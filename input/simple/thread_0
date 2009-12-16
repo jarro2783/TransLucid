@@ -1,0 +1,10 @@
+demand @ {time : 0} = “42”;;
+demand @ {time : 1} = ustring<some<text\>>>;;
+demand @ {time : 2} = '42';;
+demand @ {time : 3} = "this is a string";;
+demand @ {time : 4} = intmp<4u>;;
+demand @ {time : 5} = ustring<string with spaces>;;
+demand @ {time : 6} = inf .. inf;;
+demand @ {time : 7} = 1 .. 100;;
+demand @ {time : 8} = inf .. intmp<-50>;;
+demand @ {time : 9} = 0 .. inf;;

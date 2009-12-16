@@ -1,0 +1,6 @@
+demand @ [time : 1] = ustring<some<text\>>>;;
+demand @ [time : 2] = '42';;
+demand @ [time : 3] = "this is a string";;
+demand @ [time : 4] = intmp<4u>;;
+demand @ [time : 5] = ustring<string with spaces>;;
+demand @ [time : 6] = “42”;;

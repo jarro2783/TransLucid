@@ -1,0 +1,3 @@
+delimiters ustring<intmp> uchar<'> uchar<'>;;
+delimiters ustring<ustring> uchar<“> uchar<”>;;
+delimiters ustring<ustring> uchar<"> uchar<">;;

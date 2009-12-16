@@ -1,0 +1,11 @@
+a set is a group of values, all the values must have the same type? no.
+a general set will probably have to specify all the values, range can derive?
+from set and specifies the set as anything between to limits
+you could have some sort of other set which has groups of ranges and single
+values
+
+there are four types of sets:
+sets as containers
+sets of pairs = tuple
+sets of context - ranges, validity of definitions
+types - a type is a set of possible values

@@ -1,0 +1,11 @@
+foo @ [x : #y] = expr;;
+
+#y should be evaluated every time, as should @ [], this makes using {} more
+efficient.
+should the lhs be constant?
+could we come up with a way to determine if something is context independent 
+and not need to evaluate it afterwards?
+
+any raw int is, strings probably are except that the current way means they are still evaluated as expressions since quote pairs can occur for any type.
+
+Anything involving an operation may or may not be. Overflow etc.

@@ -1,0 +1,2 @@
+f = if #x _<_ 10 then true else false fi;;
+compten = if #x _<_ 10 then intmp<-1> elsif #x > 10 then 1 else 0 fi;;

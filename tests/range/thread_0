@@ -1,0 +1,3 @@
+demand @ [time : 1] = x @ [a : 0];;
+demand @ [time : 2] = x @ [a : 150];;
+demand @ [time : 3] = x @ [a : 202];;
