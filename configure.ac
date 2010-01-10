@@ -5,6 +5,7 @@ AC_PREREQ([2.61])
 AC_INIT([tl], [0.6.0], [jarrydb@cse.unsw.edu.au])
 AC_CONFIG_SRCDIR([src/dirsystem/main.cpp])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([dist-bzip2])
 
