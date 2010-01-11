@@ -2,224 +2,228 @@
 #define SET_EVALUATOR_HPP_INCLUDED
 
 #include <tl/interpreter.hpp>
+#include <tl/hyperdaton.hpp>
 
 namespace TransLucid {
 
    namespace SetLazyEvaluator {
 
-      class AtAbsolute : public SetEvaluator {
+      class AtAbsolute : public HD {
          public:
 
-         AtAbsolute(SetEvaluator *e2, SetEvaluator *e1)
+         AtAbsolute(HD *e2, HD *e1)
          : e2(e2), e1(e1)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
-         SetEvaluator *e2;
-         SetEvaluator *e1;
+         HD *e2;
+         HD *e1;
       };
 
-      class AtRelative : public SetEvaluator {
+      class AtRelative : public HD {
          public:
 
-         AtRelative(SetEvaluator *e2, SetEvaluator *e1)
+         AtRelative(HD *e2, HD *e1)
          : e2(e2), e1(e1)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
-         SetEvaluator *e2;
-         SetEvaluator *e1;
+         HD *e2;
+         HD *e1;
       };
 
-      class BinaryOp : public SetEvaluator {
+      class BinaryOp : public HD {
          public:
 
-         BinaryOp(const std::vector<SetEvaluator*>& operands)
+         BinaryOp(const std::vector<HD*>& operands)
          : operands(operands)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
-         std::vector<SetEvaluator*> operands;
+         std::vector<HD*> operands;
       };
 
-      class Boolean : public SetEvaluator {
+      class Boolean : public HD {
          public:
 
          Boolean(bool value)
          : m_value(value)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          bool m_value;
       };
 
-      class BuildTuple : public SetEvaluator {
+      class BuildTuple : public HD {
          public:
 
-         BuildTuple(const std::list<SetEvaluator*>& elements)
+         BuildTuple(const std::list<HD*>& elements)
          : m_elements(elements)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
-         std::list<SetEvaluator*> m_elements;
+         std::list<HD*> m_elements;
       };
 
-      class Constant : public SetEvaluator {
+      template <typename T>
+      class Constant : public HD {
          public:
+
+         typedef RawType some_crazy_MPL_thing;
 
          Constant(const ustring_t& name, const ustring_t& value)
          : m_name(name), m_value(value)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         RawType operator()(const Tuple& context);
 
          private:
          ustring_t m_name;
          ustring_t m_value;
       };
 
-      class Convert : public SetEvaluator {
+      class Convert : public HD {
          public:
-         Convert(const ustring_t& to, SetEvaluator *e)
+         Convert(const ustring_t& to, HD *e)
          : m_to(to), m_e(e)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          ustring_t m_to;
-         SetEvaluator *m_e;
+         HD *m_e;
       };
 
-      class Dimension : public SetEvaluator {
+      class Dimension : public HD {
          public:
          Dimension(const ustring_t& name)
          : m_name(name)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          ustring_t m_name;
       };
 
-      class Hash : public SetEvaluator {
+      class Hash : public HD {
          public:
-         Hash(SetEvaluator *e)
+         Hash(HD *e)
          : m_e(e)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
-         SetEvaluator *m_e;
+         HD *m_e;
       };
 
-      class Ident : public SetEvaluator {
+      class Ident : public HD {
          public:
          Ident(const ustring_t& name)
          : m_name(name)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          ustring_t m_name;
       };
 
-      class If : public SetEvaluator {
+      class If : public HD {
          public:
-         If(SetEvaluator *condition, SetEvaluator *then,
-            const std::list<SetEvaluator*>& elseifs,
-            SetEvaluator *else_)
+         If(HD *condition, HD *then,
+            const std::list<HD*>& elseifs,
+            HD *else_)
          : m_condition(condition),
          m_then(then),
          m_elseifs(elseifs),
          m_else(else_)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
-         SetEvaluator *m_condition;
-         SetEvaluator *m_then;
-         std::list<SetEvaluator*> m_elseifs;
-         SetEvaluator *m_else;
+         HD *m_condition;
+         HD *m_then;
+         std::list<HD*> m_elseifs;
+         HD *m_else;
       };
 
-      class Integer : public SetEvaluator {
+      class Integer : public HD {
          public:
          Integer(const mpz_class& value)
          : m_value(value)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          mpz_class m_value;
       };
 
-      class IsSpecial : public SetEvaluator {
+      class IsSpecial : public HD {
          public:
-         IsSpecial(const ustring_t& special, SetEvaluator *e)
+         IsSpecial(const ustring_t& special, HD *e)
          : m_special(special),
          m_e(e)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          ustring_t m_special;
-         SetEvaluator *m_e;
+         HD *m_e;
       };
 
-      class IsType : public SetEvaluator {
+      class IsType : public HD {
          public:
-         IsType(const ustring_t& type, SetEvaluator *e)
+         IsType(const ustring_t& type, HD *e)
          : m_type(type), m_e(e)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          ustring_t m_type;
-         SetEvaluator *m_e;
+         HD *m_e;
       };
 
-      class Pair : public SetEvaluator {
+      class Pair : public HD {
          public:
-         Pair(SetEvaluator *lhs, SetEvaluator *rhs)
+         Pair(HD *lhs, HD *rhs)
          : m_lhs(lhs), m_rhs(rhs)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
-         SetEvaluator *m_lhs;
-         SetEvaluator *m_rhs;
+         HD *m_lhs;
+         HD *m_rhs;
       };
 
-      class UnaryOp : public SetEvaluator {
+      class UnaryOp : public HD {
          public:
-         UnaryOp(Parser::UnaryOperation op, SetEvaluator *e)
+         UnaryOp(Parser::UnaryOperation op, HD *e)
          : m_op(op), m_e(e)
          {}
 
-         SetResult evaluate(const TupleSet& context, Interpreter& i);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          Parser::UnaryOperation m_op;
-         SetEvaluator *m_e;
+         HD *m_e;
       };
 
    }

@@ -750,8 +750,8 @@ namespace TransLucid {
       }
    };
 
-   typedef std::map<Tuple, std::set<TypedValue> > SetResult;
-   typedef std::vector<Tuple> TupleSet;
+   //typedef std::vector<Tuple> TupleSet;
+   typedef TypedValue TaggedValue;
 
 } //namespace TransLucid
 

@@ -103,6 +103,9 @@
 		<Unit filename="src/include/tl/cache.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
+		<Unit filename="src/include/tl/compiled_classes.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/constant_parser.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
@@ -128,6 +131,9 @@
 		</Unit>
 		<Unit filename="src/include/tl/expr_parser.hpp" />
 		<Unit filename="src/include/tl/header_type.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
+		<Unit filename="src/include/tl/hyperdaton.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/include/tl/interpreter.hpp">

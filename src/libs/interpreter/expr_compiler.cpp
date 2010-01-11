@@ -7,11 +7,11 @@ namespace {
 
 struct Compiled : public AST::Data {
 
-   Compiled(SetEvaluator *e)
+   Compiled(HD *e)
    : e(e)
    {}
 
-   SetEvaluator *e;
+   HD *e;
 };
 
 }

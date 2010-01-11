@@ -17,13 +17,15 @@ namespace TransLucid {
 
    class Interpreter;
 
+#if 0
    class SetEvaluator {
       public:
       virtual ~SetEvaluator() {
       }
 
-      virtual SetResult evaluate(const TupleSet& context,Interpreter& i) = 0;
+      virtual TaggedValue evaluate(const TupleSet& context,Interpreter& i) = 0;
    };
+#endif
 
    class SingleEvaluator {
    };
@@ -123,6 +125,10 @@ namespace TransLucid {
       LazyWarehouse& warehouse() {
          return m_warehouse;
       }
+
+      int add(const Tuple& context, EquationBase *e);
+
+      //int add(const Context& context,
 
       private:
       Libtool m_lt;

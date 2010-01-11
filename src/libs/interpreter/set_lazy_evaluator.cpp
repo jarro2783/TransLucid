@@ -5,51 +5,51 @@ namespace TransLucid {
 
 namespace SetLazyEvaluator {
 
-SetResult AtAbsolute::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue AtAbsolute::operator()(const Tuple& context) {
 }
 
-SetResult AtRelative::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue AtRelative::operator()(const Tuple& context) {
 }
 
-SetResult Boolean::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue Boolean::operator()(const Tuple& context) {
    //return boost::assign::list_of(ValueContext(
    //   TypedValue(TransLucid::Boolean(m_value), i.typeRegistry().indexBoolean()), Tuple()));
 }
 
-SetResult BuildTuple::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue BuildTuple::operator()(const Tuple& context) {
 }
 
-SetResult Constant::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue Constant::operator()(const Tuple& context) {
 }
 
-SetResult Convert::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue Convert::operator()(const Tuple& context) {
 }
 
-SetResult Dimension::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue Dimension::operator()(const Tuple& context) {
 }
 
-SetResult Hash::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue Hash::operator()(const Tuple& context) {
 }
 
-SetResult Ident::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue Ident::operator()(const Tuple& context) {
 }
 
-SetResult If::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue If::operator()(const Tuple& context) {
 }
 
-SetResult Integer::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue Integer::operator()(const Tuple& context) {
 }
 
-SetResult IsSpecial::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue IsSpecial::operator()(const Tuple& context) {
 }
 
-SetResult IsType::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue IsType::operator()(const Tuple& context) {
 }
 
-SetResult Pair::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue Pair::operator()(const Tuple& context) {
 }
 
-SetResult UnaryOp::evaluate(const TupleSet& context, Interpreter& i) {
+TaggedValue UnaryOp::operator()(const Tuple& context) {
 }
 
 } //namespace SetLazyEvaluator
