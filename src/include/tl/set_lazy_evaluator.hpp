@@ -75,17 +75,16 @@ namespace TransLucid {
          std::list<HD*> m_elements;
       };
 
-      template <typename T>
       class Constant : public HD {
          public:
 
-         typedef RawType some_crazy_MPL_thing;
+         //typedef RawType some_crazy_MPL_thing;
 
          Constant(const ustring_t& name, const ustring_t& value)
          : m_name(name), m_value(value)
          {}
 
-         RawType operator()(const Tuple& context);
+         TaggedValue operator()(const Tuple& context);
 
          private:
          ustring_t m_name;

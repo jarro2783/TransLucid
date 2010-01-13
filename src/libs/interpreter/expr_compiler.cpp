@@ -30,19 +30,19 @@ AST::Data *ExprCompiler::visitAtExpr(AST::AtExpr* e, AST::Data*) {
    Compiled *d2 = dynamic_cast<Compiled*>(e->e2->visit(this, 0));
    Compiled *d1 = dynamic_cast<Compiled*>(e->e1->visit(this, 0));
 
-   SetEvaluator *e1 = d1->e;
-   SetEvaluator *e2 = d2->e;
+   HD *e1 = d1->e;
+   HD *e2 = d2->e;
 
    delete d1;
    delete d2;
 
    return new Compiled(e->relative ?
-      static_cast<SetEvaluator*>(new SetLazyEvaluator::AtRelative(e2, e1)) :
-      static_cast<SetEvaluator*>(new SetLazyEvaluator::AtAbsolute(e2, e1)));
+      static_cast<HD*>(new SetLazyEvaluator::AtRelative(e2, e1)) :
+      static_cast<HD*>(new SetLazyEvaluator::AtAbsolute(e2, e1)));
 }
 
 AST::Data *ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr *e, AST::Data*) {
-   std::vector<SetEvaluator*> compiled;
+   std::vector<HD*> compiled;
    BOOST_FOREACH(AST::Expr *expr, e->operands) {
       Compiled *c = dynamic_cast<Compiled*>(expr->visit(this, 0));
       compiled.push_back(c->e);
@@ -55,7 +55,7 @@ AST::Data *ExprCompiler::visitBooleanExpr(AST::BooleanExpr* e, AST::Data*) {
 }
 
 AST::Data *ExprCompiler::visitBuildTupleExpr(AST::BuildTupleExpr* e, AST::Data*) {
-   std::list<SetEvaluator*> pairs;
+   std::list<HD*> pairs;
 
    BOOST_FOREACH(AST::Expr *pe, e->values) {
       Compiled *c = dynamic_cast<Compiled*>(pe->visit(this, 0));
@@ -84,7 +84,7 @@ AST::Data *ExprCompiler::visitDimensionExpr(AST::DimensionExpr* e, AST::Data*) {
 
 AST::Data *ExprCompiler::visitHashExpr(AST::HashExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
-   SetEvaluator *se = c->e;
+   HD *se = c->e;
    delete c;
    return new Compiled(new SetLazyEvaluator::Hash(se));
 }
@@ -98,10 +98,10 @@ AST::Data *ExprCompiler::visitIfExpr(AST::IfExpr* e, AST::Data*) {
    Compiled *thenc = 0;
    Compiled *elsec = 0;
 
-   SetEvaluator *cond = 0;
-   SetEvaluator *then = 0;
-   SetEvaluator *else_ = 0;
-   std::list<SetEvaluator*> elseifs;
+   HD *cond = 0;
+   HD *then = 0;
+   HD *else_ = 0;
+   std::list<HD*> elseifs;
 
    condc = dynamic_cast<Compiled*>(e->condition->visit(this, 0));
    thenc = dynamic_cast<Compiled*>(e->then->visit(this, 0));
@@ -131,14 +131,14 @@ AST::Data *ExprCompiler::visitIntegerExpr(AST::IntegerExpr* e, AST::Data*) {
 
 AST::Data *ExprCompiler::visitIsSpecialExpr(AST::SpecialOpsExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
-   SetEvaluator *eval = c->e;
+   HD *eval = c->e;
    delete c;
    return new Compiled(new SetLazyEvaluator::IsSpecial(e->value, eval));
 }
 
 AST::Data *ExprCompiler::visitIsTypeExpr(AST::SpecialOpsExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
-   SetEvaluator *eval = c->e;
+   HD *eval = c->e;
    delete c;
    return new Compiled(new SetLazyEvaluator::IsType(e->value, eval));
 }
@@ -147,8 +147,8 @@ AST::Data *ExprCompiler::visitPairExpr(AST::PairExpr* e, AST::Data*) {
    Compiled *lhsc = dynamic_cast<Compiled*>(e->lhs->visit(this, 0));
    Compiled *rhsc = dynamic_cast<Compiled*>(e->rhs->visit(this, 0));
 
-   SetEvaluator *lhs = lhsc->e;
-   SetEvaluator *rhs = rhsc->e;
+   HD *lhs = lhsc->e;
+   HD *rhs = rhsc->e;
 
    delete lhsc;
    delete rhsc;
@@ -161,7 +161,7 @@ AST::Data *ExprCompiler::visitRangeExpr(AST::RangeExpr*, AST::Data*) {
 
 AST::Data *ExprCompiler::visitUnaryExpr(AST::UnaryExpr* e, AST::Data*) {
    Compiled *operandc = dynamic_cast<Compiled*>(e->e->visit(this, 0));
-   SetEvaluator *operand = operandc->e;
+   HD *operand = operandc->e;
 
    delete operandc;
 
