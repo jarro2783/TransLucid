@@ -169,6 +169,10 @@ namespace TransLucid {
          return m_s < rhs.m_s;
       }
 
+      const ustring_t& value() const {
+         return m_s;
+      }
+
       private:
       ustring_t m_s;
    };

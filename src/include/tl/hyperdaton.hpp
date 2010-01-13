@@ -6,12 +6,12 @@
 
 namespace TransLucid {
 
-   class Interpreter;
-
    class HD {
       public:
       virtual ~HD() {}
       virtual TaggedValue operator()(const Tuple& k) = 0;
+
+      virtual void addExpr(const Tuple& k, AST::Expr *e) = 0;
    };
 
 } //namespace TransLucid

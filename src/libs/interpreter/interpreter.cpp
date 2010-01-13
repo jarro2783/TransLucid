@@ -5,6 +5,7 @@
 #include <glibmm/miscutils.h>
 #include <tl/range.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid {
 
@@ -12,6 +13,7 @@ Interpreter::Interpreter()
 : m_types(*this), m_evaluator(*this),
 m_maxClock(0),
 m_warehouse(*this),
+m_dimension_id(m_dimTranslator.insert("id")),
 m_verbose(false)
 {
    //m_systemParser.push(*m_systemGrammar);
@@ -83,21 +85,6 @@ void Interpreter::cleanupParserObjects() {
    m_parsers.expr_stack.clear();
 }
 
-EquationSetIterator Interpreter::equationsBegin() {
-   return EquationSetIterator(eqnSets.begin(), m_variables);
-}
-
-EquationSetIterator Interpreter::equationsEnd() {
-   return EquationSetIterator(eqnSets.end(), m_variables);
-}
-
-EquationSet Interpreter::createEquationSet(const EquationGuard& guard) {
-   boost::shared_ptr<EquationMap> p(new EquationMap);
-   EqnSetList::const_iterator inserted =
-      eqnSets.insert(eqnSets.end(), std::make_pair(guard, p));
-   return EquationSet(inserted, m_variables);
-}
-
 Tuple EquationGuard::evaluate(Interpreter& i, const Tuple& context) const
    throw (InvalidGuard)
 {
@@ -121,6 +108,29 @@ Tuple EquationGuard::evaluate(Interpreter& i, const Tuple& context) const
    }
 
    return Tuple(t);
+}
+
+void Interpreter::addExpr(const Tuple& k, AST::Expr *e) {
+   Tuple::const_iterator iter = k.find(m_dimension_id);
+   if (iter == k.end()) {
+      return;
+   }
+
+   const String *id = iter->second.valuep<String>();
+   if (id == 0) {
+      return;
+   }
+
+   SplitID split(id->value());
+
+   if (split.has_components()) {
+      //and the end to the first
+   } else {
+      //set the equation for the whole name
+   }
+}
+
+TaggedValue Interpreter::operator()(const Tuple& k) {
 }
 
 } //namespace TransLucid

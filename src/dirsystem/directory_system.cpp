@@ -90,9 +90,6 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
    files.push_back(std::make_pair(
       Glib::build_filename(pathl, "structure"), STRUCTURE));
 
-   std::vector<EquationSet> equationSets;
-   std::vector<EquationSet> threadSets;
-
    for (FileList::iterator iter = files.begin();
          iter != files.end() && success;
          ++iter)
@@ -130,7 +127,8 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                         if (eqn.first.index() == typeRegistry().indexIntmp()) {
                            const Intmp& value = eqn.first.value<Intmp>();
                            files.push_back(std::make_pair(namePre + value.value().get_str(), EQNS));
-                           equationSets.push_back(createEquationSet(e.get<1>()));
+                           #warning add the equation to the system
+                           //equationSets.push_back(createEquationSet(e.get<1>()));
                         }
                      }
                   }
@@ -162,7 +160,8 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                   std::ifstream is(file.c_str());
                   if (is) {
                      files.push_back(std::make_pair(file, THREAD));
-                     threadSets.push_back(createEquationSet(EquationGuard()));
+                     #warning add demand to system
+                     //threadSets.push_back(createEquationSet(EquationGuard()));
                   } else {
                      throw std::string("Could not open ") + file;
                   }
@@ -174,6 +173,7 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                //addParsedEquationSet(m_parseInfo.equations);
                //m_parseInfo.equations.clear();
                {
+                  #if 0
                   EquationSet& es = equationSets.at(currentEqn);
                   BOOST_FOREACH(
                      const Parser::equation_t& e,
@@ -183,11 +183,15 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                         Equation(e.get<0>(), e.get<1>(), new ASTEquation(e.get<2>())));
                   }
                   ++currentEqn;
+                  #endif
+                  #warning have to completely redo this
                }
                break;
 
                case THREAD:
                {
+                  #warning have to completely redo this
+                  #if 0
                   EquationSet& es = threadSets.at(currentThread);
                   BOOST_FOREACH(const Parser::equation_t& e,
                      eHolder.equations())
@@ -196,6 +200,7 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                         Equation(e.get<0>(), e.get<1>(), new ASTEquation(e.get<2>())));
                   }
                   ++currentThread;
+                  #endif
                }
                break;
 

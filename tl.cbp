@@ -171,6 +171,9 @@
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
 		</Unit>
+		<Unit filename="src/include/tl/utility.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/interactive/interactive.cpp">
 			<Option target="interactive" />
 		</Unit>

@@ -11,27 +11,6 @@ ValueContext ASTEquation::evaluate(Interpreter& i, const Tuple& context) {
 EquationBase::~EquationBase() {
 }
 
-void EquationSet::addEquation(const Equation& e) {
-   (*m_set->second)[e.name()].push_back(
-      std::make_pair(e.validContext(), e.equation()));
-
-   EquationMap::const_iterator iter;
-   VariableMap::const_iterator varIter = m_variables->find(e.name());
-   if (varIter == m_variables->end()) {
-      Variable *v = 0;
-      try {
-         v = new Variable(e.name());
-         m_variables->insert(std::make_pair(e.name(), v));
-      } catch (...) {
-         delete v;
-         throw;
-      }
-      v->addSet(m_set, m_set->second->find(e.name()));
-   } else {
-      varIter->second->addSet(m_set, m_set->second->find(e.name()));
-   }
-}
-
 void Variable::addSet(EqnSetList::const_iterator guard,
    EquationMap::const_iterator set)
 {
@@ -134,7 +113,7 @@ bool Variable::booleanTrue(Interpreter& i, const EquationGuard& g, const Tuple& 
    }
 }
 
-ValueContext Variable::evaluate(Interpreter& i, const Tuple& c) {
+TaggedValue Variable::operator()(const Tuple& k) {
 
    //std::cout << "evaluating variable " << m_name << ", context: " << std::endl;
    //c.print(i, std::cout, c);
@@ -153,7 +132,7 @@ ValueContext Variable::evaluate(Interpreter& i, const Tuple& c) {
       bool setValid = true;
       if (guard) {
          try {
-            setValid = tupleApplicable(i, guard.evaluate(i, c), c);
+            setValid = tupleApplicable(m_i, guard.evaluate(m_i, k), k);
          } catch (InvalidGuard& e) {
             setValid = false;
          }
@@ -170,10 +149,10 @@ ValueContext Variable::evaluate(Interpreter& i, const Tuple& c) {
             if (vec_i->first) {
                try {
                   Tuple evalContext =
-                     vec_i->first.evaluate(i, c);
+                     vec_i->first.evaluate(m_i, k);
                   //std::cout << "guard:" << std::endl;
-                  //evalContext.print(i, std::cout, c);
-                  if (tupleApplicable(i, evalContext, c) && booleanTrue(i, vec_i->first, c)) {
+                  //evalContext.print(m_i, std::cout, c);
+                  if (tupleApplicable(m_i, evalContext, k) && booleanTrue(m_i, vec_i->first, k)) {
                      applicable.push_back(
                         ApplicableTuple(evalContext, vec_i->second));
                   }
@@ -189,13 +168,11 @@ ValueContext Variable::evaluate(Interpreter& i, const Tuple& c) {
    }
 
    if (applicable.size() == 0) {
-      return ValueContext(
-         TypedValue(
-            Special(Special::UNDEF),
-            i.typeRegistry().indexSpecial()),
-         c);
+      return TypedValue(
+         Special(Special::UNDEF),
+         m_i.typeRegistry().indexSpecial());
    } else if (applicable.size() == 1) {
-      return applicable.front().get<1>()->evaluate(i, c);
+      return applicable.front().get<1>()->evaluate(m_i, k).first;
    }
 
    applicable_list::const_iterator bestIter = applicable.end();
@@ -206,42 +183,42 @@ ValueContext Variable::evaluate(Interpreter& i, const Tuple& c) {
    {
       if (bestIter == applicable.end()) {
          bestIter = iter;
-      } else if (tupleRefines(i, iter->get<0>(), bestIter->get<0>())) {
+      } else if (tupleRefines(m_i, iter->get<0>(), bestIter->get<0>())) {
          bestIter = iter;
-      } else if (!tupleRefines(i, bestIter->get<0>(), iter->get<0>())) {
+      } else if (!tupleRefines(m_i, bestIter->get<0>(), iter->get<0>())) {
          bestIter = applicable.end();
       }
    }
 
    if (bestIter == applicable.end()) {
-      return ValueContext(
-         TypedValue(
-            Special(Special::UNDEF),
-            i.typeRegistry().indexSpecial()),
-         c);
+      return TypedValue(
+         Special(Special::UNDEF),
+         m_i.typeRegistry().indexSpecial());
    }
 
    for (applicable_list::const_iterator iter = applicable.begin();
       iter != applicable.end(); ++iter)
    {
       if (bestIter->get<1>() != iter->get<1>() &&
-         !tupleRefines(i, bestIter->get<0>(), iter->get<0>()))
+         !tupleRefines(m_i, bestIter->get<0>(), iter->get<0>()))
       {
-         return ValueContext(
-            TypedValue(
-               Special(Special::MULTIDEF),
-               i.typeRegistry().indexSpecial()),
-            c);
+         return TypedValue(
+            Special(Special::MULTIDEF),
+            m_i.typeRegistry().indexSpecial());
       }
    }
 
-   return bestIter->get<1>()->evaluate(i, c);
+   #warning need to make this the correct value
+   //return bestIter->get<1>()->evaluate(m_i, c);
 
    //return ValueContext(
    //   TypedValue(
    //      Special(Special::ERROR),
-   //      i.typeRegistry().indexSpecial()),
+   //      m_i.typeRegistry().indexSpecial()),
    //   c);
+}
+
+void Variable::addExpr(const Tuple& k, AST::Expr *e) {
 }
 
 }

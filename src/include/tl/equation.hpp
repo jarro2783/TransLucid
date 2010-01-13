@@ -6,6 +6,7 @@
 #include <tl/exception.hpp>
 #include <list>
 #include <deque>
+#include <tl/hyperdaton.hpp>
 
 namespace TransLucid {
 
@@ -168,129 +169,18 @@ namespace TransLucid {
       EquationBase *m_e;
    };
 
-   class EquationIterator {
-      public:
-      EquationIterator(boost::shared_ptr<const EquationMap> m)
-      : m_map(m), m_outer(m->begin())
-      {
-         if (m_outer != m_map->end()) {
-            m_inner = m_outer->second.begin();
-         }
-      }
-
-      EquationIterator(
-         boost::shared_ptr<const EquationMap> m,
-         EquationMap::const_iterator start)
-      : m_map(m), m_outer(start)
-      {
-         if (m_outer != m_map->end()) {
-            m_inner = m_outer->second.begin();
-         }
-      }
-
-      Equation operator*() const {
-         return Equation(m_outer->first, m_inner->first, m_inner->second);
-      }
-
-      EquationIterator& operator++() {
-         increment();
-         return *this;
-      }
-
-      EquationIterator operator++(int) {
-         EquationIterator ret(*this);
-         increment();
-         return ret;
-      }
-
-      private:
-      typedef EquationMap::const_iterator outer;
-      typedef expr_pair_v::const_iterator inner;
-      boost::shared_ptr<const EquationMap> m_map;
-      outer m_outer;
-      inner m_inner;
-
-      void increment() {
-         ++m_inner;
-         if (m_inner == m_outer->second.end()) {
-            ++m_outer;
-            if (m_outer != m_map->end()) {
-               m_inner = m_outer->second.begin();
-            }
-         }
-      }
-   };
-
-   class EquationSet {
-      public:
-
-      typedef EquationIterator const_iterator;
-
-      EquationSet(
-         EqnSetList::const_iterator setIter,
-         VariableMap& variables)
-      : m_set(setIter),
-      m_variables(&variables)
-      {}
-
-      void addEquation(const Equation& e);
-
-      const EquationGuard& validContext() const {
-         return m_set->first;
-      }
-
-      const_iterator begin() {
-         return const_iterator(m_set->second);
-      }
-
-      const_iterator end() {
-         return const_iterator(m_set->second, m_set->second->end());
-      }
-
-      private:
-      EqnSetList::const_iterator m_set;
-      VariableMap *m_variables;
-   };
-
-   class EquationSetIterator {
-      public:
-
-      EquationSetIterator(EqnSetList::iterator begin,
-         VariableMap& variables)
-      : m_current(begin), m_variables(variables)
-      {
-      }
-
-      EquationSet operator*() const {
-         return EquationSet(m_current, m_variables);
-      }
-
-      EquationSetIterator& operator++() {
-         ++m_current;
-         return *this;
-      }
-
-      EquationSetIterator operator++(int) {
-         EquationSetIterator ret(*this);
-         ++m_current;
-         return ret;
-      }
-
-      private:
-      EqnSetList::iterator m_current;
-      VariableMap& m_variables;
-   };
-
    //represents all definitions of a variable, is responsible for
    //JIT and best fitting
-   class Variable {
+   class Variable : public HD {
       public:
 
-      Variable(const ustring_t& name)
-      : m_name(name)
+      Variable(const ustring_t& name, Interpreter& i)
+      : m_name(name), m_i(i)
       {}
 
-      ValueContext evaluate(Interpreter& i, const Tuple& context);
+      TaggedValue operator()(const Tuple& k);
+
+      void addExpr(const Tuple& k, AST::Expr *e);
 
       void added();
       void removed();
@@ -312,8 +202,11 @@ namespace TransLucid {
          Equations;
 
       Equations m_e;
-      ustring_t m_name;
 
+      std::list<Equation> m_equations;
+
+      ustring_t m_name;
+      Interpreter& m_i;
    };
 };
 

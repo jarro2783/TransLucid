@@ -12,6 +12,7 @@
 #include <boost/assign.hpp>
 #include <tl/cache.hpp>
 #include <tl/equation.hpp>
+#include <tl/hyperdaton.hpp>
 
 namespace TransLucid {
 
@@ -35,7 +36,7 @@ namespace TransLucid {
     *
     * Holds all the data necessary for an interpreter.
     **/
-   class Interpreter {
+   class Interpreter : public HD {
       public:
 
       Interpreter();
@@ -95,11 +96,6 @@ namespace TransLucid {
          m_verbose = v;
       }
 
-      EquationSet createEquationSet(const EquationGuard& guard);
-
-      EquationSetIterator equationsBegin();
-      EquationSetIterator equationsEnd();
-
       Parser::Parsers& parsers() {
          return m_parsers;
       }
@@ -126,7 +122,9 @@ namespace TransLucid {
          return m_warehouse;
       }
 
-      int add(const Tuple& context, EquationBase *e);
+      TaggedValue operator()(const Tuple& k);
+
+      void addExpr(const Tuple& k, AST::Expr *e);
 
       //int add(const Context& context,
 
@@ -144,6 +142,8 @@ namespace TransLucid {
       //std::vector<std::pair<AST::Expr*, std::map<ustring_t, std::vector<std::pair<AST::Expr*, AST::Expr*> > > >
       EqnSetList eqnSets;
 
+      std::map<ustring_t, HD*> m_equations;
+
       //everything related to the parser
       void initExprParser();
       void cleanupExprParser();
@@ -157,7 +157,8 @@ namespace TransLucid {
       Parser::ConstantGrammar *m_constantGrammar;
       VariableMap m_variables;
 
-      //Parser::ParserStack m_systemParser;
+      //special dimensions
+      size_t m_dimension_id;
 
       protected:
       Parser::Header m_parseInfo;

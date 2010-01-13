@@ -58,7 +58,7 @@ namespace TransLucid {
 
             if (v) {
                //*out = e.equation()->evaluate(*this, c);
-               *out = v->evaluate(*this, c);
+               *out = ValueContext((*v)(c), c);
             } else {
                *out = ValueContext(TypedValue(Special(Special::UNDEF), typeRegistry().indexSpecial()), c);
             }

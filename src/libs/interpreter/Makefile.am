@@ -12,8 +12,8 @@ interpreter_tuple.cpp interpreter_constant.cpp \
 library.cpp types.cpp \
 dimtranslator.cpp \
 range.cpp evaluator.cpp expr.cpp  parser.cpp \
-builtin_types.cpp header_type.cpp equation.cpp expr_compiler.cpp \
-set_lazy_evaluator.cpp cache.cpp
+builtin_types.cpp header_type.cpp equation.cpp \
+cache.cpp
 
 libtlinterpreter_la_CPPFLAGS = $(GLIBMM_CFLAGS) -I$(top_srcdir)/src/include \
 -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS)

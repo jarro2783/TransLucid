@@ -365,7 +365,9 @@ Data *Evaluator::visitIdentExpr(IdentExpr* e, Data *d) {
       Variable *v = m_interpreter.lookupVariable(e->id);
 
       if (v) {
-         ValueContext vc = v->evaluate(m_interpreter, c->c);
+         ValueContext vc;
+         vc.first = (*v)(c->c);
+         vc.second = c->c;
          m_interpreter.warehouse().add(e->id, vc.first, c->c);
          return new ValueV(vc);
       } else {
