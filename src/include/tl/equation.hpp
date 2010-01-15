@@ -119,7 +119,7 @@ namespace TransLucid {
    typedef std::deque<std::pair<EquationGuard, EquationMap_p> > EqnSetList;
 
    class Variable;
-   typedef std::map<ustring_t, Variable*> VariableMap;
+   typedef std::map<ustring_t, HD*> VariableMap;
 
    class ASTEquation : public EquationBase {
       public:
@@ -195,6 +195,8 @@ namespace TransLucid {
       bool valueRefines(const Interpreter& i, const TypedValue& a, const TypedValue& b) const;
       bool booleanTrue(Interpreter& i, const EquationGuard& g, const Tuple& c) const;
 
+      void addExprActual(const Tuple& k, AST::Expr *e);
+
       //guard -> equations
       typedef std::map<
          EqnSetList::const_iterator, EquationMap::const_iterator
@@ -204,6 +206,7 @@ namespace TransLucid {
       Equations m_e;
 
       std::list<Equation> m_equations;
+      VariableMap m_variables;
 
       ustring_t m_name;
       Interpreter& m_i;

@@ -130,6 +130,7 @@ typedef InternalManager<Dimension> DimensionManager;
 typedef EagerManager<String> StringManager;
 typedef InternalManager<ValueCalc> CalcManager;
 typedef EagerManager<Char> CharManager;
+typedef InternalManager<EquationGuardType> EquationGuardManager;
 
 TypeRegistry::TypeRegistry(Interpreter& i)
 : m_nextIndex(1), m_indexError(0), m_interpreter(i)
@@ -160,6 +161,8 @@ TypeRegistry::TypeRegistry(Interpreter& i)
    m_indexCalc = m->index();
    m = new CharManager(*this, "uchar");
    m_indexChar = m->index();
+   m = new EquationGuardManager(*this, "_eguard");
+   m_indexGuard = m->index();
 
    new HeaderManager<HeaderType::DIRECT>(*this);
 }

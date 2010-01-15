@@ -157,12 +157,13 @@ namespace TLInteractive {
          }
 
          TL::Parser::equation_v *equations;
-         TL::EquationSet equationSet;
+         //TL::EquationSet equationSet;
 
+         #warning need to fix this
          void postParseEquations() {
             BOOST_FOREACH(const TL::Parser::equation_t& e, *equations) {
-               equationSet.addEquation(
-                  TL::Equation(e.get<0>(), e.get<1>(), new TL::ASTEquation(e.get<2>())));
+               //equationSet.addEquation(
+               //   TL::Equation(e.get<0>(), e.get<1>(), new TL::ASTEquation(e.get<2>())));
             }
          }
       };

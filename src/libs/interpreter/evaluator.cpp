@@ -362,12 +362,13 @@ Data *Evaluator::visitIdentExpr(IdentExpr* e, Data *d) {
 
    } else {
 
-      Variable *v = m_interpreter.lookupVariable(e->id);
+      //Variable *v = m_interpreter.lookupVariable(e->id);
+      #warning interpreter.get
+
+      Variable *v = 0;
 
       if (v) {
-         ValueContext vc;
-         vc.first = (*v)(c->c);
-         vc.second = c->c;
+         ValueContext vc = (*v)(c->c);
          m_interpreter.warehouse().add(e->id, vc.first, c->c);
          return new ValueV(vc);
       } else {

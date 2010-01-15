@@ -74,6 +74,8 @@ namespace TransLucid {
       class Expr;
    }
 
+   //class EquationGuard;
+
    typedef uint16_t type_index;
    typedef Glib::ustring ustring_t;
 
@@ -577,6 +579,7 @@ namespace TransLucid {
       type_index m_indexString;
       type_index m_indexChar;
       type_index m_indexCalc;
+      type_index m_indexGuard;
 
       OpFunction makeOpTypeError;
       TypedValue makeOpTypeErrorActual(const TypeManager *special);
@@ -751,7 +754,7 @@ namespace TransLucid {
    };
 
    //typedef std::vector<Tuple> TupleSet;
-   typedef TypedValue TaggedValue;
+   typedef ValueContext TaggedValue;
 
 } //namespace TransLucid
 

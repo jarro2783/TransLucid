@@ -1,3 +1,5 @@
+#if 0
+
 #ifdef TL_DEBUG
    #define BOOST_SPIRIT_DEBUG
 #endif
@@ -224,3 +226,5 @@ void System::parseHeader(const std::string& file) {
 }
 
 }
+
+#endif

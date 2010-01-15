@@ -9,6 +9,34 @@
 
 namespace TransLucid {
 
+inline void Interpreter::addToVariableActual(const ustring_t& id,
+   const Tuple& k, AST::Expr *e)
+{
+   //find the variable
+   VariableMap::const_iterator iter = m_variables.find(id);
+   if (iter == m_variables.end()) {
+      iter = m_variables.insert(std::make_pair(id, new Variable(id, *this))).first;
+      iter->second->addExpr(k, e);
+   }
+}
+
+inline void Interpreter::addToVariable(const ustring_t& id,
+   const ustring_t& remaining, const Tuple& k, AST::Expr *e)
+{
+   tuple_t kp = k.tuple();
+   kp[m_dimension_id] = TypedValue(String(remaining),
+      m_types.indexString());
+   addToVariableActual(id, Tuple(kp), e);
+}
+
+inline void Interpreter::addToVariable(const ustring_t& id,
+   const Tuple& k, AST::Expr *e)
+{
+   tuple_t kp = k.tuple();
+   kp.erase(m_dimension_id);
+   addToVariableActual(id, Tuple(kp), e);
+}
+
 Interpreter::Interpreter()
 : m_types(*this), m_evaluator(*this),
 m_maxClock(0),
@@ -124,9 +152,11 @@ void Interpreter::addExpr(const Tuple& k, AST::Expr *e) {
    SplitID split(id->value());
 
    if (split.has_components()) {
-      //and the end to the first
+      //set the equation for the first component
+      addToVariable(split.first(), split.last(), k, e);
    } else {
       //set the equation for the whole name
+      addToVariable(id->value(), k, e);
    }
 }
 

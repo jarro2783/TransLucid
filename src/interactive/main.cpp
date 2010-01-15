@@ -1,11 +1,18 @@
+
+#if 0
 #include "interactive.hpp"
 #include <tl/interpreter.hpp>
 #include <boost/program_options.hpp>
+
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 namespace po = boost::program_options;
+#endif
 
 int main(int argc, char *argv[]) {
+   #if 0
    setlocale(LC_ALL, "");
 
    TLInteractive::System system;
@@ -28,5 +35,7 @@ int main(int argc, char *argv[]) {
    std::cout << "TransLucid " PACKAGE_VERSION << std::endl;
 
    system.run();
+   #endif
+   #warning fix interactive
    return 0;
 }

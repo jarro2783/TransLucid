@@ -11,9 +11,7 @@ namespace TLInteractive {
       public:
 
       System()
-      :
-      demands(createEquationSet(TL::EquationGuard())),
-      time(0)
+      : time(0)
       {
          TL::Parser::addSymbol(
             L"demand",
@@ -29,7 +27,7 @@ namespace TLInteractive {
       void postInputSignal(std::vector<TL::AST::Expr*> const& e);
       void postEqnSignal(TL::Parser::equation_v& eqns);
       std::string m_header;
-      TL::EquationSet demands;
+      //TL::EquationSet demands;
 
       size_t time;
    };

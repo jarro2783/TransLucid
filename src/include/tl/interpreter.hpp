@@ -107,10 +107,12 @@ namespace TransLucid {
          const P& parser,
          const ustring_t& name = ustring_t());
 
-      Variable *lookupVariable(const ustring_t& name) {
+      #if 0
+      HD *lookupVariable(const ustring_t& name) {
          VariableMap::const_iterator iter = m_variables.find(name);
          return iter != m_variables.end() ? iter->second : 0;
       }
+      #endif
 
       void listVariables() {
          BOOST_FOREACH(const VariableMap::value_type& v, m_variables) {
@@ -142,8 +144,6 @@ namespace TransLucid {
       //std::vector<std::pair<AST::Expr*, std::map<ustring_t, std::vector<std::pair<AST::Expr*, AST::Expr*> > > >
       EqnSetList eqnSets;
 
-      std::map<ustring_t, HD*> m_equations;
-
       //everything related to the parser
       void initExprParser();
       void cleanupExprParser();
@@ -159,6 +159,16 @@ namespace TransLucid {
 
       //special dimensions
       size_t m_dimension_id;
+
+      //adds to id with remaining in the id dimension
+      void addToVariable(const ustring_t& id, const ustring_t& remaining,
+         const Tuple& k, AST::Expr *e);
+      //adds to id removing id from the context
+      void addToVariable(const ustring_t& id,
+         const Tuple& k, AST::Expr *e);
+      //does the actual add
+      void addToVariableActual(const ustring_t& id,
+         const Tuple& k, AST::Expr *e);
 
       protected:
       Parser::Header m_parseInfo;

@@ -54,11 +54,12 @@ namespace TransLucid {
             Tuple c(tuple);
 
             //Equation e = findEquation("demand", c);
-            Variable *v = lookupVariable("demand");
+            //Variable *v = lookupVariable("demand");
+            Variable *v = 0;
 
             if (v) {
                //*out = e.equation()->evaluate(*this, c);
-               *out = ValueContext((*v)(c), c);
+               *out = (*v)(c);
             } else {
                *out = ValueContext(TypedValue(Special(Special::UNDEF), typeRegistry().indexSpecial()), c);
             }

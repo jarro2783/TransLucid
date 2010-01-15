@@ -1,8 +1,13 @@
 #include <tl/equation.hpp>
 #include <tl/interpreter.hpp>
 #include <tl/range.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid {
+
+inline void Variable::addExprActual(const Tuple& k, AST::Expr *e) {
+   //m_e.push_back
+}
 
 ValueContext ASTEquation::evaluate(Interpreter& i, const Tuple& context) {
    return i.evaluate(m_e, context);
@@ -168,11 +173,11 @@ TaggedValue Variable::operator()(const Tuple& k) {
    }
 
    if (applicable.size() == 0) {
-      return TypedValue(
+      return TaggedValue(TypedValue(
          Special(Special::UNDEF),
-         m_i.typeRegistry().indexSpecial());
+         m_i.typeRegistry().indexSpecial()),k);
    } else if (applicable.size() == 1) {
-      return applicable.front().get<1>()->evaluate(m_i, k).first;
+      return applicable.front().get<1>()->evaluate(m_i, k);
    }
 
    applicable_list::const_iterator bestIter = applicable.end();
@@ -191,9 +196,9 @@ TaggedValue Variable::operator()(const Tuple& k) {
    }
 
    if (bestIter == applicable.end()) {
-      return TypedValue(
+      return TaggedValue(TypedValue(
          Special(Special::UNDEF),
-         m_i.typeRegistry().indexSpecial());
+         m_i.typeRegistry().indexSpecial()), k);
    }
 
    for (applicable_list::const_iterator iter = applicable.begin();
@@ -202,9 +207,9 @@ TaggedValue Variable::operator()(const Tuple& k) {
       if (bestIter->get<1>() != iter->get<1>() &&
          !tupleRefines(m_i, bestIter->get<0>(), iter->get<0>()))
       {
-         return TypedValue(
+         return TaggedValue(TypedValue(
             Special(Special::MULTIDEF),
-            m_i.typeRegistry().indexSpecial());
+            m_i.typeRegistry().indexSpecial()), k);
       }
    }
 
@@ -219,6 +224,35 @@ TaggedValue Variable::operator()(const Tuple& k) {
 }
 
 void Variable::addExpr(const Tuple& k, AST::Expr *e) {
+   size_t dim_id = m_i.dimTranslator().lookup("id");
+   Tuple::const_iterator iter = k.find(dim_id);
+   if (iter == k.end()) {
+      addExprActual(k, e);
+   } else {
+      const String *id = iter->second.valuep<String>();
+      if (id == 0) {
+         return;
+      }
+
+      SplitID split(id->value());
+
+      //add the equation, don't add any id dimension if the end is empty
+      ustring_t begin = split.first();
+      ustring_t end = split.last();
+
+      tuple_t kp = k.tuple();
+      if (end.size() != 0) {
+         kp[dim_id] = TypedValue(String(end), m_i.typeRegistry().indexString());
+      } else {
+         kp.erase(dim_id);
+      }
+
+      VariableMap::iterator viter = m_variables.find(begin);
+      if (viter == m_variables.end()) {
+         viter = m_variables.insert(std::make_pair(begin, new Variable(begin, m_i))).first;
+      }
+      viter->second->addExpr(Tuple(kp), e);
+   }
 }
 
 }

@@ -256,6 +256,9 @@
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
 		</Unit>
+		<Unit filename="src/libs/interpreter/utility.cpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/libs/printer/printer.cpp">
 			<Option target="libprinter" />
 			<Option target="interactive" />

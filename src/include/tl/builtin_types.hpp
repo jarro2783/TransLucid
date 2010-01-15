@@ -2,6 +2,7 @@
 #define BUILTIN_TYPES_HPP_INCLUDED
 
 #include <tl/types.hpp>
+#include <tl/equation.hpp>
 
 namespace TransLucid {
 
@@ -348,6 +349,14 @@ namespace TransLucid {
 
       private:
       gunichar m_c;
+   };
+
+   class EquationGuardType : public TypedValueBase {
+      public:
+      EquationGuardType();
+
+      private:
+      EquationGuard m_g;
    };
 }
 

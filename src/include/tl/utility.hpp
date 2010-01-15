@@ -38,8 +38,6 @@ namespace TransLucid {
          return ustring_t(m_end, m_s.end());
       }
    };
-
-   const ustring_t SplitID::m_split_match = ".";
 }
 
 #endif // UTILITY_HPP_INCLUDED
