@@ -185,9 +185,6 @@ namespace TransLucid {
       void added();
       void removed();
 
-      void addSet(EqnSetList::const_iterator guard,
-         EquationMap::const_iterator set);
-
       private:
 
       bool tupleApplicable(const Interpreter& i, const Tuple& def, const Tuple& c) const;
@@ -197,15 +194,8 @@ namespace TransLucid {
 
       void addExprActual(const Tuple& k, AST::Expr *e);
 
-      //guard -> equations
-      typedef std::map<
-         EqnSetList::const_iterator, EquationMap::const_iterator
-         >
-         Equations;
-
-      Equations m_e;
-
-      std::list<Equation> m_equations;
+      typedef std::list<Equation> Equations;
+      Equations m_equations;
       VariableMap m_variables;
 
       ustring_t m_name;

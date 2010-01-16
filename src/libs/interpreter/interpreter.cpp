@@ -50,6 +50,7 @@ m_verbose(false)
    initConstantParser();
    m_dimTranslator.insert("time");
    m_dimTranslator.insert("priority");
+   m_dimTranslator.insert("_validguard");
    Parser::addSymbol(L"time", m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
 }
 
@@ -161,6 +162,24 @@ void Interpreter::addExpr(const Tuple& k, AST::Expr *e) {
 }
 
 TaggedValue Interpreter::operator()(const Tuple& k) {
+   //the interpreter understands requests for an id
+   //therefore, look for an id and evaluate it
+   Tuple::const_iterator iditer = k.find(m_dimension_id);
+
+   if (iditer == k.end()) {
+      return TaggedValue(TypedValue(Special(Special::DIMENSION), m_types.indexSpecial()), k);
+   }
+
+   try {
+      VariableMap::const_iterator viter = m_variables.find(iditer->second.value<String>().value());
+      if (viter == m_variables.end()) {
+         return TaggedValue(TypedValue(Special(Special::UNDEF), m_types.indexSpecial()), k);
+      } else {
+         return (*viter->second)(k);
+      }
+   } catch (std::bad_cast& e) {
+      return TaggedValue(TypedValue(Special(Special::DIMENSION), m_types.indexSpecial()), k);
+   }
 }
 
 } //namespace TransLucid

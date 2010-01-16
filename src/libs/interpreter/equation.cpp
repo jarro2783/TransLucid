@@ -26,14 +26,6 @@ ValueContext ASTEquation::evaluate(Interpreter& i, const Tuple& context) {
 EquationBase::~EquationBase() {
 }
 
-void Variable::addSet(EqnSetList::const_iterator guard,
-   EquationMap::const_iterator set)
-{
-   if (m_e.find(guard) == m_e.end()) {
-      m_e.insert(std::make_pair(guard, set));
-   }
-}
-
 bool Variable::tupleApplicable(const Interpreter& i, const Tuple& def, const Tuple& c) const {
    //all of def has to be in c, and the values have to either be
    //equal or within the range
@@ -138,47 +130,27 @@ TaggedValue Variable::operator()(const Tuple& k) {
    applicable_list applicable;
 
    //find all the applicable ones
-   for (Equations::const_iterator set_i = m_e.begin();
-      set_i != m_e.end();
-      ++set_i)
+
+   for (Equations::const_iterator eqn_i = m_equations.begin();
+      eqn_i != m_equations.end();
+      ++eqn_i)
    {
-      const EquationGuard& guard = set_i->first->first;
-
-      bool setValid = true;
-      if (guard) {
+      if (eqn_i->validContext()) {
          try {
-            setValid = tupleApplicable(m_i, guard.evaluate(m_i, k), k);
-         } catch (InvalidGuard& e) {
-            setValid = false;
-         }
-      }
-      if (setValid) {
-         //go through each equation and see what is applicable
-         //EquationMap::const_iterator map_i = set_i->second->find(name);
-         EquationMap::const_iterator map_i = set_i->second;
-
-         for (expr_pair_v::const_iterator vec_i = map_i->second.begin();
-            vec_i != map_i->second.end();
-            ++vec_i)
-         {
-            if (vec_i->first) {
-               try {
-                  Tuple evalContext =
-                     vec_i->first.evaluate(m_i, k);
-                  //std::cout << "guard:" << std::endl;
-                  //evalContext.print(m_i, std::cout, c);
-                  if (tupleApplicable(m_i, evalContext, k) && booleanTrue(m_i, vec_i->first, k)) {
-                     applicable.push_back(
-                        ApplicableTuple(evalContext, vec_i->second));
-                  }
-               } catch (InvalidGuard& e) {
-               }
-            } else {
+            const EquationGuard& guard = eqn_i->validContext();
+            Tuple evalContext = guard.evaluate(m_i, k);
+            //std::cout << "guard:" << std::endl;
+            //evalContext.print(m_i, std::cout, c);
+            if (tupleApplicable(m_i, evalContext, k) && booleanTrue(m_i, guard, k)) {
                applicable.push_back(
-                  ApplicableTuple(
-                     Tuple(), vec_i->second));
+                  ApplicableTuple(evalContext, eqn_i->equation()));
             }
+         } catch (InvalidGuard& e) {
          }
+      } else {
+         applicable.push_back(
+            ApplicableTuple(
+               Tuple(), eqn_i->equation()));
       }
    }
 
