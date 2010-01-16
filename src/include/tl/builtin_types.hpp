@@ -353,7 +353,13 @@ namespace TransLucid {
 
    class EquationGuardType : public TypedValueBase {
       public:
-      EquationGuardType();
+      EquationGuardType(const EquationGuard& g)
+      : m_g(g)
+      {}
+
+      const EquationGuard& value() const {
+         return m_g;
+      }
 
       private:
       EquationGuard m_g;

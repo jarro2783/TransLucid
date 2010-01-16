@@ -6,7 +6,17 @@
 namespace TransLucid {
 
 inline void Variable::addExprActual(const Tuple& k, AST::Expr *e) {
-   //m_e.push_back
+   const EquationGuard *g = 0;
+   Tuple::const_iterator giter = k.find(m_i.dimTranslator().lookup("_validguard"));
+   if (giter != k.end()) {
+      g = &giter->second.value<EquationGuardType const&>().value();
+   }
+
+   if (g) {
+      m_equations.push_back(Equation(m_name, *g, new ASTEquation(e)));
+   } else {
+      m_equations.push_back(Equation(m_name, EquationGuard(), new ASTEquation(e)));
+   }
 }
 
 ValueContext ASTEquation::evaluate(Interpreter& i, const Tuple& context) {
