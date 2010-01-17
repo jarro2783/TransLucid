@@ -12,12 +12,15 @@ namespace TransLucid {
 inline void Interpreter::addToVariableActual(const ustring_t& id,
    const Tuple& k, AST::Expr *e)
 {
+   //std::cerr << "addToVariableActual: " <<
+   //   id << std::endl;
    //find the variable
    VariableMap::const_iterator iter = m_variables.find(id);
    if (iter == m_variables.end()) {
+      //std::cerr << "constructing new variable" << std::endl;
       iter = m_variables.insert(std::make_pair(id, new Variable(id, *this))).first;
-      iter->second->addExpr(k, e);
    }
+   iter->second->addExpr(k, e);
 }
 
 inline void Interpreter::addToVariable(const ustring_t& id,
@@ -167,6 +170,7 @@ TaggedValue Interpreter::operator()(const Tuple& k) {
    Tuple::const_iterator iditer = k.find(m_dimension_id);
 
    if (iditer == k.end()) {
+      //std::cerr << "could not find id dimension " << std::endl;
       return TaggedValue(TypedValue(Special(Special::DIMENSION), m_types.indexSpecial()), k);
    }
 

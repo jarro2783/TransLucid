@@ -46,15 +46,20 @@ namespace TransLucid {
          //listVariables();
 
          size_t dimTime = dimTranslator().lookup("time");
+         size_t dim_id = dimTranslator().lookup("id");
+         TypedValue demandString(String("demand"), typeRegistry().indexString());
 
          //evaluate from time 1 to end
          for (size_t time = 1; time <= m_maxClock; ++time) {
             //just do one thread
-            tuple_t tuple = map_list_of(dimTime, TypedValue(Intmp(time), typeRegistry().indexIntmp()));
+            tuple_t tuple = map_list_of(dimTime, TypedValue(Intmp(time), typeRegistry().indexIntmp()))
+            (dim_id, demandString);
             Tuple c(tuple);
 
             //Equation e = findEquation("demand", c);
             //Variable *v = lookupVariable("demand");
+            *out = Interpreter::operator()(c);
+            #if 0
             Variable *v = 0;
 
             if (v) {
@@ -63,6 +68,7 @@ namespace TransLucid {
             } else {
                *out = ValueContext(TypedValue(Special(Special::UNDEF), typeRegistry().indexSpecial()), c);
             }
+            #endif
             ++out;
          }
       }

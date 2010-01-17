@@ -134,6 +134,8 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                      k.insert(std::make_pair(dim_valid,
                         TypedValue(EquationGuardType(e.get<1>()),
                            typeRegistry().indexGuard())));
+                     //std::cerr << "adding equation " << ustring_t(e.get<0>()) << std::endl;
+                     addExpr(Tuple(k), e.get<2>());
                   }
                }
                break;
