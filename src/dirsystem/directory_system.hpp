@@ -12,7 +12,7 @@ namespace TransLucid {
          EQNS,
          STRUCTURE,
          CLOCK,
-         THREAD
+         DEMANDS
       };
 
       class DirectoryGrammar;

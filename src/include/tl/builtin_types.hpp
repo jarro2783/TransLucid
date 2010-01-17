@@ -361,6 +361,18 @@ namespace TransLucid {
          return m_g;
       }
 
+      bool operator==(const EquationGuardType& rhs) const {
+         return true;
+      }
+
+      bool operator<(const EquationGuardType& rhs) const {
+         return false;
+      }
+
+      size_t hash() const {
+         return 0;
+      }
+
       private:
       EquationGuard m_g;
    };

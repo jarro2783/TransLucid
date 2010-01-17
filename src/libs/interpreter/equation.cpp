@@ -195,8 +195,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
       }
    }
 
-   #warning need to make this the correct value
-   //return bestIter->get<1>()->evaluate(m_i, c);
+   return bestIter->get<1>()->evaluate(m_i, k);
 
    //return ValueContext(
    //   TypedValue(

@@ -361,19 +361,10 @@ Data *Evaluator::visitIdentExpr(IdentExpr* e, Data *d) {
       }
 
    } else {
-
-      //Variable *v = m_interpreter.lookupVariable(e->id);
-      #warning interpreter.get
-
-      Variable *v = 0;
-
-      if (v) {
-         ValueContext vc = (*v)(c->c);
-         m_interpreter.warehouse().add(e->id, vc.first, c->c);
-         return new ValueV(vc);
-      } else {
-         return new ValueV(makeSpecial(Special::UNDEF), c->c);
-      }
+      tuple_t k = c->c.tuple();
+      k[m_interpreter.dimTranslator().lookup("id")] =
+         TypedValue(String(e->id), m_interpreter.typeRegistry().indexString());
+      return new ValueV(m_interpreter(Tuple(k)));
    }
 }
 

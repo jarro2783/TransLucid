@@ -47,7 +47,7 @@ class DirectoryGrammar : public Spirit::grammar<DirectoryGrammar> {
             case EQNS:
             case STRUCTURE:
             case CLOCK:
-            case THREAD:
+            case DEMANDS:
             return equation_file;
             break;
          }
@@ -76,8 +76,6 @@ DirectorySystem::DirectorySystem() {
 bool DirectorySystem::parseSystem(const ustring_t& path) {
 
    bool success = true;
-   int currentThread = 0;
-   int currentEqn = 0;
 
    std::string pathl = Glib::filename_from_utf8(path);
 
@@ -87,8 +85,12 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
       Glib::build_filename(pathl, "header"), HEADER));
    files.push_back(std::make_pair(
       Glib::build_filename(pathl, "clock"), CLOCK));
+   //files.push_back(std::make_pair(
+   //   Glib::build_filename(pathl, "structure"), STRUCTURE));
    files.push_back(std::make_pair(
-      Glib::build_filename(pathl, "structure"), STRUCTURE));
+      Glib::build_filename(pathl, "eqns"), EQNS));
+   files.push_back(std::make_pair(
+      Glib::build_filename(pathl, "demands"), DEMANDS));
 
    for (FileList::iterator iter = files.begin();
          iter != files.end() && success;
@@ -117,90 +119,22 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                setClock(eHolder.equations());
                break;
 
-               case STRUCTURE:
-               //put the equations files in the file list
-               {
-                  std::string namePre = pathl + "/eqns_";
-                  BOOST_FOREACH(const Parser::equation_t& e, eHolder.equations()) {
-                     if (e.get<0>() == L"eqns") {
-                        ValueContext eqn = evaluate(e.get<2>(), Tuple());
-                        if (eqn.first.index() == typeRegistry().indexIntmp()) {
-                           const Intmp& value = eqn.first.value<Intmp>();
-                           files.push_back(std::make_pair(namePre + value.value().get_str(), EQNS));
-                           #warning add the equation to the system
-                           //equationSets.push_back(createEquationSet(e.get<1>()));
-                        }
-                     }
-                  }
-               }
-               //try to open thread files
-               {
-                  #if 0
-                  std::string namePre = pathl + "/thread_";
-                  int i = 0;
-                  bool finished = false;
-                  while (!finished) {
-                     std::ostringstream os;
-                     os << namePre << i;
-                     std::string file = os.str();
-                     std::ifstream is(file.c_str());
-                     if (is) {
-                        files.push_back(std::make_pair(file, THREAD));
-                        threadSets.push_back(createEquationSet(EquationGuard()));
-                     } else {
-                        finished = true;
-                     }
-
-                     ++i;
-                  }
-                  #endif
-                  std::ostringstream os;
-                  os << pathl << "/demands";
-                  std::string file = os.str();
-                  std::ifstream is(file.c_str());
-                  if (is) {
-                     files.push_back(std::make_pair(file, THREAD));
-                     #warning add demand to system
-                     //threadSets.push_back(createEquationSet(EquationGuard()));
-                  } else {
-                     throw std::string("Could not open ") + file;
-                  }
-               }
-               break;
-
                case EQNS:
-               //eqnSets.at(currentEqn).second = m_parseInfo.equations;
-               //addParsedEquationSet(m_parseInfo.equations);
-               //m_parseInfo.equations.clear();
+               case DEMANDS:
+               //demands and equations are the same thing
                {
-                  #if 0
-                  EquationSet& es = equationSets.at(currentEqn);
-                  BOOST_FOREACH(
-                     const Parser::equation_t& e,
-                     eHolder.equations())
+                  size_t dim_id = dimTranslator().lookup("id");
+                  size_t dim_valid = dimTranslator().lookup("_validguard");
+                  BOOST_FOREACH(const Parser::equation_t& e, eHolder.equations())
                   {
-                     es.addEquation(
-                        Equation(e.get<0>(), e.get<1>(), new ASTEquation(e.get<2>())));
+                     tuple_t k;
+                     k.insert(std::make_pair(dim_id,
+                        TypedValue(String(e.get<0>()),
+                           typeRegistry().indexString())));
+                     k.insert(std::make_pair(dim_valid,
+                        TypedValue(EquationGuardType(e.get<1>()),
+                           typeRegistry().indexGuard())));
                   }
-                  ++currentEqn;
-                  #endif
-                  #warning have to completely redo this
-               }
-               break;
-
-               case THREAD:
-               {
-                  #warning have to completely redo this
-                  #if 0
-                  EquationSet& es = threadSets.at(currentThread);
-                  BOOST_FOREACH(const Parser::equation_t& e,
-                     eHolder.equations())
-                  {
-                     es.addEquation(
-                        Equation(e.get<0>(), e.get<1>(), new ASTEquation(e.get<2>())));
-                  }
-                  ++currentThread;
-                  #endif
                }
                break;
 

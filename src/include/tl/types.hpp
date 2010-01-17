@@ -552,6 +552,10 @@ namespace TransLucid {
          return m_indexCalc;
       }
 
+      type_index indexGuard() const {
+         return m_indexGuard;
+      }
+
       private:
 
       typedef std::map<type_index, const TypeManager*> IndexTypeMap;
