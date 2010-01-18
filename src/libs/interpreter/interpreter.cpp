@@ -6,6 +6,7 @@
 #include <tl/range.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
+#include <tl/constant.hpp>
 
 namespace TransLucid {
 
