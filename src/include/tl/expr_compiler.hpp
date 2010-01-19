@@ -11,6 +11,8 @@ namespace TransLucid {
       ExprCompiler(Interpreter& i);
       ~ExprCompiler();
 
+      HD *compile(AST::Expr *);
+
       AST::Data *visitAtExpr(AST::AtExpr*, AST::Data*);
       AST::Data *visitBinaryOpExpr(AST::BinaryOpExpr*, AST::Data*);
       AST::Data *visitBooleanExpr(AST::BooleanExpr*, AST::Data*);

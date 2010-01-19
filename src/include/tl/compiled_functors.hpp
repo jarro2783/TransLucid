@@ -13,16 +13,18 @@ namespace TransLucid {
          }
       };
 
+      //e2 @ e1
       class AtAbsolute : public CompiledFunctor {
          public:
 
-         AtAbsolute(HD *e2, HD *e1)
-         : e2(e2), e1(e1)
+         AtAbsolute(Interpreter& system, HD *e2, HD *e1)
+         : m_system(system), e2(e2), e1(e1)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          HD *e2;
          HD *e1;
       };
@@ -30,13 +32,14 @@ namespace TransLucid {
       class AtRelative : public CompiledFunctor {
          public:
 
-         AtRelative(HD *e2, HD *e1)
-         : e2(e2), e1(e1)
+         AtRelative(Interpreter& system, HD *e2, HD *e1)
+         : m_system(system), e2(e2), e1(e1)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          HD *e2;
          HD *e1;
       };
@@ -70,13 +73,14 @@ namespace TransLucid {
       class BuildTuple : public CompiledFunctor {
          public:
 
-         BuildTuple(const std::list<HD*>& elements)
-         : m_elements(elements)
+         BuildTuple(Interpreter& system, const std::list<HD*>& elements)
+         : m_system(system), m_elements(elements)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          std::list<HD*> m_elements;
       };
 
@@ -125,13 +129,14 @@ namespace TransLucid {
 
       class Hash : public CompiledFunctor {
          public:
-         Hash(HD *e)
-         : m_e(e)
+         Hash(Interpreter& system, HD *e)
+         : m_system(system), m_e(e)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          HD *m_e;
       };
 
@@ -172,13 +177,14 @@ namespace TransLucid {
 
       class Integer : public CompiledFunctor {
          public:
-         Integer(const mpz_class& value)
-         : m_value(value)
+         Integer(Interpreter& system, const mpz_class& value)
+         : m_system(system), m_value(value)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          mpz_class m_value;
       };
 
@@ -226,13 +232,14 @@ namespace TransLucid {
 
       class Pair : public CompiledFunctor {
          public:
-         Pair(HD *lhs, HD *rhs)
-         : m_lhs(lhs), m_rhs(rhs)
+         Pair(Interpreter& system, HD *lhs, HD *rhs)
+         : m_system(system), m_lhs(lhs), m_rhs(rhs)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          HD *m_lhs;
          HD *m_rhs;
       };

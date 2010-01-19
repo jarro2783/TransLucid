@@ -131,6 +131,7 @@ typedef EagerManager<String> StringManager;
 typedef InternalManager<ValueCalc> CalcManager;
 typedef EagerManager<Char> CharManager;
 typedef InternalManager<EquationGuardType> EquationGuardManager;
+typedef InternalManager<PairType> PairManager;
 
 TypeRegistry::TypeRegistry(Interpreter& i)
 : m_nextIndex(1), m_indexError(0), m_interpreter(i)
@@ -163,6 +164,8 @@ TypeRegistry::TypeRegistry(Interpreter& i)
    m_indexChar = m->index();
    m = new EquationGuardManager(*this, "_eguard");
    m_indexGuard = m->index();
+   m = new PairManager(*this, "_pair");
+   m_indexPair = m->index();
 
    new HeaderManager<HeaderType::DIRECT>(*this);
 }

@@ -376,6 +376,38 @@ namespace TransLucid {
       private:
       EquationGuard m_g;
    };
+
+   class PairType : public TypedValueBase {
+      public:
+      PairType(const TypedValue& first, const TypedValue& second)
+      : m_first(first), m_second(second)
+      {
+      }
+
+      const TypedValue& first() const {
+         return m_first;
+      }
+
+      const TypedValue& second() const {
+         return m_second;
+      }
+
+      size_t hash() const {
+         return 0;
+      }
+
+      bool operator==(const PairType&) const {
+         return true;
+      }
+
+      bool operator<(const PairType&) const {
+         return false;
+      }
+
+      private:
+      TypedValue m_first;
+      TypedValue m_second;
+   };
 }
 
 #endif // BUILTIN_TYPES_HPP_INCLUDED

@@ -4,6 +4,7 @@
 #include <glibmm/fileutils.h>
 #include <tl/exception.hpp>
 #include <tl/parser.hpp>
+#include <tl/expr_compiler.hpp>
 
 namespace TransLucid {
 
@@ -76,6 +77,7 @@ DirectorySystem::DirectorySystem() {
 bool DirectorySystem::parseSystem(const ustring_t& path) {
 
    bool success = true;
+   ExprCompiler compiler(*this);
 
    std::string pathl = Glib::filename_from_utf8(path);
 
@@ -135,6 +137,8 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                         TypedValue(EquationGuardType(e.get<1>()),
                            typeRegistry().indexGuard())));
                      //std::cerr << "adding equation " << ustring_t(e.get<0>()) << std::endl;
+                     #warning finish doing this
+                     HD *h = compiler.compile(e.get<2>());
                      addExpr(Tuple(k), e.get<2>());
                   }
                }

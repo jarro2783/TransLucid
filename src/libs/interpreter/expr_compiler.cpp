@@ -25,6 +25,13 @@ ExprCompiler::~ExprCompiler()
 {
 }
 
+HD *ExprCompiler::compile(AST::Expr *e) {
+   Compiled *c = dynamic_cast<Compiled*>(e->visit(this, 0));
+   HD *h = c->e;
+   delete c;
+   return h;
+}
+
 AST::Data *ExprCompiler::visitAtExpr(AST::AtExpr* e, AST::Data*) {
    Compiled *d2 = dynamic_cast<Compiled*>(e->e2->visit(this, 0));
    Compiled *d1 = dynamic_cast<Compiled*>(e->e1->visit(this, 0));
@@ -36,8 +43,8 @@ AST::Data *ExprCompiler::visitAtExpr(AST::AtExpr* e, AST::Data*) {
    delete d2;
 
    return new Compiled(e->relative ?
-      static_cast<HD*>(new CompiledFunctors::AtRelative(e2, e1)) :
-      static_cast<HD*>(new CompiledFunctors::AtAbsolute(e2, e1)));
+      static_cast<HD*>(new CompiledFunctors::AtRelative(m_i, e2, e1)) :
+      static_cast<HD*>(new CompiledFunctors::AtAbsolute(m_i, e2, e1)));
 }
 
 AST::Data *ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr *e, AST::Data*) {
@@ -47,6 +54,8 @@ AST::Data *ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr *e, AST::Data*) {
       compiled.push_back(c->e);
       delete c;
    }
+   //possibly ditching this
+   #warning redo
 }
 
 AST::Data *ExprCompiler::visitBooleanExpr(AST::BooleanExpr* e, AST::Data*) {
@@ -62,7 +71,7 @@ AST::Data *ExprCompiler::visitBuildTupleExpr(AST::BuildTupleExpr* e, AST::Data*)
       delete c;
    }
 
-   return new Compiled(new CompiledFunctors::BuildTuple(pairs));
+   return new Compiled(new CompiledFunctors::BuildTuple(m_i, pairs));
 }
 
 AST::Data *ExprCompiler::visitConstantExpr(AST::ConstantExpr* e, AST::Data*) {
@@ -85,7 +94,7 @@ AST::Data *ExprCompiler::visitHashExpr(AST::HashExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
    HD *se = c->e;
    delete c;
-   return new Compiled(new CompiledFunctors::Hash(se));
+   return new Compiled(new CompiledFunctors::Hash(m_i, se));
 }
 
 AST::Data *ExprCompiler::visitIdentExpr(AST::IdentExpr* e, AST::Data*) {
@@ -125,7 +134,7 @@ AST::Data *ExprCompiler::visitIfExpr(AST::IfExpr* e, AST::Data*) {
 }
 
 AST::Data *ExprCompiler::visitIntegerExpr(AST::IntegerExpr* e, AST::Data*) {
-   return new Compiled(new CompiledFunctors::Integer(e->m_value));
+   return new Compiled(new CompiledFunctors::Integer(m_i, e->m_value));
 }
 
 AST::Data *ExprCompiler::visitIsSpecialExpr(AST::SpecialOpsExpr* e, AST::Data*) {
@@ -162,10 +171,11 @@ AST::Data *ExprCompiler::visitPairExpr(AST::PairExpr* e, AST::Data*) {
    delete lhsc;
    delete rhsc;
 
-   return new Compiled(new CompiledFunctors::Pair(lhs, rhs));
+   return new Compiled(new CompiledFunctors::Pair(m_i, lhs, rhs));
 }
 
 AST::Data *ExprCompiler::visitRangeExpr(AST::RangeExpr*, AST::Data*) {
+   return 0;
 }
 
 AST::Data *ExprCompiler::visitUnaryExpr(AST::UnaryExpr* e, AST::Data*) {

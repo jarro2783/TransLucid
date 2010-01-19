@@ -556,6 +556,10 @@ namespace TransLucid {
          return m_indexGuard;
       }
 
+      type_index indexPair() const {
+         return m_indexPair;
+      }
+
       private:
 
       typedef std::map<type_index, const TypeManager*> IndexTypeMap;
@@ -584,6 +588,7 @@ namespace TransLucid {
       type_index m_indexChar;
       type_index m_indexCalc;
       type_index m_indexGuard;
+      type_index m_indexPair;
 
       OpFunction makeOpTypeError;
       TypedValue makeOpTypeErrorActual(const TypeManager *special);
