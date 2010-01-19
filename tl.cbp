@@ -106,6 +106,9 @@
 		<Unit filename="src/include/tl/compiled_classes.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
+		<Unit filename="src/include/tl/compiled_functors.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/constant.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
@@ -133,6 +136,9 @@
 			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/include/tl/expr_parser.hpp" />
+		<Unit filename="src/include/tl/function.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/header_type.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
@@ -162,9 +168,6 @@
 		<Unit filename="src/include/tl/range.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
-		</Unit>
-		<Unit filename="src/include/tl/set_lazy_evaluator.hpp">
-			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/include/tl/tuple_parser.hpp">
 			<Option target="libinterpreter" />
@@ -203,6 +206,9 @@
 		<Unit filename="src/libs/interpreter/cache.cpp">
 			<Option target="libinterpreter" />
 		</Unit>
+		<Unit filename="src/libs/interpreter/compiled_functors.cpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/libs/interpreter/constant.cpp">
 			<Option target="libinterpreter" />
 		</Unit>
@@ -222,6 +228,9 @@
 			<Option target="interactive" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/expr_compiler.cpp">
+			<Option target="libinterpreter" />
+		</Unit>
+		<Unit filename="src/libs/interpreter/function.cpp">
 			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/header_type.cpp">
@@ -254,9 +263,6 @@
 		<Unit filename="src/libs/interpreter/range.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
-		</Unit>
-		<Unit filename="src/libs/interpreter/set_lazy_evaluator.cpp">
-			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/types.cpp">
 			<Option target="libinterpreter" />

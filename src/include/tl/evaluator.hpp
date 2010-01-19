@@ -31,6 +31,7 @@ namespace TransLucid {
       AST::Data *visitIntegerExpr(AST::IntegerExpr*, AST::Data*);
       AST::Data *visitIsSpecialExpr(AST::SpecialOpsExpr*, AST::Data*);
       AST::Data *visitIsTypeExpr(AST::SpecialOpsExpr*, AST::Data*);
+      AST::Data *visitOpExpr(AST::OpExpr*, AST::Data*);
       AST::Data *visitPairExpr(AST::PairExpr*, AST::Data*);
       AST::Data *visitRangeExpr(AST::RangeExpr*, AST::Data*);
       AST::Data *visitUnaryExpr(AST::UnaryExpr*, AST::Data*);

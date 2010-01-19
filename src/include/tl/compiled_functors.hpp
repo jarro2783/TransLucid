@@ -6,9 +6,14 @@
 
 namespace TransLucid {
 
-   namespace SetLazyEvaluator {
+   namespace CompiledFunctors {
 
-      class AtAbsolute : public HD {
+      class CompiledFunctor : public HD {
+         void addExpr(const Tuple& k, AST::Expr* e) {
+         }
+      };
+
+      class AtAbsolute : public CompiledFunctor {
          public:
 
          AtAbsolute(HD *e2, HD *e1)
@@ -22,7 +27,7 @@ namespace TransLucid {
          HD *e1;
       };
 
-      class AtRelative : public HD {
+      class AtRelative : public CompiledFunctor {
          public:
 
          AtRelative(HD *e2, HD *e1)
@@ -36,7 +41,7 @@ namespace TransLucid {
          HD *e1;
       };
 
-      class BinaryOp : public HD {
+      class BinaryOp : public CompiledFunctor {
          public:
 
          BinaryOp(const std::vector<HD*>& operands)
@@ -49,10 +54,10 @@ namespace TransLucid {
          std::vector<HD*> operands;
       };
 
-      class Boolean : public HD {
+      class BoolConst : public CompiledFunctor {
          public:
 
-         Boolean(bool value)
+         BoolConst(bool value)
          : m_value(value)
          {}
 
@@ -62,7 +67,7 @@ namespace TransLucid {
          bool m_value;
       };
 
-      class BuildTuple : public HD {
+      class BuildTuple : public CompiledFunctor {
          public:
 
          BuildTuple(const std::list<HD*>& elements)
@@ -75,23 +80,24 @@ namespace TransLucid {
          std::list<HD*> m_elements;
       };
 
-      class Constant : public HD {
+      class Constant : public CompiledFunctor {
          public:
 
          //typedef RawType some_crazy_MPL_thing;
 
-         Constant(const ustring_t& name, const ustring_t& value)
-         : m_name(name), m_value(value)
+         Constant(Interpreter& system, const ustring_t& type, const ustring_t& text)
+         : m_system(system), m_type(type), m_text(text)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
-         ustring_t m_name;
-         ustring_t m_value;
+         Interpreter& m_system;
+         ustring_t m_type;
+         ustring_t m_text;
       };
 
-      class Convert : public HD {
+      class Convert : public CompiledFunctor {
          public:
          Convert(const ustring_t& to, HD *e)
          : m_to(to), m_e(e)
@@ -104,19 +110,20 @@ namespace TransLucid {
          HD *m_e;
       };
 
-      class Dimension : public HD {
+      class Dimension : public CompiledFunctor {
          public:
-         Dimension(const ustring_t& name)
-         : m_name(name)
+         Dimension(Interpreter& system, const ustring_t& name)
+         : m_system(system), m_name(name)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          ustring_t m_name;
       };
 
-      class Hash : public HD {
+      class Hash : public CompiledFunctor {
          public:
          Hash(HD *e)
          : m_e(e)
@@ -128,39 +135,42 @@ namespace TransLucid {
          HD *m_e;
       };
 
-      class Ident : public HD {
+      class Ident : public CompiledFunctor {
          public:
-         Ident(const ustring_t& name)
-         : m_name(name)
+         Ident(Interpreter& system, const ustring_t& name)
+         : m_system(system), m_name(name)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          ustring_t m_name;
       };
 
-      class If : public HD {
+      class If : public CompiledFunctor {
          public:
-         If(HD *condition, HD *then,
-            const std::list<HD*>& elseifs,
+         If(Interpreter& system, HD *condition, HD *then,
+            const std::list<HD*>& elsifs,
             HD *else_)
-         : m_condition(condition),
+         : m_system(system),
+         m_condition(condition),
          m_then(then),
-         m_elseifs(elseifs),
+         m_elsifs(elsifs),
          m_else(else_)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          HD *m_condition;
          HD *m_then;
-         std::list<HD*> m_elseifs;
+         std::list<HD*> m_elsifs;
          HD *m_else;
       };
 
-      class Integer : public HD {
+      class Integer : public CompiledFunctor {
          public:
          Integer(const mpz_class& value)
          : m_value(value)
@@ -172,7 +182,7 @@ namespace TransLucid {
          mpz_class m_value;
       };
 
-      class IsSpecial : public HD {
+      class IsSpecial : public CompiledFunctor {
          public:
          IsSpecial(const ustring_t& special, HD *e)
          : m_special(special),
@@ -186,7 +196,7 @@ namespace TransLucid {
          HD *m_e;
       };
 
-      class IsType : public HD {
+      class IsType : public CompiledFunctor {
          public:
          IsType(const ustring_t& type, HD *e)
          : m_type(type), m_e(e)
@@ -199,7 +209,22 @@ namespace TransLucid {
          HD *m_e;
       };
 
-      class Pair : public HD {
+      class Operation : public CompiledFunctor {
+         public:
+         Operation(Interpreter& i, const std::vector<HD*>& operands, const ustring_t& symbol)
+         : m_system(i), m_operands(operands), m_symbol(symbol)
+         {
+         }
+
+         TaggedValue operator()(const Tuple& context);
+
+         private:
+         Interpreter& m_system;
+         const std::vector<HD*>& m_operands;
+         ustring_t m_symbol;
+      };
+
+      class Pair : public CompiledFunctor {
          public:
          Pair(HD *lhs, HD *rhs)
          : m_lhs(lhs), m_rhs(rhs)
@@ -212,7 +237,7 @@ namespace TransLucid {
          HD *m_rhs;
       };
 
-      class UnaryOp : public HD {
+      class UnaryOp : public CompiledFunctor {
          public:
          UnaryOp(Parser::UnaryOperation op, HD *e)
          : m_op(op), m_e(e)

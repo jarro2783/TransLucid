@@ -9,7 +9,8 @@ interpreter_tuple.cpp interpreter_constant.cpp
 library.cpp dimtranslator.cpp types.cpp
 range.cpp evaluator.cpp expr.cpp parser.cpp
 builtin_types.cpp equation.cpp
-header_type.cpp cache.cpp utility.cpp constant.cpp)
+header_type.cpp cache.cpp utility.cpp constant.cpp function.cpp
+compiled_functors.cpp expr_compiler.cpp)
 #link_directories(${GLIBMM_LIBRARY_DIRS})
 #target_link_libraries(tlinterpreter ${GLIBMM_LIBRARIES})
 target_link_libraries(tlinterpreter ${GLIBMM_LDFLAGS} ltdl rt gmpxx)

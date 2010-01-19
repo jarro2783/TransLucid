@@ -1,0 +1,21 @@
+dimensions:
+
+the dimensions arg[0..inf] are reserved for function parameters
+
+the system responds to the "id" dimension for identifiers
+the @ [] on the lhs is in the dimension _validguard
+
+CONST uses type and text
+
+identifiers:
+constants are CONST
+functions are FUN
+default int is in DEFAULTINT
+
+constants that are defined:
+
+constants that need defining:
+char
+bool
+special
+string

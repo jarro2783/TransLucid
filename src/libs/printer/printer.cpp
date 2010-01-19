@@ -66,6 +66,7 @@ class PrintVisitor : public TL::AST::Visitor {
    Data * visitIntegerExpr(IntegerExpr*, Data*);
    Data * visitIsSpecialExpr(SpecialOpsExpr*, Data*);
    Data * visitIsTypeExpr(SpecialOpsExpr*, Data*);
+   Data * visitOpExpr(OpExpr*, Data*);
    Data * visitPairExpr(PairExpr*, Data*);
    Data * visitRangeExpr(RangeExpr*, Data*);
    Data * visitUnaryExpr(UnaryExpr*, Data*);

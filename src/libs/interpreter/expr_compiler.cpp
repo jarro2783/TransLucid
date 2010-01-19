@@ -1,5 +1,5 @@
 #include <tl/expr_compiler.hpp>
-#include <tl/set_lazy_evaluator.hpp>
+#include <tl/compiled_functors.hpp>
 
 namespace TransLucid {
 
@@ -16,14 +16,13 @@ struct Compiled : public AST::Data {
 
 }
 
-ExprCompiler::ExprCompiler()
+ExprCompiler::ExprCompiler(Interpreter& i)
+: m_i(i)
 {
-   //ctor
 }
 
 ExprCompiler::~ExprCompiler()
 {
-   //dtor
 }
 
 AST::Data *ExprCompiler::visitAtExpr(AST::AtExpr* e, AST::Data*) {
@@ -37,8 +36,8 @@ AST::Data *ExprCompiler::visitAtExpr(AST::AtExpr* e, AST::Data*) {
    delete d2;
 
    return new Compiled(e->relative ?
-      static_cast<HD*>(new SetLazyEvaluator::AtRelative(e2, e1)) :
-      static_cast<HD*>(new SetLazyEvaluator::AtAbsolute(e2, e1)));
+      static_cast<HD*>(new CompiledFunctors::AtRelative(e2, e1)) :
+      static_cast<HD*>(new CompiledFunctors::AtAbsolute(e2, e1)));
 }
 
 AST::Data *ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr *e, AST::Data*) {
@@ -51,7 +50,7 @@ AST::Data *ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr *e, AST::Data*) {
 }
 
 AST::Data *ExprCompiler::visitBooleanExpr(AST::BooleanExpr* e, AST::Data*) {
-   return new Compiled(new SetLazyEvaluator::Boolean(e->value));
+   return new Compiled(new CompiledFunctors::BoolConst(e->value));
 }
 
 AST::Data *ExprCompiler::visitBuildTupleExpr(AST::BuildTupleExpr* e, AST::Data*) {
@@ -63,34 +62,34 @@ AST::Data *ExprCompiler::visitBuildTupleExpr(AST::BuildTupleExpr* e, AST::Data*)
       delete c;
    }
 
-   return new Compiled(new SetLazyEvaluator::BuildTuple(pairs));
+   return new Compiled(new CompiledFunctors::BuildTuple(pairs));
 }
 
 AST::Data *ExprCompiler::visitConstantExpr(AST::ConstantExpr* e, AST::Data*) {
-   return new Compiled(new SetLazyEvaluator::Constant(e->name, e->value));
+   return new Compiled(new CompiledFunctors::Constant(m_i, e->name, e->value));
 }
 
 AST::Data *ExprCompiler::visitConvertExpr(AST::SpecialOpsExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
 
-   Compiled *result = new Compiled(new SetLazyEvaluator::Convert(e->value, c->e));
+   Compiled *result = new Compiled(new CompiledFunctors::Convert(e->value, c->e));
    delete c;
    return result;
 }
 
 AST::Data *ExprCompiler::visitDimensionExpr(AST::DimensionExpr* e, AST::Data*) {
-   return new Compiled(new SetLazyEvaluator::Dimension(e->value));
+   return new Compiled(new CompiledFunctors::Dimension(m_i, e->value));
 }
 
 AST::Data *ExprCompiler::visitHashExpr(AST::HashExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
    HD *se = c->e;
    delete c;
-   return new Compiled(new SetLazyEvaluator::Hash(se));
+   return new Compiled(new CompiledFunctors::Hash(se));
 }
 
 AST::Data *ExprCompiler::visitIdentExpr(AST::IdentExpr* e, AST::Data*) {
-   return new Compiled(new SetLazyEvaluator::Ident(e->id));
+   return new Compiled(new CompiledFunctors::Ident(m_i, e->id));
 }
 
 AST::Data *ExprCompiler::visitIfExpr(AST::IfExpr* e, AST::Data*) {
@@ -122,25 +121,35 @@ AST::Data *ExprCompiler::visitIfExpr(AST::IfExpr* e, AST::Data*) {
    delete thenc;
    delete elsec;
 
-   return new Compiled(new SetLazyEvaluator::If(cond, then, elseifs, else_));
+   return new Compiled(new CompiledFunctors::If(m_i, cond, then, elseifs, else_));
 }
 
 AST::Data *ExprCompiler::visitIntegerExpr(AST::IntegerExpr* e, AST::Data*) {
-   return new Compiled(new SetLazyEvaluator::Integer(e->m_value));
+   return new Compiled(new CompiledFunctors::Integer(e->m_value));
 }
 
 AST::Data *ExprCompiler::visitIsSpecialExpr(AST::SpecialOpsExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
    HD *eval = c->e;
    delete c;
-   return new Compiled(new SetLazyEvaluator::IsSpecial(e->value, eval));
+   return new Compiled(new CompiledFunctors::IsSpecial(e->value, eval));
 }
 
 AST::Data *ExprCompiler::visitIsTypeExpr(AST::SpecialOpsExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
    HD *eval = c->e;
    delete c;
-   return new Compiled(new SetLazyEvaluator::IsType(e->value, eval));
+   return new Compiled(new CompiledFunctors::IsType(e->value, eval));
+}
+
+AST::Data *ExprCompiler::visitOpExpr(AST::OpExpr* e, AST::Data*) {
+   std::vector<HD*> operands;
+   BOOST_FOREACH(AST::Expr* o, e->m_ops) {
+      Compiled *c = dynamic_cast<Compiled*>(o->visit(this, 0));
+      operands.push_back(c->e);
+      delete c;
+   }
+   return new Compiled(new CompiledFunctors::Operation(m_i, operands, e->m_name));
 }
 
 AST::Data *ExprCompiler::visitPairExpr(AST::PairExpr* e, AST::Data*) {
@@ -153,7 +162,7 @@ AST::Data *ExprCompiler::visitPairExpr(AST::PairExpr* e, AST::Data*) {
    delete lhsc;
    delete rhsc;
 
-   return new Compiled(new SetLazyEvaluator::Pair(lhs, rhs));
+   return new Compiled(new CompiledFunctors::Pair(lhs, rhs));
 }
 
 AST::Data *ExprCompiler::visitRangeExpr(AST::RangeExpr*, AST::Data*) {
@@ -165,7 +174,7 @@ AST::Data *ExprCompiler::visitUnaryExpr(AST::UnaryExpr* e, AST::Data*) {
 
    delete operandc;
 
-   return new Compiled(new SetLazyEvaluator::UnaryOp(e->op, operand));
+   return new Compiled(new CompiledFunctors::UnaryOp(e->op, operand));
 }
 
 } //namespace TransLucid

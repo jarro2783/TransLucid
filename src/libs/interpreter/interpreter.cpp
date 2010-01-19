@@ -56,6 +56,9 @@ m_verbose(false)
    m_dimTranslator.insert("priority");
    m_dimTranslator.insert("_validguard");
    Parser::addSymbol(L"time", m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
+
+   //create the obj, const and fun ids
+   m_variables.insert(std::make_pair("const", new ConstantHD(*this)));
 }
 
 Interpreter::~Interpreter() {

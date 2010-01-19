@@ -35,6 +35,7 @@ namespace TransLucid {
       class IdentExpr;
       class IfExpr;
       class IntegerExpr;
+      class OpExpr;
       class PairExpr;
       class RangeExpr;
       class SpecialOpsExpr;
@@ -57,6 +58,7 @@ namespace TransLucid {
          virtual Data *visitIntegerExpr(IntegerExpr*, Data*) = 0;
          virtual Data *visitIsSpecialExpr(SpecialOpsExpr*, Data*) = 0;
          virtual Data *visitIsTypeExpr(SpecialOpsExpr*, Data*) = 0;
+         virtual Data *visitOpExpr(OpExpr*, Data*) = 0;
          virtual Data *visitPairExpr(PairExpr*, Data*) = 0;
          virtual Data *visitRangeExpr(RangeExpr*, Data*) = 0;
          virtual Data *visitUnaryExpr(UnaryExpr*, Data*) = 0;
@@ -219,6 +221,20 @@ namespace TransLucid {
          }
 
          mpz_class m_value;
+      };
+
+      class OpExpr : public Expr {
+         public:
+         OpExpr(const std::vector<Expr*>& ops, ustring_t& name)
+         : m_ops(ops), m_name(name)
+         {}
+
+         Data *visit(Visitor *visitor, Data *data) {
+            return visitor->visitOpExpr(this, data);
+         }
+
+         std::vector<Expr*> m_ops;
+         ustring_t m_name;
       };
 
       class PairExpr : public Expr {

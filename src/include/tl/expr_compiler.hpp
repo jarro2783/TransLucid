@@ -8,7 +8,7 @@ namespace TransLucid {
    class ExprCompiler : public AST::Visitor {
       public:
 
-      ExprCompiler();
+      ExprCompiler(Interpreter& i);
       ~ExprCompiler();
 
       AST::Data *visitAtExpr(AST::AtExpr*, AST::Data*);
@@ -25,9 +25,12 @@ namespace TransLucid {
       AST::Data *visitIsSpecialExpr(AST::SpecialOpsExpr*, AST::Data*);
       AST::Data *visitIsTypeExpr(AST::SpecialOpsExpr*, AST::Data*);
       AST::Data *visitPairExpr(AST::PairExpr*, AST::Data*);
+      AST::Data *visitOpExpr(AST::OpExpr*, AST::Data*);
       AST::Data *visitRangeExpr(AST::RangeExpr*, AST::Data*);
       AST::Data *visitUnaryExpr(AST::UnaryExpr*, AST::Data*);
 
+      private:
+      Interpreter& m_i;
    };
 
 } //namespace TransLucid

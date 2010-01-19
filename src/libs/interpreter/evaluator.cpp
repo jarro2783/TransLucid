@@ -466,6 +466,10 @@ Data *Evaluator::visitIsTypeExpr(SpecialOpsExpr *e, Data *d) {
    return new ValueV(makeBoolean(result), makeContext(d)->c);
 }
 
+Data *Evaluator::visitOpExpr(AST::OpExpr*, AST::Data*) {
+   return 0;
+}
+
 Data *Evaluator::visitPairExpr(PairExpr* e, Data *d) {
    ValueV *lhs = makeValue(e->lhs->visit(this, d));
    ValueV *rhs = makeValue(e->rhs->visit(this, d));

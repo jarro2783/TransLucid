@@ -13,7 +13,8 @@ library.cpp types.cpp \
 dimtranslator.cpp \
 range.cpp evaluator.cpp expr.cpp  parser.cpp \
 builtin_types.cpp header_type.cpp equation.cpp \
-cache.cpp utility.cpp constant.cpp
+cache.cpp utility.cpp constant.cpp function.cpp compiled_functors.cpp \
+expr_compiler.cpp
 
 libtlinterpreter_la_CPPFLAGS = $(GLIBMM_CFLAGS) -I$(top_srcdir)/src/include \
 -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS)
