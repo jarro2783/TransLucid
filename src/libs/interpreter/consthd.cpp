@@ -8,7 +8,7 @@ namespace ConstHD {
 const char *UChar::name = "uchar";
 
 TaggedValue UChar::operator()(const Tuple& k) {
-   size_t valueindex = m_i.dimTranslator().lookup("value");
+   size_t valueindex = m_i.dimTranslator().lookup("text");
    Tuple::const_iterator value = k.find(valueindex);
 
    if (value == k.end() || value->second.index() != m_i.typeRegistry().indexString()) {

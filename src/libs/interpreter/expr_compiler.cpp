@@ -59,7 +59,7 @@ AST::Data *ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr *e, AST::Data*) {
 }
 
 AST::Data *ExprCompiler::visitBooleanExpr(AST::BooleanExpr* e, AST::Data*) {
-   return new Compiled(new CompiledFunctors::BoolConst(e->value));
+   return new Compiled(new CompiledFunctors::BoolConst(m_i, e->value));
 }
 
 AST::Data *ExprCompiler::visitBuildTupleExpr(AST::BuildTupleExpr* e, AST::Data*) {

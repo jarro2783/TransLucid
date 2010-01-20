@@ -79,9 +79,19 @@ TaggedValue AtRelative::operator()(const Tuple& k) {
    }
 }
 
-TaggedValue BoolConst::operator()(const Tuple& context) {
+TaggedValue BoolConst::operator()(const Tuple& k) {
    //return boost::assign::list_of(ValueContext(
    //   TypedValue(TransLucid::Boolean(m_value), i.typeRegistry().indexBoolean()), Tuple()));
+   #warning maybe there is a better way to do this
+   size_t indexString = m_system.typeRegistry().indexString();
+   tuple_t kp = k.tuple();
+   insert_tuple<String>(kp, m_system, indexString)
+      ("id", "CONST")
+      ("type", "bool")
+      ("text", m_value ? "true" : "false")
+   ;
+
+   return m_system(Tuple(kp));
 }
 
 TaggedValue BuildTuple::operator()(const Tuple& k) {

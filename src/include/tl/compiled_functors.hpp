@@ -60,13 +60,14 @@ namespace TransLucid {
       class BoolConst : public CompiledFunctor {
          public:
 
-         BoolConst(bool value)
-         : m_value(value)
+         BoolConst(Interpreter& system, bool value)
+         : m_system(system), m_value(value)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
+         Interpreter& m_system;
          bool m_value;
       };
 
