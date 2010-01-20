@@ -9,7 +9,7 @@ namespace TransLucid {
    namespace CompiledFunctors {
 
       class CompiledFunctor : public HD {
-         void addExpr(const Tuple& k, AST::Expr* e) {
+         void addExpr(const Tuple& k, HD* h) {
          }
       };
 

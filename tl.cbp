@@ -109,12 +109,12 @@
 		<Unit filename="src/include/tl/compiled_functors.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
-		<Unit filename="src/include/tl/constant.hpp">
-			<Option target="libinterpreter" />
-		</Unit>
 		<Unit filename="src/include/tl/constant_parser.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+		</Unit>
+		<Unit filename="src/include/tl/consthd.hpp">
+			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/include/tl/dimtranslator.hpp">
 			<Option target="libinterpreter" />
@@ -209,7 +209,7 @@
 		<Unit filename="src/libs/interpreter/compiled_functors.cpp">
 			<Option target="libinterpreter" />
 		</Unit>
-		<Unit filename="src/libs/interpreter/constant.cpp">
+		<Unit filename="src/libs/interpreter/consthd.cpp">
 			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/dimtranslator.cpp">

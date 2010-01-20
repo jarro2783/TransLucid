@@ -11,7 +11,7 @@ namespace TransLucid {
       virtual ~HD() {}
       virtual TaggedValue operator()(const Tuple& k) = 0;
 
-      virtual void addExpr(const Tuple& k, AST::Expr *e) = 0;
+      virtual void addExpr(const Tuple& k, HD *h) = 0;
    };
 
 } //namespace TransLucid

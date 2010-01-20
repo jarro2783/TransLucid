@@ -124,14 +124,14 @@ class InternalManager : public TypeManager {
 
 }
 
-typedef EagerManager<Intmp> IntmpManager;
-typedef EagerManager<Boolean> BooleanManager;
-typedef InternalManager<Dimension> DimensionManager;
-typedef EagerManager<String> StringManager;
-typedef InternalManager<ValueCalc> CalcManager;
-typedef EagerManager<Char> CharManager;
+typedef EagerManager   <Intmp>             IntmpManager;
+typedef EagerManager   <Boolean>           BooleanManager;
+typedef InternalManager<Dimension>         DimensionManager;
+typedef EagerManager   <String>            StringManager;
+typedef InternalManager<ValueCalc>         CalcManager;
+typedef EagerManager   <Char>              CharManager;
 typedef InternalManager<EquationGuardType> EquationGuardManager;
-typedef InternalManager<PairType> PairManager;
+typedef InternalManager<PairType>          PairManager;
 
 TypeRegistry::TypeRegistry(Interpreter& i)
 : m_nextIndex(1), m_indexError(0), m_interpreter(i)

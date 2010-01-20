@@ -135,13 +135,13 @@ namespace TransLucid {
 
    class Equation {
       public:
-      Equation(const ustring_t& name, const EquationGuard& valid, EquationBase *e)
-      : m_name(name), m_validContext(valid), m_e(e)
+      Equation(const ustring_t& name, const EquationGuard& valid, HD *h)
+      : m_name(name), m_validContext(valid), m_h(h)
       {
       }
 
       Equation()
-      : m_e(0)
+      : m_h(0)
       {
       }
 
@@ -154,11 +154,11 @@ namespace TransLucid {
       }
 
       operator bool() const {
-         return m_e;
+         return m_h;
       }
 
-      EquationBase *equation() const {
-         return m_e;
+      HD *equation() const {
+         return m_h;
       }
 
       private:
@@ -166,7 +166,8 @@ namespace TransLucid {
       EquationGuard m_validContext;
       //AST::Expr *m_e;
       //SystemEquation *m_se;
-      EquationBase *m_e;
+      //EquationBase *m_e;
+      HD *m_h;
    };
 
    //represents all definitions of a variable, is responsible for
@@ -180,7 +181,7 @@ namespace TransLucid {
 
       TaggedValue operator()(const Tuple& k);
 
-      void addExpr(const Tuple& k, AST::Expr *e);
+      void addExpr(const Tuple& k, HD *h);
 
       void added();
       void removed();
@@ -192,7 +193,7 @@ namespace TransLucid {
       bool valueRefines(const Interpreter& i, const TypedValue& a, const TypedValue& b) const;
       bool booleanTrue(Interpreter& i, const EquationGuard& g, const Tuple& c) const;
 
-      void addExprActual(const Tuple& k, AST::Expr *e);
+      void addExprActual(const Tuple& k, HD *e);
 
       typedef std::list<Equation> Equations;
       Equations m_equations;

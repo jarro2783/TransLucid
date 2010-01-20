@@ -98,7 +98,7 @@ size_t Evaluator::lookupDim(const TypedValue& v) {
       const Dimension& d = v.value<Dimension>();
       i = d.value();
    } else {
-      i = m_dims.insert(v);
+      i = m_dims.lookup(v);
    }
 
    return i;
@@ -292,7 +292,7 @@ Data *Evaluator::visitBuildTupleExpr(BuildTupleExpr *e, Data *d) {
          const Dimension& d = result->lhs.value<Dimension>();
          lhs = d.value();
       } else {
-         lhs = m_dims.insert(result->lhs);
+         lhs = m_dims.lookup(result->lhs);
       }
 
       tuple1.insert(

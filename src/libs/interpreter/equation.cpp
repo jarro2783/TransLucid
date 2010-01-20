@@ -5,7 +5,7 @@
 
 namespace TransLucid {
 
-inline void Variable::addExprActual(const Tuple& k, AST::Expr *e) {
+inline void Variable::addExprActual(const Tuple& k, HD *h) {
    const EquationGuard *g = 0;
    Tuple::const_iterator giter = k.find(m_i.dimTranslator().lookup("_validguard"));
    if (giter != k.end()) {
@@ -13,9 +13,9 @@ inline void Variable::addExprActual(const Tuple& k, AST::Expr *e) {
    }
 
    if (g) {
-      m_equations.push_back(Equation(m_name, *g, new ASTEquation(e)));
+      m_equations.push_back(Equation(m_name, *g, h));
    } else {
-      m_equations.push_back(Equation(m_name, EquationGuard(), new ASTEquation(e)));
+      m_equations.push_back(Equation(m_name, EquationGuard(), h));
    }
 }
 
@@ -125,7 +125,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
    //std::cout << "evaluating variable " << m_name << ", context: " << std::endl;
    //c.print(i, std::cout, c);
 
-   typedef boost::tuple<Tuple, EquationBase*> ApplicableTuple;
+   typedef boost::tuple<Tuple, HD*> ApplicableTuple;
    typedef std::list<ApplicableTuple> applicable_list;
    applicable_list applicable;
 
@@ -159,7 +159,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
          Special(Special::UNDEF),
          m_i.typeRegistry().indexSpecial()),k);
    } else if (applicable.size() == 1) {
-      return applicable.front().get<1>()->evaluate(m_i, k);
+      return (*applicable.front().get<1>())(k);
    }
 
    applicable_list::const_iterator bestIter = applicable.end();
@@ -195,7 +195,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
       }
    }
 
-   return bestIter->get<1>()->evaluate(m_i, k);
+   return (*bestIter->get<1>())(k);
 
    //return ValueContext(
    //   TypedValue(
@@ -204,7 +204,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
    //   c);
 }
 
-void Variable::addExpr(const Tuple& k, AST::Expr *e) {
+void Variable::addExpr(const Tuple& k, HD *e) {
    size_t dim_id = m_i.dimTranslator().lookup("id");
    Tuple::const_iterator iter = k.find(dim_id);
    if (iter == k.end()) {

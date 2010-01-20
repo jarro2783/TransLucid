@@ -139,7 +139,7 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                      //std::cerr << "adding equation " << ustring_t(e.get<0>()) << std::endl;
                      #warning finish doing this
                      HD *h = compiler.compile(e.get<2>());
-                     addExpr(Tuple(k), e.get<2>());
+                     addExpr(Tuple(k), h);
                   }
                }
                break;

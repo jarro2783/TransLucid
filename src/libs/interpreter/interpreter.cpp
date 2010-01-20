@@ -7,11 +7,12 @@
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
 #include <tl/constant.hpp>
+#include <tl/consthd.hpp>
 
 namespace TransLucid {
 
 inline void Interpreter::addToVariableActual(const ustring_t& id,
-   const Tuple& k, AST::Expr *e)
+   const Tuple& k, HD *h)
 {
    //std::cerr << "addToVariableActual: " <<
    //   id << std::endl;
@@ -21,44 +22,57 @@ inline void Interpreter::addToVariableActual(const ustring_t& id,
       //std::cerr << "constructing new variable" << std::endl;
       iter = m_variables.insert(std::make_pair(id, new Variable(id, *this))).first;
    }
-   iter->second->addExpr(k, e);
+   iter->second->addExpr(k, h);
 }
 
 inline void Interpreter::addToVariable(const ustring_t& id,
-   const ustring_t& remaining, const Tuple& k, AST::Expr *e)
+   const ustring_t& remaining, const Tuple& k, HD *h)
 {
    tuple_t kp = k.tuple();
    kp[m_dimension_id] = TypedValue(String(remaining),
       m_types.indexString());
-   addToVariableActual(id, Tuple(kp), e);
+   addToVariableActual(id, Tuple(kp), h);
 }
 
 inline void Interpreter::addToVariable(const ustring_t& id,
-   const Tuple& k, AST::Expr *e)
+   const Tuple& k, HD *h)
 {
    tuple_t kp = k.tuple();
    kp.erase(m_dimension_id);
-   addToVariableActual(id, Tuple(kp), e);
+   addToVariableActual(id, Tuple(kp), h);
+}
+
+template <typename T>
+void Interpreter::buildConstantHD() {
+   HD *h = new T(*this);
+
+   tuple_t k;
+   //k[m_dimTranslator.lookup("id")] = TypedValue(String("CONST"), m_typeRegistry.indexString());
+   k[m_dimTranslator.lookup("type")] = TypedValue(String(T::name), m_types.indexString());
+   addToVariableActual("CONST", Tuple(k), h);
 }
 
 Interpreter::Interpreter()
 : m_types(*this), m_evaluator(*this),
 m_maxClock(0),
 m_warehouse(*this),
-m_dimension_id(m_dimTranslator.insert("id")),
+m_dimension_id(m_dimTranslator.lookup("id")),
 m_verbose(false)
 {
    //m_systemParser.push(*m_systemGrammar);
    initExprParser();
    initTupleParser();
    initConstantParser();
-   m_dimTranslator.insert("time");
-   m_dimTranslator.insert("priority");
-   m_dimTranslator.insert("_validguard");
+   m_dimTranslator.lookup("time");
+   m_dimTranslator.lookup("priority");
+   m_dimTranslator.lookup("_validguard");
    Parser::addSymbol(L"time", m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
 
    //create the obj, const and fun ids
-   m_variables.insert(std::make_pair("const", new ConstantHD(*this)));
+   //m_variables.insert(std::make_pair("const", new ConstantHD(*this)));
+
+   //build the constant creators
+   buildConstantHD<ConstHD::UChar>();
 }
 
 Interpreter::~Interpreter() {
@@ -146,7 +160,7 @@ Tuple EquationGuard::evaluate(Interpreter& i, const Tuple& context) const
    return Tuple(t);
 }
 
-void Interpreter::addExpr(const Tuple& k, AST::Expr *e) {
+void Interpreter::addExpr(const Tuple& k, HD *h) {
    Tuple::const_iterator iter = k.find(m_dimension_id);
    if (iter == k.end()) {
       return;
@@ -161,10 +175,10 @@ void Interpreter::addExpr(const Tuple& k, AST::Expr *e) {
 
    if (split.has_components()) {
       //set the equation for the first component
-      addToVariable(split.first(), split.last(), k, e);
+      addToVariable(split.first(), split.last(), k, h);
    } else {
       //set the equation for the whole name
-      addToVariable(id->value(), k, e);
+      addToVariable(id->value(), k, h);
    }
 }
 

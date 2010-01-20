@@ -38,6 +38,7 @@ namespace TransLucid {
          return ustring_t(m_end, m_s.end());
       }
    };
+
 }
 
 #endif // UTILITY_HPP_INCLUDED

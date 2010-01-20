@@ -126,7 +126,7 @@ namespace TransLucid {
 
       TaggedValue operator()(const Tuple& k);
 
-      void addExpr(const Tuple& k, AST::Expr *e);
+      void addExpr(const Tuple& k, HD *h);
 
       //int add(const Context& context,
 
@@ -162,13 +162,16 @@ namespace TransLucid {
 
       //adds to id with remaining in the id dimension
       void addToVariable(const ustring_t& id, const ustring_t& remaining,
-         const Tuple& k, AST::Expr *e);
+         const Tuple& k, HD *e);
       //adds to id removing id from the context
       void addToVariable(const ustring_t& id,
-         const Tuple& k, AST::Expr *e);
+         const Tuple& k, HD *e);
       //does the actual add
       void addToVariableActual(const ustring_t& id,
-         const Tuple& k, AST::Expr *e);
+         const Tuple& k, HD *e);
+
+      template <typename T>
+      void buildConstantHD();
 
       protected:
       Parser::Header m_parseInfo;
@@ -181,7 +184,7 @@ namespace TransLucid {
 
       void addDimensions() {
          BOOST_FOREACH(const ustring_t& s, m_parseInfo.dimension_names) {
-            m_dimTranslator.insert(s);
+            m_dimTranslator.lookup(s);
          }
       }
 

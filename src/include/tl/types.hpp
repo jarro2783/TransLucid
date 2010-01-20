@@ -560,6 +560,10 @@ namespace TransLucid {
          return m_indexPair;
       }
 
+      type_index indexChar() const {
+         return m_indexChar;
+      }
+
       private:
 
       typedef std::map<type_index, const TypeManager*> IndexTypeMap;

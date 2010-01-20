@@ -29,16 +29,6 @@ namespace TransLucid {
        **/
       size_t lookup(const TypedValue& value);
 
-      /**
-       * @brief Inserts a named dimension and returns the value.
-       **/
-      size_t insert(const ustring_t& name);
-
-      /**
-       * @brief Inserts a typed value dimension and returns tha value.
-       **/
-      size_t insert(const TypedValue& value);
-
       private:
 
       size_t m_nextIndex;

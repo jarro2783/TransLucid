@@ -93,7 +93,7 @@ TaggedValue BuildTuple::operator()(const Tuple& k) {
             m_system.typeRegistry().indexSpecial()), k);
       } else {
          const PairType& p = v.first.value<PairType>();
-         kp[m_system.dimTranslator().insert(p.first())] = p.second();
+         kp[m_system.dimTranslator().lookup(p.first())] = p.second();
       }
    }
    return TaggedValue(TypedValue(Tuple(kp), m_system.typeRegistry().indexTuple()), k);
