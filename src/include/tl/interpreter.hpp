@@ -49,7 +49,7 @@ namespace TransLucid {
        * to the type registry.
        **/
       void loadLibrary(const ustring_t& name) {
-         m_lt.loadLibrary(name, m_types);
+         m_lt.loadLibrary(name, *this);
       }
 
       /**

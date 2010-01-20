@@ -7,7 +7,7 @@
 
 namespace TransLucid {
 
-   typedef void (*library_loader)(TypeRegistry&);
+   typedef void (*library_loader)(Interpreter&);
 
    class Libtool {
       public:
@@ -15,7 +15,7 @@ namespace TransLucid {
 
       ~Libtool();
 
-      void loadLibrary(const Glib::ustring& name, TypeRegistry& registry);
+      void loadLibrary(const Glib::ustring& name, Interpreter& i);
 
       void addSearchPath(const ustring_t& path);
 

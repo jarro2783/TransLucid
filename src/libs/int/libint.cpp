@@ -8,6 +8,8 @@
 #include <gmpxx.h>
 #include <boost/ref.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/interpreter.hpp>
+#include <tl/hyperdaton.hpp>
 
 namespace std {
    template <class T>
@@ -26,6 +28,24 @@ using boost::assign::list_of;
 namespace TL = TransLucid;
 
 namespace {
+
+template <typename T>
+class IntHD : public TL::HD {
+   public:
+   IntHD(TL::Interpreter& system)
+   : m_system(system)
+   {}
+
+   TL::TaggedValue operator()(const TL::Tuple& k) {
+
+   }
+
+   void addExpr(const TL::Tuple& k, HD *h) {
+   }
+
+   private:
+   TL::Interpreter& m_system;
+};
 
 BOOST_PARAMETER_TEMPLATE_KEYWORD(pre_type);
 BOOST_PARAMETER_TEMPLATE_KEYWORD(post_type);
@@ -300,7 +320,8 @@ void Int<T>::print(std::ostream& os, const TL::Tuple& context) const {
    os << m_value;
 }
 
-void registerTypes(TransLucid::TypeRegistry& r) {
+void registerTypes(TransLucid::Interpreter& i) {
+   TransLucid::TypeRegistry& r = i.typeRegistry();
    makeTypeManager<uint8_t>("uint8", r);
    makeTypeManager<int8_t>("int8", r);
    makeTypeManager<uint16_t>("uint16", r);
@@ -319,8 +340,8 @@ void registerTypes(TransLucid::TypeRegistry& r) {
 
 extern "C" {
 
-void library_init(TransLucid::TypeRegistry& registry) {
-   IntLib::registerTypes(registry);
+void lib_int_init(TransLucid::Interpreter& i) {
+   IntLib::registerTypes(i);
 }
 
 }

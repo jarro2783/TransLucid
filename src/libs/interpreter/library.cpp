@@ -7,17 +7,21 @@
 namespace TransLucid {
 
 namespace {
-   bool attemptLibraryOpen(const Glib::ustring& name, TypeRegistry& registry) {
+   bool attemptLibraryOpen(
+      const ustring_t& file,
+      const ustring_t& name,
+      Interpreter& i)
+   {
       bool success = true;
       std::string filename = Glib::filename_from_utf8(name);
 
       lt_dlhandle h = lt_dlopenext(filename.c_str());
 
       if (h != 0) {
-         void* init = lt_dlsym(h, "library_init");
+         void* init = lt_dlsym(h, ("lib_" + name + "_init").c_str());
 
          if (init != 0) {
-            (*(library_loader)init)(registry);
+            (*(library_loader)init)(i);
          } else {
             success = false;
          }
@@ -51,13 +55,13 @@ Libtool::~Libtool() {
    lt_dlexit();
 }
 
-void Libtool::loadLibrary(const Glib::ustring& name, TypeRegistry& registry) {
+void Libtool::loadLibrary(const Glib::ustring& name, Interpreter& i) {
 
    bool success = false;
 
    std::list<ustring_t>::const_iterator iter = m_searchDirs.begin();
    while (!success && iter != m_searchDirs.end()) {
-      if (attemptLibraryOpen(*iter + "/lib" + name, registry)) {
+      if (attemptLibraryOpen(*iter + "/lib" + name, name, i)) {
          success = true;
       }
       ++iter;
