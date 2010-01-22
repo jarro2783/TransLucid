@@ -13,9 +13,36 @@ functions are FUN
 default int is in DEFAULTINT
 
 constants that are defined:
+uchar
 
 constants that need defining:
-char
 bool
 special
 string
+intmp
+
+types:
+need to remove the magic for type indexes (RTTI?)
+things like special should be built by asking the system for a special instead
+of just building it
+the index of a type could be part of the system, anyone can ask for it, and
+then only if an implementation can see the header declaration for the class of
+a type can it access the type.
+
+When a constant is registered it must set CONST.
+It must also call _unique and set TYPEINDEX.
+
+it is required that some type and dimension indexes be fixed and visible to 
+everyone
+
+   types:
+      ustring     TYPE_INDEX_USTRING
+      intmp       TYPE_INDEX_INTMP
+      bool        TYPE_INDEX_BOOL
+
+   dimensions:
+      type        DIM_TYPE
+      text        DIM_TEXT
+      name        DIM_NAME
+      id          DIM_ID
+

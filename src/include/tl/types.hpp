@@ -459,6 +459,10 @@ namespace TransLucid {
 
       void registerType(const TypeManager *manager);
 
+      size_t registerType(const ustring_t& name);
+
+      size_t lookupType(const ustring_t& name) const;
+
       const TypeManager *findType(const Glib::ustring& name) const {
          StringTypeMap::const_iterator i = m_typeNameMapping.find(name);
          return i == m_typeNameMapping.end() ? 0 : i->second;

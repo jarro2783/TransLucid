@@ -15,9 +15,7 @@ namespace TransLucid {
    class DimensionTranslator {
       public:
 
-      DimensionTranslator()
-      : m_nextIndex(1)
-      {}
+      DimensionTranslator();
 
       /**
        * @brief Retrieves the value of a named dimension.

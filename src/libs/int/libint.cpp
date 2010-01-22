@@ -10,6 +10,8 @@
 #include <tl/builtin_types.hpp>
 #include <tl/interpreter.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/fixed_indexes.hpp>
+#include <tl/utility.hpp>
 
 namespace std {
    template <class T>
@@ -28,24 +30,6 @@ using boost::assign::list_of;
 namespace TL = TransLucid;
 
 namespace {
-
-template <typename T>
-class IntHD : public TL::HD {
-   public:
-   IntHD(TL::Interpreter& system)
-   : m_system(system)
-   {}
-
-   TL::TaggedValue operator()(const TL::Tuple& k) {
-
-   }
-
-   void addExpr(const TL::Tuple& k, HD *h) {
-   }
-
-   private:
-   TL::Interpreter& m_system;
-};
 
 BOOST_PARAMETER_TEMPLATE_KEYWORD(pre_type);
 BOOST_PARAMETER_TEMPLATE_KEYWORD(post_type);
@@ -291,6 +275,26 @@ TL::OpFunction bindCompOp(const TL::TypeManager& m) {
    return boost::bind(int_comp_op<T, Op>, _1, boost::cref(m.registry()));
 }
 
+template <typename T>
+class OpHD : public TL::HD {
+   public:
+
+   OpHD(TL::Interpreter& system)
+   : m_system(system)
+   {}
+
+   TL::TaggedValue operator()(const TL::Tuple& k) {
+      return TL::TaggedValue(op(), k);
+   }
+
+   void addExpr(const TL::Tuple& k, HD *h) {
+   }
+
+   private:
+   T op;
+   TL::Interpreter& m_system;
+};
+
 template<class T>
 class RegisterIntOps {
    public:
@@ -308,9 +312,57 @@ class RegisterIntOps {
    }
 };
 
+template <typename T>
+class IntHD : public TL::HD {
+   public:
+   IntHD(const TL::ustring_t& name, TL::Interpreter& system)
+   : m_system(system)
+   {
+      m_index = system.typeRegistry().registerType(name);
+   }
+
+   TL::TaggedValue operator()(const TL::Tuple& k) {
+      //retrieve the text and parse it
+      size_t tdim = m_system.dimTranslator().lookup("text");
+
+      TL::Tuple::const_iterator text = k.find(tdim);
+
+      if (text == k.end()) {
+         return TL::TaggedValue(TL::TypedValue(
+            TL::Special(TL::Special::DIMENSION), m_system.typeRegistry().indexSpecial()), k);
+      }
+
+      try {
+         return TL::TaggedValue(TL::TypedValue(
+            Int<T>(boost::lexical_cast<T>(text->second.value<TL::String>().value())), m_index), k);
+      } catch (...) {
+         return TL::TaggedValue(TL::TypedValue(
+            TL::Special(TL::Special::CONST), m_system.typeRegistry().indexSpecial()), k);
+      }
+   }
+
+   void addExpr(const TL::Tuple& k, HD *h) {
+   }
+
+   private:
+   TL::Interpreter& m_system;
+   size_t m_index;
+};
+
 template <class T>
 void makeTypeManager(const TL::ustring_t& name, TL::TypeRegistry& r) {
    new TL::TemplateTypeManager<Int<T> >(r, name, RegisterIntOps<Int<T> >());
+}
+
+template <class T>
+void registerType(const TL::ustring_t& name, TL::Interpreter& i) {
+   TL::HD *h = new IntHD<T>(name, i);
+
+   TL::tuple_t k;
+   k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
+   k.insert(std::make_pair(TL::DIM_ID, TL::generate_string("CONST")));
+   i.addExpr(TransLucid::Tuple(k), h);
+   mpz_class unique = TL::get_unique(&i);
 }
 
 }
@@ -334,6 +386,8 @@ void registerTypes(TransLucid::Interpreter& i) {
    const TL::TypeManager *m = r.findType("intmp");
    RegisterIntOps<TL::Intmp> intmpops;
    intmpops(*m);
+
+   registerType<uint8_t>("uint8", i);
 }
 
 } //namespace IntLib

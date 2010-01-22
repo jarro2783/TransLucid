@@ -136,6 +136,9 @@
 			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/include/tl/expr_parser.hpp" />
+		<Unit filename="src/include/tl/fixed_indexes.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/function.hpp">
 			<Option target="libinterpreter" />
 		</Unit>

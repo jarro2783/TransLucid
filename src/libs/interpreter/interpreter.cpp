@@ -11,6 +11,28 @@
 
 namespace TransLucid {
 
+namespace {
+
+   class UniqueHD : public HD {
+      public:
+
+      UniqueHD(int start)
+      : m_index(start)
+      {
+      }
+
+      TaggedValue operator()(const Tuple& k) {
+         return TaggedValue(TypedValue(Intmp(m_index++), TYPE_INDEX_INTMP), k);
+      }
+
+      void addExpr(const Tuple& k, HD *h) {
+      }
+
+      private:
+      mpz_class m_index;
+   };
+}
+
 inline void Interpreter::addToVariableActual(const ustring_t& id,
    const Tuple& k, HD *h)
 {
@@ -48,7 +70,7 @@ void Interpreter::buildConstantHD() {
 
    tuple_t k;
    //k[m_dimTranslator.lookup("id")] = TypedValue(String("CONST"), m_typeRegistry.indexString());
-   k[m_dimTranslator.lookup("type")] = TypedValue(String(T::name), m_types.indexString());
+   k[DIM_TYPE] = TypedValue(String(T::name), TYPE_INDEX_USTRING);
    addToVariableActual("CONST", Tuple(k), h);
 }
 
@@ -73,6 +95,9 @@ m_verbose(false)
 
    //build the constant creators
    buildConstantHD<ConstHD::UChar>();
+
+   tuple_t k;
+   addToVariableActual("_unique", Tuple(), new UniqueHD(RESERVED_INDEX_LAST));
 }
 
 Interpreter::~Interpreter() {
