@@ -4,7 +4,7 @@
 namespace TransLucid {
 
    //predefined unique indexes
-   enum {
+   enum Indexes {
       //types
       TYPE_INDEX_USTRING,
       TYPE_INDEX_INTMP,

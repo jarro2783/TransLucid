@@ -5,13 +5,13 @@
 namespace TransLucid {
 
 DimensionTranslator::DimensionTranslator()
-: m_nextIndex(RESERVED_INDEX_LAST),
-   m_namedDims(boost::assign::map_list_of(ustring_t("type"), int(DIM_TYPE))
+: m_nextIndex(RESERVED_INDEX_LAST)
+{
+   m_namedDims = (boost::assign::map_list_of("type", DIM_TYPE)
               ("text", DIM_TEXT)
               ("name", DIM_NAME)
               ("id", DIM_ID)
-              )
-{
+              );
 }
 
 size_t DimensionTranslator::lookup(const ustring_t& name) {
