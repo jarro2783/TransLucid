@@ -7,6 +7,11 @@ the @ [] on the lhs is in the dimension _validguard
 
 CONST uses type and text
 
+dimension indexes are stored in
+DIMENSION_INDEX
+   named dimensions in @ [name : string]
+   typed dimension in @ [arg0 : tv]
+
 identifiers:
 constants are CONST
 functions are FUN
@@ -46,3 +51,6 @@ everyone
       name        DIM_NAME
       id          DIM_ID
 
+operations and arg{0..inf}:
+we need to work out how exactly to do this in TL, this requires the default
+not found equation when the name is argN to add it return the new index

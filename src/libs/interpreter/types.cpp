@@ -203,17 +203,21 @@ Tuple Tuple::insert(size_t key, const TypedValue& value) const {
    return Tuple(t);
 }
 
+#warning do something about unevaluated expression types
 std::pair<TypedValue, Tuple> UnevalExpr::evaluate() const {
-   return m_interpreter.evaluate(m_expr, m_context);
+   //return m_interpreter.evaluate(m_expr, m_context);
 }
 
 Tuple Tuple::parse(const ustring_t& text, const Tuple& c, Interpreter& i) {
+   #warning I think this goes away now, but we will have to see what happens
+   #if 0
    AST::Expr *e = i.parseExpr(text);
    ValueContext v = i.evaluate(e, c);
    if (v.first.index() != i.typeRegistry().indexTuple()) {
       throw ParseError("tried to construct a tuple with an AST that is not a tuple");
    }
    return v.first.value<Tuple>();
+   #endif
 }
 
 void Tuple::print(const Interpreter& i, std::ostream& os, const Tuple& c) const {

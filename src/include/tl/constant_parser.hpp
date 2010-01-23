@@ -3,6 +3,7 @@
 
 #include <tl/parser_fwd.hpp>
 #include <tl/parser_util.hpp>
+#include <tl/expr.hpp>
 
 namespace TransLucid {
    namespace Parser {

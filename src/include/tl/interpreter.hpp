@@ -82,9 +82,9 @@ namespace TransLucid {
 
       AST::Expr *lookupEquation(const ustring_t& name, const Tuple& c);
 
-      ValueContext evaluate(AST::Expr *e, const Tuple& c) {
-         return m_evaluator.evaluate(e, c);
-      }
+      //ValueContext evaluate(AST::Expr *e, const Tuple& c) {
+      //   return m_evaluator.evaluate(e, c);
+      //}
 
       AST::Expr* parseExpr(const ustring_t& s);
 
@@ -133,7 +133,7 @@ namespace TransLucid {
       private:
       Libtool m_lt;
       TypeRegistry m_types;
-      Evaluator m_evaluator;
+      //Evaluator m_evaluator;
       DimensionTranslator m_dimTranslator;
       mpz_class m_maxClock;
       LazyWarehouse m_warehouse;

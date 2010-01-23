@@ -75,7 +75,8 @@ void Interpreter::buildConstantHD() {
 }
 
 Interpreter::Interpreter()
-: m_types(*this), m_evaluator(*this),
+: m_types(*this),
+//m_evaluator(*this),
 m_maxClock(0),
 m_warehouse(*this),
 m_dimension_id(m_dimTranslator.lookup("id")),
@@ -160,10 +161,11 @@ void Interpreter::cleanupParserObjects() {
    m_parsers.expr_stack.clear();
 }
 
+#warning redo equation guard
 Tuple EquationGuard::evaluate(Interpreter& i, const Tuple& context) const
    throw (InvalidGuard)
 {
-
+#if 0
    tuple_t t = m_dimensions;
 
    if (m_guard) {
@@ -183,6 +185,7 @@ Tuple EquationGuard::evaluate(Interpreter& i, const Tuple& context) const
    }
 
    return Tuple(t);
+#endif
 }
 
 void Interpreter::addExpr(const Tuple& k, HD *h) {

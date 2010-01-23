@@ -1,3 +1,5 @@
+#if 0
+
 #ifndef EVALUATOR_HPP_INCLUDED
 #define EVALUATOR_HPP_INCLUDED
 
@@ -50,3 +52,5 @@ namespace TransLucid {
 }
 
 #endif // EVALUATOR_HPP_INCLUDED
+
+#endif //if 0

@@ -18,7 +18,6 @@ namespace TransLucid {
 
       //the last one
       RESERVED_INDEX_LAST
-
    };
 
 } //namespace TransLucid

@@ -20,7 +20,8 @@ inline void Variable::addExprActual(const Tuple& k, HD *h) {
 }
 
 ValueContext ASTEquation::evaluate(Interpreter& i, const Tuple& context) {
-   return i.evaluate(m_e, context);
+   #warning this probably goes away
+   //return i.evaluate(m_e, context);
 }
 
 EquationBase::~EquationBase() {
@@ -111,7 +112,8 @@ bool Variable::booleanTrue(Interpreter& i, const EquationGuard& g, const Tuple& 
    AST::Expr *b = g.boolean();
 
    if (b) {
-      ValueContext v = i.evaluate(g.boolean(), c);
+      #warning something about a hyperdaton for the guard
+      ValueContext v;// = i.evaluate(g.boolean(), c);
 
       return v.first.index() == i.typeRegistry().indexBoolean()
       && v.first.value<Boolean>();

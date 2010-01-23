@@ -2,6 +2,7 @@
 #include <tl/types.hpp>
 #include <tl/expr.hpp>
 #include <tl/interpreter.hpp>
+#include <tl/builtin_types.hpp>
 
 namespace TL = TransLucid;
 

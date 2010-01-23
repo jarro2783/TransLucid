@@ -12,6 +12,7 @@
 #include <tl/hyperdaton.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
+#include <tl/consthd.hpp>
 
 namespace std {
    template <class T>
@@ -283,6 +284,9 @@ class OpHD : public TL::HD {
    : m_system(system)
    {}
 
+   //takes the two operands out of the tuple and passes them to the
+   //op as arguments
+   //variadic templates would be really really good here
    TL::TaggedValue operator()(const TL::Tuple& k) {
       return TL::TaggedValue(op(), k);
    }
@@ -363,6 +367,11 @@ void registerType(const TL::ustring_t& name, TL::Interpreter& i) {
    k.insert(std::make_pair(TL::DIM_ID, TL::generate_string("CONST")));
    i.addExpr(TransLucid::Tuple(k), h);
    mpz_class unique = TL::get_unique(&i);
+
+   k.clear();
+   k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
+   k.insert(std::make_pair(TL::DIM_ID, TL::generate_string("TYPEINDEX")));
+   i.addExpr(TransLucid::Tuple(k), new TL::ConstHD::IntmpConst(i, unique));
 }
 
 }

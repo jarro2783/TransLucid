@@ -67,7 +67,9 @@ class DirectoryGrammar : public Spirit::grammar<DirectoryGrammar> {
    };
 };
 
-DirectorySystem::DirectorySystem() {
+DirectorySystem::DirectorySystem()
+: m_compiler(*this)
+{
    m_grammar = new DirectoryGrammar(m_parseInfo, m_parsers, m_equationAdder);
    #ifdef BOOST_SPIRIT_DEBUG
    BOOST_SPIRIT_DEBUG_GRAMMAR(*m_grammar);
@@ -77,7 +79,6 @@ DirectorySystem::DirectorySystem() {
 bool DirectorySystem::parseSystem(const ustring_t& path) {
 
    bool success = true;
-   ExprCompiler compiler(*this);
 
    std::string pathl = Glib::filename_from_utf8(path);
 
@@ -136,9 +137,8 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                      k.insert(std::make_pair(dim_valid,
                         TypedValue(EquationGuardType(e.get<1>()),
                            typeRegistry().indexGuard())));
-                     //std::cerr << "adding equation " << ustring_t(e.get<0>()) << std::endl;
-                     #warning finish doing this
-                     HD *h = compiler.compile(e.get<2>());
+
+                     HD *h = m_compiler.compile(e.get<2>());
                      addExpr(Tuple(k), h);
                   }
                }
@@ -197,11 +197,12 @@ void DirectorySystem::setClock(const Parser::equation_v& equations) {
    if (equations.size() == 1 &&
       (e = &equations.front())->get<0>() == L"clock")
    {
-      ValueContext r = evaluate(e->get<2>(), Tuple());
-      if (r.first.index() != typeRegistry().indexIntmp()) {
+      HD *h = m_compiler.compile(e->get<2>());
+      TypedValue v = (*h)(Tuple()).first;//= evaluate(e->get<2>(), Tuple());
+      if (v.index() != typeRegistry().indexIntmp()) {
          throw ParseError("clock variable must be an intmp");
       } else {
-         const Intmp& i = r.first.value<Intmp>();
+         const Intmp& i = v.value<Intmp>();
          m_maxClock = i.value();
       }
    } else {

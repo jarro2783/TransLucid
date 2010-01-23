@@ -7,7 +7,7 @@ add_definitions(${TLCFLAGS} -DSHAREDIR="${CMAKE_INSTALL_PREFIX}/share/tl"
 add_library(tlinterpreter SHARED interpreter.cpp interpreter_expr.cpp 
 interpreter_tuple.cpp interpreter_constant.cpp
 library.cpp dimtranslator.cpp types.cpp
-range.cpp evaluator.cpp expr.cpp parser.cpp
+range.cpp expr.cpp parser.cpp
 builtin_types.cpp equation.cpp
 header_type.cpp cache.cpp utility.cpp 
 compiled_functors.cpp expr_compiler.cpp consthd.cpp)

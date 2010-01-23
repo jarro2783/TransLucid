@@ -11,7 +11,7 @@ libtlinterpreter_la_SOURCES = interpreter.cpp interpreter_expr.cpp \
 interpreter_tuple.cpp interpreter_constant.cpp \
 library.cpp types.cpp \
 dimtranslator.cpp \
-range.cpp evaluator.cpp expr.cpp  parser.cpp \
+range.cpp expr.cpp  parser.cpp \
 builtin_types.cpp header_type.cpp equation.cpp \
 cache.cpp utility.cpp constant.cpp function.cpp compiled_functors.cpp \
 expr_compiler.cpp consthd.cpp

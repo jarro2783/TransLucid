@@ -3,6 +3,8 @@
 
 #include <tl/interpreter.hpp>
 #include <tl/parser_fwd.hpp>
+#include <tl/builtin_types.hpp>
+#include <tl/expr_compiler.hpp>
 
 namespace TransLucid {
 
@@ -35,6 +37,8 @@ namespace TransLucid {
          mpz_class m_maxClock;
 
          DirectoryGrammar *m_grammar;
+
+         ExprCompiler m_compiler;
       };
 
       template <typename OutputIterator>
