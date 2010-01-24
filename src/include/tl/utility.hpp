@@ -11,6 +11,9 @@
 
 namespace TransLucid {
 
+   class DimensionNotFound {
+   };
+
    class SplitID {
       private:
       static const ustring_t m_split_match;;
@@ -61,7 +64,17 @@ namespace TransLucid {
 
    inline mpz_class get_dimension_index(HD *h, const ustring_t& name) {
       tuple_t k;
-      //k[DIM_ID] =
+      k[DIM_ID] = generate_string("DIMENSION_INDEX");
+      k[DIM_TEXT] = generate_string(name);
+      return (*h)(Tuple(k)).first.value<Intmp>().value();
+   }
+
+   inline TypedValue get_dimension(const Tuple& k, size_t index) {
+      Tuple::const_iterator i = k.find(index);
+      if (i == k.end()) {
+         throw DimensionNotFound();
+      }
+      return i->second;
    }
 
    template <typename T>

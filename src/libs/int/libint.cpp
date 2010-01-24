@@ -288,14 +288,27 @@ class OpHD : public TL::HD {
    //op as arguments
    //variadic templates would be really really good here
    TL::TaggedValue operator()(const TL::Tuple& k) {
-      return TL::TaggedValue(op(), k);
+      try {
+         size_t index_arg0 = TL::get_dimension_index(&m_system, "arg0");
+         size_t index_arg1 = TL::get_dimension_index(&m_system, "arg1");
+
+         return TL::TaggedValue(m_op(TL::get_dimension(k, index_arg0),
+                                     TL::get_dimension(k, index_arg1),
+                                     k));
+      } catch (TL::DimensionNotFound& e) {
+         #warning maybe use the system to build these specials
+         //H @ [id : "CONST", type : "special", value : "dimension"]
+         //or we could leave these since it is slightly more efficient, however it will
+         //all come out in the wash when we compile anyway
+         return TL::TaggedValue(TL::TypedValue(TL::Special(TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
+      }
    }
 
    void addExpr(const TL::Tuple& k, HD *h) {
    }
 
    private:
-   T op;
+   T m_op;
    TL::Interpreter& m_system;
 };
 
@@ -306,6 +319,7 @@ class RegisterIntOps {
       std::vector<TL::type_index> ops = list_of(m.index())(m.index());
       TL::TypeRegistry& r = m.registry();
       //r.registerOp("operator+", ops, TL::BinaryOp<T, int_bin_op<T, std::plus> >(m));
+      #if 0
       r.registerOp("operator+", ops, bindBinOp<T, std::plus>(m));
       r.registerOp("operator-", ops, bindBinOp<T, std::minus>(m));
       r.registerOp("operator*", ops, bindBinOp<T, std::multiplies>(m));
@@ -313,6 +327,7 @@ class RegisterIntOps {
       r.registerOp("operator%", ops, bindBinOp<T, std::modulus, pre_type<ValueCheck::DivByZero> >(m));
       r.registerOp("operator<", ops, bindCompOp<T, std::less>(m));
       r.registerOp("operator>", ops, bindCompOp<T, std::greater>(m));
+      #endif
    }
 };
 
