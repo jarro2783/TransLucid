@@ -82,19 +82,19 @@ namespace ValueCheck {
 
 struct Null {
    template <class Actual, class T>
-   bool operator()(const T& lhs, const T& rhs, int) {
+   bool operator()(const T& lhs, const T& rhs, const TL::Tuple& k) {
       return false;
    }
 
    template <class Actual, class T>
-   bool operator()(const T& value, int) {
+   bool operator()(const T& value, const TL::Tuple& k) {
       return false;
    }
 };
 
 struct Overflow {
    template <class Actual, class T>
-   bool operator()(const T& value, int) {
+   bool operator()(const T& value, const TL::Tuple& k) {
       return value < convert<T>(std::numeric_limits<Actual>::min()) ||
          std::greater<T>()(value, convert<T>(std::numeric_limits<Actual>::max()));
    }
@@ -102,12 +102,12 @@ struct Overflow {
 
 struct DivByZero {
    template <class Actual, class T>
-   bool operator()(const T& lhs, const T& rhs, int) {
+   bool operator()(const T& lhs, const T& rhs, const TL::Tuple& k) {
       return rhs == 0;
    }
 };
 
-}
+} //namespace ValueCheck
 
 template <typename T>
 struct IntTraits {
@@ -200,7 +200,13 @@ struct BigStore <TL::Intmp> {
 
 template <class T, template <typename> class Op, class Arg1, class Arg2>
 //TL::TypedValue int_bin_op(const T& lhs, const T& rhs, TL::TypeManager& m, int) {
-TL::TypedValue int_bin_op(const std::vector<TL::TypedValue>& operands, const TL::TypeManager& m, int) {
+TL::TypedValue int_bin_op(
+   //const std::vector<TL::TypedValue>& operands,
+   size_t index,
+   const TL::TypedValue& l,
+   const TL::TypedValue& r,
+   const TL::Tuple& k)
+{
 
    typedef typename
       int_bin_op_signature::bind<Arg1, Arg2>::type
@@ -217,48 +223,57 @@ TL::TypedValue int_bin_op(const std::vector<TL::TypedValue>& operands, const TL:
 
    typedef typename BigStore<T>::type bigstore;
 
-   bigstore lhs = convert<bigstore>(operands.at(0).value<T>().value());
-   bigstore rhs = convert<bigstore>(operands.at(1).value<T>().value());
+   bigstore lhs = convert<bigstore>(l.value<T>().value());
+   bigstore rhs = convert<bigstore>(r.value<T>().value());
 
-   if (Pre().template operator()<typename IntTraits<T>::type>(lhs, rhs, 0)) {
-      return TL::TypedValue(TL::Special("aritherr"), m.registry().indexSpecial());
+   if (Pre().template operator()<typename IntTraits<T>::type>(lhs, rhs, k)) {
+      return TL::TypedValue(TL::Special("aritherr"), TL::TYPE_INDEX_SPECIAL);
    }
 
    typename IntTraits<T>::big value = Op<typename IntTraits<T>::big>()(lhs, rhs);
 
-   if (Post().template operator()<typename IntTraits<T>::type>(value, 0)) {
-      return TL::TypedValue(TL::Special("aritherr"), m.registry().indexSpecial());
+   if (Post().template operator()<typename IntTraits<T>::type>(value, k)) {
+      return TL::TypedValue(TL::Special("aritherr"), TL::TYPE_INDEX_SPECIAL);
    }
 
-   return TL::TypedValue(T(convert<type>(value)), m.index());
+   return TL::TypedValue(T(convert<type>(value)), index);
 };
 
 template <class T, template <typename> class Op, class Arg1>
-TL::TypedValue int_bin_op(const std::vector<TL::TypedValue>& operands, const TL::TypeManager& m, int) {
-   return int_bin_op<T, Op, Arg1, boost::parameter::void_>(operands, m, 0);
+TL::TypedValue int_bin_op(//const std::vector<TL::TypedValue>& operands, const TL::TypeManager& m, int) {
+   size_t index,
+   const TL::TypedValue& l,
+   const TL::TypedValue& r,
+   const TL::Tuple& k)
+{
+   return int_bin_op<T, Op, Arg1, boost::parameter::void_>(index, l, r, k);
 }
 
 template <class T, template <typename> class Op>
-TL::TypedValue int_bin_op(const std::vector<TL::TypedValue>& operands, const TL::TypeManager& m, int) {
-   return int_bin_op<T, Op, boost::parameter::void_, boost::parameter::void_>(operands, m, 0);
+TL::TypedValue int_bin_op(//const std::vector<TL::TypedValue>& operands, const TL::TypeManager& m, int)
+   size_t index,
+   const TL::TypedValue& l,
+   const TL::TypedValue& r,
+   const TL::Tuple& k)
+{
+   return int_bin_op<T, Op, boost::parameter::void_, boost::parameter::void_>(index, l, r, k);
 }
 
 template <class T, template <typename> class Op>
-TL::OpFunction bindBinOp(const TL::TypeManager& m) {
-   //when adding context make the third _2
-   return boost::bind(int_bin_op<T, Op>, _1, boost::ref(m), 0);
+TL::OpFunction bindBinOp(TL::Interpreter& i, size_t index) {
+   return boost::bind(int_bin_op<T, Op>, index, _1, _2, _3);
 }
 
 template <class T, template <typename> class Op, class Arg1>
-TL::OpFunction bindBinOp(const TL::TypeManager& m) {
+TL::OpFunction bindBinOp(TL::Interpreter& i, size_t index) {
    //when adding context make the third _2
-   return boost::bind(int_bin_op<T, Op, Arg1>, _1, boost::ref(m), 0);
+   return boost::bind(int_bin_op<T, Op, Arg1>, index, _1, _2, _3);
 }
 
 template <class T, template <typename> class Op, class Arg1, class Arg2>
-TL::OpFunction bindBinOp(const TL::TypeManager& m) {
+TL::OpFunction bindBinOp(TL::Interpreter& i, size_t index) {
    //when adding context make the third _2
-   return boost::bind(int_bin_op<T, Op, Arg1, Arg2>, _1, boost::ref(m), 0);
+   return boost::bind(int_bin_op<T, Op, Arg1, Arg2>, index, _1, _2, _3);
 }
 
 template <class T, template <typename> class Op>
@@ -280,8 +295,8 @@ template <typename T>
 class OpHD : public TL::HD {
    public:
 
-   OpHD(TL::Interpreter& system)
-   : m_system(system)
+   OpHD(TL::Interpreter& system, const T& op)
+   : m_op(op), m_system(system)
    {}
 
    //takes the two operands out of the tuple and passes them to the
@@ -289,12 +304,13 @@ class OpHD : public TL::HD {
    //variadic templates would be really really good here
    TL::TaggedValue operator()(const TL::Tuple& k) {
       try {
-         size_t index_arg0 = TL::get_dimension_index(&m_system, "arg0");
-         size_t index_arg1 = TL::get_dimension_index(&m_system, "arg1");
+         size_t index_arg0 = TL::get_dimension_index(&m_system, "arg0").get_ui();
+         size_t index_arg1 = TL::get_dimension_index(&m_system, "arg1").get_ui();
 
          return TL::TaggedValue(m_op(TL::get_dimension(k, index_arg0),
                                      TL::get_dimension(k, index_arg1),
-                                     k));
+                                     k),
+                                k);
       } catch (TL::DimensionNotFound& e) {
          #warning maybe use the system to build these specials
          //H @ [id : "CONST", type : "special", value : "dimension"]
@@ -312,24 +328,28 @@ class OpHD : public TL::HD {
    TL::Interpreter& m_system;
 };
 
+template <typename Operation>
+TL::HD *build_op_hd(TL::Interpreter& i, const Operation& op) {
+   return new OpHD<Operation>(i, op);
+}
+
 template<class T>
-class RegisterIntOps {
-   public:
-   void operator()(const TL::TypeManager& m) {
-      std::vector<TL::type_index> ops = list_of(m.index())(m.index());
-      TL::TypeRegistry& r = m.registry();
-      //r.registerOp("operator+", ops, TL::BinaryOp<T, int_bin_op<T, std::plus> >(m));
-      #if 0
-      r.registerOp("operator+", ops, bindBinOp<T, std::plus>(m));
-      r.registerOp("operator-", ops, bindBinOp<T, std::minus>(m));
-      r.registerOp("operator*", ops, bindBinOp<T, std::multiplies>(m));
-      r.registerOp("operator/", ops, bindBinOp<T, std::divides, pre_type<ValueCheck::DivByZero> >(m));
-      r.registerOp("operator%", ops, bindBinOp<T, std::modulus, pre_type<ValueCheck::DivByZero> >(m));
-      r.registerOp("operator<", ops, bindCompOp<T, std::less>(m));
-      r.registerOp("operator>", ops, bindCompOp<T, std::greater>(m));
-      #endif
-   }
-};
+void register_int_ops(TL::Interpreter& i, size_t index) {
+   //std::vector<TL::type_index> ops = list_of(m.index())(m.index());
+   //TL::TypeRegistry& r = m.registry();
+   //r.registerOp("operator+", ops, TL::BinaryOp<T, int_bin_op<T, std::plus> >(m));
+   #warning need to register this with the system, but we dont know how to do that yet
+   TL::HD *h = build_op_hd(i, bindBinOp<T, std::plus>(i, index));
+   #if 0
+   r.registerOp("operator+", ops, bindBinOp<T, std::plus>(m));
+   r.registerOp("operator-", ops, bindBinOp<T, std::minus>(m));
+   r.registerOp("operator*", ops, bindBinOp<T, std::multiplies>(m));
+   r.registerOp("operator/", ops, bindBinOp<T, std::divides, pre_type<ValueCheck::DivByZero> >(m));
+   r.registerOp("operator%", ops, bindBinOp<T, std::modulus, pre_type<ValueCheck::DivByZero> >(m));
+   r.registerOp("operator<", ops, bindCompOp<T, std::less>(m));
+   r.registerOp("operator>", ops, bindCompOp<T, std::greater>(m));
+   #endif
+}
 
 template <typename T>
 class IntHD : public TL::HD {
@@ -368,10 +388,12 @@ class IntHD : public TL::HD {
    size_t m_index;
 };
 
+#if 0
 template <class T>
 void makeTypeManager(const TL::ustring_t& name, TL::TypeRegistry& r) {
    new TL::TemplateTypeManager<Int<T> >(r, name, RegisterIntOps<Int<T> >());
 }
+#endif
 
 template <class T>
 void registerType(const TL::ustring_t& name, TL::Interpreter& i) {
@@ -386,10 +408,12 @@ void registerType(const TL::ustring_t& name, TL::Interpreter& i) {
    k.clear();
    k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
    k.insert(std::make_pair(TL::DIM_ID, TL::generate_string("TYPEINDEX")));
-   i.addExpr(TransLucid::Tuple(k), new TL::ConstHD::IntmpConst(i, unique));
+   i.addExpr(TransLucid::Tuple(k), new TL::ConstHD::IntmpConst(unique));
+
+   register_int_ops<Int<T> >(i, unique.get_ui());
 }
 
-}
+} //namespace <unnamed>
 
 template <class T>
 void Int<T>::print(std::ostream& os, const TL::Tuple& context) const {
@@ -397,6 +421,7 @@ void Int<T>::print(std::ostream& os, const TL::Tuple& context) const {
 }
 
 void registerTypes(TransLucid::Interpreter& i) {
+   #if 0
    TransLucid::TypeRegistry& r = i.typeRegistry();
    makeTypeManager<uint8_t>("uint8", r);
    makeTypeManager<int8_t>("int8", r);
@@ -408,8 +433,9 @@ void registerTypes(TransLucid::Interpreter& i) {
    makeTypeManager<int64_t>("int64", r);
    //makeTypeManager<mpz_class>("intmp", r);
    const TL::TypeManager *m = r.findType("intmp");
-   RegisterIntOps<TL::Intmp> intmpops;
-   intmpops(*m);
+   //RegisterIntOps<TL::Intmp> intmpops;
+   //intmpops(*m);
+   #endif
 
    registerType<uint8_t>("uint8", i);
 }

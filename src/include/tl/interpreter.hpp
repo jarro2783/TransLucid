@@ -157,9 +157,6 @@ namespace TransLucid {
       Parser::ConstantGrammar *m_constantGrammar;
       VariableMap m_variables;
 
-      //special dimensions
-      size_t m_dimension_id;
-
       //adds to id with remaining in the id dimension
       void addToVariable(const ustring_t& id, const ustring_t& remaining,
          const Tuple& k, HD *e);
@@ -171,7 +168,7 @@ namespace TransLucid {
          const Tuple& k, HD *e);
 
       template <typename T>
-      void buildConstantHD();
+      HD* buildConstantHD(size_t index);
 
       protected:
       Parser::Header m_parseInfo;

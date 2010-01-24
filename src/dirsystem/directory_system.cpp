@@ -5,6 +5,7 @@
 #include <tl/exception.hpp>
 #include <tl/parser.hpp>
 #include <tl/expr_compiler.hpp>
+#include <tl/fixed_indexes.hpp>
 
 namespace TransLucid {
 
@@ -134,8 +135,12 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                      k.insert(std::make_pair(dim_id,
                         TypedValue(String(e.get<0>()),
                            typeRegistry().indexString())));
+
+                     //need to compile the guard
+                     HD *guardTuple = m_compiler.compile(e.get<1>().get<0>());
+                     HD *guardBool = m_compiler.compile(e.get<1>().get<1>());
                      k.insert(std::make_pair(dim_valid,
-                        TypedValue(EquationGuardType(e.get<1>()),
+                        TypedValue(EquationGuardType(EquationGuard(guardTuple, guardBool)),
                            typeRegistry().indexGuard())));
 
                      HD *h = m_compiler.compile(e.get<2>());
@@ -199,7 +204,7 @@ void DirectorySystem::setClock(const Parser::equation_v& equations) {
    {
       HD *h = m_compiler.compile(e->get<2>());
       TypedValue v = (*h)(Tuple()).first;//= evaluate(e->get<2>(), Tuple());
-      if (v.index() != typeRegistry().indexIntmp()) {
+      if (v.index() != TYPE_INDEX_INTMP) {
          throw ParseError("clock variable must be an intmp");
       } else {
          const Intmp& i = v.value<Intmp>();

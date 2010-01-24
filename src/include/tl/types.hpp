@@ -415,7 +415,7 @@ namespace TransLucid {
     **/
    typedef std::pair<TypedValue, Tuple> ValueContext;
 
-   typedef boost::function<TypedValue (const std::vector<TypedValue>&, const Tuple&)> OpFunction;
+   typedef boost::function<TypedValue (const TypedValue&, const TypedValue&, const Tuple&)> OpFunction;
    typedef boost::function<TypedValue (const TypedValue&, const Tuple&)> ConvertFunction;
 
    /**

@@ -276,7 +276,7 @@ namespace TransLucid {
                   bind(self.adder,
                      construct<equation_t>(
                         at(ref(string_stack), 0),
-                        construct<EquationGuard>(
+                        construct<ParsedEquationGuard>(
                            at(ref(expr_stack), 2),
                            at(ref(expr_stack), 1)),
                         at(ref(expr_stack), 0))

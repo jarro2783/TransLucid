@@ -221,7 +221,8 @@ namespace TransLucid {
       class TupleGrammar;
       class ConstantGrammar;
 
-      typedef boost::tuple<wstring_t, EquationGuard, AST::Expr*> equation_t;
+      typedef boost::tuple<AST::Expr*, AST::Expr*> ParsedEquationGuard;
+      typedef boost::tuple<wstring_t, ParsedEquationGuard, AST::Expr*> equation_t;
       typedef std::vector<equation_t> equation_v;
 
       enum InfixAssoc {

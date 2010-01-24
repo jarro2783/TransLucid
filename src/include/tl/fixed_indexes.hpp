@@ -10,6 +10,7 @@ namespace TransLucid {
       TYPE_INDEX_INTMP,
       TYPE_INDEX_BOOL,
       TYPE_INDEX_SPECIAL,
+      TYPE_INDEX_UCHAR,
 
       //dimensions
       DIM_TYPE,

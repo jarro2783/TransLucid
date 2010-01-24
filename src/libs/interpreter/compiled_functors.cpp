@@ -1,6 +1,8 @@
 #include <tl/compiled_functors.hpp>
 #include <boost/assign/list_of.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/fixed_indexes.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid {
 
@@ -207,9 +209,9 @@ TaggedValue If::operator()(const Tuple& k) {
 TaggedValue Integer::operator()(const Tuple& k) {
    // @[id : CONST, type : @[id : DEFAULTINT], value : m_value]
    tuple_t kp = k.tuple();
-   TupleInserter<String> inserter(kp, m_system, m_system.typeRegistry(). indexString());
+   TupleInserter<String> inserter(kp, m_system, TYPE_INDEX_USTRING);
    //contextInsert<String>(kp, m_system, "id", "DEFAULTINT", m_system.typeRegistry().indexString());
-   inserter("id", "DEFAULTINT");
+   kp[DIM_ID] = generate_string("DEFAULTINT");
    TaggedValue defaultint = m_system(Tuple(kp));
 
    //kp = k.tuple();

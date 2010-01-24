@@ -1,31 +1,32 @@
 #include <tl/consthd.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid {
 
 namespace ConstHD {
 
-const char *UChar::name = "uchar";
+const char *UChar::name =     "uchar";
+const char *Intmp::name =     "intmp";
 
 TaggedValue UChar::operator()(const Tuple& k) {
-   size_t valueindex = m_i.dimTranslator().lookup("text");
+   size_t valueindex = get_dimension_index(m_system, "text").get_ui();
    Tuple::const_iterator value = k.find(valueindex);
 
-   if (value == k.end() || value->second.index() != m_i.typeRegistry().indexString()) {
+   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING) {
       return TaggedValue(TypedValue(Special(Special::DIMENSION),
-         m_i.typeRegistry().indexSpecial()), k);
+         TYPE_INDEX_SPECIAL), k);
    }
 
    const ustring_t& s = value->second.value<String>().value();
    //return TaggedValue(m_i.typeRegistry().findType("uchar")->parse(s.value(), k, m_i), k);
    if (s.length() != 1) {
-      return TaggedValue(TypedValue(Special(Special::CONST),
-         m_i.typeRegistry().indexSpecial()), k);
+      return TaggedValue(TypedValue(Special(Special::CONST), TYPE_INDEX_SPECIAL), k);
    }
-   return TaggedValue(TypedValue(Char(s[0]), m_i.typeRegistry().indexChar()), k);
+   return TaggedValue(TypedValue(Char(s[0]), TYPE_INDEX_UCHAR), k);
 }
 
-void UChar::addExpr(const Tuple& k, HD *h) {
+TaggedValue Intmp::operator()(const Tuple& k) {
 }
 
 } //namespace ConstHD

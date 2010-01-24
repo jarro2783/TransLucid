@@ -35,7 +35,7 @@ namespace TransLucid {
        *
        * Specifies the AST to use for the guard.
        **/
-      EquationGuard(AST::Expr* g, AST::Expr *b)
+      EquationGuard(HD* g, HD *b)
       : m_guard(g), m_boolean(b)
       {
       }
@@ -80,7 +80,7 @@ namespace TransLucid {
        * @throw InvalidGuard when the user has specified a system imposed
        * dimension.
        **/
-      Tuple evaluate(Interpreter& i, const Tuple& context) const
+      Tuple evaluate(const Tuple& context) const
          throw(InvalidGuard);
 
       /**
@@ -93,13 +93,13 @@ namespace TransLucid {
          m_dimensions[dim] = v;
       }
 
-      AST::Expr *boolean() const {
+      HD *boolean() const {
          return m_boolean;
       }
 
       private:
-      AST::Expr *m_guard;
-      AST::Expr *m_boolean;
+      HD *m_guard;
+      HD *m_boolean;
       std::map<size_t, TypedValue> m_dimensions;
    };
 

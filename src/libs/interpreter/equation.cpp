@@ -5,6 +5,33 @@
 
 namespace TransLucid {
 
+#warning redo equation guard
+Tuple EquationGuard::evaluate(const Tuple& context) const
+   throw (InvalidGuard)
+{
+#if 0
+   tuple_t t = m_dimensions;
+
+   if (m_guard) {
+      ValueContext v = i.evaluate(m_guard, context);
+
+      if (v.first.index() == i.typeRegistry().indexTuple()) {
+         BOOST_FOREACH(const Tuple::value_type& value, v.first.value<Tuple>()) {
+            if (t.find(value.first) != t.end()) {
+               throw InvalidGuard();
+            }
+
+            t.insert(std::make_pair(value.first, value.second));
+         }
+      } else {
+         throw ParseError(__FILE__ ":" STRING_(__LINE__) ": guard is not a tuple");
+      }
+   }
+
+   return Tuple(t);
+#endif
+}
+
 inline void Variable::addExprActual(const Tuple& k, HD *h) {
    const EquationGuard *g = 0;
    Tuple::const_iterator giter = k.find(m_i.dimTranslator().lookup("_validguard"));
@@ -108,14 +135,14 @@ bool Variable::tupleRefines(const Interpreter& i, const Tuple& a, const Tuple& b
    return true;
 }
 
-bool Variable::booleanTrue(Interpreter& i, const EquationGuard& g, const Tuple& c) const {
-   AST::Expr *b = g.boolean();
+bool Variable::booleanTrue(Interpreter& i, const EquationGuard& g, const Tuple& k) const {
+   HD *b = g.boolean();
 
    if (b) {
       #warning something about a hyperdaton for the guard
-      ValueContext v;// = i.evaluate(g.boolean(), c);
+      TaggedValue v = (*b)(k);// = i.evaluate(g.boolean(), c);
 
-      return v.first.index() == i.typeRegistry().indexBoolean()
+      return v.first.index() == TYPE_INDEX_BOOL
       && v.first.value<Boolean>();
    } else {
       return true;
@@ -140,7 +167,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
       if (eqn_i->validContext()) {
          try {
             const EquationGuard& guard = eqn_i->validContext();
-            Tuple evalContext = guard.evaluate(m_i, k);
+            Tuple evalContext = guard.evaluate(k);
             //std::cout << "guard:" << std::endl;
             //evalContext.print(m_i, std::cout, c);
             if (tupleApplicable(m_i, evalContext, k) && booleanTrue(m_i, guard, k)) {

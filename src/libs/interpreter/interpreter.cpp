@@ -51,8 +51,7 @@ inline void Interpreter::addToVariable(const ustring_t& id,
    const ustring_t& remaining, const Tuple& k, HD *h)
 {
    tuple_t kp = k.tuple();
-   kp[m_dimension_id] = TypedValue(String(remaining),
-      m_types.indexString());
+   kp[DIM_ID] = TypedValue(String(remaining), TYPE_INDEX_USTRING);
    addToVariableActual(id, Tuple(kp), h);
 }
 
@@ -60,18 +59,21 @@ inline void Interpreter::addToVariable(const ustring_t& id,
    const Tuple& k, HD *h)
 {
    tuple_t kp = k.tuple();
-   kp.erase(m_dimension_id);
+   kp.erase(DIM_ID);
    addToVariableActual(id, Tuple(kp), h);
 }
 
 template <typename T>
-void Interpreter::buildConstantHD() {
-   HD *h = new T(*this);
+HD* Interpreter::buildConstantHD(size_t index) {
+   HD *h = new T(this);
 
    tuple_t k;
+   Tuple empty;
    //k[m_dimTranslator.lookup("id")] = TypedValue(String("CONST"), m_typeRegistry.indexString());
    k[DIM_TYPE] = TypedValue(String(T::name), TYPE_INDEX_USTRING);
    addToVariableActual("CONST", Tuple(k), h);
+   addToVariableActual("TYPEINDEX", empty, new ConstHD::IntmpConst(index));
+   return h;
 }
 
 Interpreter::Interpreter()
@@ -79,7 +81,7 @@ Interpreter::Interpreter()
 //m_evaluator(*this),
 m_maxClock(0),
 m_warehouse(*this),
-m_dimension_id(m_dimTranslator.lookup("id")),
+//m_dimension_id(m_dimTranslator.lookup("id")),
 m_verbose(false)
 {
    //m_systemParser.push(*m_systemGrammar);
@@ -95,9 +97,13 @@ m_verbose(false)
    //m_variables.insert(std::make_pair("const", new ConstantHD(*this)));
 
    //build the constant creators
-   buildConstantHD<ConstHD::UChar>();
+   buildConstantHD<ConstHD::UChar>(TYPE_INDEX_UCHAR);
+   HD *intmpHD = buildConstantHD<ConstHD::Intmp>(TYPE_INDEX_INTMP);
 
-   tuple_t k;
+   //set this as the default int too
+   addToVariableActual("DEFAULTINT", Tuple(), intmpHD);
+
+   //tuple_t k;
    addToVariableActual("_unique", Tuple(), new UniqueHD(RESERVED_INDEX_LAST));
 }
 
@@ -161,35 +167,8 @@ void Interpreter::cleanupParserObjects() {
    m_parsers.expr_stack.clear();
 }
 
-#warning redo equation guard
-Tuple EquationGuard::evaluate(Interpreter& i, const Tuple& context) const
-   throw (InvalidGuard)
-{
-#if 0
-   tuple_t t = m_dimensions;
-
-   if (m_guard) {
-      ValueContext v = i.evaluate(m_guard, context);
-
-      if (v.first.index() == i.typeRegistry().indexTuple()) {
-         BOOST_FOREACH(const Tuple::value_type& value, v.first.value<Tuple>()) {
-            if (t.find(value.first) != t.end()) {
-               throw InvalidGuard();
-            }
-
-            t.insert(std::make_pair(value.first, value.second));
-         }
-      } else {
-         throw ParseError(__FILE__ ":" STRING_(__LINE__) ": guard is not a tuple");
-      }
-   }
-
-   return Tuple(t);
-#endif
-}
-
 void Interpreter::addExpr(const Tuple& k, HD *h) {
-   Tuple::const_iterator iter = k.find(m_dimension_id);
+   Tuple::const_iterator iter = k.find(DIM_ID);
    if (iter == k.end()) {
       return;
    }
@@ -213,7 +192,7 @@ void Interpreter::addExpr(const Tuple& k, HD *h) {
 TaggedValue Interpreter::operator()(const Tuple& k) {
    //the interpreter understands requests for an id
    //therefore, look for an id and evaluate it
-   Tuple::const_iterator iditer = k.find(m_dimension_id);
+   Tuple::const_iterator iditer = k.find(DIM_ID);
 
    if (iditer == k.end()) {
       //std::cerr << "could not find id dimension " << std::endl;

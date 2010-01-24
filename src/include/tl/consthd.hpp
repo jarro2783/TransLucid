@@ -8,38 +8,59 @@
 
 namespace TransLucid {
    namespace ConstHD {
-      class UChar : public HD {
+
+      class ConstantHD : public HD {
+         public:
+         ConstantHD(HD *system)
+         : m_system(system)
+         {}
+
+         virtual void addExpr(const Tuple& k, HD *h) {
+         }
+
+         protected:
+         HD *m_system;
+      };
+
+      class UChar : public ConstantHD {
          public:
          static const char *name;
 
-         UChar(Interpreter& i)
-         : m_i(i)
+         UChar(HD *system)
+         : ConstantHD(system)
+         {}
+
+         TaggedValue operator()(const Tuple& k);
+      };
+
+      class Intmp : public ConstantHD {
+         public:
+         static const char *name;
+
+         Intmp(HD *system)
+         : ConstantHD(system)
          {}
 
          TaggedValue operator()(const Tuple& k);
 
-         void addExpr(const Tuple& k, HD *h);
-
          private:
-         Interpreter& m_i;
       };
 
       //this is not the intmp builder, this returns a constant intmp
       class IntmpConst : public HD {
          public:
-         IntmpConst(Interpreter& i, const mpz_class& v)
-         : m_i(i), m_v(v)
+         IntmpConst(const mpz_class& v)
+         : m_v(v)
          {}
 
          TaggedValue operator()(const Tuple& k) {
-            return TaggedValue(TypedValue(Intmp(m_v), TYPE_INDEX_INTMP), k);
+            return TaggedValue(TypedValue(TransLucid::Intmp(m_v), TYPE_INDEX_INTMP), k);
          }
 
          void addExpr(const Tuple& k, HD *h) {
          }
 
          private:
-         Interpreter& m_i;
          mpz_class m_v;
       };
    } //namespace ConstHD
