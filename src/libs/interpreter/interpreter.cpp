@@ -8,6 +8,7 @@
 #include <tl/utility.hpp>
 #include <tl/constant.hpp>
 #include <tl/consthd.hpp>
+#include <tl/printer.hpp>
 
 namespace TransLucid {
 

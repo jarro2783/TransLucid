@@ -26,6 +26,9 @@ ExprCompiler::~ExprCompiler()
 }
 
 HD *ExprCompiler::compile(AST::Expr *e) {
+   if (e == 0) {
+      return 0;
+   }
    Compiled *c = dynamic_cast<Compiled*>(e->visit(this, 0));
    HD *h = c->e;
    delete c;

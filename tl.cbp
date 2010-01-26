@@ -168,6 +168,9 @@
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
 		</Unit>
+		<Unit filename="src/include/tl/printer.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/range.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
@@ -262,6 +265,9 @@
 		<Unit filename="src/libs/interpreter/parser.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+		</Unit>
+		<Unit filename="src/libs/interpreter/printer.cpp">
+			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/range.cpp">
 			<Option target="libinterpreter" />

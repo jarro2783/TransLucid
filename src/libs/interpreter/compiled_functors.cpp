@@ -217,8 +217,7 @@ TaggedValue Integer::operator()(const Tuple& k) {
    //kp = k.tuple();
    inserter("id", "CONST");
    contextInsert(kp, m_system, "type", defaultint.first);
-   contextInsert<Intmp>(kp, m_system, "value", m_value,
-      m_system.typeRegistry().indexIntmp());
+   contextInsert(kp, m_system, "text", generate_string(m_value.get_str(10)));
    return m_system(Tuple(kp));
 }
 

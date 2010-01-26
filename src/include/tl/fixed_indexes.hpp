@@ -17,6 +17,7 @@ namespace TransLucid {
       DIM_TEXT,
       DIM_NAME,
       DIM_ID,
+      DIM_VALUE,
 
       //the last one
       RESERVED_INDEX_LAST

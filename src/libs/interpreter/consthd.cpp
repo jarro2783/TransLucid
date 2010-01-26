@@ -27,6 +27,16 @@ TaggedValue UChar::operator()(const Tuple& k) {
 }
 
 TaggedValue Intmp::operator()(const Tuple& k) {
+   Tuple::const_iterator value = k.find(DIM_TEXT);
+
+   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING) {
+      return TaggedValue(TypedValue(Special(Special::DIMENSION),
+         TYPE_INDEX_SPECIAL), k);
+   }
+
+   return TaggedValue(TypedValue(TransLucid::Intmp(
+         mpz_class(value->second.value<String>().value().raw())),
+      TYPE_INDEX_INTMP), k);
 }
 
 } //namespace ConstHD

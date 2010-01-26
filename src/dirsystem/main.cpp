@@ -5,6 +5,8 @@
 #include <boost/program_options.hpp>
 #include <glibmm/miscutils.h>
 #include "directory_system.hpp"
+#include <tl/fixed_indexes.hpp>
+#include <tl/utility.hpp>
 
 namespace TL = TransLucid;
 namespace po = boost::program_options;
@@ -75,12 +77,20 @@ int main(int argc, char *argv[]) {
    if (evaluate) {
       interpreter.evaluateSystem(std::back_inserter(evaluated));
 
-      TL::TypeRegistry& registry = interpreter.typeRegistry();
+      //TL::TypeRegistry& registry = interpreter.typeRegistry();
 
       BOOST_FOREACH(ValueContextPair& p, evaluated) {
-         const TL::TypeManager* m = registry.findType(p.first.index());
-
-         m->print(std::cout, p.first, p.second);
+         //const TL::TypeManager* m = registry.findType(p.first.index());
+         //m->print(std::cout, p.first, p.second);
+         TL::tuple_t k;
+         k[TL::DIM_ID] = TL::generate_string("PRINT");
+         k[TL::DIM_VALUE] = p.first;
+         TL::TypedValue s = interpreter(TL::Tuple(k)).first;
+         if (s.index() != TL::TYPE_INDEX_USTRING) {
+            std::cout << "oops";
+         } else {
+            std::cout << s.value<TL::String>().value();
+         }
          std::cout << std::endl;
       }
    }

@@ -1,3 +1,22 @@
+Typed value has two concepts, a c++ data structure to store it, and the 
+TransLucid meaning. In TransLucid it is a constructor and a type index.
+The type index is used by the c++ implementation. When a new type is created
+it is implemented by adding two equations to the system.
+
+CONST @ [type : "name"] = constructor
+TYPEINDEX @ [type : "name"] = unique-id
+
+The unique IDs are obtained by calling _unique.
+
+Note about parsing types.
+We can write a new parser for a type without knowing the internals of the
+type as long as we know an appropriate input format then just call the 
+more general version.
+
+best fitting to make a new parser
+CONST @ [type : intmp, inputstyle : "words"] = ...
+a symbol instead of "words" could improve speed here
+
 dimensions:
 
 the dimensions arg[0..inf] are reserved for function parameters
@@ -61,11 +80,11 @@ TODO:
 DIMENSION_INDEX needs to be defined and keep track of dimensions
 this requires two things:
    - the fixed dimensions be registered
-   - whenever the user looks up a dimension it registers it if it doesn't
+   - whenever the user looks up a dimension it registers it if it does not
      exist
 
-DIMENSION_INDEX @ [text : ustring] = ...;;
-DIMENSION_INDEX @ [value : any] = ...;;
+DIMENSION_INDEX @ [text : ustring] = ...;; - this is for a named dim
+DIMENSION_INDEX @ [value : any] = ...;; - this is for any other dim
 ... will be a special hyperdaton which is hooked up to the dim translator
 class.
 
@@ -77,3 +96,16 @@ hyperdaton which takes the args out and gives it to the op
 
 we should guarantee certain conditions, for example that DEFAULTINT will
 always work and construct the correct value unless a CONST error occurs.
+
+Printer:
+We need a way to print these things.
+
+PRINT = TYPENAME + "<" + 
+   if PRINTVALUE : special then 
+      PRINTVALUE @ [value : PRINTVALUE] 
+   else 
+      PRINTVALUE 
+   fi
+   + ">";;
+
+PRINT should be guaranteed to return a string.
