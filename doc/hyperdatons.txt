@@ -1,3 +1,15 @@
+Everything as a hyperdaton:
+
+All the objects comply with the interface of a hyperdaton. This interface is:
+
+addExpr(k, E)
+operator()(k)
+
+Different hyperdatons respond to different dimensions. However there are a
+couple of main types of hyperdatons. The system hyperdaton which responds to
+the id dimension. The op hyperdatons which take arg{0..inf}. The const
+hyperdatons which take the text.
+
 Typed value has two concepts, a c++ data structure to store it, and the 
 TransLucid meaning. In TransLucid it is a constructor and a type index.
 The type index is used by the c++ implementation. When a new type is created
@@ -5,6 +17,8 @@ it is implemented by adding two equations to the system.
 
 CONST @ [type : "name"] = constructor
 TYPEINDEX @ [type : "name"] = unique-id
+
+the constructor will respond to at least the text dimension
 
 The unique IDs are obtained by calling _unique.
 
@@ -46,16 +60,13 @@ special
 string
 
 types:
-need to remove the magic for type indexes (RTTI?)
 things like special should be built by asking the system for a special instead
 of just building it
 the index of a type could be part of the system, anyone can ask for it, and
 then only if an implementation can see the header declaration for the class of
 a type can it access the type.
 
-When a constant is registered it must set CONST.
-It must also call _unique and set TYPEINDEX.
-
+fixed dimensions and types:
 it is required that some type and dimension indexes be fixed and visible to 
 everyone
 
@@ -91,9 +102,6 @@ class.
 operations:
 FUN @ [op : ustring<operator?>, arg0 : intmp, arg1 : intmp] = 
 
-the actual op will be implemented as a binary op, thus I need to write a
-hyperdaton which takes the args out and gives it to the op
-
 we should guarantee certain conditions, for example that DEFAULTINT will
 always work and construct the correct value unless a CONST error occurs.
 
@@ -109,3 +117,22 @@ PRINT = TYPENAME + "<" +
    + ">";;
 
 PRINT should be guaranteed to return a string.
+
+Examples:
+
+identifier @ context is the same as
+system @ [id : "identifier"];;
+
+ustring<a string> will call:
+CONST @ [type : "ustring", text : "a string"];;
+
+Registering a dimension in the header like so:
+dim<x>;;
+
+will result in the following: 
+u = _unique
+DIMENSION_INDEX @ [text : "x"] = u;;
+
+to look up the index of a dimension:
+when [x : 1] is seen the x will be translated to:
+DIMENSION_INDEX @ [text : "x"];;
