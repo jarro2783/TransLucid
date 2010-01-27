@@ -132,7 +132,11 @@ dim<x>;;
 will result in the following: 
 u = _unique
 DIMENSION_INDEX @ [text : "x"] = u;;
+or maybe the system can do this itself
 
 to look up the index of a dimension:
 when [x : 1] is seen the x will be translated to:
 DIMENSION_INDEX @ [text : "x"];;
+
+_unique is a special thing in the implementation which increments itself
+whenever it is called and returns the current value.
