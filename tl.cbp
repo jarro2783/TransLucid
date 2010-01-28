@@ -181,6 +181,9 @@
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
 		</Unit>
+		<Unit filename="src/include/tl/set_types.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/tuple_parser.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
@@ -281,6 +284,9 @@
 		<Unit filename="src/libs/interpreter/range.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+		</Unit>
+		<Unit filename="src/libs/interpreter/set_types.cpp">
+			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/types.cpp">
 			<Option target="libinterpreter" />
