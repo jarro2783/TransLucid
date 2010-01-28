@@ -11,6 +11,11 @@ namespace TransLucid {
       TYPE_INDEX_BOOL,
       TYPE_INDEX_SPECIAL,
       TYPE_INDEX_UCHAR,
+      TYPE_INDEX_TUPLE,
+      TYPE_INDEX_DIMENSION,
+      TYPE_INDEX_GUARD,
+      TYPE_INDEX_RANGE,
+      TYPE_INDEX_PAIR,
 
       //dimensions
       DIM_TYPE,
@@ -18,6 +23,7 @@ namespace TransLucid {
       DIM_NAME,
       DIM_ID,
       DIM_VALUE,
+      DIM_TIME,
 
       //the last one
       RESERVED_INDEX_LAST

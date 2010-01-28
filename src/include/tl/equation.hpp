@@ -121,18 +121,6 @@ namespace TransLucid {
    class Variable;
    typedef std::map<ustring_t, HD*> VariableMap;
 
-   class ASTEquation : public EquationBase {
-      public:
-      ASTEquation(AST::Expr *e)
-      : m_e(e)
-      {}
-
-      ValueContext evaluate(Interpreter& i, const Tuple& context);
-
-      private:
-      AST::Expr *m_e;
-   };
-
    class Equation {
       public:
       Equation(const ustring_t& name, const EquationGuard& valid, HD *h)
@@ -188,10 +176,10 @@ namespace TransLucid {
 
       private:
 
-      bool tupleApplicable(const Interpreter& i, const Tuple& def, const Tuple& c) const;
-      bool tupleRefines(const Interpreter& i, const Tuple& a, const Tuple& b) const;
-      bool valueRefines(const Interpreter& i, const TypedValue& a, const TypedValue& b) const;
-      bool booleanTrue(Interpreter& i, const EquationGuard& g, const Tuple& c) const;
+      bool tupleApplicable(const Tuple& def, const Tuple& c) const;
+      bool tupleRefines(const Tuple& a, const Tuple& b) const;
+      bool valueRefines(const TypedValue& a, const TypedValue& b) const;
+      bool booleanTrue(const EquationGuard& g, const Tuple& c) const;
 
       void addExprActual(const Tuple& k, HD *e);
 

@@ -32,6 +32,52 @@ namespace {
       private:
       mpz_class m_index;
    };
+
+   class DimensionsStringHD : public HD {
+      public:
+
+      DimensionsStringHD(DimensionTranslator& d)
+      : m_d(d)
+      {}
+
+      TaggedValue operator()(const Tuple& k) {
+         Tuple::const_iterator iter = k.find(DIM_TEXT);
+         if (iter == k.end()) {
+            throw "called dim lookup without text dimension";
+         }
+         return TaggedValue(TypedValue(Intmp(
+            m_d.lookup(iter->second.value<String>().value())), TYPE_INDEX_INTMP), k);
+      }
+
+      void addExpr(const Tuple& k, HD *h) {
+      }
+
+      private:
+      DimensionTranslator& m_d;
+   };
+
+   class DimensionsTypedHD : public HD {
+      public:
+
+      DimensionsTypedHD(DimensionTranslator& d)
+      : m_d(d)
+      {}
+
+      TaggedValue operator()(const Tuple& k) {
+         Tuple::const_iterator iter = k.find(DIM_VALUE);
+         if (iter == k.end()) {
+            throw "called dim lookup without value dimension";
+         }
+         return TaggedValue(TypedValue(Intmp(
+            m_d.lookup(iter->second)), TYPE_INDEX_INTMP), k);
+      }
+
+      void addExpr(const Tuple& k, HD *h) {
+      }
+
+      private:
+      DimensionTranslator& m_d;
+   };
 }
 
 inline void Interpreter::addToVariableActual(const ustring_t& id,
@@ -100,9 +146,13 @@ m_verbose(false)
    //build the constant creators
    buildConstantHD<ConstHD::UChar>(TYPE_INDEX_UCHAR);
    HD *intmpHD = buildConstantHD<ConstHD::Intmp>(TYPE_INDEX_INTMP);
+   buildConstantHD<ConstHD::UString>(TYPE_INDEX_USTRING);
 
    //set this as the default int too
    addToVariableActual("DEFAULTINT", Tuple(), intmpHD);
+
+   addToVariableActual("DIMENSION_INDEX", Tuple(), new DimensionsStringHD(m_dimTranslator));
+   addToVariableActual("DIMENSION_TYPED_INDEX", Tuple(), new DimensionsTypedHD(m_dimTranslator));
 
    //tuple_t k;
    addToVariableActual("_unique", Tuple(), new UniqueHD(RESERVED_INDEX_LAST));

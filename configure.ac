@@ -47,6 +47,7 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  doc/Doxyfile
                  src/Makefile
+                 src/basic/Makefile
                  src/include/Makefile
                  src/include/tl/Makefile
                  src/libs/Makefile

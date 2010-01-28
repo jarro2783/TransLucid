@@ -62,11 +62,18 @@ namespace TransLucid {
       return (*h)(Tuple(k)).first.value<Intmp>().value();
    }
 
-   inline mpz_class get_dimension_index(HD *h, const ustring_t& name) {
+   inline size_t get_dimension_index(HD *h, const ustring_t& name) {
       tuple_t k;
       k[DIM_ID] = generate_string("DIMENSION_INDEX");
       k[DIM_TEXT] = generate_string(name);
-      return (*h)(Tuple(k)).first.value<Intmp>().value();
+      return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
+   }
+
+   inline size_t get_dimension_index(HD *h, const TypedValue& v) {
+      tuple_t k;
+      k[DIM_ID] = generate_string("DIMENSION_TYPED_INDEX");
+      k[DIM_VALUE] = v;
+      return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
    }
 
    inline TypedValue get_dimension(const Tuple& k, size_t index) {

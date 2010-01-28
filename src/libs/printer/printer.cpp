@@ -110,6 +110,7 @@ class PrinterManager : public TL::TypeManager {
 };
 
 void Printer::print(std::ostream& os, const TL::Tuple& c, TL::Interpreter& i) const {
+   #if 0
    if (m_type == ERROR) {
       os << "printer<error>";
    } else {
@@ -131,7 +132,7 @@ void Printer::print(std::ostream& os, const TL::Tuple& c, TL::Interpreter& i) co
          os << "special<dim>";
       }
    }
-
+   #endif
 }
 
 Data * PrintVisitor::visitBinaryOpExpr(BinaryOpExpr* e, Data*) {

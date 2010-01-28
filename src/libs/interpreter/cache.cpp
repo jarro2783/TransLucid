@@ -6,6 +6,7 @@
 namespace TransLucid {
 
 std::pair<bool, TypedValue> LazyWarehouse::lookupCalc(const ustring_t& name, const Tuple& c) {
+   #if 0
    CacheMapping::iterator iter = m_cache.find(name);
    if (iter == m_cache.end()) {
       //add calc because it wasn't found
@@ -27,10 +28,12 @@ std::pair<bool, TypedValue> LazyWarehouse::lookupCalc(const ustring_t& name, con
          return std::make_pair(true, titer->second);
       }
    }
+   #endif
    return std::make_pair(false, TypedValue());
 }
 
 void LazyWarehouse::add(const ustring_t& name, const TypedValue& value, const Tuple& c) {
+   #if 0
    CacheMapping::iterator iter = m_cache.find(name);
    if (iter == m_cache.end()) {
       TupleToValue m;
@@ -44,6 +47,7 @@ void LazyWarehouse::add(const ustring_t& name, const TypedValue& value, const Tu
          titer->second = value;
       }
    }
+   #endif
 }
 
 }

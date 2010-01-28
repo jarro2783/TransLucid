@@ -127,21 +127,21 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                case DEMANDS:
                //demands and equations are the same thing
                {
-                  size_t dim_id = dimTranslator().lookup("id");
-                  size_t dim_valid = dimTranslator().lookup("_validguard");
+                  size_t dim_id = DIM_ID;
+                  size_t dim_valid = get_dimension_index(this, "_validguard");
                   BOOST_FOREACH(const Parser::equation_t& e, eHolder.equations())
                   {
                      tuple_t k;
                      k.insert(std::make_pair(dim_id,
                         TypedValue(String(e.get<0>()),
-                           typeRegistry().indexString())));
+                           TYPE_INDEX_USTRING)));
 
                      //need to compile the guard
                      HD *guardTuple = m_compiler.compile(e.get<1>().get<0>());
                      HD *guardBool = m_compiler.compile(e.get<1>().get<1>());
                      k.insert(std::make_pair(dim_valid,
                         TypedValue(EquationGuardType(EquationGuard(guardTuple, guardBool)),
-                           typeRegistry().indexGuard())));
+                           TYPE_INDEX_GUARD)));
 
                      HD *h = m_compiler.compile(e.get<2>());
                      addExpr(Tuple(k), h);

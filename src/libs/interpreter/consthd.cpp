@@ -8,9 +8,10 @@ namespace ConstHD {
 
 const char *UChar::name =     "uchar";
 const char *Intmp::name =     "intmp";
+const char *UString::name =   "ustring";
 
 TaggedValue UChar::operator()(const Tuple& k) {
-   size_t valueindex = get_dimension_index(m_system, "text").get_ui();
+   size_t valueindex = get_dimension_index(m_system, "text");
    Tuple::const_iterator value = k.find(valueindex);
 
    if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING) {
@@ -37,6 +38,17 @@ TaggedValue Intmp::operator()(const Tuple& k) {
    return TaggedValue(TypedValue(TransLucid::Intmp(
          mpz_class(value->second.value<String>().value().raw())),
       TYPE_INDEX_INTMP), k);
+}
+
+TaggedValue UString::operator()(const Tuple& k) {
+   Tuple::const_iterator value = k.find(DIM_TEXT);
+
+   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING) {
+      return TaggedValue(TypedValue(Special(Special::DIMENSION),
+         TYPE_INDEX_SPECIAL), k);
+   }
+
+   return TaggedValue(value->second, k);
 }
 
 } //namespace ConstHD

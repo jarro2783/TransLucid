@@ -97,7 +97,7 @@ AST::Data *ExprCompiler::visitHashExpr(AST::HashExpr* e, AST::Data*) {
    Compiled *c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
    HD *se = c->e;
    delete c;
-   return new Compiled(new CompiledFunctors::Hash(m_i, se));
+   return new Compiled(new CompiledFunctors::Hash(&m_i, se));
 }
 
 AST::Data *ExprCompiler::visitIdentExpr(AST::IdentExpr* e, AST::Data*) {
@@ -178,6 +178,7 @@ AST::Data *ExprCompiler::visitPairExpr(AST::PairExpr* e, AST::Data*) {
 }
 
 AST::Data *ExprCompiler::visitRangeExpr(AST::RangeExpr*, AST::Data*) {
+   #warning come up with a more general sets will work in guards thing and actually do the range
    return 0;
 }
 

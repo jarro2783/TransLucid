@@ -408,6 +408,41 @@ namespace TransLucid {
       TypedValue m_first;
       TypedValue m_second;
    };
+
+   class SetBase {
+      public:
+      //is v a member of this
+      virtual bool is_member(const TypedValue& v) = 0;
+
+      //is s a subset of this
+      virtual bool is_subset(const SetBase& s) = 0;
+   };
+
+   //the general set type
+   //all the actual sets will put a derived class in here and then
+   //have an is member function.
+   class SetType : public TypedValueBase {
+      public:
+
+      SetType(SetBase *v)
+      : m_value(v)
+      {}
+
+      bool operator==(const SetType& rhs) const {
+         return m_value == rhs.m_value;
+      }
+
+      bool operator<(const SetType& rhs) const {
+         return m_value < rhs.m_value;
+      }
+
+      size_t hash() const {
+         return reinterpret_cast<size_t>(m_value);
+      }
+
+      private:
+      SetBase *m_value;
+   };
 }
 
 #endif // BUILTIN_TYPES_HPP_INCLUDED

@@ -1,1 +1,1 @@
-SUBDIRS = libs include dirsystem interactive
+SUBDIRS = libs include dirsystem interactive basic

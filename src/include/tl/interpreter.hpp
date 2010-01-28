@@ -1,6 +1,8 @@
 #ifndef INTERPRETER_HPP_INCLUDED
 #define INTERPRETER_HPP_INCLUDED
 
+#define REMOVE_MAGIC
+
 #include <tl/library.hpp>
 #include <tl/types.hpp>
 #include <glibmm/convert.h>
@@ -62,6 +64,7 @@ namespace TransLucid {
          m_lt.addSearchPath(name);
       }
 
+      #ifndef REMOVE_MAGIC
       TypeRegistry& typeRegistry() {
          return m_types;
       }
@@ -75,6 +78,7 @@ namespace TransLucid {
       }
 
       size_t registerDimension(const ustring_t& name);
+      #endif
 
       void registerEquation(const ustring_t& name,
          const Tuple& validContext,

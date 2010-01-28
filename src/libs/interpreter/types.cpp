@@ -221,6 +221,7 @@ Tuple Tuple::parse(const ustring_t& text, const Tuple& c, Interpreter& i) {
 }
 
 void Tuple::print(const Interpreter& i, std::ostream& os, const Tuple& c) const {
+   #if 0
    os << "[" << std::endl;
    BOOST_FOREACH(tuple_t::value_type const& v, *m_value) {
       os << v.first << " : ";
@@ -229,6 +230,7 @@ void Tuple::print(const Interpreter& i, std::ostream& os, const Tuple& c) const 
       os << "," << std::endl;
    }
    os << "]" << std::endl;
+   #endif
 }
 
 } //namespace TransLucid

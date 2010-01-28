@@ -13,12 +13,12 @@ namespace {
 template <typename T, typename V>
 inline void contextInsert(
    tuple_t& k,
-   Interpreter& i,
+   HD *h,
    const ustring_t& dim,
    const V& value,
    size_t index)
 {
-   k[i.dimTranslator().lookup(dim)] = TypedValue(T(value), index);
+   k[get_dimension_index(h, dim)] = TypedValue(T(value), index);
 }
 
 inline void contextInsert(
@@ -27,41 +27,41 @@ inline void contextInsert(
    const ustring_t& dim,
    const TypedValue& v)
 {
-   k[i.dimTranslator().lookup(dim)] = v;
+   k[get_dimension_index(&i, dim)] = v;
 }
 
 template <typename T>
 class TupleInserter {
    public:
-   TupleInserter(tuple_t& k, Interpreter& i, size_t index)
-   : m_k(k), m_i(i), m_index(index)
+   TupleInserter(tuple_t& k, HD *h, size_t index)
+   : m_k(k), m_h(h), m_index(index)
    {
    }
 
    template <typename V>
    const TupleInserter<T>& operator()(const ustring_t& dim, const V& v) const {
-      m_k[m_i.dimTranslator().lookup(dim)] = TypedValue(T(v), m_index);
+      m_k[get_dimension_index(m_h, dim)] = TypedValue(T(v), m_index);
       return *this;
    }
 
    private:
    tuple_t& m_k;
-   Interpreter& m_i;
+   HD *m_h;
    size_t m_index;
 };
 
 template <typename T>
-TupleInserter<T> insert_tuple(tuple_t& k, Interpreter& i, size_t index) {
-   return TupleInserter<T>(k, i, index);
+TupleInserter<T> insert_tuple(tuple_t& k, HD *h, size_t index) {
+   return TupleInserter<T>(k, h, index);
 }
 
 }
 
 TaggedValue AtAbsolute::operator()(const Tuple& k) {
    TaggedValue kp = (*e1)(k);
-   if (kp.first.index() != m_system.typeRegistry().indexTuple()) {
+   if (kp.first.index() != TYPE_INDEX_TUPLE) {
       return TaggedValue(TypedValue(Special(Special::TYPEERROR),
-         m_system.typeRegistry().indexSpecial()), k);
+         TYPE_INDEX_SPECIAL), k);
    } else {
       return (*e2)(kp.first.value<Tuple>());
    }
@@ -70,9 +70,9 @@ TaggedValue AtAbsolute::operator()(const Tuple& k) {
 TaggedValue AtRelative::operator()(const Tuple& k) {
    tuple_t kNew = k.tuple();
    TaggedValue kp = (*e1)(k);
-   if (kp.first.index() != m_system.typeRegistry().indexTuple()) {
+   if (kp.first.index() != TYPE_INDEX_TUPLE) {
       return TaggedValue(TypedValue(Special(Special::TYPEERROR),
-         m_system.typeRegistry().indexSpecial()), k);
+         TYPE_INDEX_SPECIAL), k);
    } else {
       BOOST_FOREACH(tuple_t::value_type v, kp.first.value<Tuple>().tuple()) {
          kNew[v.first] = v.second;
@@ -85,9 +85,8 @@ TaggedValue BoolConst::operator()(const Tuple& k) {
    //return boost::assign::list_of(ValueContext(
    //   TypedValue(TransLucid::Boolean(m_value), i.typeRegistry().indexBoolean()), Tuple()));
    #warning maybe there is a better way to do this
-   size_t indexString = m_system.typeRegistry().indexString();
    tuple_t kp = k.tuple();
-   insert_tuple<String>(kp, m_system, indexString)
+   insert_tuple<String>(kp, &m_system, TYPE_INDEX_USTRING)
       ("id", "CONST")
       ("type", "bool")
       ("text", m_value ? "true" : "false")
@@ -100,27 +99,33 @@ TaggedValue BuildTuple::operator()(const Tuple& k) {
    tuple_t kp;
    BOOST_FOREACH(HD* h, m_elements) {
       TaggedValue v = (*h)(k);
-      if (v.first.index() != m_system.typeRegistry().indexPair()) {
+      if (v.first.index() != TYPE_INDEX_PAIR) {
          return TaggedValue(TypedValue(Special(Special::TYPEERROR),
-            m_system.typeRegistry().indexSpecial()), k);
+            TYPE_INDEX_SPECIAL), k);
       } else {
          const PairType& p = v.first.value<PairType>();
-         kp[m_system.dimTranslator().lookup(p.first())] = p.second();
+         #warning change this to the proper way to lookup dims
+         #warning work out what I was doing here
+         //kp[m_system.dimTranslator().lookup(p.first())] = p.second();
+         size_t dimVal;
+
+         if (p.first().index() == TYPE_INDEX_DIMENSION) {
+            kp[p.first().value<TransLucid::Dimension>().value()] = p.second();
+         }
       }
    }
-   return TaggedValue(TypedValue(Tuple(kp), m_system.typeRegistry().indexTuple()), k);
+   return TaggedValue(TypedValue(Tuple(kp), TYPE_INDEX_TUPLE), k);
 }
 
 TaggedValue Constant::operator()(const Tuple& k) {
    //evaluate CONST
-   size_t indexString = m_system.typeRegistry().indexString();
    tuple_t kp = k.tuple();
    //kp[m_system.dimTranslator().lookup("id")] =
    //   TypedValue(String("CONST"), m_system.typeRegistry().indexString());
    //contextInsertString(kp, m_system, "id", "CONST", indexString);
    //contextInsertString(kp, m_system, "type", m_type, indexString);
    //contextInsertString(kp, m_system, "text", m_text, indexString);
-   insert_tuple<String>(kp, m_system, indexString)
+   insert_tuple<String>(kp, &m_system, TYPE_INDEX_USTRING)
       ("id", "CONST")
       ("type", m_type)
       ("text", m_text)
@@ -135,27 +140,37 @@ TaggedValue Convert::operator()(const Tuple& context) {
 }
 
 TaggedValue Dimension::operator()(const Tuple& k) {
+   size_t id = get_dimension_index(&m_system, m_name);
    return TaggedValue(
-      TypedValue(TransLucid::Dimension(m_system.dimTranslator().lookup(m_name)),
-         m_system.typeRegistry().indexDimension()),
+      TypedValue(TransLucid::Dimension(id),
+         TYPE_INDEX_DIMENSION),
       k);
 }
 
 TaggedValue Hash::operator()(const Tuple& k) {
-   size_t index = m_system.dimTranslator().lookup((*m_e)(k).first);
+   TaggedValue r = (*m_e)(k);
+   size_t index;
+   if (r.first.index() == TYPE_INDEX_DIMENSION) {
+      index = r.first.value<TransLucid::Dimension>().value();
+   } else {
+      index = get_dimension_index(m_system, r.first);
+   }
+   //size_t index = m_system.dimTranslator().lookup((*m_e)(k).first);
+   #warning fix this
+
    Tuple::const_iterator iter = k.find(index);
    if (iter != k.end()) {
       return TaggedValue(iter->second, k);
    } else {
       return TaggedValue(TypedValue(Special(Special::DIMENSION),
-         m_system.typeRegistry().indexSpecial()), k);
+         TYPE_INDEX_SPECIAL), k);
    }
 }
 
 TaggedValue Ident::operator()(const Tuple& k) {
    tuple_t kp = k.tuple();
 
-   insert_tuple<String>(kp, m_system, m_system.typeRegistry().indexString())
+   insert_tuple<String>(kp, &m_system, TYPE_INDEX_USTRING)
       ("id", m_name)
       ;
    return m_system(Tuple(kp));
@@ -165,9 +180,9 @@ TaggedValue If::operator()(const Tuple& k) {
    TaggedValue cond = (*m_condition)(k);
    TypedValue& condv = cond.first;
 
-   if (condv.index() == m_system.typeRegistry().indexSpecial()) {
+   if (condv.index() == TYPE_INDEX_SPECIAL) {
       return cond;
-   } else if (condv.index() == m_system.typeRegistry().indexBoolean()) {
+   } else if (condv.index() == TYPE_INDEX_BOOL) {
       const Boolean& b = condv.value<Boolean>();
 
       if (b) {
@@ -182,9 +197,9 @@ TaggedValue If::operator()(const Tuple& k) {
 
             type_index index = cond.first.index();
 
-            if (index == m_system.typeRegistry().indexSpecial()) {
+            if (index == TYPE_INDEX_SPECIAL) {
                return cond;
-            } else if (index == m_system.typeRegistry().indexBoolean()) {
+            } else if (index == TYPE_INDEX_BOOL) {
                const Boolean& bcond = cond.first.value<Boolean>();
                ++iter;
                if (bcond) {
@@ -192,7 +207,7 @@ TaggedValue If::operator()(const Tuple& k) {
                }
             } else {
                return TaggedValue(TypedValue(Special(Special::TYPEERROR),
-                  m_system.typeRegistry().indexSpecial()), k);
+                  TYPE_INDEX_SPECIAL), k);
             }
 
             ++iter;
@@ -202,23 +217,29 @@ TaggedValue If::operator()(const Tuple& k) {
       }
    } else {
       return TaggedValue(TypedValue(Special(Special::TYPEERROR),
-         m_system.typeRegistry().indexSpecial()), k);
+         TYPE_INDEX_SPECIAL), k);
    }
 }
 
 TaggedValue Integer::operator()(const Tuple& k) {
    // @[id : CONST, type : @[id : DEFAULTINT], value : m_value]
    tuple_t kp = k.tuple();
-   TupleInserter<String> inserter(kp, m_system, TYPE_INDEX_USTRING);
+   TupleInserter<String> inserter(kp, &m_system, TYPE_INDEX_USTRING);
    //contextInsert<String>(kp, m_system, "id", "DEFAULTINT", m_system.typeRegistry().indexString());
    kp[DIM_ID] = generate_string("DEFAULTINT");
-   TaggedValue defaultint = m_system(Tuple(kp));
+   //TaggedValue defaultint = m_system(Tuple(kp));
 
+   kp[DIM_TEXT] = generate_string(m_value.get_str(10));
+
+   return m_system(Tuple(kp));
+
+   #if 0
    //kp = k.tuple();
    inserter("id", "CONST");
    contextInsert(kp, m_system, "type", defaultint.first);
    contextInsert(kp, m_system, "text", generate_string(m_value.get_str(10)));
    return m_system(Tuple(kp));
+   #endif
 }
 
 TaggedValue IsSpecial::operator()(const Tuple& context) {
@@ -234,7 +255,7 @@ TaggedValue IsType::operator()(const Tuple& context) {
 TaggedValue Operation::operator()(const Tuple& k) {
    tuple_t kp = k.tuple();
 
-   TupleInserter<String> insert(kp, m_system, m_system.typeRegistry().indexString());
+   TupleInserter<String> insert(kp, &m_system, TYPE_INDEX_USTRING);
    insert("id", "FUN");
 
    int i = 0;
@@ -242,7 +263,7 @@ TaggedValue Operation::operator()(const Tuple& k) {
    BOOST_FOREACH(HD *h, m_operands) {
       os.str("arg");
       os << i;
-      kp[m_system.dimTranslator().lookup(os.str())] = (*h)(k).first;
+      kp[get_dimension_index(h, os.str())] = (*h)(k).first;
       ++i;
    }
 
@@ -250,8 +271,12 @@ TaggedValue Operation::operator()(const Tuple& k) {
 }
 
 TaggedValue Pair::operator()(const Tuple& k) {
+
+   TaggedValue l = (*m_lhs)(k);
+   TaggedValue r = (*m_rhs)(k);
+
    return TaggedValue(TypedValue(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
-      m_system.typeRegistry().indexPair()), k);
+      TYPE_INDEX_PAIR), k);
 }
 
 TaggedValue UnaryOp::operator()(const Tuple& context) {

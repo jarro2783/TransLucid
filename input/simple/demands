@@ -1,1 +1,1 @@
-demand = uchar<a>;;
+demand = ustring<hello world!>;;

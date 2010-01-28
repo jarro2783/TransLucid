@@ -5,17 +5,17 @@
 
 namespace TransLucid {
 
-#warning redo equation guard
-Tuple EquationGuard::evaluate(const Tuple& context) const
+Tuple EquationGuard::evaluate(const Tuple& k) const
    throw (InvalidGuard)
 {
-#if 0
    tuple_t t = m_dimensions;
 
    if (m_guard) {
-      ValueContext v = i.evaluate(m_guard, context);
+      TaggedValue v = (*m_guard)(k);
+      //ValueContext v = i.evaluate(m_guard, context);
 
-      if (v.first.index() == i.typeRegistry().indexTuple()) {
+      //still need to remove this magic
+      if (v.first.index() == TYPE_INDEX_TUPLE) {
          BOOST_FOREACH(const Tuple::value_type& value, v.first.value<Tuple>()) {
             if (t.find(value.first) != t.end()) {
                throw InvalidGuard();
@@ -29,12 +29,12 @@ Tuple EquationGuard::evaluate(const Tuple& context) const
    }
 
    return Tuple(t);
-#endif
+   //TaggedValue v = (*m_guard)(k);
 }
 
 inline void Variable::addExprActual(const Tuple& k, HD *h) {
    const EquationGuard *g = 0;
-   Tuple::const_iterator giter = k.find(m_i.dimTranslator().lookup("_validguard"));
+   Tuple::const_iterator giter = k.find(get_dimension_index(&m_i, "_validguard"));
    if (giter != k.end()) {
       g = &giter->second.value<EquationGuardType const&>().value();
    }
@@ -46,15 +46,10 @@ inline void Variable::addExprActual(const Tuple& k, HD *h) {
    }
 }
 
-ValueContext ASTEquation::evaluate(Interpreter& i, const Tuple& context) {
-   #warning this probably goes away
-   //return i.evaluate(m_e, context);
-}
-
 EquationBase::~EquationBase() {
 }
 
-bool Variable::tupleApplicable(const Interpreter& i, const Tuple& def, const Tuple& c) const {
+bool Variable::tupleApplicable(const Tuple& def, const Tuple& c) const {
    //all of def has to be in c, and the values have to either be
    //equal or within the range
    for (Tuple::const_iterator iter = def.begin(); iter != def.end(); ++iter) {
@@ -62,7 +57,7 @@ bool Variable::tupleApplicable(const Interpreter& i, const Tuple& def, const Tup
       if (citer == c.end()) {
          return false;
       } else {
-         if (!valueRefines(i, citer->second, iter->second)) {
+         if (!valueRefines(citer->second, iter->second)) {
             return false;
          }
       }
@@ -74,18 +69,16 @@ bool Variable::tupleApplicable(const Interpreter& i, const Tuple& def, const Tup
 
 
 //does value a refine value b
-bool Variable::valueRefines(const Interpreter& i, const TypedValue& a, const TypedValue& b) const {
+bool Variable::valueRefines(const TypedValue& a, const TypedValue& b) const {
    //if b is a range, a has to be a range and within or equal, or an int and inside
    //otherwise they have to be equal
 
-   const TypeRegistry &types = i.typeRegistry();
-
-   if (b.index() == types.indexRange()) {
-      if (a.index() == types.indexRange()) {
+   if (b.index() == TYPE_INDEX_RANGE) {
+      if (a.index() == TYPE_INDEX_RANGE) {
          if (!b.value<Range>().within(a.value<Range>())) {
             return false;
          }
-      } else if (a.index() == types.indexIntmp()) {
+      } else if (a.index() == TYPE_INDEX_INTMP) {
          if (!b.value<Range>().within(a.value<Intmp>())) {
             return false;
          }
@@ -102,7 +95,7 @@ bool Variable::valueRefines(const Interpreter& i, const TypedValue& a, const Typ
 }
 
 //does a refine b
-bool Variable::tupleRefines(const Interpreter& i, const Tuple& a, const Tuple& b) const {
+bool Variable::tupleRefines(const Tuple& a, const Tuple& b) const {
    //for a to refine b, everything in b must be in a, and for the values that are,
    //they have to be either equal, or their ranges must be more specific
    Tuple::const_iterator it1 = a.begin();
@@ -122,7 +115,7 @@ bool Variable::tupleRefines(const Interpreter& i, const Tuple& a, const Tuple& b
          continue;
       }
 
-      if (!valueRefines(i, it1->second, it2->second)) {
+      if (!valueRefines(it1->second, it2->second)) {
          return false;
       }
       ++it1;
@@ -135,11 +128,10 @@ bool Variable::tupleRefines(const Interpreter& i, const Tuple& a, const Tuple& b
    return true;
 }
 
-bool Variable::booleanTrue(Interpreter& i, const EquationGuard& g, const Tuple& k) const {
+bool Variable::booleanTrue(const EquationGuard& g, const Tuple& k) const {
    HD *b = g.boolean();
 
    if (b) {
-      #warning something about a hyperdaton for the guard
       TaggedValue v = (*b)(k);// = i.evaluate(g.boolean(), c);
 
       return v.first.index() == TYPE_INDEX_BOOL
@@ -168,9 +160,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
          try {
             const EquationGuard& guard = eqn_i->validContext();
             Tuple evalContext = guard.evaluate(k);
-            //std::cout << "guard:" << std::endl;
-            //evalContext.print(m_i, std::cout, c);
-            if (tupleApplicable(m_i, evalContext, k) && booleanTrue(m_i, guard, k)) {
+            if (tupleApplicable(evalContext, k) && booleanTrue(guard, k)) {
                applicable.push_back(
                   ApplicableTuple(evalContext, eqn_i->equation()));
             }
@@ -185,8 +175,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
 
    if (applicable.size() == 0) {
       return TaggedValue(TypedValue(
-         Special(Special::UNDEF),
-         m_i.typeRegistry().indexSpecial()),k);
+         Special(Special::UNDEF), TYPE_INDEX_SPECIAL),k);
    } else if (applicable.size() == 1) {
       return (*applicable.front().get<1>())(k);
    }
@@ -199,28 +188,26 @@ TaggedValue Variable::operator()(const Tuple& k) {
    {
       if (bestIter == applicable.end()) {
          bestIter = iter;
-      } else if (tupleRefines(m_i, iter->get<0>(), bestIter->get<0>())) {
+      } else if (tupleRefines(iter->get<0>(), bestIter->get<0>())) {
          bestIter = iter;
-      } else if (!tupleRefines(m_i, bestIter->get<0>(), iter->get<0>())) {
+      } else if (!tupleRefines(bestIter->get<0>(), iter->get<0>())) {
          bestIter = applicable.end();
       }
    }
 
    if (bestIter == applicable.end()) {
       return TaggedValue(TypedValue(
-         Special(Special::UNDEF),
-         m_i.typeRegistry().indexSpecial()), k);
+         Special(Special::UNDEF), TYPE_INDEX_SPECIAL), k);
    }
 
    for (applicable_list::const_iterator iter = applicable.begin();
       iter != applicable.end(); ++iter)
    {
       if (bestIter->get<1>() != iter->get<1>() &&
-         !tupleRefines(m_i, bestIter->get<0>(), iter->get<0>()))
+         !tupleRefines(bestIter->get<0>(), iter->get<0>()))
       {
          return TaggedValue(TypedValue(
-            Special(Special::MULTIDEF),
-            m_i.typeRegistry().indexSpecial()), k);
+            Special(Special::MULTIDEF), TYPE_INDEX_SPECIAL), k);
       }
    }
 
@@ -234,7 +221,7 @@ TaggedValue Variable::operator()(const Tuple& k) {
 }
 
 void Variable::addExpr(const Tuple& k, HD *e) {
-   size_t dim_id = m_i.dimTranslator().lookup("id");
+   size_t dim_id = DIM_ID;
    Tuple::const_iterator iter = k.find(dim_id);
    if (iter == k.end()) {
       addExprActual(k, e);
@@ -252,7 +239,7 @@ void Variable::addExpr(const Tuple& k, HD *e) {
 
       tuple_t kp = k.tuple();
       if (end.size() != 0) {
-         kp[dim_id] = TypedValue(String(end), m_i.typeRegistry().indexString());
+         kp[dim_id] = TypedValue(String(end), TYPE_INDEX_USTRING);
       } else {
          kp.erase(dim_id);
       }

@@ -46,6 +46,17 @@ namespace TransLucid {
          private:
       };
 
+      class UString : public ConstantHD {
+         public:
+         static const char *name;
+
+         UString(HD *system)
+         : ConstantHD(system)
+         {}
+
+         TaggedValue operator()(const Tuple& k);
+      };
+
       //this is not the intmp builder, this returns a constant intmp
       class IntmpConst : public HD {
          public:

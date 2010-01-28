@@ -12,6 +12,7 @@ DimensionTranslator::DimensionTranslator()
               ("name", DIM_NAME)
               ("id", DIM_ID)
               ("value", DIM_VALUE)
+              ("time", DIM_TIME)
               );
 }
 

@@ -130,14 +130,14 @@ namespace TransLucid {
 
       class Hash : public CompiledFunctor {
          public:
-         Hash(Interpreter& system, HD *e)
+         Hash(HD *system, HD *e)
          : m_system(system), m_e(e)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
-         Interpreter& m_system;
+         HD *m_system;
          HD *m_e;
       };
 

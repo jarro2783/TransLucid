@@ -80,6 +80,31 @@ int main(int argc, char *argv[]) {
       //TL::TypeRegistry& registry = interpreter.typeRegistry();
 
       BOOST_FOREACH(ValueContextPair& p, evaluated) {
+         const TL::TypedValue& v = p.first;
+         std::cout << "type index: " << v.index() << std::endl;
+         switch (v.index()) {
+            case TL::TYPE_INDEX_INTMP:
+            std::cout << "intmp<" << v.value<TL::Intmp>().value() << ">" << std::endl;
+            break;
+
+            case TL::TYPE_INDEX_USTRING:
+            std::cout << "ustring<" << v.value<TL::String>().value() << ">" << std::endl;
+            break;
+
+            case TL::TYPE_INDEX_SPECIAL:
+            std::cout << "special<" << v.value<TL::Special>().value() << ">" << std::endl;
+            break;
+
+            case TL::TYPE_INDEX_UCHAR:
+            std::cout << "uchar<";
+            v.value<TL::Char>().print(std::cout, TL::Tuple());
+            std::cout << ">" << std::endl;
+            break;
+
+            default:
+            std::cout << "Don't know how to print this" << std::endl;
+         }
+         #if 0
          //const TL::TypeManager* m = registry.findType(p.first.index());
          //m->print(std::cout, p.first, p.second);
          TL::tuple_t k;
@@ -87,11 +112,12 @@ int main(int argc, char *argv[]) {
          k[TL::DIM_VALUE] = p.first;
          TL::TypedValue s = interpreter(TL::Tuple(k)).first;
          if (s.index() != TL::TYPE_INDEX_USTRING) {
-            std::cout << "oops";
+            //std::cout << "oops";
          } else {
             std::cout << s.value<TL::String>().value();
          }
          std::cout << std::endl;
+         #endif
       }
    }
 

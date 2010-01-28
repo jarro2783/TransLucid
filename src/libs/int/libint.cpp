@@ -304,15 +304,14 @@ class OpHD : public TL::HD {
    //variadic templates would be really really good here
    TL::TaggedValue operator()(const TL::Tuple& k) {
       try {
-         size_t index_arg0 = TL::get_dimension_index(&m_system, "arg0").get_ui();
-         size_t index_arg1 = TL::get_dimension_index(&m_system, "arg1").get_ui();
+         size_t index_arg0 = TL::get_dimension_index(&m_system, "arg0");
+         size_t index_arg1 = TL::get_dimension_index(&m_system, "arg1");
 
          return TL::TaggedValue(m_op(TL::get_dimension(k, index_arg0),
                                      TL::get_dimension(k, index_arg1),
                                      k),
                                 k);
       } catch (TL::DimensionNotFound& e) {
-         #warning maybe use the system to build these specials
          //H @ [id : "CONST", type : "special", value : "dimension"]
          //or we could leave these since it is slightly more efficient, however it will
          //all come out in the wash when we compile anyway
@@ -354,21 +353,21 @@ void register_int_ops(TL::Interpreter& i, size_t index) {
 template <typename T>
 class IntHD : public TL::HD {
    public:
-   IntHD(const TL::ustring_t& name, TL::Interpreter& system)
-   : m_system(system)
+   IntHD(const TL::ustring_t& name, size_t index, TL::Interpreter& system)
+   : m_system(system), m_index(index)
    {
-      m_index = system.typeRegistry().registerType(name);
+      //m_index = system.typeRegistry().registerType(name);
    }
 
    TL::TaggedValue operator()(const TL::Tuple& k) {
       //retrieve the text and parse it
-      size_t tdim = m_system.dimTranslator().lookup("text");
+      size_t tdim = TL::DIM_TEXT;
 
       TL::Tuple::const_iterator text = k.find(tdim);
 
       if (text == k.end()) {
          return TL::TaggedValue(TL::TypedValue(
-            TL::Special(TL::Special::DIMENSION), m_system.typeRegistry().indexSpecial()), k);
+            TL::Special(TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
       }
 
       try {
@@ -376,7 +375,7 @@ class IntHD : public TL::HD {
             Int<T>(boost::lexical_cast<T>(text->second.value<TL::String>().value())), m_index), k);
       } catch (...) {
          return TL::TaggedValue(TL::TypedValue(
-            TL::Special(TL::Special::CONST), m_system.typeRegistry().indexSpecial()), k);
+            TL::Special(TL::Special::CONST), TL::TYPE_INDEX_SPECIAL), k);
       }
    }
 
@@ -397,13 +396,14 @@ void makeTypeManager(const TL::ustring_t& name, TL::TypeRegistry& r) {
 
 template <class T>
 void registerType(const TL::ustring_t& name, TL::Interpreter& i) {
-   TL::HD *h = new IntHD<T>(name, i);
+   mpz_class unique = TL::get_unique(&i);
+
+   TL::HD *h = new IntHD<T>(name, unique.get_ui(), i);
 
    TL::tuple_t k;
    k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
    k.insert(std::make_pair(TL::DIM_ID, TL::generate_string("CONST")));
    i.addExpr(TransLucid::Tuple(k), h);
-   mpz_class unique = TL::get_unique(&i);
 
    k.clear();
    k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));

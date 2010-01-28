@@ -42,8 +42,9 @@ CONST uses type and text
 
 dimension indexes are stored in
 DIMENSION_INDEX
-   named dimensions in @ [name : string]
-   typed dimension in @ [arg0 : tv]
+   for named dimensions @ [text : string]
+DIMENSION_TYPED_INDEX
+   typed dimension in @ [value : tv]
 
 identifiers:
 constants are CONST

@@ -5,6 +5,7 @@
 #include <tl/parser_fwd.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/expr_compiler.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid {
 
@@ -49,14 +50,17 @@ namespace TransLucid {
          //std::cout << "list of variables" << std::endl;
          //listVariables();
 
-         size_t dimTime = dimTranslator().lookup("time");
-         size_t dim_id = dimTranslator().lookup("id");
-         TypedValue demandString(String("demand"), typeRegistry().indexString());
+         //size_t dimTime = dimTranslator().lookup("time");
+         size_t dimTime = DIM_TIME;
+         //size_t dim_id = dimTranslator().lookup("id");
+         size_t dim_id = DIM_ID;
+         //TypedValue demandString(String("demand"), typeRegistry().indexString());
+         TypedValue demandString = generate_string("demand");
 
          //evaluate from time 1 to end
          for (size_t time = 1; time <= m_maxClock; ++time) {
             //just do one thread
-            tuple_t tuple = map_list_of(dimTime, TypedValue(Intmp(time), typeRegistry().indexIntmp()))
+            tuple_t tuple = map_list_of(dimTime, TypedValue(Intmp(time), TYPE_INDEX_INTMP))
             (dim_id, demandString);
             Tuple c(tuple);
 
