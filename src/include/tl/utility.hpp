@@ -8,6 +8,7 @@
 #include <tl/fixed_indexes.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/range.hpp>
 
 namespace TransLucid {
 
@@ -106,6 +107,11 @@ namespace TransLucid {
    FunctorHD<T> *generate_functor_hd(const T& f) {
       return new FunctorHD<T>(f);
    }
+
+   bool tupleApplicable(const Tuple& def, const Tuple& c);
+   bool tupleRefines(const Tuple& a, const Tuple& b);
+   bool valueRefines(const TypedValue& a, const TypedValue& b);
+   bool booleanTrue(const EquationGuard& g, const Tuple& c);
 
 
 }

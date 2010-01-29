@@ -44,6 +44,15 @@ namespace TransLucid {
       Interpreter();
       virtual ~Interpreter();
 
+      typedef std::map<ustring_t, HD*> IOList;
+
+      void addOutput(const IOList& output);
+      void addInput(const IOList& input);
+
+      void addDemand(const ustring_t& id, const EquationGuard& guard);
+
+      void tick();
+
       /**
        * @brief Loads a library.
        *
@@ -142,11 +151,19 @@ namespace TransLucid {
       mpz_class m_maxClock;
       LazyWarehouse m_warehouse;
 
+      size_t m_time;
+
       //the demands for each thread
-      std::vector<std::vector<std::pair<AST::Expr*, AST::Expr*> > > m_demands;
+      //std::vector<std::vector<std::pair<AST::Expr*, AST::Expr*> > > m_demands;
 
       //std::vector<std::pair<AST::Expr*, std::map<ustring_t, std::vector<std::pair<AST::Expr*, AST::Expr*> > > >
-      EqnSetList eqnSets;
+      //EqnSetList eqnSets;
+
+      IOList m_outputs;
+      IOList m_inputs;
+
+      typedef std::map<ustring_t, EquationGuard> DemandStore;
+      DemandStore m_demands;
 
       //everything related to the parser
       void initExprParser();

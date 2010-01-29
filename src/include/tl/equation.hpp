@@ -176,11 +176,6 @@ namespace TransLucid {
 
       private:
 
-      bool tupleApplicable(const Tuple& def, const Tuple& c) const;
-      bool tupleRefines(const Tuple& a, const Tuple& b) const;
-      bool valueRefines(const TypedValue& a, const TypedValue& b) const;
-      bool booleanTrue(const EquationGuard& g, const Tuple& c) const;
-
       void addExprActual(const Tuple& k, HD *e);
 
       typedef std::list<Equation> Equations;

@@ -129,6 +129,7 @@ Interpreter::Interpreter()
 m_maxClock(0),
 m_warehouse(*this),
 //m_dimension_id(m_dimTranslator.lookup("id")),
+m_time(0),
 m_verbose(false)
 {
    //m_systemParser.push(*m_systemGrammar);
@@ -260,6 +261,54 @@ TaggedValue Interpreter::operator()(const Tuple& k) {
    } catch (std::bad_cast& e) {
       return TaggedValue(TypedValue(Special(Special::DIMENSION), m_types.indexSpecial()), k);
    }
+}
+
+void Interpreter::addOutput(const IOList& output) {
+   m_outputs.insert(output.begin(), output.end());
+}
+
+void Interpreter::addInput(const IOList& input) {
+   m_inputs.insert(input.begin(), input.end());
+
+   //add all the inputs as equations
+   #warning clear up semantics here, this only works if the names do not
+   #warning clash and there is only one equation per name, otherwise trouble
+   m_variables.insert(input.begin(), input.end());
+}
+
+void Interpreter::addDemand(const ustring_t& id, const EquationGuard& guard) {
+   m_demands.insert(std::make_pair(id, guard));
+}
+
+void Interpreter::tick() {
+
+   tuple_t current;
+   current[DIM_TIME] = TypedValue(Intmp(m_time), TYPE_INDEX_INTMP);
+
+   tuple_t toSave = current;
+
+   Tuple k(current);
+
+   //run the applicable demands
+
+   BOOST_FOREACH(const DemandStore::value_type& d, m_demands) {
+      Tuple t = d.second.evaluate(Tuple());
+      if (tupleApplicable(t, k)) {
+         VariableMap::const_iterator iter = m_variables.find(d.first);
+         if (iter != m_variables.end()) {
+            //evaluate the demand
+            TaggedValue r = (*iter->second)(k);
+            //save it in the output
+            toSave[DIM_VALUE] = r.first;
+            IOList::iterator iter = m_outputs.find(d.first);
+            if (iter != m_outputs.end()) {
+               (*iter->second)(Tuple(toSave));
+            }
+         }
+      }
+   }
+
+   ++m_time;
 }
 
 } //namespace TransLucid
