@@ -80,6 +80,10 @@ namespace {
    };
 }
 
+void Interpreter::addDimensionSymbol(const ustring_t& s) {
+   Parser::addSymbol(wstring_t(s.begin(), s.end()), m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
+}
+
 inline void Interpreter::addToVariableActual(const ustring_t& id,
    const Tuple& k, HD *h)
 {
@@ -139,10 +143,28 @@ m_verbose(false)
    m_dimTranslator.lookup("time");
    m_dimTranslator.lookup("priority");
    m_dimTranslator.lookup("_validguard");
-   Parser::addSymbol(L"time", m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
+
+   //add some default builtin dimension symbols to the parser
+   addDimensionSymbol("time");
+   addDimensionSymbol("priority");
+   addDimensionSymbol("_validguard");
+   addDimensionSymbol("type");
+   #if 0
+            ("type", DIM_TYPE)
+              ("text", DIM_TEXT)
+              ("name", DIM_NAME)
+              ("id", DIM_ID)
+              ("value", DIM_VALUE)
+              ("time", DIM_TIME)
+   #endif
 
    //create the obj, const and fun ids
    //m_variables.insert(std::make_pair("const", new ConstantHD(*this)));
+
+   //we need dimensions and unique to do anything
+   addToVariableActual("DIMENSION_INDEX", Tuple(), new DimensionsStringHD(m_dimTranslator));
+   addToVariableActual("DIMENSION_TYPED_INDEX", Tuple(), new DimensionsTypedHD(m_dimTranslator));
+   addToVariableActual("_unique", Tuple(), new UniqueHD(RESERVED_INDEX_LAST));
 
    //build the constant creators
    buildConstantHD<ConstHD::UChar>(TYPE_INDEX_UCHAR);
@@ -151,12 +173,6 @@ m_verbose(false)
 
    //set this as the default int too
    addToVariableActual("DEFAULTINT", Tuple(), intmpHD);
-
-   addToVariableActual("DIMENSION_INDEX", Tuple(), new DimensionsStringHD(m_dimTranslator));
-   addToVariableActual("DIMENSION_TYPED_INDEX", Tuple(), new DimensionsTypedHD(m_dimTranslator));
-
-   //tuple_t k;
-   addToVariableActual("_unique", Tuple(), new UniqueHD(RESERVED_INDEX_LAST));
 }
 
 Interpreter::~Interpreter() {
@@ -302,7 +318,7 @@ void Interpreter::tick() {
             toSave[DIM_VALUE] = r.first;
             IOList::iterator iter = m_outputs.find(d.first);
             if (iter != m_outputs.end()) {
-               (*iter->second)(Tuple(toSave));
+               iter->second->addExpr(Tuple(toSave), 0);
             }
          }
       }

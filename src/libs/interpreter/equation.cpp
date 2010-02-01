@@ -34,7 +34,7 @@ Tuple EquationGuard::evaluate(const Tuple& k) const
 
 inline void Variable::addExprActual(const Tuple& k, HD *h) {
    const EquationGuard *g = 0;
-   Tuple::const_iterator giter = k.find(get_dimension_index(&m_i, "_validguard"));
+   Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
    if (giter != k.end()) {
       g = &giter->second.value<EquationGuardType const&>().value();
    }

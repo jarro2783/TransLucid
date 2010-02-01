@@ -143,14 +143,14 @@ namespace TransLucid {
 
       class Ident : public CompiledFunctor {
          public:
-         Ident(Interpreter& system, const ustring_t& name)
+         Ident(HD *system, const ustring_t& name)
          : m_system(system), m_name(name)
          {}
 
          TaggedValue operator()(const Tuple& context);
 
          private:
-         Interpreter& m_system;
+         HD *m_system;
          ustring_t m_name;
       };
 

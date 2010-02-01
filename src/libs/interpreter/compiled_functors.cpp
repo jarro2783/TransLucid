@@ -84,7 +84,6 @@ TaggedValue AtRelative::operator()(const Tuple& k) {
 TaggedValue BoolConst::operator()(const Tuple& k) {
    //return boost::assign::list_of(ValueContext(
    //   TypedValue(TransLucid::Boolean(m_value), i.typeRegistry().indexBoolean()), Tuple()));
-   #warning maybe there is a better way to do this
    tuple_t kp = k.tuple();
    insert_tuple<String>(kp, &m_system, TYPE_INDEX_USTRING)
       ("id", "CONST")
@@ -104,13 +103,11 @@ TaggedValue BuildTuple::operator()(const Tuple& k) {
             TYPE_INDEX_SPECIAL), k);
       } else {
          const PairType& p = v.first.value<PairType>();
-         #warning change this to the proper way to lookup dims
-         #warning work out what I was doing here
-         //kp[m_system.dimTranslator().lookup(p.first())] = p.second();
-         size_t dimVal;
 
          if (p.first().index() == TYPE_INDEX_DIMENSION) {
             kp[p.first().value<TransLucid::Dimension>().value()] = p.second();
+         } else {
+            kp[get_dimension_index(&m_system, p.first())] = p.second();
          }
       }
    }
@@ -155,8 +152,6 @@ TaggedValue Hash::operator()(const Tuple& k) {
    } else {
       index = get_dimension_index(m_system, r.first);
    }
-   //size_t index = m_system.dimTranslator().lookup((*m_e)(k).first);
-   #warning fix this
 
    Tuple::const_iterator iter = k.find(index);
    if (iter != k.end()) {
@@ -170,10 +165,10 @@ TaggedValue Hash::operator()(const Tuple& k) {
 TaggedValue Ident::operator()(const Tuple& k) {
    tuple_t kp = k.tuple();
 
-   insert_tuple<String>(kp, &m_system, TYPE_INDEX_USTRING)
+   insert_tuple<String>(kp, m_system, TYPE_INDEX_USTRING)
       ("id", m_name)
       ;
-   return m_system(Tuple(kp));
+   return (*m_system)(Tuple(kp));
 }
 
 TaggedValue If::operator()(const Tuple& k) {

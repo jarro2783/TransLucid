@@ -191,6 +191,8 @@ namespace TransLucid {
       template <typename T>
       HD* buildConstantHD(size_t index);
 
+      void addDimensionSymbol(const ustring_t& s);
+
       protected:
       Parser::Header m_parseInfo;
       bool parseString(

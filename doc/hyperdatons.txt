@@ -141,3 +141,11 @@ DIMENSION_INDEX @ [text : "x"];;
 
 _unique is a special thing in the implementation which increments itself
 whenever it is called and returns the current value.
+
+== Parsing ==
+
+We should be able to create parsers using the system. These just become
+hyperdatons and are used by adding more equations to the system to parse
+things. In the meantime at least we can make the parser a hyperdaton and types
+such as tuple can request a pointer to it so that they can parse stuff inside
+<> at runtime.

@@ -101,7 +101,7 @@ AST::Data *ExprCompiler::visitHashExpr(AST::HashExpr* e, AST::Data*) {
 }
 
 AST::Data *ExprCompiler::visitIdentExpr(AST::IdentExpr* e, AST::Data*) {
-   return new Compiled(new CompiledFunctors::Ident(m_i, e->id));
+   return new Compiled(new CompiledFunctors::Ident(&m_i, e->id));
 }
 
 AST::Data *ExprCompiler::visitIfExpr(AST::IfExpr* e, AST::Data*) {

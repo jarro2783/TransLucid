@@ -86,6 +86,9 @@
 			<Add library="ltdl" />
 			<Add directory="$(#boost.lib)" />
 		</Linker>
+		<Unit filename="src/basic/echo.cpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/basic/single.cpp">
 			<Option target="libinterpreter" />
 		</Unit>
