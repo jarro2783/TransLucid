@@ -16,6 +16,7 @@ namespace TransLucid {
       TYPE_INDEX_GUARD,
       TYPE_INDEX_RANGE,
       TYPE_INDEX_PAIR,
+      TYPE_INDEX_TYPE,
 
       //dimensions
       DIM_TYPE,

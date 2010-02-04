@@ -163,6 +163,7 @@ TaggedValue Hash::operator()(const Tuple& k) {
 }
 
 TaggedValue Ident::operator()(const Tuple& k) {
+   std::cout << "ident: " << m_name << std::endl;
    tuple_t kp = k.tuple();
 
    insert_tuple<String>(kp, m_system, TYPE_INDEX_USTRING)

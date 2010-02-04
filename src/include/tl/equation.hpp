@@ -105,7 +105,7 @@ namespace TransLucid {
 
    class EquationBase {
       public:
-      virtual ~EquationBase();
+      virtual ~EquationBase() {}
       virtual ValueContext evaluate(Interpreter& i, const Tuple& context) = 0;
    };
 

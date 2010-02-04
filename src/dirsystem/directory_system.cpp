@@ -133,17 +133,17 @@ bool DirectorySystem::parseSystem(const ustring_t& path) {
                   {
                      tuple_t k;
                      k.insert(std::make_pair(dim_id,
-                        TypedValue(String(e.get<0>()),
+                        TypedValue(String(std::get<0>(e)),
                            TYPE_INDEX_USTRING)));
 
                      //need to compile the guard
-                     HD *guardTuple = m_compiler.compile(e.get<1>().get<0>());
-                     HD *guardBool = m_compiler.compile(e.get<1>().get<1>());
+                     HD *guardTuple = m_compiler.compile(std::get<0>(std::get<1>(e)));
+                     HD *guardBool = m_compiler.compile(std::get<1>(std::get<1>(e)));
                      k.insert(std::make_pair(dim_valid,
                         TypedValue(EquationGuardType(EquationGuard(guardTuple, guardBool)),
                            TYPE_INDEX_GUARD)));
 
-                     HD *h = m_compiler.compile(e.get<2>());
+                     HD *h = m_compiler.compile(std::get<2>(e));
                      addExpr(Tuple(k), h);
                   }
                }
@@ -200,9 +200,9 @@ void DirectorySystem::addParsedEquationSet(const Parser::equation_v& eqns) {
 void DirectorySystem::setClock(const Parser::equation_v& equations) {
    const Parser::equation_t *e;
    if (equations.size() == 1 &&
-      (e = &equations.front())->get<0>() == L"clock")
+      std::get<0>(*(e = &equations.front())) == L"clock")
    {
-      HD *h = m_compiler.compile(e->get<2>());
+      HD *h = m_compiler.compile(std::get<2>(*e));
       TypedValue v = (*h)(Tuple()).first;//= evaluate(e->get<2>(), Tuple());
       if (v.index() != TYPE_INDEX_INTMP) {
          throw ParseError("clock variable must be an intmp");

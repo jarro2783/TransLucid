@@ -177,8 +177,8 @@ namespace TransLucid {
 
       class IdentExpr : public Expr {
          public:
-         IdentExpr(const boost::tuple<ustring_t, Expr*, Expr*>& t)
-         : id(t.get<0>())
+         IdentExpr(const ustring_t& s)
+         : id(s)
          {
          }
 

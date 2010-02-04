@@ -30,6 +30,8 @@ bool valueRefines(const TypedValue& a, const TypedValue& b) {
    //if b is a range, a has to be a range and within or equal, or an int and inside
    //otherwise they have to be equal
 
+   //three cases, range, type, anything else
+
    if (b.index() == TYPE_INDEX_RANGE) {
       if (a.index() == TYPE_INDEX_RANGE) {
          if (!b.value<Range>().within(a.value<Range>())) {
@@ -43,6 +45,12 @@ bool valueRefines(const TypedValue& a, const TypedValue& b) {
          return false;
       }
       return true;
+   } else if (b.index() == TYPE_INDEX_TYPE) {
+      if (a.index() == b.value<TypeType>().index()) {
+         return true;
+      } else {
+         return false;
+      }
    } else {
       return a == b;
    }

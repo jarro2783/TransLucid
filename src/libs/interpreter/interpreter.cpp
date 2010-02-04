@@ -92,6 +92,7 @@ inline void Interpreter::addToVariableActual(const ustring_t& id,
    //find the variable
    VariableMap::const_iterator iter = m_variables.find(id);
    if (iter == m_variables.end()) {
+      std::cout << "adding " << id << std::endl;
       //std::cerr << "constructing new variable" << std::endl;
       iter = m_variables.insert(std::make_pair(id, new Variable(id, *this))).first;
    }
@@ -127,6 +128,12 @@ HD* Interpreter::buildConstantHD(size_t index) {
    return h;
 }
 
+void Interpreter::init_types() {
+   BOOST_FOREACH(auto v, builtin_name_to_index) {
+      addToVariableActual(v.first, Tuple(), new ConstHD::TypeConst(v.second));
+   }
+}
+
 Interpreter::Interpreter()
 : m_types(*this),
 //m_evaluator(*this),
@@ -134,6 +141,15 @@ m_maxClock(0),
 m_warehouse(*this),
 //m_dimension_id(m_dimTranslator.lookup("id")),
 m_time(0),
+builtin_name_to_index {
+   {"ustring", TYPE_INDEX_USTRING},
+   {"intmp", TYPE_INDEX_INTMP},
+   {"bool", TYPE_INDEX_BOOL},
+   {"special", TYPE_INDEX_SPECIAL},
+   {"uchar", TYPE_INDEX_UCHAR},
+   {"dim", TYPE_INDEX_DIMENSION},
+   {"type", TYPE_INDEX_TYPE}
+},
 m_verbose(false)
 {
    //m_systemParser.push(*m_systemGrammar);
@@ -149,6 +165,7 @@ m_verbose(false)
    addDimensionSymbol("priority");
    addDimensionSymbol("_validguard");
    addDimensionSymbol("type");
+   addDimensionSymbol("value");
    #if 0
             ("type", DIM_TYPE)
               ("text", DIM_TEXT)
@@ -165,6 +182,10 @@ m_verbose(false)
    addToVariableActual("DIMENSION_INDEX", Tuple(), new DimensionsStringHD(m_dimTranslator));
    addToVariableActual("DIMENSION_TYPED_INDEX", Tuple(), new DimensionsTypedHD(m_dimTranslator));
    addToVariableActual("_unique", Tuple(), new UniqueHD(RESERVED_INDEX_LAST));
+
+   //add variables for all the types
+   //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
+   init_types();
 
    //build the constant creators
    buildConstantHD<ConstHD::UChar>(TYPE_INDEX_UCHAR);
@@ -269,7 +290,9 @@ TaggedValue Interpreter::operator()(const Tuple& k) {
 
    try {
       VariableMap::const_iterator viter = m_variables.find(iditer->second.value<String>().value());
+      std::cout << "looking for " << iditer->second.value<String>().value() << std::endl;
       if (viter == m_variables.end()) {
+         std::cout << "not found" << std::endl;
          return TaggedValue(TypedValue(Special(Special::UNDEF), m_types.indexSpecial()), k);
       } else {
          return (*viter->second)(k);

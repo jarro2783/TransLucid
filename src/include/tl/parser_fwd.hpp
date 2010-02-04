@@ -1,6 +1,7 @@
 #ifndef PARSER_FWD_HPP_INCLUDED
 #define PARSER_FWD_HPP_INCLUDED
 
+#include <tuple>
 #include <boost/spirit/include/classic_core.hpp>
 #include <map>
 #include <vector>
@@ -62,9 +63,9 @@ namespace TransLucid {
          };
       };
 
-      namespace {
-         SkipGrammar skip_p;
-      }
+      //namespace {
+      //   SkipGrammar skip_p;
+      //}
 
       class IteratorTraits {
          public:
@@ -219,10 +220,10 @@ namespace TransLucid {
       class SystemGrammar;
       class ExprGrammar;
       class TupleGrammar;
-      class ConstantGrammar;
+      //class ConstantGrammar;
 
-      typedef boost::tuple<AST::Expr*, AST::Expr*> ParsedEquationGuard;
-      typedef boost::tuple<wstring_t, ParsedEquationGuard, AST::Expr*> equation_t;
+      typedef std::tuple<AST::Expr*, AST::Expr*> ParsedEquationGuard;
+      typedef std::tuple<wstring_t, ParsedEquationGuard, AST::Expr*> equation_t;
       typedef std::vector<equation_t> equation_v;
 
       enum InfixAssoc {
@@ -410,7 +411,7 @@ namespace TransLucid {
          ParserStack expr_parser;
          ParserStack primary_expr_parser;
          ParserStack tuple_parser;
-         ParserStack constant_parser;
+         //ParserStack constant_parser;
       };
 
       ustring_t formatError(const file_position& pos, const ustring_t& message);

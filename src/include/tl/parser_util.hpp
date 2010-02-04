@@ -48,6 +48,8 @@ namespace TransLucid {
       using namespace boost::phoenix::arg_names;
       using namespace boost::phoenix::local_names;
 
+      namespace ph = boost::phoenix;
+
       template <class Op, int N>
       struct operate_n_imp {
 
@@ -146,7 +148,7 @@ namespace TransLucid {
                   ]
                   | Spirit::int_p )
                   [
-                     ref(s) = construct<wstring_t>(arg1, arg2)
+                     ph::ref(s) = construct<wstring_t>(arg1, arg2)
                   ]
                ;
             typename Spirit::parser_result<Spirit::rule<ScannerT>, ScannerT>
@@ -207,7 +209,7 @@ namespace TransLucid {
                   (Spirit::alpha_p >> *(Spirit::alnum_p | '_'))
                ]
                [
-                  ref(s) = construct<wstring_t>(arg1, arg2)
+                  ph::ref(s) = construct<wstring_t>(arg1, arg2)
                ]
                ;
 
@@ -247,7 +249,7 @@ namespace TransLucid {
                   =  Spirit::lexeme_d
                      [
                         '<'
-                        >> type_value_p[(push_front(ref(string_stack), arg1))]
+                        >> type_value_p[(push_front(ph::ref(string_stack), arg1))]
                         >> '>'
                      ]
                   ;

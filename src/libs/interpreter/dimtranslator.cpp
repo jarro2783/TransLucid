@@ -5,15 +5,17 @@
 namespace TransLucid {
 
 DimensionTranslator::DimensionTranslator()
-: m_nextIndex(RESERVED_INDEX_LAST)
+: m_nextIndex(RESERVED_INDEX_LAST),
+m_namedDims({
+{"type", DIM_TYPE},
+{"text", DIM_TEXT},
+{"name", DIM_NAME},
+{"id", DIM_ID},
+{"value", DIM_VALUE},
+{"time", DIM_TIME},
+{"_validguard", DIM_VALID_GUARD}
+})
 {
-   m_namedDims = (boost::assign::map_list_of("type", DIM_TYPE)
-              ("text", DIM_TEXT)
-              ("name", DIM_NAME)
-              ("id", DIM_ID)
-              ("value", DIM_VALUE)
-              ("time", DIM_TIME)
-              );
 }
 
 size_t DimensionTranslator::lookup(const ustring_t& name) {

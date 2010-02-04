@@ -46,9 +46,6 @@ inline void Variable::addExprActual(const Tuple& k, HD *h) {
    }
 }
 
-EquationBase::~EquationBase() {
-}
-
 TaggedValue Variable::operator()(const Tuple& k) {
 
    //std::cout << "evaluating variable " << m_name << ", context: " << std::endl;

@@ -443,6 +443,33 @@ namespace TransLucid {
       private:
       SetBase *m_value;
    };
+
+   class TypeType : public TypedValueBase {
+      public:
+
+      TypeType(size_t index)
+      : m_index(index)
+      {}
+
+      bool operator==(const TypeType& rhs) const {
+         return m_index == rhs.m_index;
+      }
+
+      bool operator<(const TypeType& rhs) const {
+         return m_index < rhs.m_index;
+      }
+
+      size_t hash() const {
+         return m_index;
+      }
+
+      size_t index() const {
+         return m_index;
+      }
+
+      private:
+      size_t m_index;
+   };
 }
 
 #endif // BUILTIN_TYPES_HPP_INCLUDED

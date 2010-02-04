@@ -5,14 +5,14 @@
 #include <iostream>
 
 #include <boost/functional/hash.hpp>
-#include <boost/flyweight.hpp>
+//#include <boost/flyweight.hpp>
 #include <boost/any.hpp>
 #include <map>
 #include <boost/unordered_map.hpp>
 #include <boost/function.hpp>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include <boost/flyweight/intermodule_holder.hpp>
+//#include <boost/flyweight/intermodule_holder.hpp>
 #include <gmpxx.h>
 #include <boost/foreach.hpp>
 #include <set>
@@ -295,7 +295,7 @@ namespace TransLucid {
          }
 
          const TypedValueBase& value() const {
-            return m_value.get();
+            return m_value;
          }
 
          Storage<T>* clone() const {
@@ -321,7 +321,7 @@ namespace TransLucid {
          }
 
          private:
-         boost::flyweight<T, boost::flyweights::intermodule_holder> m_value;
+         T m_value;
       };
 
       StorageBase *m_value;

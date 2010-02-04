@@ -17,6 +17,8 @@ AC_PROG_CXX
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 
+AC_LANG([C++])
+
 # Checks for libraries.
 
 AX_BOOST_BASE([1.39])
@@ -31,6 +33,12 @@ PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4],
 [
    AC_MSG_ERROR([glibmm is required])
 ])
+
+TL_LDFLAGS="-std=gnu++0x"
+TL_CFLAGS="-std=gnu++0x"
+
+AC_SUBST(TL_LDFLAGS)
+AC_SUBST(TL_CFLAGS)
 
 # Checks for header files.
 

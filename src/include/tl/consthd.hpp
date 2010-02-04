@@ -74,6 +74,21 @@ namespace TransLucid {
          private:
          mpz_class m_v;
       };
+
+      class TypeConst : public ConstantHD {
+         public:
+
+         TypeConst(size_t index)
+         : ConstantHD(0), m_index(index)
+         {}
+
+         TaggedValue operator()(const Tuple& k) {
+            return TaggedValue(TypedValue(TypeType(m_index), TYPE_INDEX_TYPE), k);
+         }
+
+         private:
+         size_t m_index;
+      };
    } //namespace ConstHD
 } //namespace TransLucid
 

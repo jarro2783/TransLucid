@@ -1,2 +1,3 @@
 demand @ [time : 1] = x;;
 demand @ [time : 2] = 6;;
+demand @ [time : 3] = y @ [value : 42];;

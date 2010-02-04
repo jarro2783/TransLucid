@@ -172,10 +172,14 @@ namespace TransLucid {
       void cleanupTupleParser();
       void initConstantParser();
       void cleanupConstantParser();
+
+      //initialises the type indexes
+      void init_types();
+
       //Parser::SystemGrammar *m_systemGrammar;
       Parser::ExprGrammar *m_exprGrammar;
       Parser::TupleGrammar *m_tupleGrammar;
-      Parser::ConstantGrammar *m_constantGrammar;
+      //Parser::ConstantGrammar *m_constantGrammar;
       VariableMap m_variables;
 
       //adds to id with remaining in the id dimension
@@ -192,6 +196,11 @@ namespace TransLucid {
       HD* buildConstantHD(size_t index);
 
       void addDimensionSymbol(const ustring_t& s);
+
+      //map builtin types to type indexes
+      std::map<ustring_t, size_t> builtin_name_to_index;
+
+      Parser::SkipGrammar m_skip_parser;
 
       protected:
       Parser::Header m_parseInfo;
@@ -233,7 +242,7 @@ namespace TransLucid {
          return Parser::Spirit::parse(
             begin, end,
             parser,
-            Parser::skip_p
+            m_skip_parser
             ).
             full;
       } catch (const std::exception& e) {

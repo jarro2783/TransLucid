@@ -52,7 +52,7 @@ namespace TransLucid {
                (
                Spirit::str_p("if")
                [
-                  push_front(ref(list_stack), construct<std::list<AST::Expr*> >())
+                  push_front(ph::ref(list_stack), construct<std::list<AST::Expr*> >())
                ]
                   >> if_expr
                   >> expect_then(Spirit::str_p("then")) >> if_expr
@@ -60,25 +60,25 @@ namespace TransLucid {
                      expect_then(Spirit::str_p("then"))
                      >> if_expr)
                   [
-                     let(_a = at(ref(list_stack), 0))
+                     let(_a = at(ph::ref(list_stack), 0))
                      [
-                        push_back(_a, at(ref(expr_stack), 1)),
-                        push_back(_a, at(ref(expr_stack), 0)),
-                        pop_front_n<2>()(ref(expr_stack))
+                        push_back(_a, at(ph::ref(expr_stack), 1)),
+                        push_back(_a, at(ph::ref(expr_stack), 0)),
+                        pop_front_n<2>()(ph::ref(expr_stack))
                      ]
                   ]
                   >> expect_else(Spirit::str_p("else")) >> if_expr >> expect_fi(Spirit::str_p("fi"))
                )
                [
                   let (_a = new_<AST::IfExpr>(
-                     at(ref(expr_stack), 2),
-                     at(ref(expr_stack), 1),
-                     at(ref(list_stack), 0),
-                     at(ref(expr_stack), 0)))
+                     at(ph::ref(expr_stack), 2),
+                     at(ph::ref(expr_stack), 1),
+                     at(ph::ref(list_stack), 0),
+                     at(ph::ref(expr_stack), 0)))
                   [
-                     pop_front_n<3>()(ref(expr_stack)),
-                     pop_front(ref(list_stack)),
-                     push_front(ref(expr_stack), _a)
+                     pop_front_n<3>()(ph::ref(expr_stack)),
+                     pop_front(ph::ref(list_stack)),
+                     push_front(ph::ref(expr_stack), _a)
                   ]
                ]
                | range_expr
@@ -89,11 +89,11 @@ namespace TransLucid {
                   >> !(".."
                   >> if_expr)
                   [
-                     let(_a = new_<AST::RangeExpr>(at(ref(expr_stack), 1),
-                           at(ref(expr_stack), 0)))
+                     let(_a = new_<AST::RangeExpr>(at(ph::ref(expr_stack), 1),
+                           at(ph::ref(expr_stack), 0)))
                      [
-                        pop_front_n<2>()(ref(expr_stack)),
-                        push_front(ref(expr_stack), _a)
+                        pop_front_n<2>()(ph::ref(expr_stack)),
+                        push_front(ph::ref(expr_stack), _a)
                      ]
                   ]
                   ;
@@ -101,26 +101,26 @@ namespace TransLucid {
                at_expr = spec_ops >> !('@' >> at_expr)
                [
                   //let(_a = at(ref(expr_stack), 1), _b = at(ref(expr_stack), 0))
-                  let(_a = new_<AST::AtExpr>(at(ref(expr_stack), 1), at(ref(expr_stack), 0)))
+                  let(_a = new_<AST::AtExpr>(at(ph::ref(expr_stack), 1), at(ph::ref(expr_stack), 0)))
                   [
-                     pop_front_n<2>()(ref(expr_stack)),
-                     push_front(ref(expr_stack), _a)
+                     pop_front_n<2>()(ph::ref(expr_stack)),
+                     push_front(ph::ref(expr_stack), _a)
                   ]
                ]
                ;
 
                spec_ops = ((Spirit::str_p("isspecial") | "convert" | "istype")
                   [
-                     push_front(ref(string_stack), construct<wstring_t>(arg1, arg2))
+                     push_front(ph::ref(string_stack), construct<wstring_t>(arg1, arg2))
                   ]
                >> angle_string >> spec_ops)
                [
                   let(_a = new_<AST::SpecialOpsExpr>(
-                     at(ref(string_stack), 1), at(ref(string_stack), 0), at(ref(expr_stack), 0)))
+                     at(ph::ref(string_stack), 1), at(ph::ref(string_stack), 0), at(ph::ref(expr_stack), 0)))
                      [
-                        pop_front(ref(expr_stack)),
-                        pop_front(ref(string_stack)),
-                        push_front(ref(expr_stack), _a)
+                        pop_front(ph::ref(expr_stack)),
+                        pop_front(ph::ref(string_stack)),
+                        push_front(ph::ref(expr_stack), _a)
                      ]
                ]
                | binary_op
@@ -129,19 +129,19 @@ namespace TransLucid {
                binary_op = prefix_expr >>
                *(self.header.binary_op_symbols
                [
-                  push_front(ref(op_stack), arg1)
+                  push_front(ph::ref(op_stack), arg1)
                ]
                >> prefix_expr
                [
                   let (_a = bind(&insert_binary_operation,
-                     at(ref(self.header.binary_op_info), at(ref(op_stack), 0)),
-                     at(ref(expr_stack), 1),
-                     at(ref(expr_stack), 0)
+                     at(ph::ref(self.header.binary_op_info), at(ph::ref(op_stack), 0)),
+                     at(ph::ref(expr_stack), 1),
+                     at(ph::ref(expr_stack), 0)
                   ))
                   [
-                     pop_front_n<2>()(ref(expr_stack)),
-                     pop_front(ref(op_stack)),
-                     push_front(ref(expr_stack), _a)
+                     pop_front_n<2>()(ph::ref(expr_stack)),
+                     pop_front(ph::ref(op_stack)),
+                     push_front(ph::ref(expr_stack), _a)
                   ]
                ]
                )
@@ -150,10 +150,10 @@ namespace TransLucid {
                prefix_expr
                   = (self.header.prefix_op_symbols >> postfix_expr)
                   [
-                     let(_a = new_<AST::UnaryExpr>(at(ref(self.header.unary_op_info), (ref(op_stack), 0)), at(ref(expr_stack), 0)))
+                     let(_a = new_<AST::UnaryExpr>(at(ph::ref(self.header.unary_op_info), (ph::ref(op_stack), 0)), at(ph::ref(expr_stack), 0)))
                      [
-                        pop_front(ref(expr_stack)),
-                        push_back(ref(expr_stack), _a)
+                        pop_front(ph::ref(expr_stack)),
+                        push_back(ph::ref(expr_stack), _a)
                      ]
 
                   ]
@@ -166,9 +166,9 @@ namespace TransLucid {
 
                hash_expr =
                '#' >> hash_expr [
-                  let(_a = new_<AST::HashExpr>(at(ref(expr_stack), 0))) [
-                     pop_front(ref(expr_stack)),
-                     push_front(ref(expr_stack), _a)
+                  let(_a = new_<AST::HashExpr>(at(ph::ref(expr_stack), 0))) [
+                     pop_front(ph::ref(expr_stack)),
+                     push_front(ph::ref(expr_stack), _a)
                   ]
                ]
                | expect_primary(primary_expr)
@@ -179,63 +179,81 @@ namespace TransLucid {
                   = integer
                   |  boolean
                   | self.header.dimension_symbols [
-                     push_front(ref(expr_stack), new_<AST::DimensionExpr>(
-                        at(ref(self.header.dimension_names), arg1)))
+                     push_front(ph::ref(expr_stack), new_<AST::DimensionExpr>(
+                        at(ph::ref(self.header.dimension_names), arg1)))
                   ]
-                  | self.header.equation_symbols [
-                     push_front(ref(expr_stack), new_<AST::IdentExpr>(
-                        at(ref(self.header.equation_names), arg1))
-                     )
+                  | identifier_p
+                  [
+                     push_front(ph::ref(string_stack), arg1)
                   ]
-                  |   constant
+                  >> (angle_string
+                  [
+                     push_front(ph::ref(expr_stack),
+                        new_<AST::ConstantExpr>(at(ph::ref(string_stack), 1),
+                        at(ph::ref(string_stack), 0))),
+                     pop_front_n<2>()(ph::ref(string_stack))
+                  ]
+                     | Spirit::eps_p [
+                        push_front(ph::ref(expr_stack), new_<AST::IdentExpr>(
+                           at(ph::ref(string_stack), 0))
+                        ),
+                        pop_front(ph::ref(string_stack))
+                     ]
+                  )
+                  //| self.header.equation_symbols [
+                  //   push_front(ph::ref(expr_stack), new_<AST::IdentExpr>(
+                  //      at(ph::ref(self.header.equation_names), arg1))
+                  //   )
+                  //]
+                  //|   constant
                   |   context_perturb
                   |   '(' >> expr >> expect_close_paren(Spirit::ch_p(')'))
                   |   (Spirit::confix_p( self.header.delimiter_start_symbols
                   [
-                     push_front(ref(string_stack),
+                     push_front(ph::ref(string_stack),
                         bind(&getDelimiterType,
-                           at(ref(self.header.delimiter_info), arg1)
+                           at(ph::ref(self.header.delimiter_info), arg1)
                         )
                      ),
-                     bind(&setEndDelimiter, at(ref(self.header.delimiter_info), arg1),
-                        ref(endDelimiter))
+                     bind(&setEndDelimiter, at(ph::ref(self.header.delimiter_info), arg1),
+                        ph::ref(endDelimiter))
                   ]
                   , (*Spirit::anychar_p)
                   [
-                     push_front(ref(string_stack), construct<wstring_t>(arg1, arg2))
+                     push_front(ph::ref(string_stack), construct<wstring_t>(arg1, arg2))
                   ]
                   ,  Spirit::ch_p(boost::ref(endDelimiter)) )
                   )
                   [
-                     push_front(ref(expr_stack), new_<AST::ConstantExpr>(
-                        at(ref(string_stack), 1),
-                        at(ref(string_stack), 0)
+                     push_front(ph::ref(expr_stack), new_<AST::ConstantExpr>(
+                        at(ph::ref(string_stack), 1),
+                        at(ph::ref(string_stack), 0)
                         )),
-                     pop_front_n<2>()(ref(string_stack))
+                     pop_front_n<2>()(ph::ref(string_stack))
                   ]
                   ;
 
                boolean = (Spirit::str_p("true") | "false")
                [
-                  push_front(ref(expr_stack),
+                  push_front(ph::ref(expr_stack),
                      new_<AST::BooleanExpr>(construct<wstring_t>(arg1, arg2)))
                ]
                ;
 
                integer = integer_p
                [
-                  push_front(ref(expr_stack), new_<AST::IntegerExpr>(arg1))
+                  push_front(ph::ref(expr_stack), new_<AST::IntegerExpr>(arg1))
                ]
                ;
 
-               constant = self.parsers.constant_parser.top();
+               //constant = self.parsers.constant_parser.top();
 
                context_perturb = self.parsers.tuple_parser.top();
 
                #ifdef BOOST_SPIRIT_DEBUG
                BOOST_SPIRIT_DEBUG_NODE(integer);
                BOOST_SPIRIT_DEBUG_NODE(boolean);
-               BOOST_SPIRIT_DEBUG_NODE(constant);
+               //BOOST_SPIRIT_DEBUG_NODE(constant);
                BOOST_SPIRIT_DEBUG_NODE(primary_expr);
                BOOST_SPIRIT_DEBUG_NODE(hash_expr);
                BOOST_SPIRIT_DEBUG_NODE(postfix_expr);
@@ -259,7 +277,7 @@ namespace TransLucid {
             hash_expr,
             spec_ops,
             boolean,
-            constant,
+            //constant,
             primary_expr,
             integer,
             context_perturb

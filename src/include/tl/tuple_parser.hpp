@@ -30,23 +30,23 @@ namespace TransLucid {
                expr = self.parsers.expr_parser.top();
 
                tuple_inside = pair [
-                  push_front(ref(list_stack), construct<std::list<AST::Expr*> >()),
-                  push_back(at(ref(list_stack), 0), at(ref(expr_stack), 0)),
-                  pop_front(ref(expr_stack))
+                  push_front(ph::ref(list_stack), construct<std::list<AST::Expr*> >()),
+                  push_back(at(ph::ref(list_stack), 0), at(ph::ref(expr_stack), 0)),
+                  pop_front(ph::ref(expr_stack))
                ]
                >> *(',' >> pair [
-                  push_back(at(ref(list_stack), 0), at(ref(expr_stack), 0)),
-                  pop_front(ref(expr_stack))
+                  push_back(at(ph::ref(list_stack), 0), at(ph::ref(expr_stack), 0)),
+                  pop_front(ph::ref(expr_stack))
                ]
                );
 
                pair = (expr >> Spirit::ch_p(':') >> expr)
                [
-                  let(_a = new_<AST::PairExpr>(at(ref(expr_stack), 1),
-		              at(ref(expr_stack), 0)))
+                  let(_a = new_<AST::PairExpr>(at(ph::ref(expr_stack), 1),
+		              at(ph::ref(expr_stack), 0)))
                   [
-                     pop_front_n<2>()(ref(expr_stack)),
-                     push_front(ref(expr_stack), _a)
+                     pop_front_n<2>()(ph::ref(expr_stack)),
+                     push_front(ph::ref(expr_stack), _a)
                   ]
                ];
 
@@ -54,12 +54,12 @@ namespace TransLucid {
                >> tuple_inside
                >> expect_close_bracket(Spirit::ch_p(']')))
                [
-                  push_front(ref(expr_stack),
+                  push_front(ph::ref(expr_stack),
                      new_<AST::BuildTupleExpr>(
-                        at(ref(list_stack), 0)
+                        at(ph::ref(list_stack), 0)
                      )
                   ),
-                  pop_front(ref(list_stack))
+                  pop_front(ph::ref(list_stack))
 
                ]
                ;

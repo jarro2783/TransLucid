@@ -3,7 +3,7 @@ EXTRA_DIST = CMakeLists.txt
 lib_LTLIBRARIES = libtlinterpreter.la
 
 libtlinterpreter_la_LDFLAGS = -version-info 0:0:0 $(GLIBMM_LIBS) \
-$(BOOST_LDFLAGS)
+$(BOOST_LDFLAGS) $(TL_LDFLAGS)
 libtlinterpreter_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
 -lltdl
 
@@ -17,4 +17,4 @@ cache.cpp utility.cpp constant.cpp function.cpp compiled_functors.cpp \
 expr_compiler.cpp consthd.cpp printer.cpp container.cpp set_types.cpp
 
 libtlinterpreter_la_CPPFLAGS = $(GLIBMM_CFLAGS) -I$(top_srcdir)/src/include \
--DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS)
+-DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)

@@ -133,14 +133,14 @@ namespace TransLucid {
                      >> angle_string
                      [
                         //push_back(ref(self.header.dimension_names), at(ref(string_stack), 0)),
-                        bind(&addSymbol, at(ref(string_stack), 0),
-                           ref(self.header.dimension_names),
-                           ref(self.header.dimension_symbols)),
-                        pop_front(ref(string_stack))
+                        bind(&addSymbol, at(ph::ref(string_stack), 0),
+                           ph::ref(self.header.dimension_names),
+                           ph::ref(self.header.dimension_symbols)),
+                        pop_front(ph::ref(string_stack))
                      ]
                      | ( assoc_symbols
                      [
-                        ref(currentAssoc) = arg1
+                        ph::ref(currentAssoc) = arg1
                      ]
                      >> "ustring"
                      >> angle_string
@@ -149,13 +149,13 @@ namespace TransLucid {
                      >> integer )
                      [
                         bind(&addOpDefinition,
-                           ref(self.header),
-                           ref(currentAssoc),
-                           at(ref(string_stack), 1),
-                           at(ref(string_stack), 0),
-                           at(ref(expr_stack), 0)),
-                        pop_front_n<2>()(ref(string_stack)),
-                        pop_front(ref(expr_stack))
+                           ph::ref(self.header),
+                           ph::ref(currentAssoc),
+                           at(ph::ref(string_stack), 1),
+                           at(ph::ref(string_stack), 0),
+                           at(ph::ref(expr_stack), 0)),
+                        pop_front_n<2>()(ph::ref(string_stack)),
+                        pop_front(ph::ref(expr_stack))
                      ]
                      | ( Spirit::str_p("delimiters")
                      >> "ustring"
@@ -165,20 +165,20 @@ namespace TransLucid {
                      >> "uchar"
                      >> angle_string)
                      [
-                        bind(&addDelimiter, ref(self.header),
-                           at(ref(string_stack), 2),
-                           at(ref(string_stack), 1),
-                           at(ref(string_stack), 0)
+                        bind(&addDelimiter, ph::ref(self.header),
+                           at(ph::ref(string_stack), 2),
+                           at(ph::ref(string_stack), 1),
+                           at(ph::ref(string_stack), 0)
                            ),
-                        pop_front_n<3>()(ref(string_stack))
+                        pop_front_n<3>()(ph::ref(string_stack))
                      ]
                      | ( Spirit::str_p("library")
                      >> "ustring"
                      >> angle_string )
                      [
-                        push_back(ref(self.header.libraries),
-                           at(ref(string_stack), 0)),
-                        pop_front(ref(string_stack))
+                        push_back(ph::ref(self.header.libraries),
+                           at(ph::ref(string_stack), 0)),
+                        pop_front(ph::ref(string_stack))
                      ]
                      | ( Spirit::str_p("prefix") | "postfix" )
                      >> "ustring"
@@ -187,12 +187,12 @@ namespace TransLucid {
                      >> angle_string
                   ;
 
-               integer = integer_p[push_front(ref(expr_stack),
+               integer = integer_p[push_front(ph::ref(expr_stack),
                   new_<AST::IntegerExpr>(arg1))];
 
-               constant = self.parsers.constant_parser.top();
+               //constant = self.parsers.constant_parser.top();
 
-               BOOST_SPIRIT_DEBUG_RULE(constant);
+               //BOOST_SPIRIT_DEBUG_RULE(constant);
                BOOST_SPIRIT_DEBUG_GRAMMAR(angle_string);
                BOOST_SPIRIT_DEBUG_RULE(header);
                BOOST_SPIRIT_DEBUG_RULE(headerItem);
@@ -218,7 +218,7 @@ namespace TransLucid {
             Spirit::rule<ScannerT>
             header,
             headerItem,
-            constant,
+            //constant,
             integer
             ;
 
@@ -263,31 +263,31 @@ namespace TransLucid {
 
                equation = ( identifier_p
                [
-                  push_front(ref(string_stack), arg1)
+                  push_front(ph::ref(string_stack), arg1)
                ]
                >>
                !( (Spirit::ch_p('@') >> context_perturb) |
-                  Spirit::epsilon_p[push_front(ref(expr_stack), (AST::Expr*)0)])
+                  Spirit::epsilon_p[push_front(ph::ref(expr_stack), (AST::Expr*)0)])
                >>
                !( (Spirit::ch_p('|') >> expr) |
-                  Spirit::epsilon_p[push_front(ref(expr_stack), (AST::Expr*)0)])
+                  Spirit::epsilon_p[push_front(ph::ref(expr_stack), (AST::Expr*)0)])
                >> '=' >> expr)
                [
                   bind(self.adder,
                      construct<equation_t>(
-                        at(ref(string_stack), 0),
+                        at(ph::ref(string_stack), 0),
                         construct<ParsedEquationGuard>(
-                           at(ref(expr_stack), 2),
-                           at(ref(expr_stack), 1)),
-                        at(ref(expr_stack), 0))
+                           at(ph::ref(expr_stack), 2),
+                           at(ph::ref(expr_stack), 1)),
+                        at(ph::ref(expr_stack), 0))
                      ),
                   bind(&addSymbol,
-                     at(ref(string_stack), 0),
-                     ref(self.header.equation_names),
-                     ref(self.header.equation_symbols)
+                     at(ph::ref(string_stack), 0),
+                     ph::ref(self.header.equation_names),
+                     ph::ref(self.header.equation_symbols)
                   ),
-                  pop_front(ref(string_stack)),
-                  pop_front_n<3>()(ref(expr_stack))
+                  pop_front(ph::ref(string_stack)),
+                  pop_front_n<3>()(ph::ref(expr_stack))
                ]
                ;
 
