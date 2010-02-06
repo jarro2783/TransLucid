@@ -45,6 +45,9 @@ namespace TransLucid {
 
    namespace Parser {
 
+      template <typename Iterator>
+      class ExprGrammar;
+
       #if 0
       struct parse_type_value {
          typedef wstring_t result_t;
@@ -143,6 +146,19 @@ namespace TransLucid {
          }
 
          qi::rule<Iterator, mpz_class()> integer;
+      };
+
+      template <typename Iterator>
+      class escaped_string_parser : public qi::grammar<Iterator, string_type()> {
+         public:
+         escaped_string_parser()
+         : escaped_string_parser::base_type(string)
+         {
+            string = '<' >> *(qi::char_ - '>') >> '>';
+         }
+
+         private:
+         qi::rule<Iterator> string;
       };
 
       struct ident_parser {

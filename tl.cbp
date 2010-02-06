@@ -148,6 +148,9 @@
 		<Unit filename="src/include/tl/fixed_indexes.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
+		<Unit filename="src/include/tl/footer_type.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/function.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
