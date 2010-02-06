@@ -1,3 +1,6 @@
+#warning clean up op types here
+#if 0
+
 #include "libint.hpp"
 
 #include <boost/lexical_cast.hpp>
@@ -449,3 +452,5 @@ void lib_int_init(TransLucid::Interpreter& i) {
 }
 
 }
+
+#endif

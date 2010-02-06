@@ -1,5 +1,5 @@
 #include <tl/interpreter.hpp>
-#include <tl/parser.hpp>
+//#include <tl/parser.hpp>
 #include <glibmm/convert.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
@@ -81,7 +81,8 @@ namespace {
 }
 
 void Interpreter::addDimensionSymbol(const ustring_t& s) {
-   Parser::addSymbol(wstring_t(s.begin(), s.end()), m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
+   #warning work out who uses this and what to do with it
+   //Parser::addSymbol(wstring_t(s.begin(), s.end()), m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
 }
 
 inline void Interpreter::addToVariableActual(const ustring_t& id,
@@ -153,9 +154,9 @@ builtin_name_to_index {
 m_verbose(false)
 {
    //m_systemParser.push(*m_systemGrammar);
-   initExprParser();
-   initTupleParser();
-   initConstantParser();
+   //initExprParser();
+   //initTupleParser();
+   //initConstantParser();
    m_dimTranslator.lookup("time");
    m_dimTranslator.lookup("priority");
    m_dimTranslator.lookup("_validguard");
@@ -197,11 +198,12 @@ m_verbose(false)
 }
 
 Interpreter::~Interpreter() {
-   cleanupExprParser();
-   cleanupTupleParser();
-   cleanupConstantParser();
+   //cleanupExprParser();
+   //cleanupTupleParser();
+   //cleanupConstantParser();
 }
 
+#if 0
 bool Interpreter::parseString(
    const ustring_t& s,
    const Parser::Spirit::stored_rule<Parser::scanner_t>& parser,
@@ -226,6 +228,7 @@ AST::Expr *Interpreter::parseExpr(const ustring_t& s) {
 
    return e;
 }
+#endif
 
 #if 0
 bool Interpreter::parseRange(
@@ -246,7 +249,6 @@ void Interpreter::cleanupParserObjects() {
          delete p.second;
       }
    }
-   #endif
 
    //m_parseInfo.equations.clear();
 
@@ -254,6 +256,7 @@ void Interpreter::cleanupParserObjects() {
       delete e;
    }
    m_parsers.expr_stack.clear();
+   #endif
 }
 
 void Interpreter::addExpr(const Tuple& k, HD *h) {

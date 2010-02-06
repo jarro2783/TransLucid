@@ -9,7 +9,7 @@
 #include <boost/any.hpp>
 #include <map>
 #include <boost/unordered_map.hpp>
-#include <boost/function.hpp>
+//#include <boost/function.hpp>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 //#include <boost/flyweight/intermodule_holder.hpp>
@@ -79,6 +79,8 @@ namespace TransLucid {
    typedef uint16_t type_index;
    typedef Glib::ustring ustring_t;
 
+   #if 0
+
    class wstring_t : public std::basic_string<wchar_t> {
       public:
 
@@ -113,6 +115,8 @@ namespace TransLucid {
       //   return std::basic_string<wchar_t>(*this);
       //}
    };
+
+   #endif
 
    class Tuple;
 
@@ -415,8 +419,8 @@ namespace TransLucid {
     **/
    typedef std::pair<TypedValue, Tuple> ValueContext;
 
-   typedef boost::function<TypedValue (const TypedValue&, const TypedValue&, const Tuple&)> OpFunction;
-   typedef boost::function<TypedValue (const TypedValue&, const Tuple&)> ConvertFunction;
+   //typedef boost::function<TypedValue (const TypedValue&, const TypedValue&, const Tuple&)> OpFunction;
+   //typedef boost::function<TypedValue (const TypedValue&, const Tuple&)> ConvertFunction;
 
    /**
     * @brief Vector of type indexes.
@@ -428,14 +432,14 @@ namespace TransLucid {
     *
     * Maps the type signatures for an operation to a functor of the actual op.
     **/
-   typedef std::map<type_vec, OpFunction> op_map;
+   //typedef std::map<type_vec, OpFunction> op_map;
 
    /**
     * @brief Map of operations.
     *
     * Maps op names to all the operations that exist by that name.
     **/
-   typedef std::map<Glib::ustring, op_map> ops_map;
+   //typedef std::map<Glib::ustring, op_map> ops_map;
 
    class TypeManager;
 
@@ -473,6 +477,7 @@ namespace TransLucid {
          return i == m_typeIndexMapping.end() ? 0 : i->second;
       }
 
+      #if 0
       void registerOp(const Glib::ustring& name,
          const type_vec& operands,
          OpFunction op)
@@ -510,6 +515,7 @@ namespace TransLucid {
          }
          return opit->second;
       }
+      #endif
 
       Interpreter& interpreter() const {
          return m_interpreter;
@@ -572,16 +578,17 @@ namespace TransLucid {
 
       typedef std::map<type_index, const TypeManager*> IndexTypeMap;
       typedef boost::unordered_map<Glib::ustring, const TypeManager*> StringTypeMap;
-      typedef std::map<type_index, ConvertFunction> IndexConvertMap;
-      typedef std::map<type_index, IndexConvertMap> ConvertorsMap;
-      typedef std::map<ustring_t, std::map<type_index, OpFunction> > VariadicOpMap;
+      //typedef std::map<type_index, ConvertFunction> IndexConvertMap;
+      //typedef std::map<type_index, IndexConvertMap> ConvertorsMap;
+      //typedef std::map<ustring_t, std::map<type_index, OpFunction> > VariadicOpMap;
 
       IndexTypeMap m_typeIndexMapping;
       StringTypeMap m_typeNameMapping;
+      //ops_map opsMap;
+      //ConvertorsMap m_convertors;
+      //VariadicOpMap m_variadicOperators;
+
       type_index m_nextIndex;
-      ops_map opsMap;
-      ConvertorsMap m_convertors;
-      VariadicOpMap m_variadicOperators;
 
       type_index m_indexError;
       type_index m_indexSpecial;
@@ -598,14 +605,15 @@ namespace TransLucid {
       type_index m_indexGuard;
       type_index m_indexPair;
 
-      OpFunction makeOpTypeError;
-      TypedValue makeOpTypeErrorActual(const TypeManager *special);
+      //OpFunction makeOpTypeError;
+      //TypedValue makeOpTypeErrorActual(const TypeManager *special);
 
-      ConvertFunction makeConvertTypeError;
+      //ConvertFunction makeConvertTypeError;
 
       Interpreter& m_interpreter;
 
       public:
+      #if 0
       ConvertFunction findConverter(type_index to, type_index from) const {
          ConvertorsMap::const_iterator iter = m_convertors.find(to);
 
@@ -620,6 +628,7 @@ namespace TransLucid {
 
          return iter2->second;
       }
+      #endif
    };
 
    //all the functions needed for dealing with a new type

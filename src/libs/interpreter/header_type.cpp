@@ -1,3 +1,5 @@
+#if 0
+
 #include <tl/header_type.hpp>
 #include <tl/parser.hpp>
 
@@ -12,6 +14,7 @@ void HeaderType::parseString(
    const Tuple& c,
    Interpreter& i)
 {
+   #if 0
    Parser::HeaderGrammar hg(m_header, i.parsers());
 
    Parser::UIterator iter(s);
@@ -20,6 +23,7 @@ void HeaderType::parseString(
       Parser::Iterator(iter.make_end()));
 
    i.parseRange(begin, Parser::iterator_t(), hg);
+   #endif
 }
 
 void HeaderType::parseFile(
@@ -34,3 +38,5 @@ bool HeaderType::operator==(const HeaderType& rhs) const {
 }
 
 }
+
+#endif

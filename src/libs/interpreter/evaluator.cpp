@@ -1,3 +1,5 @@
+#if 0
+
 #include <tl/evaluator.hpp>
 #include <tl/interpreter.hpp>
 #include <boost/assign.hpp>
@@ -513,3 +515,5 @@ Data *Evaluator::visitUnaryExpr(UnaryExpr* e, Data *d) {
 }
 
 }
+
+#endif

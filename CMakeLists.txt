@@ -4,8 +4,8 @@ project(TransLucid)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 
-set(TLCFLAGS ${GLIBMM_CFLAGS} -Wall -std=gnu++0x)
-set(TLLIBS ${GLIBMM_LDFLAGS} -std=gnu++0x)
+set(TLCFLAGS ${GLIBMM_CFLAGS} -Wall -std=c++0x)
+set(TLLIBS ${GLIBMM_LDFLAGS} -std=c++0x)
 
 set (Boost_USE_STATIC_LIBS OFF)
 set (Boost_ADDITIONAL_VERSIONS 1.39 1.39.0)

@@ -1,3 +1,5 @@
+#if 0
+
 #include "directory_system.hpp"
 #include <tl/parser_fwd.hpp>
 #include <glibmm/miscutils.h>
@@ -11,7 +13,7 @@ namespace TransLucid {
 
 namespace DirectoryParser {
 
-namespace Spirit = Parser::Spirit;
+//namespace Spirit = Parser::Spirit;
 
 class DirectoryGrammar : public Spirit::grammar<DirectoryGrammar> {
    public:
@@ -218,3 +220,5 @@ void DirectorySystem::setClock(const Parser::equation_v& equations) {
 }
 
 }
+
+#endif

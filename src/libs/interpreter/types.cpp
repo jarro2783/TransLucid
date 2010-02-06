@@ -1,6 +1,6 @@
 #include <tl/types.hpp>
 #include <boost/foreach.hpp>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
 #include <tl/range.hpp>
 #include <tl/interpreter.hpp>
 #include <boost/assign.hpp>
@@ -28,8 +28,8 @@ class ExprManager : public TypeManager {
       const Tuple& context,
       Interpreter& interpreter) const
    {
-      AST::Expr *e = interpreter.parseExpr(s);
-      return TypedValue(ExprType(e), index());
+      //AST::Expr *e = interpreter.parseExpr(s);
+      //return TypedValue(ExprType(e), index());
    }
 
    void printInternal(std::ostream& os, const TypedValue &v, const Tuple& c) const {
@@ -137,7 +137,7 @@ TypeRegistry::TypeRegistry(Interpreter& i)
 : m_nextIndex(1), m_indexError(0), m_interpreter(i)
 {
    TypeManager *m = new SpecialManager(*this);
-   makeOpTypeError = boost::bind(&TypeRegistry::makeOpTypeErrorActual, this, m);
+   //makeOpTypeError = boost::bind(&TypeRegistry::makeOpTypeErrorActual, this, m);
    m_indexSpecial = m->index();
    m = new UnevalManager(*this);
    m_indexUneval = m->index();
@@ -167,7 +167,7 @@ TypeRegistry::TypeRegistry(Interpreter& i)
    m = new PairManager(*this, "_pair");
    m_indexPair = m->index();
 
-   new HeaderManager<HeaderType::DIRECT>(*this);
+   //new HeaderManager<HeaderType::DIRECT>(*this);
 }
 
 TypeRegistry::~TypeRegistry() {
@@ -183,9 +183,9 @@ void TypeRegistry::registerType(const TypeManager *manager) {
    m_typeNameMapping.insert(std::make_pair(manager->name(), manager));
 }
 
-TypedValue TypeRegistry::makeOpTypeErrorActual(const TypeManager *special) {
-   return TypedValue(Special(Special::TYPEERROR), special->index());
-}
+//TypedValue TypeRegistry::makeOpTypeErrorActual(const TypeManager *special) {
+//   return TypedValue(Special(Special::TYPEERROR), special->index());
+//}
 
 Tuple::Tuple()
 : m_value(new tuple_t)

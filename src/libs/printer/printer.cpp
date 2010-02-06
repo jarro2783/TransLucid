@@ -1,3 +1,5 @@
+#if 0
+
 #include <iostream>
 #include <tl/types.hpp>
 #include <tl/expr.hpp>
@@ -136,6 +138,8 @@ void Printer::print(std::ostream& os, const TL::Tuple& c, TL::Interpreter& i) co
 }
 
 Data * PrintVisitor::visitBinaryOpExpr(BinaryOpExpr* e, Data*) {
+   #warning fix the printer
+   #if 0
    m_os << "(";
    switch (e->op.assoc) {
       case TL::Parser::ASSOC_LEFT:
@@ -164,6 +168,8 @@ Data * PrintVisitor::visitBinaryOpExpr(BinaryOpExpr* e, Data*) {
       break;
    }
    m_os << ")";
+
+   #endif
 
    return 0;
 }
@@ -406,3 +412,5 @@ extern "C" {
       new PrinterManager(r);
    }
 }
+
+#endif

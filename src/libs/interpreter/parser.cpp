@@ -58,6 +58,7 @@ EquationHolder::~EquationHolder() {
    m_adder.setEquations(0);
 }
 
+#if 0
 void printErrorMessage(file_position& pos, ParseErrorType type) {
    switch (type) {
       case Parser::error_expected_fi:
@@ -95,7 +96,9 @@ void printErrorMessage(file_position& pos, ParseErrorType type) {
       break;
    }
 }
+#endif
 
+#if 0
 ustring_t formatError(const file_position& pos, const ustring_t& message)
 {
    return (boost::format("%1%:%2%:%3%: error: %4%")
@@ -104,6 +107,7 @@ ustring_t formatError(const file_position& pos, const ustring_t& message)
       % pos.column
       % message).str();
 }
+#endif
 
 }
 

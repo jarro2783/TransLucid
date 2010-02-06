@@ -1,6 +1,8 @@
 #ifndef HEADER_TYPE_HPP_INCLUDED
 #define HEADER_TYPE_HPP_INCLUDED
 
+#if 0
+
 #include <tl/types.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/interpreter.hpp>
@@ -95,5 +97,7 @@ namespace TransLucid {
       }
    };
 };
+
+#endif
 
 #endif // HEADER_TYPE_HPP_INCLUDED

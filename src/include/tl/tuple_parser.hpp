@@ -8,81 +8,37 @@
 namespace TransLucid {
    namespace Parser {
 
-      class TupleGrammar : public Spirit::grammar<TupleGrammar> {
+      template <typename Iterator>
+      class TupleGrammar : public qi::grammar<Iterator> {
 
          public:
-         TupleGrammar(Parsers& parsers)
-         : parsers(parsers)
+         TupleGrammar()
+         : TupleGrammar::base_type(context_perturb)
          {
+
+            //expr = self.parsers.expr_parser.top();
+
+            tuple_inside = pair
+               >> *(',' >> pair)
+            ;
+
+            pair = (expr >> ':' >> expr)
+            ;
+
+            context_perturb =
+               ('['
+               >> tuple_inside
+               >> ']')
+            ;
+
          }
 
-         Parsers& parsers;
-
-         template <typename ScannerT>
-         class definition {
-
-            public:
-
-            definition(const TupleGrammar& self)
-            : expr_stack(self.parsers.expr_stack),
-            expect_close_bracket(error_expected_close_bracket)
-            {
-               expr = self.parsers.expr_parser.top();
-
-               tuple_inside = pair [
-                  push_front(ph::ref(list_stack), construct<std::list<AST::Expr*> >()),
-                  push_back(at(ph::ref(list_stack), 0), at(ph::ref(expr_stack), 0)),
-                  pop_front(ph::ref(expr_stack))
-               ]
-               >> *(',' >> pair [
-                  push_back(at(ph::ref(list_stack), 0), at(ph::ref(expr_stack), 0)),
-                  pop_front(ph::ref(expr_stack))
-               ]
-               );
-
-               pair = (expr >> Spirit::ch_p(':') >> expr)
-               [
-                  let(_a = new_<AST::PairExpr>(at(ph::ref(expr_stack), 1),
-		              at(ph::ref(expr_stack), 0)))
-                  [
-                     pop_front_n<2>()(ph::ref(expr_stack)),
-                     push_front(ph::ref(expr_stack), _a)
-                  ]
-               ];
-
-               context_perturb = ('['
-               >> tuple_inside
-               >> expect_close_bracket(Spirit::ch_p(']')))
-               [
-                  push_front(ph::ref(expr_stack),
-                     new_<AST::BuildTupleExpr>(
-                        at(ph::ref(list_stack), 0)
-                     )
-                  ),
-                  pop_front(ph::ref(list_stack))
-
-               ]
-               ;
-
-            }
-
-            const Spirit::rule<ScannerT>& start() const {
-               return context_perturb;
-            }
-
-            private:
-            Spirit::rule<ScannerT>
+         qi::rule<Iterator>
             context_perturb,
             pair,
             tuple_inside,
             expr
-            ;
-
-            std::deque<AST::Expr*>& expr_stack;
-            std::deque<std::list<AST::Expr*> > list_stack;
-
-            Spirit::assertion<ParseErrorType> expect_close_bracket;
-         };
+         ;
 
       };
    }

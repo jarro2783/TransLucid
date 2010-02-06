@@ -4,7 +4,7 @@
 #include <tl/types.hpp>
 #include <list>
 #include <boost/function.hpp>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
 #include <tl/parser_fwd.hpp>
 
 namespace TransLucid {
@@ -109,6 +109,16 @@ namespace TransLucid {
          {
          }
 
+         BooleanExpr(const std::u32string& value)
+         : value(value == U"true")
+         {
+         }
+
+         //BooleanExpr(const std::basic_string<wchar_t>& s)
+         //: value(s == L"true")
+         //{
+         //}
+
          Data *visit(Visitor *v, Data *data) {
             return v->visitBooleanExpr(this, data);
          }
@@ -149,7 +159,7 @@ namespace TransLucid {
       class DimensionExpr : public Expr {
          public:
 
-         DimensionExpr(const ustring_t& v)
+         DimensionExpr(const std::u32string& v)
          : value(v)
          {
          }
@@ -158,7 +168,7 @@ namespace TransLucid {
             return v->visitDimensionExpr(this, d);
          }
 
-         ustring_t value;
+         std::u32string value;
       };
 
       class HashExpr : public Expr {
@@ -190,16 +200,24 @@ namespace TransLucid {
       };
 
       class IfExpr : public Expr {
+
+         typedef std::vector<std::pair<Expr*, Expr*>> ElseIfList;
+
          public:
+         template <typename List>
          IfExpr(Expr *condition,
             Expr *then,
-            const std::list<Expr*>& elsifs,
+            const List& ei,
             Expr *else_)
          : condition(condition),
          then(then),
-         elsifs(elsifs),
          else_(else_)
          {
+            using boost::fusion::at_c;
+            BOOST_FOREACH(auto& element, ei) {
+               elsifs.push_back(
+                  std::make_pair(at_c<0>(element), at_c<1>(element)));
+            }
          }
 
          Data *visit(Visitor *visitor, Data *data) {
@@ -208,7 +226,7 @@ namespace TransLucid {
 
          Expr *condition;
          Expr *then;
-         std::list<Expr*> elsifs;
+         ElseIfList elsifs;
          Expr *else_;
       };
 

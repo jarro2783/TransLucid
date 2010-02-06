@@ -3,6 +3,7 @@
 
 #include <tl/interpreter.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/parser_fwd.hpp>
 
 namespace TransLucid {
 
@@ -117,7 +118,7 @@ namespace TransLucid {
 
       class Dimension : public CompiledFunctor {
          public:
-         Dimension(Interpreter& system, const ustring_t& name)
+         Dimension(Interpreter& system, const std::u32string& name)
          : m_system(system), m_name(name)
          {}
 
@@ -125,7 +126,7 @@ namespace TransLucid {
 
          private:
          Interpreter& m_system;
-         ustring_t m_name;
+         std::u32string m_name;
       };
 
       class Hash : public CompiledFunctor {

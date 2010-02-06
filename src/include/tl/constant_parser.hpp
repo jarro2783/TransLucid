@@ -42,15 +42,11 @@ namespace TransLucid {
                   ;
             }
 
-            const Spirit::rule<ScannerT>& start() const {
-               return constant;
-            }
-
             private:
-            Spirit::rule<ScannerT> constant;
+            qi::rule<Iterator> constant;
 
-            std::deque<AST::Expr*>& expr_stack;
-            std::deque<wstring_t>& string_stack;
+            //std::deque<AST::Expr*>& expr_stack;
+            //std::deque<wstring_t>& string_stack;
 
             AngleStringGrammar angle_string;
          };

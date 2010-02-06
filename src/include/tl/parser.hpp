@@ -15,9 +15,29 @@
 
 #include <tl/parser_util.hpp>
 #include <tl/parser_fwd.hpp>
+#include <boost/spirit/include/qi_auxiliary.hpp>
 
 namespace TransLucid {
    namespace Parser {
+
+      using namespace boost::phoenix;
+      namespace ph = boost::phoenix;
+
+      struct add_dimension_impl {
+         template <typename Arg1, typename Arg2>
+         struct result
+         {
+            typedef void type;
+         };
+
+         template <typename Arg1, typename Arg2>
+         void operator()(Arg1 arg1, Arg2 arg2) const
+         {
+            arg1.add(arg2.c_str(), std::u32string(arg2.begin(), arg2.end()));
+         }
+      };
+
+      function<add_dimension_impl> add_dimension;
 
       //typedef Spirit::position_iterator<std::string::const_iterator> iterator_t;
 
@@ -37,277 +57,174 @@ namespace TransLucid {
          }
       };
 
+      #if 0
       inline void addDimensions(
          const std::vector<ustring_t>& dims,
-         Spirit::symbols<>& dimsyms)
+         qi::symbols<>& dimsyms)
       {
-         int i = dims.size();
+         size_t i = dims.size();
          BOOST_FOREACH(const ustring_t& s, dims) {
             dimsyms.add(s.begin(), s.end(), i);
             ++i;
          }
       }
+      #endif
 
-      inline void addSymbol(const wstring_t& symbol,
-         std::vector<ustring_t>& names,
-         symbols_t& symbols)
-      {
-         size_t *i = Spirit::add(symbols, symbol.c_str(), names.size());
-         if (i) {
-            names.push_back(symbol);
-         }
-      }
-
+      #if 0
       inline void addOpDefinition(
          Header& header,
          InfixAssoc assoc,
-         const wstring_t& op,
-         const wstring_t& symbol,
+         const std::u32string& op,
+         const std::u32string& symbol,
          AST::Expr *precedence)
       {
          size_t pos = header.binary_op_info.size();
          if (symbol.size() == 1) {
-            Spirit::add(header.binary_op_symbols, symbol.c_str(), pos);
+            header.binary_op_symbols.add(symbol.c_str(), pos);
          }
-         wstring_t underscoreSymbol = L"_" + symbol + L"_";
-         Spirit::add(header.binary_op_symbols, underscoreSymbol.c_str(), pos);
+         std::u32string underscoreSymbol = U"_" + symbol + U"_";
+         header.binary_op_symbols.add(underscoreSymbol.c_str(), pos);
          AST::IntegerExpr *p = dynamic_cast<AST::IntegerExpr*>(precedence);
          header.binary_op_info.push_back(BinaryOperation(assoc, op, symbol, p->m_value));
       }
+      #endif
 
       inline void addDelimiter(
          Header& header,
-         const wstring_t& type,
-         const wstring_t& open,
-         const wstring_t& close)
+         const string_type& type,
+         const string_type& open,
+         const string_type& close)
       {
          //std::cout << "adding " << open << " " << close << std::endl;
-         if (!Spirit::add(
-            header.delimiter_start_symbols,
-            open.c_str(),
-            header.delimiter_info.size()))
-         {
-            throw ParseError("open delimiter '" + ustring_t(open) + "' already defined");
-         } else {
-            header.delimiter_info.push_back(Delimiter(type, open[0], close[0]));
-         }
+         //if (
+            header.delimiter_start_symbols.add(
+               open.c_str(),
+               Delimiter(type, open[0], close[0]));//)
+         //{
+         //   throw ParseError("open delimiter '" + ustring_t(open) + "' already defined");
+         //} else {
+         //}
       }
 
-      class HeaderGrammar : public Spirit::grammar<HeaderGrammar> {
+      template <typename Iterator>
+      class HeaderGrammar : public qi::grammar<Iterator> {
+         Header& header;
          public:
 
-         HeaderGrammar(
-            Header& header,
-            Parsers& parsers)
-         : header(header), parsers(parsers)
+         HeaderGrammar(Header& h)
+         : HeaderGrammar::base_type(headerp),
+         header(h)
          {
-         }
+            using namespace qi::labels;
 
-         Header& header;
-         Parsers& parsers;
-
-         template <typename ScannerT>
-         class definition {
-            public:
-            definition(const HeaderGrammar& self)
-            //initialise errors
-            : self(self),
-               expr_stack(self.parsers.expr_stack),
-               string_stack(self.parsers.string_stack),
-               expect_dbl_semi(error_expected_dbl_semi),
-               angle_string(string_stack)
-            {
-               assoc_symbols.add("infixl", ASSOC_LEFT)
-               ("infixr", ASSOC_RIGHT)
-               ("infixn", ASSOC_NON)
-               ("infixp", ASSOC_COMPARISON)
-               ("infixm", ASSOC_VARIABLE)
-               ;
-
-               header
-                  = *( headerItem >> Spirit::str_p( ";;" )) >> Spirit::end_p;
-                  ;
-
-               headerItem
-                  =  Spirit::str_p("dimension")
-                     >> angle_string
-                     [
-                        //push_back(ref(self.header.dimension_names), at(ref(string_stack), 0)),
-                        bind(&addSymbol, at(ph::ref(string_stack), 0),
-                           ph::ref(self.header.dimension_names),
-                           ph::ref(self.header.dimension_symbols)),
-                        pop_front(ph::ref(string_stack))
-                     ]
-                     | ( assoc_symbols
-                     [
-                        ph::ref(currentAssoc) = arg1
-                     ]
-                     >> "ustring"
-                     >> angle_string
-                     >> "ustring"
-                     >> angle_string
-                     >> integer )
-                     [
-                        bind(&addOpDefinition,
-                           ph::ref(self.header),
-                           ph::ref(currentAssoc),
-                           at(ph::ref(string_stack), 1),
-                           at(ph::ref(string_stack), 0),
-                           at(ph::ref(expr_stack), 0)),
-                        pop_front_n<2>()(ph::ref(string_stack)),
-                        pop_front(ph::ref(expr_stack))
-                     ]
-                     | ( Spirit::str_p("delimiters")
-                     >> "ustring"
-                     >> angle_string
-                     >> "uchar"
-                     >> angle_string
-                     >> "uchar"
-                     >> angle_string)
-                     [
-                        bind(&addDelimiter, ph::ref(self.header),
-                           at(ph::ref(string_stack), 2),
-                           at(ph::ref(string_stack), 1),
-                           at(ph::ref(string_stack), 0)
-                           ),
-                        pop_front_n<3>()(ph::ref(string_stack))
-                     ]
-                     | ( Spirit::str_p("library")
-                     >> "ustring"
-                     >> angle_string )
-                     [
-                        push_back(ph::ref(self.header.libraries),
-                           at(ph::ref(string_stack), 0)),
-                        pop_front(ph::ref(string_stack))
-                     ]
-                     | ( Spirit::str_p("prefix") | "postfix" )
-                     >> "ustring"
-                     >> angle_string
-                     >> "ustring"
-                     >> angle_string
-                  ;
-
-               integer = integer_p[push_front(ph::ref(expr_stack),
-                  new_<AST::IntegerExpr>(arg1))];
-
-               //constant = self.parsers.constant_parser.top();
-
-               //BOOST_SPIRIT_DEBUG_RULE(constant);
-               BOOST_SPIRIT_DEBUG_GRAMMAR(angle_string);
-               BOOST_SPIRIT_DEBUG_RULE(header);
-               BOOST_SPIRIT_DEBUG_RULE(headerItem);
-               BOOST_SPIRIT_DEBUG_RULE(integer);
-            }
-
-            const Spirit::rule<ScannerT>& start() const {
-               return header;
-            }
-
-            ~definition() {
-               //delete anything left over in the stacks because of errors
-
-               BOOST_FOREACH(std::list<AST::Expr*>& l, list_stack) {
-                  std::for_each(l.begin(), l.end(), delete_(arg1));
-               }
-            }
-
-            private:
-
-            const HeaderGrammar& self;
-
-            Spirit::rule<ScannerT>
-            header,
-            headerItem,
-            //constant,
-            integer
+            assoc_symbols.add(L"infixl", ASSOC_LEFT)
+            (L"infixr", ASSOC_RIGHT)
+            (L"infixn", ASSOC_NON)
+            (L"infixp", ASSOC_COMPARISON)
+            (L"infixm", ASSOC_VARIABLE)
             ;
 
-            std::deque<AST::Expr*>& expr_stack;
-            std::deque<wstring_t>& string_stack;
-            std::deque<std::list<AST::Expr*> > list_stack;
+            headerp
+               = *( headerItem >> qi::string( ";;" )) >> qi::eoi;
+               ;
 
-            Spirit::symbols<InfixAssoc> assoc_symbols;
-            InfixAssoc currentAssoc;
+            headerItem
+               =  (qi::lit("dimension")
+                  > angle_string
+                  [
+                     add_dimension(ph::ref(header.dimension_symbols), _1)
+                  ]
+                  )
+                  | ( assoc_symbols
+                  >> "ustring"
+                  >> angle_string
+                  >> "ustring"
+                  >> angle_string
+                  >> integer )
 
-            Spirit::assertion<ParseErrorType> expect_dbl_semi;
+                  | ( qi::string("delimiters")
+                  >> "ustring"
+                  >> angle_string
+                  >> "uchar"
+                  >> angle_string
+                  >> "uchar"
+                  >> angle_string)
 
-            AngleStringGrammar angle_string;
-         };
+                  | ( qi::string("library")
+                  >> "ustring"
+                  >> angle_string )
+
+                  | ( qi::string("prefix") | "postfix" )
+                  >> "ustring"
+                  >> angle_string
+                  >> "ustring"
+                  >> angle_string
+               ;
+
+            integer = qi::int_;
+
+            angle_string = '<' >> *(qi::char_ - '>') >> '>';
+
+            //constant = self.parsers.constant_parser.top();
+
+            //BOOST_SPIRIT_DEBUG_RULE(constant);
+         }
+
+         private:
+
+         qi::rule<Iterator>
+            headerp,
+            headerItem,
+            integer
+         ;
+
+         qi::rule<Iterator, string_type()> angle_string;
+
+         qi::symbols<char_type, InfixAssoc> assoc_symbols;
+         InfixAssoc currentAssoc;
+
+         //Spirit::assertion<ParseErrorType> expect_dbl_semi;
+
+         //AngleStringGrammar angle_string;
       };
 
-      class EquationGrammar : public Spirit::grammar<EquationGrammar> {
+      template <typename Iterator>
+      class EquationGrammar : public qi::grammar<Iterator> {
+         Header& header;
+         EquationAdder& adder;
          public:
 
          EquationGrammar(Header& header,
-            Parsers& parsers,
             EquationAdder& adder)
-         : header(header),
-         parsers(parsers),
+         :
+         EquationGrammar::base_type(equation),
+         header(header),
          adder(adder)
-         {}
+         {
+            //context_perturb = self.parsers.tuple_parser.top();
 
-         Header& header;
-         Parsers& parsers;
-         EquationAdder& adder;
+            ident = (qi::alpha | "_") >> *(qi::alnum | "_");
 
-         template <typename ScannerT>
-         class definition {
-            public:
+            equation = ( ident
+            >>
+            !( (qi::char_('@') >> context_perturb) | qi::eps)
+            >>
+            !( (qi::char_('|') >> expr) | qi::eps)
+            >> '=' >> expr)
+            ;
 
-            definition(EquationGrammar const& self)
-            : expr_stack(self.parsers.expr_stack),
-            string_stack(self.parsers.string_stack),
-            expect_dbl_semi(error_expected_dbl_semi)
-            {
-               context_perturb = self.parsers.tuple_parser.top();
+            #warning need to redo how all the parsers are connected
+            //expr = self.parsers.expr_parser.top();
+         }
 
-               equation = ( identifier_p
-               [
-                  push_front(ph::ref(string_stack), arg1)
-               ]
-               >>
-               !( (Spirit::ch_p('@') >> context_perturb) |
-                  Spirit::epsilon_p[push_front(ph::ref(expr_stack), (AST::Expr*)0)])
-               >>
-               !( (Spirit::ch_p('|') >> expr) |
-                  Spirit::epsilon_p[push_front(ph::ref(expr_stack), (AST::Expr*)0)])
-               >> '=' >> expr)
-               [
-                  bind(self.adder,
-                     construct<equation_t>(
-                        at(ph::ref(string_stack), 0),
-                        construct<ParsedEquationGuard>(
-                           at(ph::ref(expr_stack), 2),
-                           at(ph::ref(expr_stack), 1)),
-                        at(ph::ref(expr_stack), 0))
-                     ),
-                  bind(&addSymbol,
-                     at(ph::ref(string_stack), 0),
-                     ph::ref(self.header.equation_names),
-                     ph::ref(self.header.equation_symbols)
-                  ),
-                  pop_front(ph::ref(string_stack)),
-                  pop_front_n<3>()(ph::ref(expr_stack))
-               ]
-               ;
+         private:
 
-               expr = self.parsers.expr_parser.top();
-            }
+         qi::rule<Iterator> equation,
+         context_perturb,
+         expr,
+         ident;
 
-            Spirit::rule<ScannerT> const& start() const {
-               return equation;
-            }
-
-            private:
-            std::deque<AST::Expr*>& expr_stack;
-            std::deque<wstring_t>& string_stack;
-
-            Spirit::rule<ScannerT> equation,
-            context_perturb,
-            expr;
-
-            Spirit::assertion<ParseErrorType> expect_dbl_semi;
-         };
+         //Spirit::assertion<ParseErrorType> expect_dbl_semi;
       };
    }
 }

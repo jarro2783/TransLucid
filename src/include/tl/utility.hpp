@@ -70,6 +70,17 @@ namespace TransLucid {
       return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
    }
 
+   inline size_t get_dimension_index(HD *h, const std::u32string& name) {
+      ustring_t s;
+      BOOST_FOREACH(char32_t c, name) {
+         s += c;
+      }
+      tuple_t k;
+      k[DIM_ID] = generate_string("DIMENSION_INDEX");
+      k[DIM_TEXT] = generate_string(s);
+      return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
+   }
+
    inline size_t get_dimension_index(HD *h, const TypedValue& v) {
       tuple_t k;
       k[DIM_ID] = generate_string("DIMENSION_TYPED_INDEX");

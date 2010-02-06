@@ -1,10 +1,7 @@
 #ifndef PARSER_UTIL_HPP_INCLUDED
 #define PARSER_UTIL_HPP_INCLUDED
 
-#define PHOENIX_LIMIT 10
-
-#include <boost/spirit/include/classic.hpp>
-
+#if 0
 #include <boost/spirit/home/phoenix/container.hpp>
 #include <boost/spirit/home/phoenix/object/new.hpp>
 #include <boost/spirit/home/phoenix/function/function.hpp>
@@ -21,6 +18,9 @@
 #include <boost/spirit/home/phoenix/bind/bind_function_object.hpp>
 #include <boost/spirit/home/phoenix/object/delete.hpp>
 #include <boost/spirit/home/phoenix/algorithm.hpp>
+#endif
+
+#include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <gmpxx.h>
 #include <tl/types.hpp>
@@ -44,53 +44,8 @@ namespace Glib {
 namespace TransLucid {
 
    namespace Parser {
-      using namespace boost::phoenix;
-      using namespace boost::phoenix::arg_names;
-      using namespace boost::phoenix::local_names;
 
-      namespace ph = boost::phoenix;
-
-      template <class Op, int N>
-      struct operate_n_imp {
-
-         //bit of a hack because one thing seems to give it one
-         //arg and another gives it two, but the arg is
-         //completely irrelevant
-         template <typename C, typename Arg1 = std::string>
-         struct result
-         {
-             typedef void type;
-         };
-
-         template <class C>
-         void operator()(C& c) const {
-            for (int i = 0; i != N; ++i) {
-               m_op(c);
-            }
-         }
-
-         template <typename RT, typename Env, typename A0>
-         static void
-         eval(Env const& env, A0& _0)
-         {
-            Op op;
-            for (int i = 0; i != N; ++i) {
-               op(_0.eval(env));
-            }
-
-            return;
-         }
-
-         Op m_op;
-      };
-
-      template <int N>
-      inline function<operate_n_imp<boost::phoenix::stl::pop_front, N> >
-      pop_front_n()
-      {
-         return function<operate_n_imp<boost::phoenix::stl::pop_front, N> >();
-      }
-
+      #if 0
       struct parse_type_value {
          typedef wstring_t result_t;
 
@@ -131,29 +86,25 @@ namespace TransLucid {
             return len;
          }
       };
+      #endif
 
-      struct integer_parser {
-         typedef mpz_class result_t;
-
-         template <typename ScannerT>
-         std::ptrdiff_t
-         operator()(ScannerT const& scan, result_t& result) const {
-            wstring_t s;
-            Spirit::rule<ScannerT> integer =
-               ( Spirit::lexeme_d
-                  [
-                     '0'
-                     >> (Spirit::range_p('2', '9') | Spirit::alpha_p)
-                     >> +(Spirit::digit_p | Spirit::alpha_p)
-                  ]
-                  | Spirit::int_p )
-                  [
-                     ph::ref(s) = construct<wstring_t>(arg1, arg2)
-                  ]
+      template <typename Iterator>
+      struct integer_parser : public qi::grammar<Iterator, mpz_class()>
+      {
+         integer_parser()
+         : integer_parser::base_type(integer)
+         {
+            integer =
+               ( '0'
+               >> (qi::char_('2', '9') | qi::ascii::alpha)
+               >> +(qi::ascii::digit | qi::ascii::alpha)
+               | qi::int_ [qi::_val = qi::_1])
                ;
-            typename Spirit::parser_result<Spirit::rule<ScannerT>, ScannerT>
-               ::type p = integer.parse(scan);
 
+            //bool success = qi::parse(first, last, integer);
+
+            #warning work out how to do this
+            #if 0
             if (p.length() > 0) {
                try {
                   wstring_t::const_iterator iter = s.begin();
@@ -188,92 +139,47 @@ namespace TransLucid {
                }
             }
             return -1;
+            #endif
          }
+
+         qi::rule<Iterator, mpz_class()> integer;
       };
 
       struct ident_parser {
-         typedef wstring_t result_t;
+         typedef std::u32string result_t;
 
-         template <typename ScannerT>
-         std::ptrdiff_t
-         operator()(ScannerT const& scan, result_t& result) const {
-            wstring_t s;
+         template <typename Iterator, typename Context
+         , typename Skipper, typename Attribute>
+         bool parse(Iterator& first, Iterator const& last
+         , Context& context, Skipper const& skipper
+         , Attribute& attr) const
+         {
+            bool r = parse(first, last,
+               (qi::ascii::alpha >> *(qi::ascii::alnum | '_'))
+            );
 
-            typedef
-            boost::spirit::classic::action<boost::spirit::classic::contiguous<boost::spirit::classic::sequence<boost::spirit::classic::alpha_parser, boost::spirit::classic::kleene_star<boost::spirit::classic::alternative<boost::spirit::classic::alnum_parser, boost::spirit::classic::chlit<char> > > > >, boost::phoenix::actor<boost::phoenix::composite<boost::phoenix::assign_eval, boost::fusion::vector<boost::phoenix::reference<TransLucid::wstring_t>, boost::phoenix::composite<boost::phoenix::detail::construct_eval<TransLucid::wstring_t>, boost::fusion::vector<boost::phoenix::argument<0>, boost::phoenix::argument<1>, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_> >, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_, boost::fusion::void_> > > >
-            ident_t;
-
-            ident_t ident
-               = Spirit::lexeme_d
-               [
-                  (Spirit::alpha_p >> *(Spirit::alnum_p | '_'))
-               ]
-               [
-                  ph::ref(s) = construct<wstring_t>(arg1, arg2)
-               ]
-               ;
-
-            typename Spirit::parser_result<ident_t, ScannerT>::type p
-               = ident.parse(scan);
-
-            if (p.length() > 0) {
-               result = s;
-            }
-            return p.length();
+            #warning work out how to return result
+            return r;
          }
       };
 
       namespace {
+         #if 0
          Spirit::functor_parser<integer_parser> const integer_p;
          Spirit::functor_parser<parse_type_value> const type_value_p = parse_type_value();
          Spirit::functor_parser<ident_parser> identifier_p;
+         #endif
       }
-
-      class AngleStringGrammar : public Spirit::grammar<AngleStringGrammar> {
-         public:
-
-         AngleStringGrammar(std::deque<wstring_t>& string_stack)
-         : string_stack(string_stack)
-         {
-         }
-
-         std::deque<wstring_t>& string_stack;
-
-         template <typename ScannerT>
-         class definition {
-            public:
-            definition(const AngleStringGrammar& self)
-            : string_stack(self.string_stack)
-            {
-               angle_string
-                  =  Spirit::lexeme_d
-                     [
-                        '<'
-                        >> type_value_p[(push_front(ph::ref(string_stack), arg1))]
-                        >> '>'
-                     ]
-                  ;
-            }
-
-            const Spirit::rule<ScannerT>& start() const {
-               return angle_string;
-            }
-
-            private:
-            Spirit::rule<ScannerT> angle_string;
-
-            std::deque<wstring_t>& string_stack;
-         };
-      };
 
       inline void setEndDelimiter(Delimiter& d, wchar_t& end) {
          end = d.end;
       }
 
-      inline const wstring_t& getDelimiterType(const Delimiter& d) {
+      inline const string_type& getDelimiterType(const Delimiter& d) {
          return d.type;
       }
 
+      #if 0
       struct handle_expr_error {
          template <class ScannerT, class ErrorT>
          Spirit::error_status<>
@@ -323,6 +229,7 @@ namespace TransLucid {
             return Spirit::error_status<>(result);
          }
       };
+      #endif
    }
 
 }

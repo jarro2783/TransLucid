@@ -34,8 +34,8 @@ PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4],
    AC_MSG_ERROR([glibmm is required])
 ])
 
-TL_LDFLAGS="-std=gnu++0x"
-TL_CFLAGS="-std=gnu++0x"
+TL_LDFLAGS="-std=c++0x"
+TL_CFLAGS="-std=c++0x"
 
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_CFLAGS)

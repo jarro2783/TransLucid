@@ -1,17 +1,27 @@
+#include <tl/expr_parser.hpp>
 #include <tl/interpreter.hpp>
 #include <iostream>
 #include <ltdl.h>
-#include <boost/assign.hpp>
 #include <boost/program_options.hpp>
 #include <glibmm/miscutils.h>
 #include "directory_system.hpp"
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
+#include <string>
+#include <tl/parser.hpp>
 
 namespace TL = TransLucid;
 namespace po = boost::program_options;
 
 int main(int argc, char *argv[]) {
+
+   TL::Parser::Header h;
+   TL::Parser::HeaderGrammar<TL::Parser::string_type::const_iterator> hg(h);
+   //TL::Parser::ExprGrammar<std::u32string::const_iterator> parser(h);
+   TL::Parser::ExprGrammar<TL::Parser::string_type::const_iterator> parser(h);
+   //TL::Parser::ExprGrammar<std::string::const_iterator> parser(h);
+
+   #if 0
    using boost::assign::list_of;
 
    setlocale(LC_ALL, "");
@@ -66,8 +76,8 @@ int main(int argc, char *argv[]) {
    bool evaluate = true;
    try {
       if (!interpreter.parseSystem(input)) {
-         std::cerr << interpreter.errorCount() << " errors parsing input: "
-         "demands not evaluated" << std::endl;
+         //std::cerr << interpreter.errorCount() << " errors parsing input: "
+         //"demands not evaluated" << std::endl;
          evaluate = false;
       }
    } catch (const char *c) {
@@ -122,4 +132,6 @@ int main(int argc, char *argv[]) {
    }
 
    return evaluate ? 0 : 1;
+
+   #endif
 }

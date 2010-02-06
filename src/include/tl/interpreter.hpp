@@ -9,7 +9,7 @@
 #include <tl/evaluator.hpp>
 #include <tl/dimtranslator.hpp>
 #include <boost/foreach.hpp>
-#include <tl/parser_fwd.hpp>
+//#include <tl/parser_fwd.hpp>
 #include <deque>
 #include <boost/assign.hpp>
 #include <tl/cache.hpp>
@@ -93,32 +93,24 @@ namespace TransLucid {
          const Tuple& validContext,
          AST::Expr *e);
 
-      AST::Expr *lookupEquation(const ustring_t& name, const Tuple& c);
+      //AST::Expr *lookupEquation(const ustring_t& name, const Tuple& c);
 
       //ValueContext evaluate(AST::Expr *e, const Tuple& c) {
       //   return m_evaluator.evaluate(e, c);
       //}
 
-      AST::Expr* parseExpr(const ustring_t& s);
-
-      int errorCount() const {
-         return m_parseInfo.errorCount;
-      }
-
       void verbose(bool v = true) {
          m_verbose = v;
       }
 
-      Parser::Parsers& parsers() {
-         return m_parsers;
-      }
-
+      #if 0
       template <typename P>
       bool parseRange(
          Parser::iterator_t begin,
          Parser::iterator_t end,
          const P& parser,
          const ustring_t& name = ustring_t());
+      #endif
 
       #if 0
       HD *lookupVariable(const ustring_t& name) {
@@ -153,6 +145,8 @@ namespace TransLucid {
 
       size_t m_time;
 
+      //Parser::Header m_parseInfo;
+
       //the demands for each thread
       //std::vector<std::vector<std::pair<AST::Expr*, AST::Expr*> > > m_demands;
 
@@ -177,8 +171,8 @@ namespace TransLucid {
       void init_types();
 
       //Parser::SystemGrammar *m_systemGrammar;
-      Parser::ExprGrammar *m_exprGrammar;
-      Parser::TupleGrammar *m_tupleGrammar;
+      //Parser::ExprGrammar<std::u32string::const_iterator> *m_exprGrammar;
+      //Parser::TupleGrammar *m_tupleGrammar;
       //Parser::ConstantGrammar *m_constantGrammar;
       VariableMap m_variables;
 
@@ -200,35 +194,22 @@ namespace TransLucid {
       //map builtin types to type indexes
       std::map<ustring_t, size_t> builtin_name_to_index;
 
-      Parser::SkipGrammar m_skip_parser;
-
       protected:
-      Parser::Header m_parseInfo;
-      bool parseString(
-         const ustring_t& string,
-         const Parser::Spirit::stored_rule<Parser::scanner_t>& parser,
-         const ustring_t& name = ustring_t());
 
       bool m_verbose;
 
+      #if 0
       void addDimensions() {
          BOOST_FOREACH(const ustring_t& s, m_parseInfo.dimension_names) {
             m_dimTranslator.lookup(s);
          }
       }
+      #endif
 
       void cleanupParserObjects();
-
-      //template <typename T>
-      //void pushSystemParser(const T& parser) {
-      //   m_systemParser.push(parser);
-      //}
-
-      Parser::EquationAdder m_equationAdder;
-
-      Parser::Parsers m_parsers;
    };
 
+#if 0
    template <typename P>
    bool Interpreter::parseRange(
       Parser::iterator_t begin,
@@ -254,6 +235,7 @@ namespace TransLucid {
 
       return false;
    }
+#endif
 
    TypedValue hash(const TypedValue& dimension, const Tuple& context);
    TypedValue hash(size_t dimension, const Tuple& context);

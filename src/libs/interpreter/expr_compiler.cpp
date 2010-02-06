@@ -117,10 +117,13 @@ AST::Data *ExprCompiler::visitIfExpr(AST::IfExpr* e, AST::Data*) {
    condc = dynamic_cast<Compiled*>(e->condition->visit(this, 0));
    thenc = dynamic_cast<Compiled*>(e->then->visit(this, 0));
 
-   BOOST_FOREACH(AST::Expr *elseif, e->elsifs) {
-      Compiled *eic = dynamic_cast<Compiled*>(elseif->visit(this, 0));
-      elseifs.push_back(eic->e);
-      delete eic;
+   BOOST_FOREACH(auto& elseif, e->elsifs) {
+      Compiled *eicl = dynamic_cast<Compiled*>(elseif.first->visit(this, 0));
+      Compiled *eicr = dynamic_cast<Compiled*>(elseif.second->visit(this, 0));
+      elseifs.push_back(eicl->e);
+      elseifs.push_back(eicr->e);
+      delete eicl;
+      delete eicr;
    }
 
    elsec = dynamic_cast<Compiled*>(e->else_->visit(this, 0));
