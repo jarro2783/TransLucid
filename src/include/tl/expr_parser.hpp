@@ -43,12 +43,14 @@ namespace TransLucid
 
     function<make_u32string_impl> make_u32string;
 
-    char_type get_end_char(const Delimiter& d)
+    char_type
+    get_end_char(const Delimiter& d)
     {
       return d.end;
     }
 
-    string_type get_name(const Delimiter& d)
+    string_type
+    get_name(const Delimiter& d)
     {
       return d.type;
     }
@@ -212,7 +214,8 @@ namespace TransLucid
       }
 
       template <typename T>
-      void set_context_perturb(const T& t)
+      void
+      set_context_perturb(const T& t)
       {
         context_perturb = t;
       }

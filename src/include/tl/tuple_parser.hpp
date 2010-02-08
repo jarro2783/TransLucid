@@ -55,7 +55,8 @@ namespace TransLucid
       }
 
       template <typename T>
-      void set_expr(const T& t)
+      void
+      set_expr(const T& t)
       {
         expr = t;
       }
