@@ -97,12 +97,14 @@ namespace TransLucid
       qi::rule<Iterator, string_type()> ident;
     };
 
-    inline void setEndDelimiter(Delimiter& d, wchar_t& end)
+    inline void
+    setEndDelimiter(Delimiter& d, wchar_t& end)
     {
       end = d.end;
     }
 
-    inline const string_type& getDelimiterType(const Delimiter& d)
+    inline const
+    string_type& getDelimiterType(const Delimiter& d)
     {
       return d.type;
     }

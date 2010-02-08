@@ -103,13 +103,15 @@ namespace TransLucid
       : op(op), symbol(symbol), assoc(assoc), precedence(precedence)
       {}
 
-      bool operator==(const BinaryOperation& rhs) const
+      bool
+      operator==(const BinaryOperation& rhs) const
       {
         return op == rhs.op && symbol == rhs.symbol &&
         assoc == rhs.assoc && precedence == rhs.precedence;
       }
 
-      bool operator!=(const BinaryOperation& rhs) const
+      bool
+      operator!=(const BinaryOperation& rhs) const
       {
         return !(*this == rhs);
       }
@@ -136,7 +138,8 @@ namespace TransLucid
       ustring_t symbol;
       UnaryType type;
 
-      bool operator==(const UnaryOperation& rhs) const
+      bool
+      operator==(const UnaryOperation& rhs) const
       {
         return op == rhs.op && symbol == rhs.symbol && type == rhs.type;
       }
@@ -153,7 +156,8 @@ namespace TransLucid
       : type(type), start(start), end(end)
       {}
 
-      bool operator==(const Delimiter& rhs) const
+      bool
+      operator==(const Delimiter& rhs) const
       {
         return type == rhs.type && start == rhs.start && end == rhs.end;
       }
@@ -193,7 +197,8 @@ namespace TransLucid
       std::vector<ustring_t> libraries;
 
       #if 0
-      bool operator==(const Header& rhs) const
+      bool
+      operator==(const Header& rhs) const
       {
         return dimension_names == rhs.dimension_names &&
           equation_names == rhs.equation_names &&
@@ -224,7 +229,8 @@ namespace TransLucid
       : m_equations(0)
       {}
 
-      void operator()(const equation_t& e) const
+      void
+      operator()(const equation_t& e) const
       {
         if (m_equations != 0)
         {
@@ -232,7 +238,8 @@ namespace TransLucid
         }
       }
 
-      void setEquations(equation_v *equations)
+      void
+      setEquations(equation_v *equations)
       {
         m_equations = equations;
       }
@@ -246,7 +253,8 @@ namespace TransLucid
       EquationHolder(EquationAdder& adder);
       ~EquationHolder();
 
-      const equation_v& equations() const
+      const equation_v&
+      equations() const
       {
         return m_equations;
       }

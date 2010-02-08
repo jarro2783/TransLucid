@@ -33,7 +33,8 @@ namespace TransLucid
       };
 
       template <typename Arg1, typename Arg2>
-      void operator()(Arg1 arg1, Arg2 arg2) const
+      void
+      operator()(Arg1 arg1, Arg2 arg2) const
       {
         arg1.add(arg2.c_str(), std::u32string(arg2.begin(), arg2.end()));
       }
@@ -45,7 +46,8 @@ namespace TransLucid
     //        iterator_t;
 
     #if 0
-    inline void addDimensions
+    inline void
+    addDimensions
     (
       const std::vector<ustring_t>& dims,
       qi::symbols<>& dimsyms
@@ -61,7 +63,8 @@ namespace TransLucid
     #endif
 
     #if 0
-    inline void addOpDefinition
+    inline void
+    addOpDefinition
     (
       Header& header,
       InfixAssoc assoc,
@@ -83,7 +86,8 @@ namespace TransLucid
     }
     #endif
 
-    inline void addDelimiter
+    inline void
+    addDelimiter
     (
       Header& header,
       const string_type& type,
