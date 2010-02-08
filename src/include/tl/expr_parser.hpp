@@ -59,7 +59,7 @@ namespace TransLucid
       public:
 
       ExprGrammar(Header& h)
-        : ExprGrammar::base_type(expr), header(h)
+      : ExprGrammar::base_type(expr), header(h)
       {
         using qi::_val;
         using namespace qi::labels;

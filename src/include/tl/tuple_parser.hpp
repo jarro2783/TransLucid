@@ -18,7 +18,7 @@ namespace TransLucid
       public:
 
       TupleGrammar()
-        : TupleGrammar::base_type(context_perturb)
+      : TupleGrammar::base_type(context_perturb)
       {
         using namespace qi::labels;
         using namespace boost::phoenix;

@@ -116,7 +116,7 @@ namespace TransLucid
       public:
 
       HeaderGrammar(Header& h)
-        : HeaderGrammar::base_type(headerp), header(h)
+      : HeaderGrammar::base_type(headerp), header(h)
       {
          using namespace qi::labels;
 
@@ -209,9 +209,9 @@ namespace TransLucid
       public:
 
       EquationGrammar(Header& header, EquationAdder& adder)
-        : EquationGrammar::base_type(equation),
-          header(header),
-          adder(adder)
+      : EquationGrammar::base_type(equation),
+        header(header),
+        adder(adder)
       {
         //context_perturb = self.parsers.tuple_parser.top();
 
