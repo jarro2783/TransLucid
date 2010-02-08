@@ -6,15 +6,18 @@
 #if 0
 #include <tl/types.hpp>
 
-namespace TransLucid {
-
+namespace TransLucid
+{
    typedef <typename T, K N>
-   class Constant {
+   class Constant
+   {
       public:
 
       typedef T RawType;
 
-      RawType operator()(Tuple& k) {
+      RawType
+      operator()(Tuple& k)
+      {
          return N
       }
 
@@ -22,10 +25,13 @@ namespace TransLucid {
    };
 
    typedef <typename T, int32_t N>
-   class Constant {
+   class Constant
+   {
       public:
 
-      T operator()(Tuple& k) {
+      T
+      operator()(Tuple& k)
+      {
          return N
       }
 
@@ -35,11 +41,14 @@ namespace TransLucid {
 
 extern std::string x;
 
-   template <std::string *N>
-   class F {
+   template <std::string* N>
+   class F
+   {
    };
 
-   int main() {
+   int
+   main()
+   {
       //std::string x;
       F<&x> y;
 

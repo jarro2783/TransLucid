@@ -50,27 +50,27 @@ namespace TransLucid {
       return TypedValue(String(name), TYPE_INDEX_USTRING);
    }
 
-   inline mpz_class get_type_index(HD *h, const u32string& name) {
+   inline mpz_class get_type_index(HD* h, const u32string& name) {
       tuple_t k;
       k[DIM_ID] = generate_string(U"TYPEINDEX"); //TypedValue(String("TYPEINDEX"), TYPE_INDEX_USTRING);
       k[DIM_TYPE] = generate_string(name); //TypedValue(String(name), TYPE_INDEX_USTRING);
       return (*h)(Tuple(k)).first.value<Intmp>().value();
    }
 
-   inline mpz_class get_unique(HD *h) {
+   inline mpz_class get_unique(HD* h) {
       tuple_t k;
       k[DIM_ID] = TypedValue(String(U"_unique"), TYPE_INDEX_USTRING);
       return (*h)(Tuple(k)).first.value<Intmp>().value();
    }
 
-   inline size_t get_dimension_index(HD *h, const u32string& name) {
+   inline size_t get_dimension_index(HD* h, const u32string& name) {
       tuple_t k;
       k[DIM_ID] = generate_string(U"DIMENSION_INDEX");
       k[DIM_TEXT] = generate_string(name);
       return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
    }
 
-   inline size_t get_dimension_index(HD *h, const TypedValue& v) {
+   inline size_t get_dimension_index(HD* h, const TypedValue& v) {
       tuple_t k;
       k[DIM_ID] = generate_string(U"DIMENSION_TYPED_INDEX");
       k[DIM_VALUE] = v;
@@ -96,7 +96,7 @@ namespace TransLucid {
          return m_f(k);
       }
 
-      void addExpr(const Tuple& k, HD *h) {
+      void addExpr(const Tuple& k, HD* h) {
       }
 
       private:
@@ -104,7 +104,7 @@ namespace TransLucid {
    };
 
    template <typename T>
-   FunctorHD<T> *generate_functor_hd(const T& f) {
+   FunctorHD<T>* generate_functor_hd(const T& f) {
       return new FunctorHD<T>(f);
    }
 

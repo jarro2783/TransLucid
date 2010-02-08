@@ -210,11 +210,11 @@ namespace TransLucid
       #endif
     };
 
-    AST::Expr *insert_binary_operation
+    AST::Expr* insert_binary_operation
     (
       const BinaryOperation& info,
-      AST::Expr *lhs,
-      AST::Expr *rhs
+      AST::Expr* lhs,
+      AST::Expr* rhs
     );
 
     struct EquationAdder
@@ -239,13 +239,13 @@ namespace TransLucid
       }
 
       void
-      setEquations(equation_v *equations)
+      setEquations(equation_v* equations)
       {
         m_equations = equations;
       }
 
       private:
-      equation_v *m_equations;
+      equation_v* m_equations;
     };
 
     struct EquationHolder

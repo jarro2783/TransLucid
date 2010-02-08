@@ -8,15 +8,18 @@
 #include <deque>
 #include <tl/hyperdaton.hpp>
 
-namespace TransLucid {
+namespace TransLucid
+{
 
-   namespace AST {
+   namespace AST
+   {
       class Expr;
    };
 
    class Interpreter;
 
-   class InvalidGuard : public Exception {
+   class InvalidGuard : public Exception
+   {
    };
 
    /**
@@ -27,7 +30,8 @@ namespace TransLucid {
     * The system can impose elements of the guard, it is an error for
     * the user to specify those ones too.
     **/
-   class EquationGuard {
+   class EquationGuard
+   {
       public:
 
       /**
@@ -35,7 +39,7 @@ namespace TransLucid {
        *
        * Specifies the AST to use for the guard.
        **/
-      EquationGuard(HD* g, HD *b)
+      EquationGuard(HD* g, HD* b)
       : m_guard(g), m_boolean(b)
       {
       }
@@ -68,7 +72,8 @@ namespace TransLucid {
        * @return false if there are no user or system imposed dimensions,
        * true otherwise.
        **/
-      operator bool() const {
+      operator bool() const
+      {
          return m_guard != 0 || m_dimensions.size() != 0 || m_boolean != 0;
       }
 
@@ -80,8 +85,9 @@ namespace TransLucid {
        * @throw InvalidGuard when the user has specified a system imposed
        * dimension.
        **/
-      Tuple evaluate(const Tuple& context) const
-         throw(InvalidGuard);
+      Tuple
+      evaluate(const Tuple& context) const
+      throw(InvalidGuard);
 
       /**
        * @brief Adds a system imposed dimension.
@@ -89,21 +95,26 @@ namespace TransLucid {
        * The system can add dimensions to the guard which the user can't
        * change.
        **/
-      void addDimension(size_t dim, const TypedValue& v) {
+      void
+      addDimension(size_t dim, const TypedValue& v)
+      {
          m_dimensions[dim] = v;
       }
 
-      HD *boolean() const {
+      HD*
+      boolean() const
+      {
          return m_boolean;
       }
 
       private:
-      HD *m_guard;
-      HD *m_boolean;
+      HD* m_guard;
+      HD* m_boolean;
       std::map<size_t, TypedValue> m_dimensions;
    };
 
-   class EquationBase {
+   class EquationBase
+   {
       public:
       virtual ~EquationBase() {}
       virtual ValueContext evaluate(Interpreter& i, const Tuple& context) = 0;
@@ -121,9 +132,10 @@ namespace TransLucid {
    class Variable;
    typedef std::map<u32string, HD*> VariableMap;
 
-   class Equation {
+   class Equation
+   {
       public:
-      Equation(const u32string& name, const EquationGuard& valid, HD *h)
+      Equation(const u32string& name, const EquationGuard& valid, HD* h)
       : m_name(name), m_validContext(valid), m_h(h)
       {
       }
@@ -133,34 +145,42 @@ namespace TransLucid {
       {
       }
 
-      const u32string& name() const {
+      const u32string&
+      name() const
+      {
          return m_name;
       }
 
-      const EquationGuard& validContext() const {
+      const EquationGuard&
+      validContext() const
+      {
          return m_validContext;
       }
 
-      operator bool() const {
+      operator bool() const
+      {
          return m_h;
       }
 
-      HD *equation() const {
+      HD*
+      equation() const
+      {
          return m_h;
       }
 
       private:
       u32string m_name;
       EquationGuard m_validContext;
-      //AST::Expr *m_e;
-      //SystemEquation *m_se;
-      //EquationBase *m_e;
-      HD *m_h;
+      //AST::Expr* m_e;
+      //SystemEquation* m_se;
+      //EquationBase* m_e;
+      HD* m_h;
    };
 
    //represents all definitions of a variable, is responsible for
    //JIT and best fitting
-   class Variable : public HD {
+   class Variable : public HD
+   {
       public:
 
       Variable(const u32string& name, Interpreter& i)
@@ -169,14 +189,19 @@ namespace TransLucid {
 
       TaggedValue operator()(const Tuple& k);
 
-      void addExpr(const Tuple& k, HD *h);
+      void
+      addExpr(const Tuple& k, HD* h);
 
-      void added();
-      void removed();
+      void
+      added();
+
+      void
+      removed();
 
       private:
 
-      void addExprActual(const Tuple& k, HD *e);
+      void
+      addExprActual(const Tuple& k, HD* e);
 
       typedef std::list<Equation> Equations;
       Equations m_equations;

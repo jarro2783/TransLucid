@@ -22,7 +22,7 @@ namespace TransLucid {
       class Expr {
          public:
          virtual ~Expr() {}
-         virtual Data *visit(Visitor *visitor, Data *data) = 0;
+         virtual Data* visit(Visitor* visitor, Data* data) = 0;
       };
 
       class AtExpr;
@@ -45,58 +45,58 @@ namespace TransLucid {
          public:
          virtual ~Visitor() {}
 
-         virtual Data *visitAtExpr(AtExpr*, Data*) = 0;
-         virtual Data *visitBinaryOpExpr(BinaryOpExpr*, Data*) = 0;
-         virtual Data *visitBooleanExpr(BooleanExpr*, Data*) = 0;
-         virtual Data *visitBuildTupleExpr(BuildTupleExpr*, Data*) = 0;
-         virtual Data *visitConstantExpr(ConstantExpr*, Data*) = 0;
-         virtual Data *visitConvertExpr(SpecialOpsExpr*, Data*) = 0;
-         virtual Data *visitDimensionExpr(DimensionExpr*, Data*) = 0;
-         virtual Data *visitHashExpr(HashExpr*, Data*) = 0;
-         virtual Data *visitIdentExpr(IdentExpr*, Data*) = 0;
-         virtual Data *visitIfExpr(IfExpr*, Data*) = 0;
-         virtual Data *visitIntegerExpr(IntegerExpr*, Data*) = 0;
-         virtual Data *visitIsSpecialExpr(SpecialOpsExpr*, Data*) = 0;
-         virtual Data *visitIsTypeExpr(SpecialOpsExpr*, Data*) = 0;
-         virtual Data *visitOpExpr(OpExpr*, Data*) = 0;
-         virtual Data *visitPairExpr(PairExpr*, Data*) = 0;
-         virtual Data *visitRangeExpr(RangeExpr*, Data*) = 0;
-         virtual Data *visitUnaryExpr(UnaryExpr*, Data*) = 0;
+         virtual Data* visitAtExpr(AtExpr*, Data*) = 0;
+         virtual Data* visitBinaryOpExpr(BinaryOpExpr*, Data*) = 0;
+         virtual Data* visitBooleanExpr(BooleanExpr*, Data*) = 0;
+         virtual Data* visitBuildTupleExpr(BuildTupleExpr*, Data*) = 0;
+         virtual Data* visitConstantExpr(ConstantExpr*, Data*) = 0;
+         virtual Data* visitConvertExpr(SpecialOpsExpr*, Data*) = 0;
+         virtual Data* visitDimensionExpr(DimensionExpr*, Data*) = 0;
+         virtual Data* visitHashExpr(HashExpr*, Data*) = 0;
+         virtual Data* visitIdentExpr(IdentExpr*, Data*) = 0;
+         virtual Data* visitIfExpr(IfExpr*, Data*) = 0;
+         virtual Data* visitIntegerExpr(IntegerExpr*, Data*) = 0;
+         virtual Data* visitIsSpecialExpr(SpecialOpsExpr*, Data*) = 0;
+         virtual Data* visitIsTypeExpr(SpecialOpsExpr*, Data*) = 0;
+         virtual Data* visitOpExpr(OpExpr*, Data*) = 0;
+         virtual Data* visitPairExpr(PairExpr*, Data*) = 0;
+         virtual Data* visitRangeExpr(RangeExpr*, Data*) = 0;
+         virtual Data* visitUnaryExpr(UnaryExpr*, Data*) = 0;
       };
 
       class AtExpr : public Expr {
          public:
          //e2 @ e1
-         AtExpr(Expr *e2, Expr *e1)
+         AtExpr(Expr* e2, Expr* e1)
          : e2(e2), e1(e1), relative(true)
          {
          }
 
-         Data *visit(Visitor *v, Data *data) {
+         Data* visit(Visitor* v, Data* data) {
             return v->visitAtExpr(this, data);
          }
 
-         Expr *e2;
-         Expr *e1;
+         Expr* e2;
+         Expr* e1;
          bool relative;
       };
 
       class BinaryOpExpr : public Expr {
 
          public:
-         BinaryOpExpr(const Parser::BinaryOperation& op, Expr *lhs, Expr *rhs)
+         BinaryOpExpr(const Parser::BinaryOperation& op, Expr* lhs, Expr* rhs)
          : op(op)
          {
             operands.push_back(lhs);
             operands.push_back(rhs);
          }
 
-         Data *visit(Visitor *v, Data *data) {
+         Data* visit(Visitor* v, Data* data) {
             return v->visitBinaryOpExpr(this, data);
          }
 
-         void add_right(const Parser::BinaryOperation& op, Expr *rhs);
-         void add_leaf(Expr *e);
+         void add_right(const Parser::BinaryOperation& op, Expr* rhs);
+         void add_leaf(Expr* e);
 
          Parser::BinaryOperation op;
          std::vector<Expr*> operands;
@@ -119,7 +119,7 @@ namespace TransLucid {
          //{
          //}
 
-         Data *visit(Visitor *v, Data *data) {
+         Data* visit(Visitor* v, Data* data) {
             return v->visitBooleanExpr(this, data);
          }
 
@@ -138,7 +138,7 @@ namespace TransLucid {
             }
          }
 
-         Data *visit(Visitor *v, Data *data) {
+         Data* visit(Visitor* v, Data* data) {
             return v->visitBuildTupleExpr(this, data);
          }
 
@@ -152,7 +152,7 @@ namespace TransLucid {
          {
          }
 
-         Data *visit(Visitor *v, Data *data) {
+         Data* visit(Visitor* v, Data* data) {
             return v->visitConstantExpr(this, data);
          }
 
@@ -168,7 +168,7 @@ namespace TransLucid {
          {
          }
 
-         Data *visit(Visitor *v, Data *d) {
+         Data* visit(Visitor* v, Data* d) {
             return v->visitDimensionExpr(this, d);
          }
 
@@ -177,16 +177,16 @@ namespace TransLucid {
 
       class HashExpr : public Expr {
          public:
-         HashExpr(Expr *e)
+         HashExpr(Expr* e)
          : e(e)
          {
          }
 
-         Data *visit(Visitor *visitor, Data *data) {
+         Data* visit(Visitor* visitor, Data* data) {
             return visitor->visitHashExpr(this, data);
          }
 
-         Expr *e;
+         Expr* e;
       };
 
       class IdentExpr : public Expr {
@@ -196,7 +196,7 @@ namespace TransLucid {
          {
          }
 
-         Data *visit(Visitor *visitor, Data *data) {
+         Data* visit(Visitor* visitor, Data* data) {
             return visitor->visitIdentExpr(this, data);
          }
 
@@ -209,10 +209,10 @@ namespace TransLucid {
 
          public:
          template <typename List>
-         IfExpr(Expr *condition,
-            Expr *then,
+         IfExpr(Expr* condition,
+            Expr* then,
             const List& ei,
-            Expr *else_)
+            Expr* else_)
          : condition(condition),
          then(then),
          else_(else_)
@@ -224,21 +224,21 @@ namespace TransLucid {
             }
          }
 
-         Data *visit(Visitor *visitor, Data *data) {
+         Data* visit(Visitor* visitor, Data* data) {
             return visitor->visitIfExpr(this, data);
          }
 
-         Expr *condition;
-         Expr *then;
+         Expr* condition;
+         Expr* then;
          ElseIfList elsifs;
-         Expr *else_;
+         Expr* else_;
       };
 
       class IntegerExpr : public Expr {
          public:
          IntegerExpr(const mpz_class& value);
 
-         Data *visit(Visitor *visitor, Data *data) {
+         Data* visit(Visitor* visitor, Data* data) {
             return visitor->visitIntegerExpr(this, data);
          }
 
@@ -251,7 +251,7 @@ namespace TransLucid {
          : m_ops(ops), m_name(name)
          {}
 
-         Data *visit(Visitor *visitor, Data *data) {
+         Data* visit(Visitor* visitor, Data* data) {
             return visitor->visitOpExpr(this, data);
          }
 
@@ -261,36 +261,36 @@ namespace TransLucid {
 
       class PairExpr : public Expr {
          public:
-         PairExpr(Expr *lhs, Expr *rhs)
+         PairExpr(Expr* lhs, Expr* rhs)
          : lhs(lhs), rhs(rhs)
          {
          }
 
-         Data *visit(Visitor *v, Data *data) {
+         Data* visit(Visitor* v, Data* data) {
             return v->visitPairExpr(this, data);
          }
 
-         Expr *lhs;
-         Expr *rhs;
+         Expr* lhs;
+         Expr* rhs;
       };
 
       class RangeExpr : public Expr {
          public:
-         RangeExpr(Expr *lhs, Expr *rhs)
+         RangeExpr(Expr* lhs, Expr* rhs)
          : lhs(lhs), rhs(rhs)
          {}
 
-         Data *visit(Visitor *v, Data *data) {
+         Data* visit(Visitor* v, Data* data) {
             return v->visitRangeExpr(this, data);
          }
 
-         Expr *lhs;
-         Expr *rhs;
+         Expr* lhs;
+         Expr* rhs;
       };
 
       class SpecialOpsExpr : public Expr {
          public:
-         SpecialOpsExpr(const ustring_t& op, const ustring_t& value, Expr *e)
+         SpecialOpsExpr(const ustring_t& op, const ustring_t& value, Expr* e)
          : value(value), e(e)
          {
             if (op == "isspecial") {
@@ -302,12 +302,12 @@ namespace TransLucid {
             }
          }
 
-         Data *visit(Visitor *v, Data *data) {
+         Data* visit(Visitor* v, Data* data) {
             return m_f(v, this, data);
          }
 
          ustring_t value;
-         Expr *e;
+         Expr* e;
 
          private:
          boost::function<Data* (Visitor*, SpecialOpsExpr*, Data*)> m_f;
@@ -315,17 +315,17 @@ namespace TransLucid {
 
       class UnaryExpr : public Expr {
          public:
-         UnaryExpr(const Parser::UnaryOperation& op, Expr *e)
+         UnaryExpr(const Parser::UnaryOperation& op, Expr* e)
          : op(op), e(e)
          {
          }
 
-         Data *visit(Visitor *v, Data *d) {
+         Data* visit(Visitor* v, Data* d) {
             return v->visitUnaryExpr(this, d);
          }
 
          Parser::UnaryOperation op;
-         Expr *e;
+         Expr* e;
       };
 
    }

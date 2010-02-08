@@ -3,14 +3,17 @@
 
 #include <tl/hyperdaton.hpp>
 
-namespace TransLucid {
-
-   class ValuePrinter : public HD {
+namespace TransLucid
+{
+   class ValuePrinter : public HD
+   {
       public:
 
-      TaggedValue operator()(const Tuple& k);
+      TaggedValue
+      operator()(const Tuple& k);
 
-      void addExpr(const Tuple& k, HD *h);
+      void
+      addExpr(const Tuple& k, HD* h);
    };
 }
 

@@ -71,7 +71,7 @@ namespace TransLucid
       InfixAssoc assoc,
       const std::u32string& op,
       const std::u32string& symbol,
-      AST::Expr *precedence
+      AST::Expr* precedence
     )
     {
       size_t pos = header.binary_op_info.size();
@@ -81,7 +81,7 @@ namespace TransLucid
       }
       std::u32string underscoreSymbol = U"_" + symbol + U"_";
       header.binary_op_symbols.add(underscoreSymbol.c_str(), pos);
-      AST::IntegerExpr *p = dynamic_cast<AST::IntegerExpr*>(precedence);
+      AST::IntegerExpr* p = dynamic_cast<AST::IntegerExpr*>(precedence);
       header.binary_op_info.push_back
         (BinaryOperation(assoc, op, symbol, p->m_value));
     }

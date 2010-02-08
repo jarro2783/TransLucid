@@ -9,7 +9,7 @@ namespace TransLucid {
    class Range : public TypedValueBase {
       public:
       Range();
-      Range(const mpz_class *lower, const mpz_class *upper);
+      Range(const mpz_class* lower, const mpz_class* upper);
       Range(const Range& other);
       Range& operator=(const Range& rhs);
 
@@ -57,8 +57,8 @@ namespace TransLucid {
       }
 
       private:
-      const mpz_class *m_lower;
-      const mpz_class *m_upper;
+      const mpz_class* m_lower;
+      const mpz_class* m_upper;
    };
 }
 

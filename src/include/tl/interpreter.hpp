@@ -91,11 +91,11 @@ namespace TransLucid {
 
       void registerEquation(const u32string& name,
          const Tuple& validContext,
-         AST::Expr *e);
+         AST::Expr* e);
 
-      //AST::Expr *lookupEquation(const ustring_t& name, const Tuple& c);
+      //AST::Expr* lookupEquation(const ustring_t& name, const Tuple& c);
 
-      //ValueContext evaluate(AST::Expr *e, const Tuple& c) {
+      //ValueContext evaluate(AST::Expr* e, const Tuple& c) {
       //   return m_evaluator.evaluate(e, c);
       //}
 
@@ -113,7 +113,7 @@ namespace TransLucid {
       #endif
 
       #if 0
-      HD *lookupVariable(const ustring_t& name) {
+      HD* lookupVariable(const ustring_t& name) {
          VariableMap::const_iterator iter = m_variables.find(name);
          return iter != m_variables.end() ? iter->second : 0;
       }
@@ -121,7 +121,7 @@ namespace TransLucid {
 
       TaggedValue operator()(const Tuple& k);
 
-      void addExpr(const Tuple& k, HD *h);
+      void addExpr(const Tuple& k, HD* h);
 
       //int add(const Context& context,
 
@@ -160,21 +160,21 @@ namespace TransLucid {
       //initialises the type indexes
       void init_types();
 
-      //Parser::SystemGrammar *m_systemGrammar;
-      //Parser::ExprGrammar<std::u32string::const_iterator> *m_exprGrammar;
-      //Parser::TupleGrammar *m_tupleGrammar;
-      //Parser::ConstantGrammar *m_constantGrammar;
+      //Parser::SystemGrammar* m_systemGrammar;
+      //Parser::ExprGrammar<std::u32string::const_iterator>* m_exprGrammar;
+      //Parser::TupleGrammar* m_tupleGrammar;
+      //Parser::ConstantGrammar* m_constantGrammar;
       VariableMap m_variables;
 
       //adds to id with remaining in the id dimension
       void addToVariable(const u32string& id, const u32string& remaining,
-         const Tuple& k, HD *e);
+         const Tuple& k, HD* e);
       //adds to id removing id from the context
       void addToVariable(const u32string& id,
-         const Tuple& k, HD *e);
+         const Tuple& k, HD* e);
       //does the actual add
       void addToVariableActual(const u32string& id,
-         const Tuple& k, HD *e);
+         const Tuple& k, HD* e);
 
       template <typename T>
       HD* buildConstantHD(size_t index);

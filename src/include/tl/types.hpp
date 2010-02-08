@@ -192,7 +192,7 @@ namespace TransLucid {
             //if this throws then leave the value as it is, having
             //a 0 here would be bad since TypedValue should always have
             //a value, so it's better to leave the old value
-            StorageBase *copy = rhs.m_value->clone();
+            StorageBase* copy = rhs.m_value->clone();
             delete m_value;
             m_value = copy;
             m_index = rhs.m_index;
@@ -258,7 +258,7 @@ namespace TransLucid {
        * Attempts to cast the value stored to T, if it fails 0 is returned.
        **/
       template <typename T>
-      const T *valuep() const {
+      const T* valuep() const {
          return dynamic_cast<const T*>(&m_value->value());
       }
 
@@ -329,7 +329,7 @@ namespace TransLucid {
          T m_value;
       };
 
-      StorageBase *m_value;
+      StorageBase* m_value;
       type_index m_index;
    };
 
@@ -406,7 +406,7 @@ namespace TransLucid {
 
       private:
 
-      Tuple(tuple_t *t)
+      Tuple(tuple_t* t)
       : m_value(t)
       {}
 
@@ -462,18 +462,18 @@ namespace TransLucid {
          return m_nextIndex++;
       }
 
-      void registerType(const TypeManager *manager);
+      void registerType(const TypeManager* manager);
 
       size_t registerType(const ustring_t& name);
 
       size_t lookupType(const ustring_t& name) const;
 
-      const TypeManager *findType(const Glib::ustring& name) const {
+      const TypeManager* findType(const Glib::ustring& name) const {
          StringTypeMap::const_iterator i = m_typeNameMapping.find(name);
          return i == m_typeNameMapping.end() ? 0 : i->second;
       }
 
-      const TypeManager *findType(type_index index) const {
+      const TypeManager* findType(type_index index) const {
          IndexTypeMap::const_iterator i = m_typeIndexMapping.find(index);
          return i == m_typeIndexMapping.end() ? 0 : i->second;
       }
@@ -607,7 +607,7 @@ namespace TransLucid {
       type_index m_indexPair;
 
       //OpFunction makeOpTypeError;
-      //TypedValue makeOpTypeErrorActual(const TypeManager *special);
+      //TypedValue makeOpTypeErrorActual(const TypeManager* special);
 
       //ConvertFunction makeConvertTypeError;
 

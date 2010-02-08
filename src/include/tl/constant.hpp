@@ -5,12 +5,14 @@
 #include <tl/interpreter.hpp>
 #include <map>
 
-namespace TransLucid {
+namespace TransLucid
+{
 
    //this hyperdaton varies in the type and value dimension
    //it can be added to by adding a parser for a specific type
    //it can be used by putting k = [type : t, value : v]
-   class ConstantHD : public HD {
+   class ConstantHD : public HD
+   {
       public:
 
       ConstantHD(Interpreter& i)
@@ -18,8 +20,11 @@ namespace TransLucid {
       {
       }
 
-      TaggedValue operator()(const Tuple& k);
-      void addExpr(const Tuple& k, AST::Expr *e);
+      TaggedValue
+      operator()(const Tuple& k);
+
+      void
+      addExpr(const Tuple& k, AST::Expr* e);
 
       private:
       Interpreter& m_i;

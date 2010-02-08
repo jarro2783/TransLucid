@@ -29,7 +29,7 @@ namespace TransLucid {
 
       ~TemplateException() throw() {}
 
-      const char *what() const throw() {
+      const char* what() const throw() {
          return m.c_str();
       }
 
