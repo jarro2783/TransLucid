@@ -163,8 +163,6 @@ namespace TransLucid {
 
             integer = qi::int_;
 
-            angle_string = '<' >> *(qi::char_ - '>') >> '>';
-
             //constant = self.parsers.constant_parser.top();
 
             //BOOST_SPIRIT_DEBUG_RULE(constant);
@@ -178,7 +176,9 @@ namespace TransLucid {
             integer
          ;
 
-         qi::rule<Iterator, string_type()> angle_string;
+         //qi::rule<Iterator, string_type()> angle_string;
+
+         escaped_string_parser<Iterator> angle_string;
 
          qi::symbols<char_type, InfixAssoc> assoc_symbols;
          InfixAssoc currentAssoc;

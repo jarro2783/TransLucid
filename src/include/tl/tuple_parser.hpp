@@ -44,6 +44,13 @@ namespace TransLucid {
 
          }
 
+         template <typename T>
+         void set_expr(const T& t) {
+            expr = t;
+         }
+
+         private:
+
          qi::rule<Iterator, AST::Expr*()>
             context_perturb,
             expr

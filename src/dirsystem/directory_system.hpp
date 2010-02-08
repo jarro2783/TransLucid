@@ -20,7 +20,7 @@ namespace TransLucid {
 
       class DirectoryGrammar;
 
-      class DirectorySystem : public Interpreter {
+      class DirectorySystem {
          public:
          DirectorySystem();
 
@@ -35,11 +35,15 @@ namespace TransLucid {
 
          bool parseFile(const ustring_t& file, FileType type);
 
+         void addLibrarySearchPath();
+
          mpz_class m_maxClock;
 
          DirectoryGrammar *m_grammar;
 
          ExprCompiler m_compiler;
+
+         Libtool m_lt;
       };
 
       template <typename OutputIterator>

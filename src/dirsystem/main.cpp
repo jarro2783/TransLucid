@@ -16,14 +16,15 @@ namespace po = boost::program_options;
 
 int main(int argc, char *argv[]) {
 
-   TL::Parser::Header h;
-   TL::Parser::HeaderGrammar<TL::Parser::string_type::const_iterator> hg(h);
+   //TL::Parser::Header h;
+   //TL::Parser::HeaderGrammar<TL::Parser::string_type::const_iterator> hg(h);
    //TL::Parser::ExprGrammar<std::u32string::const_iterator> parser(h);
-   TL::Parser::ExprGrammar<TL::Parser::string_type::const_iterator> parser(h);
+   //TL::Parser::ExprGrammar<TL::Parser::string_type::const_iterator> parser(h);
    //TL::Parser::ExprGrammar<std::string::const_iterator> parser(h);
-   TL::Parser::TupleGrammar<TL::Parser::string_type::const_iterator> tuple;
+   //TL::Parser::TupleGrammar<TL::Parser::string_type::const_iterator> tuple;
+   //parser.set_context_perturb(tuple);
+   //tuple.set_expr(parser);
 
-   #if 0
    using boost::assign::list_of;
 
    setlocale(LC_ALL, "");
@@ -54,11 +55,11 @@ int main(int argc, char *argv[]) {
       return 1;
    }
 
-   TL::DirectoryParser::DirectorySystem interpreter;
+   TL::DirectoryParser::DirectorySystem system;
    TL::Tuple context;
 
    if (vm.count("verbose")) {
-      interpreter.verbose();
+      //interpreter.verbose();
       std::clog << "running in source directory: " <<
       Glib::get_current_dir() + "/" + input << std::endl;
    }
@@ -67,7 +68,7 @@ int main(int argc, char *argv[]) {
       std::vector<std::string> paths =
          vm["library-path"].as<std::vector<std::string> >();
       BOOST_FOREACH(const std::string& s, paths) {
-         interpreter.addLibrarySearchPath(s);
+         system.addLibrarySearchPath(s);
       }
    }
 
@@ -134,6 +135,4 @@ int main(int argc, char *argv[]) {
    }
 
    return evaluate ? 0 : 1;
-
-   #endif
 }

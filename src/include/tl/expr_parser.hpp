@@ -16,12 +16,14 @@
 
 namespace TransLucid {
 
-   namespace Parser {
+   namespace Parser
+   {
 
       using namespace boost::phoenix;
       namespace ph = boost::phoenix;
 
-      struct make_u32string_impl {
+      struct make_u32string_impl
+      {
          template <typename Arg>
          struct result
          {
@@ -42,18 +44,19 @@ namespace TransLucid {
 
       function<make_u32string_impl> make_u32string;
 
-      char_type get_end_char(const Delimiter& d) {
+      char_type get_end_char(const Delimiter& d)
+      {
          return d.end;
       }
 
-      string_type get_name(const Delimiter& d) {
+      string_type get_name(const Delimiter& d)
+      {
          return d.type;
       }
 
       template <typename Iterator>
-      class ExprGrammar : public qi::grammar<Iterator, AST::Expr*()> {
-         Header &header;
-         //Parsers& parsers;
+      class ExprGrammar : public qi::grammar<Iterator, AST::Expr*()>
+      {
          public:
 
          ExprGrammar(Header& h)
@@ -65,21 +68,19 @@ namespace TransLucid {
             expr %= if_expr
             ;
 
-            //stack handling for if
-            //when if is seen, push a new list for elsifs
-            //when elsif is seen push both expressions onto the list
-            //after the whole lot, make an IfExpr with
-            //the condition, the expression, the elsif list, and the else
-            //expression and pop all
             if_expr =
-            (
-            qi::lit("if")
-               >> if_expr
-               >> qi::lit("then") >> if_expr
-               >> *("elsif" >> if_expr >>
-                  qi::lit("then")
-                  >> if_expr)
-               >> qi::lit("else") >> if_expr >> qi::lit("fi")
+            ( qi::lit("if")
+             >> if_expr
+             >> qi::lit("then")
+             >> if_expr
+             >> * ( "elsif"
+                  >> if_expr
+                  >> qi::lit("then")
+                  >> if_expr
+                 )
+             >> qi::lit("else")
+             >> if_expr
+             >> qi::lit("fi")
             )
             [
                qi::_val = new_<AST::IfExpr>(_1, _2, _3, _4)
@@ -92,7 +93,6 @@ namespace TransLucid {
 
             range_expr = at_expr
                ;
-
                //>> -(".."
                //>> if_expr)
                //;
@@ -141,7 +141,6 @@ namespace TransLucid {
 
             hash_expr = ('#' > hash_expr [_val = new_<AST::HashExpr>(_1)])
                | primary_expr [_val = _1]
-            //| primary_expr
             ;
 
             primary_expr
@@ -149,8 +148,6 @@ namespace TransLucid {
                |  boolean [_val = _1]
                | header.dimension_symbols
                [
-                  //_val = new_<AST::DimensionExpr>(
-                  //   at(ph::ref(header.dimension_names), _1))
                   _val = new_<AST::DimensionExpr>(make_u32string(_1))
                ]
                | ident [_a = _1]
@@ -163,28 +160,22 @@ namespace TransLucid {
                      _val = new_<AST::IdentExpr>(make_u32string(_a))
                   ]
                   )
-               //| self.header.equation_symbols [
-               //   push_front(ph::ref(expr_stack), new_<AST::IdentExpr>(
-               //      at(ph::ref(self.header.equation_names), arg1))
-               //   )
-               //]
-               //|   constant
                | context_perturb [_val = _1]
                | ('(' >> expr > ')') [_val = _1]
-               | header.delimiter_start_symbols
-                  [
-                     _b = _1,
-                     _a = construct<string_type>()
-                     //_val = new_<AST::ConstantExpr>(U"a", U"b")
-                  ]
-                  >> (
-                        *(qi::standard_wide::char_ - end_delimiter(ph::bind(&get_end_char, _b)))
-                        [_a += _1]
-                     )
-                     [
-                        _val = new_<AST::ConstantExpr>(make_u32string(ph::bind(get_name, _b)), make_u32string(_1))
-                     ]
-                  >> end_delimiter(ph::bind(get_end_char, _b))
+               | ( header.delimiter_start_symbols
+                 [
+                   _b = _1,
+                   _a = construct<string_type>()
+                 ]
+                 >> (
+                      *(qi::standard_wide::char_ - end_delimiter(ph::bind(&get_end_char, _b)))
+                      [_a += _1]
+                    )
+                  > end_delimiter(ph::bind(&get_end_char, _b))
+                 )
+               [
+                  _val = new_<AST::ConstantExpr>(make_u32string(ph::bind(&get_name, _b)), make_u32string(_a))
+               ]
             ;
 
             boolean = (qi::ascii::string("true") | qi::ascii::string("false"))
@@ -200,11 +191,12 @@ namespace TransLucid {
             ;
 
             end_delimiter = qi::standard_wide::char_(_r1);
+         }
 
-            //constant = self.parsers.constant_parser.top();
-
-            #warning need to fix the modules up here
-            //context_perturb = parsers.tuple_parser.top();
+         template <typename T>
+         void set_context_perturb(const T& t)
+         {
+            context_perturb = t;
          }
 
          private:
@@ -240,8 +232,12 @@ namespace TransLucid {
          escaped_string_parser<Iterator> angle_string;
          ident_parser<Iterator> ident;
 
+         Header &header;
+
          #warning error checking
       };
+
+      extern template class ExprGrammar<string_type::const_iterator>;
 
    }
 

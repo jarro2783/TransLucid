@@ -1,25 +1,6 @@
 #ifndef PARSER_UTIL_HPP_INCLUDED
 #define PARSER_UTIL_HPP_INCLUDED
 
-#if 0
-#include <boost/spirit/home/phoenix/container.hpp>
-#include <boost/spirit/home/phoenix/object/new.hpp>
-#include <boost/spirit/home/phoenix/function/function.hpp>
-#include <boost/spirit/home/phoenix/statement/for.hpp>
-#include <boost/spirit/home/phoenix/object/construct.hpp>
-#include <boost/spirit/home/phoenix/operator/self.hpp>
-#include <boost/spirit/home/phoenix/operator/io.hpp>
-#include <boost/spirit/home/phoenix/statement/sequence.hpp>
-#include <boost/spirit/home/phoenix/scope/local_variable.hpp>
-#include <boost/spirit/home/phoenix/scope/let.hpp>
-#include <boost/spirit/home/phoenix/core/argument.hpp>
-#include <boost/spirit/home/phoenix/operator/arithmetic.hpp>
-#include <boost/spirit/home/phoenix/bind/bind_function.hpp>
-#include <boost/spirit/home/phoenix/bind/bind_function_object.hpp>
-#include <boost/spirit/home/phoenix/object/delete.hpp>
-#include <boost/spirit/home/phoenix/algorithm.hpp>
-#endif
-
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <gmpxx.h>
@@ -48,49 +29,6 @@ namespace TransLucid {
       template <typename Iterator>
       class ExprGrammar;
 
-      #if 0
-      struct parse_type_value {
-         typedef wstring_t result_t;
-
-         template <typename ScannerT>
-         std::ptrdiff_t
-         operator()(ScannerT const& scan, result_t& result) const {
-            if (scan.at_end()) {
-               return -1;
-            }
-
-            result.clear();
-
-            int angleCount = 0;
-
-            std::ptrdiff_t len = 0;
-            wchar_t c;
-            while (!scan.at_end() && !((c = *scan) == '>' && angleCount == 0)) {
-               if (c == '<') {
-                  ++angleCount;
-               } else if (c == '>') {
-                  --angleCount;
-               } else if (c == '\\') {
-                  ++scan;
-                  c = *scan;
-                  if (!scan.at_end()) {
-                     ++len;
-                  } else {
-                     result.append(1, L'\\');
-                     continue;
-                  }
-               }
-
-               result.append(1, c);
-               ++scan;
-               ++len;
-            }
-
-            return len;
-         }
-      };
-      #endif
-
       template <typename Iterator>
       struct integer_parser : public qi::grammar<Iterator, mpz_class()>
       {
@@ -102,47 +40,7 @@ namespace TransLucid {
                >> (qi::char_('2', '9') | qi::ascii::alpha)
                >> +(qi::ascii::digit | qi::ascii::alpha)
                | qi::int_ [qi::_val = qi::_1])
-               ;
-
-            //bool success = qi::parse(first, last, integer);
-
-            #warning work out how to do this
-            #if 0
-            if (p.length() > 0) {
-               try {
-                  wstring_t::const_iterator iter = s.begin();
-                  if (s == L"0") {
-                     result = mpz_class();
-                  } else if (*iter == '0') {
-                     ++iter;
-                     int baseChar = *iter;
-                     int base;
-
-                     if (baseChar >= '2' && baseChar <= '9') {
-                        base = baseChar - '0';
-                     } else if (baseChar >= 'a' && baseChar <= 'z') {
-                        base = baseChar - 'a' + 10;
-                     } else if (baseChar >= 'A' && baseChar <= 'Z') {
-                        base = baseChar - 'A' + 36;
-                     } else {
-                        return -1;
-                     }
-
-                     ++iter;
-
-                     wstring_t::const_iterator end = s.end();
-                     result = mpz_class(ustring_t(wstring_t(iter, end)).raw(), base);
-
-                  } else {
-                     result = mpz_class(ustring_t(s).raw(), 10);
-                  }
-                  return p.length();
-               } catch (...) {
-                  return -1;
-               }
-            }
-            return -1;
-            #endif
+            ;
          }
 
          qi::rule<Iterator, mpz_class()> integer;
@@ -191,14 +89,6 @@ namespace TransLucid {
 
          qi::rule<Iterator, string_type()> ident;
       };
-
-      namespace {
-         #if 0
-         Spirit::functor_parser<integer_parser> const integer_p;
-         Spirit::functor_parser<parse_type_value> const type_value_p = parse_type_value();
-         Spirit::functor_parser<ident_parser> identifier_p;
-         #endif
-      }
 
       inline void setEndDelimiter(Delimiter& d, wchar_t& end) {
          end = d.end;

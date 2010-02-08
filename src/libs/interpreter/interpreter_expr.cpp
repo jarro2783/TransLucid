@@ -1,6 +1,14 @@
-#if 0
-
 #include <tl/expr_parser.hpp>
+
+namespace TransLucid {
+
+   namespace Parser {
+      template class ExprGrammar<string_type::const_iterator>;
+   }
+
+}
+
+#if 0
 #include <tl/interpreter.hpp>
 
 namespace TransLucid {
