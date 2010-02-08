@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
    bool evaluate = true;
    try {
-      if (!interpreter.parseSystem(input)) {
+      if (!system.parseSystem(input)) {
          //std::cerr << interpreter.errorCount() << " errors parsing input: "
          //"demands not evaluated" << std::endl;
          evaluate = false;
@@ -88,11 +88,12 @@ int main(int argc, char *argv[]) {
    }
 
    if (evaluate) {
-      interpreter.evaluateSystem(std::back_inserter(evaluated));
+      system.evaluateSystem(std::back_inserter(evaluated));
 
       //TL::TypeRegistry& registry = interpreter.typeRegistry();
-
-      BOOST_FOREACH(ValueContextPair& p, evaluated) {
+      #if 0
+      BOOST_FOREACH(ValueContextPair& p, evaluated)
+      {
          const TL::TypedValue& v = p.first;
          std::cout << "type index: " << v.index() << std::endl;
          switch (v.index()) {
@@ -123,7 +124,7 @@ int main(int argc, char *argv[]) {
          TL::tuple_t k;
          k[TL::DIM_ID] = TL::generate_string("PRINT");
          k[TL::DIM_VALUE] = p.first;
-         TL::TypedValue s = interpreter(TL::Tuple(k)).first;
+         TL::TypedValue s = system(TL::Tuple(k)).first;
          if (s.index() != TL::TYPE_INDEX_USTRING) {
             //std::cout << "oops";
          } else {
@@ -132,6 +133,7 @@ int main(int argc, char *argv[]) {
          std::cout << std::endl;
          #endif
       }
+      #endif
    }
 
    return evaluate ? 0 : 1;

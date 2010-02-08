@@ -29,13 +29,13 @@ namespace TransLucid {
          template <typename OutputIterator>
          void evaluateSystem(OutputIterator out);
 
+         void addLibrarySearchPath(const std::string& path);
+
          private:
          void addParsedEquationSet(const Parser::equation_v& eqns);
          void setClock(const Parser::equation_v& equations);
 
          bool parseFile(const ustring_t& file, FileType type);
-
-         void addLibrarySearchPath();
 
          mpz_class m_maxClock;
 

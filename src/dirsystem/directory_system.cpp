@@ -217,6 +217,10 @@ void DirectorySystem::setClock(const Parser::equation_v& equations) {
    }
 }
 
+void DirectorySystem::addLibrarySearchPath(const std::string& path) {
+   m_lt.addSearchPath(path);
+}
+
 }
 
 }
