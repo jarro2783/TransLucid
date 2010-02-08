@@ -1,5 +1,3 @@
-#if 0
-
 #include "directory_system.hpp"
 #include <tl/parser_fwd.hpp>
 #include <glibmm/miscutils.h>
@@ -15,7 +13,8 @@ namespace DirectoryParser {
 
 //namespace Spirit = Parser::Spirit;
 
-class DirectoryGrammar : public Spirit::grammar<DirectoryGrammar> {
+#if 0
+class DirectoryGrammar : public qi::grammar<DirectoryGrammar> {
    public:
 
    FileType fileType;
@@ -69,110 +68,131 @@ class DirectoryGrammar : public Spirit::grammar<DirectoryGrammar> {
       Parser::HeaderGrammar headerGrammar;
    };
 };
+#endif
 
 DirectorySystem::DirectorySystem()
-: m_compiler(*this)
+: m_compiler(m_interpreter), m_header_parser(m_header), m_expr_parser(m_header)
 {
-   m_grammar = new DirectoryGrammar(m_parseInfo, m_parsers, m_equationAdder);
-   #ifdef BOOST_SPIRIT_DEBUG
-   BOOST_SPIRIT_DEBUG_GRAMMAR(*m_grammar);
-   #endif
+   m_expr_parser.set_context_perturb(m_tuple_parser);
+   m_tuple_parser.(m_expr_parser);
 }
 
-bool DirectorySystem::parseSystem(const ustring_t& path) {
+bool DirectorySystem::parseSystem(const ustring_t& path)
+{
 
-   bool success = true;
+  bool success = true;
 
-   std::string pathl = Glib::filename_from_utf8(path);
+  std::string pathl = Glib::filename_from_utf8(path);
 
-   typedef std::list<std::pair<std::string, DirectoryParser::FileType> > FileList;
-   FileList files;
-   files.push_back(std::make_pair(
-      Glib::build_filename(pathl, "header"), HEADER));
-   files.push_back(std::make_pair(
-      Glib::build_filename(pathl, "clock"), CLOCK));
-   //files.push_back(std::make_pair(
-   //   Glib::build_filename(pathl, "structure"), STRUCTURE));
-   files.push_back(std::make_pair(
-      Glib::build_filename(pathl, "eqns"), EQNS));
-   files.push_back(std::make_pair(
-      Glib::build_filename(pathl, "demands"), DEMANDS));
+  typedef std::list<std::pair<std::string, DirectoryParser::FileType> > FileList;
+  FileList files;
+  files.push_back(std::make_pair(
+    Glib::build_filename(pathl, "header"), HEADER));
+  files.push_back(std::make_pair(
+    Glib::build_filename(pathl, "clock"), CLOCK));
+  files.push_back(std::make_pair(
+    Glib::build_filename(pathl, "eqns"), EQNS));
+  files.push_back(std::make_pair(
+    Glib::build_filename(pathl, "demands"), DEMANDS));
 
-   for (FileList::iterator iter = files.begin();
-         iter != files.end() && success;
-         ++iter)
-   {
-      Parser::EquationHolder eHolder(m_equationAdder);
+  std::wstring headerText = L"dimension<test>;;";
 
-      std::string file;
-      try {
-         file = iter->first;
+  for (FileList::iterator iter = files.begin();
+    iter != files.end() && success;
+    ++iter)
+  {
+      //Parser::EquationHolder eHolder(m_equationAdder);
 
-         //if (parseString(contents, type, file)) {
-         if (parseFile(file, iter->second)) {
-            if (m_verbose) {
-               std::clog << "successfully parsed " << file << std::endl;
-            }
-            switch (iter->second) {
-               case HEADER:
-               addDimensions();
-               BOOST_FOREACH(const ustring_t& s, m_parseInfo.libraries) {
-                  loadLibrary(s);
-               }
-               break;
+    switch (iter->second)
+    {
+      case HEADER:
+      qi::phrase_parse
+      (
+        headerText.begin(),
+        headerText.end(),
+        m_header,
+        SkipGrammar<Parser::iterator_t>()
+      );
 
-               case CLOCK:
-               setClock(eHolder.equations());
-               break;
-
-               case EQNS:
-               case DEMANDS:
-               //demands and equations are the same thing
-               {
-                  size_t dim_id = DIM_ID;
-                  size_t dim_valid = get_dimension_index(this, "_validguard");
-                  BOOST_FOREACH(const Parser::equation_t& e, eHolder.equations())
-                  {
-                     tuple_t k;
-                     k.insert(std::make_pair(dim_id,
-                        TypedValue(String(std::get<0>(e)),
-                           TYPE_INDEX_USTRING)));
-
-                     //need to compile the guard
-                     HD *guardTuple = m_compiler.compile(std::get<0>(std::get<1>(e)));
-                     HD *guardBool = m_compiler.compile(std::get<1>(std::get<1>(e)));
-                     k.insert(std::make_pair(dim_valid,
-                        TypedValue(EquationGuardType(EquationGuard(guardTuple, guardBool)),
-                           TYPE_INDEX_GUARD)));
-
-                     HD *h = m_compiler.compile(std::get<2>(e));
-                     addExpr(Tuple(k), h);
-                  }
-               }
-               break;
-
-               default:
-               throw InternalError(
-                  __FILE__ ": Interpreter::parseSystem() line: "
-                  STRING_(__LINE__)
-                  " should not have been reached");
-            }
-
-            cleanupParserObjects();
-         } else {
-            success = false;
-            std::cerr << "failed parsing " << file << std::endl;
-         }
-      } catch (Glib::FileError& e) {
-         std::cerr << e.what() << std::endl;
-         ++m_parseInfo.errorCount;
-         success = false;
-      } catch (Glib::ConvertError& e) {
-         std::cerr << "convert error reading " << file << std::endl;
+      case EQNS:
+      case DEMANDS:
+      {
+        std::vector<Parser::ParsedEquation> eqns;
       }
-   }
+    }
 
-   return success;
+    #if 0
+    std::string file;
+    try {
+      file = iter->first;
+
+       //if (parseString(contents, type, file)) {
+      if (parseFile(file, iter->second)) {
+        if (m_verbose) {
+          std::clog << "successfully parsed " << file << std::endl;
+        }
+        switch (iter->second)
+        {
+          case HEADER:
+          addDimensions();
+          BOOST_FOREACH(const ustring_t& s, m_parseInfo.libraries) {
+            loadLibrary(s);
+          }
+          break;
+
+          case CLOCK:
+          setClock(eHolder.equations());
+          break;
+
+          case EQNS:
+          case DEMANDS:
+          //demands and equations are the same thing
+          {
+            size_t dim_id = DIM_ID;
+            size_t dim_valid = get_dimension_index(this, "_validguard");
+            BOOST_FOREACH(const Parser::equation_t& e, eHolder.equations())
+            {
+              tuple_t k;
+              k.insert(std::make_pair(dim_id,
+              TypedValue(String(std::get<0>(e)),
+                         TYPE_INDEX_USTRING)));
+
+              //need to compile the guard
+              HD *guardTuple = m_compiler.compile(std::get<0>(std::get<1>(e)));
+              HD *guardBool = m_compiler.compile(std::get<1>(std::get<1>(e)));
+              k.insert(std::make_pair(dim_valid,
+                TypedValue(EquationGuardType(EquationGuard(guardTuple, guardBool)),
+                TYPE_INDEX_GUARD)));
+
+                HD *h = m_compiler.compile(std::get<2>(e));
+                addExpr(Tuple(k), h);
+            }
+          }
+          break;
+
+          default:
+          throw InternalError(
+            __FILE__ ": Interpreter::parseSystem() line: "
+            STRING_(__LINE__)
+            " should not have been reached");
+        }
+
+        cleanupParserObjects();
+      } else {
+        success = false;
+        std::cerr << "failed parsing " << file << std::endl;
+      }
+    } catch (Glib::FileError& e) {
+       std::cerr << e.what() << std::endl;
+       ++m_parseInfo.errorCount;
+       success = false;
+    } catch (Glib::ConvertError& e) {
+       std::cerr << "convert error reading " << file << std::endl;
+    }
+    #endif
+  }
+
+  return success;
 }
 
 bool DirectorySystem::parseFile(const ustring_t& file, FileType type) {
@@ -224,5 +244,3 @@ void DirectorySystem::addLibrarySearchPath(const std::string& path) {
 }
 
 }
-
-#endif

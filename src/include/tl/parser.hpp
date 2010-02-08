@@ -16,6 +16,7 @@
 #include <tl/parser_util.hpp>
 #include <tl/parser_fwd.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
+#include <boost/spirit/home/phoenix/object/construct.hpp>
 
 namespace TransLucid
 {
@@ -201,47 +202,58 @@ namespace TransLucid
       //AngleStringGrammar angle_string;
     };
 
+    typedef std::tuple<string_type, AST::Expr*, AST::Expr*, AST::Expr*>
+    ParsedEquation;
+
     template <typename Iterator>
-    class EquationGrammar : public qi::grammar<Iterator>
+    class EquationGrammar : public qi::grammar<Iterator, ParsedEquation()>
     {
-      Header& header;
-      EquationAdder& adder;
       public:
 
-      EquationGrammar(Header& header, EquationAdder& adder)
-      : EquationGrammar::base_type(equation),
-        header(header),
-        adder(adder)
+      EquationGrammar()
+      : EquationGrammar::base_type(equation)
       {
-        //context_perturb = self.parsers.tuple_parser.top();
-
-        ident =
-           (qi::alpha | "_")
-        >> *(qi::alnum | "_")
-        ;
+        using namespace qi::labels;
 
         equation =
           (
               ident
-           >> -((qi::char_('@') >> context_perturb) | qi::eps)
-           >> -((qi::char_('|') >> expr) | qi::eps)
+           >> guard
+           >> boolean
            >> '='
            >> expr
           )
+          [
+            _val = construct<Equation>(_1, _2, _3, _4)
+          ]
         ;
 
-         #warning need to redo how all the parsers are connected
-         //expr = self.parsers.expr_parser.top();
+        guard =
+          -((qi::lit('@') >> context_perturb[_val = _1]) | qi::eps[_val = 0]);
+
+        boolean = -((qi::lit('|') >> expr[_val = _1]) | qi::eps[_val = 0]);
+      }
+
+      template <typename T>
+      void
+      set_context_perturb(const T& t) {
+        context_perturb = t;
       }
 
       private:
 
-      qi::rule<Iterator>
-        equation,
-        context_perturb,
-        expr,
-        ident
+      qi::rule<Iterator, ParsedEquation()>
+        equation
       ;
+
+      qi::rule<Iterator, AST::Expr*()>
+        guard,
+        boolean,
+        context_perturb,
+        expr
+      ;
+
+      ident_parser<Iterator> ident;
     };
   }
 }

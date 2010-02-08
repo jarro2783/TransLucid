@@ -258,6 +258,8 @@ namespace TransLucid
       EquationAdder& m_adder;
       equation_v m_equations;
     };
+
+    typedef string_type::const_iterator iterator_t;
   }
 }
 

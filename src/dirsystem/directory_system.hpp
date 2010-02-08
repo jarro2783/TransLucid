@@ -6,6 +6,9 @@
 #include <tl/builtin_types.hpp>
 #include <tl/expr_compiler.hpp>
 #include <tl/utility.hpp>
+#include <tl/parser.hpp>
+#include <tl/tuple_parser.hpp>
+#include <tl/expr_parser.hpp>
 
 namespace TransLucid {
 
@@ -44,6 +47,13 @@ namespace TransLucid {
          ExprCompiler m_compiler;
 
          Libtool m_lt;
+
+         TransLucid::Interpreter m_interpreter;
+
+         Parser::HeaderGrammar<Parser::iterator_t> m_header_parser;
+         Parser::ExprGrammar<Parser::iterator_t> m_expr_parser;
+         Parser::TupleGrammar<Parser::iterator_t> m_tuple_parser;
+         Parser::Header m_header;
       };
 
       template <typename OutputIterator>
@@ -70,7 +80,7 @@ namespace TransLucid {
 
             //Equation e = findEquation("demand", c);
             //Variable *v = lookupVariable("demand");
-            *out = Interpreter::operator()(c);
+            *out = m_interpreter(c);
             #if 0
             Variable *v = 0;
 
