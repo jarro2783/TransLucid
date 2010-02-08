@@ -55,7 +55,7 @@ namespace TransLucid {
          //size_t dim_id = dimTranslator().lookup("id");
          size_t dim_id = DIM_ID;
          //TypedValue demandString(String("demand"), typeRegistry().indexString());
-         TypedValue demandString = generate_string("demand");
+         TypedValue demandString = generate_string(U"demand");
 
          //evaluate from time 1 to end
          for (size_t time = 1; time <= m_maxClock; ++time) {

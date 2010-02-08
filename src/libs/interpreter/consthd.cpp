@@ -4,14 +4,31 @@
 
 namespace TransLucid {
 
+namespace {
+
+   std::string u32_to_ascii(const u32string& s) {
+      std::string r;
+
+      BOOST_FOREACH(char32_t c, s) {
+         if (c > 0x7F) {
+            throw "character not ascii";
+         } else {
+            r += c;
+         }
+      }
+      return r;
+   }
+
+}
+
 namespace ConstHD {
 
-const char *UChar::name =     "uchar";
-const char *Intmp::name =     "intmp";
-const char *UString::name =   "ustring";
+const char32_t *UChar::name =     U"uchar";
+const char32_t *Intmp::name =     U"intmp";
+const char32_t *UString::name =   U"ustring";
 
 TaggedValue UChar::operator()(const Tuple& k) {
-   size_t valueindex = get_dimension_index(m_system, "text");
+   size_t valueindex = get_dimension_index(m_system, U"text");
    Tuple::const_iterator value = k.find(valueindex);
 
    if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING) {
@@ -19,7 +36,7 @@ TaggedValue UChar::operator()(const Tuple& k) {
          TYPE_INDEX_SPECIAL), k);
    }
 
-   const ustring_t& s = value->second.value<String>().value();
+   const u32string& s = value->second.value<String>().value();
    //return TaggedValue(m_i.typeRegistry().findType("uchar")->parse(s.value(), k, m_i), k);
    if (s.length() != 1) {
       return TaggedValue(TypedValue(Special(Special::CONST), TYPE_INDEX_SPECIAL), k);
@@ -35,9 +52,14 @@ TaggedValue Intmp::operator()(const Tuple& k) {
          TYPE_INDEX_SPECIAL), k);
    }
 
-   return TaggedValue(TypedValue(TransLucid::Intmp(
-         mpz_class(value->second.value<String>().value().raw())),
-      TYPE_INDEX_INTMP), k);
+   try {
+      return TaggedValue(TypedValue(TransLucid::Intmp(
+         mpz_class(u32_to_ascii(value->second.value<String>().value())) ),
+         TYPE_INDEX_INTMP), k);
+   } catch (...) {
+      return TaggedValue(TypedValue(Special(Special::CONST),
+         TYPE_INDEX_SPECIAL), k);
+   }
 }
 
 TaggedValue UString::operator()(const Tuple& k) {

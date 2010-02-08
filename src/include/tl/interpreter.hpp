@@ -44,12 +44,12 @@ namespace TransLucid {
       Interpreter();
       virtual ~Interpreter();
 
-      typedef std::map<ustring_t, HD*> IOList;
+      typedef std::map<u32string, HD*> IOList;
 
       void addOutput(const IOList& output);
       void addInput(const IOList& input);
 
-      void addDemand(const ustring_t& id, const EquationGuard& guard);
+      void addDemand(const u32string& id, const EquationGuard& guard);
 
       void tick();
 
@@ -89,7 +89,7 @@ namespace TransLucid {
       size_t registerDimension(const ustring_t& name);
       #endif
 
-      void registerEquation(const ustring_t& name,
+      void registerEquation(const u32string& name,
          const Tuple& validContext,
          AST::Expr *e);
 
@@ -119,16 +119,6 @@ namespace TransLucid {
       }
       #endif
 
-      void listVariables() {
-         BOOST_FOREACH(const VariableMap::value_type& v, m_variables) {
-            std::cout << v.first << std::endl;
-         }
-      }
-
-      LazyWarehouse& warehouse() {
-         return m_warehouse;
-      }
-
       TaggedValue operator()(const Tuple& k);
 
       void addExpr(const Tuple& k, HD *h);
@@ -141,7 +131,7 @@ namespace TransLucid {
       //Evaluator m_evaluator;
       DimensionTranslator m_dimTranslator;
       mpz_class m_maxClock;
-      LazyWarehouse m_warehouse;
+      //LazyWarehouse m_warehouse;
 
       size_t m_time;
 
@@ -156,7 +146,7 @@ namespace TransLucid {
       IOList m_outputs;
       IOList m_inputs;
 
-      typedef std::map<ustring_t, EquationGuard> DemandStore;
+      typedef std::map<u32string, EquationGuard> DemandStore;
       DemandStore m_demands;
 
       //everything related to the parser
@@ -177,13 +167,13 @@ namespace TransLucid {
       VariableMap m_variables;
 
       //adds to id with remaining in the id dimension
-      void addToVariable(const ustring_t& id, const ustring_t& remaining,
+      void addToVariable(const u32string& id, const u32string& remaining,
          const Tuple& k, HD *e);
       //adds to id removing id from the context
-      void addToVariable(const ustring_t& id,
+      void addToVariable(const u32string& id,
          const Tuple& k, HD *e);
       //does the actual add
-      void addToVariableActual(const ustring_t& id,
+      void addToVariableActual(const u32string& id,
          const Tuple& k, HD *e);
 
       template <typename T>
@@ -192,7 +182,7 @@ namespace TransLucid {
       void addDimensionSymbol(const ustring_t& s);
 
       //map builtin types to type indexes
-      std::map<ustring_t, size_t> builtin_name_to_index;
+      std::map<u32string, size_t> builtin_name_to_index;
 
       protected:
 

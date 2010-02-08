@@ -139,8 +139,8 @@ void Variable::addExpr(const Tuple& k, HD *e) {
       SplitID split(id->value());
 
       //add the equation, don't add any id dimension if the end is empty
-      ustring_t begin = split.first();
-      ustring_t end = split.last();
+      u32string begin = split.first();
+      u32string end = split.last();
 
       tuple_t kp = k.tuple();
       if (end.size() != 0) {

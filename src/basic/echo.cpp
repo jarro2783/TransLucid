@@ -27,7 +27,7 @@ class Sender : public HD {
 
    private:
    static const int BUF_SIZE = 1000;
-   char m_buf[BUF_SIZE];
+   char32_t m_buf[BUF_SIZE];
 };
 
 TaggedValue Receiver::operator()(const Tuple& k) {
@@ -40,8 +40,8 @@ void Receiver::addExpr(const Tuple& k, HD *h) {
 }
 
 TaggedValue Sender::operator()(const Tuple& k) {
-   std::cin.getline(m_buf, BUF_SIZE);
-   return TaggedValue(TypedValue(String(m_buf), TYPE_INDEX_USTRING), k);
+   //std::cin.getline(m_buf, BUF_SIZE);
+   //return TaggedValue(TypedValue(String(m_buf), TYPE_INDEX_USTRING), k);
 }
 
 void Sender::addExpr(const Tuple& k, HD *h) {
@@ -53,21 +53,21 @@ int main(int argc, char *argv[]) {
    Receiver r;
    Sender s;
 
-   i.addOutput(map_list_of("out", &r));
-   i.addInput(map_list_of("keyboard", &s));
+   i.addOutput(map_list_of(U"out", &r));
+   i.addInput(map_list_of(U"keyboard", &s));
 
-   i.addDemand("out", EquationGuard());
+   i.addDemand(U"out", EquationGuard());
 
    //set out = keyboard
-   CompiledFunctors::Ident ident(&i, "keyboard");
-   tuple_t context = map_list_of(size_t(DIM_ID), generate_string("out"))
-   (get_dimension_index(&i, "_validguard"), TypedValue(EquationGuardType(EquationGuard()), TYPE_INDEX_GUARD));
+   CompiledFunctors::Ident ident(&i, U"keyboard");
+   tuple_t context = map_list_of(size_t(DIM_ID), generate_string(U"out"))
+   (get_dimension_index(&i, U"_validguard"), TypedValue(EquationGuardType(EquationGuard()), TYPE_INDEX_GUARD));
    i.addExpr(Tuple(context), &ident);
 
    while (true) {
       i.tick();
       TaggedValue result = r(Tuple());
-      std::cout << result.first.value<String>().value() << std::endl;
+      //std::cout << result.first.value<String>().value() << std::endl;
    }
 
    return 0;

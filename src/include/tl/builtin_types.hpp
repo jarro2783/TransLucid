@@ -144,22 +144,22 @@ namespace TransLucid {
 
    class String : public TypedValueBase {
       public:
-      String(const ustring_t& s)
+      String(const u32string& s)
       : m_s(s)
       {
       }
 
       size_t hash() const {
-         boost::hash<ustring_t> hasher;
+         boost::hash<u32string> hasher;
          return hasher(m_s);
       }
 
-      static String parse(const ustring_t& text) {
+      static String parse(const u32string& text) {
          return String(text);
       }
 
       void print(std::ostream& os, const Tuple& c) const {
-         os << m_s;
+         //os << m_s;
       }
 
       bool operator==(const String& rhs) const {
@@ -170,12 +170,12 @@ namespace TransLucid {
          return m_s < rhs.m_s;
       }
 
-      const ustring_t& value() const {
+      const u32string& value() const {
          return m_s;
       }
 
       private:
-      ustring_t m_s;
+      u32string m_s;
    };
 
    class Boolean : public TypedValueBase {

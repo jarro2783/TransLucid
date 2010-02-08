@@ -66,12 +66,14 @@ AST::Data *ExprCompiler::visitBooleanExpr(AST::BooleanExpr* e, AST::Data*) {
 }
 
 AST::Data *ExprCompiler::visitBuildTupleExpr(AST::BuildTupleExpr* e, AST::Data*) {
-   std::list<HD*> pairs;
+   std::list<std::pair<HD*, HD*>> pairs;
 
-   BOOST_FOREACH(AST::Expr *pe, e->values) {
-      Compiled *c = dynamic_cast<Compiled*>(pe->visit(this, 0));
-      pairs.push_back(c->e);
-      delete c;
+   BOOST_FOREACH(auto& pe, e->values) {
+      Compiled *cl = dynamic_cast<Compiled*>(pe.first->visit(this, 0));
+      Compiled *cr = dynamic_cast<Compiled*>(pe.second->visit(this, 0));
+      pairs.push_back(std::make_pair(cl->e, cr->e));
+      delete cl;
+      delete cr;
    }
 
    return new Compiled(new CompiledFunctors::BuildTuple(m_i, pairs));

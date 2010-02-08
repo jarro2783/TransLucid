@@ -8,8 +8,11 @@
 #include <boost/spirit/include/qi_auxiliary.hpp>
 
 #include <boost/spirit/home/phoenix/object/new.hpp>
+#include <boost/spirit/home/phoenix/object/construct.hpp>
 #include <boost/spirit/home/phoenix/function/function.hpp>
 #include <boost/spirit/home/phoenix/container.hpp>
+#include <boost/spirit/home/phoenix/bind/bind_function.hpp>
+#include <boost/spirit/home/phoenix/statement/sequence.hpp>
 
 namespace TransLucid {
 
@@ -30,9 +33,22 @@ namespace TransLucid {
          {
             return std::u32string(arg1.begin(), arg1.end());
          }
+
+         std::u32string operator()(const u32string& arg1) const
+         {
+            return arg1;
+         }
       };
 
       function<make_u32string_impl> make_u32string;
+
+      char_type get_end_char(const Delimiter& d) {
+         return d.end;
+      }
+
+      string_type get_name(const Delimiter& d) {
+         return d.type;
+      }
 
       template <typename Iterator>
       class ExprGrammar : public qi::grammar<Iterator, AST::Expr*()> {
@@ -83,33 +99,48 @@ namespace TransLucid {
 
             //the actions have to be put after the optional with | eps
             at_expr = binary_op [_a = _1]
-               >> -('@' >> at_expr)
+               >> (-('@' >> at_expr)
                [
                   _val = new_<AST::AtExpr>(_a, _1)
                ]
                | qi::eps [_val = _a]
+               )
             ;
 
-            binary_op = prefix_expr [_val = _1]
-            #warning work out how to do binary ops
-            #if 0
-               >> *(header.binary_op_symbols
-               >> prefix_expr
+            binary_op = prefix_expr [_a = _1]
+               >> (*(header.binary_op_symbols
+               >> prefix_expr)
+                  [
+                     _a = ph::bind(&insert_binary_operation, _1, _a, _2)
+                  ]
                )
-            #endif
+               [
+                  _val = _a
+               ]
             ;
 
             prefix_expr
-               = //(header.prefix_op_symbols >> postfix_expr)
-               postfix_expr [_val = _1]
+               = (header.prefix_op_symbols >> postfix_expr)
+               [
+                  _val = new_<AST::UnaryExpr>(_1, _2)
+               ]
+               | postfix_expr [_val = _1]
                ;
 
-            postfix_expr = hash_expr [_val = _1]
-               //>> -header.postfix_op_symbols
+            postfix_expr = hash_expr [_a = _1]
+               >> (-(header.postfix_op_symbols
+                     [
+                        _val = new_<AST::UnaryExpr>(_1, _a)
+                     ])
+                  | qi::eps
+                  [
+                     _val = _a
+                  ]
+                  )
                ;
 
             hash_expr = ('#' > hash_expr [_val = new_<AST::HashExpr>(_1)])
-            | primary_expr [_val = _1]
+               | primary_expr [_val = _1]
             //| primary_expr
             ;
 
@@ -122,47 +153,39 @@ namespace TransLucid {
                   //   at(ph::ref(header.dimension_names), _1))
                   _val = new_<AST::DimensionExpr>(make_u32string(_1))
                ]
-               #if 0
-               #warning make this a utility parser
-               | ((qi::alpha | "_") >> *(qi::alnum | "_"))
-               #warning make a utility parser which does backslash escaping
-               >> (angle_string | qi::eps )
+               | ident [_a = _1]
+               >> (angle_string
+                  [
+                     _val = new_<AST::ConstantExpr>(make_u32string(_a), make_u32string(_1))
+                  ]
+                  | qi::eps
+                  [
+                     _val = new_<AST::IdentExpr>(make_u32string(_a))
+                  ]
+                  )
                //| self.header.equation_symbols [
                //   push_front(ph::ref(expr_stack), new_<AST::IdentExpr>(
                //      at(ph::ref(self.header.equation_names), arg1))
                //   )
                //]
                //|   constant
-               |   context_perturb
-               |   ('(' >> expr > ')') [_val = _1]
-               #if 0
-               |   (Spirit::confix_p( self.header.delimiter_start_symbols
-               [
-                  push_front(ph::ref(string_stack),
-                     bind(&getDelimiterType,
-                        at(ph::ref(self.header.delimiter_info), arg1)
+               | context_perturb [_val = _1]
+               | ('(' >> expr > ')') [_val = _1]
+               | header.delimiter_start_symbols
+                  [
+                     _b = _1,
+                     _a = construct<string_type>()
+                     //_val = new_<AST::ConstantExpr>(U"a", U"b")
+                  ]
+                  >> (
+                        *(qi::standard_wide::char_ - end_delimiter(ph::bind(&get_end_char, _b)))
+                        [_a += _1]
                      )
-                  ),
-                  bind(&setEndDelimiter, at(ph::ref(self.header.delimiter_info), arg1),
-                     ph::ref(endDelimiter))
-               ]
-               , (*Spirit::anychar_p)
-               [
-                  push_front(ph::ref(string_stack), construct<wstring_t>(arg1, arg2))
-               ]
-               ,  Spirit::ch_p(boost::ref(endDelimiter)) )
-               )
-               [
-                  push_front(ph::ref(expr_stack), new_<AST::ConstantExpr>(
-                     at(ph::ref(string_stack), 1),
-                     at(ph::ref(string_stack), 0)
-                     )),
-                  pop_front_n<2>()(ph::ref(string_stack))
-               ]
-               #endif
-               #warning work out how to do delimiters
-               #endif
-               ;
+                     [
+                        _val = new_<AST::ConstantExpr>(make_u32string(ph::bind(get_name, _b)), make_u32string(_1))
+                     ]
+                  >> end_delimiter(ph::bind(get_end_char, _b))
+            ;
 
             boolean = (qi::ascii::string("true") | qi::ascii::string("false"))
             [
@@ -176,78 +199,48 @@ namespace TransLucid {
             ]
             ;
 
+            end_delimiter = qi::standard_wide::char_(_r1);
+
             //constant = self.parsers.constant_parser.top();
 
             #warning need to fix the modules up here
             //context_perturb = parsers.tuple_parser.top();
-
-            angle_string =
-               (qi::ascii::char_('<') >> *(qi::ascii::char_ - '>') >> qi::ascii::char_('>'))
-               [
-                  _val = _1
-               ]
-            ;
-
-            #if 0
-            BOOST_SPIRIT_DEBUG_NODE(integer);
-            BOOST_SPIRIT_DEBUG_NODE(boolean);
-            //BOOST_SPIRIT_DEBUG_NODE(constant);
-            BOOST_SPIRIT_DEBUG_NODE(primary_expr);
-            BOOST_SPIRIT_DEBUG_NODE(hash_expr);
-            BOOST_SPIRIT_DEBUG_NODE(postfix_expr);
-            BOOST_SPIRIT_DEBUG_NODE(prefix_expr);
-            #endif
          }
 
          private:
-         qi::rule<Iterator, AST::Expr*()> expr,
-         if_expr,
-         binary_op,
-         boolean,
-         range_expr,
-         integer,
-         postfix_expr,
-         prefix_expr,
-         hash_expr,
-         primary_expr
-         ;
 
-         qi::rule<Iterator, AST::Expr*(), qi::locals<AST::Expr*>>
-            at_expr
-         ;
+         char_type end;
 
-         qi::rule<Iterator>
-            //constant,
+         qi::rule<Iterator, AST::Expr*()>
+            expr,
+            if_expr,
+            boolean,
+            range_expr,
+            integer,
+            prefix_expr,
+            hash_expr,
             context_perturb
          ;
 
-         qi::rule<Iterator, string_type>
-            angle_string
+         qi::rule<Iterator, void(char_type)>
+            end_delimiter
+         ;
+
+         qi::rule<Iterator, AST::Expr*(), qi::locals<AST::Expr*>>
+            postfix_expr,
+            at_expr,
+            binary_op
+         ;
+
+         qi::rule<Iterator, AST::Expr*(), qi::locals<string_type, Delimiter>>
+            primary_expr
          ;
 
          integer_parser<Iterator> integer_grammar;
+         escaped_string_parser<Iterator> angle_string;
+         ident_parser<Iterator> ident;
 
-         //std::deque<size_t> op_stack;
-         //std::deque<AST::Expr*>& expr_stack;
-         //std::deque<wstring_t>& string_stack;
-         //std::deque<std::list<AST::Expr*> > list_stack;
-
-         //errors
-         #warning work out how to do error checking
-         #if 0
-         Spirit::assertion<ParseErrorType>
-         expect_fi,
-         expect_else,
-         expect_colon,
-         expect_primary,
-         expect_close_paren,
-         expect_then
-         ;
-         #endif
-
-         wchar_t endDelimiter;
-
-         //AngleStringGrammar angle_string;
+         #warning error checking
       };
 
    }

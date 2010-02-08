@@ -24,7 +24,7 @@ namespace TransLucid {
 
       class UChar : public ConstantHD {
          public:
-         static const char *name;
+         static const char32_t *name;
 
          UChar(HD *system)
          : ConstantHD(system)
@@ -35,7 +35,7 @@ namespace TransLucid {
 
       class Intmp : public ConstantHD {
          public:
-         static const char *name;
+         static const char32_t *name;
 
          Intmp(HD *system)
          : ConstantHD(system)
@@ -48,7 +48,7 @@ namespace TransLucid {
 
       class UString : public ConstantHD {
          public:
-         static const char *name;
+         static const char32_t *name;
 
          UString(HD *system)
          : ConstantHD(system)

@@ -7,18 +7,18 @@ namespace TransLucid {
 DimensionTranslator::DimensionTranslator()
 : m_nextIndex(RESERVED_INDEX_LAST),
 m_namedDims({
-{"type", DIM_TYPE},
-{"text", DIM_TEXT},
-{"name", DIM_NAME},
-{"id", DIM_ID},
-{"value", DIM_VALUE},
-{"time", DIM_TIME},
-{"_validguard", DIM_VALID_GUARD}
+   {U"type", DIM_TYPE},
+   {U"text", DIM_TEXT},
+   {U"name", DIM_NAME},
+   {U"id", DIM_ID},
+   {U"value", DIM_VALUE},
+   {U"time", DIM_TIME},
+   {U"_validguard", DIM_VALID_GUARD}
 })
 {
 }
 
-size_t DimensionTranslator::lookup(const ustring_t& name) {
+size_t DimensionTranslator::lookup(const u32string& name) {
    std::pair<ustring_size_map::iterator,bool> result =
       m_namedDims.insert(std::make_pair(name, m_nextIndex));
    if (result.second) {

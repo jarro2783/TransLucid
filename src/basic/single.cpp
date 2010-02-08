@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
    TL::Interpreter i;
    HD& h = i;
 
-   TL::Variable x("x", i);
+   TL::Variable x(U"x", i);
    TL::ConstHD::IntmpConst i1(5);
    TL::Tuple k;
    x.addExpr(k, &i1);
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
    //set up the context for addExpr
    tuple_t k2;
-   k2[get_dimension_index(&h, "_validguard")] =
+   k2[get_dimension_index(&h, U"_validguard")] =
       TypedValue(EquationGuardType(EquationGuard(Tuple(guard))),
                  TYPE_INDEX_GUARD);
 

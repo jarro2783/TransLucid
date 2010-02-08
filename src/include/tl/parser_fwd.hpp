@@ -83,6 +83,8 @@ namespace TransLucid {
 
       struct BinaryOperation {
 
+         BinaryOperation() = default;
+
          BinaryOperation(
             InfixAssoc assoc,
             const std::u32string& op,
@@ -108,6 +110,8 @@ namespace TransLucid {
 
       struct UnaryOperation {
 
+         UnaryOperation() = default;
+
          UnaryOperation(
             const ustring_t& op,
             const ustring_t& symbol,
@@ -125,6 +129,9 @@ namespace TransLucid {
       };
 
       struct Delimiter {
+
+         Delimiter() = default;
+
          Delimiter(
             const string_type& type,
             char_type start,
@@ -141,6 +148,9 @@ namespace TransLucid {
          char_type end;
       };
 
+      typedef qi::symbols<char_type, UnaryOperation> unary_symbols;
+      typedef qi::symbols<char_type, BinaryOperation> binary_symbols;
+
       struct Header {
 
          Header()
@@ -149,24 +159,25 @@ namespace TransLucid {
          }
          int errorCount;
 
-         std::vector<ustring_t> dimension_names;
          symbols_t dimension_symbols;
 
          std::vector<ustring_t> equation_names;
          symbols_t equation_symbols;
 
-         symbols_t binary_op_symbols;
-         std::vector<BinaryOperation> binary_op_info;
+         binary_symbols binary_op_symbols;
+         //std::vector<BinaryOperation> binary_op_info;
 
-         symbols_t prefix_op_symbols;
-         symbols_t postfix_op_symbols;
-         std::vector<UnaryOperation> unary_op_info;
+         unary_symbols prefix_op_symbols;
+         unary_symbols postfix_op_symbols;
+         //std::vector<UnaryOperation> unary_op_info;
 
          qi::symbols<char_type, Delimiter> delimiter_start_symbols;
+
          std::vector<Delimiter> delimiter_info;
 
          std::vector<ustring_t> libraries;
 
+         #if 0
          bool operator==(const Header& rhs) const {
             return dimension_names == rhs.dimension_names &&
                equation_names == rhs.equation_names &&
@@ -175,6 +186,7 @@ namespace TransLucid {
                delimiter_info == rhs.delimiter_info
             ;
          }
+         #endif
       };
 
       AST::Expr *insert_binary_operation(

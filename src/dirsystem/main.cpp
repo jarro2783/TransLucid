@@ -9,6 +9,7 @@
 #include <tl/utility.hpp>
 #include <string>
 #include <tl/parser.hpp>
+#include <tl/tuple_parser.hpp>
 
 namespace TL = TransLucid;
 namespace po = boost::program_options;
@@ -20,6 +21,7 @@ int main(int argc, char *argv[]) {
    //TL::Parser::ExprGrammar<std::u32string::const_iterator> parser(h);
    TL::Parser::ExprGrammar<TL::Parser::string_type::const_iterator> parser(h);
    //TL::Parser::ExprGrammar<std::string::const_iterator> parser(h);
+   TL::Parser::TupleGrammar<TL::Parser::string_type::const_iterator> tuple;
 
    #if 0
    using boost::assign::list_of;

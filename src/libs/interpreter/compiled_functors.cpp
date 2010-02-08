@@ -14,7 +14,7 @@ template <typename T, typename V>
 inline void contextInsert(
    tuple_t& k,
    HD *h,
-   const ustring_t& dim,
+   const u32string& dim,
    const V& value,
    size_t index)
 {
@@ -24,7 +24,7 @@ inline void contextInsert(
 inline void contextInsert(
    tuple_t& k,
    Interpreter& i,
-   const ustring_t& dim,
+   const u32string& dim,
    const TypedValue& v)
 {
    k[get_dimension_index(&i, dim)] = v;
@@ -39,7 +39,7 @@ class TupleInserter {
    }
 
    template <typename V>
-   const TupleInserter<T>& operator()(const ustring_t& dim, const V& v) const {
+   const TupleInserter<T>& operator()(const u32string& dim, const V& v) const {
       m_k[get_dimension_index(m_h, dim)] = TypedValue(T(v), m_index);
       return *this;
    }
@@ -86,9 +86,9 @@ TaggedValue BoolConst::operator()(const Tuple& k) {
    //   TypedValue(TransLucid::Boolean(m_value), i.typeRegistry().indexBoolean()), Tuple()));
    tuple_t kp = k.tuple();
    insert_tuple<String>(kp, &m_system, TYPE_INDEX_USTRING)
-      ("id", "CONST")
-      ("type", "bool")
-      ("text", m_value ? "true" : "false")
+      (U"id", U"CONST")
+      (U"type", U"bool")
+      (U"text", m_value ? U"true" : U"false")
    ;
 
    return m_system(Tuple(kp));
@@ -96,19 +96,15 @@ TaggedValue BoolConst::operator()(const Tuple& k) {
 
 TaggedValue BuildTuple::operator()(const Tuple& k) {
    tuple_t kp;
-   BOOST_FOREACH(HD* h, m_elements) {
-      TaggedValue v = (*h)(k);
-      if (v.first.index() != TYPE_INDEX_PAIR) {
-         return TaggedValue(TypedValue(Special(Special::TYPEERROR),
-            TYPE_INDEX_SPECIAL), k);
-      } else {
-         const PairType& p = v.first.value<PairType>();
+   BOOST_FOREACH(auto& pair, m_elements) {
+      //const PairType& p = v.first.value<PairType>();
+      TaggedValue left = (*pair.first)(k);
+      TaggedValue right = (*pair.second)(k);
 
-         if (p.first().index() == TYPE_INDEX_DIMENSION) {
-            kp[p.first().value<TransLucid::Dimension>().value()] = p.second();
-         } else {
-            kp[get_dimension_index(&m_system, p.first())] = p.second();
-         }
+      if (left.first.index() == TYPE_INDEX_DIMENSION) {
+         kp[left.first.value<TransLucid::Dimension>().value()] = right.first;
+      } else {
+         kp[get_dimension_index(&m_system, left.first)] = right.first;
       }
    }
    return TaggedValue(TypedValue(Tuple(kp), TYPE_INDEX_TUPLE), k);
@@ -123,9 +119,9 @@ TaggedValue Constant::operator()(const Tuple& k) {
    //contextInsertString(kp, m_system, "type", m_type, indexString);
    //contextInsertString(kp, m_system, "text", m_text, indexString);
    insert_tuple<String>(kp, &m_system, TYPE_INDEX_USTRING)
-      ("id", "CONST")
-      ("type", m_type)
-      ("text", m_text)
+      (U"id", U"CONST")
+      (U"type", m_type)
+      (U"text", m_text)
    ;
 
    return m_system(Tuple(kp));
@@ -163,11 +159,10 @@ TaggedValue Hash::operator()(const Tuple& k) {
 }
 
 TaggedValue Ident::operator()(const Tuple& k) {
-   std::cout << "ident: " << m_name << std::endl;
    tuple_t kp = k.tuple();
 
    insert_tuple<String>(kp, m_system, TYPE_INDEX_USTRING)
-      ("id", m_name)
+      (U"id", m_name)
       ;
    return (*m_system)(Tuple(kp));
 }
@@ -222,10 +217,10 @@ TaggedValue Integer::operator()(const Tuple& k) {
    tuple_t kp = k.tuple();
    TupleInserter<String> inserter(kp, &m_system, TYPE_INDEX_USTRING);
    //contextInsert<String>(kp, m_system, "id", "DEFAULTINT", m_system.typeRegistry().indexString());
-   kp[DIM_ID] = generate_string("DEFAULTINT");
+   kp[DIM_ID] = generate_string(U"DEFAULTINT");
    //TaggedValue defaultint = m_system(Tuple(kp));
 
-   kp[DIM_TEXT] = generate_string(m_value.get_str(10));
+   kp[DIM_TEXT] = generate_string(to_u32string(m_value.get_str(10)));
 
    return m_system(Tuple(kp));
 
@@ -252,14 +247,14 @@ TaggedValue Operation::operator()(const Tuple& k) {
    tuple_t kp = k.tuple();
 
    TupleInserter<String> insert(kp, &m_system, TYPE_INDEX_USTRING);
-   insert("id", "FUN");
+   insert(U"id", U"FUN");
 
    int i = 0;
    std::ostringstream os;
    BOOST_FOREACH(HD *h, m_operands) {
       os.str("arg");
       os << i;
-      kp[get_dimension_index(h, os.str())] = (*h)(k).first;
+      kp[get_dimension_index(h, to_u32string(os.str()))] = (*h)(k).first;
       ++i;
    }
 

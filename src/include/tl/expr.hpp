@@ -129,21 +129,25 @@ namespace TransLucid {
       class BuildTupleExpr : public Expr {
          public:
 
-         BuildTupleExpr(const std::list<AST::Expr*>& l)
-         : values(l)
+         template <typename T>
+         BuildTupleExpr(const T& l)
          {
+            using boost::fusion::at_c;
+            BOOST_FOREACH(auto& v, l) {
+               values.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
+            }
          }
 
          Data *visit(Visitor *v, Data *data) {
             return v->visitBuildTupleExpr(this, data);
          }
 
-         std::list<AST::Expr*> values;
+         std::list<std::pair<AST::Expr*,AST::Expr*>> values;
       };
 
       class ConstantExpr : public Expr {
          public:
-         ConstantExpr(const ustring_t& name, const ustring_t& value)
+         ConstantExpr(const std::u32string& name, const std::u32string& value)
          : name(name), value(value)
          {
          }
@@ -152,8 +156,8 @@ namespace TransLucid {
             return v->visitConstantExpr(this, data);
          }
 
-         ustring_t name;
-         ustring_t value;
+         std::u32string name;
+         std::u32string value;
       };
 
       class DimensionExpr : public Expr {
@@ -187,7 +191,7 @@ namespace TransLucid {
 
       class IdentExpr : public Expr {
          public:
-         IdentExpr(const ustring_t& s)
+         IdentExpr(const u32string& s)
          : id(s)
          {
          }
@@ -196,7 +200,7 @@ namespace TransLucid {
             return visitor->visitIdentExpr(this, data);
          }
 
-         ustring_t id;
+         u32string id;
       };
 
       class IfExpr : public Expr {

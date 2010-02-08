@@ -4,7 +4,7 @@
 
 namespace TransLucid {
 
-const ustring_t SplitID::m_split_match = ".";
+const u32string SplitID::m_split_match = U".";
 
 bool tupleApplicable(const Tuple& def, const Tuple& c) {
    //all of def has to be in c, and the values have to either be

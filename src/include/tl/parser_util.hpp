@@ -154,29 +154,42 @@ namespace TransLucid {
          escaped_string_parser()
          : escaped_string_parser::base_type(string)
          {
-            string = '<' >> *(qi::char_ - '>') >> '>';
+            using namespace qi::labels;
+
+            string = '<' >>
+               (
+               *(escaped | (qi::standard_wide::char_ - '>'))
+                  [
+                     _val += _1
+                  ]
+               )
+               >> '>'
+            ;
+
+            escaped = ('\\' >> qi::standard_wide::char_) [_val = _1]
+            ;
          }
 
          private:
-         qi::rule<Iterator> string;
+         qi::rule<Iterator, string_type()>
+            string
+         ;
+
+         qi::rule<Iterator, char_type()>
+            escaped
+         ;
       };
 
-      struct ident_parser {
-         typedef std::u32string result_t;
-
-         template <typename Iterator, typename Context
-         , typename Skipper, typename Attribute>
-         bool parse(Iterator& first, Iterator const& last
-         , Context& context, Skipper const& skipper
-         , Attribute& attr) const
+      template <typename Iterator>
+      struct ident_parser : public qi::grammar<Iterator, string_type()> {
+         ident_parser()
+         : ident_parser::base_type(ident)
          {
-            bool r = parse(first, last,
-               (qi::ascii::alpha >> *(qi::ascii::alnum | '_'))
-            );
-
-            #warning work out how to return result
-            return r;
+            ident %= qi::ascii::alpha >> *(qi::ascii::alnum | '_')
+            ;
          }
+
+         qi::rule<Iterator, string_type()> ident;
       };
 
       namespace {

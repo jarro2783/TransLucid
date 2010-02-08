@@ -85,7 +85,7 @@ void Interpreter::addDimensionSymbol(const ustring_t& s) {
    //Parser::addSymbol(wstring_t(s.begin(), s.end()), m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
 }
 
-inline void Interpreter::addToVariableActual(const ustring_t& id,
+inline void Interpreter::addToVariableActual(const u32string& id,
    const Tuple& k, HD *h)
 {
    //std::cerr << "addToVariableActual: " <<
@@ -93,22 +93,21 @@ inline void Interpreter::addToVariableActual(const ustring_t& id,
    //find the variable
    VariableMap::const_iterator iter = m_variables.find(id);
    if (iter == m_variables.end()) {
-      std::cout << "adding " << id << std::endl;
       //std::cerr << "constructing new variable" << std::endl;
       iter = m_variables.insert(std::make_pair(id, new Variable(id, *this))).first;
    }
    iter->second->addExpr(k, h);
 }
 
-inline void Interpreter::addToVariable(const ustring_t& id,
-   const ustring_t& remaining, const Tuple& k, HD *h)
+inline void Interpreter::addToVariable(const u32string& id,
+   const u32string& remaining, const Tuple& k, HD *h)
 {
    tuple_t kp = k.tuple();
    kp[DIM_ID] = TypedValue(String(remaining), TYPE_INDEX_USTRING);
    addToVariableActual(id, Tuple(kp), h);
 }
 
-inline void Interpreter::addToVariable(const ustring_t& id,
+inline void Interpreter::addToVariable(const u32string& id,
    const Tuple& k, HD *h)
 {
    tuple_t kp = k.tuple();
@@ -124,8 +123,8 @@ HD* Interpreter::buildConstantHD(size_t index) {
    Tuple empty;
    //k[m_dimTranslator.lookup("id")] = TypedValue(String("CONST"), m_typeRegistry.indexString());
    k[DIM_TYPE] = TypedValue(String(T::name), TYPE_INDEX_USTRING);
-   addToVariableActual("CONST", Tuple(k), h);
-   addToVariableActual("TYPEINDEX", empty, new ConstHD::IntmpConst(index));
+   addToVariableActual(U"CONST", Tuple(k), h);
+   addToVariableActual(U"TYPEINDEX", empty, new ConstHD::IntmpConst(index));
    return h;
 }
 
@@ -139,17 +138,17 @@ Interpreter::Interpreter()
 : m_types(*this),
 //m_evaluator(*this),
 m_maxClock(0),
-m_warehouse(*this),
+//m_warehouse(*this),
 //m_dimension_id(m_dimTranslator.lookup("id")),
 m_time(0),
 builtin_name_to_index {
-   {"ustring", TYPE_INDEX_USTRING},
-   {"intmp", TYPE_INDEX_INTMP},
-   {"bool", TYPE_INDEX_BOOL},
-   {"special", TYPE_INDEX_SPECIAL},
-   {"uchar", TYPE_INDEX_UCHAR},
-   {"dim", TYPE_INDEX_DIMENSION},
-   {"type", TYPE_INDEX_TYPE}
+   {U"ustring", TYPE_INDEX_USTRING},
+   {U"intmp", TYPE_INDEX_INTMP},
+   {U"bool", TYPE_INDEX_BOOL},
+   {U"special", TYPE_INDEX_SPECIAL},
+   {U"uchar", TYPE_INDEX_UCHAR},
+   {U"dim", TYPE_INDEX_DIMENSION},
+   {U"type", TYPE_INDEX_TYPE}
 },
 m_verbose(false)
 {
@@ -157,9 +156,9 @@ m_verbose(false)
    //initExprParser();
    //initTupleParser();
    //initConstantParser();
-   m_dimTranslator.lookup("time");
-   m_dimTranslator.lookup("priority");
-   m_dimTranslator.lookup("_validguard");
+   //m_dimTranslator.lookup("time");
+   //m_dimTranslator.lookup("priority");
+   //m_dimTranslator.lookup("_validguard");
 
    //add some default builtin dimension symbols to the parser
    addDimensionSymbol("time");
@@ -180,9 +179,9 @@ m_verbose(false)
    //m_variables.insert(std::make_pair("const", new ConstantHD(*this)));
 
    //we need dimensions and unique to do anything
-   addToVariableActual("DIMENSION_INDEX", Tuple(), new DimensionsStringHD(m_dimTranslator));
-   addToVariableActual("DIMENSION_TYPED_INDEX", Tuple(), new DimensionsTypedHD(m_dimTranslator));
-   addToVariableActual("_unique", Tuple(), new UniqueHD(RESERVED_INDEX_LAST));
+   addToVariableActual(U"DIMENSION_INDEX", Tuple(), new DimensionsStringHD(m_dimTranslator));
+   addToVariableActual(U"DIMENSION_TYPED_INDEX", Tuple(), new DimensionsTypedHD(m_dimTranslator));
+   addToVariableActual(U"_unique", Tuple(), new UniqueHD(RESERVED_INDEX_LAST));
 
    //add variables for all the types
    //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
@@ -194,7 +193,7 @@ m_verbose(false)
    buildConstantHD<ConstHD::UString>(TYPE_INDEX_USTRING);
 
    //set this as the default int too
-   addToVariableActual("DEFAULTINT", Tuple(), intmpHD);
+   addToVariableActual(U"DEFAULTINT", Tuple(), intmpHD);
 }
 
 Interpreter::~Interpreter() {
@@ -293,9 +292,9 @@ TaggedValue Interpreter::operator()(const Tuple& k) {
 
    try {
       VariableMap::const_iterator viter = m_variables.find(iditer->second.value<String>().value());
-      std::cout << "looking for " << iditer->second.value<String>().value() << std::endl;
+      //std::cout << "looking for " << iditer->second.value<String>().value() << std::endl;
       if (viter == m_variables.end()) {
-         std::cout << "not found" << std::endl;
+         //std::cout << "not found" << std::endl;
          return TaggedValue(TypedValue(Special(Special::UNDEF), m_types.indexSpecial()), k);
       } else {
          return (*viter->second)(k);
@@ -318,7 +317,7 @@ void Interpreter::addInput(const IOList& input) {
    m_variables.insert(input.begin(), input.end());
 }
 
-void Interpreter::addDemand(const ustring_t& id, const EquationGuard& guard) {
+void Interpreter::addDemand(const u32string& id, const EquationGuard& guard) {
    m_demands.insert(std::make_pair(id, guard));
 }
 

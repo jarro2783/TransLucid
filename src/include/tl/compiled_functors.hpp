@@ -75,7 +75,7 @@ namespace TransLucid {
       class BuildTuple : public CompiledFunctor {
          public:
 
-         BuildTuple(Interpreter& system, const std::list<HD*>& elements)
+         BuildTuple(Interpreter& system, const std::list<std::pair<HD*, HD*>>& elements)
          : m_system(system), m_elements(elements)
          {}
 
@@ -83,7 +83,7 @@ namespace TransLucid {
 
          private:
          Interpreter& m_system;
-         std::list<HD*> m_elements;
+         std::list<std::pair<HD*, HD*>> m_elements;
       };
 
       class Constant : public CompiledFunctor {
@@ -91,7 +91,7 @@ namespace TransLucid {
 
          //typedef RawType some_crazy_MPL_thing;
 
-         Constant(Interpreter& system, const ustring_t& type, const ustring_t& text)
+         Constant(Interpreter& system, const std::u32string& type, const std::u32string& text)
          : m_system(system), m_type(type), m_text(text)
          {}
 
@@ -99,8 +99,8 @@ namespace TransLucid {
 
          private:
          Interpreter& m_system;
-         ustring_t m_type;
-         ustring_t m_text;
+         std::u32string m_type;
+         std::u32string m_text;
       };
 
       class Convert : public CompiledFunctor {
@@ -144,7 +144,7 @@ namespace TransLucid {
 
       class Ident : public CompiledFunctor {
          public:
-         Ident(HD *system, const ustring_t& name)
+         Ident(HD *system, const u32string& name)
          : m_system(system), m_name(name)
          {}
 
@@ -152,7 +152,7 @@ namespace TransLucid {
 
          private:
          HD *m_system;
-         ustring_t m_name;
+         u32string m_name;
       };
 
       class If : public CompiledFunctor {

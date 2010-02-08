@@ -119,11 +119,11 @@ namespace TransLucid {
    typedef std::deque<std::pair<EquationGuard, EquationMap_p> > EqnSetList;
 
    class Variable;
-   typedef std::map<ustring_t, HD*> VariableMap;
+   typedef std::map<u32string, HD*> VariableMap;
 
    class Equation {
       public:
-      Equation(const ustring_t& name, const EquationGuard& valid, HD *h)
+      Equation(const u32string& name, const EquationGuard& valid, HD *h)
       : m_name(name), m_validContext(valid), m_h(h)
       {
       }
@@ -133,7 +133,7 @@ namespace TransLucid {
       {
       }
 
-      const ustring_t& name() const {
+      const u32string& name() const {
          return m_name;
       }
 
@@ -150,7 +150,7 @@ namespace TransLucid {
       }
 
       private:
-      ustring_t m_name;
+      u32string m_name;
       EquationGuard m_validContext;
       //AST::Expr *m_e;
       //SystemEquation *m_se;
@@ -163,7 +163,7 @@ namespace TransLucid {
    class Variable : public HD {
       public:
 
-      Variable(const ustring_t& name, Interpreter& i)
+      Variable(const u32string& name, Interpreter& i)
       : m_name(name), m_i(i)
       {}
 
@@ -182,7 +182,7 @@ namespace TransLucid {
       Equations m_equations;
       VariableMap m_variables;
 
-      ustring_t m_name;
+      u32string m_name;
       Interpreter& m_i;
    };
 };
