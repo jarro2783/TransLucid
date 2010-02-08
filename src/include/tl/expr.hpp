@@ -7,328 +7,389 @@
 //#include <boost/bind.hpp>
 #include <tl/parser_fwd.hpp>
 
-namespace TransLucid {
-   namespace AST {
+namespace TransLucid
+{
+  namespace AST
+  {
 
-      class Data {
-         public:
-         virtual ~Data() = 0;
-      };
+    class Data
+    {
+      public:
+      virtual ~Data() = 0;
+    };
 
-      inline Data::~Data() {}
+    inline Data::~Data() {}
 
-      class Visitor;
+    class Visitor;
 
-      class Expr {
-         public:
-         virtual ~Expr() {}
-         virtual Data* visit(Visitor* visitor, Data* data) = 0;
-      };
+    class Expr
+    {
+      public:
+      virtual ~Expr() {}
+      virtual Data* visit(Visitor* visitor, Data* data) = 0;
+    };
 
-      class AtExpr;
-      class BinaryOpExpr;
-      class BooleanExpr;
-      class BuildTupleExpr;
-      class ConstantExpr;
-      class DimensionExpr;
-      class HashExpr;
-      class IdentExpr;
-      class IfExpr;
-      class IntegerExpr;
-      class OpExpr;
-      class PairExpr;
-      class RangeExpr;
-      class SpecialOpsExpr;
-      class UnaryExpr;
+    class AtExpr;
+    class BinaryOpExpr;
+    class BooleanExpr;
+    class BuildTupleExpr;
+    class ConstantExpr;
+    class DimensionExpr;
+    class HashExpr;
+    class IdentExpr;
+    class IfExpr;
+    class IntegerExpr;
+    class OpExpr;
+    class PairExpr;
+    class RangeExpr;
+    class SpecialOpsExpr;
+    class UnaryExpr;
 
-      class Visitor {
-         public:
-         virtual ~Visitor() {}
+    class Visitor
+    {
+      public:
+      virtual ~Visitor() {}
 
-         virtual Data* visitAtExpr(AtExpr*, Data*) = 0;
-         virtual Data* visitBinaryOpExpr(BinaryOpExpr*, Data*) = 0;
-         virtual Data* visitBooleanExpr(BooleanExpr*, Data*) = 0;
-         virtual Data* visitBuildTupleExpr(BuildTupleExpr*, Data*) = 0;
-         virtual Data* visitConstantExpr(ConstantExpr*, Data*) = 0;
-         virtual Data* visitConvertExpr(SpecialOpsExpr*, Data*) = 0;
-         virtual Data* visitDimensionExpr(DimensionExpr*, Data*) = 0;
-         virtual Data* visitHashExpr(HashExpr*, Data*) = 0;
-         virtual Data* visitIdentExpr(IdentExpr*, Data*) = 0;
-         virtual Data* visitIfExpr(IfExpr*, Data*) = 0;
-         virtual Data* visitIntegerExpr(IntegerExpr*, Data*) = 0;
-         virtual Data* visitIsSpecialExpr(SpecialOpsExpr*, Data*) = 0;
-         virtual Data* visitIsTypeExpr(SpecialOpsExpr*, Data*) = 0;
-         virtual Data* visitOpExpr(OpExpr*, Data*) = 0;
-         virtual Data* visitPairExpr(PairExpr*, Data*) = 0;
-         virtual Data* visitRangeExpr(RangeExpr*, Data*) = 0;
-         virtual Data* visitUnaryExpr(UnaryExpr*, Data*) = 0;
-      };
+      virtual Data* visitAtExpr(AtExpr*, Data*) = 0;
+      virtual Data* visitBinaryOpExpr(BinaryOpExpr*, Data*) = 0;
+      virtual Data* visitBooleanExpr(BooleanExpr*, Data*) = 0;
+      virtual Data* visitBuildTupleExpr(BuildTupleExpr*, Data*) = 0;
+      virtual Data* visitConstantExpr(ConstantExpr*, Data*) = 0;
+      virtual Data* visitConvertExpr(SpecialOpsExpr*, Data*) = 0;
+      virtual Data* visitDimensionExpr(DimensionExpr*, Data*) = 0;
+      virtual Data* visitHashExpr(HashExpr*, Data*) = 0;
+      virtual Data* visitIdentExpr(IdentExpr*, Data*) = 0;
+      virtual Data* visitIfExpr(IfExpr*, Data*) = 0;
+      virtual Data* visitIntegerExpr(IntegerExpr*, Data*) = 0;
+      virtual Data* visitIsSpecialExpr(SpecialOpsExpr*, Data*) = 0;
+      virtual Data* visitIsTypeExpr(SpecialOpsExpr*, Data*) = 0;
+      virtual Data* visitOpExpr(OpExpr*, Data*) = 0;
+      virtual Data* visitPairExpr(PairExpr*, Data*) = 0;
+      virtual Data* visitRangeExpr(RangeExpr*, Data*) = 0;
+      virtual Data* visitUnaryExpr(UnaryExpr*, Data*) = 0;
+    };
 
-      class AtExpr : public Expr {
-         public:
-         //e2 @ e1
-         AtExpr(Expr* e2, Expr* e1)
-         : e2(e2), e1(e1), relative(true)
-         {
-         }
+    class AtExpr : public Expr
+    {
+      public:
+      //e2 @ e1
+      AtExpr(Expr* e2, Expr* e1)
+      : e2(e2), e1(e1), relative(true)
+      {
+      }
 
-         Data* visit(Visitor* v, Data* data) {
-            return v->visitAtExpr(this, data);
-         }
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return v->visitAtExpr(this, data);
+      }
 
-         Expr* e2;
-         Expr* e1;
-         bool relative;
-      };
+      Expr* e2;
+      Expr* e1;
+      bool relative;
+    };
 
-      class BinaryOpExpr : public Expr {
+    class BinaryOpExpr : public Expr
+    {
 
-         public:
-         BinaryOpExpr(const Parser::BinaryOperation& op, Expr* lhs, Expr* rhs)
-         : op(op)
-         {
-            operands.push_back(lhs);
-            operands.push_back(rhs);
-         }
+      public:
+      BinaryOpExpr(const Parser::BinaryOperation& op, Expr* lhs, Expr* rhs)
+      : op(op)
+      {
+        operands.push_back(lhs);
+        operands.push_back(rhs);
+      }
 
-         Data* visit(Visitor* v, Data* data) {
-            return v->visitBinaryOpExpr(this, data);
-         }
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return v->visitBinaryOpExpr(this, data);
+      }
 
-         void add_right(const Parser::BinaryOperation& op, Expr* rhs);
-         void add_leaf(Expr* e);
+      void
+      add_right(const Parser::BinaryOperation& op, Expr* rhs);
 
-         Parser::BinaryOperation op;
-         std::vector<Expr*> operands;
-      };
+      void
+      add_leaf(Expr* e);
 
-      class BooleanExpr : public Expr {
-         public:
-         BooleanExpr(const ustring_t& value)
-         : value(value == "true")
-         {
-         }
+      Parser::BinaryOperation op;
+      std::vector<Expr*> operands;
+    };
 
-         BooleanExpr(const std::u32string& value)
-         : value(value == U"true")
-         {
-         }
+    class BooleanExpr : public Expr
+    {
+      public:
+      BooleanExpr(const ustring_t& value)
+      : value(value == "true")
+      {
+      }
 
-         //BooleanExpr(const std::basic_string<wchar_t>& s)
-         //: value(s == L"true")
-         //{
-         //}
+      BooleanExpr(const std::u32string& value)
+      : value(value == U"true")
+      {
+      }
 
-         Data* visit(Visitor* v, Data* data) {
-            return v->visitBooleanExpr(this, data);
-         }
+      //BooleanExpr(const std::basic_string<wchar_t>& s)
+      //: value(s == L"true")
+      //{
+      //}
 
-         bool value;
-      };
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return v->visitBooleanExpr(this, data);
+      }
 
-      class BuildTupleExpr : public Expr {
-         public:
+      bool value;
+    };
 
-         template <typename T>
-         BuildTupleExpr(const T& l)
-         {
-            using boost::fusion::at_c;
-            BOOST_FOREACH(auto& v, l) {
-               values.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
-            }
-         }
+    class BuildTupleExpr : public Expr
+    {
+      public:
 
-         Data* visit(Visitor* v, Data* data) {
-            return v->visitBuildTupleExpr(this, data);
-         }
+      template <typename T>
+      BuildTupleExpr(const T& l)
+      {
+        using boost::fusion::at_c;
+        BOOST_FOREACH(auto& v, l)
+        {
+          values.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
+        }
+      }
 
-         std::list<std::pair<AST::Expr*,AST::Expr*>> values;
-      };
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return v->visitBuildTupleExpr(this, data);
+      }
 
-      class ConstantExpr : public Expr {
-         public:
-         ConstantExpr(const std::u32string& name, const std::u32string& value)
-         : name(name), value(value)
-         {
-         }
+      std::list<std::pair<AST::Expr*,AST::Expr*>> values;
+    };
 
-         Data* visit(Visitor* v, Data* data) {
-            return v->visitConstantExpr(this, data);
-         }
+    class ConstantExpr : public Expr
+    {
+      public:
+      ConstantExpr(const std::u32string& name, const std::u32string& value)
+      : name(name), value(value)
+      {
+      }
 
-         std::u32string name;
-         std::u32string value;
-      };
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return v->visitConstantExpr(this, data);
+      }
 
-      class DimensionExpr : public Expr {
-         public:
+      std::u32string name;
+      std::u32string value;
+    };
 
-         DimensionExpr(const std::u32string& v)
-         : value(v)
-         {
-         }
+    class DimensionExpr : public Expr
+    {
+      public:
 
-         Data* visit(Visitor* v, Data* d) {
-            return v->visitDimensionExpr(this, d);
-         }
+      DimensionExpr(const std::u32string& v)
+      : value(v)
+      {
+      }
 
-         std::u32string value;
-      };
+      Data*
+      visit(Visitor* v, Data* d)
+      {
+        return v->visitDimensionExpr(this, d);
+      }
 
-      class HashExpr : public Expr {
-         public:
-         HashExpr(Expr* e)
-         : e(e)
-         {
-         }
+      std::u32string value;
+    };
 
-         Data* visit(Visitor* visitor, Data* data) {
-            return visitor->visitHashExpr(this, data);
-         }
+    class HashExpr : public Expr
+    {
+      public:
+      HashExpr(Expr* e)
+      : e(e)
+      {
+      }
 
-         Expr* e;
-      };
+      Data*
+      visit(Visitor* visitor, Data* data)
+      {
+        return visitor->visitHashExpr(this, data);
+      }
 
-      class IdentExpr : public Expr {
-         public:
-         IdentExpr(const u32string& s)
-         : id(s)
-         {
-         }
+      Expr* e;
+    };
 
-         Data* visit(Visitor* visitor, Data* data) {
-            return visitor->visitIdentExpr(this, data);
-         }
+    class IdentExpr : public Expr
+    {
+      public:
+      IdentExpr(const u32string& s)
+      : id(s)
+      {
+      }
 
-         u32string id;
-      };
+      Data*
+      visit(Visitor* visitor, Data* data)
+      {
+        return visitor->visitIdentExpr(this, data);
+      }
 
-      class IfExpr : public Expr {
+      u32string id;
+    };
 
-         typedef std::vector<std::pair<Expr*, Expr*>> ElseIfList;
+    class IfExpr : public Expr
+    {
 
-         public:
-         template <typename List>
-         IfExpr(Expr* condition,
-            Expr* then,
-            const List& ei,
-            Expr* else_)
-         : condition(condition),
-         then(then),
-         else_(else_)
-         {
-            using boost::fusion::at_c;
-            BOOST_FOREACH(auto& element, ei) {
-               elsifs.push_back(
-                  std::make_pair(at_c<0>(element), at_c<1>(element)));
-            }
-         }
+      typedef std::vector<std::pair<Expr*, Expr*>> ElseIfList;
 
-         Data* visit(Visitor* visitor, Data* data) {
-            return visitor->visitIfExpr(this, data);
-         }
+      public:
+      template <typename List>
+      IfExpr
+      (
+        Expr* condition,
+        Expr* then,
+        const List& ei,
+        Expr* else_
+      )
+      : condition(condition),
+        then(then),
+        else_(else_)
+      {
+        using boost::fusion::at_c;
+        BOOST_FOREACH(auto& element, ei)
+        {
+          elsifs.push_back
+            (std::make_pair(at_c<0>(element), at_c<1>(element)));
+        }
+      }
 
-         Expr* condition;
-         Expr* then;
-         ElseIfList elsifs;
-         Expr* else_;
-      };
+      Data*
+      visit(Visitor* visitor, Data* data)
+      {
+        return visitor->visitIfExpr(this, data);
+      }
 
-      class IntegerExpr : public Expr {
-         public:
-         IntegerExpr(const mpz_class& value);
+      Expr* condition;
+      Expr* then;
+      ElseIfList elsifs;
+      Expr* else_;
+    };
 
-         Data* visit(Visitor* visitor, Data* data) {
-            return visitor->visitIntegerExpr(this, data);
-         }
+    class IntegerExpr : public Expr
+    {
+      public:
+      IntegerExpr(const mpz_class& value);
 
-         mpz_class m_value;
-      };
+      Data*
+      visit(Visitor* visitor, Data* data)
+      {
+        return visitor->visitIntegerExpr(this, data);
+      }
 
-      class OpExpr : public Expr {
-         public:
-         OpExpr(const std::vector<Expr*>& ops, ustring_t& name)
-         : m_ops(ops), m_name(name)
-         {}
+      mpz_class m_value;
+    };
 
-         Data* visit(Visitor* visitor, Data* data) {
-            return visitor->visitOpExpr(this, data);
-         }
+    class OpExpr : public Expr
+    {
+      public:
+      OpExpr(const std::vector<Expr*>& ops, ustring_t& name)
+      : m_ops(ops), m_name(name)
+      {}
 
-         std::vector<Expr*> m_ops;
-         ustring_t m_name;
-      };
+      Data*
+      visit(Visitor* visitor, Data* data)
+      {
+        return visitor->visitOpExpr(this, data);
+      }
 
-      class PairExpr : public Expr {
-         public:
-         PairExpr(Expr* lhs, Expr* rhs)
-         : lhs(lhs), rhs(rhs)
-         {
-         }
+      std::vector<Expr*> m_ops;
+      ustring_t m_name;
+    };
 
-         Data* visit(Visitor* v, Data* data) {
-            return v->visitPairExpr(this, data);
-         }
+    class PairExpr : public Expr
+    {
+      public:
+      PairExpr(Expr* lhs, Expr* rhs)
+      : lhs(lhs), rhs(rhs)
+      {
+      }
 
-         Expr* lhs;
-         Expr* rhs;
-      };
+      Data* visit(Visitor* v, Data* data)
+      {
+        return v->visitPairExpr(this, data);
+      }
 
-      class RangeExpr : public Expr {
-         public:
-         RangeExpr(Expr* lhs, Expr* rhs)
-         : lhs(lhs), rhs(rhs)
-         {}
+      Expr* lhs;
+      Expr* rhs;
+    };
 
-         Data* visit(Visitor* v, Data* data) {
-            return v->visitRangeExpr(this, data);
-         }
+    class RangeExpr : public Expr
+    {
+      public:
+      RangeExpr(Expr* lhs, Expr* rhs)
+      : lhs(lhs), rhs(rhs)
+      {}
 
-         Expr* lhs;
-         Expr* rhs;
-      };
+      Data* visit(Visitor* v, Data* data)
+      {
+        return v->visitRangeExpr(this, data);
+      }
 
-      class SpecialOpsExpr : public Expr {
-         public:
-         SpecialOpsExpr(const ustring_t& op, const ustring_t& value, Expr* e)
-         : value(value), e(e)
-         {
-            if (op == "isspecial") {
-               m_f = &Visitor::visitIsSpecialExpr;
-            } else if (op == "istype") {
-               m_f = &Visitor::visitIsTypeExpr;
-            } else if (op == "convert") {
-               m_f = &Visitor::visitConvertExpr;
-            }
-         }
+      Expr* lhs;
+      Expr* rhs;
+    };
 
-         Data* visit(Visitor* v, Data* data) {
-            return m_f(v, this, data);
-         }
+    class SpecialOpsExpr : public Expr
+    {
+      public:
+      SpecialOpsExpr(const ustring_t& op, const ustring_t& value, Expr* e)
+      : value(value), e(e)
+      {
+        if (op == "isspecial")
+        {
+          m_f = &Visitor::visitIsSpecialExpr;
+        }
+        else if (op == "istype")
+        {
+          m_f = &Visitor::visitIsTypeExpr;
+        }
+        else if (op == "convert")
+        {
+          m_f = &Visitor::visitConvertExpr;
+        }
+      }
 
-         ustring_t value;
-         Expr* e;
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return m_f(v, this, data);
+      }
 
-         private:
-         boost::function<Data* (Visitor*, SpecialOpsExpr*, Data*)> m_f;
-      };
+      ustring_t value;
+      Expr* e;
 
-      class UnaryExpr : public Expr {
-         public:
-         UnaryExpr(const Parser::UnaryOperation& op, Expr* e)
-         : op(op), e(e)
-         {
-         }
+      private:
+      boost::function<Data* (Visitor*, SpecialOpsExpr*, Data*)> m_f;
+    };
 
-         Data* visit(Visitor* v, Data* d) {
-            return v->visitUnaryExpr(this, d);
-         }
+    class UnaryExpr : public Expr
+    {
+      public:
+      UnaryExpr(const Parser::UnaryOperation& op, Expr* e)
+      : op(op), e(e)
+      {
+      }
 
-         Parser::UnaryOperation op;
-         Expr* e;
-      };
+      Data*
+      visit(Visitor* v, Data* d)
+      {
+        return v->visitUnaryExpr(this, d);
+      }
 
-   }
+      Parser::UnaryOperation op;
+      Expr* e;
+    };
+
+  }
 }
 
 #endif // EXPR_HPP_INCLUDED

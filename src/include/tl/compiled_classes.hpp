@@ -8,59 +8,58 @@
 
 namespace TransLucid
 {
-   typedef <typename T, K N>
-   class Constant
-   {
-      public:
+  typedef <typename T, K N>
+  class Constant
+  {
+    public:
 
-      typedef T RawType;
+    typedef T RawType;
 
-      RawType
-      operator()(Tuple& k)
-      {
-         return N
-      }
+    RawType
+    operator()(Tuple& k)
+    {
+      return N;
+    }
 
-      private:
-   };
+    private:
+  };
 
-   typedef <typename T, int32_t N>
-   class Constant
-   {
-      public:
+  typedef <typename T, int32_t N>
+  class Constant
+  {
+    public:
 
-      T
-      operator()(Tuple& k)
-      {
-         return N
-      }
+    T
+    operator()(Tuple& k)
+    {
+      return N;
+    }
 
-      private:
-   };
+    private:
+  };
 #endif
 
 extern std::string x;
 
-   template <std::string* N>
-   class F
-   {
-   };
+  template <std::string* N>
+  class F
+  {
+  };
 
-   int
-   main()
-   {
-      //std::string x;
-      F<&x> y;
+  int
+  main()
+  {
+    //std::string x;
+    F<&x> y;
+  }
 
-   }
+  //int32<3> + int32<4>;;
+  //
+  // Constant<int32_t, 3>()() + Constant<int32_t, 4>()()
 
-   //int32<3> + int32<4>;;
-   //
-   // Constant<int32_t, 3>()() + Constant<int32_t, 4>()()
+  //Constant<int32_t>(4)() + Constant<int32>(3)();
 
-   //Constant<int32_t>(4)() + Constant<int32>(3)();
-
-   //Constant<Glib::ustring,"h">
+  //Constant<Glib::ustring,"h">
 
 #if 0
 }
