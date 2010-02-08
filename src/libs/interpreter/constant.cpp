@@ -1,11 +1,16 @@
 #include <tl/constant.hpp>
 
-namespace TransLucid {
+namespace TransLucid
+{
 
-TaggedValue ConstantHD::operator()(const Tuple& k) {
+TaggedValue
+ConstantHD::operator()(const Tuple& k)
+{
 }
 
-void ConstantHD::addExpr(const Tuple& k, AST::Expr *e) {
+void
+ConstantHD::addExpr(const Tuple& k, AST::Expr* e)
+{
 }
 
 }
