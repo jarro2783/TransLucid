@@ -21,8 +21,6 @@ namespace TransLucid {
          DEMANDS
       };
 
-      class DirectoryGrammar;
-
       class DirectorySystem {
          public:
          DirectorySystem();
@@ -41,8 +39,6 @@ namespace TransLucid {
          bool parseFile(const ustring_t& file, FileType type);
 
          mpz_class m_maxClock;
-
-         DirectoryGrammar *m_grammar;
 
          ExprCompiler m_compiler;
 

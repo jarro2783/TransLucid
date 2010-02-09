@@ -12,6 +12,85 @@ namespace TransLucid {
 namespace DirectoryParser {
 
 //namespace Spirit = Parser::Spirit;
+namespace qi = boost::spirit::qi;
+
+namespace
+{
+
+template <typename Parser, typename Action, typename Next>
+class parse_file_function
+{
+  public:
+
+  parse_file_function(
+    const std::string& f,
+    Parser& p,
+    Action& a,
+    Next& n
+  )
+  : file(f),
+    parse(p),
+    action(a),
+    next(n)
+  {}
+
+  void operator()() const
+  {
+    parse();
+    action(parse.result());
+    next();
+  }
+
+  private:
+
+  std::string file;
+  const Parser& parse;
+  const Action& action;
+  const Next& next;
+};
+
+template <typename Parser, typename Result>
+class parse_one_file_function
+{
+  public:
+
+  parse_one_file_function(
+    const std::string& file,
+    Parser& p,
+    Result& r
+  )
+  : m_file(file),
+    m_parser(p),
+    m_result(r)
+  {
+  }
+
+  void operator()() const
+  {
+    std::wstring text;
+    std::wstring::const_iterator pos = text.begin();
+    qi::phrase_parse
+    (
+      pos,
+      text.cend(),
+      m_parser,
+      qi::standard_wide::space,
+      m_result
+    );
+  }
+
+  const Result result() const
+  {
+    return m_result;
+  }
+
+  private:
+  std::string m_file;
+  Parser& m_parser;
+  Result& m_result;
+};
+
+}
 
 #if 0
 class DirectoryGrammar : public qi::grammar<DirectoryGrammar> {
@@ -71,10 +150,10 @@ class DirectoryGrammar : public qi::grammar<DirectoryGrammar> {
 #endif
 
 DirectorySystem::DirectorySystem()
-: m_compiler(m_interpreter), m_header_parser(m_header), m_expr_parser(m_header)
+: m_compiler(m_interpreter), m_expr_parser(m_header)
 {
    m_expr_parser.set_context_perturb(m_tuple_parser);
-   m_tuple_parser.(m_expr_parser);
+   m_tuple_parser.set_expr(m_expr_parser);
 }
 
 bool DirectorySystem::parseSystem(const ustring_t& path)
@@ -95,7 +174,9 @@ bool DirectorySystem::parseSystem(const ustring_t& path)
   files.push_back(std::make_pair(
     Glib::build_filename(pathl, "demands"), DEMANDS));
 
-  std::wstring headerText = L"dimension<test>;;";
+  const std::wstring headerText = L"dimension<test>;;";
+
+  std::wstring::const_iterator pos;
 
   for (FileList::iterator iter = files.begin();
     iter != files.end() && success;
@@ -106,12 +187,13 @@ bool DirectorySystem::parseSystem(const ustring_t& path)
     switch (iter->second)
     {
       case HEADER:
+      pos = headerText.begin();
       qi::phrase_parse
       (
-        headerText.begin(),
+        pos,
         headerText.end(),
-        m_header,
-        SkipGrammar<Parser::iterator_t>()
+        m_header_parser,
+        qi::standard_wide::space
       );
 
       case EQNS:
@@ -195,8 +277,8 @@ bool DirectorySystem::parseSystem(const ustring_t& path)
   return success;
 }
 
+#if r
 bool DirectorySystem::parseFile(const ustring_t& file, FileType type) {
-   m_grammar->fileType = type;
    ustring_t contents = Glib::locale_to_utf8(Glib::file_get_contents(file));
 
    Parser::UIterator iter(contents);
@@ -214,12 +296,14 @@ bool DirectorySystem::parseFile(const ustring_t& file, FileType type) {
       Parser::skip_p).full;
 #endif
 }
+#endif
 
 void DirectorySystem::addParsedEquationSet(const Parser::equation_v& eqns) {
 }
 
 //the only equation in the map should be clock
 void DirectorySystem::setClock(const Parser::equation_v& equations) {
+  #if 0
    const Parser::equation_t *e;
    if (equations.size() == 1 &&
       std::get<0>(*(e = &equations.front())) == L"clock")
@@ -227,14 +311,15 @@ void DirectorySystem::setClock(const Parser::equation_v& equations) {
       HD *h = m_compiler.compile(std::get<2>(*e));
       TypedValue v = (*h)(Tuple()).first;//= evaluate(e->get<2>(), Tuple());
       if (v.index() != TYPE_INDEX_INTMP) {
-         throw ParseError("clock variable must be an intmp");
+        throw ParseError("clock variable must be an intmp");
       } else {
-         const Intmp& i = v.value<Intmp>();
-         m_maxClock = i.value();
+        const Intmp& i = v.value<Intmp>();
+        m_maxClock = i.value();
       }
-   } else {
-      throw ParseError("Clock variable not set correctly");
-   }
+  } else {
+    throw ParseError("Clock variable not set correctly");
+  }
+  #endif
 }
 
 void DirectorySystem::addLibrarySearchPath(const std::string& path) {
