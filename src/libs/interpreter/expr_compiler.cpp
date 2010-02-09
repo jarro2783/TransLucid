@@ -231,6 +231,17 @@ ExprCompiler::visitRangeExpr(AST::RangeExpr*, AST::Data*)
 }
 
 AST::Data*
+ExprCompiler::visitStringExpr(AST::StringExpr* e, AST::Data*)
+{
+  return new Compiled(new CompiledFunctors::StringConst(e->value));
+}
+
+AST::Data*
+ExprCompiler::visitUcharExpr(AST::UcharExpr* e, AST::Data*) {
+  return new Compiled(new CompiledFunctors::UcharConst(e->value));
+}
+
+AST::Data*
 ExprCompiler::visitUnaryExpr(AST::UnaryExpr* e, AST::Data*)
 {
   Compiled* operandc = dynamic_cast<Compiled*>(e->e->visit(this, 0));

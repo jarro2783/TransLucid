@@ -414,7 +414,7 @@ namespace TransLucid
   class Char : public TypedValueBase
   {
     public:
-    Char(const gunichar c)
+    Char(char32_t c)
     : m_c(c)
     {
     }
@@ -429,6 +429,12 @@ namespace TransLucid
       {
         m_c = text.at(0);
       }
+    }
+
+    char32_t
+    value() const
+    {
+      return m_c;
     }
 
     size_t
@@ -464,7 +470,7 @@ namespace TransLucid
     }
 
     private:
-    gunichar m_c;
+    char32_t m_c;
   };
 
   class EquationGuardType : public TypedValueBase

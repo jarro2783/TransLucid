@@ -154,7 +154,7 @@ namespace TransLucid
       Delimiter() = default;
 
       Delimiter(
-        const string_type& type,
+        const u32string& type,
         char_type start,
         char_type end)
       : type(type), start(start), end(end)
@@ -166,7 +166,7 @@ namespace TransLucid
         return type == rhs.type && start == rhs.start && end == rhs.end;
       }
 
-      string_type type;
+      u32string type;
       char_type start;
       char_type end;
     };
@@ -263,6 +263,7 @@ namespace TransLucid
   }
 }
 
+#if 0
 BOOST_FUSION_ADAPT_STRUCT
 (
   TransLucid::Parser::Header,
@@ -273,5 +274,6 @@ BOOST_FUSION_ADAPT_STRUCT
   (TransLucid::Parser::delimiter_symbols, delimiter_start_symbols)
   (std::vector<std::u32string>, libraries)
 )
+#endif
 
 #endif // PARSER_FWD_HPP_INCLUDED

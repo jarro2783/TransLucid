@@ -95,7 +95,7 @@ namespace TransLucid
     addDelimiter
     (
       Header& header,
-      const string_type& type,
+      const u32string& type,
       const string_type& open,
       const string_type& close
     )

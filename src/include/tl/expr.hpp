@@ -43,6 +43,8 @@ namespace TransLucid
     class PairExpr;
     class RangeExpr;
     class SpecialOpsExpr;
+    class StringExpr;
+    class UcharExpr;
     class UnaryExpr;
 
     class Visitor
@@ -66,6 +68,8 @@ namespace TransLucid
       virtual Data* visitOpExpr(OpExpr*, Data*) = 0;
       virtual Data* visitPairExpr(PairExpr*, Data*) = 0;
       virtual Data* visitRangeExpr(RangeExpr*, Data*) = 0;
+      virtual Data* visitStringExpr(StringExpr*, Data*) = 0;
+      virtual Data* visitUcharExpr(UcharExpr*, Data*) = 0;
       virtual Data* visitUnaryExpr(UnaryExpr*, Data*) = 0;
     };
 
@@ -369,6 +373,36 @@ namespace TransLucid
 
       private:
       boost::function<Data* (Visitor*, SpecialOpsExpr*, Data*)> m_f;
+    };
+
+    class StringExpr : public Expr {
+      public:
+      StringExpr(const u32string& s)
+      : value(s)
+      {}
+
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return v->visitStringExpr(this, data);
+      }
+
+      u32string value;
+    };
+
+    class UcharExpr : public Expr {
+      public:
+      UcharExpr(char32_t c)
+      : value(c)
+      {}
+
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return v->visitUcharExpr(this, data);
+      }
+
+      char32_t value;
     };
 
     class UnaryExpr : public Expr

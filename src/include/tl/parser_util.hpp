@@ -103,11 +103,11 @@ namespace TransLucid
       end = d.end;
     }
 
-    inline const
-    string_type& getDelimiterType(const Delimiter& d)
-    {
-      return d.type;
-    }
+    //inline const
+    //string_type& getDelimiterType(const Delimiter& d)
+    //{
+    //  return d.type;
+    //}
 
     #if 0
     struct handle_expr_error

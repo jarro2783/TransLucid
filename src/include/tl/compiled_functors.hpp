@@ -287,6 +287,34 @@ namespace TransLucid
       HD* m_rhs;
     };
 
+    class StringConst : public CompiledFunctor
+    {
+      public:
+      StringConst(const u32string& s)
+      : m_value(s)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& k);
+
+      private:
+      u32string m_value;
+    };
+
+    class UcharConst : public CompiledFunctor
+    {
+      public:
+      UcharConst(char32_t c)
+      : m_value(c)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& k);
+
+      private:
+      char32_t m_value;
+    };
+
     class UnaryOp : public CompiledFunctor
     {
       public:

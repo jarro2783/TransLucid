@@ -340,12 +340,24 @@ Operation::operator()(const Tuple& k)
 
 TaggedValue
 Pair::operator()(const Tuple& k)
-{ 
+{
   TaggedValue l = (*m_lhs)(k);
   TaggedValue r = (*m_rhs)(k);
 
   return TaggedValue(TypedValue(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
                      TYPE_INDEX_PAIR), k);
+}
+
+TaggedValue
+StringConst::operator()(const Tuple& k)
+{
+  return TaggedValue(TypedValue(String(m_value), TYPE_INDEX_USTRING), k);
+}
+
+TaggedValue
+UcharConst::operator()(const Tuple& k)
+{
+  return TaggedValue(TypedValue(Char(m_value), TYPE_INDEX_UCHAR), k);
 }
 
 TaggedValue

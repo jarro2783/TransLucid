@@ -52,10 +52,22 @@ namespace TransLucid
       return d.end;
     }
 
-    inline string_type
+    inline u32string
     get_name(const Delimiter& d)
     {
       return d.type;
+    }
+
+    inline AST::Expr*
+    construct_delimited_constant(Delimiter& d, const u32string& v)
+    {
+      if (d.type == U"ustring") {
+        return new AST::StringExpr(v);
+      } else if (d.type == U"uchar") {
+        return new AST::UcharExpr(v[0]);
+      } else {
+        return new AST::ConstantExpr(d.type, v);
+      }
     }
 
     template <typename Iterator>
@@ -193,9 +205,12 @@ namespace TransLucid
             > end_delimiter(ph::bind(&get_end_char, _b))
           )
           [
-            _val = new_<AST::ConstantExpr>
-                     (make_u32string(ph::bind(&get_name, _b)),
-                      make_u32string(_a))
+            _val = ph::bind(&construct_delimited_constant, _b,
+                            make_u32string(_a))
+
+            //      new_<AST::ConstantExpr>
+            //         (make_u32string(ph::bind(&get_name, _b)),
+            //          make_u32string(_a))
           ]
         ;
 
