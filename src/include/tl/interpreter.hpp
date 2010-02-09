@@ -88,28 +88,6 @@ namespace TransLucid
       m_lt.addSearchPath(name);
     }
 
-    #ifndef REMOVE_MAGIC
-    TypeRegistry& typeRegistry()
-    {
-      return m_types;
-    }
-
-    const TypeRegistry&
-    typeRegistry() const
-    {
-      return m_types;
-    }
-
-    DimensionTranslator&
-    dimTranslator()
-    {
-      return m_dimTranslator;
-    }
-
-    size_t
-    registerDimension(const ustring_t& name);
-    #endif
-
     void
     registerEquation
     (const u32string& name, const Tuple& validContext, AST::Expr* e);
