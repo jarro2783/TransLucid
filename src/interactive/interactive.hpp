@@ -5,32 +5,34 @@
 #include <tl/parser_fwd.hpp>
 #include <tl/parser.hpp>
 
-namespace TLInteractive {
-   namespace TL = TransLucid;
-   class System : public TL::Interpreter {
-      public:
+namespace TLInteractive
+{
+  namespace TL = TransLucid;
+  class System : public TL::Interpreter
+  {
+    public:
 
-      System()
-      : time(0)
-      {
-         TL::Parser::addSymbol(
-            L"demand",
-            m_parseInfo.equation_names,
-            m_parseInfo.equation_symbols);
-      }
+    System()
+    : time(0)
+    {
+      TL::Parser::addSymbol
+        (L"demand",
+         m_parseInfo.equation_names,
+         m_parseInfo.equation_symbols);
+    }
 
-      void run();
+    void run();
 
-      void parseHeader(const std::string& file);
+    void parseHeader(const std::string& file);
 
-      private:
-      void postInputSignal(std::vector<TL::AST::Expr*> const& e);
-      void postEqnSignal(TL::Parser::equation_v& eqns);
-      std::string m_header;
-      //TL::EquationSet demands;
+    private:
+    void postInputSignal(std::vector<TL::AST::Expr*> const& e);
+    void postEqnSignal(TL::Parser::equation_v& eqns);
+    std::string m_header;
+    //TL::EquationSet demands;
 
-      size_t time;
-   };
+    size_t time;
+  };
 }
 
 #endif // INTERACTIVE_HPP_INCLUDED

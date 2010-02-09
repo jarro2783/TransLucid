@@ -7,9 +7,11 @@
 #include <tl/expr_compiler.hpp>
 #include <tl/fixed_indexes.hpp>
 
-namespace TransLucid {
+namespace TransLucid
+{
 
-namespace DirectoryParser {
+namespace DirectoryParser
+{
 
 //namespace Spirit = Parser::Spirit;
 namespace qi = boost::spirit::qi;
@@ -22,7 +24,8 @@ class parse_file_function
 {
   public:
 
-  parse_file_function(
+  parse_file_function
+  (
     const std::string& f,
     Parser& p,
     Action& a,
@@ -54,7 +57,8 @@ class parse_one_file_function
 {
   public:
 
-  parse_one_file_function(
+  parse_one_file_function
+  (
     const std::string& file,
     Parser& p,
     Result& r
@@ -65,7 +69,8 @@ class parse_one_file_function
   {
   }
 
-  void operator()() const
+  void
+  operator()() const
   {
     std::wstring text;
     std::wstring::const_iterator pos = text.begin();
@@ -79,7 +84,8 @@ class parse_one_file_function
     );
   }
 
-  const Result result() const
+  const Result
+  result() const
   {
     return m_result;
   }
@@ -93,58 +99,65 @@ class parse_one_file_function
 }
 
 #if 0
-class DirectoryGrammar : public qi::grammar<DirectoryGrammar> {
-   public:
+class DirectoryGrammar : public qi::grammar<DirectoryGrammar>
+{
+  public:
 
-   FileType fileType;
+  FileType fileType;
 
-   DirectoryGrammar(Parser::Header& header,
-      Parser::Parsers& parsers,
-      Parser::EquationAdder& adder)
-   : header(header),
-   parsers(parsers),
-   adder(adder)
-   {}
+  DirectoryGrammar
+  (
+    Parser::Header& header,
+    Parser::Parsers& parsers,
+    Parser::EquationAdder& adder
+  )
+  : header(header),
+    parsers(parsers),
+    adder(adder)
+  {}
 
-   Parser::Header& header;
-   Parser::Parsers& parsers;
-   Parser::EquationAdder& adder;
+  Parser::Header& header;
+  Parser::Parsers& parsers;
+  Parser::EquationAdder& adder;
 
-   template <typename ScannerT>
-   class definition {
-      public:
-      definition(DirectoryGrammar const& self)
-      : self(self),
+  template <typename ScannerT>
+  class definition
+  {
+    public:
+    definition(DirectoryGrammar const& self)
+    : self(self),
       equationGrammar(self.header, self.parsers, self.adder),
       headerGrammar(self.header, self.parsers)
+    {
+      equation_file = *(equationGrammar >> ";;") >> Spirit::end_p;
+      header = headerGrammar;
+    }
+
+    Spirit::rule<ScannerT> const&
+    start() const
+    {
+      switch (self.fileType)
       {
-         equation_file = *(equationGrammar >> ";;") >> Spirit::end_p;
-         header = headerGrammar;
+        case HEADER:
+          return header;
+        case EQNS:
+        case STRUCTURE:
+        case CLOCK:
+        case DEMANDS:
+          return equation_file;
+          break;
       }
+      return header;
+    }
 
-      Spirit::rule<ScannerT> const& start() const {
-         switch (self.fileType) {
-            case HEADER:
-            return header;
-            case EQNS:
-            case STRUCTURE:
-            case CLOCK:
-            case DEMANDS:
-            return equation_file;
-            break;
-         }
-         return header;
-      }
+    private:
+    DirectoryGrammar const& self;
 
-      private:
-      DirectoryGrammar const& self;
+    Spirit::rule<ScannerT> equation_file;
+    Spirit::rule<ScannerT> header;
 
-      Spirit::rule<ScannerT> equation_file,
-      header
-      ;
-
-      Parser::EquationGrammar equationGrammar;
-      Parser::HeaderGrammar headerGrammar;
+    Parser::EquationGrammar equationGrammar;
+    Parser::HeaderGrammar headerGrammar;
    };
 };
 #endif
@@ -152,35 +165,36 @@ class DirectoryGrammar : public qi::grammar<DirectoryGrammar> {
 DirectorySystem::DirectorySystem()
 : m_compiler(m_interpreter), m_expr_parser(m_header)
 {
-   m_expr_parser.set_context_perturb(m_tuple_parser);
-   m_tuple_parser.set_expr(m_expr_parser);
+  m_expr_parser.set_context_perturb(m_tuple_parser);
+  m_tuple_parser.set_expr(m_expr_parser);
 }
 
-bool DirectorySystem::parseSystem(const ustring_t& path)
+bool
+DirectorySystem::parseSystem(const ustring_t& path)
 {
 
   bool success = true;
 
   std::string pathl = Glib::filename_from_utf8(path);
 
-  typedef std::list<std::pair<std::string, DirectoryParser::FileType> > FileList;
+  typedef std::list<std::pair<std::string, DirectoryParser::FileType>>
+          FileList;
   FileList files;
-  files.push_back(std::make_pair(
-    Glib::build_filename(pathl, "header"), HEADER));
-  files.push_back(std::make_pair(
-    Glib::build_filename(pathl, "clock"), CLOCK));
-  files.push_back(std::make_pair(
-    Glib::build_filename(pathl, "eqns"), EQNS));
-  files.push_back(std::make_pair(
-    Glib::build_filename(pathl, "demands"), DEMANDS));
+  files.push_back(std::make_pair
+    (Glib::build_filename(pathl, "header"), HEADER));
+  files.push_back(std::make_pair
+    (Glib::build_filename(pathl, "clock"), CLOCK));
+  files.push_back(std::make_pair
+    (Glib::build_filename(pathl, "eqns"), EQNS));
+  files.push_back(std::make_pair
+    (Glib::build_filename(pathl, "demands"), DEMANDS));
 
   const std::wstring headerText = L"dimension<test>;;";
 
   std::wstring::const_iterator pos;
 
   for (FileList::iterator iter = files.begin();
-    iter != files.end() && success;
-    ++iter)
+       iter != files.end() && success; ++iter)
   {
       //Parser::EquationHolder eHolder(m_equationAdder);
 
@@ -205,70 +219,79 @@ bool DirectorySystem::parseSystem(const ustring_t& path)
 
     #if 0
     std::string file;
-    try {
+    try
+    {
       file = iter->first;
 
-       //if (parseString(contents, type, file)) {
-      if (parseFile(file, iter->second)) {
-        if (m_verbose) {
+      //if (parseString(contents, type, file))
+      if (parseFile(file, iter->second))
+      {
+        if (m_verbose)
+        {
           std::clog << "successfully parsed " << file << std::endl;
         }
         switch (iter->second)
         {
           case HEADER:
-          addDimensions();
-          BOOST_FOREACH(const ustring_t& s, m_parseInfo.libraries) {
-            loadLibrary(s);
-          }
-          break;
+            addDimensions();
+            BOOST_FOREACH(const ustring_t& s, m_parseInfo.libraries)
+            {
+              loadLibrary(s);
+            }
+            break;
 
           case CLOCK:
-          setClock(eHolder.equations());
-          break;
+            setClock(eHolder.equations());
+            break;
 
           case EQNS:
           case DEMANDS:
-          //demands and equations are the same thing
           {
+            //demands and equations are the same thing
             size_t dim_id = DIM_ID;
             size_t dim_valid = get_dimension_index(this, "_validguard");
             BOOST_FOREACH(const Parser::equation_t& e, eHolder.equations())
             {
               tuple_t k;
               k.insert(std::make_pair(dim_id,
-              TypedValue(String(std::get<0>(e)),
-                         TYPE_INDEX_USTRING)));
+              TypedValue(String(std::get<0>(e)), TYPE_INDEX_USTRING)));
 
               //need to compile the guard
-              HD *guardTuple = m_compiler.compile(std::get<0>(std::get<1>(e)));
-              HD *guardBool = m_compiler.compile(std::get<1>(std::get<1>(e)));
+              HD* guardTuple = m_compiler.compile(std::get<0>(std::get<1>(e)));
+              HD* guardBool = m_compiler.compile(std::get<1>(std::get<1>(e)));
               k.insert(std::make_pair(dim_valid,
                 TypedValue(EquationGuardType(EquationGuard(guardTuple, guardBool)),
                 TYPE_INDEX_GUARD)));
 
-                HD *h = m_compiler.compile(std::get<2>(e));
-                addExpr(Tuple(k), h);
+              HD* h = m_compiler.compile(std::get<2>(e));
+              addExpr(Tuple(k), h);
             }
+            break;
           }
-          break;
 
           default:
-          throw InternalError(
-            __FILE__ ": Interpreter::parseSystem() line: "
-            STRING_(__LINE__)
-            " should not have been reached");
+            throw InternalError(
+              __FILE__ ": Interpreter::parseSystem() line: "
+              STRING_(__LINE__)
+              " should not have been reached");
         }
 
         cleanupParserObjects();
-      } else {
+      }
+      else
+      {
         success = false;
         std::cerr << "failed parsing " << file << std::endl;
       }
-    } catch (Glib::FileError& e) {
+    }
+    catch (Glib::FileError& e)
+    {
        std::cerr << e.what() << std::endl;
        ++m_parseInfo.errorCount;
        success = false;
-    } catch (Glib::ConvertError& e) {
+    }
+    catch (Glib::ConvertError& e)
+    {
        std::cerr << "convert error reading " << file << std::endl;
     }
     #endif
@@ -278,52 +301,65 @@ bool DirectorySystem::parseSystem(const ustring_t& path)
 }
 
 #if r
-bool DirectorySystem::parseFile(const ustring_t& file, FileType type) {
-   ustring_t contents = Glib::locale_to_utf8(Glib::file_get_contents(file));
+bool
+DirectorySystem::parseFile(const ustring_t& file, FileType type)
+{
+  ustring_t contents = Glib::locale_to_utf8(Glib::file_get_contents(file));
 
-   Parser::UIterator iter(contents);
-   Parser::UIterator end = iter.make_end();
+  Parser::UIterator iter(contents);
+  Parser::UIterator end = iter.make_end();
 
-   return parseString(contents, *m_grammar);
+  return parseString(contents, *m_grammar);
 
 #if 0
-   return Spirit::parse(
-      Parser::iterator_t(
-         Parser::Iterator(iter),
-         Parser::Iterator(end)),
-      Parser::iterator_t(),
-      *m_grammar,
-      Parser::skip_p).full;
+  return Spirit::parse(
+     Parser::iterator_t(
+        Parser::Iterator(iter),
+        Parser::Iterator(end)),
+     Parser::iterator_t(),
+     *m_grammar,
+     Parser::skip_p).full;
 #endif
 }
 #endif
 
-void DirectorySystem::addParsedEquationSet(const Parser::equation_v& eqns) {
+void
+DirectorySystem::addParsedEquationSet(const Parser::equation_v& eqns)
+{
 }
 
 //the only equation in the map should be clock
-void DirectorySystem::setClock(const Parser::equation_v& equations) {
+void
+DirectorySystem::setClock(const Parser::equation_v& equations)
+{
   #if 0
-   const Parser::equation_t *e;
-   if (equations.size() == 1 &&
+  const Parser::equation_t* e;
+  if (equations.size() == 1 &&
       std::get<0>(*(e = &equations.front())) == L"clock")
-   {
-      HD *h = m_compiler.compile(std::get<2>(*e));
-      TypedValue v = (*h)(Tuple()).first;//= evaluate(e->get<2>(), Tuple());
-      if (v.index() != TYPE_INDEX_INTMP) {
-        throw ParseError("clock variable must be an intmp");
-      } else {
-        const Intmp& i = v.value<Intmp>();
-        m_maxClock = i.value();
-      }
-  } else {
+  {
+    HD* h = m_compiler.compile(std::get<2>(*e));
+    TypedValue v = (*h)(Tuple()).first;//= evaluate(e->get<2>(), Tuple());
+    if (v.index() != TYPE_INDEX_INTMP)
+    {
+      throw ParseError("clock variable must be an intmp");
+    }
+    else
+    {
+      const Intmp& i = v.value<Intmp>();
+      m_maxClock = i.value();
+    }
+  }
+  else
+  {
     throw ParseError("Clock variable not set correctly");
   }
   #endif
 }
 
-void DirectorySystem::addLibrarySearchPath(const std::string& path) {
-   m_lt.addSearchPath(path);
+void
+DirectorySystem::addLibrarySearchPath(const std::string& path)
+{
+  m_lt.addSearchPath(path);
 }
 
 }
