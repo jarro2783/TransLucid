@@ -37,11 +37,15 @@ namespace TransLucid
       void
       operator()(Arg1 arg1, Arg2 arg2) const
       {
-        arg1.add(arg2.c_str(), std::u32string(arg2.begin(), arg2.end()));
+        arg1.dimension_symbols.add
+          (arg2.c_str(), std::u32string(arg2.begin(), arg2.end()));
       }
     };
 
-    function<add_dimension_impl> add_dimension;
+    namespace
+    {
+      function<add_dimension_impl> add_dimension;
+    }
 
     //typedef Spirit::position_iterator<std::string::const_iterator>
     //        iterator_t;
@@ -115,13 +119,12 @@ namespace TransLucid
     }
 
     template <typename Iterator>
-    class HeaderGrammar : public qi::grammar<Iterator>
+    class HeaderGrammar : public qi::grammar<Iterator, skip, Header()>
     {
-      Header& header;
       public:
 
-      HeaderGrammar(Header& h)
-      : HeaderGrammar::base_type(headerp), header(h)
+      HeaderGrammar()
+      : HeaderGrammar::base_type(headerp)
       {
          using namespace qi::labels;
 
@@ -134,8 +137,8 @@ namespace TransLucid
          ;
 
          headerp =
-           *( headerItem >> qi::string( ";;" ))
-            >> qi::eoi;
+           *( headerItem(_a) >> qi::string( ";;" ))
+            >> qi::eoi[_val = _a];
          ;
 
          headerItem =
@@ -143,7 +146,7 @@ namespace TransLucid
              qi::lit("dimension")
                > angle_string
                  [
-                    add_dimension(ph::ref(header.dimension_symbols), _1)
+                    add_dimension(_r1, _1)
                  ]
            )
          | (
@@ -188,9 +191,15 @@ namespace TransLucid
 
       private:
 
+      qi::rule<Iterator, skip, Header(), qi::locals<Header>>
+         headerp
+      ;
+
+      qi::rule<Iterator, skip, void(Header)>
+         headerItem
+      ;
+
       qi::rule<Iterator>
-         headerp,
-         headerItem,
          integer
       ;
 

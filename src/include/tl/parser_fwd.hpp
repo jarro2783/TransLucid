@@ -46,6 +46,8 @@ namespace TransLucid
     typedef wchar_t char_type;
     typedef qi::symbols<char_type, std::u32string> symbols_t;
 
+    typedef qi::standard_wide::space_type skip;
+
     template <typename Iterator>
     struct SkipGrammar : public qi::grammar<Iterator>
     {

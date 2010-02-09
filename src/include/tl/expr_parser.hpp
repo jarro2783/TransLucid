@@ -41,15 +41,18 @@ namespace TransLucid
       }
     };
 
-    function<make_u32string_impl> make_u32string;
+    namespace
+    {
+      function<make_u32string_impl> make_u32string;
+    }
 
-    char_type
+    inline char_type
     get_end_char(const Delimiter& d)
     {
       return d.end;
     }
 
-    string_type
+    inline string_type
     get_name(const Delimiter& d)
     {
       return d.type;
