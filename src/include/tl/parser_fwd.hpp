@@ -42,6 +42,7 @@ namespace TransLucid
     };
 
     namespace qi = boost::spirit::qi;
+    namespace fusion = boost::fusion;
 
     typedef std::basic_string<wchar_t> string_type;
     typedef wchar_t char_type;
@@ -172,6 +173,7 @@ namespace TransLucid
 
     typedef qi::symbols<char_type, UnaryOperation> unary_symbols;
     typedef qi::symbols<char_type, BinaryOperation> binary_symbols;
+    typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
 
     struct Header
     {
@@ -182,9 +184,9 @@ namespace TransLucid
       unary_symbols prefix_op_symbols;
       unary_symbols postfix_op_symbols;
 
-      qi::symbols<char_type, Delimiter> delimiter_start_symbols;
+      delimiter_symbols delimiter_start_symbols;
 
-      std::vector<ustring_t> libraries;
+      std::vector<u32string> libraries;
 
       #if 0
       bool
@@ -199,17 +201,6 @@ namespace TransLucid
       }
       #endif
     };
-
-    BOOST_FUSION_ADAPT_STRUCT
-    (
-      Header,
-      (symbols_t, dimension_symbols)
-      (binary_symbols, binary_op_symbols)
-      (unary_symbols, prefix_op_symbols)
-      (unary_symbols, postfix_op_symbols)
-      ((qi::symbols<char_type, Delimiter>), delimiter_start_symbols)
-      (std::vector<ustring_t>, libraries)
-    )
 
     AST::Expr* insert_binary_operation
     (
@@ -271,5 +262,16 @@ namespace TransLucid
     typedef string_type::const_iterator iterator_t;
   }
 }
+
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Parser::Header,
+  (TransLucid::Parser::symbols_t, dimension_symbols)
+  (TransLucid::Parser::binary_symbols, binary_op_symbols)
+  (TransLucid::Parser::unary_symbols, prefix_op_symbols)
+  (TransLucid::Parser::unary_symbols, postfix_op_symbols)
+  (TransLucid::Parser::delimiter_symbols, delimiter_start_symbols)
+  (std::vector<std::u32string>, libraries)
+)
 
 #endif // PARSER_FWD_HPP_INCLUDED

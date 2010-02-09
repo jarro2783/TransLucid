@@ -207,7 +207,8 @@ DirectorySystem::parseSystem(const ustring_t& path)
         pos,
         headerText.end(),
         m_header_parser,
-        qi::standard_wide::space
+        qi::standard_wide::space,
+        m_header
       );
 
       case EQNS:

@@ -138,7 +138,7 @@ namespace TransLucid
          ;
 
          headerp =
-           *( headerItem(_val) >> qi::string( ";;" ))
+           *( headerItem(_val) >> qi::lit( ";;" ))
             >> qi::eoi;
          ;
 
@@ -196,7 +196,7 @@ namespace TransLucid
          headerp
       ;
 
-      qi::rule<Iterator, skip, void(Header)>
+      qi::rule<Iterator, skip, void(Header&)>
          headerItem
       ;
 
@@ -238,20 +238,33 @@ namespace TransLucid
            >> expr
           )
           [
-            _val = construct<Equation>(_1, _2, _3, _4)
+            _val = construct<ParsedEquation>(_1, _2, _3, _4)
           ]
         ;
 
         guard =
-          -((qi::lit('@') >> context_perturb[_val = _1]) | qi::eps[_val = 0]);
+          ( qi::lit('|') >> context_perturb[_val = _1])
+        | qi::eps[_val = (AST::Expr*)0]
+        ;
 
-        boolean = -((qi::lit('|') >> expr[_val = _1]) | qi::eps[_val = 0]);
+        boolean =
+          ( qi::lit('&') >> expr[_val = _1])
+        | qi::eps[_val = (AST::Expr*)0]
+        ;
       }
 
       template <typename T>
       void
-      set_context_perturb(const T& t) {
+      set_context_perturb(const T& t)
+      {
         context_perturb = t;
+      }
+
+      template <typename T>
+      void
+      set_expr(const T& t)
+      {
+        expr = t;
       }
 
       private:
