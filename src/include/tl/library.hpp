@@ -5,23 +5,27 @@
 #include <ltdl.h>
 #include <list>
 
-namespace TransLucid {
+namespace TransLucid
+{
 
-   typedef void (*library_loader)(Interpreter&);
+  typedef void (*library_loader)(Interpreter&);
 
-   class Libtool {
-      public:
-      Libtool();
+  class Libtool
+  {
+    public:
+    Libtool();
 
-      ~Libtool();
+    ~Libtool();
 
-      void loadLibrary(const Glib::ustring& name, Interpreter& i);
+    void
+    loadLibrary(const Glib::ustring& name, Interpreter& i);
 
-      void addSearchPath(const ustring_t& path);
+    void
+    addSearchPath(const ustring_t& path);
 
-      private:
-      std::list<ustring_t> m_searchDirs;
-   };
+    private:
+    std::list<ustring_t> m_searchDirs;
+  };
 } //namespace TransLucid
 
 #endif // LIBRARY_HPP_INCLUDED

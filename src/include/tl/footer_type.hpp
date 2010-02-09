@@ -3,9 +3,11 @@
 
 #include <tl/types.hpp>
 
-namespace TransLucid {
-   class FooterType : public TypedValueBase {
-   };
+namespace TransLucid
+{
+  class FooterType : public TypedValueBase
+  {
+  };
 }
 
 #endif // FOOTER_TYPE_HPP_INCLUDED
