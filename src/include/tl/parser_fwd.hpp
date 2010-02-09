@@ -16,6 +16,7 @@
 //#include <boost/shared_array.hpp>
 #include <stack>
 #include <tl/equation.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
 
 namespace TransLucid
 {
@@ -174,27 +175,14 @@ namespace TransLucid
 
     struct Header
     {
-      Header()
-      : errorCount(0)
-      {
-      }
-      int errorCount;
-
       symbols_t dimension_symbols;
 
-      std::vector<ustring_t> equation_names;
-      symbols_t equation_symbols;
-
       binary_symbols binary_op_symbols;
-      //std::vector<BinaryOperation> binary_op_info;
 
       unary_symbols prefix_op_symbols;
       unary_symbols postfix_op_symbols;
-      //std::vector<UnaryOperation> unary_op_info;
 
       qi::symbols<char_type, Delimiter> delimiter_start_symbols;
-
-      std::vector<Delimiter> delimiter_info;
 
       std::vector<ustring_t> libraries;
 
@@ -211,6 +199,17 @@ namespace TransLucid
       }
       #endif
     };
+
+    BOOST_FUSION_ADAPT_STRUCT
+    (
+      Header,
+      (symbols_t, dimension_symbols)
+      (binary_symbols, binary_op_symbols)
+      (unary_symbols, prefix_op_symbols)
+      (unary_symbols, postfix_op_symbols)
+      ((qi::symbols<char_type, Delimiter>), delimiter_start_symbols)
+      (std::vector<ustring_t>, libraries)
+    )
 
     AST::Expr* insert_binary_operation
     (
