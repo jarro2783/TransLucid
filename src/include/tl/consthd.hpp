@@ -11,10 +11,10 @@ namespace TransLucid
   namespace ConstHD
   {
 
-    class ConstantHD : public HD
+    class ExprHD : public HD
     {
       public:
-      ConstantHD(HD* system)
+      ExprHD(HD* system)
       : m_system(system)
       {}
 
@@ -27,26 +27,26 @@ namespace TransLucid
       HD* m_system;
     };
 
-    class UChar : public ConstantHD
+    class UChar : public ExprHD
     {
       public:
       static const char32_t* name;
 
       UChar(HD* system)
-      : ConstantHD(system)
+      : ExprHD(system)
       {}
 
       TaggedValue
       operator()(const Tuple& k);
     };
 
-    class Intmp : public ConstantHD
+    class Intmp : public ExprHD
     {
       public:
       static const char32_t* name;
 
       Intmp(HD* system)
-      : ConstantHD(system)
+      : ExprHD(system)
       {}
 
       TaggedValue
@@ -55,13 +55,13 @@ namespace TransLucid
       private:
     };
 
-    class UString : public ConstantHD
+    class UString : public ExprHD
     {
       public:
       static const char32_t* name;
 
       UString(HD* system)
-      : ConstantHD(system)
+      : ExprHD(system)
       {}
 
       TaggedValue
@@ -92,12 +92,12 @@ namespace TransLucid
       mpz_class m_v;
     };
 
-    class TypeConst : public ConstantHD
+    class TypeConst : public ExprHD
     {
       public:
 
       TypeConst(size_t index)
-      : ConstantHD(0), m_index(index)
+      : ExprHD(0), m_index(index)
       {}
 
       TaggedValue

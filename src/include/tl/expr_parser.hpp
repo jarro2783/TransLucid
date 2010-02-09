@@ -69,7 +69,7 @@ namespace TransLucid
         using qi::_val;
         using namespace qi::labels;
 
-        expr %= if_expr
+        expr = if_expr [_val = _1]
         ;
 
         if_expr =
@@ -107,7 +107,7 @@ namespace TransLucid
         at_expr =
            binary_op [_a = _1]
         >> (
-            -('@' >> at_expr)
+             ('@' >> at_expr)
              [
                _val = new_<AST::AtExpr>(_a, _1)
              ]
@@ -141,11 +141,11 @@ namespace TransLucid
         postfix_expr =
            hash_expr [_a = _1]
         >> (
-             -(header.postfix_op_symbols
+             ( header.postfix_op_symbols
                [
                  _val = new_<AST::UnaryExpr>(_1, _a)
                ]
-              )
+             )
            | qi::eps
              [
               _val = _a
@@ -214,6 +214,20 @@ namespace TransLucid
         ;
 
         end_delimiter = qi::standard_wide::char_(_r1);
+
+        BOOST_SPIRIT_DEBUG_NODE(if_expr);
+        BOOST_SPIRIT_DEBUG_NODE(expr);
+        BOOST_SPIRIT_DEBUG_NODE(boolean);
+        BOOST_SPIRIT_DEBUG_NODE(range_expr);
+        BOOST_SPIRIT_DEBUG_NODE(integer);
+        BOOST_SPIRIT_DEBUG_NODE(prefix_expr);
+        BOOST_SPIRIT_DEBUG_NODE(hash_expr);
+        BOOST_SPIRIT_DEBUG_NODE(context_perturb);
+        BOOST_SPIRIT_DEBUG_NODE(end_delimiter);
+        BOOST_SPIRIT_DEBUG_NODE(postfix_expr);
+        BOOST_SPIRIT_DEBUG_NODE(at_expr);
+        BOOST_SPIRIT_DEBUG_NODE(binary_op);
+        //BOOST_SPIRIT_DEBUG_NODE(primary_expr);
       }
 
       template <typename T>

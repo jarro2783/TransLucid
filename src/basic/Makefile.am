@@ -1,8 +1,10 @@
-noinst_PROGRAMS = single echo
+noinst_PROGRAMS = single echo typewriter
 
 single_SOURCES = single.cpp
 
 echo_SOURCES = echo.cpp
+
+typewrite_SOURCES = typewriter.cpp
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/include $(GLIBMM_CFLAGS) \
 -DSHAREDIR=\"$(pkgdatadir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
