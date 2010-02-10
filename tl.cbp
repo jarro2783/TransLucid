@@ -68,6 +68,19 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Target title="typewriter">
+				<Option output="bin/typewriter/tl" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/typewriter/" />
+				<Option object_output="obj/typewriter/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
 		</Build>
 		<VirtualTargets>
 			<Add alias="all" targets="libinterpreter;intlib;Debug;libprinter;" />
@@ -88,222 +101,294 @@
 		</Linker>
 		<Unit filename="src/basic/echo.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/basic/single.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
+		</Unit>
+		<Unit filename="src/basic/typewriter.cpp">
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/dirsystem/directory_system.cpp">
 			<Option target="Debug" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/dirsystem/directory_system.hpp">
 			<Option target="Debug" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/dirsystem/main.cpp">
 			<Option target="Debug" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/builtin_types.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/cache.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/compiled_classes.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/compiled_functors.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/constant_parser.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/consthd.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/container.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/dimtranslator.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/equation.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/evaluator.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/exception.hpp" />
 		<Unit filename="src/include/tl/expr.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/expr_compiler.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/expr_parser.hpp" />
 		<Unit filename="src/include/tl/fixed_indexes.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/footer_type.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/function.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/header_type.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/hyperdaton.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/interpreter.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/library.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/parser.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/parser_fwd.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/parser_util.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/printer.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/range.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/set_types.hpp">
+			<Option target="libinterpreter" />
+			<Option target="typewriter" />
+		</Unit>
+		<Unit filename="src/include/tl/translator.hpp">
 			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/include/tl/tuple_parser.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/types.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/include/tl/utility.hpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/interactive/interactive.cpp">
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/interactive/interactive.hpp">
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/interactive/main.cpp">
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/interactive/parser.hpp">
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/int/libint.cpp">
 			<Option target="intlib" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/int/libint.hpp">
 			<Option target="intlib" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/builtin_types.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/cache.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/compiled_functors.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/consthd.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/container.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/dimtranslator.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/equation.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/evaluator.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/expr.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/expr_compiler.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/function.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/header_type.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/interpreter.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/interpreter_constant.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/interpreter_expr.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/interpreter_tuple.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/library.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/parser.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/printer.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/range.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/set_types.cpp">
+			<Option target="libinterpreter" />
+			<Option target="typewriter" />
+		</Unit>
+		<Unit filename="src/libs/interpreter/translator.cpp">
 			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/types.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/utility.cpp">
 			<Option target="libinterpreter" />
+			<Option target="typewriter" />
 		</Unit>
 		<Unit filename="src/libs/printer/printer.cpp">
 			<Option target="libprinter" />
 			<Option target="interactive" />
+			<Option target="typewriter" />
 		</Unit>
 		<Extensions>
 			<code_completion />

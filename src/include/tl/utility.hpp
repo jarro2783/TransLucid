@@ -12,7 +12,6 @@
 
 namespace TransLucid
 {
-
   class DimensionNotFound
   {
   };
@@ -156,6 +155,9 @@ namespace TransLucid
 
   bool
   booleanTrue(const EquationGuard& g, const Tuple& c);
+
+  std::string
+  utf32_to_utf8(const std::u32string& s);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

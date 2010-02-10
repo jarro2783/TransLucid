@@ -4,6 +4,7 @@
 #include <tl/parser_util.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/expr.hpp>
+#include <tl/utility.hpp>
 //#include <boost/format.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 

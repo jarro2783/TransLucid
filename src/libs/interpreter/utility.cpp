@@ -1,6 +1,7 @@
 #include <tl/utility.hpp>
 #include <tl/equation.hpp>
 #include <tl/types.hpp>
+#include <iconv.h>
 
 namespace TransLucid
 {
@@ -142,6 +143,45 @@ booleanTrue(const EquationGuard& g, const Tuple& k)
   {
     return true;
   }
+}
+
+
+std::string
+utf32_to_utf8(const std::u32string& s) {
+  const size_t buffer_size = 8000;
+  if (s.size()+1 > buffer_size/sizeof(char32_t))
+  {
+    return std::string("string too big");
+  }
+  iconv_t id = iconv_open("UTF8", "UTF32LE");
+  if (id == (iconv_t)-1)
+  {
+    perror("unable to open iconv: ");
+  }
+
+  size_t inSize = (s.size())* sizeof(char32_t);
+  size_t outSize = buffer_size * sizeof(char32_t);
+  char out[buffer_size];
+  char32_t in[buffer_size];
+  memcpy(in, s.c_str(), s.size()*sizeof(char32_t));
+
+  char* outp = out;
+  char* inp = (char*)in;
+
+  while (inSize > 0) {
+    size_t r = iconv(id, &inp, &inSize, &outp, &outSize);
+    if (r == (size_t)-1)
+    {
+      //std::cerr << "iconv failed: " << errno << std::endl;
+      perror("iconv failed: ");
+      inSize = 0;
+      return std::string();
+    }
+  }
+
+  iconv_close(id);
+  *outp = '\0';
+  return std::string(out);
 }
 
 }

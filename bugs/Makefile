@@ -1,0 +1,22 @@
+CXXFLAGS=-std=gnu++0x -c
+LDFLAGS=-std=gnu++0x
+
+all:lambda_inline_2 lambda_inline 
+
+lambda_inline: lambda_inline_a.o lambda_inline_b.o
+	g++ -o $@ $^ $(LDFLAGS)
+
+lambda_inline_a.o: lambda_inline_a.cpp lambda_inline.hpp
+	g++ $< -o $@ $(CXXFLAGS)
+
+lambda_inline_b.o: lambda_inline_b.cpp lambda_inline.hpp
+	g++ $< -o $@ $(CXXFLAGS)
+
+lambda_inline_2: lambda_inline_c.o lambda_inline_d.o
+	g++ -o $@ $^ $(LDFLAGS)
+
+lambda_inline_c.o: lambda_inline_c.cpp lambda_inline_2.hpp
+	g++ $< -o $@ $(CXXFLAGS)
+
+lambda_inline_d.o: lambda_inline_d.cpp lambda_inline_2.hpp
+	g++ $< -o $@ $(CXXFLAGS)

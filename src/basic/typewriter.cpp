@@ -1,43 +1,16 @@
 #include <tl/translator.hpp>
 #include <tl/builtin_types.hpp>
 #include <algorithm>
-#include <iconv.h>
-
-std::string
-utf32_to_utf8(const std::u32string& s) {
-  const size_t buffer_size = 2000;
-  if (s.size() > buffer_size)
-  {
-    return std::string("string too big");
-  }
-  iconv_t id = iconv_open("UTF-8", "UTF-32");
-
-  size_t inSize = s.size();
-  size_t outSize = buffer_size;
-  char out[buffer_size];
-  char in[buffer_size*4];
-  memcpy(in, s.c_str(), s.size()*sizeof(char32_t));
-
-  char* outp = out;
-  char* inp = in;
-
-  while (inSize > 0) {
-    size_t r = iconv(id, &inp, &inSize, &outp, &outSize);
-    if (r == (size_t)-1)
-    {
-      //std::cerr << "iconv failed: " << errno << std::endl;
-      perror("iconv failed: ");
-      inSize = 0;
-    }
-  }
-
-  return std::string(out);
-}
+#include <tl/utility.hpp>
 
 namespace TL = TransLucid;
 
 int main(int argc, char *argv[])
 {
+  std::cout << "in unicode é looks like" << std::endl;
+  std::u32string echar = U"é";
+  std::cout << echar[0] << std::endl;
+
   TL::Translator translator;
   TL::HD* h = translator.translate_expr(L"42");
 
@@ -51,14 +24,14 @@ int main(int argc, char *argv[])
   v = (*h)(TL::Tuple());
   std::u32string s = v.first.value<TL::String>().value();
 
-  std::cout << utf32_to_utf8(s) << std::endl;
+  std::cout << TL::utf32_to_utf8(s) << std::endl;
   delete h;
 
-  h = translator.translate_expr(L"\'é\'");
+  h = translator.translate_expr(L"\'è\'");
   v = (*h)(TL::Tuple());
   //std::cout << "char value = " << v.first.value<TL::Char>().value() << std::endl;
   s.clear();
   s += v.first.value<TL::Char>().value();
-  std::cout << utf32_to_utf8(s) << std::endl;
+  std::cout << TL::utf32_to_utf8(s) << std::endl;
   return 0;
 }
