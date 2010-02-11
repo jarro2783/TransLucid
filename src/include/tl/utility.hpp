@@ -158,6 +158,9 @@ namespace TransLucid
 
   std::string
   utf32_to_utf8(const std::u32string& s);
+
+  std::string
+  u32_to_ascii(const u32string& s);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

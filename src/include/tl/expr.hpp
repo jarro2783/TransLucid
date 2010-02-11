@@ -6,6 +6,7 @@
 #include <boost/function.hpp>
 //#include <boost/bind.hpp>
 #include <tl/parser_fwd.hpp>
+#include <tl/builtin_types.hpp>
 
 namespace TransLucid
 {
@@ -42,6 +43,7 @@ namespace TransLucid
     class OpExpr;
     class PairExpr;
     class RangeExpr;
+    class SpecialExpr;
     class SpecialOpsExpr;
     class StringExpr;
     class UcharExpr;
@@ -68,6 +70,7 @@ namespace TransLucid
       virtual Data* visitOpExpr(OpExpr*, Data*) = 0;
       virtual Data* visitPairExpr(PairExpr*, Data*) = 0;
       virtual Data* visitRangeExpr(RangeExpr*, Data*) = 0;
+      virtual Data* visitSpecialExpr(SpecialExpr*, Data*) = 0;
       virtual Data* visitStringExpr(StringExpr*, Data*) = 0;
       virtual Data* visitUcharExpr(UcharExpr*, Data*) = 0;
       virtual Data* visitUnaryExpr(UnaryExpr*, Data*) = 0;
@@ -340,6 +343,22 @@ namespace TransLucid
 
       Expr* lhs;
       Expr* rhs;
+    };
+
+    class SpecialExpr : public Expr
+    {
+      public:
+      SpecialExpr(Special::Value s)
+      : value(s)
+      {}
+
+      Data*
+      visit(Visitor* v, Data* data)
+      {
+        return v->visitSpecialExpr(this, data);
+      }
+
+      Special::Value value;
     };
 
     class SpecialOpsExpr : public Expr

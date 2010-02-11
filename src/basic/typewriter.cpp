@@ -33,5 +33,14 @@ int main(int argc, char *argv[])
   s.clear();
   s += v.first.value<TL::Char>().value();
   std::cout << TL::utf32_to_utf8(s) << std::endl;
+
+  delete h;
+  h = translator.translate_expr(L"spdim");
+  v = (*h)(TL::Tuple());
+  std::cout << v.first.value<TL::Special>().value() << std::endl;
+
+  h = translator.translate_expr(L"0X10");
+  v = (*h)(TL::Tuple());
+  std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;
   return 0;
 }

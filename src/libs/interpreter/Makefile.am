@@ -8,7 +8,7 @@ libtlinterpreter_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
 -lltdl
 
 libtlinterpreter_la_SOURCES = interpreter.cpp interpreter_expr.cpp \
-interpreter_tuple.cpp interpreter_constant.cpp \
+interpreter_tuple.cpp \
 library.cpp types.cpp \
 dimtranslator.cpp \
 range.cpp expr.cpp  parser.cpp \

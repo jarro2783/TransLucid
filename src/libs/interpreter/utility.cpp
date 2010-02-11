@@ -184,4 +184,23 @@ utf32_to_utf8(const std::u32string& s) {
   return std::string(out);
 }
 
+std::string
+u32_to_ascii(const u32string& s)
+{
+  std::string r;
+
+  BOOST_FOREACH(char32_t c, s)
+  {
+    if (c > 0x7F)
+    {
+      throw "character not ascii";
+    }
+    else
+    {
+      r += c;
+    }
+  }
+  return r;
+}
+
 }

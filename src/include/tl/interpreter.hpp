@@ -72,15 +72,6 @@ namespace TransLucid
     registerEquation
     (const u32string& name, const Tuple& validContext, AST::Expr* e);
 
-    #if 0
-    HD*
-    lookupVariable(const ustring_t& name)
-    {
-      VariableMap::const_iterator iter = m_variables.find(name);
-      return iter != m_variables.end() ? iter->second : 0;
-    }
-    #endif
-
     TaggedValue
     operator()(const Tuple& k);
 

@@ -172,10 +172,6 @@ Interpreter::init_types()
 
 Interpreter::Interpreter()
 : m_types(*this),
-  //m_evaluator(*this),
-  m_maxClock(0),
-  //m_warehouse(*this),
-  //m_dimension_id(m_dimTranslator.lookup("id")),
   m_time(0),
   builtin_name_to_index
   {

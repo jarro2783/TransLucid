@@ -5,12 +5,12 @@
 #include <tl/parser_fwd.hpp>
 #include <tl/expr.hpp>
 #include <tl/utility.hpp>
+#include <tl/builtin_types.hpp>
 //#include <boost/format.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 
 #include <boost/spirit/home/phoenix/object/new.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
-#include <boost/spirit/home/phoenix/function/function.hpp>
 #include <boost/spirit/home/phoenix/container.hpp>
 #include <boost/spirit/home/phoenix/bind/bind_function.hpp>
 #include <boost/spirit/home/phoenix/statement/sequence.hpp>
@@ -21,31 +21,6 @@ namespace TransLucid
   {
     using namespace boost::phoenix;
     namespace ph = boost::phoenix;
-
-    struct make_u32string_impl
-    {
-      template <typename Arg>
-      struct result
-      {
-        typedef std::u32string type;
-      };
-
-      template <typename Arg>
-      std::u32string operator()(Arg arg1) const
-      {
-        return std::u32string(arg1.begin(), arg1.end());
-      }
-
-      std::u32string operator()(const u32string& arg1) const
-      {
-        return arg1;
-      }
-    };
-
-    namespace
-    {
-      function<make_u32string_impl> make_u32string;
-    }
 
     inline char_type
     get_end_char(const Delimiter& d)
@@ -81,6 +56,26 @@ namespace TransLucid
       {
         using qi::_val;
         using namespace qi::labels;
+
+        specials.add
+          (L"sperror", Special::ERROR)
+          (L"spaccess", Special::ACCESS)
+          (L"sptype", Special::TYPEERROR)
+          (L"spdim", Special::DIMENSION)
+          (L"spundef", Special::UNDEF)
+          (L"const", Special::CONST)
+          (L"loop", Special::LOOP)
+        ;
+
+        #if 0
+        {Special::ERROR, "error"},
+        {Special::ACCESS, "access"},
+        {Special::TYPEERROR, "type"},
+        {Special::DIMENSION, "dim"},
+        {Special::UNDEF, "undef"},
+        {Special::CONST, "const"},
+        {Special::LOOP, "loop"}
+        #endif
 
         expr = if_expr [_val = _1]
         ;
@@ -189,6 +184,7 @@ namespace TransLucid
                 _val = new_<AST::IdentExpr>(make_u32string(_a))
                ]
              )
+        | specials [_val = new_<AST::SpecialExpr>(_1)]
         | context_perturb [_val = _1]
         | ('(' >> expr > ')') [_val = _1]
         | (   header.delimiter_start_symbols
@@ -287,6 +283,8 @@ namespace TransLucid
       ident_parser<Iterator> ident;
 
       Header &header;
+
+      qi::symbols<char_type, Special::Value> specials;
 
       #warning error checking
     };

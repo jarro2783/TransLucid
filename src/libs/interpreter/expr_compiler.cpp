@@ -231,6 +231,12 @@ ExprCompiler::visitRangeExpr(AST::RangeExpr*, AST::Data*)
 }
 
 AST::Data*
+ExprCompiler::visitSpecialExpr(AST::SpecialExpr* e, AST::Data*)
+{
+  return new Compiled(new CompiledFunctors::SpecialConst(e->value));
+}
+
+AST::Data*
 ExprCompiler::visitStringExpr(AST::StringExpr* e, AST::Data*)
 {
   return new Compiled(new CompiledFunctors::StringConst(e->value));

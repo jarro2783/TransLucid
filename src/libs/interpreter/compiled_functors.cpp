@@ -349,6 +349,12 @@ Pair::operator()(const Tuple& k)
 }
 
 TaggedValue
+SpecialConst::operator()(const Tuple& k)
+{
+  return TaggedValue(TypedValue(Special(m_value), TYPE_INDEX_SPECIAL), k);
+}
+
+TaggedValue
 StringConst::operator()(const Tuple& k)
 {
   return TaggedValue(TypedValue(String(m_value), TYPE_INDEX_USTRING), k);

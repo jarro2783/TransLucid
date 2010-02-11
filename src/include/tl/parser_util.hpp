@@ -2,10 +2,13 @@
 #define PARSER_UTIL_HPP_INCLUDED
 
 #include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_bind.hpp>
+#include <boost/spirit/home/phoenix/function/function.hpp>
 
 #include <gmpxx.h>
 #include <tl/types.hpp>
 #include <tl/parser_fwd.hpp>
+#include <tl/utility.hpp>
 
 namespace Glib
 {
@@ -28,24 +31,76 @@ namespace TransLucid
 {
   namespace Parser
   {
+    struct make_u32string_impl
+    {
+      template <typename Arg>
+      struct result
+      {
+        typedef std::u32string type;
+      };
+
+      template <typename Arg>
+      std::u32string operator()(Arg arg1) const
+      {
+        return std::u32string(arg1.begin(), arg1.end());
+      }
+
+      std::u32string operator()(const u32string& arg1) const
+      {
+        return arg1;
+      }
+    };
+
+    namespace
+    {
+      boost::phoenix::function<make_u32string_impl> make_u32string;
+    }
+
+    inline mpz_class
+    create_mpz(char base, const u32string& s)
+    {
+      //0-9a-zA-Z
+      int actualBase;
+      if (base <= '9')
+      {
+        actualBase = base - '0';
+      }
+      else if (base <= 'Z')
+      {
+        actualBase = base - 'A' + 26 + 1 + 10;
+      }
+      else
+      {
+        actualBase = base - 'a' + 10;
+      }
+      return mpz_class(u32_to_ascii(s), actualBase);
+    }
+
     template <typename Iterator>
     class ExprGrammar;
 
     template <typename Iterator>
-    struct integer_parser : public qi::grammar<Iterator, mpz_class()>
+    struct integer_parser
+    : public qi::grammar<Iterator, mpz_class(), qi::locals<string_type>>
     {
       integer_parser()
         : integer_parser::base_type(integer)
       {
+        namespace ph = boost::phoenix;
+        using namespace qi::labels;
+
         integer =
-          ( '0'
+          (( '0'
           >> (qi::char_('2', '9') | qi::ascii::alpha)
-          >> +(qi::ascii::digit | qi::ascii::alpha)
+          >> +(qi::ascii::digit | qi::ascii::alpha)[_a += _1])
+            [
+               _val = ph::bind(&create_mpz, _1, make_u32string(_a))
+            ]
           | qi::int_ [qi::_val = qi::_1])
         ;
       }
 
-      qi::rule<Iterator, mpz_class()> integer;
+      qi::rule<Iterator, mpz_class(), qi::locals<string_type>> integer;
     };
 
     template <typename Iterator>

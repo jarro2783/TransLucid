@@ -54,12 +54,6 @@ TypeRegistry::TypeRegistry(Interpreter& i)
 
 TypeRegistry::~TypeRegistry()
 {
-  //doesn't really matter which one I use here to clean up, as long as
-  //I only use one of them
-  BOOST_FOREACH(IndexTypeMap::value_type& v, m_typeIndexMapping)
-  {
-     delete v.second;
-  }
 }
 
 //TypedValue TypeRegistry::makeOpTypeErrorActual(const TypeManager* special)

@@ -530,8 +530,6 @@ namespace TransLucid
    **/
   //typedef std::map<Glib::ustring, op_map> ops_map;
 
-  class TypeManager;
-
   //keeps track of types
   /**
    * @brief Stores types and operations on a types.
@@ -553,28 +551,11 @@ namespace TransLucid
       return m_nextIndex++;
     }
 
-    void
-    registerType(const TypeManager* manager);
-
     size_t
     registerType(const ustring_t& name);
 
     size_t
     lookupType(const ustring_t& name) const;
-
-    const TypeManager*
-    findType(const Glib::ustring& name) const
-    {
-      StringTypeMap::const_iterator i = m_typeNameMapping.find(name);
-      return i == m_typeNameMapping.end() ? 0 : i->second;
-    }
-
-    const TypeManager*
-    findType(type_index index) const
-    {
-      IndexTypeMap::const_iterator i = m_typeIndexMapping.find(index);
-      return i == m_typeIndexMapping.end() ? 0 : i->second;
-    }
 
     #if 0
     void
@@ -713,20 +694,6 @@ namespace TransLucid
 
     private:
 
-    typedef std::map<type_index, const TypeManager*> IndexTypeMap;
-    typedef boost::unordered_map<Glib::ustring, const TypeManager*>
-           StringTypeMap;
-    //typedef std::map<type_index, ConvertFunction> IndexConvertMap;
-    //typedef std::map<type_index, IndexConvertMap> ConvertorsMap;
-    //typedef std::map<ustring_t, std::map<type_index, OpFunction>>
-    //        VariadicOpMap;
-
-    IndexTypeMap m_typeIndexMapping;
-    StringTypeMap m_typeNameMapping;
-    //ops_map opsMap;
-    //ConvertorsMap m_convertors;
-    //VariadicOpMap m_variadicOperators;
-
     type_index m_nextIndex;
 
     type_index m_indexError;
@@ -743,11 +710,6 @@ namespace TransLucid
     type_index m_indexCalc;
     type_index m_indexGuard;
     type_index m_indexPair;
-
-    //OpFunction makeOpTypeError;
-    //TypedValue makeOpTypeErrorActual(const TypeManager* special);
-
-    //ConvertFunction makeConvertTypeError;
 
     Interpreter& m_interpreter;
 

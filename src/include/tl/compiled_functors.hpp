@@ -4,6 +4,7 @@
 #include <tl/interpreter.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/parser_fwd.hpp>
+#include <tl/builtin_types.hpp>
 
 namespace TransLucid
 {
@@ -285,6 +286,20 @@ namespace TransLucid
       Interpreter& m_system;
       HD* m_lhs;
       HD* m_rhs;
+    };
+
+    class SpecialConst : public CompiledFunctor
+    {
+      public:
+      SpecialConst(Special::Value v)
+      : m_value(v)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& k);
+
+      private:
+      Special::Value m_value;
     };
 
     class StringConst : public CompiledFunctor

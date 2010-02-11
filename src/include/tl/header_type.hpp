@@ -111,32 +111,6 @@ namespace TransLucid
       }
     };
   }
-
-  template <HeaderType::Input H>
-  class HeaderManager : public TypeManager
-  {
-
-    private:
-
-    public:
-    HeaderManager(TypeRegistry& r)
-    : TypeManager(r, HeaderImp::name<H>()())
-    {}
-
-    TypedValue
-    parse(const ustring_t& s, const Tuple& c, Interpreter& i) const
-    {
-      HeaderType h;
-      HeaderImp::parser<H>()(h, s, c, i);
-      return TypedValue(h, index());
-    }
-
-    void
-    printInternal
-    (std::ostream& out, const TypedValue& v, const Tuple& c) const
-    {
-    }
-  };
 };
 
 #endif

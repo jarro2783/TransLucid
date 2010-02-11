@@ -335,11 +335,6 @@
 			<Option target="interactive" />
 			<Option target="typewriter" />
 		</Unit>
-		<Unit filename="src/libs/interpreter/interpreter_constant.cpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-		</Unit>
 		<Unit filename="src/libs/interpreter/interpreter_expr.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />

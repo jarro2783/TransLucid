@@ -148,12 +148,6 @@ Variable::operator()(const Tuple& k)
   }
 
   return (*bestIter->get<1>())(k);
-
-  //return ValueContext(
-  //   TypedValue(
-  //      Special(Special::ERROR),
-  //      m_i.typeRegistry().indexSpecial()),
-  //   c);
 }
 
 void
