@@ -75,12 +75,6 @@ Range::~Range() {
   delete m_upper;
 }
 
-Range
-Range::parse(const ustring_t& text, const Tuple& context, Interpreter& i)
-{
-  return Range();
-}
-
 size_t
 Range::hash() const
 {

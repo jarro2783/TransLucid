@@ -7,10 +7,6 @@ namespace TL = TransLucid;
 
 int main(int argc, char *argv[])
 {
-  std::cout << "in unicode é looks like" << std::endl;
-  std::u32string echar = U"é";
-  std::cout << echar[0] << std::endl;
-
   TL::Translator translator;
   TL::HD* h = translator.translate_expr(L"42");
 

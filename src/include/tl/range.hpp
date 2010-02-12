@@ -18,9 +18,6 @@ namespace TransLucid
 
     ~Range();
 
-    static Range
-    parse(const ustring_t& text, const Tuple& context, Interpreter& i);
-
     void
     print(std::ostream& os, const Tuple& context) const;
 

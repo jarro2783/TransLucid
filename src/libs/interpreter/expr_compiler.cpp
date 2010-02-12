@@ -18,7 +18,7 @@ struct Compiled : public AST::Data
 
 }
 
-ExprCompiler::ExprCompiler(Interpreter& i)
+ExprCompiler::ExprCompiler(HD* i)
 : m_i(i)
 {
 }
@@ -53,8 +53,8 @@ ExprCompiler::visitAtExpr(AST::AtExpr* e, AST::Data*)
   delete d2;
 
   return new Compiled(e->relative ?
-    static_cast<HD*>(new CompiledFunctors::AtRelative(m_i, e2, e1)) :
-    static_cast<HD*>(new CompiledFunctors::AtAbsolute(m_i, e2, e1)));
+    static_cast<HD*>(new CompiledFunctors::AtRelative(e2, e1)) :
+    static_cast<HD*>(new CompiledFunctors::AtAbsolute(e2, e1)));
 }
 
 AST::Data* ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr* e, AST::Data*)
@@ -73,7 +73,7 @@ AST::Data* ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr* e, AST::Data*)
 AST::Data*
 ExprCompiler::visitBooleanExpr(AST::BooleanExpr* e, AST::Data*)
 {
-  return new Compiled(new CompiledFunctors::BoolConst(m_i, e->value));
+  return new Compiled(new CompiledFunctors::BoolConst(e->value));
 }
 
 AST::Data*
@@ -122,13 +122,13 @@ ExprCompiler::visitHashExpr(AST::HashExpr* e, AST::Data*)
   Compiled* c = dynamic_cast<Compiled*>(e->e->visit(this, 0));
   HD* se = c->e;
   delete c;
-  return new Compiled(new CompiledFunctors::Hash(&m_i, se));
+  return new Compiled(new CompiledFunctors::Hash(m_i, se));
 }
 
 AST::Data*
  ExprCompiler::visitIdentExpr(AST::IdentExpr* e, AST::Data*)
 {
-  return new Compiled(new CompiledFunctors::Ident(&m_i, e->id));
+  return new Compiled(new CompiledFunctors::Ident(m_i, e->id));
 }
 
 AST::Data*
@@ -167,7 +167,7 @@ ExprCompiler::visitIfExpr(AST::IfExpr* e, AST::Data*)
   delete elsec;
 
   return
-    new Compiled(new CompiledFunctors::If(m_i, cond, then, elseifs, else_));
+    new Compiled(new CompiledFunctors::If(cond, then, elseifs, else_));
 }
 
 AST::Data*
@@ -220,7 +220,7 @@ ExprCompiler::visitPairExpr(AST::PairExpr* e, AST::Data*)
   delete lhsc;
   delete rhsc;
 
-  return new Compiled(new CompiledFunctors::Pair(m_i, lhs, rhs));
+  return new Compiled(new CompiledFunctors::Pair(lhs, rhs));
 }
 
 AST::Data*

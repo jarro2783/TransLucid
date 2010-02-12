@@ -7,7 +7,7 @@ namespace TransLucid
 TaggedValue
 ValuePrinter::operator()(const Tuple& k)
 {
-  ustring_t s = "<";
+  u32string s = U"<";
 
   Tuple::const_iterator iter = k.find(DIM_VALUE);
 

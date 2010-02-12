@@ -7,7 +7,7 @@ namespace TransLucid
 {
 
 std::pair<bool, TypedValue>
-LazyWarehouse::lookupCalc(const ustring_t& name, const Tuple& c)
+LazyWarehouse::lookupCalc(const u32string& name, const Tuple& c)
 {
   #if 0
   CacheMapping::iterator iter = m_cache.find(name);
@@ -43,7 +43,7 @@ LazyWarehouse::lookupCalc(const ustring_t& name, const Tuple& c)
 
 void
 LazyWarehouse::add
-(const ustring_t& name, const TypedValue& value, const Tuple& c)
+(const u32string& name, const TypedValue& value, const Tuple& c)
 {
   #if 0
   CacheMapping::iterator iter = m_cache.find(name);

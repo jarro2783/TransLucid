@@ -267,15 +267,15 @@ System::parseHeader(const std::string& file)
 {
   TL::Parser::HeaderGrammar headerParser(m_parseInfo, m_parsers);
 
-  TL::ustring_t contents =
-    Glib::locale_to_utf8(Glib::file_get_contents(file));
+  //TL::ustring_t contents =
+  //  Glib::locale_to_utf8(Glib::file_get_contents(file));
 
   Parser::UIterator iter(contents);
   Parser::UIterator end = iter.make_end();
 
   parseString(contents, headerParser);
 
-  BOOST_FOREACH(const TL::ustring_t& s, m_parseInfo.libraries)
+  BOOST_FOREACH(const TL::u32string& s, m_parseInfo.libraries)
   {
     std::cout << "loading library \"" << s << "\"" << std::endl;
     loadLibrary(s);

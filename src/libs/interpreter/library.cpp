@@ -1,7 +1,5 @@
 #include "tl/library.hpp"
 #include <ltdl.h>
-#include <glibmm/ustring.h>
-#include <glibmm/convert.h>
 #include <iostream>
 
 namespace TransLucid
@@ -12,23 +10,25 @@ namespace
   bool
   attemptLibraryOpen
   (
-    const ustring_t& file,
-    const ustring_t& name,
-    Interpreter& i
+    const u32string& file,
+    const u32string& name,
+    HD* system
   )
   {
+    #warning fix library loading
     bool success = true;
-    std::string filename = Glib::filename_from_utf8(name);
+    std::string filename;//= Glib::filename_from_utf8(name);
 
     lt_dlhandle h = lt_dlopenext(filename.c_str());
 
     if (h != 0)
     {
-      void* init = lt_dlsym(h, ("lib_" + name + "_init").c_str());
+      //void* init = lt_dlsym(h, (U"lib_" + name + U"_init").c_str());
+      void *init = 0;
 
       if (init != 0)
       {
-        (*(library_loader)init)(i);
+        (*(library_loader)init)(system);
       }
       else
       {
@@ -59,9 +59,9 @@ namespace
 Libtool::Libtool()
 {
   lt_dlinit();
-  m_searchDirs.push_back(".");
+  m_searchDirs.push_back(U".");
   #ifdef PKGLIBDIR
-  m_searchDirs.push_back(PKGLIBDIR);
+  //m_searchDirs.push_back(U PKGLIBDIR);
   #endif
 }
 
@@ -71,15 +71,15 @@ Libtool::~Libtool()
 }
 
 void
-Libtool::loadLibrary(const Glib::ustring& name, Interpreter& i)
+Libtool::loadLibrary(const u32string& name, HD* system)
 {
 
   bool success = false;
 
-  std::list<ustring_t>::const_iterator iter = m_searchDirs.begin();
+  std::list<u32string>::const_iterator iter = m_searchDirs.begin();
   while (!success && iter != m_searchDirs.end())
   {
-    if (attemptLibraryOpen(*iter + "/lib" + name, name, i))
+    if (attemptLibraryOpen(*iter + U"/lib" + name, name, system))
     {
       success = true;
     }
@@ -88,12 +88,12 @@ Libtool::loadLibrary(const Glib::ustring& name, Interpreter& i)
 
   if (!success)
   {
-    std::cerr << "warning: unable to open library " << name << std::endl;
+    //std::cerr << "warning: unable to open library " << name << std::endl;
   }
 }
 
 void
-Libtool::addSearchPath(const ustring_t& path)
+Libtool::addSearchPath(const u32string& path)
 {
   m_searchDirs.push_back(path);
 }

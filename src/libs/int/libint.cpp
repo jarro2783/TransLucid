@@ -286,7 +286,7 @@ TL::TypedValue int_bin_op
 
   if (Pre().template operator()<typename IntTraits<T>::type>(lhs, rhs, k))
   {
-    return TL::TypedValue(TL::Special("aritherr"), TL::TYPE_INDEX_SPECIAL);
+    return TL::TypedValue(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
   }
 
   typename IntTraits<T>::big value =
@@ -294,7 +294,7 @@ TL::TypedValue int_bin_op
 
   if (Post().template operator()<typename IntTraits<T>::type>(value, k))
   {
-    return TL::TypedValue(TL::Special("aritherr"), TL::TYPE_INDEX_SPECIAL);
+    return TL::TypedValue(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
   }
 
   return TL::TypedValue(T(convert<type>(value)), index);
@@ -531,15 +531,6 @@ class IntHD : public TL::HD
   TL::Interpreter& m_system;
   size_t m_index;
 };
-
-#if 0
-template <class T>
-void
-makeTypeManager(const TL::ustring_t& name, TL::TypeRegistry& r)
-{
-  new TL::TemplateTypeManager<Int<T> >(r, name, RegisterIntOps<Int<T> >());
-}
-#endif
 
 template <class T>
 void

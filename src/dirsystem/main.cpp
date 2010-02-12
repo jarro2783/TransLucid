@@ -1,3 +1,5 @@
+#if 0
+
 #include <tl/expr_parser.hpp>
 #include <tl/interpreter.hpp>
 #include <iostream>
@@ -14,10 +16,12 @@
 namespace TL = TransLucid;
 namespace po = boost::program_options;
 
+#endif
+
 int
 main(int argc, char *argv[])
 {
-
+  #if 0
   //TL::Parser::Header h;
   //TL::Parser::HeaderGrammar<TL::Parser::string_type::const_iterator> hg(h);
   //TL::Parser::ExprGrammar<std::u32string::const_iterator> parser(h);
@@ -166,4 +170,7 @@ main(int argc, char *argv[])
   }
 
   return evaluate ? 0 : 1;
+
+  #endif
+  return 0;
 }

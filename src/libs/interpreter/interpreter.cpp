@@ -1,14 +1,8 @@
 #include <tl/interpreter.hpp>
-//#include <tl/parser.hpp>
-#include <glibmm/convert.h>
-#include <glibmm/fileutils.h>
-#include <glibmm/miscutils.h>
-#include <tl/range.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
 #include <tl/constant.hpp>
 #include <tl/consthd.hpp>
-#include <tl/printer.hpp>
 
 namespace TransLucid
 {
@@ -99,14 +93,7 @@ namespace
   };
 }
 
-void
-Interpreter::addDimensionSymbol(const ustring_t& s)
-{
-  #warning work out who uses this and what to do with it
-  //Parser::addSymbol(wstring_t(s.begin(), s.end()),
-  //  m_parseInfo.dimension_names, m_parseInfo.dimension_symbols);
-}
-
+#if 0
 inline void
 Interpreter::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
 {
@@ -144,6 +131,7 @@ Interpreter::addToVariable(const u32string& id, const Tuple& k, HD* h)
   kp.erase(DIM_ID);
   addToVariableActual(id, Tuple(kp), h);
 }
+#endif
 
 template <typename T>
 HD*
@@ -171,7 +159,8 @@ Interpreter::init_types()
 }
 
 Interpreter::Interpreter()
-: m_types(*this),
+: Variable(U"", this),
+  m_types(*this),
   m_time(0),
   builtin_name_to_index
   {
@@ -185,31 +174,7 @@ Interpreter::Interpreter()
   },
   m_verbose(false)
 {
-  //m_systemParser.push(*m_systemGrammar);
-  //initExprParser();
-  //initTupleParser();
-  //initConstantParser();
-  //m_dimTranslator.lookup("time");
-  //m_dimTranslator.lookup("priority");
-  //m_dimTranslator.lookup("_validguard");
-
-  //add some default builtin dimension symbols to the parser
-  addDimensionSymbol("time");
-  addDimensionSymbol("priority");
-  addDimensionSymbol("_validguard");
-  addDimensionSymbol("type");
-  addDimensionSymbol("value");
-  #if 0
-    ("type", DIM_TYPE)
-    ("text", DIM_TEXT)
-    ("name", DIM_NAME)
-    ("id", DIM_ID)
-    ("value", DIM_VALUE)
-    ("time", DIM_TIME)
-  #endif
-
   //create the obj, const and fun ids
-  //m_variables.insert(std::make_pair("const", new ConstantHD(*this)));
 
   //we need dimensions and unique to do anything
   addToVariableActual(U"DIMENSION_INDEX", Tuple(),
@@ -239,52 +204,6 @@ Interpreter::~Interpreter()
   //cleanupConstantParser();
 }
 
-#if 0
-bool
-Interpreter::parseString
-(
-  const ustring_t& s,
-  const Parser::Spirit::stored_rule<Parser::scanner_t>& parser,
-  const ustring_t& name
-)
-{
-  Parser::UIterator iter(s);
-  Parser::UIterator end = iter.make_end();
-  return parseRange(
-    Parser::iterator_t(
-      Parser::Iterator(iter),
-      Parser::Iterator(end)
-      ),
-    Parser::iterator_t(), parser, name);
-}
-
-AST::Expr*
-Interpreter::parseExpr(const ustring_t& s)
-{
-  AST::Expr* e = 0;
-  if (parseString(s, m_parsers.expr_parser.top()))
-  {
-    e = m_parsers.expr_stack.at(0);
-    m_parsers.expr_stack.pop_front();
-  }
-
-  return e;
-}
-#endif
-
-#if 0
-bool Interpreter::parseRange
-(
-  Parser::iterator_t begin,
-  Parser::iterator_t end,
-  const Parser::Spirit::stored_rule<Parser::scanner_t>& parser,
-  const ustring_t& name
-)
-{
-
-}
-#endif
-
 void
 Interpreter::cleanupParserObjects()
 {
@@ -308,6 +227,7 @@ Interpreter::cleanupParserObjects()
   #endif
 }
 
+#if 0
 void
 Interpreter::addExpr(const Tuple& k, HD* h)
 {
@@ -373,6 +293,7 @@ Interpreter::operator()(const Tuple& k)
                        m_types.indexSpecial()), k);
   }
 }
+#endif
 
 void
 Interpreter::addOutput(const IOList& output)

@@ -1,11 +1,8 @@
 #ifndef INTERPRETER_HPP_INCLUDED
 #define INTERPRETER_HPP_INCLUDED
 
-#define REMOVE_MAGIC
-
 #include <tl/library.hpp>
 #include <tl/types.hpp>
-#include <glibmm/convert.h>
 #include <tl/evaluator.hpp>
 #include <tl/dimtranslator.hpp>
 #include <boost/foreach.hpp>
@@ -23,7 +20,7 @@ namespace TransLucid
    *
    * Holds all the data necessary for an interpreter.
    **/
-  class Interpreter : public HD
+  class Interpreter : public Variable
   {
     public:
 
@@ -51,9 +48,9 @@ namespace TransLucid
      * to the type registry.
      **/
     void
-    loadLibrary(const ustring_t& name)
+    loadLibrary(const u32string& name)
     {
-      m_lt.loadLibrary(name, *this);
+      m_lt.loadLibrary(name, this);
     }
 
     /**
@@ -63,7 +60,7 @@ namespace TransLucid
      * for the library in the order they are added.
      **/
     void
-    addLibrarySearchPath(const ustring_t& name)
+    addLibrarySearchPath(const u32string& name)
     {
       m_lt.addSearchPath(name);
     }
@@ -72,11 +69,11 @@ namespace TransLucid
     registerEquation
     (const u32string& name, const Tuple& validContext, AST::Expr* e);
 
-    TaggedValue
-    operator()(const Tuple& k);
+    //TaggedValue
+    //operator()(const Tuple& k);
 
-    void
-    addExpr(const Tuple& k, HD* h);
+    //void
+    //addExpr(const Tuple& k, HD* h);
 
     private:
     Libtool m_lt;
@@ -98,26 +95,26 @@ namespace TransLucid
     VariableMap m_variables;
 
     //adds to id with remaining in the id dimension
-    void
-    addToVariable
-    (
-      const u32string& id,
-      const u32string& remaining,
-      const Tuple& k, HD* e
-    );
+    //void
+    //addToVariable
+    //(
+    //  const u32string& id,
+    //  const u32string& remaining,
+    //  const Tuple& k, HD* e
+    //);
     //adds to id removing id from the context
-    void
-    addToVariable(const u32string& id, const Tuple& k, HD* e);
+    //void
+    //addToVariable(const u32string& id, const Tuple& k, HD* e);
     //does the actual add
-    void
-    addToVariableActual(const u32string& id, const Tuple& k, HD* e);
+    //void
+    //addToVariableActual(const u32string& id, const Tuple& k, HD* e);
 
     template <typename T>
     HD*
     buildConstantHD(size_t index);
 
     void
-    addDimensionSymbol(const ustring_t& s);
+    addDimensionSymbol(const u32string& s);
 
     std::map<u32string, size_t> builtin_name_to_index;
 

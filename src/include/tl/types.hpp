@@ -1,7 +1,6 @@
 #ifndef TYPES_H_INCLUDED
 #define TYPES_H_INCLUDED
 
-#include <glibmm/ustring.h>
 #include <iostream>
 
 #include <boost/functional/hash.hpp>
@@ -39,17 +38,6 @@ hash_value(const mpz_class& v)
   return hasher(v.get_str());
 }
 
-namespace Glib
-{
-
-inline size_t
-hash_value(const ustring& s)
-{
-  boost::hash<std::string> hasher;
-  return hasher(s.raw());
-}
-
-}
 #if 0
 namespace TransLucid {
   class TypedValue;
@@ -92,52 +80,7 @@ namespace TransLucid
   //class EquationGuard;
 
   typedef uint16_t type_index;
-  typedef Glib::ustring ustring_t;
   typedef std::u32string u32string;
-
-  #if 0
-
-  class wstring_t : public std::basic_string<wchar_t>
-  {
-    public:
-
-    wstring_t(const std::basic_string<wchar_t>& other)
-    : std::basic_string<wchar_t>(other)
-    {}
-
-    template <class Iterator>
-    wstring_t(Iterator begin, Iterator end)
-    : std::basic_string<wchar_t>(begin, end)
-    {}
-
-    wstring_t()
-    {}
-
-    wstring_t(const wstring_t& rhs)
-    : std::basic_string<wchar_t>(rhs)
-    {}
-
-    wstring_t(const wchar_t* s)
-    : std::basic_string<wchar_t>(s)
-    {}
-
-    operator ustring_t() const
-    {
-      ustring_t s;
-      BOOST_FOREACH(wchar_t c, *this)
-      {
-        s += (gunichar)c;
-      }
-      return s;
-    }
-
-    //operator std::basic_string<wchar_t>() const
-    //{
-    //  return std::basic_string<wchar_t>(*this);
-    //}
-  };
-
-  #endif
 
   class Tuple;
 
@@ -466,9 +409,6 @@ namespace TransLucid
       return hasher(*m_value);
     }
 
-    static Tuple
-    parse(const ustring_t& text, const Tuple& c, Interpreter& i);
-
     bool
     operator==(const Tuple& rhs) const
     {
@@ -552,10 +492,10 @@ namespace TransLucid
     }
 
     size_t
-    registerType(const ustring_t& name);
+    registerType(const u32string& name);
 
     size_t
-    lookupType(const ustring_t& name) const;
+    lookupType(const u32string& name) const;
 
     #if 0
     void
@@ -584,7 +524,7 @@ namespace TransLucid
 
     //a variadic op takes a list of operands all of the same type
     void
-    registerVariadicOp(const ustring_t& name, type_index t, OpFunction op)
+    registerVariadicOp(const u32string& name, type_index t, OpFunction op)
     {
       m_variadicOperators[name][t] = op;
     }

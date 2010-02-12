@@ -12,13 +12,13 @@ Special::StringValueInitialiser Special::m_sv;
 Special::StringValueInitialiser::StringValueInitialiser()
 : vtos
 {
-  {Special::ERROR, "error"},
-  {Special::ACCESS, "access"},
-  {Special::TYPEERROR, "type"},
-  {Special::DIMENSION, "dim"},
-  {Special::UNDEF, "undef"},
-  {Special::CONST, "const"},
-  {Special::LOOP, "loop"}
+  {Special::ERROR, U"error"},
+  {Special::ACCESS, U"access"},
+  {Special::TYPEERROR, U"type"},
+  {Special::DIMENSION, U"dim"},
+  {Special::UNDEF, U"undef"},
+  {Special::CONST, U"const"},
+  {Special::LOOP, U"loop"}
 }
 {
   BOOST_FOREACH(ValueStringMap::value_type const& v, vtos)

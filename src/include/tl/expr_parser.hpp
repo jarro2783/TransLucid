@@ -130,7 +130,7 @@ namespace TransLucid
                >> prefix_expr
               )
               [
-                _a = ph::bind(&insert_binary_operation, _1, _a, _2)
+                _a = ph::bind(&AST::insert_binary_operation, _1, _a, _2)
               ]
            )
            [
@@ -173,7 +173,8 @@ namespace TransLucid
           [
             _val = new_<AST::DimensionExpr>(make_u32string(_1))
           ]
-        |    ident [_a = _1]
+        | specials [_val = new_<AST::SpecialExpr>(_1)]
+        | ident [_a = _1]
           >> ( angle_string
                [
                  _val = new_<AST::ConstantExpr>(make_u32string(_a),
@@ -184,7 +185,6 @@ namespace TransLucid
                 _val = new_<AST::IdentExpr>(make_u32string(_a))
                ]
              )
-        | specials [_val = new_<AST::SpecialExpr>(_1)]
         | context_perturb [_val = _1]
         | ('(' >> expr > ')') [_val = _1]
         | (   header.delimiter_start_symbols

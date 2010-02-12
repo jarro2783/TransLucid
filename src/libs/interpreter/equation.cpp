@@ -1,5 +1,4 @@
 #include <tl/equation.hpp>
-#include <tl/interpreter.hpp>
 #include <tl/range.hpp>
 #include <tl/utility.hpp>
 
@@ -33,7 +32,7 @@ throw (InvalidGuard)
     else
     {
       throw ParseError(__FILE__ ":" STRING_(__LINE__)
-                       ": guard is not a tuple");
+                       U": guard is not a tuple");
     }
   }
 
@@ -69,7 +68,7 @@ Variable::operator()(const Tuple& k)
   //          << m_name << ", context: " << std::endl;
   //c.print(i, std::cout, c);
 
-  typedef boost::tuple<Tuple, HD*> ApplicableTuple;
+  typedef std::tuple<Tuple, HD*> ApplicableTuple;
   typedef std::list<ApplicableTuple> applicable_list;
   applicable_list applicable;
 
@@ -108,7 +107,7 @@ Variable::operator()(const Tuple& k)
   }
   else if (applicable.size() == 1)
   {
-    return (*applicable.front().get<1>())(k);
+    return (*std::get<1>(applicable.front()))(k);
   }
 
   applicable_list::const_iterator bestIter = applicable.end();
@@ -120,11 +119,11 @@ Variable::operator()(const Tuple& k)
     {
       bestIter = iter;
     }
-    else if (tupleRefines(iter->get<0>(), bestIter->get<0>()))
+    else if (tupleRefines(std::get<0>(*iter), std::get<0>(*bestIter)))
     {
       bestIter = iter;
     }
-    else if (!tupleRefines(bestIter->get<0>(), iter->get<0>()))
+    else if (!tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
       bestIter = applicable.end();
     }
@@ -139,15 +138,15 @@ Variable::operator()(const Tuple& k)
   for (applicable_list::const_iterator iter = applicable.begin();
        iter != applicable.end(); ++iter)
   {
-    if (bestIter->get<1>() != iter->get<1>() &&
-        !tupleRefines(bestIter->get<0>(), iter->get<0>()))
+    if (std::get<1>(*bestIter) != std::get<1>(*iter) &&
+        !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
       return TaggedValue(TypedValue(Special(Special::MULTIDEF),
                          TYPE_INDEX_SPECIAL), k);
     }
   }
 
-  return (*bestIter->get<1>())(k);
+  return (*std::get<1>(*bestIter))(k);
 }
 
 void
@@ -183,6 +182,7 @@ Variable::addExpr(const Tuple& k, HD* e)
       kp.erase(dim_id);
     }
 
+    #if 0
     VariableMap::iterator viter = m_variables.find(begin);
     if (viter == m_variables.end())
     {
@@ -190,7 +190,25 @@ Variable::addExpr(const Tuple& k, HD* e)
                 (std::make_pair(begin, new Variable(begin, m_i))).first;
     }
     viter->second->addExpr(Tuple(kp), e);
+    #endif
+    addToVariableActual(begin, Tuple(kp), e);
   }
+}
+
+void
+Variable::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
+{
+  //std::cerr << "addToVariableActual: " <<
+  //   id << std::endl;
+  //find the variable
+  VariableMap::const_iterator iter = m_variables.find(id);
+  if (iter == m_variables.end())
+  {
+    //std::cerr << "constructing new variable" << std::endl;
+    iter = m_variables.insert(std::make_pair
+                              (id, new Variable(id, m_system))).first;
+  }
+  iter->second->addExpr(k, h);
 }
 
 }

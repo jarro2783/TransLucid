@@ -104,7 +104,7 @@ class PrinterManager : public TL::TypeManager
   TL::TypedValue
   parse
   (
-    const TL::ustring_t& text,
+    const TL::u32string& text,
     const TL::Tuple& c,
     TL::Interpreter& interpreter
   ) const

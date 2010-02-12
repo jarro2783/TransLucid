@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(TransLucid)
 
+enable_testing()
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 

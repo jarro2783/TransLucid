@@ -4,11 +4,12 @@
 #include <tl/types.hpp>
 #include <ltdl.h>
 #include <list>
+#include <tl/hyperdaton.hpp>
 
 namespace TransLucid
 {
 
-  typedef void (*library_loader)(Interpreter&);
+  typedef void (*library_loader)(HD*);
 
   class Libtool
   {
@@ -18,13 +19,13 @@ namespace TransLucid
     ~Libtool();
 
     void
-    loadLibrary(const Glib::ustring& name, Interpreter& i);
+    loadLibrary(const u32string& name, HD* system);
 
     void
-    addSearchPath(const ustring_t& path);
+    addSearchPath(const u32string& path);
 
     private:
-    std::list<ustring_t> m_searchDirs;
+    std::list<u32string> m_searchDirs;
   };
 } //namespace TransLucid
 

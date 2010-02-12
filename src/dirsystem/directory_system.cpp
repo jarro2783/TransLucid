@@ -1,3 +1,5 @@
+#if 0
+
 #include "directory_system.hpp"
 #include <tl/parser_fwd.hpp>
 #include <glibmm/miscutils.h>
@@ -366,3 +368,5 @@ DirectorySystem::addLibrarySearchPath(const std::string& path)
 }
 
 }
+
+#endif

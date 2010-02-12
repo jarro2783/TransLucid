@@ -47,26 +47,6 @@ namespace TransLucid
       function<add_dimension_impl> add_dimension;
     }
 
-    //typedef Spirit::position_iterator<std::string::const_iterator>
-    //        iterator_t;
-
-    #if 0
-    inline void
-    addDimensions
-    (
-      const std::vector<ustring_t>& dims,
-      qi::symbols<>& dimsyms
-    )
-    {
-      size_t i = dims.size();
-      BOOST_FOREACH(const ustring_t& s, dims)
-      {
-        dimsyms.add(s.begin(), s.end(), i);
-        ++i;
-      }
-    }
-    #endif
-
     #if 0
     inline void
     addOpDefinition
@@ -130,11 +110,11 @@ namespace TransLucid
          using namespace qi::labels;
 
          assoc_symbols.add
-           (L"infixl", ASSOC_LEFT)
-           (L"infixr", ASSOC_RIGHT)
-           (L"infixn", ASSOC_NON)
-           (L"infixp", ASSOC_COMPARISON)
-           (L"infixm", ASSOC_VARIABLE)
+           (L"infixl", AST::ASSOC_LEFT)
+           (L"infixr", AST::ASSOC_RIGHT)
+           (L"infixn", AST::ASSOC_NON)
+           (L"infixp", AST::ASSOC_COMPARISON)
+           (L"infixm", AST::ASSOC_VARIABLE)
          ;
 
          headerp =
@@ -208,8 +188,8 @@ namespace TransLucid
 
       escaped_string_parser<Iterator> angle_string;
 
-      qi::symbols<char_type, InfixAssoc> assoc_symbols;
-      InfixAssoc currentAssoc;
+      qi::symbols<char_type, AST::InfixAssoc> assoc_symbols;
+      AST::InfixAssoc currentAssoc;
 
       //Spirit::assertion<ParseErrorType> expect_dbl_semi;
 
@@ -220,7 +200,8 @@ namespace TransLucid
     ParsedEquation;
 
     template <typename Iterator>
-    class EquationGrammar : public qi::grammar<Iterator, ParsedEquation()>
+    class EquationGrammar
+    : public qi::grammar<Iterator, ParsedEquation(),qi::locals<string_type>>
     {
       public:
 
@@ -231,14 +212,14 @@ namespace TransLucid
 
         equation =
           (
-              ident
+              +ident[_a = _1]
            >> guard
            >> boolean
            >> '='
            >> expr
           )
           [
-            _val = construct<ParsedEquation>(_1, _2, _3, _4)
+            _val = construct<ParsedEquation>(_a, _2, _3, _4)
           ]
         ;
 
@@ -269,7 +250,7 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, ParsedEquation()>
+      qi::rule<Iterator, ParsedEquation(), qi::locals<string_type>>
         equation
       ;
 

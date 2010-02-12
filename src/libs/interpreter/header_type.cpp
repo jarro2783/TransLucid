@@ -15,7 +15,7 @@ HeaderType::hash() const
 void
 HeaderType::parseString
 (
-  const ustring_t& s,
+  const u32string& s,
   const Tuple& c,
   Interpreter& i
 )
@@ -35,7 +35,7 @@ HeaderType::parseString
 void
 HeaderType::parseFile
 (
-  const ustring_t& file,
+  const u32string& file,
   const Tuple& c,
   Interpreter& i
 )

@@ -26,7 +26,7 @@ namespace TransLucid
   class TemplateException : public Exception
   {
     public:
-    TemplateException(const ustring_t& m)
+    TemplateException(const u32string& m)
     : m(m)
     {
     }
@@ -37,11 +37,11 @@ namespace TransLucid
     const char*
     what() const throw()
     {
-      return m.c_str();
+      return "don't know how to convert u32string to char*";
     }
 
     private:
-    ustring_t m;
+    u32string m;
   };
 
   /**

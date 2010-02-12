@@ -10,23 +10,6 @@
 #include <tl/parser_fwd.hpp>
 #include <tl/utility.hpp>
 
-namespace Glib
-{
-  template <class In>
-  struct ustring::SequenceToString<In, wchar_t> : public std::string
-  {
-    SequenceToString(In begin, In end)
-    {
-      char c[6];
-      for (; begin != end; ++begin)
-      {
-        const std::string::size_type len = g_unichar_to_utf8(*begin, c);
-        this->append(c, len);
-      }
-    }
-  };
-}
-
 namespace TransLucid
 {
   namespace Parser

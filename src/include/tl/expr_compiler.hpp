@@ -10,7 +10,7 @@ namespace TransLucid
   {
     public:
 
-    ExprCompiler(Interpreter& i);
+    ExprCompiler(HD* i);
     ~ExprCompiler();
 
     HD* compile(AST::Expr*);
@@ -37,7 +37,7 @@ namespace TransLucid
     AST::Data* visitUnaryExpr(AST::UnaryExpr*, AST::Data*);
 
     private:
-    Interpreter& m_i;
+    HD* m_i;
   };
 
 } //namespace TransLucid

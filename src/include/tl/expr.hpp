@@ -5,13 +5,84 @@
 #include <list>
 #include <boost/function.hpp>
 //#include <boost/bind.hpp>
-#include <tl/parser_fwd.hpp>
+//#include <tl/parser_fwd.hpp>
 #include <tl/builtin_types.hpp>
+#include <boost/fusion/container.hpp>
 
 namespace TransLucid
 {
   namespace AST
   {
+    enum InfixAssoc
+    {
+      ASSOC_LEFT,
+      ASSOC_RIGHT,
+      ASSOC_NON,
+      ASSOC_VARIABLE,
+      ASSOC_COMPARISON
+    };
+
+    struct BinaryOperation
+    {
+      BinaryOperation() = default;
+
+      BinaryOperation
+      (
+        InfixAssoc assoc,
+        const std::u32string& op,
+        const std::u32string& symbol,
+        const mpz_class& precedence
+      )
+      : op(op), symbol(symbol), assoc(assoc), precedence(precedence)
+      {}
+
+      bool
+      operator==(const BinaryOperation& rhs) const
+      {
+        return op == rhs.op && symbol == rhs.symbol &&
+        assoc == rhs.assoc && precedence == rhs.precedence;
+      }
+
+      bool
+      operator!=(const BinaryOperation& rhs) const
+      {
+        return !(*this == rhs);
+      }
+
+      std::u32string op;
+      std::u32string symbol;
+      InfixAssoc assoc;
+      mpz_class precedence;
+    };
+
+    enum UnaryType
+    {
+      UNARY_PREFIX,
+      UNARY_POSTFIX
+    };
+
+    struct UnaryOperation
+    {
+      UnaryOperation() = default;
+
+      UnaryOperation
+      (
+        const u32string& op,
+        const u32string& symbol,
+        UnaryType type)
+      : op(op), symbol(symbol), type(type)
+      {}
+
+      u32string op;
+      u32string symbol;
+      UnaryType type;
+
+      bool
+      operator==(const UnaryOperation& rhs) const
+      {
+        return op == rhs.op && symbol == rhs.symbol && type == rhs.type;
+      }
+    };
 
     class Data
     {
@@ -100,7 +171,7 @@ namespace TransLucid
     {
 
       public:
-      BinaryOpExpr(const Parser::BinaryOperation& op, Expr* lhs, Expr* rhs)
+      BinaryOpExpr(const BinaryOperation& op, Expr* lhs, Expr* rhs)
       : op(op)
       {
         operands.push_back(lhs);
@@ -114,24 +185,20 @@ namespace TransLucid
       }
 
       void
-      add_right(const Parser::BinaryOperation& op, Expr* rhs);
+      add_right(const BinaryOperation& op, Expr* rhs);
 
       void
       add_leaf(Expr* e);
 
-      Parser::BinaryOperation op;
+      BinaryOperation op;
       std::vector<Expr*> operands;
     };
 
     class BooleanExpr : public Expr
     {
       public:
-      BooleanExpr(const ustring_t& value)
-      : value(value == "true")
-      {
-      }
 
-      BooleanExpr(const std::u32string& value)
+      BooleanExpr(const u32string& value)
       : value(value == U"true")
       {
       }
@@ -298,7 +365,7 @@ namespace TransLucid
     class OpExpr : public Expr
     {
       public:
-      OpExpr(const std::vector<Expr*>& ops, ustring_t& name)
+      OpExpr(const std::vector<Expr*>& ops, u32string& name)
       : m_ops(ops), m_name(name)
       {}
 
@@ -309,7 +376,7 @@ namespace TransLucid
       }
 
       std::vector<Expr*> m_ops;
-      ustring_t m_name;
+      u32string m_name;
     };
 
     class PairExpr : public Expr
@@ -350,7 +417,8 @@ namespace TransLucid
       public:
       SpecialExpr(Special::Value s)
       : value(s)
-      {}
+      {
+      }
 
       Data*
       visit(Visitor* v, Data* data)
@@ -364,18 +432,18 @@ namespace TransLucid
     class SpecialOpsExpr : public Expr
     {
       public:
-      SpecialOpsExpr(const ustring_t& op, const ustring_t& value, Expr* e)
+      SpecialOpsExpr(const u32string& op, const u32string& value, Expr* e)
       : value(value), e(e)
       {
-        if (op == "isspecial")
+        if (op == U"isspecial")
         {
           m_f = &Visitor::visitIsSpecialExpr;
         }
-        else if (op == "istype")
+        else if (op == U"istype")
         {
           m_f = &Visitor::visitIsTypeExpr;
         }
-        else if (op == "convert")
+        else if (op == U"convert")
         {
           m_f = &Visitor::visitConvertExpr;
         }
@@ -387,7 +455,7 @@ namespace TransLucid
         return m_f(v, this, data);
       }
 
-      ustring_t value;
+      u32string value;
       Expr* e;
 
       private:
@@ -427,7 +495,7 @@ namespace TransLucid
     class UnaryExpr : public Expr
     {
       public:
-      UnaryExpr(const Parser::UnaryOperation& op, Expr* e)
+      UnaryExpr(const UnaryOperation& op, Expr* e)
       : op(op), e(e)
       {
       }
@@ -438,10 +506,16 @@ namespace TransLucid
         return v->visitUnaryExpr(this, d);
       }
 
-      Parser::UnaryOperation op;
+      UnaryOperation op;
       Expr* e;
     };
 
+    AST::Expr* insert_binary_operation
+    (
+      const AST::BinaryOperation& info,
+      AST::Expr* lhs,
+      AST::Expr* rhs
+    );
   }
 }
 

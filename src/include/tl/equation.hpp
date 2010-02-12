@@ -113,6 +113,7 @@ namespace TransLucid
     std::map<size_t, TypedValue> m_dimensions;
   };
 
+  #if 0
   class EquationBase
   {
     public:
@@ -128,6 +129,7 @@ namespace TransLucid
   typedef boost::shared_ptr<EquationMap> EquationMap_p;
 
   typedef std::deque<std::pair<EquationGuard, EquationMap_p> > EqnSetList;
+  #endif
 
   class Variable;
   typedef std::map<u32string, HD*> VariableMap;
@@ -183,8 +185,8 @@ namespace TransLucid
   {
     public:
 
-    Variable(const u32string& name, Interpreter& i)
-    : m_name(name), m_i(i)
+    Variable(const u32string& name, HD* system)
+    : m_name(name), m_system(system)
     {}
 
     TaggedValue operator()(const Tuple& k);
@@ -198,6 +200,11 @@ namespace TransLucid
     void
     removed();
 
+    protected:
+
+    void
+    addToVariableActual(const u32string& id, const Tuple& k, HD* h);
+
     private:
 
     void
@@ -208,7 +215,7 @@ namespace TransLucid
     VariableMap m_variables;
 
     u32string m_name;
-    Interpreter& m_i;
+    HD* m_system;
   };
 };
 

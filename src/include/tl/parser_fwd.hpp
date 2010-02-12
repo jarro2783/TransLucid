@@ -17,6 +17,7 @@
 #include <stack>
 #include <tl/equation.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <tl/expr.hpp>
 
 namespace TransLucid
 {
@@ -78,77 +79,6 @@ namespace TransLucid
             equation_t;
     typedef std::vector<equation_t> equation_v;
 
-    enum InfixAssoc
-    {
-      ASSOC_LEFT,
-      ASSOC_RIGHT,
-      ASSOC_NON,
-      ASSOC_VARIABLE,
-      ASSOC_COMPARISON
-    };
-
-    enum UnaryType
-    {
-      UNARY_PREFIX,
-      UNARY_POSTFIX
-    };
-
-    struct BinaryOperation
-    {
-      BinaryOperation() = default;
-
-      BinaryOperation
-      (
-        InfixAssoc assoc,
-        const std::u32string& op,
-        const std::u32string& symbol,
-        const mpz_class& precedence
-      )
-      : op(op), symbol(symbol), assoc(assoc), precedence(precedence)
-      {}
-
-      bool
-      operator==(const BinaryOperation& rhs) const
-      {
-        return op == rhs.op && symbol == rhs.symbol &&
-        assoc == rhs.assoc && precedence == rhs.precedence;
-      }
-
-      bool
-      operator!=(const BinaryOperation& rhs) const
-      {
-        return !(*this == rhs);
-      }
-
-      std::u32string op;
-      std::u32string symbol;
-      InfixAssoc assoc;
-      mpz_class precedence;
-    };
-
-    struct UnaryOperation
-    {
-      UnaryOperation() = default;
-
-      UnaryOperation
-      (
-        const ustring_t& op,
-        const ustring_t& symbol,
-        UnaryType type)
-      : op(op), symbol(symbol), type(type)
-      {}
-
-      ustring_t op;
-      ustring_t symbol;
-      UnaryType type;
-
-      bool
-      operator==(const UnaryOperation& rhs) const
-      {
-        return op == rhs.op && symbol == rhs.symbol && type == rhs.type;
-      }
-    };
-
     struct Delimiter
     {
       Delimiter() = default;
@@ -171,8 +101,8 @@ namespace TransLucid
       char_type end;
     };
 
-    typedef qi::symbols<char_type, UnaryOperation> unary_symbols;
-    typedef qi::symbols<char_type, BinaryOperation> binary_symbols;
+    typedef qi::symbols<char_type, AST::UnaryOperation> unary_symbols;
+    typedef qi::symbols<char_type, AST::BinaryOperation> binary_symbols;
     typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
 
     struct Header
@@ -201,13 +131,6 @@ namespace TransLucid
       }
       #endif
     };
-
-    AST::Expr* insert_binary_operation
-    (
-      const BinaryOperation& info,
-      AST::Expr* lhs,
-      AST::Expr* rhs
-    );
 
     struct EquationAdder
     {

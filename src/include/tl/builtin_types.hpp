@@ -59,7 +59,7 @@ namespace TransLucid
       LOOP
     };
 
-    Special(const ustring_t& text)
+    Special(const u32string& text)
     : m_v(stringToValue(text))
     {}
 
@@ -76,7 +76,7 @@ namespace TransLucid
     void
     print(std::ostream& os, const Tuple& context) const
     {
-      os << "special<" << m_sv.vtos[m_v] << ">";
+      //os << "special<" << m_sv.vtos[m_v] << ">";
     }
 
     bool
@@ -102,10 +102,10 @@ namespace TransLucid
 
     struct StringValueInitialiser
     {
-      typedef boost::unordered_map<ustring_t, Value> StringValueMap;
+      typedef boost::unordered_map<u32string, Value> StringValueMap;
       StringValueMap stov;
 
-      typedef boost::unordered_map<Value, ustring_t> ValueStringMap;
+      typedef boost::unordered_map<Value, u32string> ValueStringMap;
       ValueStringMap vtos;
 
       StringValueInitialiser();
@@ -115,7 +115,7 @@ namespace TransLucid
 
     public:
 
-    static Value stringToValue(const ustring_t& s)
+    static Value stringToValue(const u32string& s)
     {
       StringValueInitialiser::StringValueMap::const_iterator iter
         = m_sv.stov.find(s);
@@ -130,6 +130,7 @@ namespace TransLucid
     }
   };
 
+  #if 0
   class UnevalExpr : public TypedValueBase
   {
     public:
@@ -179,6 +180,7 @@ namespace TransLucid
     //the interpreter that the expression should be evaluated with
     Interpreter& m_interpreter;
   };
+  #endif
 
   class String : public TypedValueBase
   {
@@ -262,19 +264,6 @@ namespace TransLucid
       }
     }
 
-    static Boolean
-    parse(const ustring_t& v)
-    {
-      if (v == "true")
-      {
-        return Boolean(true);
-      }
-      else
-      {
-        return Boolean(false);
-      }
-    }
-
     private:
     bool m_value;
   };
@@ -285,12 +274,6 @@ namespace TransLucid
     Intmp(const mpz_class& value)
     : m_value(value)
     {
-    }
-
-    static Intmp
-    parse(const ustring_t& text)
-    {
-      return Intmp(mpz_class(text.raw()));
     }
 
     size_t
@@ -419,18 +402,6 @@ namespace TransLucid
     {
     }
 
-    Char(const ustring_t& text)
-    {
-      if (text.length() != 1)
-      {
-        throw "Invalid char length";
-      }
-      else
-      {
-        m_c = text.at(0);
-      }
-    }
-
     char32_t
     value() const
     {
@@ -443,18 +414,9 @@ namespace TransLucid
       return m_c;
     }
 
-    static Char
-    parse(const ustring_t& text)
-    {
-      return Char(text);
-    }
-
     void
     print(std::ostream& os, const Tuple& c) const
     {
-      ustring_t s;
-      s.push_back(m_c);
-      os << s;
     }
 
     bool

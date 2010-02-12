@@ -29,7 +29,7 @@ namespace TransLucid
     private:
     Interpreter& m_i;
 
-    std::map<ustring_t, HD*> m_build;
+    std::map<u32string, HD*> m_build;
   };
 
 }

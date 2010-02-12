@@ -6,62 +6,71 @@ namespace TransLucid
 namespace AST
 {
 
-namespace
-{
-  mpz_class
-  parseInteger(const ustring_t& value)
-  {
-    ustring_t::const_iterator iter = value.begin();
-    if (value == "0")
-    {
-      return mpz_class();
-    }
-    else if (*iter == '0')
-    {
-      ++iter;
-      int baseChar = *iter;
-      int base;
-
-      if (baseChar >= '2' && baseChar <= '9')
-      {
-        base = baseChar - '0';
-      }
-      else if (baseChar >= 'a' && baseChar <= 'z')
-      {
-        base = baseChar - 'a' + 10;
-      }
-      else if (baseChar >= 'A' && baseChar <= 'Z')
-      {
-        base = baseChar - 'A' + 36;
-      }
-      else
-      {
-        throw "invalid base in integer";
-      }
-
-      ++iter;
-
-      return mpz_class(std::string(iter, value.end()), base);
-
-    }
-    else
-    {
-      return mpz_class(value.raw());
-    }
-  }
-}
-
 IntegerExpr::IntegerExpr(const mpz_class& value)
 : m_value(value)
 {
 }
 
+AST::Expr*
+insert_binary_operation
+(
+  const BinaryOperation& op,
+  AST::Expr* lhs,
+  AST::Expr* rhs
+)
+{
+  AST::BinaryOpExpr* binop = dynamic_cast<AST::BinaryOpExpr*>(lhs);
+  if (binop == 0)
+  {
+    return new AST::BinaryOpExpr(op, lhs, rhs);
+  }
+  if (binop->op.precedence > op.precedence)
+  {
+    return new AST::BinaryOpExpr(op, lhs, rhs);
+  }
+  if (binop->op.precedence < op.precedence)
+  {
+    binop->add_right(op, rhs);
+    return binop;
+  }
+  //precedence is the same
+  if (binop->op.assoc != op.assoc)
+  {
+    //error, mixed associativity of same precedence
+    throw ParseError(U"Mixed associativity of same precedence");
+  }
+  if (binop->op.assoc == ASSOC_NON)
+  {
+    //error multiple non assoc operators
+    throw
+      ParseError(U"Multiple non associative operators of the same precedence");
+  }
+  if (binop->op.assoc == ASSOC_LEFT)
+  {
+    return new AST::BinaryOpExpr(op, lhs, rhs);
+  }
+  if (binop->op.assoc == ASSOC_RIGHT)
+  {
+    binop->add_right(op, rhs);
+    return binop;
+  }
+  //assoc_variable or assoc_comparison
+  if (binop->op != op)
+  {
+    //error multiple variadic operators
+    throw ParseError(U"Multiple variadic operators of the same precedence");
+  }
+  //we have the same operator
+  binop->add_leaf(rhs);
+  return binop;
+}
+
 void
-BinaryOpExpr::add_right(const Parser::BinaryOperation& op, Expr* rhs)
+BinaryOpExpr::add_right(const BinaryOperation& op, Expr* rhs)
 {
   size_t last = operands.size()-1;
   operands.at(last) =
-    Parser::insert_binary_operation(op, operands.at(last), rhs);
+    insert_binary_operation(op, operands.at(last), rhs);
 }
 
 void

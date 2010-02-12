@@ -31,16 +31,16 @@ namespace IntLib
       return m_value;
     }
 
-    static Int<T>
-    parse
-    (
-      const TransLucid::ustring_t& text,
-      const TransLucid::Tuple& context,
-      const TransLucid::Interpreter& i
-    )
-    {
-      return Int<T>(boost::lexical_cast<T>(text));
-    }
+    //static Int<T>
+    //parse
+    //(
+    //  const TransLucid::u32string& text,
+    //  const TransLucid::Tuple& context,
+    //  const TransLucid::Interpreter& i
+    //)
+    //{
+    //  return Int<T>(boost::lexical_cast<T>(text));
+    //}
 
     size_t
     hash() const

@@ -32,10 +32,10 @@ namespace TransLucid
     operator==(const HeaderType& rhs) const;
 
     void
-    parseString(const ustring_t& s, const Tuple& c, Interpreter& i);
+    parseString(const u32string& s, const Tuple& c, Interpreter& i);
 
     void
-    parseFile(const ustring_t& file, const Tuple& c, Interpreter& i);
+    parseFile(const u32string& file, const Tuple& c, Interpreter& i);
 
     bool
     operator<(const HeaderType& rhs) const
@@ -61,7 +61,7 @@ namespace TransLucid
       operator()
       (
         HeaderType& h,
-        const ustring_t& s,
+        const u32string& s,
         const Tuple& c,
         Interpreter& i
       ) const
@@ -77,7 +77,7 @@ namespace TransLucid
       operator()
       (
         HeaderType& h,
-        const ustring_t& s,
+        const u32string& s,
         const Tuple& c,
         Interpreter& i
       ) const

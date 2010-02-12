@@ -3,12 +3,9 @@
 //#include <boost/bind.hpp>
 #include <tl/range.hpp>
 #include <tl/interpreter.hpp>
-#include <boost/assign.hpp>
 #include <tl/exception.hpp>
 #include <tl/header_type.hpp>
 #include <tl/footer_type.hpp>
-
-using boost::assign::map_list_of;
 
 namespace TransLucid
 {
