@@ -15,68 +15,25 @@
 
 namespace TL = TransLucid;
 
-namespace karma = boost::spirit::karma;
-namespace phoenix = boost::phoenix;
-
-template <typename Iterator>
-struct hex_number : public karma::grammar<Iterator, std::vector<int>()>
-{
-  hex_number()
-  : hex_number<Iterator>::base_type(start)
-  {
-    using namespace karma::labels;
-    namespace sp = boost::spirit;
-    using karma::char_;
-    using phoenix::if_;
-
-    start =
-        "0"
-    <<  base
-    <<  karma::int_
-    ;
-
-    base =
-      char_("a-zA-Z2-9")
-      [
-        if_(_val >= 2 && _val <= 9)
-        [
-          sp::_1 = _val + '0'
-        ]
-        .else_
-        [
-          if_(_val >= 10 && _val <= 36)
-          [
-            sp::_1 = _val - 10 + 'a'
-          ]
-          .else_
-          [
-            sp::_1 = _val - 37 + 'A'
-          ]
-        ]
-      ]
-    ;
-  }
-
-  karma::rule<Iterator, std::vector<int>()> start;
-  karma::rule<Iterator, int()> base;
-};
-
 void
-test_base(int base, int number, TL::Translator& t)
+test_base(size_t base, uint32_t number, TL::Translator& t)
 {
-  std::cout << "base = " << base << std::endl;
   std::string value = "0";
   mpz_class baseVal(base);
   value += baseVal.get_str(62);
   mpz_class num(number);
-  value += num.get_str(base);
+  if (base <= 36) {
+    value += num.get_str(-base);
+  } else {
+    value += num.get_str(base);
+  }
 
   TL::HD* h = t.translate_expr(TL::Parser::string_type(value.begin(),
                                                        value.end()));
   TL::TaggedValue v = (*h)(TL::Tuple());
 
-  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value().get_ui(),
-                    (unsigned)number);
+  uint32_t result = v.first.value<TL::Intmp>().value().get_ui();
+  BOOST_CHECK_EQUAL(result, (unsigned)number);
 
   delete h;
 }
@@ -126,18 +83,7 @@ BOOST_AUTO_TEST_CASE( integers )
     }
   }
 
-#if 0
-  std::string generated;
-  std::back_insert_iterator<std::string> sink(generated);
-  boost::spirit::karma::generate(
-    sink,
-    hex_number<decltype(sink)>(),
-    std::vector<int>({62, 255})
-    );
-  std::cout << generated << std::endl;
-#endif
-
-  TL::HD* h = translator.translate_expr(L"0X10");
+  TL::HD* h = translator.translate_expr(L"0y10");
   TL::TaggedValue v = (*h)(TL::Tuple());
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value().get_ui(), (unsigned)60);
 

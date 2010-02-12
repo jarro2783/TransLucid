@@ -50,11 +50,14 @@ namespace TransLucid
       }
       else if (base <= 'Z')
       {
-        actualBase = base - 'A' + 26 + 1 + 10;
+        #warning john wanted this the other way around but mpz does it this way
+        //actualBase = base - 'A' + 26 + 10;
+        actualBase = base - 'A' + 10;
       }
       else
       {
-        actualBase = base - 'a' + 10;
+        //actualBase = base - 'a' + 10;
+        actualBase = base - 'a' + 26 + 10;
       }
       return mpz_class(u32_to_ascii(s), actualBase);
     }
