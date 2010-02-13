@@ -58,22 +58,10 @@ BOOST_FIXTURE_TEST_SUITE( expressions_tests, translator_class )
 
 BOOST_AUTO_TEST_CASE( integers )
 {
-  //TL::HD* h = translator.translate_expr(L"42");
-
-  //TL::TaggedValue v = (*h)(TL::Tuple());
-  //std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;
-  //BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value().get_ui(), 42);
-
-  //delete h;
-
   for (int i = 0; i != 500; ++i)
   {
     test_integer(i, translator);
   }
-  //test_integers<500> int_test(translator);
-  //int_test.test();
-
-  //test_bases<100, 62> base_test(translator);
 
   for (int i = 0; i != 1000; ++i)
   {
@@ -83,35 +71,59 @@ BOOST_AUTO_TEST_CASE( integers )
     }
   }
 
-  TL::HD* h = translator.translate_expr(L"0y10");
-  TL::TaggedValue v = (*h)(TL::Tuple());
-  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value().get_ui(), (unsigned)60);
+}
 
-  delete h;
+BOOST_AUTO_TEST_CASE ( strings ) {
+
+  TL::HD *h;
 
   h = translator.translate_expr(L"«hello é world»");
 
-  v = (*h)(TL::Tuple());
+  TL::TaggedValue v = (*h)(TL::Tuple());
   std::u32string s = v.first.value<TL::String>().value();
 
   BOOST_CHECK(s == U"hello é world");
   //std::cout << TL::utf32_to_utf8(s) << std::endl;
   delete h;
 
-  h = translator.translate_expr(L"\'è\'");
-  v = (*h)(TL::Tuple());
-  //std::cout << "char value = " << v.first.value<TL::Char>().value() << std::endl;
-  //s.clear();
-  //s += v.first.value<TL::Char>().value();
-  //std::cout << TL::utf32_to_utf8(s) << std::endl;
-  BOOST_CHECK(v.first.value<TL::Char>().value() == U'è');
+}
 
+BOOST_AUTO_TEST_CASE ( chars ) {
+
+  TL::HD *h;
+
+  h = translator.translate_expr(L"\'è\'");
+  TL::TaggedValue v = (*h)(TL::Tuple());
+
+  BOOST_CHECK(v.first.value<TL::Char>().value() == U'è');
   delete h;
-  h = translator.translate_expr(L"spdim");
-  v = (*h)(TL::Tuple());
-  //std::cout << v.first.value<TL::Special>().value() << std::endl;
-  BOOST_CHECK_EQUAL(v.first.value<TL::Special>().value(),
-                    TL::Special::DIMENSION);
+}
+
+BOOST_AUTO_TEST_CASE ( specials ) {
+
+  using TL::Special;
+
+  typedef std::list<std::pair<const wchar_t*, Special::Value>> SpecialList;
+  SpecialList specials =
+  {
+    {L"sperror", Special::ERROR},
+    {L"spaccess", Special::ACCESS},
+    {L"sptype", Special::TYPEERROR},
+    {L"spdim", Special::DIMENSION},
+    {L"spundef", Special::UNDEF},
+    {L"const", Special::CONST},
+    {L"loop", Special::LOOP}
+  };
+
+  std::for_each(specials.begin(), specials.end(),
+    [&translator] (SpecialList::value_type& s)
+      {
+        TL::HD *h = translator.translate_expr(s.first);
+        TL::TaggedValue v = (*h)(TL::Tuple());
+        BOOST_CHECK_EQUAL(v.first.value<TL::Special>().value(),
+                          s.second);
+        delete h;
+      });
 
 }
 

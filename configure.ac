@@ -25,15 +25,6 @@ AX_BOOST_BASE([1.41])
 AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_THREAD
 
-PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4],
-[
-   AC_SUBST([GLIBMM_CFLAGS])
-   AC_SUBST([GLIBMM_LIBS])
-],
-[
-   AC_MSG_ERROR([glibmm is required])
-])
-
 TL_LDFLAGS="-std=gnu++0x"
 TL_CFLAGS="-std=gnu++0x"
 

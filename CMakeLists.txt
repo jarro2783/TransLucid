@@ -4,15 +4,14 @@ project(TransLucid)
 enable_testing()
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 
-set(TLCFLAGS ${GLIBMM_CFLAGS} -Wall -std=gnu++0x)
-set(TLLIBS ${GLIBMM_LDFLAGS} -std=gnu++0x)
+set(TLCFLAGS -Wall -std=gnu++0x)
+set(TLLIBS -std=gnu++0x)
 
 set (Boost_USE_STATIC_LIBS OFF)
-set (Boost_ADDITIONAL_VERSIONS 1.39 1.39.0)
+set (Boost_ADDITIONAL_VERSIONS 1.41 1.41.0)
 set (Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.39.0 REQUIRED COMPONENTS program_options)
+find_package(Boost 1.41.0 REQUIRED COMPONENTS program_options)
 
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
