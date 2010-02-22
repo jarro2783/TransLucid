@@ -3,6 +3,7 @@
 #include <tl/expr_parser.hpp>
 #include <tl/tuple_parser.hpp>
 #include <boost/spirit/home/qi/parser.hpp>
+#include <tl/types.hpp>
 
 namespace TransLucid
 {
@@ -76,7 +77,8 @@ HD* Translator::translate_expr(const Parser::string_type& s)
   return m_compiler.compile(e);
 }
 
-void Translator::translate_equation_set(const u32string& s)
+equation_v
+Translator::translate_equation_set(const u32string& s)
 {
   Parser::string_type ws(s.begin(), s.end());
   Parser::iterator_t pos = ws.begin();
@@ -91,13 +93,35 @@ void Translator::translate_equation_set(const u32string& s)
     *m_skipper,
     parsedEquations);
 
+  equation_v equations;
+
   BOOST_FOREACH(auto& v, parsedEquations)
   {
     HD* context = m_compiler.compile(std::get<1>(v));
     HD* boolean = m_compiler.compile(std::get<2>(v));
     HD* e = m_compiler.compile(std::get<3>(v));
-    Tuple t(create_add_eqn_context(to_u32string(std::get<0>(v)),
-                                   context, boolean));
+    equations.push_back(TranslatedEquation(
+      to_u32string(std::get<0>(v)),
+      context,
+      boolean,
+      e));
+  }
+
+  return equations;
+}
+
+void
+Translator::translate_and_add_equation_set(const u32string& s)
+{
+  equation_v equations = translate_equation_set(s);
+
+  BOOST_FOREACH(auto& v, equations)
+  {
+    m_interpreter.addExpr(
+      Tuple(create_add_eqn_context(to_u32string(std::get<0>(v)),
+                                     std::get<1>(v),
+                                     std::get<2>(v))),
+                          std::get<3>(v));
   }
 }
 

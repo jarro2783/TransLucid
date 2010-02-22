@@ -38,32 +38,6 @@ hash_value(const mpz_class& v)
   return hasher(v.get_str());
 }
 
-#if 0
-namespace TransLucid {
-  class TypedValue;
-}
-
-namespace std
-{
-  bool
-  operator<
-  (
-    const pair<size_t, TransLucid::TypedValue>& lhs,
-    const pair<size_t, TransLucid::TypedValue>& rhs
-  )
-  {
-    if (lhs.first != rhs.first)
-    {
-      return lhs.first < rhs.first;
-    }
-    else
-    {
-      return lhs.second < rhs.second;
-    }
-  }
-}
-#endif
-
 /**
  * @brief The namespace that all of the TransLucid library is placed in.
  **/
@@ -77,10 +51,15 @@ namespace TransLucid
     class Expr;
   }
 
+  class HD;
+
   //class EquationGuard;
 
   typedef uint16_t type_index;
   typedef std::u32string u32string;
+
+  typedef std::tuple<u32string, HD*, HD*, HD*> TranslatedEquation;
+  typedef std::vector<TranslatedEquation> equation_v;
 
   class Tuple;
 
