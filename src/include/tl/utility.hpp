@@ -161,6 +161,25 @@ namespace TransLucid
 
   std::string
   u32_to_ascii(const u32string& s);
+
+  inline tuple_t
+  create_add_eqn_context
+  (
+    const u32string& name,
+    HD* guard,
+    HD* boolean
+  )
+  {
+    return tuple_t
+    {
+      {DIM_ID, generate_string(name)},
+      {
+        DIM_VALID_GUARD,
+        TypedValue(EquationGuardType(EquationGuard(guard, boolean)),
+                   TYPE_INDEX_GUARD)
+      },
+    };
+  }
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

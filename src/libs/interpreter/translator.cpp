@@ -90,6 +90,15 @@ void Translator::translate_equation_set(const u32string& s)
     equation_set,
     *m_skipper,
     parsedEquations);
+
+  BOOST_FOREACH(auto& v, parsedEquations)
+  {
+    HD* context = m_compiler.compile(std::get<1>(v));
+    HD* boolean = m_compiler.compile(std::get<2>(v));
+    HD* e = m_compiler.compile(std::get<3>(v));
+    Tuple t(create_add_eqn_context(to_u32string(std::get<0>(v)),
+                                   context, boolean));
+  }
 }
 
 }

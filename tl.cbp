@@ -471,6 +471,9 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
+		<Unit filename="src/tests/equations.cpp">
+			<Option target="tests" />
+		</Unit>
 		<Unit filename="src/tests/expressions.cpp">
 			<Option target="tests" />
 		</Unit>

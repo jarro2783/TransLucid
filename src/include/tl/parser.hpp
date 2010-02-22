@@ -196,6 +196,7 @@ namespace TransLucid
       //AngleStringGrammar angle_string;
     };
 
+    //name, | [], & bool, = HD
     typedef std::tuple<string_type, AST::Expr*, AST::Expr*, AST::Expr*>
     ParsedEquation;
 
