@@ -74,6 +74,36 @@ Variable::operator()(const Tuple& k)
 
   //find all the applicable ones
 
+  Tuple::const_iterator iditer = k.find(DIM_ID);
+
+  if (iditer != k.end())
+  {
+    try
+    {
+      VariableMap::const_iterator viter =
+        m_variables.find(iditer->second.value<String>().value());
+      //std::cout << "looking for "
+      //          << iditer->second.value<String>().value() << std::endl;
+      if (viter == m_variables.end())
+      {
+        //std::cout << "not found" << std::endl;
+        return TaggedValue(TypedValue(Special(Special::UNDEF),
+                           TYPE_INDEX_SPECIAL), k);
+      }
+      else
+      {
+        tuple_t kp = k.tuple();
+        kp.erase(DIM_ID);
+        return (*viter->second)(Tuple(kp));
+      }
+    }
+    catch (std::bad_cast& e)
+    {
+      return TaggedValue(TypedValue(Special(Special::DIMENSION),
+                         TYPE_INDEX_SPECIAL), k);
+    }
+  }
+
   for (Equations::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {

@@ -67,7 +67,8 @@ namespace TransLucid
 
     template <typename Iterator>
     struct integer_parser
-    : public qi::grammar<Iterator, mpz_class(), qi::locals<string_type>>
+    : public qi::grammar<Iterator, mpz_class(), qi::locals<string_type>,
+                         SkipGrammar<Iterator>>
     {
       integer_parser()
         : integer_parser::base_type(integer)
@@ -86,7 +87,12 @@ namespace TransLucid
         ;
       }
 
-      qi::rule<Iterator, mpz_class(), qi::locals<string_type>> integer;
+      qi::rule<
+        Iterator,
+        mpz_class(),
+        qi::locals<string_type>,
+        SkipGrammar<Iterator>
+      > integer;
     };
 
     template <typename Iterator>

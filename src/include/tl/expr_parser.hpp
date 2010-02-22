@@ -47,7 +47,8 @@ namespace TransLucid
     }
 
     template <typename Iterator>
-    class ExprGrammar : public qi::grammar<Iterator, AST::Expr*()>
+    class ExprGrammar
+    : public qi::grammar<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
     {
       public:
 
@@ -193,12 +194,15 @@ namespace TransLucid
                 _a = construct<string_type>()
               ]
            >> (
-               *(qi::standard_wide::char_ -
-                 end_delimiter(ph::bind(&get_end_char, _b)))
-                [
-                  _a += _1
-                ]
-                )
+               qi::lexeme
+               [
+                 *(qi::standard_wide::char_ -
+                   end_delimiter(ph::bind(&get_end_char, _b)))
+                  [
+                    _a += _1
+                  ]
+               ]
+              )
             > end_delimiter(ph::bind(&get_end_char, _b))
           )
           [
@@ -240,6 +244,18 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(at_expr);
         BOOST_SPIRIT_DEBUG_NODE(binary_op);
         //BOOST_SPIRIT_DEBUG_NODE(primary_expr);
+
+        qi::on_error<qi::fail>
+        (
+          expr,
+          std::cerr
+          << val("Error! Expecting ")
+          << _4
+          << val(" here: \"")
+          << construct<std::string>(_3, _2)
+          << val("\"")
+          << std::endl
+        );
       }
 
       template <typename T>
@@ -253,7 +269,7 @@ namespace TransLucid
 
       char_type end;
 
-      qi::rule<Iterator, AST::Expr*()>
+      qi::rule<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
         expr,
         if_expr,
         boolean,
@@ -268,13 +284,15 @@ namespace TransLucid
         end_delimiter
       ;
 
-      qi::rule<Iterator, AST::Expr*(), qi::locals<AST::Expr*>>
+      qi::rule<Iterator, AST::Expr*(), qi::locals<AST::Expr*>,
+               SkipGrammar<Iterator>>
         postfix_expr,
         at_expr,
         binary_op
       ;
 
-      qi::rule<Iterator, AST::Expr*(), qi::locals<string_type, Delimiter>>
+      qi::rule<Iterator, AST::Expr*(), qi::locals<string_type, Delimiter>,
+               SkipGrammar<Iterator>>
         primary_expr
       ;
 

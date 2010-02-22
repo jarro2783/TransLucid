@@ -1,1 +1,1 @@
-SUBDIRS = libs include dirsystem interactive basic
+SUBDIRS = libs include dirsystem interactive basic tests

@@ -55,6 +55,7 @@ AC_CONFIG_FILES([Makefile
                  src/libs/printer/Makefile
                  src/dirsystem/Makefile
                  src/interactive/Makefile
+                 src/tests/Makefile
                  tests/Makefile
                  tests/atlocal
                  tests/sanity/Makefile

@@ -13,7 +13,7 @@ namespace TransLucid
   namespace Parser
   {
     template <typename Iterator>
-    class TupleGrammar : public qi::grammar<Iterator, AST::Expr*()>
+    class TupleGrammar : public qi::grammar<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
     {
       public:
 
@@ -35,8 +35,8 @@ namespace TransLucid
         pair =
           (
               expr
-           >> ':'
-           >> expr
+           >  ':'
+           > expr
           )
           [
             _val = construct<boost::fusion::vector<AST::Expr*, AST::Expr*>>
@@ -52,6 +52,11 @@ namespace TransLucid
            )
            [_val = _1]
         ;
+
+        expr.name("expr");
+        pair.name("pair");
+        context_perturb.name("context_perturb");
+        tuple_inside.name("tuple_inside");
       }
 
       template <typename T>
@@ -63,16 +68,13 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, AST::Expr*()>
+      qi::rule<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
         context_perturb,
-        expr
-      ;
-
-      qi::rule<Iterator, AST::Expr*()>
+        expr,
         tuple_inside
       ;
 
-      qi::rule<Iterator, boost::fusion::vector<AST::Expr*, AST::Expr*>()>
+      qi::rule<Iterator, boost::fusion::vector<AST::Expr*, AST::Expr*>(), SkipGrammar<Iterator>>
         pair
       ;
     };

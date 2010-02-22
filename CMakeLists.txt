@@ -4,9 +4,12 @@ project(TransLucid)
 enable_testing()
 
 find_package(PkgConfig REQUIRED)
+find_package(PCHSupport)
 
 set(TLCFLAGS -Wall -std=gnu++0x)
 set(TLLIBS -std=gnu++0x)
+
+set(CMAKE_BUILD_TYPE build)
 
 set (Boost_USE_STATIC_LIBS OFF)
 set (Boost_ADDITIONAL_VERSIONS 1.41 1.41.0)
