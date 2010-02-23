@@ -18,6 +18,15 @@
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 
+namespace std
+{
+  ostream& operator<<(ostream& os, const TransLucid::Parser::string_type& s)
+  {
+    os << TransLucid::utf32_to_utf8(TransLucid::to_u32string(s));
+    return os;
+  }
+}
+
 namespace TransLucid
 {
   namespace Parser
@@ -70,6 +79,29 @@ namespace TransLucid
         (BinaryOperation(assoc, op, symbol, p->m_value));
     }
     #endif
+
+    inline void
+    addOpSymbol
+    (
+      Header& h,
+      const string_type& symbol,
+      const string_type& opName,
+      AST::InfixAssoc assoc,
+      const mpz_class& precedence
+    )
+    {
+      h.binary_op_symbols.add
+      (
+        symbol.c_str(),
+        AST::BinaryOperation
+        (
+          assoc,
+          to_u32string(opName),
+          to_u32string(symbol),
+          precedence
+        )
+      );
+    }
 
     inline void
     addDelimiter
@@ -202,7 +234,8 @@ namespace TransLucid
 
     template <typename Iterator>
     class EquationGrammar
-    : public qi::grammar<Iterator, ParsedEquation(),qi::locals<string_type>>
+    : public qi::grammar<Iterator, ParsedEquation(),qi::locals<string_type>,
+      SkipGrammar<Iterator>>
     {
       public:
 
@@ -213,10 +246,10 @@ namespace TransLucid
 
         equation =
           (
-              +ident[_a = _1]
+              ident[_a = _1]
            >> guard
            >> boolean
-           >> '='
+           >> L'='
            >> expr
           )
           [
@@ -233,6 +266,11 @@ namespace TransLucid
           ( qi::lit('&') >> expr[_val = _1])
         | qi::eps[_val = (AST::Expr*)0]
         ;
+
+        BOOST_SPIRIT_DEBUG_NODE(boolean);
+        BOOST_SPIRIT_DEBUG_NODE(guard);
+        BOOST_SPIRIT_DEBUG_NODE(equation);
+        BOOST_SPIRIT_DEBUG_NODE(expr);
       }
 
       template <typename T>
@@ -251,11 +289,12 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, ParsedEquation(), qi::locals<string_type>>
+      qi::rule<Iterator, ParsedEquation(), qi::locals<string_type>,
+               SkipGrammar<Iterator>>
         equation
       ;
 
-      qi::rule<Iterator, AST::Expr*()>
+      qi::rule<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
         guard,
         boolean,
         context_perturb,

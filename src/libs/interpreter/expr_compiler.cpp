@@ -66,8 +66,8 @@ AST::Data* ExprCompiler::visitBinaryOpExpr(AST::BinaryOpExpr* e, AST::Data*)
     compiled.push_back(c->e);
     delete c;
   }
-  //possibly ditching this
-  #warning redo
+
+  return new Compiled(new CompiledFunctors::BinaryOp(m_i, compiled, e->op.op));
 }
 
 AST::Data*

@@ -76,4 +76,10 @@ Tuple::insert(size_t key, const TypedValue& value) const
   return Tuple(t);
 }
 
+void
+Tuple::print(std::ostream& os) const
+{
+  os << "tuple";
+}
+
 } //namespace TransLucid

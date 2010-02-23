@@ -77,6 +77,8 @@ namespace TransLucid
      * @brief Compute the hash of a typed value.
      **/
     virtual size_t hash() const = 0;
+
+    virtual void print(std::ostream& os) const = 0;
   };
 
   /**
@@ -239,6 +241,12 @@ namespace TransLucid
       return m_index;
     }
 
+    void
+    print(std::ostream& os) const
+    {
+      m_value->print(os);
+    }
+
     private:
 
     //allows us to store flyweights of any type
@@ -250,6 +258,7 @@ namespace TransLucid
       virtual StorageBase* clone() const = 0;
       virtual bool equalTo(const StorageBase& other) const = 0;
       virtual bool less(const StorageBase& other) const = 0;
+      virtual void print(std::ostream& os) const = 0;
     };
 
     //stores a flyweight of type T
@@ -307,6 +316,12 @@ namespace TransLucid
         {
           throw "tried to compare less than for two values of different types";
         }
+      }
+
+      void
+      print(std::ostream& os) const
+      {
+        m_value.print(os);
       }
 
       private:
@@ -394,8 +409,10 @@ namespace TransLucid
       return *m_value == *rhs.m_value;
     }
 
-    void
-    print(const Interpreter& i, std::ostream& os, const Tuple& c) const;
+    //void
+    //print(const Interpreter& i, std::ostream& os, const Tuple& c) const;
+
+    void print(std::ostream& os) const;
 
     Tuple
     copy() const
@@ -659,5 +676,12 @@ namespace TransLucid
   typedef ValueContext TaggedValue;
 
 } //namespace TransLucid
+
+inline std::ostream&
+operator<<(std::ostream& os, const TransLucid::TypedValue& v)
+{
+  v.print(os);
+  return os;
+}
 
 #endif

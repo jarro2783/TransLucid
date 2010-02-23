@@ -56,15 +56,22 @@ namespace TransLucid
     {
       public:
 
-      BinaryOp(const std::vector<HD*>& operands)
-      : operands(operands)
+      BinaryOp
+      (
+        HD* system,
+        const std::vector<HD*>& operands,
+        const u32string& name
+      )
+      : m_system(system), m_operands(operands), m_name(name)
       {}
 
       TaggedValue
       operator()(const Tuple& context);
 
       private:
-      std::vector<HD*> operands;
+      HD* m_system;
+      std::vector<HD*> m_operands;
+      u32string m_name;
     };
 
     class BoolConst : public CompiledFunctor

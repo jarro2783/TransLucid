@@ -4,6 +4,24 @@
 #include <tl/tuple_parser.hpp>
 #include <boost/spirit/home/qi/parser.hpp>
 #include <tl/types.hpp>
+#include <tl/utility.hpp>
+
+namespace std
+{
+  ostream& operator<<
+  (
+    std::ostream& os,
+    const TransLucid::Parser::ParsedEquation& e
+  )
+  {
+    os
+    << "<"
+    << TransLucid::utf32_to_utf8(TransLucid::to_u32string(std::get<0>(e)))
+    << ", " << std::get<1>(e) << ", " <<
+      std::get<2>(e) << ", " << std::get<3>(e) << ">";
+    return os;
+  }
+}
 
 namespace TransLucid
 {
@@ -14,7 +32,8 @@ namespace
 
   template <typename Iterator>
   class EquationSetGrammar
-  : public qi::grammar<Iterator, std::vector<Parser::ParsedEquation>()>
+  : public qi::grammar<Iterator, std::vector<Parser::ParsedEquation>(),
+    Parser::SkipGrammar<Iterator>>
   {
     public:
     template <typename T>
@@ -24,7 +43,9 @@ namespace
       using boost::phoenix::push_back;
       using namespace qi::labels;
 
-      one_equation = t
+      eqn = t;
+
+      one_equation = eqn
         [
           _val = _1
         ]
@@ -35,11 +56,29 @@ namespace
           push_back(_val, _1)
         ]
       ;
+
+      BOOST_SPIRIT_DEBUG_NODE(one_equation);
+      //BOOST_SPIRIT_DEBUG_NODE(equations);
     }
 
     private:
-    qi::rule<Iterator, std::vector<Parser::ParsedEquation>()> equations;
-    qi::rule<Iterator, Parser::ParsedEquation()> one_equation;
+
+    qi::rule
+    <
+      Iterator,
+      std::vector<Parser::ParsedEquation>(),
+      Parser::SkipGrammar<Iterator>
+    > equations;
+
+    qi::rule
+    <
+      Iterator,
+      Parser::ParsedEquation(),
+      Parser::SkipGrammar<Iterator>
+    >
+      one_equation,
+      eqn
+    ;
   };
 }
 
@@ -55,6 +94,8 @@ Translator::Translator()
 
   m_expr->set_context_perturb(*m_tuple);
   m_tuple->set_expr(*m_expr);
+
+  m_equation->set_expr(*m_expr);
 
   m_header->delimiter_start_symbols.add(L"«",
     Parser::Delimiter(U"ustring", L'«', L'»'));

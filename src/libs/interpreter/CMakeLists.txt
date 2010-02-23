@@ -14,7 +14,7 @@ header_type.cpp cache.cpp utility.cpp
 compiled_functors.cpp expr_compiler.cpp consthd.cpp printer.cpp
 container.cpp set_types.cpp translator.cpp)
 
-add_precompiled_header(tlinterpreter ${PROJECT_SOURCE_DIR}/src/include/tl/expr_parser.hpp)
+#add_precompiled_header(tlinterpreter ${PROJECT_SOURCE_DIR}/src/include/tl/expr_parser.hpp)
 
 #link_directories(${GLIBMM_LIBRARY_DIRS})
 #target_link_libraries(tlinterpreter ${GLIBMM_LIBRARIES})

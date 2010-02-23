@@ -107,6 +107,23 @@ AtRelative::operator()(const Tuple& k)
 }
 
 TaggedValue
+BinaryOp::operator()(const Tuple& k)
+{
+  #warning at the moment hack it for binary, variadic will have to wait
+  tuple_t t =
+  {
+    {get_dimension_index(m_system, U"arg0"), (*m_operands.at(0))(k).first},
+    {get_dimension_index(m_system, U"arg1"), (*m_operands.at(1))(k).first},
+    {DIM_ID, generate_string(U"OP")},
+    {DIM_NAME, generate_string(m_name)}
+  };
+
+  std::cerr << "finding OP @ [name : " << utf32_to_utf8(m_name) << " ..." << std::endl;
+
+  return (*m_system)(Tuple(t));
+}
+
+TaggedValue
 BoolConst::operator()(const Tuple& k)
 {
   return TaggedValue(TypedValue(Boolean(m_value), TYPE_INDEX_BOOL), k);

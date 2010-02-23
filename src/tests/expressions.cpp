@@ -148,6 +148,14 @@ BOOST_AUTO_TEST_CASE ( context_change )
   v = (*h)(tuple2.first.value<TL::Tuple>());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 42);
+
+  TL::HD *context3 = translator.translate_expr(L"[1 : 42, 2 : 16, 3 : 47]");
+  TL::TaggedValue tuple3 = (*context3)(TL::Tuple());
+  BOOST_REQUIRE_EQUAL(tuple3.first.index(), TL::TYPE_INDEX_TUPLE);
+
+  v = (*h)(tuple3.first.value<TL::Tuple>());
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 42);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

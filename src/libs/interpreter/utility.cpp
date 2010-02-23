@@ -68,6 +68,7 @@ valueRefines(const TypedValue& a, const TypedValue& b)
   }
   else if (b.index() == TYPE_INDEX_TYPE)
   {
+    std::cerr << "type type index == " << b.value<TypeType>().index() << std::endl;
     if (a.index() == b.value<TypeType>().index())
     {
       return true;

@@ -37,6 +37,21 @@ namespace TransLucid
 
     equation_v translate_equation_set(const u32string& s);
 
+    HD& system()
+    {
+      return m_interpreter;
+    }
+
+    Parser::Header& header()
+    {
+      return *m_header;
+    }
+
+    void loadLibrary(const u32string& s)
+    {
+      m_lt.loadLibrary(s, &m_interpreter);
+    }
+
     private:
 
     Parser::Header *m_header;
@@ -49,6 +64,8 @@ namespace TransLucid
     Interpreter m_interpreter;
 
     ExprCompiler m_compiler;
+
+    Libtool m_lt;
   };
 }
 

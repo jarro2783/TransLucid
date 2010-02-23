@@ -17,7 +17,7 @@ namespace IntLib
     {}
 
     void
-    print(std::ostream& os, const TransLucid::Tuple& context) const;
+    print(std::ostream& os) const;
 
     bool
     operator==(const Int& rhs) const

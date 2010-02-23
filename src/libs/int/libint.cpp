@@ -14,6 +14,7 @@
 #include <tl/utility.hpp>
 #include <tl/consthd.hpp>
 #include <boost/function.hpp>
+#include <tl/utility.hpp>
 
 namespace std
 {
@@ -334,14 +335,14 @@ int_bin_op
 
 template <class T, template <typename> class Op>
 OpFunction
-bindBinOp(TL::Interpreter& i, size_t index)
+bindBinOp(TL::HD& i, size_t index)
 {
   return boost::bind(int_bin_op<T, Op>, index, _1, _2, _3);
 }
 
 template <class T, template <typename> class Op, class Arg1>
 OpFunction
-bindBinOp(TL::Interpreter& i, size_t index)
+bindBinOp(TL::HD& i, size_t index)
 {
   //when adding context make the third _2
   return boost::bind(int_bin_op<T, Op, Arg1>, index, _1, _2, _3);
@@ -349,7 +350,7 @@ bindBinOp(TL::Interpreter& i, size_t index)
 
 template <class T, template <typename> class Op, class Arg1, class Arg2>
 OpFunction
-bindBinOp(TL::Interpreter& i, size_t index)
+bindBinOp(TL::HD& i, size_t index)
 {
   //when adding context make the third _2
   return boost::bind(int_bin_op<T, Op, Arg1, Arg2>, index, _1, _2, _3);
@@ -385,7 +386,7 @@ class OpHD : public TL::HD
 {
   public:
 
-  OpHD(TL::Interpreter& system, const T& op)
+  OpHD(TL::HD& system, const T& op)
   : m_op(op), m_system(system)
   {}
 
@@ -422,38 +423,43 @@ class OpHD : public TL::HD
 
   private:
   T m_op;
-  TL::Interpreter& m_system;
+  TL::HD& m_system;
 };
 
 template <typename Operation>
 TL::HD*
-build_op_hd(TL::Interpreter& i, const Operation& op)
+build_op_hd(TL::HD& i, const Operation& op)
 {
   return new OpHD<Operation>(i, op);
 }
 
-template<class T>
+template <typename T, template <typename> class Op>
 void
-register_int_ops(TL::Interpreter& i, size_t index)
+register_one_op
+(
+  TL::HD& system,
+  const TL::u32string& name,
+  size_t index
+)
 {
-  //std::vector<TL::type_index> ops = list_of(m.index())(m.index());
-  //TL::TypeRegistry& r = m.registry();
-  //r.registerOp("operator+", ops,
-  //   TL::BinaryOp<T, int_bin_op<T, std::plus> >(m));
-  #warning need to register this with the system,
-  #warning but we dont know how to do that yet
-  TL::HD* h = build_op_hd(i, bindBinOp<T, std::plus>(i, index));
+  TL::HD *op = build_op_hd(system, bindBinOp<T, Op>(system, index));
   //build a guard with arg0:T, arg1:T
+
+  std::cerr << "adding OP @ [name : " << TL::utf32_to_utf8(name) << "..." << std::endl;
 
   TL::tuple_t guard =
   {
     {
-      TL::get_dimension_index(&i, U"arg0"),
+      TL::get_dimension_index(&system, U"arg0"),
       TL::TypedValue(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
     },
     {
-      TL::get_dimension_index(&i, U"arg1"),
+      TL::get_dimension_index(&system, U"arg1"),
       TL::TypedValue(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+    },
+    {
+      TL::DIM_NAME,
+      TL::generate_string(name)
     }
   };
 
@@ -470,7 +476,17 @@ register_int_ops(TL::Interpreter& i, size_t index)
     }
   };
 
-  i.addExpr(TL::Tuple(), h);
+  system.addExpr(TL::Tuple(context), op);
+}
+
+template<class T>
+void
+register_int_ops(TL::Interpreter& i, size_t index)
+{
+  register_one_op<T, std::plus>(i, U"operator+", index);
+  register_one_op<T, std::minus>(i, U"operator-", index);
+  register_one_op<T, std::multiplies>(i, U"operator*", index);
+
   #if 0
   r.registerOp("operator+", ops, bindBinOp<T, std::plus>(m));
   r.registerOp("operator-", ops, bindBinOp<T, std::minus>(m));
@@ -550,16 +566,16 @@ registerType(const TL::u32string& name, TL::Interpreter& i)
   k.insert(std::make_pair(TL::DIM_ID, TL::generate_string(U"TYPEINDEX")));
   i.addExpr(TransLucid::Tuple(k), new TL::ConstHD::IntmpConst(unique));
 
-  register_int_ops<Int<T> >(i, unique.get_ui());
+  register_int_ops<Int<T>>(i, unique.get_ui());
 }
 
 } //namespace <unnamed>
 
 template <class T>
 void
-Int<T>::print(std::ostream& os, const TL::Tuple& context) const
+Int<T>::print(std::ostream& os) const
 {
-  os << m_value;
+  os << "int<" << m_value << ">";
 }
 
 void
@@ -582,6 +598,7 @@ registerTypes(TransLucid::Interpreter& i)
   #endif
 
   registerType<uint8_t>(U"uint8", i);
+  register_int_ops<TL::Intmp>(i, TL::TYPE_INDEX_INTMP);
 }
 
 } //namespace IntLib

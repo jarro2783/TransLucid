@@ -42,7 +42,7 @@ namespace TransLucid
     inline mpz_class
     create_mpz(char base, const u32string& s)
     {
-      //0-9a-zA-Z
+      //0-9A-Za-z
       int actualBase;
       if (base <= '9')
       {
@@ -50,13 +50,10 @@ namespace TransLucid
       }
       else if (base <= 'Z')
       {
-        #warning john wanted this the other way around but mpz does it this way
-        //actualBase = base - 'A' + 26 + 10;
         actualBase = base - 'A' + 10;
       }
       else
       {
-        //actualBase = base - 'a' + 10;
         actualBase = base - 'a' + 26 + 10;
       }
       return mpz_class(u32_to_ascii(s), actualBase);
@@ -132,7 +129,8 @@ namespace TransLucid
     };
 
     template <typename Iterator>
-    struct ident_parser : public qi::grammar<Iterator, string_type()>
+    struct ident_parser
+    : public qi::grammar<Iterator, string_type(), SkipGrammar<Iterator>>
     {
       ident_parser()
       : ident_parser::base_type(ident)
@@ -141,7 +139,7 @@ namespace TransLucid
         ;
       }
 
-      qi::rule<Iterator, string_type()> ident;
+      qi::rule<Iterator, string_type(), SkipGrammar<Iterator>> ident;
     };
 
     inline void

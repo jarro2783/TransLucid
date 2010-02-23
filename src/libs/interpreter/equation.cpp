@@ -80,13 +80,14 @@ Variable::operator()(const Tuple& k)
   {
     try
     {
+      std::cerr << "looking for id: " << utf32_to_utf8(iditer->second.value<String>().value()) << std::endl;
       VariableMap::const_iterator viter =
         m_variables.find(iditer->second.value<String>().value());
       //std::cout << "looking for "
       //          << iditer->second.value<String>().value() << std::endl;
       if (viter == m_variables.end())
       {
-        //std::cout << "not found" << std::endl;
+        std::cerr << "not found" << std::endl;
         return TaggedValue(TypedValue(Special(Special::UNDEF),
                            TYPE_INDEX_SPECIAL), k);
       }
@@ -130,6 +131,7 @@ Variable::operator()(const Tuple& k)
     }
   }
 
+  std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
     return TaggedValue(TypedValue(Special(Special::UNDEF),

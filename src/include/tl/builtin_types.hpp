@@ -74,10 +74,7 @@ namespace TransLucid
     }
 
     void
-    print(std::ostream& os, const Tuple& context) const
-    {
-      //os << "special<" << m_sv.vtos[m_v] << ">";
-    }
+    print(std::ostream& os) const;
 
     bool
     operator==(const Special& rhs) const
@@ -204,10 +201,7 @@ namespace TransLucid
     }
 
     void
-    print(std::ostream& os, const Tuple& c) const
-    {
-      //os << m_s;
-    }
+    print(std::ostream& os) const;
 
     bool
     operator==(const String& rhs) const
@@ -252,7 +246,7 @@ namespace TransLucid
     }
 
     void
-    print(std::ostream& os, const Tuple& c) const
+    print(std::ostream& os) const
     {
       if (m_value)
       {
@@ -284,9 +278,9 @@ namespace TransLucid
     }
 
     void
-    print(std::ostream& os, const Tuple& c) const
+    print(std::ostream& os) const
     {
-      os << m_value.get_str();
+      os << "intmp<" << m_value.get_str() << ">";
     }
 
     bool
@@ -331,7 +325,7 @@ namespace TransLucid
     }
 
     void
-    print(std::ostream& os, const Tuple& c) const
+    print(std::ostream& os) const
     {
       os << "dimension: '" << m_value << "'";
     }
@@ -415,9 +409,7 @@ namespace TransLucid
     }
 
     void
-    print(std::ostream& os, const Tuple& c) const
-    {
-    }
+    print(std::ostream& os) const;
 
     bool
     operator==(const Char& rhs) const
@@ -466,6 +458,12 @@ namespace TransLucid
       return 0;
     }
 
+    void
+    print(std::ostream& os) const
+    {
+      os << "equation guard";
+    }
+
     private:
     EquationGuard m_g;
   };
@@ -506,6 +504,11 @@ namespace TransLucid
     operator<(const PairType&) const
     {
       return false;
+    }
+
+    void print(std::ostream& os) const
+    {
+      os << m_first << " : " << m_second;
     }
 
     private:
@@ -576,6 +579,12 @@ namespace TransLucid
     operator<(const TypeType& rhs) const
     {
       return m_index < rhs.m_index;
+    }
+
+    void
+    print(std::ostream& os) const
+    {
+      os << "type<" << m_index << ">";
     }
 
     size_t
