@@ -104,7 +104,7 @@ Libtool::loadLibrary(const u32string& name, HD* system)
   char wd[1000];
   getcwd(wd, 1000);
   std::cout << "working directory: " << wd << std::endl;
-  attemptLibraryOpen(U"lib" + name + U".so", name, system);
+  attemptLibraryOpen(U"lib" + name, name, system);
 }
 
 void
