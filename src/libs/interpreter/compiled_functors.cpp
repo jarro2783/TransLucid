@@ -118,7 +118,7 @@ BinaryOp::operator()(const Tuple& k)
     {DIM_NAME, generate_string(m_name)}
   };
 
-  std::cerr << "finding OP @ [name : " << utf32_to_utf8(m_name) << " ..." << std::endl;
+  //std::cerr << "finding OP @ [name : " << utf32_to_utf8(m_name) << " ..." << std::endl;
 
   return (*m_system)(Tuple(t));
 }
