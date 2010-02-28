@@ -1,0 +1,5 @@
+add_subdirectory(libs)
+add_subdirectory(dirsystem)
+add_subdirectory(interactive)
+add_subdirectory(basic)
+add_subdirectory(tests)
