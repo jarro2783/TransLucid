@@ -142,6 +142,9 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
+		<Unit filename="src/include/tl/ast.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/builtin_types.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
