@@ -1,5 +1,6 @@
 #include <tl/expr_compiler.hpp>
 #include <tl/compiled_functors.hpp>
+#include <boost/variant.hpp>
 
 namespace TransLucid
 {
@@ -256,6 +257,12 @@ ExprCompiler::visitUnaryExpr(AST::UnaryExpr* e, AST::Data*)
   delete operandc;
 
   return new Compiled(new CompiledFunctors::UnaryOp(e->op, operand));
+}
+
+HD*
+ExprCompiler::operator()(const Tree::AtExpr& e)
+{
+  HD* lhs = boost::apply_visitor(*this, e.lhs);
 }
 
 } //namespace TransLucid

@@ -2,6 +2,7 @@
 #define EXPR_COMPILER_HPP_INCLUDED
 
 #include <tl/expr.hpp>
+#include <tl/ast.hpp>
 
 namespace TransLucid
 {
@@ -35,6 +36,14 @@ namespace TransLucid
     AST::Data* visitStringExpr(AST::StringExpr*, AST::Data*);
     AST::Data* visitUcharExpr(AST::UcharExpr*, AST::Data*);
     AST::Data* visitUnaryExpr(AST::UnaryExpr*, AST::Data*);
+
+    //the new boost variant visitors
+    typedef HD* result_type;
+
+    HD* operator()(const Tree::AtExpr& e);
+    HD* operator()(bool b);
+    HD* operator()(const mpz_class& i);
+    HD* operator()(const u32string& s);
 
     private:
     HD* m_i;
