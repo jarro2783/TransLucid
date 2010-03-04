@@ -15,6 +15,8 @@
 #include <boost/spirit/home/phoenix/bind/bind_function.hpp>
 #include <boost/spirit/home/phoenix/statement/sequence.hpp>
 
+#include <tl/ast.hpp>
+
 namespace TransLucid
 {
   namespace Parser
