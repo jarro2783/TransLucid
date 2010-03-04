@@ -288,6 +288,9 @@
 			<Option target="libinterpreter" />
 			<Option target="tests" />
 		</Unit>
+		<Unit filename="src/include/tl/tree_printer.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/tuple_parser.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
@@ -475,6 +478,9 @@
 			<Option target="tests" />
 		</Unit>
 		<Unit filename="src/tests/expressions.cpp">
+			<Option target="tests" />
+		</Unit>
+		<Unit filename="src/tests/printing.cpp">
 			<Option target="tests" />
 		</Unit>
 		<Extensions>

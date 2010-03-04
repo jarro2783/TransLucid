@@ -1,6 +1,6 @@
 EXTRA_DIST=CMakeLists.txt
 
-noinst_PROGRAMS = expressions equations
+noinst_PROGRAMS = expressions equations printing
 
 AM_LDFLAGS = -lpthread $(GLIBMM_LIBS) -lltdl -export-dynamic \
 $(top_builddir)/src/libs/interpreter/libtlinterpreter.la \
@@ -12,3 +12,5 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/include $(GLIBMM_CFLAGS) \
 expressions_SOURCES = expressions.cpp
 
 equations_SOURCES = equations.cpp
+
+printing_SOURCES = printing.cpp

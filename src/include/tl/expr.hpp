@@ -94,13 +94,6 @@ namespace TransLucid
 
     class Visitor;
 
-    class Expr
-    {
-      public:
-      virtual ~Expr() {}
-      virtual Data* visit(Visitor* visitor, Data* data) = 0;
-    };
-
     class AtExpr;
     class BinaryOpExpr;
     class BooleanExpr;
@@ -119,6 +112,13 @@ namespace TransLucid
     class StringExpr;
     class UcharExpr;
     class UnaryExpr;
+
+    class Expr
+    {
+      public:
+      virtual ~Expr() {}
+      virtual Data* visit(Visitor* visitor, Data* data) = 0;
+    };
 
     class Visitor
     {

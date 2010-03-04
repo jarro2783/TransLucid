@@ -1,3 +1,4 @@
+#include <tl/tree_printer.hpp>
 #include <tl/translator.hpp>
 #include <tl/parser.hpp>
 #include <tl/expr_parser.hpp>
@@ -146,6 +147,12 @@ Translator::translate_equation_set(const u32string& s)
       context,
       boolean,
       e));
+
+    typedef std::back_insert_iterator<std::string> out_iter;
+    Printer::ExprPrinter<out_iter> print_grammar;
+    std::string generated;
+    std::back_insert_iterator<std::string> outit(generated);
+    Printer::karma::generate(outit, print_grammar, *std::get<3>(v));
   }
 
   return equations;
