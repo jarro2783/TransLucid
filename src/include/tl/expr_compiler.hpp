@@ -42,8 +42,33 @@ namespace TransLucid
 
     HD* operator()(const Tree::AtExpr& e);
     HD* operator()(bool b);
+    HD* operator()(const Tree::BinaryOpExpr& e);
+    HD* operator()(const Tree::BuildTupleExpr& e);
+    HD* operator()(const Tree::ConstantExpr& e);
+    HD* operator()(const Tree::DimensionExpr& e);
+    HD* operator()(const Tree::HashExpr& e);
+    HD* operator()(const Tree::IdentExpr& e);
+    HD* operator()(const Tree::IfExpr& e);
     HD* operator()(const mpz_class& i);
     HD* operator()(const u32string& s);
+    HD* operator()(const Tree::UnaryOpExpr& e);
+
+    #if 0
+    boost::recursive_wrapper<AtExpr>,
+    boost::recursive_wrapper<BinaryOpExpr>,
+    boost::recursive_wrapper<BuildTupleExpr>,
+    ConstantExpr,
+    DimensionExpr,
+    boost::recursive_wrapper<HashExpr>,
+    IdentExpr,
+    boost::recursive_wrapper<IfExpr>,
+    boost::recursive_wrapper<UnaryExpr>,
+    bool,
+    char32_t, //replaces UcharExpr
+    mpz_class, //replaces IntegerExpr
+    Special::Value, //replaces SpecialExpr
+    u32string //replaces StringExpr
+    #endif
 
     private:
     HD* m_i;

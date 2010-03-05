@@ -92,7 +92,7 @@ namespace TransLucid
     class OpExpr;
     class PairExpr;
     class RangeExpr;
-    class UnaryExpr;
+    class UnaryOpExpr;
 
     struct ConstantExpr
     {
@@ -120,7 +120,7 @@ namespace TransLucid
       boost::recursive_wrapper<HashExpr>,
       IdentExpr,
       boost::recursive_wrapper<IfExpr>,
-      boost::recursive_wrapper<UnaryExpr>,
+      boost::recursive_wrapper<UnaryOpExpr>,
       bool,
       char32_t, //replaces UcharExpr
       mpz_class, //replaces IntegerExpr
@@ -159,7 +159,7 @@ namespace TransLucid
       Expr else_;
     };
 
-    struct UnaryExpr
+    struct UnaryOpExpr
     {
       UnaryOperation op;
       Expr e;
