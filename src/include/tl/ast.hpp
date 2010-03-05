@@ -132,6 +132,7 @@ namespace TransLucid
     {
       Expr lhs;
       Expr rhs;
+      bool relative;
     };
 
     struct BinaryOpExpr

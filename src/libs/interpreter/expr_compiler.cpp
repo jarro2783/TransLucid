@@ -263,6 +263,79 @@ HD*
 ExprCompiler::operator()(const Tree::AtExpr& e)
 {
   HD* lhs = boost::apply_visitor(*this, e.lhs);
+  HD* rhs = boost::apply_visitor(*this, e.rhs);
+
+  if (e.relative)
+  {
+    return new CompiledFunctors::AtRelative(lhs, rhs);
+  }
+  else
+  {
+    return new CompiledFunctors::AtAbsolute(lhs, rhs);
+  }
+}
+
+HD*
+ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
+{
+}
+
+HD*
+ExprCompiler::operator()(bool b)
+{
+  return new CompiledFunctors::BoolConst(b);
+}
+
+HD*
+ExprCompiler::operator()(const Tree::BuildTupleExpr& e)
+{
+  std::list<std::pair<HD*, HD*>> elements;
+  BOOST_FOREACH(auto& v, e.pairs)
+  {
+    HD *lhs = boost::apply_visitor(*this, v.first);
+    HD *rhs = boost::apply_visitor(*this, v.second);
+    elements.push_back(std::make_pair(lhs, rhs));
+  }
+  return new CompiledFunctors::BuildTuple(m_i, elements);
+}
+
+HD*
+ExprCompiler::operator()(const Tree::ConstantExpr& e)
+{
+  return new CompiledFunctors::Constant(m_i, e.type, e.text);
+}
+
+HD* ExprCompiler::operator()(const Tree::DimensionExpr& e)
+{
+  return new CompiledFunctors::Dimension(m_i, e.text);
+}
+
+HD* ExprCompiler::operator()(const Tree::HashExpr& e)
+{
+  HD* expr = boost::apply_visitor(*this, e.e);
+  return new CompiledFunctors::Hash(m_i, expr);
+}
+
+HD*
+ExprCompiler::operator()(const Tree::IdentExpr& e)
+{
+}
+
+HD*
+ExprCompiler::operator()(const Tree::IfExpr& e)
+{
+}
+
+HD* ExprCompiler::operator()(const mpz_class& i)
+{
+}
+
+HD* ExprCompiler::operator()(const u32string& s)
+{
+}
+
+HD* ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
+{
 }
 
 } //namespace TransLucid
