@@ -4,6 +4,7 @@
 #include <tl/hyperdaton.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/ast.hpp>
 
 namespace TransLucid
 {
@@ -196,6 +197,15 @@ namespace TransLucid
         m_else(else_)
       {}
 
+      If(HD* condition, HD* then,
+        const std::vector<std::pair<HD*, HD*>>& elsifs,
+        HD* else_)
+      : m_condition(condition),
+        m_then(then),
+        m_elsifs_2(elsifs),
+        m_else(else_)
+      {}
+
       TaggedValue
       operator()(const Tuple& context);
 
@@ -204,6 +214,7 @@ namespace TransLucid
       HD* m_condition;
       HD* m_then;
       std::list<HD*> m_elsifs;
+      std::vector<std::pair<HD*, HD*>> m_elsifs_2;
       HD* m_else;
     };
 
@@ -332,7 +343,7 @@ namespace TransLucid
     class UnaryOp : public CompiledFunctor
     {
       public:
-      UnaryOp(AST::UnaryOperation op, HD* e)
+      UnaryOp(Tree::UnaryOperation op, HD* e)
       : m_op(op), m_e(e)
       {}
 
@@ -340,7 +351,7 @@ namespace TransLucid
       operator()(const Tuple& context);
 
       private:
-      AST::UnaryOperation m_op;
+      Tree::UnaryOperation m_op;
       HD* m_e;
     };
 

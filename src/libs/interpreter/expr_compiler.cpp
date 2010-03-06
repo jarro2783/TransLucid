@@ -251,12 +251,15 @@ ExprCompiler::visitUcharExpr(AST::UcharExpr* e, AST::Data*) {
 AST::Data*
 ExprCompiler::visitUnaryExpr(AST::UnaryExpr* e, AST::Data*)
 {
+  #if 0
   Compiled* operandc = dynamic_cast<Compiled*>(e->e->visit(this, 0));
   HD* operand = operandc->e;
 
   delete operandc;
+  #endif
 
-  return new Compiled(new CompiledFunctors::UnaryOp(e->op, operand));
+  //return new Compiled(new CompiledFunctors::UnaryOp(e->op, operand));
+  return 0;
 }
 
 HD*
@@ -278,6 +281,10 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
 HD*
 ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
 {
+  HD* lhs = boost::apply_visitor(*this, e.lhs);
+  HD* rhs = boost::apply_visitor(*this, e.rhs);
+
+  return new CompiledFunctors::BinaryOp(m_i, {lhs, rhs}, e.op.op);
 }
 
 HD*
@@ -319,23 +326,44 @@ HD* ExprCompiler::operator()(const Tree::HashExpr& e)
 HD*
 ExprCompiler::operator()(const Tree::IdentExpr& e)
 {
+  return new CompiledFunctors::Ident(m_i, e.text);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::IfExpr& e)
 {
+  HD* condition = boost::apply_visitor(*this, e.condition);
+  HD* then = boost::apply_visitor(*this, e.then);
+  HD* else_ = boost::apply_visitor(*this, e.else_);
+
+  std::vector<std::pair<HD*, HD*>> else_ifs;
+
+  BOOST_FOREACH(auto& v, e.else_ifs)
+  {
+    else_ifs.push_back(std::make_pair
+    (
+      boost::apply_visitor(*this, v.first),
+      boost::apply_visitor(*this, v.second)
+    ));
+  }
+
+  return new CompiledFunctors::If(condition, then, else_ifs, else_);
 }
 
 HD* ExprCompiler::operator()(const mpz_class& i)
 {
+  return new CompiledFunctors::Integer(m_i, i);
 }
 
 HD* ExprCompiler::operator()(const u32string& s)
 {
+  return new CompiledFunctors::StringConst(s);
 }
 
 HD* ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {
+  HD* operand = boost::apply_visitor(*this, e.e);
+  return new CompiledFunctors::UnaryOp(e.op, operand);
 }
 
 } //namespace TransLucid
