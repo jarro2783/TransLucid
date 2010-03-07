@@ -2,12 +2,13 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <tl/tree_printer.hpp>
+#include <tl/ast.hpp>
 
 using namespace TransLucid;
 
 BOOST_AUTO_TEST_CASE ( integer )
 {
-  AST::Expr *ast = new AST::IntegerExpr(42);
+  Tree::Expr ast = mpz_class(42);
 
   typedef std::back_insert_iterator<std::string> out_iter;
 
@@ -15,7 +16,7 @@ BOOST_AUTO_TEST_CASE ( integer )
   std::string generated;
   std::back_insert_iterator<std::string> outit(generated);
 
-  BOOST_CHECK(Printer::karma::generate(outit, print_grammar, *ast));
+  BOOST_CHECK(Printer::karma::generate(outit, print_grammar, ast));
 
   BOOST_CHECK_EQUAL(generated, "42");
 }

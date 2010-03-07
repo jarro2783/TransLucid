@@ -50,7 +50,7 @@ namespace TransLucid
 
     template <typename Iterator>
     class ExprGrammar
-    : public qi::grammar<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
+    : public qi::grammar<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
     {
       public:
 
@@ -71,15 +71,6 @@ namespace TransLucid
         ;
 
         #if 0
-        {Special::ERROR, "error"},
-        {Special::ACCESS, "access"},
-        {Special::TYPEERROR, "type"},
-        {Special::DIMENSION, "dim"},
-        {Special::UNDEF, "undef"},
-        {Special::CONST, "const"},
-        {Special::LOOP, "loop"}
-        #endif
-
         expr = if_expr [_val = _1]
         ;
 
@@ -114,13 +105,15 @@ namespace TransLucid
          //>> if_expr)
          //;
 
+         #endif
+
         //the actions have to be put after the optional with | eps
         at_expr =
            binary_op [_a = _1]
         >> (
              ('@' >> at_expr)
              [
-               _val = new_<AST::AtExpr>(_a, _1)
+               _val = construct<Tree::AtExpr>(_a, _1)
              ]
            | qi::eps [_val = _a]
            )
@@ -133,7 +126,7 @@ namespace TransLucid
                >> prefix_expr
               )
               [
-                _a = ph::bind(&AST::insert_binary_operation, _1, _a, _2)
+                _a = ph::bind(&Tree::insert_binary_operation, _1, _a, _2)
               ]
            )
            [
@@ -144,7 +137,7 @@ namespace TransLucid
         prefix_expr =
           ( header.prefix_op_symbols >> postfix_expr)
           [
-            _val = new_<AST::UnaryExpr>(_1, _2)
+            _val = construct<Tree::UnaryOpExpr>(_1, _2)
           ]
         | postfix_expr [_val = _1]
         ;
@@ -154,7 +147,7 @@ namespace TransLucid
         >> (
              ( header.postfix_op_symbols
                [
-                 _val = new_<AST::UnaryExpr>(_1, _a)
+                 _val = construct<Tree::UnaryOpExpr>(_1, _a)
                ]
              )
            | qi::eps
@@ -165,31 +158,31 @@ namespace TransLucid
         ;
 
         hash_expr =
-          ( '#' > hash_expr [_val = new_<AST::HashExpr>(_1)])
-          | primary_expr [_val = _1]
+          ( '#' > hash_expr [_val = construct<Tree::HashExpr>(_1)])
+          | primary_expr
         ;
 
         primary_expr =
-          integer [_val = _1]
-        | boolean [_val = _1]
+          integer
+        | boolean
         | header.dimension_symbols
-          [
-            _val = new_<AST::DimensionExpr>(make_u32string(_1))
-          ]
-        | specials [_val = new_<AST::SpecialExpr>(_1)]
+          //[
+          //  _val = new_<AST::DimensionExpr>(make_u32string(_1))
+          //]
+        | specials
         | ident [_a = _1]
           >> ( angle_string
                [
-                 _val = new_<AST::ConstantExpr>(make_u32string(_a),
-                                                make_u32string(_1))
+                 _val = construct<Tree::ConstantExpr>(make_u32string(_a),
+                                                      make_u32string(_1))
                ]
              | qi::eps
                [
-                _val = new_<AST::IdentExpr>(make_u32string(_a))
+                _val = construct<Tree::IdentExpr>(make_u32string(_a))
                ]
              )
-        | context_perturb [_val = _1]
-        | ('(' >> expr > ')') [_val = _1]
+        | context_perturb
+        | ('(' >> expr > ')')
         | (   header.delimiter_start_symbols
               [
                 _b = _1,
@@ -218,18 +211,17 @@ namespace TransLucid
         ;
 
         boolean =
-          ( qi::ascii::string("true") | qi::ascii::string("false"))
+          qi::ascii::string("true")
           [
-            _val = new_<AST::BooleanExpr>(make_u32string(_1))
+            _val = true
+          ]
+        | qi::ascii::string("false")
+          [
+            _val = false
           ]
         ;
 
-        integer =
-          integer_grammar
-          [
-            _val = new_<AST::IntegerExpr>(_1)
-          ]
-        ;
+        integer = integer_grammar[_val = _1];
 
         end_delimiter = qi::standard_wide::char_(_r1);
 
@@ -271,7 +263,7 @@ namespace TransLucid
 
       char_type end;
 
-      qi::rule<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
+      qi::rule<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
         expr,
         if_expr,
         boolean,
@@ -286,14 +278,14 @@ namespace TransLucid
         end_delimiter
       ;
 
-      qi::rule<Iterator, AST::Expr*(), qi::locals<AST::Expr*>,
+      qi::rule<Iterator, Tree::Expr(), qi::locals<Tree::Expr>,
                SkipGrammar<Iterator>>
         postfix_expr,
         at_expr,
         binary_op
       ;
 
-      qi::rule<Iterator, AST::Expr*(), qi::locals<string_type, Delimiter>,
+      qi::rule<Iterator, Tree::Expr(), qi::locals<string_type, Delimiter>,
                SkipGrammar<Iterator>>
         primary_expr
       ;
@@ -306,7 +298,7 @@ namespace TransLucid
 
       qi::symbols<char_type, Special::Value> specials;
 
-      #warning error checking
+      #warning do error checking
     };
 
     extern template class ExprGrammar<string_type::const_iterator>;

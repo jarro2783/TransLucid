@@ -64,9 +64,9 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   //TL::Parser::Header& header = translator.header();
 
   TL::Parser::Header& header = translator.header();
-  TL::Parser::addOpSymbol(header, L"+", L"operator+", TL::AST::ASSOC_LEFT, 5);
-  TL::Parser::addOpSymbol(header, L"*", L"operator*", TL::AST::ASSOC_LEFT, 10);
-  TL::Parser::addOpSymbol(header, L"-", L"operator-", TL::AST::ASSOC_LEFT, 5);
+  TL::Parser::addOpSymbol(header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5);
+  TL::Parser::addOpSymbol(header, L"*", L"operator*", TL::Tree::ASSOC_LEFT, 10);
+  TL::Parser::addOpSymbol(header, L"-", L"operator-", TL::Tree::ASSOC_LEFT, 5);
 
   translator.translate_and_add_equation_set
   (
@@ -111,9 +111,9 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
 BOOST_AUTO_TEST_CASE ( functions )
 {
   TL::Parser::Header& header = translator.header();
-  TL::Parser::addOpSymbol(header, L"+", L"operator+", TL::AST::ASSOC_LEFT, 5);
-  TL::Parser::addOpSymbol(header, L"*", L"operator*", TL::AST::ASSOC_LEFT, 10);
-  TL::Parser::addOpSymbol(header, L"-", L"operator-", TL::AST::ASSOC_LEFT, 5);
+  TL::Parser::addOpSymbol(header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5);
+  TL::Parser::addOpSymbol(header, L"*", L"operator*", TL::Tree::ASSOC_LEFT, 10);
+  TL::Parser::addOpSymbol(header, L"-", L"operator-", TL::Tree::ASSOC_LEFT, 5);
 
   translator.translate_and_add_equation_set
   (

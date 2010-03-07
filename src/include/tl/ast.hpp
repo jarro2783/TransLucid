@@ -4,6 +4,8 @@
 #include <boost/variant.hpp>
 #include <tl/types.hpp>
 #include <gmpxx.h>
+#include <tl/builtin_types.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace TransLucid
 {
@@ -96,6 +98,12 @@ namespace TransLucid
 
     struct ConstantExpr
     {
+      ConstantExpr() = default;
+
+      ConstantExpr(const u32string& t, const u32string& v)
+      : type(t), text(v)
+      {}
+
       u32string type;
       u32string text;
     };
@@ -107,11 +115,22 @@ namespace TransLucid
 
     struct IdentExpr
     {
+      IdentExpr() = default;
+
+      IdentExpr(const u32string& t)
+      : text(t)
+      {}
+
       u32string text;
+    };
+
+    struct nil
+    {
     };
 
     typedef boost::variant
     <
+      nil,
       boost::recursive_wrapper<AtExpr>,
       boost::recursive_wrapper<BinaryOpExpr>,
       boost::recursive_wrapper<BuildTupleExpr>,
@@ -130,6 +149,12 @@ namespace TransLucid
 
     struct AtExpr
     {
+      AtExpr() = default;
+
+      AtExpr(const Expr& lhs, const Expr& rhs)
+      : lhs(lhs), rhs(rhs)
+      {}
+
       Expr lhs;
       Expr rhs;
       bool relative;
@@ -144,11 +169,27 @@ namespace TransLucid
 
     struct BuildTupleExpr
     {
-      std::vector<std::pair<Expr, Expr>> pairs;
+      typedef
+      std::vector<boost::fusion::vector<Expr, Expr>>
+      TuplePairs;
+
+      TuplePairs pairs;
+
+      BuildTupleExpr() = default;
+
+      BuildTupleExpr(const TuplePairs& p)
+      : pairs(p)
+      {}
     };
 
     struct HashExpr
     {
+      HashExpr() = default;
+
+      HashExpr(Expr e)
+      : e(e)
+      {}
+
       Expr e;
     };
 
@@ -162,9 +203,22 @@ namespace TransLucid
 
     struct UnaryOpExpr
     {
+      UnaryOpExpr() = default;
+
+      UnaryOpExpr(const UnaryOperation& o, const Expr& e)
+      : op(o), e(e)
+      {}
+
       UnaryOperation op;
       Expr e;
     };
+
+    Expr insert_binary_operation
+    (
+      const BinaryOperation& info,
+      Expr& lhs,
+      Expr& rhs
+    );
   }
 }
 

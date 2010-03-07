@@ -1,7 +1,7 @@
 #ifndef TREE_PRINTER_HPP_INCLUDED
 #define TREE_PRINTER_HPP_INCLUDED
 
-#include <tl/expr.hpp>
+#include <tl/ast.hpp>
 
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -19,15 +19,9 @@
 
 BOOST_FUSION_ADAPT_STRUCT
 (
-  TransLucid::AST::IntegerExpr,
-  (mpz_class, m_value)
-)
-
-BOOST_FUSION_ADAPT_STRUCT
-(
-  TransLucid::AST::ConstantExpr,
-  (std::u32string, name)
-  (std::u32string, value)
+  TransLucid::Tree::ConstantExpr,
+  (std::u32string, type)
+  (std::u32string, text)
 )
 
 namespace TransLucid
@@ -43,25 +37,27 @@ namespace TransLucid
     using boost::spirit::_1;
     using namespace phoenix;
 
+    #if 0
     struct get_integer_impl
     {
       template <typename T1>
       struct result { typedef const mpz_class& type; };
 
-      const mpz_class& operator()(const AST::IntegerExpr* e) const
+      const mpz_class& operator()(const Tree::IntegerExpr& e) const
       {
         return e->m_value;
       }
     };
 
     phoenix::function<get_integer_impl> get_integer;
+    #endif
 
     template <typename Iterator>
-    struct ExprPrinter : karma::grammar<Iterator, AST::Expr()>
+    struct ExprPrinter : karma::grammar<Iterator, Tree::Expr()>
     {
       ExprPrinter() : ExprPrinter::base_type(expr)
       {
-        integer = karma::stream[_1 = ph::at_c<0>(_val)];
+        integer = karma::stream;
 
         constant =
            karma::string[_1 = bind(&utf32_to_utf8, ph::at_c<0>(_val))]
@@ -81,17 +77,17 @@ namespace TransLucid
         expr %= primary;
       }
 
-      karma::rule<Iterator, AST::Expr()>
+      karma::rule<Iterator, Tree::Expr()>
         expr
       ;
 
-      karma::rule<Iterator, AST::Expr()>
+      karma::rule<Iterator, Tree::Expr()>
         primary
       ;
 
-      karma::rule<Iterator, AST::IntegerExpr()> integer;
+      karma::rule<Iterator, mpz_class()> integer;
 
-      karma::rule<Iterator, AST::ConstantExpr()> constant;
+      karma::rule<Iterator, Tree::ConstantExpr()> constant;
     };
   }
 }

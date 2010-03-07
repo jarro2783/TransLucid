@@ -19,6 +19,8 @@ struct Compiled : public AST::Data
 
 }
 
+using boost::fusion::at_c;
+
 ExprCompiler::ExprCompiler(HD* i)
 : m_i(i)
 {
@@ -39,6 +41,18 @@ ExprCompiler::compile(AST::Expr* e)
   HD* h = c->e;
   delete c;
   return h;
+}
+
+HD*
+ExprCompiler::compile(const Tree::Expr& e)
+{
+  return boost::apply_visitor(*this, e);
+}
+
+HD*
+ExprCompiler::operator()(const Tree::nil& n)
+{
+  return 0;
 }
 
 AST::Data*
@@ -299,8 +313,8 @@ ExprCompiler::operator()(const Tree::BuildTupleExpr& e)
   std::list<std::pair<HD*, HD*>> elements;
   BOOST_FOREACH(auto& v, e.pairs)
   {
-    HD *lhs = boost::apply_visitor(*this, v.first);
-    HD *rhs = boost::apply_visitor(*this, v.second);
+    HD *lhs = boost::apply_visitor(*this, at_c<0>(v));
+    HD *rhs = boost::apply_visitor(*this, at_c<1>(v));
     elements.push_back(std::make_pair(lhs, rhs));
   }
   return new CompiledFunctors::BuildTuple(m_i, elements);

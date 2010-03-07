@@ -15,11 +15,13 @@ namespace std
     const TransLucid::Parser::ParsedEquation& e
   )
   {
+    #if 0
     os
     << "<"
     << TransLucid::utf32_to_utf8(TransLucid::to_u32string(std::get<0>(e)))
     << ", " << std::get<1>(e) << ", " <<
       std::get<2>(e) << ", " << std::get<3>(e) << ">";
+    #endif
     return os;
   }
 }
@@ -152,7 +154,7 @@ Translator::translate_equation_set(const u32string& s)
     Printer::ExprPrinter<out_iter> print_grammar;
     std::string generated;
     std::back_insert_iterator<std::string> outit(generated);
-    Printer::karma::generate(outit, print_grammar, *std::get<3>(v));
+    Printer::karma::generate(outit, print_grammar, std::get<3>(v));
   }
 
   return equations;

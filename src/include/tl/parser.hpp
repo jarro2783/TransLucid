@@ -86,14 +86,14 @@ namespace TransLucid
       Header& h,
       const string_type& symbol,
       const string_type& opName,
-      AST::InfixAssoc assoc,
+      Tree::InfixAssoc assoc,
       const mpz_class& precedence
     )
     {
       h.binary_op_symbols.add
       (
         symbol.c_str(),
-        AST::BinaryOperation
+        Tree::BinaryOperation
         (
           assoc,
           to_u32string(opName),
@@ -229,7 +229,7 @@ namespace TransLucid
     };
 
     //name, | [], & bool, = HD
-    typedef std::tuple<string_type, AST::Expr*, AST::Expr*, AST::Expr*>
+    typedef std::tuple<string_type, Tree::Expr, Tree::Expr, Tree::Expr>
     ParsedEquation;
 
     template <typename Iterator>
@@ -259,12 +259,12 @@ namespace TransLucid
 
         guard =
           ( qi::lit('|') >> context_perturb[_val = _1])
-        | qi::eps[_val = (AST::Expr*)0]
+        | qi::eps
         ;
 
         boolean =
           ( qi::lit('&') >> expr[_val = _1])
-        | qi::eps[_val = (AST::Expr*)0]
+        | qi::eps
         ;
 
         BOOST_SPIRIT_DEBUG_NODE(boolean);

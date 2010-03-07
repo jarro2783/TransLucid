@@ -343,6 +343,9 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
+		<Unit filename="src/libs/interpreter/ast.cpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/libs/interpreter/builtin_types.cpp">
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />

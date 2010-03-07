@@ -18,6 +18,7 @@
 #include <tl/equation.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <tl/expr.hpp>
+#include <tl/ast.hpp>
 
 namespace TransLucid
 {
@@ -101,8 +102,8 @@ namespace TransLucid
       char_type end;
     };
 
-    typedef qi::symbols<char_type, AST::UnaryOperation> unary_symbols;
-    typedef qi::symbols<char_type, AST::BinaryOperation> binary_symbols;
+    typedef qi::symbols<char_type, Tree::UnaryOperation> unary_symbols;
+    typedef qi::symbols<char_type, Tree::BinaryOperation> binary_symbols;
     typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
 
     struct Header

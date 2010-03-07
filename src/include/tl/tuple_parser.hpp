@@ -7,13 +7,24 @@
 #include <boost/spirit/home/phoenix/object/new.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 #include <boost/spirit/home/phoenix/container.hpp>
+#include <tl/ast.hpp>
+
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::BuildTupleExpr,
+  (decltype(TransLucid::Tree::BuildTupleExpr::pairs), pairs)
+);
 
 namespace TransLucid
 {
   namespace Parser
   {
+    typedef std::vector<boost::fusion::vector<Tree::Expr, Tree::Expr>>
+      vector_pair_expr;
+
     template <typename Iterator>
-    class TupleGrammar : public qi::grammar<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
+    class TupleGrammar
+    : public qi::grammar<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
     {
       public:
 
@@ -25,23 +36,18 @@ namespace TransLucid
         namespace phoenix = boost::phoenix;
         //expr = self.parsers.expr_parser.top();
 
-        tuple_inside =
-          (pair % ',')
-          [
-            _val = new_<AST::BuildTupleExpr>(_1)
-          ]
-        ;
+        tuple_inside = pair % ',';
 
         pair =
           (
-              expr
+             expr
            >  ':'
            > expr
           )
-          [
-            _val = construct<boost::fusion::vector<AST::Expr*, AST::Expr*>>
-                   (_1, _2)
-          ]
+          //[
+          //  _val = construct<boost::fusion::vector<Tree::Expr, Tree::Expr>>
+          //         (_1, _2)
+          //]
         ;
 
         context_perturb =
@@ -50,7 +56,9 @@ namespace TransLucid
             > tuple_inside
             > ']'
            )
-           [_val = _1]
+           [
+             _val = construct<Tree::BuildTupleExpr>(_1)
+           ]
         ;
 
         expr.name("expr");
@@ -68,13 +76,21 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
-        context_perturb,
+      qi::rule<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
         expr,
+        context_perturb
+      ;
+
+      qi::rule<Iterator, vector_pair_expr(), SkipGrammar<Iterator>>
         tuple_inside
       ;
 
-      qi::rule<Iterator, boost::fusion::vector<AST::Expr*, AST::Expr*>(), SkipGrammar<Iterator>>
+      qi::rule
+      <
+        Iterator,
+        boost::fusion::vector<Tree::Expr, Tree::Expr>(),
+        SkipGrammar<Iterator>
+      >
         pair
       ;
     };

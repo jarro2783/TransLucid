@@ -15,6 +15,7 @@ namespace TransLucid
     ~ExprCompiler();
 
     HD* compile(AST::Expr*);
+    HD* compile(const Tree::Expr&);
 
     AST::Data* visitAtExpr(AST::AtExpr*, AST::Data*);
     AST::Data* visitBinaryOpExpr(AST::BinaryOpExpr*, AST::Data*);
@@ -40,6 +41,7 @@ namespace TransLucid
     //the new boost variant visitors
     typedef HD* result_type;
 
+    HD* operator()(const Tree::nil& n);
     HD* operator()(const Tree::AtExpr& e);
     HD* operator()(bool b);
     HD* operator()(const Tree::BinaryOpExpr& e);
