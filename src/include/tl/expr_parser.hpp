@@ -70,8 +70,7 @@ namespace TransLucid
           (L"loop", Special::LOOP)
         ;
 
-        #if 0
-        expr = if_expr [_val = _1]
+        expr = if_expr
         ;
 
         if_expr =
@@ -91,12 +90,12 @@ namespace TransLucid
            >> qi::lit("fi")
           )
           [
-            qi::_val = new_<AST::IfExpr>(_1, _2, _3, _4)
+            qi::_val = construct<Tree::IfExpr>(_1, _2, _3, _4)
           ]
         | range_expr
-          [
-            _val = _1
-          ]
+          //[
+          //  _val = _1
+          //]
         ;
 
         range_expr = at_expr
@@ -104,8 +103,6 @@ namespace TransLucid
          //>> -(".."
          //>> if_expr)
          //;
-
-         #endif
 
         //the actions have to be put after the optional with | eps
         at_expr =

@@ -6,6 +6,7 @@
 #include <gmpxx.h>
 #include <tl/builtin_types.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/container.hpp>
 
 namespace TransLucid
 {
@@ -195,6 +196,25 @@ namespace TransLucid
 
     struct IfExpr
     {
+      IfExpr() = default;
+
+      template <typename List>
+      IfExpr(Expr c,
+             Expr t,
+             const List& eif,
+             Expr e)
+      : condition(c),
+        then(t),
+        else_(e)
+      {
+        using boost::fusion::at_c;
+
+        BOOST_FOREACH(auto& v, eif)
+        {
+          else_ifs.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
+        }
+      }
+
       Expr condition;
       Expr then;
       std::vector<std::pair<Expr, Expr>> else_ifs;
