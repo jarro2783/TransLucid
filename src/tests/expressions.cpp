@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <tl/utility.hpp>
 #include <string>
-
+#include <tl/tree_printer.hpp>
 
 #if 0
 #include <boost/spirit/home/phoenix/statement/if.hpp>
@@ -17,6 +17,9 @@
 #include <boost/test/included/unit_test.hpp>
 
 namespace TL = TransLucid;
+
+typedef std::back_insert_iterator<std::string> print_iter;
+TL::Printer::ExprPrinter<print_iter> print_grammar;
 
 void
 test_base(size_t base, uint32_t number, TL::Translator& t)
@@ -59,6 +62,8 @@ BOOST_FIXTURE_TEST_SUITE( expressions_tests, translator_class )
 
 //BOOST_AUTO_TEST_SUITE( expressions_tests )
 
+#ifndef DISABLE_INTEGER_TESTS
+
 BOOST_AUTO_TEST_CASE( integers )
 {
   for (int i = 0; i != 500; ++i)
@@ -75,6 +80,8 @@ BOOST_AUTO_TEST_CASE( integers )
   }
 
 }
+
+#endif
 
 BOOST_AUTO_TEST_CASE ( strings ) {
 
@@ -98,6 +105,16 @@ BOOST_AUTO_TEST_CASE ( chars ) {
   h = translator.translate_expr(L"\'è\'");
   TL::TaggedValue v = (*h)(TL::Tuple());
 
+  std::string generated;
+  print_iter outit(generated);
+  TL::Printer::karma::generate(outit, print_grammar,
+                               translator.lastExpression());
+
+  std::cerr << "tree:" << std::endl
+  << generated <<
+  "end tree" << std::endl;
+
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_UCHAR);
   BOOST_CHECK(v.first.value<TL::Char>().value() == U'è');
   delete h;
 }
@@ -123,6 +140,7 @@ BOOST_AUTO_TEST_CASE ( specials ) {
       {
         TL::HD *h = translator.translate_expr(s.first);
         TL::TaggedValue v = (*h)(TL::Tuple());
+        BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_SPECIAL);
         BOOST_CHECK_EQUAL(v.first.value<TL::Special>().value(),
                           s.second);
         delete h;

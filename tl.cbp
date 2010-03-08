@@ -156,6 +156,9 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
+		<Unit filename="src/include/tl/charset.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/compiled_classes.hpp">
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />

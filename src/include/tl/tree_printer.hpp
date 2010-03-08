@@ -24,6 +24,12 @@ BOOST_FUSION_ADAPT_STRUCT
   (std::u32string, text)
 )
 
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::HashExpr,
+  (TransLucid::Tree::Expr, e)
+)
+
 namespace TransLucid
 {
   namespace Printer
@@ -66,28 +72,20 @@ namespace TransLucid
         << '>'
         ;
 
-        primary %=
+        hash %= '#' << expr;
+
+        expr %=
           integer
         | constant
-        //[
-        //  _1 = ph::dynamic_cast_<const AST::IntegerExpr>(_val)
-        //]
+        | karma::bool_
+        | hash
         ;
-
-        expr %= primary;
       }
 
-      karma::rule<Iterator, Tree::Expr()>
-        expr
-      ;
-
-      karma::rule<Iterator, Tree::Expr()>
-        primary
-      ;
-
+      karma::rule<Iterator, Tree::Expr()> expr;
       karma::rule<Iterator, mpz_class()> integer;
-
       karma::rule<Iterator, Tree::ConstantExpr()> constant;
+      karma::rule<Iterator, Tree::HashExpr()> hash;
     };
   }
 }

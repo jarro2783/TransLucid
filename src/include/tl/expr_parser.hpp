@@ -36,15 +36,15 @@ namespace TransLucid
       return d.type;
     }
 
-    inline AST::Expr*
+    inline Tree::Expr
     construct_delimited_constant(Delimiter& d, const u32string& v)
     {
       if (d.type == U"ustring") {
-        return new AST::StringExpr(v);
+        return v;
       } else if (d.type == U"uchar") {
-        return new AST::UcharExpr(v[0]);
+        return (char32_t)v[0];
       } else {
-        return new AST::ConstantExpr(d.type, v);
+        return Tree::ConstantExpr(d.type, v);
       }
     }
 
@@ -70,7 +70,7 @@ namespace TransLucid
           (L"loop", Special::LOOP)
         ;
 
-        expr = if_expr
+        expr %= if_expr
         ;
 
         if_expr =
@@ -93,12 +93,12 @@ namespace TransLucid
             qi::_val = construct<Tree::IfExpr>(_1, _2, _3, _4)
           ]
         | range_expr
-          //[
-          //  _val = _1
-          //]
+          [
+            _val = _1
+          ]
         ;
 
-        range_expr = at_expr
+        range_expr %= at_expr
         ;
          //>> -(".."
          //>> if_expr)
@@ -156,17 +156,17 @@ namespace TransLucid
 
         hash_expr =
           ( '#' > hash_expr [_val = construct<Tree::HashExpr>(_1)])
-          | primary_expr
+          | primary_expr [_val = _1]
         ;
 
         primary_expr =
-          integer
-        | boolean
+          integer [_val = _1]
+        | boolean [_val = _1]
         | header.dimension_symbols
-          //[
-          //  _val = new_<AST::DimensionExpr>(make_u32string(_1))
-          //]
-        | specials
+          [
+            _val = construct<Tree::DimensionExpr>(make_u32string(_1))
+          ]
+        | specials [_val = _1]
         | ident [_a = _1]
           >> ( angle_string
                [
@@ -178,8 +178,8 @@ namespace TransLucid
                 _val = construct<Tree::IdentExpr>(make_u32string(_a))
                ]
              )
-        | context_perturb
-        | ('(' >> expr > ')')
+        | context_perturb [_val = _1]
+        | ('(' >> expr > ')') [_val = _1]
         | (   header.delimiter_start_symbols
               [
                 _b = _1,
@@ -234,7 +234,8 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(postfix_expr);
         BOOST_SPIRIT_DEBUG_NODE(at_expr);
         BOOST_SPIRIT_DEBUG_NODE(binary_op);
-        //BOOST_SPIRIT_DEBUG_NODE(primary_expr);
+        BOOST_SPIRIT_DEBUG_NODE(primary_expr);
+        //BOOST_SPIRIT_DEBUG_NODE(integer_grammar);
 
         qi::on_error<qi::fail>
         (

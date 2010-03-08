@@ -2,6 +2,7 @@
 #define EXCEPTION_HPP_INCLUDED
 
 #include <tl/types.hpp>
+#include <tl/charset.hpp>
 
 namespace TransLucid
 {
@@ -27,7 +28,7 @@ namespace TransLucid
   {
     public:
     TemplateException(const u32string& m)
-    : m(m)
+    : message(utf32_to_utf8(m))
     {
     }
 
@@ -37,11 +38,11 @@ namespace TransLucid
     const char*
     what() const throw()
     {
-      return "don't know how to convert u32string to char*";
+      return message.c_str();
     }
 
     private:
-    u32string m;
+    std::string message;
   };
 
   /**

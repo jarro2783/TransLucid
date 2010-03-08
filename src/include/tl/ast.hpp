@@ -111,6 +111,12 @@ namespace TransLucid
 
     struct DimensionExpr
     {
+      DimensionExpr() = default;
+
+      DimensionExpr(const u32string& text)
+      : text(text)
+      {}
+
       u32string text;
     };
 
@@ -239,6 +245,41 @@ namespace TransLucid
       Expr& lhs,
       Expr& rhs
     );
+
+    #define PRINT_NODE(n) \
+    inline \
+    std::ostream& operator<<(std::ostream& os, const n &) \
+    { \
+       os << #n ; \
+       return os; \
+    } \
+
+    PRINT_NODE(nil)
+    PRINT_NODE(AtExpr)
+    PRINT_NODE(BinaryOpExpr)
+    PRINT_NODE(BuildTupleExpr)
+    PRINT_NODE(ConstantExpr)
+    PRINT_NODE(DimensionExpr)
+    PRINT_NODE(HashExpr)
+    PRINT_NODE(IdentExpr)
+    PRINT_NODE(IfExpr)
+    PRINT_NODE(UnaryOpExpr)
+
+#if 0
+    class AtExpr;
+    class BinaryOpExpr;
+    class BooleanExpr;
+    class BuildTupleExpr;
+    class ConstantExpr;
+    class DimensionExpr;
+    class HashExpr;
+    class IdentExpr;
+    class IfExpr;
+    class OpExpr;
+    class PairExpr;
+    class RangeExpr;
+    class UnaryOpExpr;
+#endif
   }
 }
 

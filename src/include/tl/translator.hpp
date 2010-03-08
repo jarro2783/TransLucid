@@ -52,6 +52,12 @@ namespace TransLucid
       m_lt.loadLibrary(s, &m_interpreter);
     }
 
+    const Tree::Expr&
+    lastExpression() const
+    {
+      return m_lastExpr;
+    }
+
     private:
 
     Parser::Header *m_header;
@@ -66,6 +72,8 @@ namespace TransLucid
     ExprCompiler m_compiler;
 
     Libtool m_lt;
+
+    Tree::Expr m_lastExpr;
   };
 }
 

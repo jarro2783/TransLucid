@@ -109,7 +109,7 @@ Translator::Translator()
 HD* Translator::translate_expr(const Parser::string_type& s)
 {
   Parser::iterator_t pos = s.begin();
-  AST::Expr* e = 0;
+  Tree::Expr e;
 
   boost::spirit::qi::phrase_parse(
     pos,

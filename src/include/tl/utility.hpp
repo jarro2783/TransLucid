@@ -156,12 +156,6 @@ namespace TransLucid
   bool
   booleanTrue(const EquationGuard& g, const Tuple& c);
 
-  std::string
-  utf32_to_utf8(const std::u32string& s);
-
-  std::string
-  u32_to_ascii(const u32string& s);
-
   inline tuple_t
   create_add_eqn_context
   (

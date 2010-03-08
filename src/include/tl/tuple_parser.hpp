@@ -36,9 +36,9 @@ namespace TransLucid
         namespace phoenix = boost::phoenix;
         //expr = self.parsers.expr_parser.top();
 
-        tuple_inside = pair % ',';
+        tuple_inside %= pair % ',';
 
-        pair =
+        pair %=
           (
              expr
            >  ':'
@@ -71,7 +71,7 @@ namespace TransLucid
       void
       set_expr(const T& t)
       {
-        expr = t;
+        expr %= t;
       }
 
       private:

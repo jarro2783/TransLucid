@@ -18,15 +18,6 @@
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 
-namespace std
-{
-  ostream& operator<<(ostream& os, const TransLucid::Parser::string_type& s)
-  {
-    os << TransLucid::utf32_to_utf8(TransLucid::to_u32string(s));
-    return os;
-  }
-}
-
 namespace TransLucid
 {
   namespace Parser

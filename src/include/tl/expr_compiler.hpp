@@ -47,11 +47,13 @@ namespace TransLucid
     HD* operator()(const Tree::BinaryOpExpr& e);
     HD* operator()(const Tree::BuildTupleExpr& e);
     HD* operator()(const Tree::ConstantExpr& e);
+    HD* operator()(char32_t c);
     HD* operator()(const Tree::DimensionExpr& e);
     HD* operator()(const Tree::HashExpr& e);
     HD* operator()(const Tree::IdentExpr& e);
     HD* operator()(const Tree::IfExpr& e);
     HD* operator()(const mpz_class& i);
+    HD* operator()(Special::Value s);
     HD* operator()(const u32string& s);
     HD* operator()(const Tree::UnaryOpExpr& e);
 

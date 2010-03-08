@@ -321,6 +321,12 @@ ExprCompiler::operator()(const Tree::BuildTupleExpr& e)
 }
 
 HD*
+ExprCompiler::operator()(char32_t c)
+{
+  return new CompiledFunctors::UcharConst(c);
+}
+
+HD*
 ExprCompiler::operator()(const Tree::ConstantExpr& e)
 {
   return new CompiledFunctors::Constant(m_i, e.type, e.text);
@@ -367,6 +373,12 @@ ExprCompiler::operator()(const Tree::IfExpr& e)
 HD* ExprCompiler::operator()(const mpz_class& i)
 {
   return new CompiledFunctors::Integer(m_i, i);
+}
+
+HD*
+ExprCompiler::operator()(Special::Value s)
+{
+  return new CompiledFunctors::SpecialConst(s);
 }
 
 HD* ExprCompiler::operator()(const u32string& s)

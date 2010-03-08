@@ -19,6 +19,24 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <tl/expr.hpp>
 #include <tl/ast.hpp>
+#include <tl/utility.hpp>
+
+inline std::ostream&
+operator<<(std::ostream& os, char32_t c)
+{
+  os << "char32_t";
+  return os;
+}
+
+namespace std
+{
+  inline ostream&
+  operator<<(ostream& os, const u32string& s)
+  {
+    os << TransLucid::utf32_to_utf8(s);
+    return os;
+  }
+}
 
 namespace TransLucid
 {
@@ -102,6 +120,13 @@ namespace TransLucid
       char_type end;
     };
 
+    inline std::ostream&
+    operator<<(std::ostream& os, const Delimiter& d)
+    {
+      os << "delimiter(" << d.type << ")";
+      return os;
+    }
+
     typedef qi::symbols<char_type, Tree::UnaryOperation> unary_symbols;
     typedef qi::symbols<char_type, Tree::BinaryOperation> binary_symbols;
     typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
@@ -184,6 +209,16 @@ namespace TransLucid
     };
 
     typedef string_type::const_iterator iterator_t;
+  }
+}
+
+namespace std
+{
+  inline ostream&
+  operator<<(ostream& os, const TransLucid::Parser::string_type& s)
+  {
+    os << TransLucid::utf32_to_utf8(TransLucid::to_u32string(s));
+    return os;
   }
 }
 
