@@ -14,15 +14,14 @@ insert_binary_operation
   Expr& rhs
 )
 {
-  #if 0
-  AST::BinaryOpExpr* binop = dynamic_cast<AST::BinaryOpExpr*>(lhs);
+  Tree::BinaryOpExpr* binop = boost::get<Tree::BinaryOpExpr>(&lhs);
   if (binop == 0)
   {
-    return new AST::BinaryOpExpr(op, lhs, rhs);
+    return Tree::BinaryOpExpr(op, lhs, rhs);
   }
   if (binop->op.precedence > op.precedence)
   {
-    return new AST::BinaryOpExpr(op, lhs, rhs);
+    return Tree::BinaryOpExpr(op, lhs, rhs);
   }
   if (binop->op.precedence < op.precedence)
   {
@@ -43,7 +42,7 @@ insert_binary_operation
   }
   if (binop->op.assoc == ASSOC_LEFT)
   {
-    return new AST::BinaryOpExpr(op, lhs, rhs);
+    return Tree::BinaryOpExpr(op, lhs, rhs);
   }
   if (binop->op.assoc == ASSOC_RIGHT)
   {
@@ -59,7 +58,22 @@ insert_binary_operation
   //we have the same operator
   binop->add_leaf(rhs);
   return binop;
-  #endif
+}
+
+#warning work this out with variadic or not
+void
+BinaryOpExpr::add_right(const BinaryOperation& op, Expr& r)
+{
+  //size_t last = operands.size()-1;
+  //operands.at(last) =
+  //  insert_binary_operation(op, operands.at(last), r);
+}
+
+void
+BinaryOpExpr::add_leaf(Expr& e)
+{
+  //operands.push_back(e);
+  rhs = e;
 }
 
 } //namespace Tree

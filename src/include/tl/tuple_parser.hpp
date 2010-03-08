@@ -36,7 +36,7 @@ namespace TransLucid
         namespace phoenix = boost::phoenix;
         //expr = self.parsers.expr_parser.top();
 
-        tuple_inside %= pair % ',';
+        tuple_inside = pair[push_back(_val, _1)] % ',';
 
         pair %=
           (

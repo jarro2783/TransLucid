@@ -169,9 +169,23 @@ namespace TransLucid
 
     struct BinaryOpExpr
     {
+      BinaryOpExpr() = default;
+
+      BinaryOpExpr(BinaryOperation o,
+                   const Expr& l,
+                   const Expr& r)
+      : op(o), lhs(l), rhs(r)
+      {}
+
       BinaryOperation op;
       Expr lhs;
       Expr rhs;
+
+      void
+      add_right(const BinaryOperation& op, Expr& rhs);
+
+      void
+      add_leaf(Expr& e);
     };
 
     struct BuildTupleExpr
