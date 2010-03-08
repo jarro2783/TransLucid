@@ -268,14 +268,14 @@ namespace TransLucid
       void
       set_context_perturb(const T& t)
       {
-        context_perturb = t;
+        context_perturb %= t;
       }
 
       template <typename T>
       void
       set_expr(const T& t)
       {
-        expr = t;
+        expr %= t;
       }
 
       private:
@@ -285,7 +285,7 @@ namespace TransLucid
         equation
       ;
 
-      qi::rule<Iterator, AST::Expr*(), SkipGrammar<Iterator>>
+      qi::rule<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
         guard,
         boolean,
         context_perturb,

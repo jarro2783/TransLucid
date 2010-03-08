@@ -130,12 +130,17 @@ Translator::translate_equation_set(const u32string& s)
   EquationSetGrammar<Parser::iterator_t> equation_set(*m_equation);
   std::vector<Parser::ParsedEquation> parsedEquations;
 
-  boost::spirit::qi::phrase_parse(
+  bool success = boost::spirit::qi::phrase_parse(
     pos,
     ws.cend(),
     equation_set,
     *m_skipper,
     parsedEquations);
+
+  if (!success)
+  {
+    throw "failed parsing equations";
+  }
 
   equation_v equations;
 
@@ -154,7 +159,21 @@ Translator::translate_equation_set(const u32string& s)
     Printer::ExprPrinter<out_iter> print_grammar;
     std::string generated;
     std::back_insert_iterator<std::string> outit(generated);
+
+    std::cerr << "parsed equation: " << std::endl;
+    std::cerr << "name: " << utf32_to_utf8(to_u32string(std::get<0>(v)))
+    << std::endl;
+
+    Printer::karma::generate(outit, print_grammar, std::get<1>(v));
+    std::cerr << "guard: " << generated << std::endl;
+
+    generated.clear();
+    Printer::karma::generate(outit, print_grammar, std::get<2>(v));
+    std::cerr << "boolean: " << generated << std::endl;
+
+    generated.clear();
     Printer::karma::generate(outit, print_grammar, std::get<3>(v));
+    std::cerr << "equation: " << generated << std::endl;
   }
 
   return equations;
