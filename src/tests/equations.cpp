@@ -105,6 +105,20 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
 
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
+
+  translator.translate_and_add_equation_set
+  (
+    U"d = 1 + 2 * 3;;"
+  );
+  v = system
+  (TL::Tuple(TL::tuple_t(
+    {
+      {TL::DIM_ID, TL::generate_string(U"d")}
+    }
+  )));
+
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 7);
 }
 
 BOOST_AUTO_TEST_CASE ( functions )

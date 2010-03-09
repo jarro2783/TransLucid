@@ -26,7 +26,7 @@ insert_binary_operation
   if (binop->op.precedence < op.precedence)
   {
     binop->add_right(op, rhs);
-    return binop;
+    return *binop;
   }
   //precedence is the same
   if (binop->op.assoc != op.assoc)
@@ -47,7 +47,7 @@ insert_binary_operation
   if (binop->op.assoc == ASSOC_RIGHT)
   {
     binop->add_right(op, rhs);
-    return binop;
+    return *binop;
   }
   //assoc_variable or assoc_comparison
   if (binop->op != op)
@@ -57,7 +57,7 @@ insert_binary_operation
   }
   //we have the same operator
   binop->add_leaf(rhs);
-  return binop;
+  return *binop;
 }
 
 void
@@ -67,7 +67,7 @@ BinaryOpExpr::add_right(const BinaryOperation& op, Expr& r)
   //operands.at(last) =
   //  insert_binary_operation(op, operands.at(last), r);
   #warning hope this works rhs should be the last one when we dont have variadic
-  insert_binary_operation(op, rhs, r);
+  rhs = insert_binary_operation(op, rhs, r);
 }
 
 void

@@ -54,7 +54,7 @@ namespace
         ]
       ;
 
-      equations %= *(one_equation >> ";;")
+      equations %= *(one_equation >> ";;") >> qi::eoi
         //[
         //  push_back(_val, _1)
         //]
