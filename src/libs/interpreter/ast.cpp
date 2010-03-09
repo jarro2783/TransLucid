@@ -60,13 +60,14 @@ insert_binary_operation
   return binop;
 }
 
-#warning work this out with variadic or not
 void
 BinaryOpExpr::add_right(const BinaryOperation& op, Expr& r)
 {
   //size_t last = operands.size()-1;
   //operands.at(last) =
   //  insert_binary_operation(op, operands.at(last), r);
+  #warning hope this works rhs should be the last one when we dont have variadic
+  insert_binary_operation(op, rhs, r);
 }
 
 void

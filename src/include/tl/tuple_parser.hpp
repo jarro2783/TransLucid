@@ -9,12 +9,6 @@
 #include <boost/spirit/home/phoenix/container.hpp>
 #include <tl/ast.hpp>
 
-BOOST_FUSION_ADAPT_STRUCT
-(
-  TransLucid::Tree::BuildTupleExpr,
-  (decltype(TransLucid::Tree::BuildTupleExpr::pairs), pairs)
-);
-
 namespace TransLucid
 {
   namespace Parser

@@ -46,7 +46,7 @@ namespace
       using boost::phoenix::push_back;
       using namespace qi::labels;
 
-      eqn = t;
+      eqn %= t;
 
       one_equation = eqn
         [
@@ -54,14 +54,14 @@ namespace
         ]
       ;
 
-      equations = *(one_equation >> ";;")
-        [
-          push_back(_val, _1)
-        ]
+      equations %= *(one_equation >> ";;")
+        //[
+        //  push_back(_val, _1)
+        //]
       ;
 
       BOOST_SPIRIT_DEBUG_NODE(one_equation);
-      //BOOST_SPIRIT_DEBUG_NODE(equations);
+      BOOST_SPIRIT_DEBUG_NODE(equations);
     }
 
     private:

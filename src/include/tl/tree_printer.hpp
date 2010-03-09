@@ -30,6 +30,18 @@ BOOST_FUSION_ADAPT_STRUCT
   (TransLucid::Tree::Expr, e)
 )
 
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::BuildTupleExpr,
+  (TransLucid::Tree::BuildTupleExpr::TuplePairs, pairs)
+);
+
+//BOOST_FUSION_ADAPT_STRUCT
+//(
+//  TransLucid::Tree::BuildTupleExpr,
+//  (TransLucid::Tree::BuildTupleExpr::TuplePairs, pairs)
+//)
+
 namespace TransLucid
 {
   namespace Printer
@@ -74,6 +86,10 @@ namespace TransLucid
 
         hash %= '#' << expr;
 
+        tuple = '[' << pairs[_1 = ph::at_c<0>(_val)] << ']';
+
+        pairs %= (expr << " : " << expr) % ", ";
+
         expr %=
           integer
         | constant
@@ -86,6 +102,12 @@ namespace TransLucid
       karma::rule<Iterator, mpz_class()> integer;
       karma::rule<Iterator, Tree::ConstantExpr()> constant;
       karma::rule<Iterator, Tree::HashExpr()> hash;
+      karma::rule<Iterator, Tree::BuildTupleExpr()> tuple;
+      karma::rule
+      <
+        Iterator,
+        Tree::BuildTupleExpr::TuplePairs()
+      > pairs;
     };
   }
 }
