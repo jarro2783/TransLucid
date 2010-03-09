@@ -61,7 +61,7 @@ namespace
       ;
 
       BOOST_SPIRIT_DEBUG_NODE(one_equation);
-      BOOST_SPIRIT_DEBUG_NODE(equations);
+      //BOOST_SPIRIT_DEBUG_NODE(equations);
     }
 
     private:
@@ -117,6 +117,8 @@ HD* Translator::translate_expr(const Parser::string_type& s)
     *m_expr,
     *m_skipper,
     e);
+
+  m_lastExpr = e;
 
   return m_compiler.compile(e);
 }

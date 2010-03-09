@@ -112,8 +112,8 @@ BOOST_AUTO_TEST_CASE ( functions )
   translator.translate_and_add_equation_set
   (
     U"fib = fib @ [1 : #1-1] + fib @ [1 : #1-2];;"
-    U"fib @ [1 : 0] = 0;;"
-    U"fib @ [1 : 1] = 1;;"
+    U"fib | [1 : 0] = 0;;"
+    U"fib | [1 : 1] = 1;;"
   );
 
   TL::HD *h = translator.translate_expr(L"fib @ [1 : 2]");

@@ -250,25 +250,27 @@ namespace TransLucid
 
         guard =
           ( qi::lit('|') >> context_perturb[_val = _1])
-        | qi::eps
+        | qi::eps [_val = construct<Tree::nil>()]
         ;
 
         boolean =
           ( qi::lit('&') >> expr[_val = _1])
-        | qi::eps
+        | qi::eps [_val = construct<Tree::nil>()]
         ;
 
         BOOST_SPIRIT_DEBUG_NODE(boolean);
         BOOST_SPIRIT_DEBUG_NODE(guard);
         BOOST_SPIRIT_DEBUG_NODE(equation);
         BOOST_SPIRIT_DEBUG_NODE(expr);
+        BOOST_SPIRIT_DEBUG_NODE(context_perturb);
       }
 
       template <typename T>
       void
       set_context_perturb(const T& t)
       {
-        context_perturb %= t;
+        using namespace qi::labels;
+        context_perturb = t[_val = _1];
       }
 
       template <typename T>

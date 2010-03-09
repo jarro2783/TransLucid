@@ -28,8 +28,8 @@ namespace TransLucid
       BinaryOperation
       (
         InfixAssoc assoc,
-        const std::u32string& op,
-        const std::u32string& symbol,
+        const u32string& op,
+        const u32string& symbol,
         const mpz_class& precedence
       )
       : op(op), symbol(symbol), assoc(assoc), precedence(precedence)
@@ -207,7 +207,7 @@ namespace TransLucid
     {
       HashExpr() = default;
 
-      HashExpr(Expr e)
+      HashExpr(const Expr& e)
       : e(e)
       {}
 
@@ -219,10 +219,10 @@ namespace TransLucid
       IfExpr() = default;
 
       template <typename List>
-      IfExpr(Expr c,
-             Expr t,
+      IfExpr(const Expr& c,
+             const Expr& t,
              const List& eif,
-             Expr e)
+             const Expr& e)
       : condition(c),
         then(t),
         else_(e)

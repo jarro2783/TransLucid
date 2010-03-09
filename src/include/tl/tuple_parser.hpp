@@ -59,6 +59,10 @@ namespace TransLucid
         pair.name("pair");
         context_perturb.name("context_perturb");
         tuple_inside.name("tuple_inside");
+
+        BOOST_SPIRIT_DEBUG_NODE(context_perturb);
+        BOOST_SPIRIT_DEBUG_NODE(pair);
+        BOOST_SPIRIT_DEBUG_NODE(tuple_inside);
       }
 
       template <typename T>

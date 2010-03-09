@@ -28,16 +28,6 @@ operator<<(std::ostream& os, char32_t c)
   return os;
 }
 
-namespace std
-{
-  inline ostream&
-  operator<<(ostream& os, const u32string& s)
-  {
-    os << TransLucid::utf32_to_utf8(s);
-    return os;
-  }
-}
-
 namespace TransLucid
 {
   namespace AST
