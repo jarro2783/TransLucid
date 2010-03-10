@@ -7,18 +7,25 @@
 
 namespace TL = TransLucid;
 
+namespace
+{
+  TL::Translator translator;
+}
+
 struct translator_class {
   translator_class()
   {
+    std::cerr << "constructing fixture" << std::endl;
     TL::Parser::Header& header = translator.header();
     TL::Parser::addOpSymbol(header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5);
     TL::Parser::addOpSymbol(header, L"*", L"operator*", TL::Tree::ASSOC_LEFT, 10);
     TL::Parser::addOpSymbol(header, L"-", L"operator-", TL::Tree::ASSOC_LEFT, 5);
   }
-  TL::Translator translator;
 };
 
-BOOST_FIXTURE_TEST_SUITE( expressions_tests, translator_class )
+BOOST_GLOBAL_FIXTURE ( translator_class );
+
+BOOST_AUTO_TEST_SUITE( expressions_tests )
 
 BOOST_AUTO_TEST_CASE ( single )
 {
@@ -123,6 +130,15 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
 
 BOOST_AUTO_TEST_CASE ( functions )
 {
+  TL::HD* h = 0;
+  TL::TaggedValue v;
+
+  h = translator.translate_expr(L"(#1-2) @ [1 : 5]");
+  v = (*h)(TL::Tuple());
+
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 3);
+
   translator.translate_and_add_equation_set
   (
     U"fib = fib @ [1 : #1-1] + fib @ [1 : #1-2];;"
@@ -130,9 +146,18 @@ BOOST_AUTO_TEST_CASE ( functions )
     U"fib | [1 : 1] = 1;;"
   );
 
-  TL::HD *h = translator.translate_expr(L"fib @ [1 : 2]");
+  h = translator.translate_expr(L"fib @ [1 : 0]");
+  v = (*h)(TL::Tuple());
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 0);
 
-  TL::TaggedValue v = (*h)(TL::Tuple());
+  h = translator.translate_expr(L"fib @ [1 : 1]");
+  v = (*h)(TL::Tuple());
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
+
+  h = translator.translate_expr(L"fib @ [1 : 2]");
+  v = (*h)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
 }

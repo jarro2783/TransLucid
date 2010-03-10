@@ -99,6 +99,7 @@ Translator::Translator()
   m_tuple->set_expr(*m_expr);
 
   m_equation->set_expr(*m_expr);
+  m_equation->set_context_perturb(*m_tuple);
 
   m_header->delimiter_start_symbols.add(L"«",
     Parser::Delimiter(U"ustring", L'«', L'»'));

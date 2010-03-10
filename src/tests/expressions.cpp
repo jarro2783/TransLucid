@@ -150,11 +150,28 @@ BOOST_AUTO_TEST_CASE ( specials ) {
 
 BOOST_AUTO_TEST_CASE ( context_change )
 {
+  TL::HD* h = 0;
+
+  h = translator.translate_expr(L"1");
+  BOOST_CHECK_EQUAL
+  (
+    TL::get_dimension_index
+    (
+      &translator.system(),
+      (*h)(TL::Tuple()).first
+    ),
+    TL::get_dimension_index
+    (
+      &translator.system(),
+      (*h)(TL::Tuple()).first
+    )
+  );
+
   TL::HD *context1 = translator.translate_expr(L"[1 : 5]");
   TL::TaggedValue tuple1 = (*context1)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple1.first.index(), TL::TYPE_INDEX_TUPLE);
 
-  TL::HD *h = translator.translate_expr(L"#1");
+  h = translator.translate_expr(L"#1");
   TL::TaggedValue v = (*h)(tuple1.first.value<TL::Tuple>());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 5);
