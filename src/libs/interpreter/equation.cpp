@@ -68,7 +68,7 @@ Variable::operator()(const Tuple& k)
   //          << m_name << ", context: " << std::endl;
   //c.print(i, std::cout, c);
 
-  typedef std::tuple<Tuple, HD*> ApplicableTuple;
+  typedef std::tuple<Tuple, Equations::const_iterator> ApplicableTuple;
   typedef std::list<ApplicableTuple> applicable_list;
   applicable_list applicable;
 
@@ -117,7 +117,7 @@ Variable::operator()(const Tuple& k)
         if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
         {
           applicable.push_back
-            (ApplicableTuple(evalContext, eqn_i->equation()));
+            (ApplicableTuple(evalContext, eqn_i));
          }
       }
       catch (InvalidGuard& e)
@@ -127,7 +127,7 @@ Variable::operator()(const Tuple& k)
     else
     {
       applicable.push_back
-        (ApplicableTuple(Tuple(), eqn_i->equation()));
+        (ApplicableTuple(Tuple(), eqn_i));
     }
   }
 
@@ -139,7 +139,7 @@ Variable::operator()(const Tuple& k)
   }
   else if (applicable.size() == 1)
   {
-    return (*std::get<1>(applicable.front()))(k);
+    return (*std::get<1>(applicable.front())->equation())(k);
   }
 
   applicable_list::const_iterator bestIter = applicable.end();
@@ -170,7 +170,7 @@ Variable::operator()(const Tuple& k)
   for (applicable_list::const_iterator iter = applicable.begin();
        iter != applicable.end(); ++iter)
   {
-    if (std::get<1>(*bestIter) != std::get<1>(*iter) &&
+    if (std::get<1>(*bestIter)->equation() != std::get<1>(*iter)->equation() &&
         !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
       return TaggedValue(TypedValue(Special(Special::MULTIDEF),
@@ -178,7 +178,14 @@ Variable::operator()(const Tuple& k)
     }
   }
 
-  return (*std::get<1>(*bestIter))(k);
+  std::cerr << "running equation ";
+  BOOST_FOREACH(int i,
+                std::get<1>(*bestIter)->uuid())
+  {
+    std::cerr << i << " ";
+  }
+  std::cerr << std::endl;
+  return (*std::get<1>(*bestIter)->equation())(k);
 }
 
 void

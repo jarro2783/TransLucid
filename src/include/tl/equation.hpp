@@ -7,6 +7,8 @@
 #include <list>
 #include <deque>
 #include <tl/hyperdaton.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 
 namespace TransLucid
 {
@@ -138,12 +140,13 @@ namespace TransLucid
   {
     public:
     Equation(const u32string& name, const EquationGuard& valid, HD* h)
-    : m_name(name), m_validContext(valid), m_h(h)
+    : m_name(name), m_validContext(valid), m_h(h),
+    m_uuid(boost::uuids::random_generator()())
     {
     }
 
     Equation()
-    : m_h(0)
+    : m_h(0), m_uuid(boost::uuids::nil_generator()())
     {
     }
 
@@ -170,13 +173,16 @@ namespace TransLucid
        return m_h;
     }
 
+    const boost::uuids::uuid& uuid() const
+    {
+      return m_uuid;
+    }
+
     private:
     u32string m_name;
     EquationGuard m_validContext;
-    //AST::Expr* m_e;
-    //SystemEquation* m_se;
-    //EquationBase* m_e;
     HD* m_h;
+    boost::uuids::uuid m_uuid;
   };
 
   //represents all definitions of a variable, is responsible for
