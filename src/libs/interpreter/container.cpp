@@ -5,7 +5,7 @@
 namespace TransLucid
 {
 
-void
+uuid
 GeneralContainer::addExpr(const Tuple& k, HD* e)
 {
 }

@@ -40,7 +40,7 @@ throw (InvalidGuard)
   //TaggedValue v = (*m_guard)(k);
 }
 
-inline void
+inline uuid
 Variable::addExprActual(const Tuple& k, HD* h)
 {
   const EquationGuard* g = 0;
@@ -58,6 +58,7 @@ Variable::addExprActual(const Tuple& k, HD* h)
   {
     m_equations.push_back(Equation(m_name, EquationGuard(), h));
   }
+  return m_equations.back().id();
 }
 
 TaggedValue
@@ -180,7 +181,7 @@ Variable::operator()(const Tuple& k)
 
   std::cerr << "running equation ";
   BOOST_FOREACH(int i,
-                std::get<1>(*bestIter)->uuid())
+                std::get<1>(*bestIter)->id())
   {
     std::cerr << i << " ";
   }
@@ -188,21 +189,21 @@ Variable::operator()(const Tuple& k)
   return (*std::get<1>(*bestIter)->equation())(k);
 }
 
-void
+uuid
 Variable::addExpr(const Tuple& k, HD* e)
 {
   size_t dim_id = DIM_ID;
   Tuple::const_iterator iter = k.find(dim_id);
   if (iter == k.end())
   {
-    addExprActual(k, e);
+    return addExprActual(k, e);
   }
   else
   {
     const String* id = iter->second.valuep<String>();
     if (id == 0)
     {
-      return;
+      return nil_uuid();
     }
 
     SplitID split(id->value());
@@ -230,11 +231,11 @@ Variable::addExpr(const Tuple& k, HD* e)
     }
     viter->second->addExpr(Tuple(kp), e);
     #endif
-    addToVariableActual(begin, Tuple(kp), e);
+    return addToVariableActual(begin, Tuple(kp), e);
   }
 }
 
-void
+uuid
 Variable::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
 {
   //std::cerr << "addToVariableActual: " <<
@@ -247,7 +248,7 @@ Variable::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
     iter = m_variables.insert(std::make_pair
                               (id, new Variable(id, m_system))).first;
   }
-  iter->second->addExpr(k, h);
+  return iter->second->addExpr(k, h);
 }
 
 }

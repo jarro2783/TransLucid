@@ -16,9 +16,4 @@ ValuePrinter::operator()(const Tuple& k)
   }
 }
 
-void
-ValuePrinter::addExpr(const Tuple& k, HD* h)
-{
-}
-
 }

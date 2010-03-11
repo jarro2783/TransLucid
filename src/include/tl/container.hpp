@@ -12,7 +12,7 @@ namespace TransLucid
   {
     public:
 
-    void
+    uuid
     addExpr(const Tuple& k, HD* e);
 
     TaggedValue

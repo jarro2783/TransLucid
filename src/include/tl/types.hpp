@@ -15,6 +15,8 @@
 #include <gmpxx.h>
 #include <boost/foreach.hpp>
 #include <set>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 
 #define STRING(x) #x
 #define STRING_(x) STRING(x)
@@ -36,6 +38,22 @@ hash_value(const mpz_class& v)
 {
   boost::hash<std::string> hasher;
   return hasher(v.get_str());
+}
+
+namespace boost
+{
+  namespace uuids
+  {
+    inline std::ostream&
+    operator<<(std::ostream& os, const uuid& id)
+    {
+      BOOST_FOREACH(int i, id)
+      {
+        os << std::hex << i;
+      }
+      return os;
+    }
+  }
 }
 
 /**
@@ -60,6 +78,9 @@ namespace TransLucid
 
   typedef std::tuple<u32string, HD*, HD*, HD*> TranslatedEquation;
   typedef std::vector<TranslatedEquation> equation_v;
+
+  typedef boost::uuids::uuid uuid;
+  using boost::uuids::nil_uuid;
 
   class Tuple;
 

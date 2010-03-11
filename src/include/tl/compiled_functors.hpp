@@ -14,10 +14,6 @@ namespace TransLucid
 
     class CompiledFunctor : public HD
     {
-      void
-      addExpr(const Tuple& k, HD* h)
-      {
-      }
     };
 
     //e2 @ e1

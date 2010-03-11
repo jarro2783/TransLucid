@@ -416,11 +416,6 @@ class OpHD : public TL::HD
     }
   }
 
-  void
-  addExpr(const TL::Tuple& k, HD* h)
-  {
-  }
-
   private:
   T m_op;
   TL::HD& m_system;
@@ -536,11 +531,6 @@ class IntHD : public TL::HD
       return TL::TaggedValue(TL::TypedValue(TL::Special(
         TL::Special::CONST), TL::TYPE_INDEX_SPECIAL), k);
     }
-  }
-
-  void
-  addExpr(const TL::Tuple& k, HD* h)
-  {
   }
 
   private:

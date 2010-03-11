@@ -11,9 +11,6 @@ namespace TransLucid
 
     TaggedValue
     operator()(const Tuple& k);
-
-    void
-    addExpr(const Tuple& k, HD* h);
   };
 }
 

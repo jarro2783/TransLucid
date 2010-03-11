@@ -18,9 +18,10 @@ namespace TransLucid
       : m_system(system)
       {}
 
-      virtual void
+      virtual uuid
       addExpr(const Tuple& k, HD* h)
       {
+        return nil_uuid();
       }
 
       protected:
@@ -83,9 +84,10 @@ namespace TransLucid
                            TYPE_INDEX_INTMP), k);
       }
 
-      void
+      uuid
       addExpr(const Tuple& k, HD* h)
       {
+        return nil_uuid();
       }
 
       private:

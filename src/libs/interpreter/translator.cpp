@@ -189,11 +189,12 @@ Translator::translate_and_add_equation_set(const u32string& s)
 
   BOOST_FOREACH(auto& v, equations)
   {
-    m_interpreter.addExpr(
+    uuid id = m_interpreter.addExpr(
       Tuple(create_add_eqn_context(to_u32string(std::get<0>(v)),
                                      std::get<1>(v),
                                      std::get<2>(v))),
                           std::get<3>(v));
+    std::cerr << "added equation: " << id  << std::endl;
   }
 }
 

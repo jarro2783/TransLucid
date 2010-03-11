@@ -25,11 +25,6 @@ namespace
       return TaggedValue(TypedValue(Intmp(m_index++), TYPE_INDEX_INTMP), k);
     }
 
-    void
-    addExpr(const Tuple& k, HD* h)
-    {
-    }
-
     private:
     mpz_class m_index;
   };
@@ -55,11 +50,6 @@ namespace
                    TYPE_INDEX_INTMP), k);
     }
 
-    void
-    addExpr(const Tuple& k, HD* h)
-    {
-    }
-
     private:
     DimensionTranslator& m_d;
   };
@@ -81,11 +71,6 @@ namespace
       }
       return TaggedValue(TypedValue(Intmp(
         m_d.lookup(iter->second)), TYPE_INDEX_INTMP), k);
-    }
-
-    void
-    addExpr(const Tuple& k, HD* h)
-    {
     }
 
     private:

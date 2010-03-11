@@ -7,7 +7,6 @@
 #include <list>
 #include <deque>
 #include <tl/hyperdaton.hpp>
-#include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
 namespace TransLucid
@@ -141,12 +140,12 @@ namespace TransLucid
     public:
     Equation(const u32string& name, const EquationGuard& valid, HD* h)
     : m_name(name), m_validContext(valid), m_h(h),
-    m_uuid(boost::uuids::random_generator()())
+    m_id(boost::uuids::random_generator()())
     {
     }
 
     Equation()
-    : m_h(0), m_uuid(boost::uuids::nil_generator()())
+    : m_h(0), m_id(boost::uuids::nil_generator()())
     {
     }
 
@@ -173,16 +172,16 @@ namespace TransLucid
        return m_h;
     }
 
-    const boost::uuids::uuid& uuid() const
+    const uuid& id() const
     {
-      return m_uuid;
+      return m_id;
     }
 
     private:
     u32string m_name;
     EquationGuard m_validContext;
     HD* m_h;
-    boost::uuids::uuid m_uuid;
+    boost::uuids::uuid m_id;
   };
 
   //represents all definitions of a variable, is responsible for
@@ -197,7 +196,7 @@ namespace TransLucid
 
     TaggedValue operator()(const Tuple& k);
 
-    void
+    uuid
     addExpr(const Tuple& k, HD* h);
 
     void
@@ -208,12 +207,12 @@ namespace TransLucid
 
     protected:
 
-    void
+    uuid
     addToVariableActual(const u32string& id, const Tuple& k, HD* h);
 
     private:
 
-    void
+    uuid
     addExprActual(const Tuple& k, HD* e);
 
     typedef std::list<Equation> Equations;
