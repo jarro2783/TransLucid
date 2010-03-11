@@ -141,19 +141,19 @@ namespace TransLucid
         << '>'
         ;
 
-        hash_expr = '#' << expr[_1 = at_c<0>(_val)];
+        hash_expr = "(#" << expr[_1 = at_c<0>(_val)] << ')';
 
         tuple = '[' << pairs[_1 = ph::at_c<0>(_val)] << ']';
 
-        pairs %= (expr << " : " << expr) % ", ";
+        pairs %= (expr << ":" << expr) % ", ";
 
-        binary %= expr << binary_symbol << expr;
+        binary %= '(' << expr << binary_symbol << expr << ')';
 
         binary_symbol = ustring[_1 = at_c<0>(_val)];
 
         nil = karma::omit[nildummy] << "nil";
 
-        at_expr = expr << '@' << expr;
+        at_expr = '(' << expr << '@' << expr << ')';
 
         dimension = ustring[_1 = at_c<0>(_val)];
 

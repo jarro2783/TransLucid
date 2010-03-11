@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE ( tuple )
     translator.lastExpression()
   ));
 
-  BOOST_CHECK_EQUAL(generated, "[1 : 1]");
+  BOOST_CHECK_EQUAL(generated, "[1:1]");
 }
 
 BOOST_AUTO_TEST_CASE ( hash_expr )
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE ( hash_expr )
     translator.lastExpression()
   ));
 
-  BOOST_CHECK_EQUAL(generated, "#1");
+  BOOST_CHECK_EQUAL(generated, "(#1)");
 }
 
 BOOST_AUTO_TEST_CASE ( at )
@@ -92,5 +92,5 @@ BOOST_AUTO_TEST_CASE ( at )
     translator.lastExpression()
   ));
 
-  BOOST_CHECK_EQUAL(generated, "#1@[1 : 2]");
+  BOOST_CHECK_EQUAL(generated, "(#1)@[1:2]");
 }
