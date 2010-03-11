@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE ( integer )
 
   generated.clear();
   BOOST_CHECK(Printer::karma::generate(outit, print_grammar, ast));
-  BOOST_CHECK_EQUAL(generated, "10+15");
+  BOOST_CHECK_EQUAL(generated, "(10+15)");
 }
 
 BOOST_AUTO_TEST_CASE ( tuple )
@@ -92,5 +92,5 @@ BOOST_AUTO_TEST_CASE ( at )
     translator.lastExpression()
   ));
 
-  BOOST_CHECK_EQUAL(generated, "(#1)@[1:2]");
+  BOOST_CHECK_EQUAL(generated, "((#1)@[1:2])");
 }

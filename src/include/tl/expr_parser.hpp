@@ -98,23 +98,13 @@ namespace TransLucid
           ]
         ;
 
-        range_expr %= at_expr
+        range_expr %= binary_op
         ;
          //>> -(".."
          //>> if_expr)
          //;
 
         //the actions have to be put after the optional with | eps
-        at_expr =
-           binary_op [_a = _1]
-        >> (
-             ('@' >> at_expr)
-             [
-               _val = construct<Tree::AtExpr>(_a, _1)
-             ]
-           | qi::eps [_val = _a]
-           )
-        ;
 
         binary_op =
            prefix_expr [_a = _1]
@@ -140,7 +130,7 @@ namespace TransLucid
         ;
 
         postfix_expr =
-           hash_expr [_a = _1]
+           at_expr [_a = _1]
         >> (
              ( header.postfix_op_symbols
                [
@@ -151,6 +141,17 @@ namespace TransLucid
              [
               _val = _a
              ]
+           )
+        ;
+
+        at_expr =
+           hash_expr [_a = _1]
+        >> (
+             ('@' >> at_expr)
+             [
+               _val = construct<Tree::AtExpr>(_a, _1)
+             ]
+           | qi::eps [_val = _a]
            )
         ;
 
