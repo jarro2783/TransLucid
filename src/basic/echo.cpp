@@ -14,7 +14,7 @@ class Receiver : public HD
   public:
   TaggedValue operator()(const Tuple& k);
 
-  void addExpr(const Tuple& k, HD *h);
+  uuid addExpr(const Tuple& k, HD *h);
 
   private:
   TaggedValue m_value;
@@ -25,7 +25,7 @@ class Sender : public HD
   public:
   TaggedValue operator()(const Tuple& k);
 
-  void addExpr(const Tuple& k, HD* h);
+  uuid addExpr(const Tuple& k, HD* h);
 
   private:
   static const int BUF_SIZE = 1000;
@@ -38,11 +38,12 @@ Receiver::operator()(const Tuple& k)
   return m_value;
 }
 
-void
+uuid
 Receiver::addExpr(const Tuple& k, HD* h)
 {
   Tuple::const_iterator iter = k.find(DIM_VALUE);
   m_value = TaggedValue(iter->second, k);
+  return boost::uuids::random_generator()();
 }
 
 TaggedValue
@@ -52,9 +53,10 @@ Sender::operator()(const Tuple& k)
   //return TaggedValue(TypedValue(String(m_buf), TYPE_INDEX_USTRING), k);
 }
 
-void
+uuid
 Sender::addExpr(const Tuple& k, HD* h)
 {
+  return boost::uuids::random_generator()();
 }
 
 int
