@@ -440,7 +440,8 @@ register_one_op
   TL::HD *op = build_op_hd(system, bindBinOp<T, Op>(system, index));
   //build a guard with arg0:T, arg1:T
 
-  std::cerr << "adding OP @ [name : " << TL::utf32_to_utf8(name) << "..." << std::endl;
+  //std::cerr << "adding OP @ [name : " << TL::utf32_to_utf8(name) << "..."
+  //<< std::endl;
 
   TL::tuple_t guard =
   {

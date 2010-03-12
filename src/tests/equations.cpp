@@ -15,7 +15,6 @@ namespace
 struct translator_class {
   translator_class()
   {
-    std::cerr << "constructing fixture" << std::endl;
     TL::Parser::Header& header = translator.header();
     TL::Parser::addOpSymbol(header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5);
     TL::Parser::addOpSymbol(header, L"*", L"operator*", TL::Tree::ASSOC_LEFT, 10);

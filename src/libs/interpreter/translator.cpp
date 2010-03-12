@@ -158,6 +158,8 @@ Translator::translate_equation_set(const u32string& s)
       boolean,
       e));
 
+    #if 0
+
     typedef std::back_insert_iterator<std::string> out_iter;
     Printer::ExprPrinter<out_iter> print_grammar;
     std::string generated;
@@ -177,6 +179,7 @@ Translator::translate_equation_set(const u32string& s)
     generated.clear();
     Printer::karma::generate(outit, print_grammar, std::get<3>(v));
     std::cerr << "equation: " << generated << std::endl;
+    #endif
   }
 
   return equations;
@@ -194,7 +197,7 @@ Translator::translate_and_add_equation_set(const u32string& s)
                                      std::get<1>(v),
                                      std::get<2>(v))),
                           std::get<3>(v));
-    std::cerr << "added equation: " << id  << std::endl;
+    //std::cerr << "added equation: " << id  << std::endl;
   }
 }
 

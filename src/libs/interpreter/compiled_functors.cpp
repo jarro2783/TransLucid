@@ -109,11 +109,11 @@ AtRelative::operator()(const Tuple& k)
 TaggedValue
 BinaryOp::operator()(const Tuple& k)
 {
-  TypedValue v1 = (*m_operands.at(0))(k).first;
-  TypedValue v2 = (*m_operands.at(1))(k).first;
-  std::cerr << "operands to binary op " << m_name << ":" << std::endl;
-  std::cerr << v1 << std::endl;
-  std::cerr << v2 << std::endl;
+  //TypedValue v1 = (*m_operands.at(0))(k).first;
+  //TypedValue v2 = (*m_operands.at(1))(k).first;
+  //std::cerr << "operands to binary op " << m_name << ":" << std::endl;
+  //std::cerr << v1 << std::endl;
+  //std::cerr << v2 << std::endl;
   #warning at the moment hack it for binary, variadic will have to wait
   tuple_t t =
   {
@@ -126,7 +126,7 @@ BinaryOp::operator()(const Tuple& k)
   //std::cerr << "finding OP @ [name : " << utf32_to_utf8(m_name) << " ..." << std::endl;
 
   TaggedValue v = (*m_system)(Tuple(t));
-  std::cerr << "result: " << v.first << std::endl;
+  //std::cerr << "result: " << v.first << std::endl;
   return TaggedValue(v.first, k);
 }
 
@@ -197,7 +197,7 @@ TaggedValue
 Hash::operator()(const Tuple& k)
 {
   TaggedValue r = (*m_e)(k);
-  std::cerr << "hash " << r.first << " = ";
+  //std::cerr << "hash " << r.first << " = ";
   size_t index;
   if (r.first.index() == TYPE_INDEX_DIMENSION)
   {
@@ -211,7 +211,7 @@ Hash::operator()(const Tuple& k)
   Tuple::const_iterator iter = k.find(index);
   if (iter != k.end())
   {
-    std::cerr << iter->second << std::endl;
+    //std::cerr << iter->second << std::endl;
     return TaggedValue(iter->second, k);
   }
   else

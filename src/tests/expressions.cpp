@@ -110,9 +110,9 @@ BOOST_AUTO_TEST_CASE ( chars ) {
   TL::Printer::karma::generate(outit, print_grammar,
                                translator.lastExpression());
 
-  std::cerr << "tree:" << std::endl
-  << generated <<
-  "end tree" << std::endl;
+  //std::cerr << "tree:" << std::endl
+  //<< generated <<
+  //"end tree" << std::endl;
 
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_UCHAR);
   BOOST_CHECK(v.first.value<TL::Char>().value() == U'è');

@@ -140,8 +140,8 @@ Variable::operator()(const Tuple& k)
   }
   else if (applicable.size() == 1)
   {
-    std::cerr << "running equation " << std::get<1>(applicable.front())->id()
-    << std::endl;
+    //std::cerr << "running equation " << std::get<1>(applicable.front())->id()
+    //<< std::endl;
     return (*std::get<1>(applicable.front())->equation())(k);
   }
 
@@ -181,8 +181,8 @@ Variable::operator()(const Tuple& k)
     }
   }
 
-  std::cerr << "running equation " << std::get<1>(*bestIter)->id()
-  << std::endl;
+  //std::cerr << "running equation " << std::get<1>(*bestIter)->id()
+  //<< std::endl;
   return (*std::get<1>(*bestIter)->equation())(k);
 }
 
