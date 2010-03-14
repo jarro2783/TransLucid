@@ -1,3 +1,14 @@
+== Parsing ==
+
+=== Integers ===
+
+Integers are defined as:
+[1-9][0-9]* | 0[2-9a-zA-Z][0-9a-zA-Z]*
+
+=== Specials ===
+
+The specials are recognised by adding sp as a prefix to the specials names.
+
 == Constants ==
 
 All the typed value creators for constants are defined in the interpreter
@@ -8,13 +19,14 @@ constant. Varying any other dimension might change how the text dimension is
 formatted depending on which type it is.
 
 Defined variables:
-CONST @ [type : "intmp"]
-CONST @ [type : "uchar"]
-CONST @ [type : "ustring"]
-
+intmp
+uchar
+ustring
+special
 
 == Dimensions ==
 
 To look up a dimension index:
 DIMENSION_INDEX for named dimensions, varies in text dimension which must be
 a string.
+DIMENSION_TYPED_INDEX for typed dimensions, varies in value dimension.
