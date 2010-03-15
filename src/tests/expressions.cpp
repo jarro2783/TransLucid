@@ -1,3 +1,22 @@
+/* TODO: Give a descriptor.
+   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+
+This file is part of TransLucid.
+
+TransLucid is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+TransLucid is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TransLucid; see the file COPYING.  If not see
+<http://www.gnu.org/licenses/>.  */
+
 #include <tl/translator.hpp>
 #include <tl/builtin_types.hpp>
 #include <algorithm>
@@ -85,7 +104,7 @@ BOOST_AUTO_TEST_CASE( integers )
 
 BOOST_AUTO_TEST_CASE ( strings ) {
 
-  TL::HD *h;
+  TL::HD* h;
 
   h = translator.translate_expr(L"«hello é world»");
 
@@ -100,7 +119,7 @@ BOOST_AUTO_TEST_CASE ( strings ) {
 
 BOOST_AUTO_TEST_CASE ( chars ) {
 
-  TL::HD *h;
+  TL::HD* h;
 
   h = translator.translate_expr(L"\'è\'");
   TL::TaggedValue v = (*h)(TL::Tuple());
@@ -138,7 +157,7 @@ BOOST_AUTO_TEST_CASE ( specials ) {
   std::for_each(specials.begin(), specials.end(),
     [&translator] (SpecialList::value_type& s)
       {
-        TL::HD *h = translator.translate_expr(s.first);
+        TL::HD* h = translator.translate_expr(s.first);
         TL::TaggedValue v = (*h)(TL::Tuple());
         BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_SPECIAL);
         BOOST_CHECK_EQUAL(v.first.value<TL::Special>().value(),
@@ -167,7 +186,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
     )
   );
 
-  TL::HD *context1 = translator.translate_expr(L"[1 : 5]");
+  TL::HD* context1 = translator.translate_expr(L"[1 : 5]");
   TL::TaggedValue tuple1 = (*context1)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple1.first.index(), TL::TYPE_INDEX_TUPLE);
 
@@ -176,7 +195,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 5);
 
-  TL::HD *context2 = translator.translate_expr(L"[1 : 42]");
+  TL::HD* context2 = translator.translate_expr(L"[1 : 42]");
   TL::TaggedValue tuple2 = (*context2)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple2.first.index(), TL::TYPE_INDEX_TUPLE);
 
@@ -184,7 +203,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 42);
 
-  TL::HD *context3 = translator.translate_expr(L"[1 : 42, 2 : 16, 3 : 47]");
+  TL::HD* context3 = translator.translate_expr(L"[1 : 42, 2 : 16, 3 : 47]");
   TL::TaggedValue tuple3 = (*context3)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple3.first.index(), TL::TYPE_INDEX_TUPLE);
 
