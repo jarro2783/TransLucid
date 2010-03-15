@@ -201,4 +201,9 @@ Translator::translate_and_add_equation_set(const u32string& s)
   }
 }
 
+void
+Translator::parse_header(const u32string& s)
+{
+}
+
 }

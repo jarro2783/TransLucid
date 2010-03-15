@@ -37,6 +37,8 @@ namespace TransLucid
 
     equation_v translate_equation_set(const u32string& s);
 
+    void parse_header(const u32string& s);
+
     HD& system()
     {
       return m_interpreter;

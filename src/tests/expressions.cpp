@@ -216,6 +216,8 @@ BOOST_AUTO_TEST_CASE ( context_change )
 
 BOOST_AUTO_TEST_CASE ( header )
 {
+  TL::Translator t2;
+  t2.parse_header(U"delimiter uchar<\"> uchar<\"> ustring<ustring>;;");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -589,6 +589,13 @@ registerTypes(TransLucid::Interpreter& i)
   #endif
 
   registerType<uint8_t>(U"uint8", i);
+  registerType<int8_t>(U"int8", i);
+  registerType<uint16_t>(U"uint16", i);
+  registerType<int16_t>(U"int16", i);
+  registerType<uint32_t>(U"uint32", i);
+  registerType<int32_t>(U"int32", i);
+  registerType<uint64_t>(U"uint64", i);
+  registerType<int64_t>(U"int64", i);
   register_int_ops<TL::Intmp>(i, TL::TYPE_INDEX_INTMP);
 }
 

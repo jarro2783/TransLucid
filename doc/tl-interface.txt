@@ -1,4 +1,8 @@
+= Main System =
+
 == Parsing ==
+
+Symbols can be added to the parser through the use of a header.
 
 === Integers ===
 
@@ -22,7 +26,6 @@ Defined variables:
 intmp
 uchar
 ustring
-special
 
 == Dimensions ==
 
@@ -30,3 +33,16 @@ To look up a dimension index:
 DIMENSION_INDEX for named dimensions, varies in text dimension which must be
 a string.
 DIMENSION_TYPED_INDEX for typed dimensions, varies in value dimension.
+
+== Operations ==
+
+Operations are in the identifier OP. OP varies in the name dimension.
+The name could be operator+, operator- etc.
+These all vary in the argN dimensions.
+
+= Libraries =
+
+== Int library ==
+
+The integer library registers operations on intmp and the following types:
+u?int(8|16|32|64).
