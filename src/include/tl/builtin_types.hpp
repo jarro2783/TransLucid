@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Built-in types.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -131,7 +131,8 @@ namespace TransLucid
 
     public:
 
-    static Value stringToValue(const u32string& s)
+    static Value
+    stringToValue(const u32string& s)
     {
       StringValueInitialiser::StringValueMap::const_iterator iter
         = m_sv.stov.find(s);

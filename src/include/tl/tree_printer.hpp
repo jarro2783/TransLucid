@@ -46,6 +46,32 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
+  TransLucid::Tree::DimensionExpr,
+  (TransLucid::u32string, text)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::IdentExpr,
+  (TransLucid::u32string, text)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::BinaryOperation,
+  (TransLucid::u32string, symbol)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::BinaryOpExpr,
+  (TransLucid::Tree::Expr, lhs)
+  (TransLucid::Tree::BinaryOperation, op)
+  (TransLucid::Tree::Expr, rhs)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
   TransLucid::Tree::HashExpr,
   (TransLucid::Tree::Expr, e)
 )
@@ -58,42 +84,10 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
-  TransLucid::Tree::BinaryOpExpr,
-  (TransLucid::Tree::Expr, lhs)
-  (TransLucid::Tree::BinaryOperation, op)
-  (TransLucid::Tree::Expr, rhs)
-)
-
-BOOST_FUSION_ADAPT_STRUCT
-(
-  TransLucid::Tree::BinaryOperation,
-  (TransLucid::u32string, symbol)
-)
-
-BOOST_FUSION_ADAPT_STRUCT
-(
   TransLucid::Tree::AtExpr,
   (TransLucid::Tree::Expr, lhs)
   (TransLucid::Tree::Expr, rhs)
 )
-
-BOOST_FUSION_ADAPT_STRUCT
-(
-  TransLucid::Tree::DimensionExpr,
-  (TransLucid::u32string, text)
-)
-
-BOOST_FUSION_ADAPT_STRUCT
-(
-  TransLucid::Tree::IdentExpr,
-  (TransLucid::u32string, text)
-)
-
-//BOOST_FUSION_ADAPT_STRUCT
-//(
-//  TransLucid::Tree::BuildTupleExpr,
-//  (TransLucid::Tree::BuildTupleExpr::TuplePairs, pairs)
-//)
 
 namespace TransLucid
 {
@@ -139,19 +133,14 @@ namespace TransLucid
         {Special::LOOP, "sploop"}
       }
       {
-        #if 0
-          (L"sperror", Special::ERROR)
-          (L"spaccess", Special::ACCESS)
-          (L"sptype", Special::TYPEERROR)
-          (L"spdim", Special::DIMENSION)
-          (L"spundef", Special::UNDEF)
-          (L"const", Special::CONST)
-          (L"loop", Special::LOOP)
-        #endif
-
-        ustring = karma::string[_1 = bind(&utf32_to_utf8, _val)];
-
+        nil = karma::omit[nildummy] << "nil";
+        special = karma::string
+        [
+          _1 = ph::bind(&ExprPrinter<Iterator>::getSpecial, this, _val)
+        ]
+        ;
         integer = karma::stream;
+        ustring = karma::string[_1 = bind(&utf32_to_utf8, _val)];
 
         constant =
            karma::string[_1 = bind(&utf32_to_utf8, ph::at_c<0>(_val))]
@@ -159,45 +148,33 @@ namespace TransLucid
         << karma::string[_1 = bind(&utf32_to_utf8, ph::at_c<1>(_val))]
         << '>'
         ;
-
-        hash_expr = "(#" << expr[_1 = at_c<0>(_val)] << ')';
-
-        tuple = '[' << pairs[_1 = ph::at_c<0>(_val)] << ']';
-
-        pairs %= (expr << ":" << expr) % ", ";
-
-        binary %= '(' << expr << binary_symbol << expr << ')';
-
-        binary_symbol = ustring[_1 = at_c<0>(_val)];
-
-        nil = karma::omit[nildummy] << "nil";
-
-        at_expr = '(' << expr << '@' << expr << ')';
-
         dimension = ustring[_1 = at_c<0>(_val)];
-
-        special = karma::string
-        [
-          _1 = ph::bind(&ExprPrinter<Iterator>::getSpecial, this, _val)
-        ]
-        ;
-
         ident = ustring[_1 = at_c<0>(_val)];
 
+        binary_symbol = ustring[_1 = at_c<0>(_val)];
+        binary %= '(' << expr << binary_symbol << expr << ')';
+
+        hash_expr = "(#" << expr[_1 = at_c<0>(_val)] << ')';
+        pairs %= (expr << ":" << expr) % ", ";
+        tuple = '[' << pairs[_1 = ph::at_c<0>(_val)] << ']';
+        at_expr = '(' << expr << '@' << expr << ')';
+
+        // TODO: Missing uchar and unary
         expr %=
-          at_expr
-        | binary
+          nil
         | karma::bool_
-        | constant
-        | dimension
-        | hash_expr
-        | ident
         | integer
         | special
-        | tuple
+        // | uchar -- where is it?
         | ustring
-
-        | nil
+        | constant
+        | dimension
+        | ident
+        // | unary -- where is it?
+        | binary
+        | hash_expr
+        | tuple
+        | at_expr
         ;
       }
 
@@ -209,26 +186,25 @@ namespace TransLucid
 
       karma::rule<Iterator, Tree::Expr()> expr;
 
-      karma::rule<Iterator, Tree::AtExpr()> at_expr;
-      karma::rule<Iterator, Tree::BinaryOpExpr()> binary;
-      karma::rule<Iterator, Tree::BuildTupleExpr()> tuple;
+      karma::rule<Iterator, Tree::nil()> nil;
+      karma::rule<Iterator, Tree::nil()> nildummy;
+      karma::rule<Iterator, Special::Value()> special;
+      karma::rule<Iterator, mpz_class()> integer;
+      karma::rule<Iterator, u32string()> ustring;
       karma::rule<Iterator, Tree::ConstantExpr()> constant;
       karma::rule<Iterator, Tree::DimensionExpr()> dimension;
-      karma::rule<Iterator, Tree::HashExpr()> hash_expr;
       karma::rule<Iterator, Tree::IdentExpr()> ident;
-      karma::rule<Iterator, mpz_class()> integer;
-      karma::rule<Iterator, Special::Value()> special;
-      karma::rule<Iterator, u32string()> ustring;
+      karma::rule<Iterator, Tree::BinaryOperation()> binary_symbol;
+      karma::rule<Iterator, Tree::BinaryOpExpr()> binary;
+      karma::rule<Iterator, Tree::HashExpr()> hash_expr;
+      karma::rule<Iterator, Tree::BuildTupleExpr()> tuple;
+      karma::rule<Iterator, Tree::AtExpr()> at_expr;
 
       karma::rule
       <
         Iterator,
         Tree::BuildTupleExpr::TuplePairs()
       > pairs;
-      karma::rule<Iterator, Tree::BinaryOperation()> binary_symbol;
-      karma::rule<Iterator, Tree::nil()> nil;
-      karma::rule<Iterator, Tree::nil()> nildummy;
-
       std::map<Special::Value, std::string> special_map;
     };
   }
