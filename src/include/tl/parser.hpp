@@ -164,12 +164,9 @@ namespace TransLucid
 
          | (
                qi::string("delimiters")
-            >> "ustring"
-            >> angle_string
-            >> "uchar"
-            >> angle_string
-            >> "uchar"
-            >> angle_string
+            >  expr
+            >  expr
+            >  expr
            )
          | (
                qi::string("library")
@@ -193,18 +190,30 @@ namespace TransLucid
          //BOOST_SPIRIT_DEBUG_RULE(constant);
       }
 
+      template <class T>
+      void
+      set_expr(const T& e)
+      {
+        using namespace qi::labels;
+        expr = e[_val = _1];
+      }
+
       private:
 
       qi::rule<Iterator, skip, Header()>
-         headerp
+        headerp
       ;
 
       qi::rule<Iterator, skip, void(Header&)>
-         headerItem
+        headerItem
       ;
 
       qi::rule<Iterator>
-         integer
+        integer
+      ;
+
+      qi::rule<Iterator>
+        expr
       ;
 
       //qi::rule<Iterator, string_type()> angle_string;
