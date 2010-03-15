@@ -4,14 +4,7 @@
 #include <tl/utility.hpp>
 #include <string>
 #include <tl/tree_printer.hpp>
-
-#if 0
-#include <boost/spirit/home/phoenix/statement/if.hpp>
-#include <boost/spirit/home/phoenix/operator/comparison.hpp>
-#include <boost/spirit/home/phoenix/operator/logical.hpp>
-#include <boost/spirit/home/phoenix/operator/arithmetic.hpp>
-#include <boost/spirit/home/phoenix/operator/self.hpp>
-#endif
+#include <tl/parser.hpp>
 
 #define BOOST_TEST_MODULE expressions
 #include <boost/test/included/unit_test.hpp>
@@ -20,6 +13,34 @@ namespace TL = TransLucid;
 
 typedef std::back_insert_iterator<std::string> print_iter;
 TL::Printer::ExprPrinter<print_iter> print_grammar;
+
+
+namespace
+{
+  TL::Translator translator;
+}
+
+struct translator_class {
+  translator_class()
+  {
+    TL::Parser::Header& header = translator.header();
+    TL::Parser::addOpSymbol
+    (
+      header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5
+    );
+    TL::Parser::addOpSymbol
+    (
+      header, L"*", L"operator*", TL::Tree::ASSOC_LEFT, 10
+    );
+    TL::Parser::addOpSymbol
+    (
+      header, L"-", L"operator-", TL::Tree::ASSOC_LEFT, 5
+    );
+    translator.loadLibrary(U"int");
+  }
+};
+
+BOOST_GLOBAL_FIXTURE ( translator_class );
 
 void
 test_base(size_t base, uint32_t number, TL::Translator& t)
@@ -54,13 +75,7 @@ test_integer(int n, TL::Translator& translator)
   delete h;
 }
 
-struct translator_class {
-  TL::Translator translator;
-};
-
-BOOST_FIXTURE_TEST_SUITE( expressions_tests, translator_class )
-
-//BOOST_AUTO_TEST_SUITE( expressions_tests )
+BOOST_AUTO_TEST_SUITE( expressions_tests )
 
 #ifndef DISABLE_INTEGER_TESTS
 
@@ -191,6 +206,16 @@ BOOST_AUTO_TEST_CASE ( context_change )
   v = (*h)(tuple3.first.value<TL::Tuple>());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 42);
+
+  h = translator.translate_expr(L"(#1-2) @ [1 : 5]");
+  v = (*h)(TL::Tuple());
+
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 3);
+}
+
+BOOST_AUTO_TEST_CASE ( header )
+{
 }
 
 BOOST_AUTO_TEST_SUITE_END()

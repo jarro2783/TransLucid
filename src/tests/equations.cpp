@@ -16,9 +16,18 @@ struct translator_class {
   translator_class()
   {
     TL::Parser::Header& header = translator.header();
-    TL::Parser::addOpSymbol(header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5);
-    TL::Parser::addOpSymbol(header, L"*", L"operator*", TL::Tree::ASSOC_LEFT, 10);
-    TL::Parser::addOpSymbol(header, L"-", L"operator-", TL::Tree::ASSOC_LEFT, 5);
+    TL::Parser::addOpSymbol
+    (
+      header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5
+    );
+    TL::Parser::addOpSymbol
+    (
+      header, L"*", L"operator*", TL::Tree::ASSOC_LEFT, 10
+    );
+    TL::Parser::addOpSymbol
+    (
+      header, L"-", L"operator-", TL::Tree::ASSOC_LEFT, 5
+    );
   }
 };
 
@@ -131,12 +140,6 @@ BOOST_AUTO_TEST_CASE ( functions )
 {
   TL::HD* h = 0;
   TL::TaggedValue v;
-
-  h = translator.translate_expr(L"(#1-2) @ [1 : 5]");
-  v = (*h)(TL::Tuple());
-
-  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
-  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 3);
 
   translator.translate_and_add_equation_set
   (
