@@ -47,19 +47,6 @@ namespace TransLucid
       HD* m_system;
     };
 
-    class UChar : public ExprHD
-    {
-      public:
-      static const char32_t* name;
-
-      UChar(HD* system)
-      : ExprHD(system)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& k);
-    };
-
     class Intmp : public ExprHD
     {
       public:
@@ -73,6 +60,19 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
+    };
+
+    class UChar : public ExprHD
+    {
+      public:
+      static const char32_t* name;
+
+      UChar(HD* system)
+      : ExprHD(system)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& k);
     };
 
     class UString : public ExprHD

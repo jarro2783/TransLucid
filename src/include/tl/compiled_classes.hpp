@@ -74,7 +74,7 @@ extern std::string x;
 
   //int32<3> + int32<4>;;
   //
-  // Constant<int32_t, 3>()() + Constant<int32_t, 4>()()
+  //Constant<int32_t, 3>()() + Constant<int32_t, 4>()()
 
   //Constant<int32_t>(4)() + Constant<int32>(3)();
 

@@ -50,23 +50,29 @@ namespace TransLucid
 
     Translator();
 
-    HD* translate_expr(const Parser::string_type& s);
+    HD*
+    translate_expr(const Parser::string_type& s);
 
-    void translate_and_add_equation_set(const u32string& s);
+    void
+    translate_and_add_equation_set(const u32string& s);
 
-    equation_v translate_equation_set(const u32string& s);
+    equation_v
+    translate_equation_set(const u32string& s);
 
-    HD& system()
+    HD&
+    system()
     {
       return m_interpreter;
     }
 
-    Parser::Header& header()
+    Parser::Header&
+    header()
     {
       return *m_header;
     }
 
-    void loadLibrary(const u32string& s)
+    void
+    loadLibrary(const u32string& s)
     {
       m_lt.loadLibrary(s, &m_interpreter);
     }
@@ -79,12 +85,12 @@ namespace TransLucid
 
     private:
 
-    Parser::Header *m_header;
+    Parser::Header* m_header;
 
-    Parser::ExprGrammar<Parser::iterator_t> *m_expr;
-    Parser::EquationGrammar<Parser::iterator_t> *m_equation;
-    Parser::TupleGrammar<Parser::iterator_t> *m_tuple;
-    Parser::SkipGrammar<Parser::iterator_t> *m_skipper;
+    Parser::ExprGrammar<Parser::iterator_t>* m_expr;
+    Parser::EquationGrammar<Parser::iterator_t>* m_equation;
+    Parser::TupleGrammar<Parser::iterator_t>* m_tuple;
+    Parser::SkipGrammar<Parser::iterator_t>* m_skipper;
 
     Interpreter m_interpreter;
 

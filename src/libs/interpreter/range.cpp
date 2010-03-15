@@ -89,7 +89,8 @@ Range::operator=(const Range& rhs)
   return *this;
 }
 
-Range::~Range() {
+Range::~Range()
+{
   delete m_lower;
   delete m_upper;
 }

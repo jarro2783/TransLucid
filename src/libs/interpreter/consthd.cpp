@@ -27,32 +27,9 @@ namespace TransLucid
 namespace ConstHD
 {
 
-const char32_t* UChar::name =     U"uchar";
 const char32_t* Intmp::name =     U"intmp";
+const char32_t* UChar::name =     U"uchar";
 const char32_t* UString::name =   U"ustring";
-
-TaggedValue
-UChar::operator()(const Tuple& k)
-{
-  size_t valueindex = get_dimension_index(m_system, U"text");
-  Tuple::const_iterator value = k.find(valueindex);
-
-  if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
-  {
-    return TaggedValue(TypedValue(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
-  }
-
-  const u32string& s = value->second.value<String>().value();
-  //return TaggedValue(m_i.typeRegistry().findType("uchar")
-  //         ->parse(s.value(), k, m_i), k);
-  if (s.length() != 1)
-  {
-    return TaggedValue(TypedValue(Special(Special::CONST),
-                       TYPE_INDEX_SPECIAL), k);
-  }
-  return TaggedValue(TypedValue(Char(s[0]), TYPE_INDEX_UCHAR), k);
-}
 
 TaggedValue
 Intmp::operator()(const Tuple& k)
@@ -76,6 +53,29 @@ Intmp::operator()(const Tuple& k)
     return TaggedValue(TypedValue(Special(Special::CONST),
                        TYPE_INDEX_SPECIAL), k);
   }
+}
+
+TaggedValue
+UChar::operator()(const Tuple& k)
+{
+  size_t valueindex = get_dimension_index(m_system, U"text");
+  Tuple::const_iterator value = k.find(valueindex);
+
+  if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
+  {
+    return TaggedValue(TypedValue(Special(Special::DIMENSION),
+                       TYPE_INDEX_SPECIAL), k);
+  }
+
+  const u32string& s = value->second.value<String>().value();
+  //return TaggedValue(m_i.typeRegistry().findType("uchar")
+  //         ->parse(s.value(), k, m_i), k);
+  if (s.length() != 1)
+  {
+    return TaggedValue(TypedValue(Special(Special::CONST),
+                       TYPE_INDEX_SPECIAL), k);
+  }
+  return TaggedValue(TypedValue(Char(s[0]), TYPE_INDEX_UCHAR), k);
 }
 
 TaggedValue
