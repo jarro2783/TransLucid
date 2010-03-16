@@ -1,3 +1,22 @@
+/* TODO: Give a descriptor.
+   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+
+This file is part of TransLucid.
+
+TransLucid is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+TransLucid is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TransLucid; see the file COPYING.  If not see
+<http://www.gnu.org/licenses/>.  */
+
 #ifndef SET_EVALUATOR_HPP_INCLUDED
 #define SET_EVALUATOR_HPP_INCLUDED
 
@@ -16,61 +35,6 @@ namespace TransLucid
     {
     };
 
-    //e2 @ e1
-    class AtAbsolute : public CompiledFunctor
-    {
-      public:
-
-      AtAbsolute(HD* e2, HD* e1)
-      : e2(e2), e1(e1)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& context);
-
-      private:
-      HD* e2;
-      HD* e1;
-    };
-
-    class AtRelative : public CompiledFunctor
-    {
-      public:
-
-      AtRelative(HD* e2, HD* e1)
-      : e2(e2), e1(e1)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& context);
-
-      private:
-      HD* e2;
-      HD* e1;
-    };
-
-    class BinaryOp : public CompiledFunctor
-    {
-      public:
-
-      BinaryOp
-      (
-        HD* system,
-        const std::vector<HD*>& operands,
-        const u32string& name
-      )
-      : m_system(system), m_operands(operands), m_name(name)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& context);
-
-      private:
-      HD* m_system;
-      std::vector<HD*> m_operands;
-      u32string m_name;
-    };
-
     class BoolConst : public CompiledFunctor
     {
       public:
@@ -86,13 +50,25 @@ namespace TransLucid
       bool m_value;
     };
 
-    class BuildTuple : public CompiledFunctor
+    class SpecialConst : public CompiledFunctor
     {
       public:
+      SpecialConst(Special::Value v)
+      : m_value(v)
+      {}
 
-      BuildTuple(HD* system,
-                 const std::list<std::pair<HD*, HD*>>& elements)
-      : m_system(system), m_elements(elements)
+      TaggedValue
+      operator()(const Tuple& k);
+
+      private:
+      Special::Value m_value;
+    };
+
+    class Integer : public CompiledFunctor
+    {
+      public:
+      Integer(HD* system, const mpz_class& value)
+      : m_system(system), m_value(value)
       {}
 
       TaggedValue
@@ -100,7 +76,35 @@ namespace TransLucid
 
       private:
       HD* m_system;
-      std::list<std::pair<HD*, HD*>> m_elements;
+      mpz_class m_value;
+    };
+
+    class UcharConst : public CompiledFunctor
+    {
+      public:
+      UcharConst(char32_t c)
+      : m_value(c)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& k);
+
+      private:
+      char32_t m_value;
+    };
+
+    class StringConst : public CompiledFunctor
+    {
+      public:
+      StringConst(const u32string& s)
+      : m_value(s)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& k);
+
+      private:
+      u32string m_value;
     };
 
     class Constant : public CompiledFunctor
@@ -119,21 +123,6 @@ namespace TransLucid
       HD* m_system;
       std::u32string m_type;
       std::u32string m_text;
-    };
-
-    class Convert : public CompiledFunctor
-    {
-      public:
-      Convert(const u32string& to, HD* e)
-      : m_to(to), m_e(e)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& context);
-
-      private:
-      u32string m_to;
-      HD* m_e;
     };
 
     class Dimension : public CompiledFunctor
@@ -181,44 +170,32 @@ namespace TransLucid
       u32string m_name;
     };
 
-    class If : public CompiledFunctor
+    class UnaryOp : public CompiledFunctor
     {
       public:
-      If(HD* condition, HD* then,
-        const std::list<HD*>& elsifs,
-        HD* else_)
-      : m_condition(condition),
-        m_then(then),
-        m_elsifs(elsifs),
-        m_else(else_)
-      {}
-
-      If(HD* condition, HD* then,
-        const std::vector<std::pair<HD*, HD*>>& elsifs,
-        HD* else_)
-      : m_condition(condition),
-        m_then(then),
-        m_elsifs_2(elsifs),
-        m_else(else_)
+      UnaryOp(Tree::UnaryOperation op, HD* e)
+      : m_op(op), m_e(e)
       {}
 
       TaggedValue
       operator()(const Tuple& context);
 
       private:
-      //HD* m_system;
-      HD* m_condition;
-      HD* m_then;
-      std::list<HD*> m_elsifs;
-      std::vector<std::pair<HD*, HD*>> m_elsifs_2;
-      HD* m_else;
+      Tree::UnaryOperation m_op;
+      HD* m_e;
     };
 
-    class Integer : public CompiledFunctor
+    class BinaryOp : public CompiledFunctor
     {
       public:
-      Integer(HD* system, const mpz_class& value)
-      : m_system(system), m_value(value)
+
+      BinaryOp
+      (
+        HD* system,
+        const std::vector<HD*>& operands,
+        const u32string& name
+      )
+      : m_system(system), m_operands(operands), m_name(name)
       {}
 
       TaggedValue
@@ -226,7 +203,27 @@ namespace TransLucid
 
       private:
       HD* m_system;
-      mpz_class m_value;
+      std::vector<HD*> m_operands;
+      u32string m_name;
+    };
+
+    class Operation : public CompiledFunctor
+    {
+      public:
+      Operation(HD* system,
+                const std::vector<HD*>& operands,
+                const u32string& symbol)
+      : m_system(system), m_operands(operands), m_symbol(symbol)
+      {
+      }
+
+      TaggedValue
+      operator()(const Tuple& context);
+
+      private:
+      HD* m_system;
+      const std::vector<HD*>& m_operands;
+      u32string m_symbol;
     };
 
     class IsSpecial : public CompiledFunctor
@@ -260,23 +257,52 @@ namespace TransLucid
       HD* m_e;
     };
 
-    class Operation : public CompiledFunctor
+    class Convert : public CompiledFunctor
     {
       public:
-      Operation(HD* system,
-                const std::vector<HD*>& operands,
-                const u32string& symbol)
-      : m_system(system), m_operands(operands), m_symbol(symbol)
-      {
-      }
+      Convert(const u32string& to, HD* e)
+      : m_to(to), m_e(e)
+      {}
 
       TaggedValue
       operator()(const Tuple& context);
 
       private:
-      HD* m_system;
-      const std::vector<HD*>& m_operands;
-      u32string m_symbol;
+      u32string m_to;
+      HD* m_e;
+    };
+
+    class If : public CompiledFunctor
+    {
+      public:
+      If(HD* condition, HD* then,
+        const std::list<HD*>& elsifs,
+        HD* else_)
+      : m_condition(condition),
+        m_then(then),
+        m_elsifs(elsifs),
+        m_else(else_)
+      {}
+
+      If(HD* condition, HD* then,
+        const std::vector<std::pair<HD*, HD*>>& elsifs,
+        HD* else_)
+      : m_condition(condition),
+        m_then(then),
+        m_elsifs_2(elsifs),
+        m_else(else_)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& context);
+
+      private:
+      //HD* m_system;
+      HD* m_condition;
+      HD* m_then;
+      std::list<HD*> m_elsifs;
+      std::vector<std::pair<HD*, HD*>> m_elsifs_2;
+      HD* m_else;
     };
 
     class Pair : public CompiledFunctor
@@ -294,61 +320,54 @@ namespace TransLucid
       HD* m_rhs;
     };
 
-    class SpecialConst : public CompiledFunctor
+    class BuildTuple : public CompiledFunctor
     {
       public:
-      SpecialConst(Special::Value v)
-      : m_value(v)
-      {}
 
-      TaggedValue
-      operator()(const Tuple& k);
-
-      private:
-      Special::Value m_value;
-    };
-
-    class StringConst : public CompiledFunctor
-    {
-      public:
-      StringConst(const u32string& s)
-      : m_value(s)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& k);
-
-      private:
-      u32string m_value;
-    };
-
-    class UcharConst : public CompiledFunctor
-    {
-      public:
-      UcharConst(char32_t c)
-      : m_value(c)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& k);
-
-      private:
-      char32_t m_value;
-    };
-
-    class UnaryOp : public CompiledFunctor
-    {
-      public:
-      UnaryOp(Tree::UnaryOperation op, HD* e)
-      : m_op(op), m_e(e)
+      BuildTuple(HD* system,
+                 const std::list<std::pair<HD*, HD*>>& elements)
+      : m_system(system), m_elements(elements)
       {}
 
       TaggedValue
       operator()(const Tuple& context);
 
       private:
-      Tree::UnaryOperation m_op;
-      HD* m_e;
+      HD* m_system;
+      std::list<std::pair<HD*, HD*>> m_elements;
+    };
+
+    //e2 @ e1
+    class AtAbsolute : public CompiledFunctor
+    {
+      public:
+
+      AtAbsolute(HD* e2, HD* e1)
+      : e2(e2), e1(e1)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& context);
+
+      private:
+      HD* e2;
+      HD* e1;
+    };
+
+    class AtRelative : public CompiledFunctor
+    {
+      public:
+
+      AtRelative(HD* e2, HD* e1)
+      : e2(e2), e1(e1)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& context);
+
+      private:
+      HD* e2;
+      HD* e1;
     };
 
   }

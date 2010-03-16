@@ -1,3 +1,22 @@
+/* Abstract syntax tree.
+   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+
+This file is part of TransLucid.
+
+TransLucid is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+TransLucid is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TransLucid; see the file COPYING.  If not see
+<http://www.gnu.org/licenses/>.  */
+
 #ifndef AST_HPP_INCLUDED
 #define AST_HPP_INCLUDED
 
@@ -12,6 +31,36 @@ namespace TransLucid
 {
   namespace Tree
   {
+    enum UnaryType
+    {
+      UNARY_PREFIX,
+      UNARY_POSTFIX
+    };
+
+    struct UnaryOperation
+    {
+      UnaryOperation() = default;
+
+      UnaryOperation
+      (
+        const u32string& op,
+        const u32string& symbol,
+        UnaryType type
+      )
+      : op(op), symbol(symbol), type(type)
+      {}
+
+      u32string op;
+      u32string symbol;
+      UnaryType type;
+
+      bool
+      operator==(const UnaryOperation& rhs) const
+      {
+        return op == rhs.op && symbol == rhs.symbol && type == rhs.type;
+      }
+    };
+
     enum InfixAssoc
     {
       ASSOC_LEFT,
@@ -54,48 +103,9 @@ namespace TransLucid
       mpz_class precedence;
     };
 
-    enum UnaryType
+    struct nil
     {
-      UNARY_PREFIX,
-      UNARY_POSTFIX
     };
-
-    struct UnaryOperation
-    {
-      UnaryOperation() = default;
-
-      UnaryOperation
-      (
-        const u32string& op,
-        const u32string& symbol,
-        UnaryType type)
-      : op(op), symbol(symbol), type(type)
-      {}
-
-      u32string op;
-      u32string symbol;
-      UnaryType type;
-
-      bool
-      operator==(const UnaryOperation& rhs) const
-      {
-        return op == rhs.op && symbol == rhs.symbol && type == rhs.type;
-      }
-    };
-
-    class AtExpr;
-    class BinaryOpExpr;
-    class BooleanExpr;
-    class BuildTupleExpr;
-    class ConstantExpr;
-    class DimensionExpr;
-    class HashExpr;
-    class IdentExpr;
-    class IfExpr;
-    class OpExpr;
-    class PairExpr;
-    class RangeExpr;
-    class UnaryOpExpr;
 
     struct ConstantExpr
     {
@@ -131,49 +141,60 @@ namespace TransLucid
       u32string text;
     };
 
-    struct nil
-    {
-    };
+    class UnaryOpExpr;
+    class BinaryOpExpr;
+    class HashExpr;
+    class BuildTupleExpr;
+    class IfExpr;
+    class AtExpr;
+
+    // Not defined in ast.hpp
+    class BooleanExpr;
+    class OpExpr;
+    class PairExpr;
+    class RangeExpr;
 
     typedef boost::variant
     <
       nil,
-      boost::recursive_wrapper<AtExpr>,
-      boost::recursive_wrapper<BinaryOpExpr>,
-      boost::recursive_wrapper<BuildTupleExpr>,
+      bool,
+      Special::Value,     //replaces SpecialExpr
+      mpz_class,          //replaces IntegerExpr
+      char32_t,           //replaces UcharExpr
+      u32string,          //replaces StringExpr
       ConstantExpr,
       DimensionExpr,
-      boost::recursive_wrapper<HashExpr>,
       IdentExpr,
-      boost::recursive_wrapper<IfExpr>,
       boost::recursive_wrapper<UnaryOpExpr>,
-      bool,
-      char32_t, //replaces UcharExpr
-      mpz_class, //replaces IntegerExpr
-      Special::Value, //replaces SpecialExpr
-      u32string //replaces StringExpr
+      boost::recursive_wrapper<BinaryOpExpr>,
+      boost::recursive_wrapper<IfExpr>,
+      boost::recursive_wrapper<HashExpr>,
+      boost::recursive_wrapper<BuildTupleExpr>,
+      boost::recursive_wrapper<AtExpr>
     > Expr;
 
-    struct AtExpr
+    struct UnaryOpExpr
     {
-      AtExpr() = default;
+      UnaryOpExpr() = default;
 
-      AtExpr(const Expr& lhs, const Expr& rhs)
-      : lhs(lhs), rhs(rhs)
+      UnaryOpExpr(const UnaryOperation& o, const Expr& e)
+      : op(o), e(e)
       {}
 
-      Expr lhs;
-      Expr rhs;
-      bool relative;
+      UnaryOperation op;
+      Expr e;
     };
 
     struct BinaryOpExpr
     {
       BinaryOpExpr() = default;
 
-      BinaryOpExpr(BinaryOperation o,
-                   const Expr& l,
-                   const Expr& r)
+      BinaryOpExpr
+      (
+        BinaryOperation o,
+        const Expr& l,
+        const Expr& r
+      )
       : op(o), lhs(l), rhs(r)
       {}
 
@@ -188,41 +209,26 @@ namespace TransLucid
       add_leaf(Expr& e);
     };
 
-    struct BuildTupleExpr
-    {
-      typedef
-      std::vector<boost::fusion::vector<Expr, Expr>>
-      TuplePairs;
-
-      TuplePairs pairs;
-
-      BuildTupleExpr() = default;
-
-      BuildTupleExpr(const TuplePairs& p)
-      : pairs(p)
-      {}
-    };
-
-    struct HashExpr
-    {
-      HashExpr() = default;
-
-      HashExpr(const Expr& e)
-      : e(e)
-      {}
-
-      Expr e;
-    };
+    Expr
+    insert_binary_operation
+    (
+      const BinaryOperation& info,
+      Expr& lhs,
+      Expr& rhs
+    );
 
     struct IfExpr
     {
       IfExpr() = default;
 
       template <typename List>
-      IfExpr(const Expr& c,
-             const Expr& t,
-             const List& eif,
-             const Expr& e)
+      IfExpr
+      (
+        const Expr& c,
+        const Expr& t,
+        const List& eif,
+        const Expr& e
+      )
       : condition(c),
         then(t),
         else_(e)
@@ -241,24 +247,44 @@ namespace TransLucid
       Expr else_;
     };
 
-    struct UnaryOpExpr
+    struct HashExpr
     {
-      UnaryOpExpr() = default;
+      HashExpr() = default;
 
-      UnaryOpExpr(const UnaryOperation& o, const Expr& e)
-      : op(o), e(e)
+      HashExpr(const Expr& e)
+      : e(e)
       {}
 
-      UnaryOperation op;
       Expr e;
     };
 
-    Expr insert_binary_operation
-    (
-      const BinaryOperation& info,
-      Expr& lhs,
-      Expr& rhs
-    );
+    struct BuildTupleExpr
+    {
+      typedef
+      std::vector<boost::fusion::vector<Expr, Expr>>
+      TuplePairs;
+
+      TuplePairs pairs;
+
+      BuildTupleExpr() = default;
+
+      BuildTupleExpr(const TuplePairs& p)
+      : pairs(p)
+      {}
+    };
+
+    struct AtExpr
+    {
+      AtExpr() = default;
+
+      AtExpr(const Expr& lhs, const Expr& rhs)
+      : lhs(lhs), rhs(rhs)
+      {}
+
+      Expr lhs;
+      Expr rhs;
+      bool relative;
+    };
 
     #define PRINT_NODE(n) \
     inline \
@@ -269,31 +295,16 @@ namespace TransLucid
     } \
 
     PRINT_NODE(nil)
-    PRINT_NODE(AtExpr)
-    PRINT_NODE(BinaryOpExpr)
-    PRINT_NODE(BuildTupleExpr)
     PRINT_NODE(ConstantExpr)
     PRINT_NODE(DimensionExpr)
-    PRINT_NODE(HashExpr)
     PRINT_NODE(IdentExpr)
-    PRINT_NODE(IfExpr)
     PRINT_NODE(UnaryOpExpr)
+    PRINT_NODE(BinaryOpExpr)
+    PRINT_NODE(IfExpr)
+    PRINT_NODE(HashExpr)
+    PRINT_NODE(BuildTupleExpr)
+    PRINT_NODE(AtExpr)
 
-#if 0
-    class AtExpr;
-    class BinaryOpExpr;
-    class BooleanExpr;
-    class BuildTupleExpr;
-    class ConstantExpr;
-    class DimensionExpr;
-    class HashExpr;
-    class IdentExpr;
-    class IfExpr;
-    class OpExpr;
-    class PairExpr;
-    class RangeExpr;
-    class UnaryOpExpr;
-#endif
   }
 }
 

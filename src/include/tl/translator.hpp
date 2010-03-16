@@ -1,3 +1,22 @@
+/* TODO: Give a descriptor.
+   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+
+This file is part of TransLucid.
+
+TransLucid is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+TransLucid is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TransLucid; see the file COPYING.  If not see
+<http://www.gnu.org/licenses/>.  */
+
 #ifndef TRANSLATOR_HPP_INCLUDED
 #define TRANSLATOR_HPP_INCLUDED
 
@@ -31,25 +50,32 @@ namespace TransLucid
 
     Translator();
 
-    HD* translate_expr(const Parser::string_type& s);
+    HD*
+    translate_expr(const Parser::string_type& s);
 
-    void translate_and_add_equation_set(const u32string& s);
+    void
+    translate_and_add_equation_set(const u32string& s);
 
-    equation_v translate_equation_set(const u32string& s);
+    equation_v
+    translate_equation_set(const u32string& s);
 
-    void parse_header(const u32string& s);
+    void
+    parse_header(const u32string& s);
 
-    HD& system()
+    HD&
+    system()
     {
       return m_interpreter;
     }
 
-    Parser::Header& header()
+    Parser::Header&
+    header()
     {
       return *m_header;
     }
 
-    void loadLibrary(const u32string& s)
+    void
+    loadLibrary(const u32string& s)
     {
       m_lt.loadLibrary(s, &m_interpreter);
     }
@@ -62,12 +88,12 @@ namespace TransLucid
 
     private:
 
-    Parser::Header *m_header;
+    Parser::Header* m_header;
 
-    Parser::ExprGrammar<Parser::iterator_t> *m_expr;
-    Parser::EquationGrammar<Parser::iterator_t> *m_equation;
-    Parser::TupleGrammar<Parser::iterator_t> *m_tuple;
-    Parser::SkipGrammar<Parser::iterator_t> *m_skipper;
+    Parser::ExprGrammar<Parser::iterator_t>* m_expr;
+    Parser::EquationGrammar<Parser::iterator_t>* m_equation;
+    Parser::TupleGrammar<Parser::iterator_t>* m_tuple;
+    Parser::SkipGrammar<Parser::iterator_t>* m_skipper;
 
     Interpreter m_interpreter;
 

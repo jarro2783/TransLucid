@@ -1,3 +1,22 @@
+/* TODO: Give a descriptor.
+   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+
+This file is part of TransLucid.
+
+TransLucid is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+TransLucid is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TransLucid; see the file COPYING.  If not see
+<http://www.gnu.org/licenses/>.  */
+
 #ifndef TL_PARSER_INCLUDED
 #define TL_PARSER_INCLUDED
 
@@ -108,25 +127,12 @@ namespace TransLucid
     {
       try
       {
-        const Tree::ConstantExpr& ctype =
-          boost::get<const Tree::ConstantExpr&>(type);
-        const Tree::ConstantExpr& copen =
-          boost::get<const Tree::ConstantExpr&>(open);
-        const Tree::ConstantExpr& cclose =
-          boost::get<const Tree::ConstantExpr&>(cclose);
-
-        if (ctype.type != U"ustring")
-        {
-          throw std::invalid_argument("expected ustring");
-        }
-        if (copen.type != U"uchar")
-        {
-          throw std::invalid_argument("expected uchar");
-        }
-        if (cclose.type != U"uchar")
-        {
-          throw std::invalid_argument("expected uchar");
-        }
+        const u32string& ctype =
+          boost::get<u32string&>(type);
+        const char32_t& copen =
+          boost::get<const char32_t&>(open);
+        const char32_t& cclose =
+          boost::get<const char32_t&>(cclose);
       }
       catch (const boost::bad_get&)
       {
