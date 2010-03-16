@@ -98,19 +98,50 @@ namespace TransLucid
     addDelimiter
     (
       Header& header,
-      const u32string& type,
-      const string_type& open,
-      const string_type& close
+      const Tree::Expr& type,
+      const Tree::Expr& open,
+      const Tree::Expr& close
+      //const u32string& type,
+      //const string_type& open,
+      //const string_type& close
     )
     {
+      try
+      {
+        const Tree::ConstantExpr& ctype =
+          boost::get<const Tree::ConstantExpr&>(type);
+        const Tree::ConstantExpr& copen =
+          boost::get<const Tree::ConstantExpr&>(open);
+        const Tree::ConstantExpr& cclose =
+          boost::get<const Tree::ConstantExpr&>(cclose);
+
+        if (ctype.type != U"ustring")
+        {
+          throw std::invalid_argument("expected ustring");
+        }
+        if (copen.type != U"uchar")
+        {
+          throw std::invalid_argument("expected uchar");
+        }
+        if (cclose.type != U"uchar")
+        {
+          throw std::invalid_argument("expected uchar");
+        }
+      }
+      catch (const boost::bad_get&)
+      {
+      }
+      catch (const std::invalid_argument&)
+      {
+      }
       //std::cout << "adding " << open << " " << close << std::endl;
       //if
       //(
-         header.delimiter_start_symbols.add
-         (
-           open.c_str(),
-           Delimiter(type, open[0], close[0])
-         );
+         //header.delimiter_start_symbols.add
+         //(
+         //  open.c_str(),
+         //  Delimiter(type, open[0], close[0])
+         //);
       //)
       //{
       //  throw ParseError("open delimiter '" + ustring_t(open)
@@ -168,6 +199,9 @@ namespace TransLucid
             >  expr
             >  expr
            )
+           [
+             ph::bind(&addDelimiter, _r1, _1, _2, _3)
+           ]
          | (
                qi::string("library")
             >> "ustring"
