@@ -22,7 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/parser_util.hpp>
 #include <tl/parser_fwd.hpp>
-#include <tl/expr.hpp>
 #include <tl/utility.hpp>
 #include <tl/builtin_types.hpp>
 //#include <boost/format.hpp>
@@ -220,10 +219,6 @@ namespace TransLucid
           [
             _val = ph::bind(&construct_delimited_constant, _b,
                             make_u32string(_a))
-
-            //      new_<AST::ConstantExpr>
-            //         (make_u32string(ph::bind(&get_name, _b)),
-            //          make_u32string(_a))
           ]
         ;
 

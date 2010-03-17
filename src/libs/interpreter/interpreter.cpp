@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/interpreter.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
-#include <tl/constant.hpp>
+//#include <tl/constant.hpp>
 #include <tl/consthd.hpp>
 
 namespace TransLucid
@@ -200,36 +200,6 @@ Interpreter::Interpreter()
 
   //set this as the default int too
   addToVariableActual(U"DEFAULTINT", Tuple(), intmpHD);
-}
-
-Interpreter::~Interpreter()
-{
-  //cleanupExprParser();
-  //cleanupTupleParser();
-  //cleanupConstantParser();
-}
-
-void
-Interpreter::cleanupParserObjects()
-{
-  #if 0
-  BOOST_FOREACH(Parser::EqnMap::value_type& v, m_parseInfo.equations)
-  {
-    BOOST_FOREACH(Parser::EqnMap::mapped_type::value_type& p, v.second)
-    {
-      delete p.first;
-      delete p.second;
-    }
-  }
-
-  //m_parseInfo.equations.clear();
-
-  BOOST_FOREACH(AST::Expr* e, m_parsers.expr_stack)
-  {
-    delete e;
-  }
-  m_parsers.expr_stack.clear();
-  #endif
 }
 
 #if 0

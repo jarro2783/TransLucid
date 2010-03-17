@@ -52,7 +52,6 @@ AC_CONFIG_FILES([Makefile
                  src/libs/Makefile
                  src/libs/int/Makefile
                  src/libs/interpreter/Makefile
-                 src/libs/printer/Makefile
                  src/dirsystem/Makefile
                  src/interactive/Makefile
                  src/tests/Makefile

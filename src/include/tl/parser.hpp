@@ -23,7 +23,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <list>
 #include <map>
 #include <boost/foreach.hpp>
-#include <tl/expr.hpp>
 #include <deque>
 #include <boost/format.hpp>
 #include <wchar.h>
@@ -177,11 +176,11 @@ namespace TransLucid
          using namespace qi::labels;
 
          assoc_symbols.add
-           (L"infixl", AST::ASSOC_LEFT)
-           (L"infixr", AST::ASSOC_RIGHT)
-           (L"infixn", AST::ASSOC_NON)
-           (L"infixp", AST::ASSOC_COMPARISON)
-           (L"infixm", AST::ASSOC_VARIABLE)
+           (L"infixl", Tree::ASSOC_LEFT)
+           (L"infixr", Tree::ASSOC_RIGHT)
+           (L"infixn", Tree::ASSOC_NON)
+           (L"infixp", Tree::ASSOC_COMPARISON)
+           (L"infixm", Tree::ASSOC_VARIABLE)
          ;
 
          headerp =
@@ -267,8 +266,8 @@ namespace TransLucid
 
       escaped_string_parser<Iterator> angle_string;
 
-      qi::symbols<char_type, AST::InfixAssoc> assoc_symbols;
-      AST::InfixAssoc currentAssoc;
+      qi::symbols<char_type, Tree::InfixAssoc> assoc_symbols;
+      Tree::InfixAssoc currentAssoc;
 
       //Spirit::assertion<ParseErrorType> expect_dbl_semi;
 

@@ -25,44 +25,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class ExprType : public TypedValueBase
-  {
-    public:
-
-    ExprType(AST::Expr* e)
-    : m_expr(e)
-    {
-    }
-
-    size_t
-    hash() const
-    {
-      boost::hash<AST::Expr*> hasher;
-      return hasher(m_expr);
-    }
-
-    bool
-    operator==(const ExprType& rhs) const
-    {
-      return m_expr == rhs.m_expr;
-    }
-
-    AST::Expr*
-    expr() const
-    {
-       return m_expr;
-    }
-
-    bool
-    operator<(const ExprType& rhs) const
-    {
-      return m_expr < rhs.m_expr;
-    }
-
-    private:
-    AST::Expr* m_expr;
-  };
-
   class Special : public TypedValueBase
   {
     public:
@@ -146,58 +108,6 @@ namespace TransLucid
       }
     }
   };
-
-  #if 0
-  class UnevalExpr : public TypedValueBase
-  {
-    public:
-    UnevalExpr(AST::Expr* e, const Tuple& context, Interpreter& i)
-    : m_expr(e), m_context(context), m_interpreter(i)
-    {
-    }
-
-    size_t
-    hash() const
-    {
-      boost::hash<AST::Expr*> hasher;
-      return hasher(m_expr);
-    }
-
-    AST::Expr*
-    expr() const
-    {
-      return m_expr;
-    }
-
-    void
-    print(std::ostream& os, const Tuple& context) const
-    {
-      os << "unevaluated expression";
-    }
-
-    bool
-    operator==(const UnevalExpr& rhs) const
-    {
-      return false;
-    }
-
-    std::pair<TypedValue, Tuple> evaluate() const;
-
-    bool
-    operator<(const UnevalExpr& rhs) const
-    {
-      return m_expr < rhs.m_expr;
-    }
-
-    private:
-    //the expression
-    AST::Expr* m_expr;
-    //the context that the expression was created with
-    Tuple m_context;
-    //the interpreter that the expression should be evaluated with
-    Interpreter& m_interpreter;
-  };
-  #endif
 
   class String : public TypedValueBase
   {

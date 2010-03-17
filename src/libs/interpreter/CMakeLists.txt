@@ -7,7 +7,7 @@ add_definitions(${TLCFLAGS}
 -Wall)
 add_library(tlinterpreter SHARED interpreter.cpp interpreter_expr.cpp 
 library.cpp dimtranslator.cpp types.cpp
-range.cpp expr.cpp parser.cpp
+range.cpp parser.cpp
 builtin_types.cpp equation.cpp
 header_type.cpp cache.cpp utility.cpp 
 compiled_functors.cpp expr_compiler.cpp consthd.cpp printer.cpp
