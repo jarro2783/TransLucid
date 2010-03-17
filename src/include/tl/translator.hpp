@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Translate between representations of code.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/interpreter.hpp>
 #include <tl/expr_compiler.hpp>
 #include <tl/parser_fwd.hpp>
+#include <tl/library.hpp>
 
 namespace TransLucid
 {

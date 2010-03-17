@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* System hyperdaton.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -20,7 +20,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/interpreter.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
-//#include <tl/constant.hpp>
 #include <tl/consthd.hpp>
 
 namespace TransLucid
@@ -150,7 +149,7 @@ Interpreter::buildConstantHD(size_t index)
   //  TypedValue(String("CONST"), m_typeRegistry.indexString());
   k[DIM_TYPE] = TypedValue(String(T::name), TYPE_INDEX_USTRING);
   addToVariableActual(U"CONST", Tuple(k), h);
-  addToVariableActual(U"TYPEINDEX", empty, new ConstHD::IntmpConst(index));
+  addToVariableActual(U"TYPEINDEX", empty, new Hyperdatons::IntmpConst(index));
   return h;
 }
 
@@ -159,13 +158,12 @@ Interpreter::init_types()
 {
   BOOST_FOREACH(auto v, builtin_name_to_index)
   {
-    addToVariableActual(v.first, Tuple(), new ConstHD::TypeConst(v.second));
+    addToVariableActual(v.first, Tuple(), new Hyperdatons::TypeConst(v.second));
   }
 }
 
 Interpreter::Interpreter()
 : Variable(U"", this),
-  m_types(*this),
   m_time(0),
   builtin_name_to_index
   {
@@ -176,8 +174,7 @@ Interpreter::Interpreter()
    {U"uchar", TYPE_INDEX_UCHAR},
    {U"dim", TYPE_INDEX_DIMENSION},
    {U"type", TYPE_INDEX_TYPE}
-  },
-  m_verbose(false)
+  }
 {
   //create the obj, const and fun ids
 
@@ -194,9 +191,9 @@ Interpreter::Interpreter()
   init_types();
 
   //build the constant creators
-  buildConstantHD<ConstHD::UChar>(TYPE_INDEX_UCHAR);
-  HD* intmpHD = buildConstantHD<ConstHD::Intmp>(TYPE_INDEX_INTMP);
-  buildConstantHD<ConstHD::UString>(TYPE_INDEX_USTRING);
+  buildConstantHD<Hyperdatons::UChar>(TYPE_INDEX_UCHAR);
+  HD* intmpHD = buildConstantHD<Hyperdatons::Intmp>(TYPE_INDEX_INTMP);
+  buildConstantHD<Hyperdatons::UString>(TYPE_INDEX_USTRING);
 
   //set this as the default int too
   addToVariableActual(U"DEFAULTINT", Tuple(), intmpHD);

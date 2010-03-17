@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Character set conversion.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -39,14 +39,6 @@ namespace std
     os << TransLucid::utf32_to_utf8(s);
     return os;
   }
-
-#if 0
-  inline istream&
-  operator>>(istream& is, u32string& s)
-  {
-
-  }
-#endif
 }
 
 #endif // CHARSET_HPP_INCLUDED

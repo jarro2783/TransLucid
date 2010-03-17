@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* The "true" constant hyperdatons.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -27,61 +27,55 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  namespace ConstHD
+  namespace Hyperdatons
   {
-
-    class ExprHD : public HD
+    //TODO: as soon as inheriting constructors is done, these
+    //classes can do
+    //using ValueHD::ConstantHD;
+    class ValueHD : public HD
     {
       public:
-      ExprHD(HD* system)
+      ValueHD(HD* system)
       : m_system(system)
       {}
-
-      virtual uuid
-      addExpr(const Tuple& k, HD* h)
-      {
-        return nil_uuid();
-      }
 
       protected:
       HD* m_system;
     };
 
-    class Intmp : public ExprHD
+    class Intmp : public ValueHD
     {
       public:
       static const char32_t* name;
 
       Intmp(HD* system)
-      : ExprHD(system)
+      : ValueHD(system)
       {}
 
       TaggedValue
       operator()(const Tuple& k);
-
-      private:
     };
 
-    class UChar : public ExprHD
+    class UChar : public ValueHD
     {
       public:
       static const char32_t* name;
 
       UChar(HD* system)
-      : ExprHD(system)
+      : ValueHD(system)
       {}
 
       TaggedValue
       operator()(const Tuple& k);
     };
 
-    class UString : public ExprHD
+    class UString : public ValueHD
     {
       public:
       static const char32_t* name;
 
       UString(HD* system)
-      : ExprHD(system)
+      : ValueHD(system)
       {}
 
       TaggedValue
@@ -89,6 +83,7 @@ namespace TransLucid
     };
 
     //this is not the intmp builder, this returns a constant intmp
+    //TODO: This is probably Hyperdatons::Integer
     class IntmpConst : public HD
     {
       public:
@@ -113,12 +108,13 @@ namespace TransLucid
       mpz_class m_v;
     };
 
-    class TypeConst : public ExprHD
+    //TODO: move this to a ConstantHD
+    class TypeConst : public ValueHD
     {
       public:
 
       TypeConst(size_t index)
-      : ExprHD(0), m_index(index)
+      : ValueHD(0), m_index(index)
       {}
 
       TaggedValue
@@ -131,7 +127,7 @@ namespace TransLucid
       private:
       size_t m_index;
     };
-  } //namespace ConstHD
+  } //namespace Hyperdatons
 } //namespace TransLucid
 
 #endif // CONSTHD_HPP_INCLUDED

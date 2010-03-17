@@ -151,7 +151,7 @@ namespace TransLucid
     // Not defined in ast.hpp
     class OpExpr;
     class RangeExpr;
-
+    //TODO: rename ConstantExpr to TypedValueExpr
     typedef boost::variant
     <
       nil,

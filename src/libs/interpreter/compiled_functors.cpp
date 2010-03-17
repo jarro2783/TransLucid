@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Hyperdatons generated from AST::Expr.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-namespace CompiledFunctors
+namespace Hyperdatons
 {
 
 namespace
@@ -91,42 +91,7 @@ insert_tuple(tuple_t& k, HD* h, size_t index)
 }
 
 TaggedValue
-AtAbsolute::operator()(const Tuple& k)
-{
-  TaggedValue kp = (*e1)(k);
-  if (kp.first.index() != TYPE_INDEX_TUPLE)
-  {
-    return TaggedValue(TypedValue(Special(Special::TYPEERROR),
-      TYPE_INDEX_SPECIAL), k);
-  }
-  else
-  {
-    return (*e2)(kp.first.value<Tuple>());
-  }
-}
-
-TaggedValue
-AtRelative::operator()(const Tuple& k)
-{
-  tuple_t kNew = k.tuple();
-  TaggedValue kp = (*e1)(k);
-  if (kp.first.index() != TYPE_INDEX_TUPLE)
-  {
-    return TaggedValue(TypedValue(Special(Special::TYPEERROR),
-      TYPE_INDEX_SPECIAL), k);
-  }
-  else
-  {
-    BOOST_FOREACH(tuple_t::value_type v, kp.first.value<Tuple>().tuple())
-    {
-      kNew[v.first] = v.second;
-    }
-    return (*e2)(Tuple(kNew));
-  }
-}
-
-TaggedValue
-BinaryOp::operator()(const Tuple& k)
+BinaryOpHD::operator()(const Tuple& k)
 {
   //TypedValue v1 = (*m_operands.at(0))(k).first;
   //TypedValue v2 = (*m_operands.at(1))(k).first;
@@ -150,35 +115,13 @@ BinaryOp::operator()(const Tuple& k)
 }
 
 TaggedValue
-BoolConst::operator()(const Tuple& k)
+BoolHD::operator()(const Tuple& k)
 {
   return TaggedValue(TypedValue(Boolean(m_value), TYPE_INDEX_BOOL), k);
 }
 
 TaggedValue
-BuildTuple::operator()(const Tuple& k)
-{
-  tuple_t kp;
-  BOOST_FOREACH(auto& pair, m_elements)
-  {
-    //const PairType& p = v.first.value<PairType>();
-    TaggedValue left = (*pair.first)(k);
-    TaggedValue right = (*pair.second)(k);
-
-    if (left.first.index() == TYPE_INDEX_DIMENSION)
-    {
-      kp[left.first.value<TransLucid::Dimension>().value()] = right.first;
-    }
-    else
-    {
-      kp[get_dimension_index(m_system, left.first)] = right.first;
-    }
-  }
-  return TaggedValue(TypedValue(Tuple(kp), TYPE_INDEX_TUPLE), k);
-}
-
-TaggedValue
-Constant::operator()(const Tuple& k)
+TypedValueHD::operator()(const Tuple& k)
 {
   //evaluate CONST
   tuple_t kp = k.tuple();
@@ -205,7 +148,7 @@ Convert::operator()(const Tuple& context)
 }
 
 TaggedValue
-Dimension::operator()(const Tuple& k)
+DimensionHD::operator()(const Tuple& k)
 {
   size_t id = get_dimension_index(m_system, m_name);
   return TaggedValue (TypedValue(TransLucid::Dimension(id),
@@ -213,35 +156,7 @@ Dimension::operator()(const Tuple& k)
 }
 
 TaggedValue
-Hash::operator()(const Tuple& k)
-{
-  TaggedValue r = (*m_e)(k);
-  //std::cerr << "hash " << r.first << " = ";
-  size_t index;
-  if (r.first.index() == TYPE_INDEX_DIMENSION)
-  {
-    index = r.first.value<TransLucid::Dimension>().value();
-  }
-  else
-  {
-    index = get_dimension_index(m_system, r.first);
-  }
-
-  Tuple::const_iterator iter = k.find(index);
-  if (iter != k.end())
-  {
-    //std::cerr << iter->second << std::endl;
-    return TaggedValue(iter->second, k);
-  }
-  else
-  {
-    return TaggedValue(TypedValue(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
-  }
-}
-
-TaggedValue
-Ident::operator()(const Tuple& k)
+IdentHD::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
 
@@ -253,7 +168,7 @@ Ident::operator()(const Tuple& k)
 }
 
 TaggedValue
-If::operator()(const Tuple& k)
+IfHD::operator()(const Tuple& k)
 {
   TaggedValue cond = (*m_condition)(k);
   TypedValue& condv = cond.first;
@@ -315,29 +230,37 @@ If::operator()(const Tuple& k)
 }
 
 TaggedValue
-Integer::operator()(const Tuple& k)
+HashHD::operator()(const Tuple& k)
 {
-  // @[id : CONST, type : @[id : DEFAULTINT], value : m_value]
-  //tuple_t kp = k.tuple();
-  //TupleInserter<String> inserter(kp, m_system, TYPE_INDEX_USTRING);
-  //contextInsert<String>
-  //  (kp, m_system, "id", "DEFAULTINT", m_system.typeRegistry().indexString());
-  //kp[DIM_ID] = generate_string(U"DEFAULTINT");
-  //TaggedValue defaultint = m_system(Tuple(kp));
+  TaggedValue r = (*m_e)(k);
+  //std::cerr << "hash " << r.first << " = ";
+  size_t index;
+  if (r.first.index() == TYPE_INDEX_DIMENSION)
+  {
+    index = r.first.value<TransLucid::Dimension>().value();
+  }
+  else
+  {
+    index = get_dimension_index(m_system, r.first);
+  }
 
-  //kp[DIM_TEXT] = generate_string(to_u32string(m_value.get_str(10)));
+  Tuple::const_iterator iter = k.find(index);
+  if (iter != k.end())
+  {
+    //std::cerr << iter->second << std::endl;
+    return TaggedValue(iter->second, k);
+  }
+  else
+  {
+    return TaggedValue(TypedValue(Special(Special::DIMENSION),
+                       TYPE_INDEX_SPECIAL), k);
+  }
+}
 
-  //return (*m_system)(Tuple(kp));
-
+TaggedValue
+IntegerConstHD::operator()(const Tuple& k)
+{
   return TaggedValue(TypedValue(Intmp(m_value), TYPE_INDEX_INTMP), k);
-
-  #if 0
-  //kp = k.tuple();
-  inserter("id", "CONST");
-  contextInsert(kp, m_system, "type", defaultint.first);
-  contextInsert(kp, m_system, "text", generate_string(m_value.get_str(10)));
-  return m_system(Tuple(kp));
-  #endif
 }
 
 TaggedValue
@@ -355,7 +278,7 @@ IsType::operator()(const Tuple& context)
 }
 
 TaggedValue
-Operation::operator()(const Tuple& k)
+OperationHD::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
 
@@ -386,30 +309,87 @@ Pair::operator()(const Tuple& k)
 }
 
 TaggedValue
-SpecialConst::operator()(const Tuple& k)
+SpecialHD::operator()(const Tuple& k)
 {
   return TaggedValue(TypedValue(Special(m_value), TYPE_INDEX_SPECIAL), k);
 }
 
 TaggedValue
-StringConst::operator()(const Tuple& k)
+StringConstHD::operator()(const Tuple& k)
 {
   return TaggedValue(TypedValue(String(m_value), TYPE_INDEX_USTRING), k);
 }
 
 TaggedValue
-UcharConst::operator()(const Tuple& k)
+UcharConstHD::operator()(const Tuple& k)
 {
   return TaggedValue(TypedValue(Char(m_value), TYPE_INDEX_UCHAR), k);
 }
 
 TaggedValue
-UnaryOp::operator()(const Tuple& context)
+UnaryOpHD::operator()(const Tuple& context)
 {
-  //this will probably also go away
+  //TODO: resolve what to do with operations
   return TaggedValue();
 }
 
-} //namespace SetLazyEvaluator
+TaggedValue
+BuildTupleHD::operator()(const Tuple& k)
+{
+  tuple_t kp;
+  BOOST_FOREACH(auto& pair, m_elements)
+  {
+    //const PairType& p = v.first.value<PairType>();
+    TaggedValue left = (*pair.first)(k);
+    TaggedValue right = (*pair.second)(k);
+
+    if (left.first.index() == TYPE_INDEX_DIMENSION)
+    {
+      kp[left.first.value<TransLucid::Dimension>().value()] = right.first;
+    }
+    else
+    {
+      kp[get_dimension_index(m_system, left.first)] = right.first;
+    }
+  }
+  return TaggedValue(TypedValue(Tuple(kp), TYPE_INDEX_TUPLE), k);
+}
+
+TaggedValue
+AtAbsoluteHD::operator()(const Tuple& k)
+{
+  TaggedValue kp = (*e1)(k);
+  if (kp.first.index() != TYPE_INDEX_TUPLE)
+  {
+    return TaggedValue(TypedValue(Special(Special::TYPEERROR),
+      TYPE_INDEX_SPECIAL), k);
+  }
+  else
+  {
+    return (*e2)(kp.first.value<Tuple>());
+  }
+}
+
+TaggedValue
+AtRelativeHD::operator()(const Tuple& k)
+{
+  tuple_t kNew = k.tuple();
+  TaggedValue kp = (*e1)(k);
+  if (kp.first.index() != TYPE_INDEX_TUPLE)
+  {
+    return TaggedValue(TypedValue(Special(Special::TYPEERROR),
+      TYPE_INDEX_SPECIAL), k);
+  }
+  else
+  {
+    BOOST_FOREACH(tuple_t::value_type v, kp.first.value<Tuple>().tuple())
+    {
+      kNew[v.first] = v.second;
+    }
+    return (*e2)(Tuple(kNew));
+  }
+}
+
+} //namespace Hyperdatons
 
 } //namespace TransLucid

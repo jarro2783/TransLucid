@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Prints a Tree::Expr
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -126,7 +126,10 @@ namespace TransLucid
         ]
         ;
         integer = karma::stream;
-        uchar   = karma::string[_1 = bind(&utf32_to_utf8, construct<u32string>(1, _val))];
+        uchar   = karma::string
+        [
+          _1 = bind(&utf32_to_utf8, construct<u32string>(1, _val))
+        ];
         ustring = karma::string[_1 = bind(&utf32_to_utf8, _val)];
 
         constant =

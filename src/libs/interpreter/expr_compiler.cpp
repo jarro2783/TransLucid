@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Translates AST::Expr to hyperdatons.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -50,56 +50,56 @@ ExprCompiler::operator()(const Tree::nil& n)
 HD*
 ExprCompiler::operator()(bool b)
 {
-  return new CompiledFunctors::BoolConst(b);
+  return new Hyperdatons::BoolHD(b);
 }
 
 HD*
 ExprCompiler::operator()(Special::Value s)
 {
-  return new CompiledFunctors::SpecialConst(s);
+  return new Hyperdatons::SpecialHD(s);
 }
 
 HD*
 ExprCompiler::operator()(const mpz_class& i)
 {
-  return new CompiledFunctors::Integer(m_i, i);
+  return new Hyperdatons::IntegerConstHD(m_i, i);
 }
 
 HD*
 ExprCompiler::operator()(char32_t c)
 {
-  return new CompiledFunctors::UcharConst(c);
+  return new Hyperdatons::UcharConstHD(c);
 }
 
 HD*
 ExprCompiler::operator()(const u32string& s)
 {
-  return new CompiledFunctors::StringConst(s);
+  return new Hyperdatons::StringConstHD(s);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::ConstantExpr& e)
 {
-  return new CompiledFunctors::Constant(m_i, e.type, e.text);
+  return new Hyperdatons::TypedValueHD(m_i, e.type, e.text);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::DimensionExpr& e)
 {
-  return new CompiledFunctors::Dimension(m_i, e.text);
+  return new Hyperdatons::DimensionHD(m_i, e.text);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::IdentExpr& e)
 {
-  return new CompiledFunctors::Ident(m_i, e.text);
+  return new Hyperdatons::IdentHD(m_i, e.text);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {
   HD* operand = boost::apply_visitor(*this, e.e);
-  return new CompiledFunctors::UnaryOp(e.op, operand);
+  return new Hyperdatons::UnaryOpHD(e.op, operand);
 }
 
 HD*
@@ -108,7 +108,7 @@ ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
   HD* lhs = boost::apply_visitor(*this, e.lhs);
   HD* rhs = boost::apply_visitor(*this, e.rhs);
 
-  return new CompiledFunctors::BinaryOp(m_i, {lhs, rhs}, e.op.op);
+  return new Hyperdatons::BinaryOpHD(m_i, {lhs, rhs}, e.op.op);
 }
 
 HD*
@@ -129,14 +129,14 @@ ExprCompiler::operator()(const Tree::IfExpr& e)
     ));
   }
 
-  return new CompiledFunctors::If(condition, then, else_ifs, else_);
+  return new Hyperdatons::IfHD(condition, then, else_ifs, else_);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::HashExpr& e)
 {
   HD* expr = boost::apply_visitor(*this, e.e);
-  return new CompiledFunctors::Hash(m_i, expr);
+  return new Hyperdatons::HashHD(m_i, expr);
 }
 
 HD*
@@ -149,7 +149,7 @@ ExprCompiler::operator()(const Tree::BuildTupleExpr& e)
     HD* rhs = boost::apply_visitor(*this, at_c<1>(v));
     elements.push_back(std::make_pair(lhs, rhs));
   }
-  return new CompiledFunctors::BuildTuple(m_i, elements);
+  return new Hyperdatons::BuildTupleHD(m_i, elements);
 }
 
 HD*
@@ -160,11 +160,11 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
 
   if (e.relative)
   {
-    return new CompiledFunctors::AtRelative(lhs, rhs);
+    return new Hyperdatons::AtRelativeHD(lhs, rhs);
   }
   else
   {
-    return new CompiledFunctors::AtAbsolute(lhs, rhs);
+    return new Hyperdatons::AtAbsoluteHD(lhs, rhs);
   }
 }
 
