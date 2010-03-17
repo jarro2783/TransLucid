@@ -36,7 +36,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <stack>
 #include <tl/equation.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <tl/expr.hpp>
 #include <tl/ast.hpp>
 #include <tl/utility.hpp>
 
@@ -49,11 +48,6 @@ operator<<(std::ostream& os, char32_t c)
 
 namespace TransLucid
 {
-  namespace AST
-  {
-    class Expr;
-  }
-
   namespace Parser
   {
     enum ParseErrorType
@@ -102,10 +96,10 @@ namespace TransLucid
     //class TupleGrammar;
     //class ConstantGrammar;
 
-    typedef std::tuple<AST::Expr*, AST::Expr*> ParsedEquationGuard;
-    typedef std::tuple<std::u32string, ParsedEquationGuard, AST::Expr*>
-            equation_t;
-    typedef std::vector<equation_t> equation_v;
+    //typedef std::tuple<AST::Expr*, AST::Expr*> ParsedEquationGuard;
+    //typedef std::tuple<std::u32string, ParsedEquationGuard, AST::Expr*>
+    //        equation_t;
+    //typedef std::vector<equation_t> equation_v;
 
     struct Delimiter
     {
@@ -167,56 +161,6 @@ namespace TransLucid
       #endif
     };
 
-    struct EquationAdder
-    {
-      template <typename C>
-      struct result
-      {
-        typedef void type;
-      };
-
-      EquationAdder()
-      : m_equations(0)
-      {}
-
-      void
-      operator()(const equation_t& e) const
-      {
-        if (m_equations != 0)
-        {
-          m_equations->push_back(e);
-        }
-      }
-
-      void
-      setEquations(equation_v* equations)
-      {
-        m_equations = equations;
-      }
-
-      private:
-      equation_v* m_equations;
-    };
-
-    struct EquationHolder
-    {
-      EquationHolder(EquationAdder& adder);
-      ~EquationHolder();
-
-      const equation_v&
-      equations() const
-      {
-        return m_equations;
-      }
-
-      private:
-      EquationHolder(const EquationHolder&);
-      EquationHolder& operator=(const EquationHolder&);
-
-      EquationAdder& m_adder;
-      equation_v m_equations;
-    };
-
     typedef string_type::const_iterator iterator_t;
   }
 }
@@ -230,18 +174,5 @@ namespace std
     return os;
   }
 }
-
-#if 0
-BOOST_FUSION_ADAPT_STRUCT
-(
-  TransLucid::Parser::Header,
-  (TransLucid::Parser::symbols_t, dimension_symbols)
-  (TransLucid::Parser::binary_symbols, binary_op_symbols)
-  (TransLucid::Parser::unary_symbols, prefix_op_symbols)
-  (TransLucid::Parser::unary_symbols, postfix_op_symbols)
-  (TransLucid::Parser::delimiter_symbols, delimiter_start_symbols)
-  (std::vector<std::u32string>, libraries)
-)
-#endif
 
 #endif // PARSER_FWD_HPP_INCLUDED

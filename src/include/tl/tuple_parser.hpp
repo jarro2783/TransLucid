@@ -22,7 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/parser_fwd.hpp>
 #include <tl/parser_util.hpp>
-#include <tl/expr.hpp>
 #include <boost/spirit/home/phoenix/object/new.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 #include <boost/spirit/home/phoenix/container.hpp>

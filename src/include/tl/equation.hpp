@@ -30,12 +30,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-
-  namespace AST
-  {
-    class Expr;
-  };
-
   class Interpreter;
 
   class InvalidGuard : public Exception

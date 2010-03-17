@@ -83,11 +83,6 @@ namespace TransLucid
 
   class Interpreter;
 
-  namespace AST
-  {
-    class Expr;
-  }
-
   class HD;
 
   //class EquationGuard;

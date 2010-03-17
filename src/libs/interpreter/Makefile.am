@@ -13,7 +13,7 @@ library.cpp types.cpp \
 dimtranslator.cpp \
 range.cpp parser.cpp \
 builtin_types.cpp header_type.cpp equation.cpp \
-cache.cpp utility.cpp constant.cpp function.cpp compiled_functors.cpp \
+cache.cpp utility.cpp compiled_functors.cpp \
 expr_compiler.cpp consthd.cpp printer.cpp container.cpp set_types.cpp \
 translator.cpp ast.cpp
 

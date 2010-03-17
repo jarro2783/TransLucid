@@ -18,7 +18,6 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/parser_fwd.hpp>
-#include <tl/expr.hpp>
 #include <tl/exception.hpp>
 #include <boost/format.hpp>
 
@@ -28,17 +27,8 @@ namespace TransLucid
 namespace Parser
 {
 
-EquationHolder::EquationHolder(EquationAdder& adder)
-: m_adder(adder)
-{
-  m_adder.setEquations(&m_equations);
-}
-
-EquationHolder::~EquationHolder()
-{
-  m_adder.setEquations(0);
-}
-
+//I'll keep this for now because it could be of use
+//TODO: clean up error handling
 #if 0
 void
 printErrorMessage(file_position& pos, ParseErrorType type)

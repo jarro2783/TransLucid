@@ -1,2 +1,2 @@
-SUBDIRS = interpreter int printer
+SUBDIRS = interpreter int
 EXTRA_DIST=CMakeLists.txt

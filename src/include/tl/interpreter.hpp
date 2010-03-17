@@ -44,7 +44,6 @@ namespace TransLucid
     public:
 
     Interpreter();
-    virtual ~Interpreter();
 
     typedef std::map<u32string, HD*> IOList;
 
@@ -83,16 +82,6 @@ namespace TransLucid
     {
       m_lt.addSearchPath(name);
     }
-
-    void
-    registerEquation
-    (const u32string& name, const Tuple& validContext, AST::Expr* e);
-
-    //TaggedValue
-    //operator()(const Tuple& k);
-
-    //void
-    //addExpr(const Tuple& k, HD* h);
 
     private:
     Libtool m_lt;

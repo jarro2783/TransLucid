@@ -149,9 +149,7 @@ namespace TransLucid
     class AtExpr;
 
     // Not defined in ast.hpp
-    class BooleanExpr;
     class OpExpr;
-    class PairExpr;
     class RangeExpr;
 
     typedef boost::variant
