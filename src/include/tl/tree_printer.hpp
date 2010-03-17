@@ -146,7 +146,7 @@ namespace TransLucid
         tuple = '[' << pairs[_1 = ph::at_c<0>(_val)] << ']';
         at_expr = '(' << expr << '@' << expr << ')';
 
-        // TODO: Missing uchar and unary
+        // TODO: Missing unary
         expr %=
           nil
         | karma::bool_

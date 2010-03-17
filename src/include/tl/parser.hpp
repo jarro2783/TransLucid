@@ -133,6 +133,13 @@ namespace TransLucid
           boost::get<const char32_t&>(open);
         const char32_t& cclose =
           boost::get<const char32_t&>(cclose);
+
+        string_type open_string(1, copen);
+        header.delimiter_start_symbols.add
+        (
+          open_string.c_str(),
+          Delimiter(ctype, (char_type)copen, (char_type)cclose)
+        );
       }
       catch (const boost::bad_get&)
       {
