@@ -36,6 +36,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/statement/sequence.hpp>
 #include <boost/spirit/home/phoenix/statement/if.hpp>
 #include <boost/spirit/home/phoenix/operator/comparison.hpp>
+#include <boost/spirit/home/phoenix/object/construct.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT
 (
@@ -102,21 +103,6 @@ namespace TransLucid
     using boost::spirit::_1;
     using namespace phoenix;
 
-    #if 0
-    struct get_integer_impl
-    {
-      template <typename T1>
-      struct result { typedef const mpz_class& type; };
-
-      const mpz_class& operator()(const Tree::IntegerExpr& e) const
-      {
-        return e->m_value;
-      }
-    };
-
-    phoenix::function<get_integer_impl> get_integer;
-    #endif
-
     template <typename Iterator>
     struct ExprPrinter : karma::grammar<Iterator, Tree::Expr()>
     {
@@ -140,6 +126,7 @@ namespace TransLucid
         ]
         ;
         integer = karma::stream;
+        uchar   = karma::string[_1 = bind(&utf32_to_utf8, construct<u32string>(1, _val))];
         ustring = karma::string[_1 = bind(&utf32_to_utf8, _val)];
 
         constant =
@@ -165,7 +152,7 @@ namespace TransLucid
         | karma::bool_
         | integer
         | special
-        // | uchar -- where is it?
+        | uchar
         | ustring
         | constant
         | dimension
@@ -191,6 +178,7 @@ namespace TransLucid
       karma::rule<Iterator, Special::Value()> special;
       karma::rule<Iterator, mpz_class()> integer;
       karma::rule<Iterator, u32string()> ustring;
+      karma::rule<Iterator, char32_t()> uchar;
       karma::rule<Iterator, Tree::ConstantExpr()> constant;
       karma::rule<Iterator, Tree::DimensionExpr()> dimension;
       karma::rule<Iterator, Tree::IdentExpr()> ident;
