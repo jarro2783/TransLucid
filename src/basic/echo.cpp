@@ -92,7 +92,7 @@ main(int argc, char* argv[])
   i.addDemand(U"out", EquationGuard());
 
   //set out = keyboard
-  Hyperdatons::Ident ident(&i, U"keyboard");
+  Hyperdatons::IdentHD ident(&i, U"keyboard");
   tuple_t context =
     map_list_of(size_t(DIM_ID), generate_string(U"out"))
                (get_dimension_index(&i, U"_validguard"),
