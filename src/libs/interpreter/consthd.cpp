@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-namespace ConstHD
+namespace Hyperdatons
 {
 
 const char32_t* Intmp::name =     U"intmp";
@@ -91,6 +91,6 @@ UString::operator()(const Tuple& k)
   return TaggedValue(value->second, k);
 }
 
-} //namespace ConstHD
+} //namespace Hyperdatons
 
 } //namespace TransLucid

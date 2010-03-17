@@ -173,12 +173,6 @@
 			<Option target="libinterpreter" />
 			<Option target="tests" />
 		</Unit>
-		<Unit filename="src/include/tl/constant_parser.hpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
 		<Unit filename="src/include/tl/consthd.hpp">
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />
@@ -200,19 +194,7 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
-		<Unit filename="src/include/tl/evaluator.hpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
 		<Unit filename="src/include/tl/exception.hpp" />
-		<Unit filename="src/include/tl/expr.hpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
 		<Unit filename="src/include/tl/expr_compiler.hpp">
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />
@@ -389,18 +371,6 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
-		<Unit filename="src/libs/interpreter/evaluator.cpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
-		<Unit filename="src/libs/interpreter/expr.cpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
 		<Unit filename="src/libs/interpreter/expr_compiler.cpp">
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />
@@ -474,12 +444,6 @@
 		</Unit>
 		<Unit filename="src/libs/interpreter/utility.cpp">
 			<Option target="libinterpreter" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
-		<Unit filename="src/libs/printer/printer.cpp">
-			<Option target="libprinter" />
-			<Option target="interactive" />
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>

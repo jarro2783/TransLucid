@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* System hyperdaton.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -20,12 +20,9 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef INTERPRETER_HPP_INCLUDED
 #define INTERPRETER_HPP_INCLUDED
 
-#include <tl/library.hpp>
 #include <tl/types.hpp>
 #include <tl/evaluator.hpp>
 #include <tl/dimtranslator.hpp>
-#include <boost/foreach.hpp>
-//#include <tl/parser_fwd.hpp>
 #include <deque>
 #include <boost/assign.hpp>
 #include <tl/cache.hpp>
@@ -59,33 +56,7 @@ namespace TransLucid
     void
     tick();
 
-    /**
-     * @brief Loads a library.
-     *
-     * Initialises the library which will add its types and operations
-     * to the type registry.
-     **/
-    void
-    loadLibrary(const u32string& name)
-    {
-      m_lt.loadLibrary(name, this);
-    }
-
-    /**
-     * @brief Adds a search path for loading libraries.
-     *
-     * When a library is loaded the paths added here will be searched
-     * for the library in the order they are added.
-     **/
-    void
-    addLibrarySearchPath(const u32string& name)
-    {
-      m_lt.addSearchPath(name);
-    }
-
     private:
-    Libtool m_lt;
-    TypeRegistry m_types;
     DimensionTranslator m_dimTranslator;
 
     size_t m_time;
@@ -102,21 +73,6 @@ namespace TransLucid
 
     VariableMap m_variables;
 
-    //adds to id with remaining in the id dimension
-    //void
-    //addToVariable
-    //(
-    //  const u32string& id,
-    //  const u32string& remaining,
-    //  const Tuple& k, HD* e
-    //);
-    //adds to id removing id from the context
-    //void
-    //addToVariable(const u32string& id, const Tuple& k, HD* e);
-    //does the actual add
-    //void
-    //addToVariableActual(const u32string& id, const Tuple& k, HD* e);
-
     template <typename T>
     HD*
     buildConstantHD(size_t index);
@@ -125,12 +81,6 @@ namespace TransLucid
     addDimensionSymbol(const u32string& s);
 
     std::map<u32string, size_t> builtin_name_to_index;
-
-    protected:
-
-    bool m_verbose;
-
-    void cleanupParserObjects();
   };
 
   TypedValue hash(const TypedValue& dimension, const Tuple& context);

@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Hyperdatons generated from AST::Expr.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -27,19 +27,13 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-
-  namespace CompiledFunctors
+  namespace Hyperdatons
   {
-
-    class CompiledFunctor : public HD
-    {
-    };
-
-    class BoolConst : public CompiledFunctor
+    class BoolHD : public HD
     {
       public:
 
-      BoolConst(bool value)
+      BoolHD(bool value)
       : m_value(value)
       {}
 
@@ -50,10 +44,10 @@ namespace TransLucid
       bool m_value;
     };
 
-    class SpecialConst : public CompiledFunctor
+    class SpecialHD : public HD
     {
       public:
-      SpecialConst(Special::Value v)
+      SpecialHD(Special::Value v)
       : m_value(v)
       {}
 
@@ -64,10 +58,10 @@ namespace TransLucid
       Special::Value m_value;
     };
 
-    class Integer : public CompiledFunctor
+    class IntegerConstHD : public HD
     {
       public:
-      Integer(HD* system, const mpz_class& value)
+      IntegerConstHD(HD* system, const mpz_class& value)
       : m_system(system), m_value(value)
       {}
 
@@ -79,10 +73,10 @@ namespace TransLucid
       mpz_class m_value;
     };
 
-    class UcharConst : public CompiledFunctor
+    class UcharConstHD : public HD
     {
       public:
-      UcharConst(char32_t c)
+      UcharConstHD(char32_t c)
       : m_value(c)
       {}
 
@@ -93,10 +87,10 @@ namespace TransLucid
       char32_t m_value;
     };
 
-    class StringConst : public CompiledFunctor
+    class StringConstHD : public HD
     {
       public:
-      StringConst(const u32string& s)
+      StringConstHD(const u32string& s)
       : m_value(s)
       {}
 
@@ -107,11 +101,11 @@ namespace TransLucid
       u32string m_value;
     };
 
-    class Constant : public CompiledFunctor
+    class TypedValueHD : public HD
     {
       public:
 
-      Constant(HD* system,
+      TypedValueHD(HD* system,
                const std::u32string& type, const std::u32string& text)
       : m_system(system), m_type(type), m_text(text)
       {}
@@ -125,10 +119,10 @@ namespace TransLucid
       std::u32string m_text;
     };
 
-    class Dimension : public CompiledFunctor
+    class DimensionHD : public HD
     {
       public:
-      Dimension(HD* system, const std::u32string& name)
+      DimensionHD(HD* system, const std::u32string& name)
       : m_system(system), m_name(name)
       {}
 
@@ -140,25 +134,10 @@ namespace TransLucid
       std::u32string m_name;
     };
 
-    class Hash : public CompiledFunctor
+    class IdentHD : public HD
     {
       public:
-      Hash(HD* system, HD* e)
-      : m_system(system), m_e(e)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& context);
-
-      private:
-      HD* m_system;
-      HD* m_e;
-    };
-
-    class Ident : public CompiledFunctor
-    {
-      public:
-      Ident(HD* system, const u32string& name)
+      IdentHD(HD* system, const u32string& name)
       : m_system(system), m_name(name)
       {}
 
@@ -170,10 +149,10 @@ namespace TransLucid
       u32string m_name;
     };
 
-    class UnaryOp : public CompiledFunctor
+    class UnaryOpHD : public HD
     {
       public:
-      UnaryOp(Tree::UnaryOperation op, HD* e)
+      UnaryOpHD(Tree::UnaryOperation op, HD* e)
       : m_op(op), m_e(e)
       {}
 
@@ -185,11 +164,11 @@ namespace TransLucid
       HD* m_e;
     };
 
-    class BinaryOp : public CompiledFunctor
+    class BinaryOpHD : public HD
     {
       public:
 
-      BinaryOp
+      BinaryOpHD
       (
         HD* system,
         const std::vector<HD*>& operands,
@@ -207,10 +186,10 @@ namespace TransLucid
       u32string m_name;
     };
 
-    class Operation : public CompiledFunctor
+    class OperationHD : public HD
     {
       public:
-      Operation(HD* system,
+      OperationHD(HD* system,
                 const std::vector<HD*>& operands,
                 const u32string& symbol)
       : m_system(system), m_operands(operands), m_symbol(symbol)
@@ -226,7 +205,7 @@ namespace TransLucid
       u32string m_symbol;
     };
 
-    class IsSpecial : public CompiledFunctor
+    class IsSpecial : public HD
     {
       public:
       IsSpecial(const u32string& special, HD* e)
@@ -242,7 +221,7 @@ namespace TransLucid
       HD* m_e;
     };
 
-    class IsType : public CompiledFunctor
+    class IsType : public HD
     {
       public:
       IsType(const u32string& type, HD* e)
@@ -257,7 +236,7 @@ namespace TransLucid
       HD* m_e;
     };
 
-    class Convert : public CompiledFunctor
+    class Convert : public HD
     {
       public:
       Convert(const u32string& to, HD* e)
@@ -272,19 +251,11 @@ namespace TransLucid
       HD* m_e;
     };
 
-    class If : public CompiledFunctor
+    class IfHD : public HD
     {
       public:
-      If(HD* condition, HD* then,
-        const std::list<HD*>& elsifs,
-        HD* else_)
-      : m_condition(condition),
-        m_then(then),
-        m_elsifs(elsifs),
-        m_else(else_)
-      {}
 
-      If(HD* condition, HD* then,
+      IfHD(HD* condition, HD* then,
         const std::vector<std::pair<HD*, HD*>>& elsifs,
         HD* else_)
       : m_condition(condition),
@@ -305,7 +276,23 @@ namespace TransLucid
       HD* m_else;
     };
 
-    class Pair : public CompiledFunctor
+    class HashHD : public HD
+    {
+      public:
+      HashHD(HD* system, HD* e)
+      : m_system(system), m_e(e)
+      {}
+
+      TaggedValue
+      operator()(const Tuple& context);
+
+      private:
+      HD* m_system;
+      HD* m_e;
+    };
+
+    //TODO: What is this?
+    class Pair : public HD
     {
       public:
       Pair(HD* lhs, HD* rhs)
@@ -320,11 +307,11 @@ namespace TransLucid
       HD* m_rhs;
     };
 
-    class BuildTuple : public CompiledFunctor
+    class BuildTupleHD : public HD
     {
       public:
 
-      BuildTuple(HD* system,
+      BuildTupleHD(HD* system,
                  const std::list<std::pair<HD*, HD*>>& elements)
       : m_system(system), m_elements(elements)
       {}
@@ -338,11 +325,11 @@ namespace TransLucid
     };
 
     //e2 @ e1
-    class AtAbsolute : public CompiledFunctor
+    class AtAbsoluteHD : public HD
     {
       public:
 
-      AtAbsolute(HD* e2, HD* e1)
+      AtAbsoluteHD(HD* e2, HD* e1)
       : e2(e2), e1(e1)
       {}
 
@@ -354,11 +341,11 @@ namespace TransLucid
       HD* e1;
     };
 
-    class AtRelative : public CompiledFunctor
+    class AtRelativeHD : public HD
     {
       public:
 
-      AtRelative(HD* e2, HD* e1)
+      AtRelativeHD(HD* e2, HD* e1)
       : e2(e2), e1(e1)
       {}
 
