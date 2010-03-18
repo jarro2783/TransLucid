@@ -169,10 +169,6 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
-		<Unit filename="src/include/tl/constant.hpp">
-			<Option target="libinterpreter" />
-			<Option target="tests" />
-		</Unit>
 		<Unit filename="src/include/tl/consthd.hpp">
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />
