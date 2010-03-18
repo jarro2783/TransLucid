@@ -110,6 +110,8 @@ namespace TransLucid
         pair
       ;
     };
+
+    template class TupleGrammar<string_type::const_iterator>;
   }
 }
 
