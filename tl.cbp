@@ -337,10 +337,6 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
-		<Unit filename="src/libs/interpreter/constant.cpp">
-			<Option target="libinterpreter" />
-			<Option target="tests" />
-		</Unit>
 		<Unit filename="src/libs/interpreter/consthd.cpp">
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />
@@ -367,11 +363,6 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
-		<Unit filename="src/libs/interpreter/function.cpp">
-			<Option target="libinterpreter" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
 		<Unit filename="src/libs/interpreter/header_type.cpp">
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />
@@ -384,12 +375,6 @@
 			<Option target="tests" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/interpreter_expr.cpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
-		<Unit filename="src/libs/interpreter/interpreter_tuple.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
 			<Option target="typewriter" />
@@ -426,6 +411,9 @@
 		<Unit filename="src/libs/interpreter/translator.cpp">
 			<Option target="libinterpreter" />
 			<Option target="tests" />
+		</Unit>
+		<Unit filename="src/libs/interpreter/tuple_parser.cpp">
+			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/libs/interpreter/types.cpp">
 			<Option target="libinterpreter" />
