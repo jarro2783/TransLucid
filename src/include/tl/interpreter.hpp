@@ -21,7 +21,6 @@ along with TransLucid; see the file COPYING.  If not see
 #define INTERPRETER_HPP_INCLUDED
 
 #include <tl/types.hpp>
-#include <tl/evaluator.hpp>
 #include <tl/dimtranslator.hpp>
 #include <deque>
 #include <boost/assign.hpp>
