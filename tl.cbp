@@ -374,12 +374,6 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
-		<Unit filename="src/libs/interpreter/interpreter_expr.cpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
 		<Unit filename="src/libs/interpreter/library.cpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
