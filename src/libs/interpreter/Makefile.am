@@ -7,7 +7,7 @@ $(BOOST_LDFLAGS) $(TL_LDFLAGS)
 libtlinterpreter_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
 -lltdl
 
-libtlinterpreter_la_SOURCES = interpreter.cpp interpreter_expr.cpp \
+libtlinterpreter_la_SOURCES = interpreter.cpp expr_parser.cpp \
 library.cpp types.cpp \
 dimtranslator.cpp \
 range.cpp parser.cpp \

@@ -5,7 +5,7 @@ endif(COMMAND cmake_policy)
 add_definitions(${TLCFLAGS} 
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
 -Wall)
-add_library(tlinterpreter SHARED interpreter.cpp interpreter_expr.cpp 
+add_library(tlinterpreter SHARED interpreter.cpp expr_parser.cpp 
 library.cpp dimtranslator.cpp types.cpp
 range.cpp parser.cpp
 builtin_types.cpp equation.cpp
