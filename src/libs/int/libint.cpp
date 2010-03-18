@@ -375,6 +375,7 @@ bindBinOp(TL::HD& i, size_t index)
   return boost::bind(int_bin_op<T, Op, Arg1, Arg2>, index, _1, _2, _3);
 }
 
+#if 0
 template <class T, template <typename> class Op>
 TL::TypedValue
 int_comp_op
@@ -390,6 +391,7 @@ int_comp_op
     values.at(1).value<T>().value());
   return TL::TypedValue(TL::Boolean(result), r.indexBoolean());
 }
+#endif
 
 #if 0
 template <class T, template <typename> class Op>

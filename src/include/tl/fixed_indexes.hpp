@@ -1,4 +1,5 @@
-/* TODO: Give a descriptor.
+/* Predefined type and dimension indexes which must exist
+   for the system to work.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -28,23 +29,23 @@ namespace TransLucid
   {
     // TODO: These should correspond to the order in other files.
     //types
-    TYPE_INDEX_USTRING,
-    TYPE_INDEX_INTMP,
     TYPE_INDEX_BOOL,
     TYPE_INDEX_SPECIAL,
+    TYPE_INDEX_INTMP,
     TYPE_INDEX_UCHAR,
-    TYPE_INDEX_TUPLE,
+    TYPE_INDEX_USTRING,
     TYPE_INDEX_DIMENSION,
+    TYPE_INDEX_TUPLE,
+    TYPE_INDEX_TYPE,
     TYPE_INDEX_GUARD,
     TYPE_INDEX_RANGE,
-    TYPE_INDEX_PAIR,
-    TYPE_INDEX_TYPE,
+    //TYPE_INDEX_PAIR,
 
     //dimensions
+    DIM_ID,
     DIM_TYPE,
     DIM_TEXT,
     DIM_NAME,
-    DIM_ID,
     DIM_VALUE,
     DIM_TIME,
     DIM_VALID_GUARD,

@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Footer type, opposite of header, for formatting output at runtime.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.

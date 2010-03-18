@@ -122,7 +122,7 @@ namespace TransLucid
         }
         else
         {
-          *out = ValueContext(TypedValue(Special(Special::UNDEF),
+          *out = TaggedValue(TypedValue(Special(Special::UNDEF),
                               typeRegistry().indexSpecial()), c);
         }
         #endif

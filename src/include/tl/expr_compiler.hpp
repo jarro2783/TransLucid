@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Translates AST::Expr to hyperdatons.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -28,14 +28,13 @@ namespace TransLucid
   class ExprCompiler
   {
     public:
+    //boost::apply_visitor requires this
+    typedef HD* result_type;
 
     ExprCompiler(HD* i);
     ~ExprCompiler();
 
     HD* compile(const Tree::Expr&);
-
-    //the new boost variant visitors
-    typedef HD* result_type;
 
     HD* operator()(const Tree::nil& n);
     HD* operator()(bool b);
@@ -54,6 +53,7 @@ namespace TransLucid
     HD* operator()(const Tree::AtExpr& e);
 
     private:
+    //the system to compile with
     HD* m_i;
   };
 

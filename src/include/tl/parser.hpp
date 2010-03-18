@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Header and Equation Parser.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
+
+//TODO: refactor this into two files
 
 #ifndef TL_PARSER_INCLUDED
 #define TL_PARSER_INCLUDED

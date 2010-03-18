@@ -33,7 +33,6 @@ throw (InvalidGuard)
   if (m_guard)
   {
     TaggedValue v = (*m_guard)(k);
-    //ValueContext v = i.evaluate(m_guard, context);
 
     //still need to remove this magic
     if (v.first.index() == TYPE_INDEX_TUPLE)

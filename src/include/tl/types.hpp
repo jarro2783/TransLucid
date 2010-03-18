@@ -475,7 +475,7 @@ namespace TransLucid
    *
    * A TypedValue and the context it was evaluated in.
    **/
-  typedef std::pair<TypedValue, Tuple> ValueContext;
+  typedef std::pair<TypedValue, Tuple> TaggedValue;
 
   //typedef boost::function<TypedValue
   //        (const TypedValue&, const TypedValue&, const Tuple&)> OpFunction;
@@ -487,19 +487,7 @@ namespace TransLucid
    **/
   typedef std::vector<type_index> type_vec;
 
-  /**
-   * @brief Maps parameters to the actual op.
-   *
-   * Maps the type signatures for an operation to a functor of the actual op.
-   **/
-  //typedef std::map<type_vec, OpFunction> op_map;
-
-  /**
-   * @brief Map of operations.
-   *
-   * Maps op names to all the operations that exist by that name.
-   **/
-  //typedef std::map<Glib::ustring, op_map> ops_map;
+  #if 0
 
   //keeps track of types
   /**
@@ -706,9 +694,7 @@ namespace TransLucid
     }
     #endif
   };
-
-  //typedef std::vector<Tuple> TupleSet;
-  typedef ValueContext TaggedValue;
+  #endif
 
 } //namespace TransLucid
 

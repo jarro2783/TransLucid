@@ -260,7 +260,7 @@ System::postInputSignal(std::vector<TL::AST::Expr*> const& ev)
 
   BOOST_FOREACH(TL::AST::Expr* e, ev)
   {
-    TL::ValueContext v = evaluate(e, c);
+    TL::TaggedValue v = evaluate(e, c);
     TL::TypeRegistry& reg = typeRegistry();
     const TL::TypeManager* m = reg.findType(v.first.index());
     m->print(std::cout, v.first, v.second);

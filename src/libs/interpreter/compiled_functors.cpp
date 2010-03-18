@@ -298,6 +298,7 @@ OperationHD::operator()(const Tuple& k)
   return (*m_system)(Tuple(kp));
 }
 
+#if 0
 TaggedValue
 Pair::operator()(const Tuple& k)
 {
@@ -307,6 +308,7 @@ Pair::operator()(const Tuple& k)
   return TaggedValue(TypedValue(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
                      TYPE_INDEX_PAIR), k);
 }
+#endif
 
 TaggedValue
 SpecialHD::operator()(const Tuple& k)

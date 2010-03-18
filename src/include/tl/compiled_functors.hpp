@@ -291,6 +291,7 @@ namespace TransLucid
       HD* m_e;
     };
 
+#if 0
     //TODO: What is this?
     class Pair : public HD
     {
@@ -306,6 +307,7 @@ namespace TransLucid
       HD* m_lhs;
       HD* m_rhs;
     };
+#endif
 
     class BuildTupleHD : public HD
     {

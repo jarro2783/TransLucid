@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Header type, for customising the parser at runtime.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.

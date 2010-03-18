@@ -29,6 +29,8 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+#if 0
+
 TypeRegistry::TypeRegistry(Interpreter& i)
 : m_nextIndex(1), m_indexError(0), m_interpreter(i)
 {
@@ -71,6 +73,8 @@ TypeRegistry::TypeRegistry(Interpreter& i)
 TypeRegistry::~TypeRegistry()
 {
 }
+
+#endif
 
 //TypedValue TypeRegistry::makeOpTypeErrorActual(const TypeManager* special)
 //{

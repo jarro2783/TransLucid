@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* The expr part of the parser.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -24,7 +24,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_fwd.hpp>
 #include <tl/utility.hpp>
 #include <tl/builtin_types.hpp>
-//#include <boost/format.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 
 #include <boost/spirit/home/phoenix/object/new.hpp>
@@ -39,8 +38,8 @@ namespace TransLucid
 {
   namespace Parser
   {
-    using namespace boost::phoenix;
     namespace ph = boost::phoenix;
+    using namespace ph;
 
     inline char_type
     get_end_char(const Delimiter& d)
@@ -75,7 +74,7 @@ namespace TransLucid
       ExprGrammar(Header& h)
       : ExprGrammar::base_type(expr), header(h)
       {
-        using qi::_val;
+        //using qi::_val;
         using namespace qi::labels;
 
         specials.add

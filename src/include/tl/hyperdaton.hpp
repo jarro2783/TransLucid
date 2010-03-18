@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Everything is a hyperdaton.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.

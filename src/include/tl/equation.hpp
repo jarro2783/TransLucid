@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* Data for equations (ident = expr)
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -127,25 +127,6 @@ namespace TransLucid
     std::map<size_t, TypedValue> m_dimensions;
   };
 
-  #if 0
-  class EquationBase
-  {
-    public:
-    virtual ~EquationBase() {}
-    virtual ValueContext evaluate(Interpreter& i, const Tuple& context) = 0;
-  };
-
-  //a map from equation name to vector of <valid context, expression>
-  typedef std::pair<EquationGuard, EquationBase*> expr_pair_t;
-  typedef std::vector<expr_pair_t> expr_pair_v;
-  typedef std::map<ustring_t, expr_pair_v> EquationMap;
-
-  typedef boost::shared_ptr<EquationMap> EquationMap_p;
-
-  typedef std::deque<std::pair<EquationGuard, EquationMap_p> > EqnSetList;
-  #endif
-
-  class Variable;
   typedef std::map<u32string, HD*> VariableMap;
 
   class Equation
@@ -176,7 +157,7 @@ namespace TransLucid
 
     operator bool() const
     {
-       return m_h;
+       return m_h != 0;
     }
 
     HD*
