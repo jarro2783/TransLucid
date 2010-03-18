@@ -22,18 +22,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tuple>
 #include <boost/spirit/include/qi_core.hpp>
-#include <map>
 #include <vector>
-#include <deque>
-//#include <boost/spirit/include/qi_position_iterator.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
 #include <boost/spirit/include/qi_grammar.hpp>
-//#include <boost/spirit/include/qi_operators.hpp>
-//#include <boost/spirit/include/qi_confix.hpp>
-//#include <boost/spirit/include/qi_stored_rule.hpp>
 #include <tl/types.hpp>
-//#include <boost/shared_array.hpp>
-#include <stack>
 #include <tl/equation.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <tl/ast.hpp>
@@ -42,7 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 inline std::ostream&
 operator<<(std::ostream& os, char32_t c)
 {
-  os << "char32_t";
+  os << TransLucid::utf32_to_utf8(TransLucid::u32string(1, c));
   return os;
 }
 
@@ -90,16 +82,8 @@ namespace TransLucid
       qi::rule<Iterator> skip;
     };
 
-    //class SystemGrammar;
     template <typename Iterator>
     class ExprGrammar;
-    //class TupleGrammar;
-    //class ConstantGrammar;
-
-    //typedef std::tuple<AST::Expr*, AST::Expr*> ParsedEquationGuard;
-    //typedef std::tuple<std::u32string, ParsedEquationGuard, AST::Expr*>
-    //        equation_t;
-    //typedef std::vector<equation_t> equation_v;
 
     struct Delimiter
     {
@@ -146,19 +130,6 @@ namespace TransLucid
       delimiter_symbols delimiter_start_symbols;
 
       std::vector<u32string> libraries;
-
-      #if 0
-      bool
-      operator==(const Header& rhs) const
-      {
-        return dimension_names == rhs.dimension_names &&
-          equation_names == rhs.equation_names &&
-          binary_op_info == rhs.binary_op_info &&
-          unary_op_info == rhs.unary_op_info &&
-          delimiter_info == rhs.delimiter_info
-        ;
-      }
-      #endif
     };
 
     typedef string_type::const_iterator iterator_t;

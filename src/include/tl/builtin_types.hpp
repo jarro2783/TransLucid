@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
+#include <set>
 
 namespace TransLucid
 {

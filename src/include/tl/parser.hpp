@@ -22,17 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_PARSER_INCLUDED
 #define TL_PARSER_INCLUDED
 
-#include <list>
-#include <map>
-#include <boost/foreach.hpp>
-#include <deque>
-#include <boost/format.hpp>
-#include <wchar.h>
-#include <boost/shared_array.hpp>
-#include <tl/exception.hpp>
-
-//#include <boost/spirit/include/phoenix_core.hpp>
-
 #include <tl/parser_util.hpp>
 #include <tl/parser_fwd.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>

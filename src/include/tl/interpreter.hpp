@@ -22,11 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 #include <tl/dimtranslator.hpp>
-#include <deque>
-#include <boost/assign.hpp>
-#include <tl/cache.hpp>
 #include <tl/equation.hpp>
-#include <tl/hyperdaton.hpp>
 
 namespace TransLucid
 {

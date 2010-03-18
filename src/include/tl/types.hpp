@@ -1,4 +1,4 @@
-/* TODO: Give a descriptor.
+/* All the types in the system.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -23,17 +23,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 
 #include <boost/functional/hash.hpp>
-//#include <boost/flyweight.hpp>
-#include <boost/any.hpp>
 #include <map>
 #include <boost/unordered_map.hpp>
-//#include <boost/function.hpp>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-//#include <boost/flyweight/intermodule_holder.hpp>
 #include <gmpxx.h>
 #include <boost/foreach.hpp>
-#include <set>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
