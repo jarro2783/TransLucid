@@ -190,6 +190,9 @@
 			<Option target="typewriter" />
 			<Option target="tests" />
 		</Unit>
+		<Unit filename="src/include/tl/equation_parser.hpp">
+			<Option target="libinterpreter" />
+		</Unit>
 		<Unit filename="src/include/tl/exception.hpp" />
 		<Unit filename="src/include/tl/expr_compiler.hpp">
 			<Option target="libinterpreter" />
@@ -206,6 +209,9 @@
 			<Option target="libinterpreter" />
 			<Option target="typewriter" />
 			<Option target="tests" />
+		</Unit>
+		<Unit filename="src/include/tl/header_parser.hpp">
+			<Option target="libinterpreter" />
 		</Unit>
 		<Unit filename="src/include/tl/header_type.hpp">
 			<Option target="libinterpreter" />
@@ -224,12 +230,6 @@
 			<Option target="tests" />
 		</Unit>
 		<Unit filename="src/include/tl/library.hpp">
-			<Option target="libinterpreter" />
-			<Option target="interactive" />
-			<Option target="typewriter" />
-			<Option target="tests" />
-		</Unit>
-		<Unit filename="src/include/tl/parser.hpp">
 			<Option target="libinterpreter" />
 			<Option target="interactive" />
 			<Option target="typewriter" />

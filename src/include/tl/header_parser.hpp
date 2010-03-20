@@ -153,6 +153,17 @@ namespace TransLucid
       //}
     }
 
+    inline void
+    addUnaryOp
+    (
+      Header& header,
+      const string_type& type,
+      const Tree::Expr& symbol,
+      const Tree::Expr& operation
+    )
+    {
+    }
+
     template <typename Iterator>
     class HeaderGrammar :
       public qi::grammar<Iterator, skip, Header()>
@@ -205,17 +216,19 @@ namespace TransLucid
            ]
          | (
                qi::string("library")
-            >> "ustring"
-            >> angle_string
+            >> expr
            )
-         |    (
+         | (
+              (
                 qi::string("prefix")
               | "postfix"
               )
-           >> "ustring"
-           >> angle_string
-           >> "ustring"
-           >> angle_string
+           >> expr
+           >> expr
+           )
+           [
+             ph::bind(&addUnaryOp, _r1, _1, _2, _3)
+           ]
          ;
 
          integer = qi::int_;
