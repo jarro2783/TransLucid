@@ -22,7 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/interpreter.hpp>
 #include <tl/parser_fwd.hpp>
-#include <tl/parser.hpp>
 
 namespace TLInteractive
 {

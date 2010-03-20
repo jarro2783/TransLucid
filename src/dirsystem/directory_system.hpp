@@ -25,7 +25,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/expr_compiler.hpp>
 #include <tl/utility.hpp>
-#include <tl/parser.hpp>
 #include <tl/tuple_parser.hpp>
 #include <tl/expr_parser.hpp>
 

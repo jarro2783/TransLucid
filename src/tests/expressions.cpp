@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/utility.hpp>
 #include <string>
 #include <tl/tree_printer.hpp>
-#include <tl/parser.hpp>
+#include <tl/header_parser.hpp>
 
 #define BOOST_TEST_MODULE expressions
 #include <boost/test/included/unit_test.hpp>
@@ -180,6 +180,10 @@ BOOST_AUTO_TEST_CASE ( specials ) {
         delete h;
       });
 
+}
+
+BOOST_AUTO_TEST_CASE ( unary_ops )
+{
 }
 
 BOOST_AUTO_TEST_CASE ( context_change )

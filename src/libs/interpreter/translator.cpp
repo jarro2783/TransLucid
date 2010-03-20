@@ -19,7 +19,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/tree_printer.hpp>
 #include <tl/translator.hpp>
-#include <tl/parser.hpp>
+#include <tl/equation_parser.hpp>
+#include <tl/header_parser.hpp>
 #include <tl/expr_parser.hpp>
 #include <tl/tuple_parser.hpp>
 #include <boost/spirit/home/qi/parser.hpp>
