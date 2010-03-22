@@ -154,14 +154,24 @@ namespace TransLucid
     }
 
     inline void
-    addUnaryOp
+    addUnaryOpSymbol
     (
       Header& header,
-      const string_type& type,
-      const Tree::Expr& symbol,
-      const Tree::Expr& operation
+      Tree::UnaryType type,
+      const string_type& symbol,
+      const string_type& op
     )
     {
+      if (type == Tree::UNARY_PREFIX)
+      {
+        //header.prefix_op_symbols.add
+        //(
+        //  csymbol.c_str(),
+        //  coperation
+      }
+      else
+      {
+      }
     }
 
     template <typename Iterator>
@@ -227,7 +237,7 @@ namespace TransLucid
            >> expr
            )
            [
-             ph::bind(&addUnaryOp, _r1, _1, _2, _3)
+             ph::bind(&HeaderGrammar<Iterator>::addUnary, _r1, _1, _2, _3)
            ]
          ;
 
@@ -247,6 +257,39 @@ namespace TransLucid
       }
 
       private:
+
+      static void
+      addUnary
+      (
+        Header& header,
+        const string_type& type,
+        const Tree::Expr& symbol,
+        const Tree::Expr& op
+      )
+      {
+        try
+        {
+          const u32string& csymbol =
+            boost::get<const u32string&>(symbol);
+          const u32string& coperation =
+            boost::get<const u32string&>(op);
+
+          Tree::UnaryType actual_type;
+          if (type == L"prefix")
+          {
+            actual_type = Tree::UNARY_PREFIX;
+          }
+          else
+          {
+            actual_type = Tree::UNARY_POSTFIX;
+          }
+
+          //addUnaryOpSymbol(header, actual_type, csymbol, coperation);
+        }
+        catch (const boost::bad_get&)
+        {
+        }
+      }
 
       qi::rule<Iterator, skip, Header()>
         headerp
