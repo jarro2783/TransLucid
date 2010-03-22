@@ -34,52 +34,6 @@ namespace TransLucid
     namespace ph = boost::phoenix;
     using namespace ph;
 
-    struct add_dimension_impl
-    {
-      template <typename Arg1, typename Arg2>
-      struct result
-      {
-        typedef void type;
-      };
-
-      template <typename Arg1, typename Arg2>
-      void
-      operator()(Arg1 arg1, Arg2 arg2) const
-      {
-        arg1.dimension_symbols.add
-          (arg2.c_str(), std::u32string(arg2.begin(), arg2.end()));
-      }
-    };
-
-    namespace
-    {
-      function<add_dimension_impl> add_dimension;
-    }
-
-    #if 0
-    inline void
-    addOpDefinition
-    (
-      Header& header,
-      InfixAssoc assoc,
-      const std::u32string& op,
-      const std::u32string& symbol,
-      AST::Expr* precedence
-    )
-    {
-      size_t pos = header.binary_op_info.size();
-      if (symbol.size() == 1)
-      {
-         header.binary_op_symbols.add(symbol.c_str(), pos);
-      }
-      std::u32string underscoreSymbol = U"_" + symbol + U"_";
-      header.binary_op_symbols.add(underscoreSymbol.c_str(), pos);
-      AST::IntegerExpr* p = dynamic_cast<AST::IntegerExpr*>(precedence);
-      header.binary_op_info.push_back
-        (BinaryOperation(assoc, op, symbol, p->m_value));
-    }
-    #endif
-
     inline void
     addDimensionSymbol(Header& h, const u32string& name)
     {
@@ -190,7 +144,6 @@ namespace TransLucid
              qi::lit("dimension")
                > expr
                  [
-                    //add_dimension(_r1, _1)
                     ph::bind(&addDimensionSymbol, _r1, _1)
                  ]
            )
@@ -230,10 +183,6 @@ namespace TransLucid
          ;
 
          integer = qi::int_;
-
-         //constant = self.parsers.constant_parser.top();
-
-         //BOOST_SPIRIT_DEBUG_RULE(constant);
       }
 
       template <class T>

@@ -20,6 +20,76 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef COMPILED_CLASSES_HPP_INCLUDED
 #define COMPILED_CLASSES_HPP_INCLUDED
 
+#include <tl/types.hpp>
+
+namespace TransLucid
+{
+  namespace Compiled
+  {
+    //we probably don't need this
+    template <typename Op>
+    class GeneralNode
+    {
+      public:
+      GeneralNode(const Op& op)
+      : m_op(op)
+      {
+      }
+
+      TypedValue operator()(const Tuple& t)
+      {
+        return m_op(t);
+      }
+
+      private:
+      Op m_op;
+    };
+
+    template <bool B>
+    class Boolean
+    {
+      public:
+      TypedValue operator()(const Tuple& t)
+      {
+        return TypedValue(TransLucid::Boolean(B), TYPE_INDEX_BOOL);
+      }
+    };
+
+    template <bool B>
+    Boolean<B> makeBoolean()
+    {
+      return Boolean<B>();
+    }
+
+    class Integer
+    {
+      public:
+
+      template <typename T, T V>
+      Integer()
+      : m_value(V)
+      {
+      }
+
+      TypedValue operator()(const Tuple& t)
+      {
+        return TypedValue(Intmp(m_value), TYPE_INDEX_INTMP);
+      }
+
+      private:
+      mpz_class m_value;
+    };
+
+    template <typename T>
+    Integer makeInteger(const T& value)
+    {
+      return Integer(value);
+    }
+  }
+}
+
+#if 0
+
 #include <string>
 
 #if 0
@@ -82,6 +152,8 @@ extern std::string x;
 
 #if 0
 }
+#endif
+
 #endif
 
 #endif // COMPILED_CLASSES_HPP_INCLUDED

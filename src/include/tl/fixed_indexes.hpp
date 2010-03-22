@@ -27,7 +27,6 @@ namespace TransLucid
   //predefined unique indexes
   enum Indexes
   {
-    // TODO: These should correspond to the order in other files.
     //types
     TYPE_INDEX_BOOL,
     TYPE_INDEX_SPECIAL,
