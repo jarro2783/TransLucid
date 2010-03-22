@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 
+#warning check for duplicate added symbols
+
 namespace TransLucid
 {
   namespace Parser
@@ -79,6 +81,13 @@ namespace TransLucid
     #endif
 
     inline void
+    addDimensionSymbol(Header& h, const u32string& name)
+    {
+      string_type wsname(name.begin(), name.end());
+      h.dimension_symbols.add(wsname.c_str(), name);
+    }
+
+    inline void
     addOpSymbol
     (
       Header& h,
@@ -102,55 +111,20 @@ namespace TransLucid
     }
 
     inline void
-    addDelimiter
+    addDelimiterSymbol
     (
       Header& header,
-      const Tree::Expr& type,
-      const Tree::Expr& open,
-      const Tree::Expr& close
-      //const u32string& type,
-      //const string_type& open,
-      //const string_type& close
+      const u32string& type,
+      char32_t open,
+      char32_t close
     )
     {
-      try
-      {
-        const u32string& ctype =
-          boost::get<u32string&>(type);
-        const char32_t& copen =
-          boost::get<const char32_t&>(open);
-        const char32_t& cclose =
-          boost::get<const char32_t&>(cclose);
-
-        string_type open_string(1, copen);
-        header.delimiter_start_symbols.add
-        (
-          open_string.c_str(),
-          Delimiter(ctype, (char_type)copen, (char_type)cclose)
-        );
-      }
-      catch (const boost::bad_get&)
-      {
-      }
-      catch (const std::invalid_argument&)
-      {
-      }
-      //std::cout << "adding " << open << " " << close << std::endl;
-      //if
-      //(
-         //header.delimiter_start_symbols.add
-         //(
-         //  open.c_str(),
-         //  Delimiter(type, open[0], close[0])
-         //);
-      //)
-      //{
-      //  throw ParseError("open delimiter '" + ustring_t(open)
-      //                                      + "' already defined");
-      //}
-      //else
-      //{
-      //}
+      string_type open_string(1, open);
+      header.delimiter_start_symbols.add
+      (
+        open_string.c_str(),
+        Delimiter(type, (char_type)open, (char_type)close)
+      );
     }
 
     inline void
@@ -162,15 +136,28 @@ namespace TransLucid
       const string_type& op
     )
     {
+      Tree::UnaryOperation opinfo
+      (
+        to_u32string(op),
+        to_u32string(symbol),
+        type
+      );
+
       if (type == Tree::UNARY_PREFIX)
       {
-        //header.prefix_op_symbols.add
-        //(
-        //  csymbol.c_str(),
-        //  coperation
+        header.prefix_op_symbols.add
+        (
+          symbol.c_str(),
+          opinfo
+        );
       }
       else
       {
+        header.postfix_op_symbols.add
+        (
+          symbol.c_str(),
+          opinfo
+        );
       }
     }
 
@@ -201,9 +188,10 @@ namespace TransLucid
          headerItem =
            (
              qi::lit("dimension")
-               > angle_string
+               > expr
                  [
-                    add_dimension(_r1, _1)
+                    //add_dimension(_r1, _1)
+                    ph::bind(&addDimensionSymbol, _r1, _1)
                  ]
            )
          | (
@@ -284,9 +272,43 @@ namespace TransLucid
             actual_type = Tree::UNARY_POSTFIX;
           }
 
-          //addUnaryOpSymbol(header, actual_type, csymbol, coperation);
+          addUnaryOpSymbol
+          (
+            header,
+            actual_type,
+            string_type(csymbol.begin(), csymbol.end()),
+            string_type(coperation.begin(), coperation.end())
+          );
         }
         catch (const boost::bad_get&)
+        {
+        }
+      }
+
+      static void
+      addDelimiter
+      (
+        Header& header,
+        const Tree::Expr& type,
+        const Tree::Expr& open,
+        const Tree::Expr& close
+      )
+      {
+        try
+        {
+          const u32string& ctype =
+            boost::get<u32string&>(type);
+          const char32_t& copen =
+            boost::get<const char32_t&>(open);
+          const char32_t& cclose =
+            boost::get<const char32_t&>(cclose);
+
+          addDelimiterSymbol(header, ctype, copen, cclose);
+        }
+        catch (const boost::bad_get&)
+        {
+        }
+        catch (const std::invalid_argument&)
         {
         }
       }

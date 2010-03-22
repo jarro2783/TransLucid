@@ -29,6 +29,13 @@ namespace TransLucid
 
   std::string
   u32_to_ascii(const u32string& s);
+
+  template <typename T>
+  u32string
+  to_u32string(const T& s)
+  {
+    return u32string(s.begin(), s.end());
+  }
 }
 
 namespace std

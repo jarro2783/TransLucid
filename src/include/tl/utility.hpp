@@ -156,13 +156,6 @@ namespace TransLucid
     return new FunctorHD<T>(f);
   }
 
-  template <typename T>
-  u32string
-  to_u32string(const T& s)
-  {
-    return u32string(s.begin(), s.end());
-  }
-
   bool
   tupleApplicable(const Tuple& def, const Tuple& c);
 
