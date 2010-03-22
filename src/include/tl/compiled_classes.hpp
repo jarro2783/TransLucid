@@ -61,6 +61,23 @@ namespace TransLucid
       return Boolean<B>();
     }
 
+    template <TransLucid::Special::Value V>
+    class Special
+    {
+      public:
+
+      TypedValue operator()(const Tuple& t)
+      {
+        return TypedValue(TransLucid::Special(V), TYPE_INDEX_SPECIAL);
+      }
+    };
+
+    template <TransLucid::Special::Value V>
+    Special<V> makeSpecial()
+    {
+      return Special<V>();
+    }
+
     class Integer
     {
       public:
@@ -85,6 +102,21 @@ namespace TransLucid
     {
       return Integer(value);
     }
+  }
+
+  template <char32_t C>
+  class UChar
+  {
+    TypedValue operator()(const Tuple& t)
+    {
+      return TypedValue(Char(C), TYPE_INDEX_UCHAR);
+    }
+  };
+
+  template <char32_t C>
+  UChar<C> makeUChar()
+  {
+    return UChar<C>();
   }
 }
 
