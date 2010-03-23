@@ -141,7 +141,7 @@ TypedValueHD::operator()(const Tuple& k)
 }
 
 TaggedValue
-Convert::operator()(const Tuple& context)
+Convert::operator()(const Tuple& k)
 {
   //going away
   return TaggedValue();
@@ -264,14 +264,14 @@ IntegerConstHD::operator()(const Tuple& k)
 }
 
 TaggedValue
-IsSpecial::operator()(const Tuple& context)
+IsSpecial::operator()(const Tuple& k)
 {
   //this is going away, but to stop warnings
   return TaggedValue();
 }
 
 TaggedValue
-IsType::operator()(const Tuple& context)
+IsType::operator()(const Tuple& k)
 {
   //this is going away, but to stop warnings
   return TaggedValue();
@@ -329,7 +329,7 @@ UcharConstHD::operator()(const Tuple& k)
 }
 
 TaggedValue
-UnaryOpHD::operator()(const Tuple& context)
+UnaryOpHD::operator()(const Tuple& k)
 {
   //TODO: resolve what to do with operations
   return TaggedValue();

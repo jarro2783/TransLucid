@@ -38,7 +38,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       bool m_value;
@@ -66,7 +66,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_system;
@@ -111,7 +111,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_system;
@@ -127,7 +127,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_system;
@@ -142,7 +142,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_system;
@@ -157,7 +157,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       Tree::UnaryOperation m_op;
@@ -178,7 +178,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_system;
@@ -197,7 +197,7 @@ namespace TransLucid
       }
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_system;
@@ -214,7 +214,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       u32string m_special;
@@ -229,7 +229,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       u32string m_type;
@@ -244,7 +244,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       u32string m_to;
@@ -265,7 +265,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       //HD* m_system;
@@ -284,7 +284,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_system;
@@ -301,7 +301,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_lhs;
@@ -319,7 +319,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* m_system;
@@ -336,7 +336,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* e2;
@@ -352,7 +352,7 @@ namespace TransLucid
       {}
 
       TaggedValue
-      operator()(const Tuple& context);
+      operator()(const Tuple& k);
 
       private:
       HD* e2;
