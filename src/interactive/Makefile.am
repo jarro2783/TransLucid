@@ -1,6 +1,6 @@
 bin_PROGRAMS = tl-interactive
 
-tl_interactive_CPPFLAGS = -I$(top_srcdir)/src/include $(GLIBMM_CFLAGS) \
+tl_interactive_CPPFLAGS = -I$(top_srcdir)/src/include \
 $(BOOST_CPPFLAGS)
 tl_interactive_LDFLAGS = \
 $(top_builddir)/src/libs/interpreter/libtlinterpreter.la \

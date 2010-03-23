@@ -6,9 +6,9 @@ echo_SOURCES = echo.cpp
 
 typewriter_SOURCES = typewriter.cpp
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/include $(GLIBMM_CFLAGS) \
+AM_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
 
-AM_LDFLAGS = -lpthread $(GLIBMM_LIBS) -lltdl -export-dynamic \
+AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/interpreter/libtlinterpreter.la \
 $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(TL_LDFLAGS)
