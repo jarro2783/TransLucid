@@ -1,3 +1,5 @@
+#!/bin/bash
+
 aclocal -I m4
 libtoolize --copy
 autoheader
