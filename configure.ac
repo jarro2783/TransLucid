@@ -1,5 +1,20 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
+dnl   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+dnl
+dnl   This file is part of TransLucid.
+dnl
+dnl   TransLucid is free software; you can redistribute it and/or modify
+dnl   it under the terms of the GNU General Public License as published by
+dnl   the Free Software Foundation; either version 3, or (at your option)
+dnl   any later version.
+dnl
+dnl   TransLucid is distributed in the hope that it will be useful,
+dnl   but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl   GNU General Public License for more details.
+dnl
+dnl   You should have received a copy of the GNU General Public License
+dnl   along with TransLucid; see the file COPYING.  If not see
+dnl   <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.61])
 AC_INIT([tl], [0.6.0], [jarrydb@cse.unsw.edu.au])
