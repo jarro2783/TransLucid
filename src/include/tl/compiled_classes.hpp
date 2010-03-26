@@ -176,6 +176,8 @@ namespace TransLucid
   }
   #endif
 
+  //dimension will be compiled as a constant by
+  //looking in a symbol table
   #if 0
   template <const u32string* Name>
   class Dimension
