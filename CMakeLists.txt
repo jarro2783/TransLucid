@@ -29,11 +29,11 @@ set(TLLIBS -std=gnu++0x)
 set(CMAKE_BUILD_TYPE build)
 
 set (Boost_USE_STATIC_LIBS OFF)
-set (Boost_ADDITIONAL_VERSIONS 1.41 1.41.0)
+set (Boost_ADDITIONAL_VERSIONS 1.42 1.42.0)
 set (Boost_USE_MULTITHREADED ON)
 set (CMAKE_MODULE_PATH /home/jarrydb)
 set (Boost_DEBUG TRUE)
-find_package(Boost 1.41.0 REQUIRED COMPONENTS program_options)
+find_package(Boost 1.42.0 REQUIRED COMPONENTS program_options)
 
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
