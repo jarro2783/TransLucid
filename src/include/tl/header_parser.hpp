@@ -148,14 +148,15 @@ namespace TransLucid
                  ]
            )
          | (
+            //infixl,r,n symbol name precedence
                assoc_symbols
-            >> "ustring"
-            >> angle_string
-            >> "ustring"
-            >> angle_string
-            >> integer
+            >> expr
+            >> expr
+            >> expr
            )
-
+           [
+             ph::bind(&addBinary, _r1, _1, _2, _3, _4)
+           ]
          | (
                qi::string("delimiters")
             >  expr
@@ -194,6 +195,39 @@ namespace TransLucid
       }
 
       private:
+
+      static void
+      addBinary
+      (
+        Header& h,
+        const Tree::InfixAssoc& type,
+        const Tree::Expr& symbol,
+        const Tree::Expr& op,
+        const Tree::Expr& precedence
+      )
+      {
+        try
+        {
+          const u32string& ssymbol =
+            boost::get<const u32string&>(symbol);
+          const u32string& sop =
+            boost::get<const u32string&>(op);
+          const mpz_class& iprecedence =
+            boost::get<const mpz_class&>(precedence);
+
+          addOpSymbol
+          (
+            h,
+            string_type(ssymbol.begin(), ssymbol.end()),
+            string_type(sop.begin(), sop.end),
+            type,
+            iprecedence
+          );
+        }
+        catch (const boost::bad_get&)
+        {
+        }
+      }
 
       static void
       addUnary
