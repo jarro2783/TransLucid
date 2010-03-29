@@ -20,7 +20,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/expr_compiler.hpp>
 #include <tl/compiled_functors.hpp>
 #include <boost/variant.hpp>
-#include <tl/compiled_classes.hpp>
 
 namespace TransLucid
 {

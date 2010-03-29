@@ -55,6 +55,10 @@ struct translator_class {
     (
       header, L"-", L"operator-", TL::Tree::ASSOC_LEFT, 5
     );
+    TL::Parser::addUnaryOpSymbol
+    (
+      header, TL::Tree::UNARY_PREFIX, L"-", L"operator-"
+    );
     translator.loadLibrary(U"int");
   }
 };
