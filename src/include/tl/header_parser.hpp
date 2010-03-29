@@ -135,7 +135,7 @@ namespace TransLucid
          ;
 
          headerp =
-           *( headerItem(_val) >> qi::lit( ";;" ))
+           *( headerItem(_val) > qi::lit( ";;" ))
             >> qi::eoi;
          ;
 
@@ -150,9 +150,9 @@ namespace TransLucid
          | (
             //infixl,r,n symbol name precedence
                assoc_symbols
-            >> expr
-            >> expr
-            >> expr
+            >  expr
+            >  expr
+            >  expr
            )
            [
              ph::bind(&addBinary, _r1, _1, _2, _3, _4)
@@ -175,8 +175,8 @@ namespace TransLucid
                 qi::string("prefix")
               | "postfix"
               )
-           >> expr
-           >> expr
+           >  expr
+           >  expr
            )
            [
              ph::bind(&HeaderGrammar<Iterator>::addUnary, _r1, _1, _2, _3)

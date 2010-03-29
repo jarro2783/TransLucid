@@ -244,7 +244,16 @@ BOOST_AUTO_TEST_CASE ( context_change )
 BOOST_AUTO_TEST_CASE ( header )
 {
   TL::Translator t2;
-  t2.parse_header(U"delimiter uchar<\"> uchar<\"> ustring<ustring>;;");
+  t2.parse_header
+  (
+    U"delimiter uchar<\"> uchar<\"> ustring<ustring>;;"
+    U"prefix ustring<-> ustring<operator->;;"
+    U"infixl ustring<%> ustring<operator%> 20;;"
+  );
+
+  TL::HD *h = t2.translate_expr(L"4 % 5");
+
+  BOOST_REQUIRE(h != 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
