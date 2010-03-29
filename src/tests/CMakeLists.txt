@@ -7,6 +7,6 @@ add_executable(equations equations.cpp)
 add_executable(printing printing.cpp)
 add_definitions(${TLCFLAGS})
 
-add_test(expressions expressions)
+add_test(expressions runbinary.sh "" expressions)
 add_test(equations equations)
 add_test(printing printing)

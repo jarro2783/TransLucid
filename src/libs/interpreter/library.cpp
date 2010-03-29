@@ -123,7 +123,12 @@ Libtool::loadLibrary(const u32string& name, HD* system)
   char wd[1000];
   getcwd(wd, 1000);
   std::cout << "working directory: " << wd << std::endl;
-  attemptLibraryOpen(U"lib" + name, name, system);
+  bool result = attemptLibraryOpen(U"lib" + name, name, system);
+
+  if (!result)
+  {
+    throw utf32_to_utf8(U"unable to open library: " + name);
+  }
 }
 
 void
