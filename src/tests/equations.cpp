@@ -34,6 +34,7 @@ namespace
 struct translator_class {
   translator_class()
   {
+    translator.loadLibrary(U"int");
     TL::Parser::Header& header = translator.header();
     TL::Parser::addOpSymbol
     (
@@ -98,7 +99,6 @@ BOOST_AUTO_TEST_CASE ( single )
 
 BOOST_AUTO_TEST_CASE ( simple_expressions )
 {
-  translator.loadLibrary(U"int");
   //TL::Parser::Header& header = translator.header();
 
   translator.translate_and_add_equation_set
