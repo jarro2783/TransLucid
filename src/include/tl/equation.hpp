@@ -209,7 +209,7 @@ namespace TransLucid
     uuid
     addExprActual(const Tuple& k, HD* e);
 
-    typedef std::list<Equation> Equations;
+    typedef std::list<std::pair<uuid, Equation>> Equations;
     Equations m_equations;
     VariableMap m_variables;
 

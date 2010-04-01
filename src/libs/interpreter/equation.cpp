@@ -68,15 +68,20 @@ Variable::addExprActual(const Tuple& k, HD* h)
     g = &giter->second.value<EquationGuardType const&>().value();
   }
 
+  auto adder = [this] (const Equation& e) -> uuid
+  {
+    this->m_equations.push_back(std::make_pair(e.id(), e));
+    return e.id();
+  };
+
   if (g)
   {
-    m_equations.push_back(Equation(m_name, *g, h));
+    return adder(Equation(m_name, *g, h));
   }
   else
   {
-    m_equations.push_back(Equation(m_name, EquationGuard(), h));
+    return adder(Equation(m_name, EquationGuard(), h));
   }
-  return m_equations.back().id();
 }
 
 TaggedValue
@@ -127,11 +132,11 @@ Variable::operator()(const Tuple& k)
   for (Equations::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
-    if (eqn_i->validContext())
+    if (eqn_i->second.validContext())
     {
       try
       {
-        const EquationGuard& guard = eqn_i->validContext();
+        const EquationGuard& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
         if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
         {
@@ -160,7 +165,7 @@ Variable::operator()(const Tuple& k)
   {
     //std::cerr << "running equation " << std::get<1>(applicable.front())->id()
     //<< std::endl;
-    return (*std::get<1>(applicable.front())->equation())(k);
+    return (*std::get<1>(applicable.front())->second.equation())(k);
   }
 
   applicable_list::const_iterator bestIter = applicable.end();
@@ -191,7 +196,9 @@ Variable::operator()(const Tuple& k)
   for (applicable_list::const_iterator iter = applicable.begin();
        iter != applicable.end(); ++iter)
   {
-    if (std::get<1>(*bestIter)->equation() != std::get<1>(*iter)->equation() &&
+    if (std::get<1>(*bestIter)->second.equation()
+          != std::get<1>(*iter)->second.equation()
+        &&
         !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
       return TaggedValue(TypedValue(Special(Special::MULTIDEF),
@@ -201,7 +208,7 @@ Variable::operator()(const Tuple& k)
 
   //std::cerr << "running equation " << std::get<1>(*bestIter)->id()
   //<< std::endl;
-  return (*std::get<1>(*bestIter)->equation())(k);
+  return (*std::get<1>(*bestIter)->second.equation())(k);
 }
 
 uuid
