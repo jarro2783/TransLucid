@@ -54,7 +54,7 @@ namespace IntLib
     //parse
     //(
     //  const TransLucid::u32string& text,
-    //  const TransLucid::Tuple& context,
+    //  const TransLucid::Tuple& k,
     //  const TransLucid::Interpreter& i
     //)
     //{

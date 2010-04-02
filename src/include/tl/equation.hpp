@@ -100,7 +100,7 @@ namespace TransLucid
      * dimension.
      **/
     Tuple
-    evaluate(const Tuple& context) const
+    evaluate(const Tuple& k) const
     throw(InvalidGuard);
 
     /**
