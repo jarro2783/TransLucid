@@ -70,7 +70,7 @@ Variable::addExprActual(const Tuple& k, HD* h)
 
   auto adder = [this] (const Equation& e) -> uuid
   {
-    this->m_equations.push_back(std::make_pair(e.id(), e));
+    this->m_equations.insert(std::make_pair(e.id(), e));
     return e.id();
   };
 
@@ -244,15 +244,6 @@ Variable::addExpr(const Tuple& k, HD* e)
       kp.erase(dim_id);
     }
 
-    #if 0
-    VariableMap::iterator viter = m_variables.find(begin);
-    if (viter == m_variables.end())
-    {
-      viter = m_variables.insert
-                (std::make_pair(begin, new Variable(begin, m_i))).first;
-    }
-    viter->second->addExpr(Tuple(kp), e);
-    #endif
     return addToVariableActual(begin, Tuple(kp), e);
   }
 }
@@ -271,6 +262,23 @@ Variable::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
                               (id, new Variable(id, m_system))).first;
   }
   return iter->second->addExpr(k, h);
+}
+
+
+bool
+Variable::delexpr(uuid id, size_t time)
+{
+  Equations::iterator iter = m_equations.find(id);
+
+  if (iter != m_equations.end())
+  {
+
+  }
+}
+
+bool
+Variable::replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr)
+{
 }
 
 }

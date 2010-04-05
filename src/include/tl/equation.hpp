@@ -176,6 +176,8 @@ namespace TransLucid
     EquationGuard m_validContext;
     HD* m_h;
     boost::uuids::uuid m_id;
+    size_t validStart;
+    size_t validEnd;
   };
 
   //represents all definitions of a variable, is responsible for
@@ -193,11 +195,9 @@ namespace TransLucid
     uuid
     addExpr(const Tuple& k, HD* h);
 
-    void
-    added();
+    bool delexpr(uuid id, size_t time);
 
-    void
-    removed();
+    bool replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr);
 
     protected:
 
@@ -209,7 +209,7 @@ namespace TransLucid
     uuid
     addExprActual(const Tuple& k, HD* e);
 
-    typedef std::list<std::pair<uuid, Equation>> Equations;
+    typedef std::map<uuid, Equation> Equations;
     Equations m_equations;
     VariableMap m_variables;
 
