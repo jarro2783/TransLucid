@@ -127,7 +127,9 @@ namespace TransLucid
     std::map<size_t, TypedValue> m_dimensions;
   };
 
-  typedef std::map<u32string, HD*> VariableMap;
+  class Variable;
+
+  typedef std::map<u32string, Variable*> VariableMap;
 
   class Equation
   {
@@ -193,7 +195,10 @@ namespace TransLucid
     TaggedValue operator()(const Tuple& k);
 
     uuid
-    addExpr(const Tuple& k, HD* h);
+    addExpr(const Tuple& k, HD* h)
+    {
+      return addExprInternal(k, h).first;
+    }
 
     bool delexpr(uuid id, size_t time);
 
@@ -201,20 +206,25 @@ namespace TransLucid
 
     protected:
 
-    uuid
+    typedef std::map<uuid, Equation> Equations;
+
+    std::pair<uuid, Equations::iterator>
     addToVariableActual(const u32string& id, const Tuple& k, HD* h);
 
     private:
 
-    uuid
+    std::pair<uuid, Equations::iterator>
+    addExprInternal(const Tuple& k, HD* h);
+
+    std::pair<uuid, Equations::iterator>
     addExprActual(const Tuple& k, HD* e);
 
-    typedef std::map<uuid, Equation> Equations;
     Equations m_equations;
     VariableMap m_variables;
 
     u32string m_name;
     HD* m_system;
+    bool storeuuid;
   };
 };
 

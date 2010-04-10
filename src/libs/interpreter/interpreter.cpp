@@ -97,46 +97,6 @@ namespace
   };
 }
 
-#if 0
-inline void
-Interpreter::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
-{
-  //std::cerr << "addToVariableActual: " <<
-  //   id << std::endl;
-  //find the variable
-  VariableMap::const_iterator iter = m_variables.find(id);
-  if (iter == m_variables.end())
-  {
-    //std::cerr << "constructing new variable" << std::endl;
-    iter = m_variables.insert(std::make_pair
-                              (id, new Variable(id, *this))).first;
-  }
-  iter->second->addExpr(k, h);
-}
-
-inline void
-Interpreter::addToVariable
-(
-  const u32string& id,
-  const u32string& remaining,
-  const Tuple& k,
-  HD* h
-)
-{
-  tuple_t kp = k.tuple();
-  kp[DIM_ID] = TypedValue(String(remaining), TYPE_INDEX_USTRING);
-  addToVariableActual(id, Tuple(kp), h);
-}
-
-inline void
-Interpreter::addToVariable(const u32string& id, const Tuple& k, HD* h)
-{
-  tuple_t kp = k.tuple();
-  kp.erase(DIM_ID);
-  addToVariableActual(id, Tuple(kp), h);
-}
-#endif
-
 template <typename T>
 HD*
 Interpreter::buildConstantHD(size_t index)
@@ -240,7 +200,7 @@ Interpreter::tick()
     Tuple t = d.second.evaluate(Tuple());
     if (tupleApplicable(t, k))
     {
-      VariableMap::const_iterator iter = m_variables.find(d.first);
+      IOList::const_iterator iter = m_variables.find(d.first);
       if (iter != m_variables.end())
       {
         //evaluate the demand

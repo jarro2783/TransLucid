@@ -66,7 +66,7 @@ namespace TransLucid
     void
     init_types();
 
-    VariableMap m_variables;
+    IOList m_variables;
 
     template <typename T>
     HD*
