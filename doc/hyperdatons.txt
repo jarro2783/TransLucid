@@ -1,19 +1,21 @@
 Everything as a hyperdaton:
 
-All the objects comply with the interface of a hyperdaton. This interface is:
+All the objects comply with the interface of a hyperdaton. This
+interface is:
 
 addExpr(k, E)
 operator()(k)
 
-Different hyperdatons respond to different dimensions. However there are a
-couple of main types of hyperdatons. The system hyperdaton which responds to
-the id dimension. The op hyperdatons which take arg{0..inf}. The const
-hyperdatons which take the text.
+Different hyperdatons respond to different dimensions. However there
+are a couple of main types of hyperdatons. The system hyperdaton which
+responds to the id dimension. The op hyperdatons which take
+arg{0..inf}. The const hyperdatons which take the text.
 
-Typed value has two concepts, a c++ data structure to store it, and the 
-TransLucid meaning. In TransLucid it is a constructor and a type index.
-The type index is used by the c++ implementation. When a new type is created
-it is implemented by adding two equations to the system.
+Typed value has two concepts, a c++ data structure to store it, and
+the TransLucid meaning. In TransLucid it is a constructor and a type
+index.  The type index is used by the c++ implementation. When a new
+type is created it is implemented by adding two equations to the
+system.
 
 CONST @ [type : "name"] = constructor
 TYPEINDEX @ [type : "name"] = unique-id
@@ -22,10 +24,9 @@ the constructor will respond to at least the text dimension
 
 The unique IDs are obtained by calling _unique.
 
-Note about parsing types.
-We can write a new parser for a type without knowing the internals of the
-type as long as we know an appropriate input format then just call the 
-more general version.
+Note about parsing types.  We can write a new parser for a type
+without knowing the internals of the type as long as we know an
+appropriate input format then just call the more general version.
 
 best fitting to make a new parser
 CONST @ [type : intmp, inputstyle : "words"] = ...
@@ -61,15 +62,17 @@ special
 string
 
 types:
-things like special should be built by asking the system for a special instead
-of just building it
-the index of a type could be part of the system, anyone can ask for it, and
-then only if an implementation can see the header declaration for the class of
-a type can it access the type.
+
+things like special should be built by asking the system for a special
+instead of just building it the index of a type could be part of the
+system, anyone can ask for it, and then only if an implementation can
+see the header declaration for the class of a type can it access the
+type.
 
 fixed dimensions and types:
-it is required that some type and dimension indexes be fixed and visible to 
-everyone
+
+it is required that some type and dimension indexes be fixed and
+visible to everyone
 
    types:
       ustring     TYPE_INDEX_USTRING
@@ -85,8 +88,10 @@ everyone
       id          DIM_ID
 
 operations and arg{0..inf}:
-we need to work out how exactly to do this in TL, this requires the default
-not found equation when the name is argN to add it return the new index
+
+we need to work out how exactly to do this in TL, this requires the
+default not found equation when the name is argN to add it return the
+new index
 
 TODO:
 DIMENSION_INDEX needs to be defined and keep track of dimensions
@@ -103,8 +108,9 @@ class.
 operations:
 FUN @ [op : ustring<operator?>, arg0 : intmp, arg1 : intmp] = 
 
-we should guarantee certain conditions, for example that DEFAULTINT will
-always work and construct the correct value unless a CONST error occurs.
+we should guarantee certain conditions, for example that DEFAULTINT
+will always work and construct the correct value unless a CONST error
+occurs.
 
 Printer:
 We need a way to print these things.
@@ -144,8 +150,8 @@ whenever it is called and returns the current value.
 
 == Parsing ==
 
-We should be able to create parsers using the system. These just become
-hyperdatons and are used by adding more equations to the system to parse
-things. In the meantime at least we can make the parser a hyperdaton and types
-such as tuple can request a pointer to it so that they can parse stuff inside
-<> at runtime.
+We should be able to create parsers using the system. These just
+become hyperdatons and are used by adding more equations to the system
+to parse things. In the meantime at least we can make the parser a
+hyperdaton and types such as tuple can request a pointer to it so that
+they can parse stuff inside <> at runtime.

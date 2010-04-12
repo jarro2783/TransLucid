@@ -15,12 +15,12 @@ The specials are recognised by adding sp as a prefix to the specials names.
 
 == Constants ==
 
-All the typed value creators for constants are defined in the interpreter
-under the identifier CONST.
-CONST varies in the dimensions type and text. Varying the type dimension picks
-a specific constant builder, varying text changes the resulting value of the
-constant. Varying any other dimension might change how the text dimension is
-formatted depending on which type it is.
+All the typed value creators for constants are defined in the
+interpreter under the identifier CONST.  CONST varies in the
+dimensions type and text. Varying the type dimension picks a specific
+constant builder, varying text changes the resulting value of the
+constant. Varying any other dimension might change how the text
+dimension is formatted depending on which type it is.
 
 Defined variables:
 intmp
@@ -30,9 +30,10 @@ ustring
 == Dimensions ==
 
 To look up a dimension index:
-DIMENSION_INDEX for named dimensions, varies in text dimension which must be
-a string.
-DIMENSION_TYPED_INDEX for typed dimensions, varies in value dimension.
+
+DIMENSION_INDEX for named dimensions, varies in text dimension which
+must be a string.  DIMENSION_TYPED_INDEX for typed dimensions, varies
+in value dimension.
 
 == Operations ==
 
