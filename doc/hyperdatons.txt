@@ -49,7 +49,7 @@ DIMENSION_TYPED_INDEX
 
 identifiers:
 constants are CONST
-functions are FUN
+operations are OP
 default int is in DEFAULTINT
 
 constants that are defined:
@@ -106,7 +106,7 @@ DIMENSION_INDEX @ [value : any] = ...;; - this is for any other dim
 class.
 
 operations:
-FUN @ [op : ustring<operator?>, arg0 : intmp, arg1 : intmp] = 
+OP @ [op : ustring<operator?>, arg0 : intmp, arg1 : intmp] = 
 
 we should guarantee certain conditions, for example that DEFAULTINT
 will always work and construct the correct value unless a CONST error

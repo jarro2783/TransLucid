@@ -283,7 +283,7 @@ OperationHD::operator()(const Tuple& k)
   tuple_t kp = k.tuple();
 
   TupleInserter<String> insert(kp, m_system, TYPE_INDEX_USTRING);
-  insert(U"id", U"FUN");
+  insert(U"id", U"OP");
 
   int i = 0;
   std::ostringstream os;
