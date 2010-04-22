@@ -87,6 +87,10 @@ Variable::addExprActual(const Tuple& k, HD* h)
   }
 }
 
+bool Variable::equationValid(const Equation& e, const Tuple& k)
+{
+}
+
 TaggedValue
 Variable::operator()(const Tuple& k)
 {
@@ -135,6 +139,7 @@ Variable::operator()(const Tuple& k)
   for (Equations::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
+    #if 0
     if (eqn_i->second.validContext())
     {
       try
@@ -155,6 +160,10 @@ Variable::operator()(const Tuple& k)
     {
       applicable.push_back
         (ApplicableTuple(Tuple(), eqn_i));
+    }
+    #endif
+    if (equationValid(eqn_i->second, k))
+    {
     }
   }
 
@@ -275,13 +284,20 @@ Variable::delexpr(uuid id, size_t time)
 
   if (iter != m_equations.end())
   {
-
+    iter->second.del(time);
   }
+  return true;
 }
 
 bool
 Variable::replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr)
 {
+}
+
+void
+Equation::del(size_t time)
+{
+  m_validEnd = time;
 }
 
 }

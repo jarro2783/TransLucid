@@ -125,6 +125,8 @@ namespace TransLucid
     HD* m_guard;
     HD* m_boolean;
     std::map<size_t, TypedValue> m_dimensions;
+    size_t validStart;
+    size_t validEnd;
   };
 
   class Variable;
@@ -168,18 +170,22 @@ namespace TransLucid
        return m_h;
     }
 
-    const uuid& id() const
+    const uuid&
+    id() const
     {
       return m_id;
     }
+
+    void
+    del(size_t time);
 
     private:
     u32string m_name;
     EquationGuard m_validContext;
     HD* m_h;
     boost::uuids::uuid m_id;
-    size_t validStart;
-    size_t validEnd;
+    size_t m_validStart;
+    size_t m_validEnd;
   };
 
   //represents all definitions of a variable, is responsible for
@@ -218,6 +224,8 @@ namespace TransLucid
 
     std::pair<uuid, Equations::iterator>
     addExprActual(const Tuple& k, HD* e);
+
+    bool equationValid(const Equation& e, const Tuple& k);
 
     Equations m_equations;
     VariableMap m_variables;
