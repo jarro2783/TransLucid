@@ -17,8 +17,8 @@ index.  The type index is used by the c++ implementation. When a new
 type is created it is implemented by adding two equations to the
 system.
 
-CONST @ [type : "name"] = constructor
-TYPEINDEX @ [type : "name"] = unique-id
+CONST     | [type : "name"] = constructor
+TYPEINDEX | [type : "name"] = unique-id
 
 the constructor will respond to at least the text dimension
 
@@ -29,7 +29,7 @@ without knowing the internals of the type as long as we know an
 appropriate input format then just call the more general version.
 
 best fitting to make a new parser
-CONST @ [type : intmp, inputstyle : "words"] = ...
+CONST | [type : intmp, inputstyle : "words"] = ...
 a symbol instead of "words" could improve speed here
 
 dimensions:

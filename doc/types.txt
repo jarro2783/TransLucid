@@ -3,7 +3,6 @@ Types
 All values in a translucid system are typed. The following text
 describes how the types can be manipulated.
 
-
 TypeRegistry
 
 The type registry is the heart of the typing system. The type registry
@@ -11,7 +10,6 @@ stores information about all the types and allows the current types to
 be queried, and typed values to be created. It holds the operations
 associated with each type, and maintains information about the built
 in types.
-
 
 Basics
 
@@ -23,13 +21,11 @@ existing typed value and is also context dependent.  The type index is
 assigned by the type registry and is a faster way than the type name
 to refer to types.
 
-
 TypeManager
 
 Each type has its own type manager. The type manager stores the name
 of the type, the type registry that it was registered with, the index
 that the registry assigned it, and the type's parser.
-
 
 Making Custom Types
 
