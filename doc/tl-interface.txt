@@ -35,6 +35,21 @@ DIMENSION_INDEX for named dimensions, varies in text dimension which
 must be a string.  DIMENSION_TYPED_INDEX for typed dimensions, varies
 in value dimension.
 
+=== Predefined Dimensions ==
+
+The following dimensions are predefined and have special meaning inside the
+interpreter:
+
+  id         DIM_ID        Used to refer to variables inside a hyperdator.
+                           A request for X @ k translates to 
+			   H @ [id : "X"] @ k.
+
+  type       DIM_TYPE      Used to refer to the typed value of something.
+                           The type of the dimension is always ustring.
+			   Referenced by CONST, TYPEINDEX.
+  
+	
+
 == Operations ==
 
 Operations are in the identifier OP. OP varies in the name dimension.
