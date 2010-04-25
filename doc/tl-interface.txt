@@ -51,9 +51,14 @@ interpreter:
                            between the <> in type<value>. Also used by
 			   DIMENSION_INDEX to find the indices of dimensions.
 
+  time       DIM_TIME      The current time.
+
   type       DIM_TYPE      Used to refer to the typed value of something.
                            The type of the dimension is always ustring.
 			   Referenced by CONST, TYPEINDEX.
+
+  validguard DIM_VALIDGUARD Used when adding an equation. The guard part of
+                           the equation is passed in the dimension validguard.
 
   value      DIM_VALUE     Used by variables that need a single value passed.
                            DIMENSION_TYPED_INDEX uses value for the type value
