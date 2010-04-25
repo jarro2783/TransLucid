@@ -44,11 +44,13 @@ interpreter:
                            A request for X @ k translates to 
 			   H @ [id : "X"] @ k.
 
+  text       DIM_TEXT      Used by constant builders to read the text in
+                           between the <> in type<value>. Also used by
+			   DIMENSION_INDEX to find the indices of dimensions.
+
   type       DIM_TYPE      Used to refer to the typed value of something.
                            The type of the dimension is always ustring.
 			   Referenced by CONST, TYPEINDEX.
-  
-	
 
 == Operations ==
 
