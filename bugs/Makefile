@@ -1,7 +1,7 @@
-CXXFLAGS=-std=gnu++0x -c
+CXXFLAGS=-std=gnu++0x -c -save-temps
 LDFLAGS=-std=gnu++0x
 
-all:lambda_inline_2 lambda_inline 
+all:lambda_inline_2 lambda_inline uninit_reference
 
 lambda_inline: lambda_inline_a.o lambda_inline_b.o
 	g++ -o $@ $^ $(LDFLAGS)
@@ -19,4 +19,10 @@ lambda_inline_c.o: lambda_inline_c.cpp lambda_inline_2.hpp
 	g++ $< -o $@ $(CXXFLAGS)
 
 lambda_inline_d.o: lambda_inline_d.cpp lambda_inline_2.hpp
+	g++ $< -o $@ $(CXXFLAGS)
+
+uninit_reference: uninit_reference.o
+	g++ -o $@ $^ $(LDFLAGS)
+
+uninit_reference.o: uninit_reference.cpp
 	g++ $< -o $@ $(CXXFLAGS)
