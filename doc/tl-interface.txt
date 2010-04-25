@@ -44,6 +44,9 @@ interpreter:
                            A request for X @ k translates to 
 			   H @ [id : "X"] @ k.
 
+  name       DIM_NAME      Used for the name of operations. Operations are
+                           contained in the variables OP | [name : "opname"]
+
   text       DIM_TEXT      Used by constant builders to read the text in
                            between the <> in type<value>. Also used by
 			   DIMENSION_INDEX to find the indices of dimensions.
@@ -51,6 +54,13 @@ interpreter:
   type       DIM_TYPE      Used to refer to the typed value of something.
                            The type of the dimension is always ustring.
 			   Referenced by CONST, TYPEINDEX.
+
+  value      DIM_VALUE     Used by variables that need a single value passed.
+                           DIMENSION_TYPED_INDEX uses value for the type value
+			   being used as a dimension.
+
+  argN                     These are created as needed and store the arguments
+                           to things like operations.
 
 == Operations ==
 
