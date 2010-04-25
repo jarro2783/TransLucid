@@ -25,7 +25,7 @@ namespace TransLucid
 {
 
 DimensionTranslator::DimensionTranslator()
-: m_nextIndex(RESERVED_INDEX_LAST),
+: m_nextIndex(DIM_INDEX_LAST),
   m_namedDims
   {
    {U"type", DIM_TYPE},

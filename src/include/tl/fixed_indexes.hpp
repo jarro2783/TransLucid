@@ -25,7 +25,7 @@ namespace TransLucid
 {
 
   //predefined unique indexes
-  enum Indexes
+  enum TypeIndexes
   {
     //types
     TYPE_INDEX_BOOL,
@@ -38,8 +38,13 @@ namespace TransLucid
     TYPE_INDEX_TYPE,
     TYPE_INDEX_GUARD,
     TYPE_INDEX_RANGE,
-    //TYPE_INDEX_PAIR,
 
+    //the last one
+    TYPE_INDEX_LAST
+  };
+
+  enum DimensionIndexes
+  {
     //dimensions
     DIM_ID,
     DIM_TYPE,
@@ -50,7 +55,7 @@ namespace TransLucid
     DIM_VALID_GUARD,
 
     //the last one
-    RESERVED_INDEX_LAST
+    DIM_INDEX_LAST
   };
 
 } //namespace TransLucid

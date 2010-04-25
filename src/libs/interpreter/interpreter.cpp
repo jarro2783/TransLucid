@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
 #include <tl/consthd.hpp>
+#include <algorithm>
 
 namespace TransLucid
 {
@@ -143,8 +144,15 @@ Interpreter::Interpreter()
                       new DimensionsStringHD(m_dimTranslator));
   addToVariableActual(U"DIMENSION_TYPED_INDEX", Tuple(),
                       new DimensionsTypedHD(m_dimTranslator));
-  addToVariableActual(U"_unique", Tuple(),
-                      new UniqueHD(RESERVED_INDEX_LAST));
+  addToVariableActual
+  (
+    U"_unique", Tuple(),
+    new UniqueHD(std::max
+    (
+      static_cast<int>(TYPE_INDEX_LAST),
+      static_cast<int>(DIM_INDEX_LAST)
+    ))
+  );
 
   //add variables for all the types
   //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
