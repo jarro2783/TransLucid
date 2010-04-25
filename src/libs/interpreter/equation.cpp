@@ -111,7 +111,8 @@ Variable::operator()(const Tuple& k)
   {
     try
     {
-      //std::cerr << "looking for id: " << utf32_to_utf8(iditer->second.value<String>().value()) << std::endl;
+      //std::cerr << "looking for id: " <<
+        //utf32_to_utf8(iditer->second.value<String>().value()) << std::endl;
       VariableMap::const_iterator viter =
         m_variables.find(iditer->second.value<String>().value());
       //std::cout << "looking for "

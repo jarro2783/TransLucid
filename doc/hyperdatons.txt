@@ -17,8 +17,8 @@ index.  The type index is used by the c++ implementation. When a new
 type is created it is implemented by adding two equations to the
 system.
 
-CONST @ [type : "name"] = constructor
-TYPEINDEX @ [type : "name"] = unique-id
+CONST     | [type : "name"] = constructor
+TYPEINDEX | [type : "name"] = unique-id
 
 the constructor will respond to at least the text dimension
 
@@ -29,7 +29,7 @@ without knowing the internals of the type as long as we know an
 appropriate input format then just call the more general version.
 
 best fitting to make a new parser
-CONST @ [type : intmp, inputstyle : "words"] = ...
+CONST | [type : intmp, inputstyle : "words"] = ...
 a symbol instead of "words" could improve speed here
 
 dimensions:
@@ -100,8 +100,8 @@ this requires two things:
    - whenever the user looks up a dimension it registers it if it does not
      exist
 
-DIMENSION_INDEX @ [text : ustring] = ...;; - this is for a named dim
-DIMENSION_INDEX @ [value : any] = ...;; - this is for any other dim
+DIMENSION_INDEX | [text : ustring] = ...;; - this is for a named dim
+DIMENSION_INDEX | [value : any] = ...;; - this is for any other dim
 ... will be a special hyperdaton which is hooked up to the dim translator
 class.
 
@@ -138,12 +138,12 @@ dim<x>;;
 
 will result in the following: 
 u = _unique
-DIMENSION_INDEX @ [text : "x"] = u;;
+DIMENSION_INDEX | [text : "x"] = u;;
 or maybe the system can do this itself
 
 to look up the index of a dimension:
 when [x : 1] is seen the x will be translated to:
-DIMENSION_INDEX @ [text : "x"];;
+DIMENSION_INDEX | [text : "x"];;
 
 _unique is a special thing in the implementation which increments itself
 whenever it is called and returns the current value.

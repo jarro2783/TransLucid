@@ -101,16 +101,12 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-g" />
-			<Add option="`pkg-config --cflags glibmm-2.4`" />
 			<Add directory="src/include" />
-			<Add directory="$(#boost.include)" />
 		</Compiler>
 		<Linker>
-			<Add option="`pkg-config --libs glibmm-2.4`" />
 			<Add option="-export-dynamic" />
 			<Add library="pthread" />
 			<Add library="ltdl" />
-			<Add directory="$(#boost.lib)" />
 		</Linker>
 		<Unit filename="src/basic/echo.cpp">
 			<Option target="libinterpreter" />
