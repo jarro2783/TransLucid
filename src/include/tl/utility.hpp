@@ -84,7 +84,7 @@ namespace TransLucid
   {
     tuple_t k;
     k[DIM_ID] = generate_string(U"TYPE_INDEX");
-    //TypedValue(String("TYPEINDEX"), TYPE_INDEX_USTRING);
+    //TypedValue(String("TYPE_INDEX"), TYPE_INDEX_USTRING);
     k[DIM_TYPE] = generate_string(name);
     //TypedValue(String(name), TYPE_INDEX_USTRING);
     return (*h)(Tuple(k)).first.value<Intmp>().value();
