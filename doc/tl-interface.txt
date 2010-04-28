@@ -31,9 +31,9 @@ ustring
 
 To look up a dimension index:
 
-DIMENSION_INDEX for named dimensions, varies in text dimension which
-must be a string.  DIMENSION_TYPED_INDEX for typed dimensions, varies
-in value dimension.
+DIMENSION_NAMED_INDEX for named dimensions, varies in text dimension which
+must be a string.  DIMENSION_VALUE_INDEX for value-designated dimensions,
+varies in value dimension.
 
 === Predefined Dimensions ==
 
@@ -49,19 +49,20 @@ interpreter:
 
   text       DIM_TEXT      Used by constant builders to read the text in
                            between the <> in type<value>. Also used by
-                           DIMENSION_INDEX to find the indices of dimensions.
+                           DIMENSION_NAMED_INDEX to find the indices of
+                           dimensions.
 
   time       DIM_TIME      The current time.
 
   type       DIM_TYPE      Used to refer to the typed value of something.
                            The type of the dimension is always ustring.
-                           Referenced by CONST, TYPEINDEX.
+                           Referenced by CONST, TYPE_INDEX.
 
   validguard DIM_VALIDGUARD Used when adding an equation. The guard part of
                            the equation is passed in the dimension validguard.
 
   value      DIM_VALUE     Used by variables that need a single value passed.
-                           DIMENSION_TYPED_INDEX uses value for the type value
+                           DIMENSION_VALUE_INDEX uses value for the type value
                            being used as a dimension.
 
   argN                     These are created as needed and store the arguments
