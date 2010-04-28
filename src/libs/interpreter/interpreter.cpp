@@ -110,7 +110,7 @@ Interpreter::buildConstantHD(size_t index)
   //  TypedValue(String("CONST"), m_typeRegistry.indexString());
   k[DIM_TYPE] = TypedValue(String(T::name), TYPE_INDEX_USTRING);
   addToVariableActual(U"CONST", Tuple(k), h);
-  addToVariableActual(U"TYPEINDEX", empty, new Hyperdatons::IntmpConst(index));
+  addToVariableActual(U"TYPE_INDEX", empty, new Hyperdatons::IntmpConst(index));
   return h;
 }
 
@@ -140,9 +140,9 @@ Interpreter::Interpreter()
   //create the obj, const and fun ids
 
   //we need dimensions and unique to do anything
-  addToVariableActual(U"DIMENSION_INDEX", Tuple(),
+  addToVariableActual(U"DIMENSION_NAMED_INDEX", Tuple(),
                       new DimensionsStringHD(m_dimTranslator));
-  addToVariableActual(U"DIMENSION_TYPED_INDEX", Tuple(),
+  addToVariableActual(U"DIMENSION_VALUE_INDEX", Tuple(),
                       new DimensionsTypedHD(m_dimTranslator));
   addToVariableActual
   (

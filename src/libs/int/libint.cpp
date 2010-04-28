@@ -575,7 +575,7 @@ registerType(const TL::u32string& name, TL::Interpreter& i)
 
   k.clear();
   k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
-  k.insert(std::make_pair(TL::DIM_ID, TL::generate_string(U"TYPEINDEX")));
+  k.insert(std::make_pair(TL::DIM_ID, TL::generate_string(U"TYPE_INDEX")));
   i.addExpr(TransLucid::Tuple(k), new TL::Hyperdatons::IntmpConst(unique));
 
   register_int_ops<Int<T>>(i, unique.get_ui());

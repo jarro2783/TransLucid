@@ -83,7 +83,7 @@ namespace TransLucid
   get_type_index(HD* h, const u32string& name)
   {
     tuple_t k;
-    k[DIM_ID] = generate_string(U"TYPEINDEX");
+    k[DIM_ID] = generate_string(U"TYPE_INDEX");
     //TypedValue(String("TYPEINDEX"), TYPE_INDEX_USTRING);
     k[DIM_TYPE] = generate_string(name);
     //TypedValue(String(name), TYPE_INDEX_USTRING);
@@ -102,7 +102,7 @@ namespace TransLucid
   get_dimension_index(HD* h, const u32string& name)
   {
     tuple_t k;
-    k[DIM_ID] = generate_string(U"DIMENSION_INDEX");
+    k[DIM_ID] = generate_string(U"DIMENSION_NAMED_INDEX");
     k[DIM_TEXT] = generate_string(name);
     return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
   }
@@ -111,7 +111,7 @@ namespace TransLucid
   get_dimension_index(HD* h, const TypedValue& v)
   {
     tuple_t k;
-    k[DIM_ID] = generate_string(U"DIMENSION_TYPED_INDEX");
+    k[DIM_ID] = generate_string(U"DIMENSION_VALUE_INDEX");
     k[DIM_VALUE] = v;
     return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
   }
