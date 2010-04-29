@@ -21,6 +21,12 @@ project(TransLucid)
 
 enable_testing()
 
+try_compile(GCC_IS_CORRECT_VERSION ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/checks/version.cpp)
+
+if (NOT GCC_IS_CORRECT_VERSION)
+   message(FATAL_ERROR "g++ version 4.5.0 or greater is required")
+endif()
+
 find_package(PkgConfig REQUIRED)
 
 set(TLCFLAGS -Wall -std=gnu++0x)
