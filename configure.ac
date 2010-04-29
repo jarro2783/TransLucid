@@ -34,6 +34,13 @@ AC_PROG_LIBTOOL
 
 AC_LANG([C++])
 
+# check for the correct version of gcc
+GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
+AC_COMPILE_IFELSE($GCC_CHECK_TEXT, 
+,
+[AC_MSG_ERROR([gcc version 4.5.0 or greater is required])]
+)
+
 # Checks for libraries.
 
 AX_BOOST_BASE([1.42])
