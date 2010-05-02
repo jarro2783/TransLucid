@@ -42,7 +42,7 @@ namespace TransLucid
     }
 
     inline void
-    addOpSymbol
+    addBinaryOpSymbol
     (
       Header& h,
       const string_type& symbol,
@@ -215,7 +215,7 @@ namespace TransLucid
           const mpz_class& iprecedence =
             boost::get<const mpz_class&>(precedence);
 
-          addOpSymbol
+          addBinaryOpSymbol
           (
             h,
             string_type(ssymbol.begin(), ssymbol.end()),
