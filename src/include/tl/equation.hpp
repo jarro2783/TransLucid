@@ -188,6 +188,11 @@ namespace TransLucid
     size_t m_validEnd;
   };
 
+  class BestFit {
+    public:
+    virtual TaggedValue operator()(const Tuple& k) = 0;
+  };
+
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
   class Variable : public HD
@@ -233,6 +238,8 @@ namespace TransLucid
     u32string m_name;
     HD* m_system;
     bool storeuuid;
+
+    BestFit *m_bestFit;
   };
 };
 
