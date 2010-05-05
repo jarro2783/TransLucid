@@ -35,9 +35,10 @@ AC_PROG_LIBTOOL
 AC_LANG([C++])
 
 # check for the correct version of gcc
+AC_MSG_CHECKING([for gcc >= 4.5.0])
 GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
 AC_COMPILE_IFELSE($GCC_CHECK_TEXT, 
-,
+[AC_MSG_RESULT([yes])],
 [AC_MSG_ERROR([gcc version 4.5.0 or greater is required])]
 )
 
