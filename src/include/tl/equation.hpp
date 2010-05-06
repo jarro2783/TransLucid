@@ -199,7 +199,15 @@ namespace TransLucid
   {
     public:
     //returns the old best fit
-    BestFit* setBestFit(BestFit*) = 0;
+    BestFit* setBestFit(BestFit* b)
+    {
+      BestFit *old = m_bestFit;
+      m_bestFit = b;
+      return old;
+    }
+
+    private:
+    BestFit* m_bestFit;
   };
 
   //represents all definitions of a variable, is responsible for
@@ -223,8 +231,6 @@ namespace TransLucid
     bool delexpr(uuid id, size_t time);
 
     bool replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr);
-
-    BestFit* setBestFit(BestFit*);
 
     protected:
 

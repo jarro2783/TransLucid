@@ -34,6 +34,8 @@ class CompileBestFit : public BestFit
 
   private:
   ~CompileBestFit() {}
+
+  BestFittable* m_bestFittable;
 };
 
 class BruteForceBestFit : public BestFit
