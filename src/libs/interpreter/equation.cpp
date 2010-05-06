@@ -24,6 +24,12 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+class CompileBestFit : public BestFit
+{
+  private:
+  ~CompileBestFit() {}
+};
+
 Tuple
 EquationGuard::evaluate(const Tuple& k) const
 throw (InvalidGuard)

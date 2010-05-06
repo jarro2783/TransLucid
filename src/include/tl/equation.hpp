@@ -188,8 +188,10 @@ namespace TransLucid
     size_t m_validEnd;
   };
 
-  class BestFit {
+  class BestFit
+  {
     public:
+    virtual ~BestFit() {}
     virtual TaggedValue operator()(const Tuple& k) = 0;
   };
 
