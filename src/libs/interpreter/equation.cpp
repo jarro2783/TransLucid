@@ -24,11 +24,37 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+namespace
+{
+
 class CompileBestFit : public BestFit
 {
+  public:
+  TaggedValue operator()(Tuple& k);
+
   private:
   ~CompileBestFit() {}
 };
+
+class BruteForceBestFit : public BestFit
+{
+  public:
+  TaggedValue operator()(Tuple& k);
+};
+
+//TODO finish this
+TaggedValue CompileBestFit::operator()(Tuple& k)
+{
+  BestFit* b = 0;
+  BestFit* old = m_bestFittable->setBestFit(b);
+  if (old != this) {
+  }
+
+  delete this;
+  return (*b)(k);
+}
+
+}
 
 Tuple
 EquationGuard::evaluate(const Tuple& k) const

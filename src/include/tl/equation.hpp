@@ -195,9 +195,16 @@ namespace TransLucid
     virtual TaggedValue operator()(const Tuple& k) = 0;
   };
 
+  class BestFittable
+  {
+    public:
+    //returns the old best fit
+    BestFit* setBestFit(BestFit*) = 0;
+  };
+
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
-  class Variable : public HD
+  class Variable : public HD, BestFittable
   {
     public:
 
@@ -216,6 +223,8 @@ namespace TransLucid
     bool delexpr(uuid id, size_t time);
 
     bool replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr);
+
+    BestFit* setBestFit(BestFit*);
 
     protected:
 
