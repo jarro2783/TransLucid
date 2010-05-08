@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <deque>
 #include <tl/hyperdaton.hpp>
 #include <boost/uuid/uuid_generators.hpp>
+#include <tl/bestfit.hpp>
 
 namespace TransLucid
 {
@@ -188,37 +189,17 @@ namespace TransLucid
     size_t m_validEnd;
   };
 
-  class BestFit
-  {
-    public:
-    virtual ~BestFit() {}
-    virtual TaggedValue operator()(const Tuple& k) = 0;
-  };
-
-  class BestFittable
-  {
-    public:
-    //returns the old best fit
-    BestFit* setBestFit(BestFit* b)
-    {
-      BestFit *old = m_bestFit;
-      m_bestFit = b;
-      return old;
-    }
-
-    private:
-    BestFit* m_bestFit;
-  };
-
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
-  class Variable : public HD, BestFittable
+  class Variable : public HD
   {
     public:
 
     Variable(const u32string& name, HD* system)
     : m_name(name), m_system(system)
     {}
+    
+    ~Variable();
 
     TaggedValue operator()(const Tuple& k);
 
@@ -256,7 +237,8 @@ namespace TransLucid
     HD* m_system;
     bool storeuuid;
 
-    BestFit *m_bestFit;
+    BestFittable m_bestFit;
+    CompileBestFit *m_compileBestFit;
   };
 };
 

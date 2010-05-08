@@ -12,7 +12,7 @@ builtin_types.cpp equation.cpp
 header_type.cpp cache.cpp utility.cpp 
 compiled_functors.cpp expr_compiler.cpp consthd.cpp printer.cpp
 container.cpp set_types.cpp translator.cpp ast.cpp
-tuple_parser.cpp)
+tuple_parser.cpp bestfit.cpp)
 
 #add_precompiled_header(tlinterpreter ${PROJECT_SOURCE_DIR}/src/include/tl/expr_parser.hpp)
 

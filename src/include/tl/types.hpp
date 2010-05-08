@@ -279,7 +279,7 @@ namespace TransLucid
 
     private:
 
-    //allows us to store flyweights of any type
+    //allows us to store values of any type
     class StorageBase
     {
       public:
@@ -291,9 +291,7 @@ namespace TransLucid
       virtual void print(std::ostream& os) const = 0;
     };
 
-    //stores a flyweight of type T
-    //as long as each type uses a different T the
-    //flyweights will all be different
+    //stores a value of type T
     template <class T>
     class Storage : public StorageBase
     {
