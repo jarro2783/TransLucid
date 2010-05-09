@@ -195,9 +195,7 @@ namespace TransLucid
   {
     public:
 
-    Variable(const u32string& name, HD* system)
-    : m_name(name), m_system(system)
-    {}
+    Variable(const u32string& name, HD* system);
     
     ~Variable();
 

@@ -21,6 +21,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid 
 {
+  class Variable;
+  class Equation;
+
   class BestFit
   {
     public:
@@ -56,7 +59,9 @@ namespace TransLucid
   class CompileBestFit : public BestFit
   {
     public:
-    TaggedValue operator()(Tuple& k);
+    //CompileBestFit(Equation& e, Variable& v);
+
+    TaggedValue operator()(const Tuple& k);
 
     private:
     ~CompileBestFit() {}

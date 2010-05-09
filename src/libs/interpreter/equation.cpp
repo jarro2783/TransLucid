@@ -24,6 +24,22 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+Variable::Variable(const u32string& name, HD* system)
+: m_name(name)
+ ,m_system(system)
+#if 0
+ ,m_compileBestFit
+  (
+    new CompileBestFit
+    (
+      m_equations,
+      m_variables
+    )
+  )
+#endif
+{
+}
+
 Variable::~Variable()
 {
   //cleanup best fit variables

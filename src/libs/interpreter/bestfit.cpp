@@ -23,7 +23,7 @@ namespace TransLucid
 {
 
 //TODO finish this
-TaggedValue CompileBestFit::operator()(Tuple& k)
+TaggedValue CompileBestFit::operator()(const Tuple& k)
 {
   BestFit* b = 0;
   BestFit* old = m_bestFittable->setBestFit(b);
