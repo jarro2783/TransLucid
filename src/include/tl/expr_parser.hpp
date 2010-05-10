@@ -198,7 +198,11 @@ namespace TransLucid
              )
         | context_perturb [_val = _1]
         | ('(' >> expr > ')') [_val = _1]
-        | (   header.delimiter_start_symbols
+        | delimiters [_val = _1]
+        ;
+
+        delimiters = 
+          (   header.delimiter_start_symbols
               [
                 _b = _1,
                 _a = construct<string_type>()
@@ -299,7 +303,8 @@ namespace TransLucid
 
       qi::rule<Iterator, Tree::Expr(), qi::locals<string_type, Delimiter>,
                SkipGrammar<Iterator>>
-        primary_expr
+        primary_expr,
+        delimiters
       ;
 
       integer_parser<Iterator> integer_grammar;
