@@ -1,38 +1,4 @@
-Required by 15th August ?:
-
-Remove the lazy thing from tuple.
-
-Make the RHS of tuples be evaluated.
-
-Make @ and @@ do the context change.
-
-Make # do the lazy thing.
-
-Make the RHS of tuples not be evaluated.
-
-Remove range.
-
-Write lots of tests.
-
-fix the header types
-
+check that 2 - -a works - make it work if it doesn't
 footer for output
-
-add a type type
-
-add H - x @ blah | test - all are optional
-
-clean up boolean guards
-
-
-Would be nice:
-
-add header<> type
-
-:= for valid now only
-
-refactor x @ ... =
-so that we can add special dimensions
-
 add error checking for all parsing
 
