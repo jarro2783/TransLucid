@@ -134,7 +134,7 @@ namespace TransLucid
 
   typedef std::map<u32string, Variable*> VariableMap;
 
-  class Equation
+  class Equation : public HD
   {
     public:
     Equation(const u32string& name, const EquationGuard& valid, HD* h)
@@ -179,6 +179,12 @@ namespace TransLucid
 
     void
     del(size_t time);
+
+    TaggedValue
+    operator()(const Tuple& k)
+    {
+      return (*m_h)(k);
+    }
 
     private:
     u32string m_name;
