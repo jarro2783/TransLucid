@@ -159,9 +159,9 @@ SystemHD::SystemHD()
   init_types();
 
   //build the constant creators
-  buildConstantHD<Hyperdatons::UChar>(TYPE_INDEX_UCHAR);
+  buildConstantHD<Hyperdatons::UCharHD>(TYPE_INDEX_UCHAR);
   HD* intmpHD = buildConstantHD<Hyperdatons::Intmp>(TYPE_INDEX_INTMP);
-  buildConstantHD<Hyperdatons::UString>(TYPE_INDEX_USTRING);
+  buildConstantHD<Hyperdatons::UStringHD>(TYPE_INDEX_USTRING);
 
   //set this as the default int too
   addToVariableActual(U"DEFAULTINT", Tuple(), intmpHD);

@@ -56,12 +56,12 @@ namespace TransLucid
       operator()(const Tuple& k);
     };
 
-    class UChar : public ValueHD
+    class UCharHD : public ValueHD
     {
       public:
       static const char32_t* name;
 
-      UChar(HD* system)
+      UCharHD(HD* system)
       : ValueHD(system)
       {}
 
@@ -69,12 +69,12 @@ namespace TransLucid
       operator()(const Tuple& k);
     };
 
-    class UString : public ValueHD
+    class UStringHD : public ValueHD
     {
       public:
       static const char32_t* name;
 
-      UString(HD* system)
+      UStringHD(HD* system)
       : ValueHD(system)
       {}
 

@@ -317,13 +317,13 @@ SpecialHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-StringConstHD::operator()(const Tuple& k)
+UStringConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(String(m_value), TYPE_INDEX_USTRING), k);
 }
 
 TaggedConstant
-UcharConstHD::operator()(const Tuple& k)
+UCharConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
 }

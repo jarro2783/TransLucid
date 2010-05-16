@@ -28,8 +28,8 @@ namespace Hyperdatons
 {
 
 const char32_t* Intmp::name =     U"intmp";
-const char32_t* UChar::name =     U"uchar";
-const char32_t* UString::name =   U"ustring";
+const char32_t* UCharHD::name =     U"uchar";
+const char32_t* UStringHD::name =   U"ustring";
 
 TaggedConstant
 Intmp::operator()(const Tuple& k)
@@ -56,7 +56,7 @@ Intmp::operator()(const Tuple& k)
 }
 
 TaggedConstant
-UChar::operator()(const Tuple& k)
+UCharHD::operator()(const Tuple& k)
 {
   size_t valueindex = get_dimension_index(m_system, U"text");
   Tuple::const_iterator value = k.find(valueindex);
@@ -79,7 +79,7 @@ UChar::operator()(const Tuple& k)
 }
 
 TaggedConstant
-UString::operator()(const Tuple& k)
+UStringHD::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 

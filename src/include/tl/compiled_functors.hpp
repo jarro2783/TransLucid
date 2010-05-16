@@ -73,10 +73,10 @@ namespace TransLucid
       mpz_class m_value;
     };
 
-    class UcharConstHD : public HD
+    class UCharConstHD : public HD
     {
       public:
-      UcharConstHD(char32_t c)
+      UCharConstHD(char32_t c)
       : m_value(c)
       {}
 
@@ -87,10 +87,10 @@ namespace TransLucid
       char32_t m_value;
     };
 
-    class StringConstHD : public HD
+    class UStringConstHD : public HD
     {
       public:
-      StringConstHD(const u32string& s)
+      UStringConstHD(const u32string& s)
       : m_value(s)
       {}
 

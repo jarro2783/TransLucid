@@ -68,13 +68,13 @@ ExprCompiler::operator()(const mpz_class& i)
 HD*
 ExprCompiler::operator()(char32_t c)
 {
-  return new Hyperdatons::UcharConstHD(c);
+  return new Hyperdatons::UCharConstHD(c);
 }
 
 HD*
 ExprCompiler::operator()(const u32string& s)
 {
-  return new Hyperdatons::StringConstHD(s);
+  return new Hyperdatons::UStringConstHD(s);
 }
 
 HD*
