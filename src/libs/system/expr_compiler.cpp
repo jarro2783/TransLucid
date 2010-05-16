@@ -140,7 +140,7 @@ ExprCompiler::operator()(const Tree::HashExpr& e)
 }
 
 HD*
-ExprCompiler::operator()(const Tree::BuildTupleExpr& e)
+ExprCompiler::operator()(const Tree::TupleExpr& e)
 {
   std::list<std::pair<HD*, HD*>> elements;
   BOOST_FOREACH(auto& v, e.pairs)
@@ -149,7 +149,7 @@ ExprCompiler::operator()(const Tree::BuildTupleExpr& e)
     HD* rhs = boost::apply_visitor(*this, at_c<1>(v));
     elements.push_back(std::make_pair(lhs, rhs));
   }
-  return new Hyperdatons::BuildTupleHD(m_i, elements);
+  return new Hyperdatons::TupleHD(m_i, elements);
 }
 
 HD*

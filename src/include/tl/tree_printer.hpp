@@ -79,8 +79,8 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
-  TransLucid::Tree::BuildTupleExpr,
-  (TransLucid::Tree::BuildTupleExpr::TuplePairs, pairs)
+  TransLucid::Tree::TupleExpr,
+  (TransLucid::Tree::TupleExpr::TuplePairs, pairs)
 );
 
 BOOST_FUSION_ADAPT_STRUCT
@@ -188,13 +188,13 @@ namespace TransLucid
       karma::rule<Iterator, Tree::BinaryOperation()> binary_symbol;
       karma::rule<Iterator, Tree::BinaryOpExpr()> binary;
       karma::rule<Iterator, Tree::HashExpr()> hash_expr;
-      karma::rule<Iterator, Tree::BuildTupleExpr()> tuple;
+      karma::rule<Iterator, Tree::TupleExpr()> tuple;
       karma::rule<Iterator, Tree::AtExpr()> at_expr;
 
       karma::rule
       <
         Iterator,
-        Tree::BuildTupleExpr::TuplePairs()
+        Tree::TupleExpr::TuplePairs()
       > pairs;
       std::map<Special::Value, std::string> special_map;
     };

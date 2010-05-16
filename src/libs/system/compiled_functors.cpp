@@ -141,7 +141,7 @@ TypedValueHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-Convert::operator()(const Tuple& k)
+ConvertHD::operator()(const Tuple& k)
 {
   //going away
   return TaggedConstant();
@@ -264,14 +264,14 @@ IntegerConstHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-IsSpecial::operator()(const Tuple& k)
+IsSpecialHD::operator()(const Tuple& k)
 {
   //this is going away, but to stop warnings
   return TaggedConstant();
 }
 
 TaggedConstant
-IsType::operator()(const Tuple& k)
+IsTypeHD::operator()(const Tuple& k)
 {
   //this is going away, but to stop warnings
   return TaggedConstant();
@@ -336,7 +336,7 @@ UnaryOpHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-BuildTupleHD::operator()(const Tuple& k)
+TupleHD::operator()(const Tuple& k)
 {
   tuple_t kp;
   BOOST_FOREACH(auto& pair, m_elements)

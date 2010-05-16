@@ -144,7 +144,7 @@ namespace TransLucid
     class UnaryOpExpr;
     class BinaryOpExpr;
     class HashExpr;
-    class BuildTupleExpr;
+    class TupleExpr;
     class IfExpr;
     class AtExpr;
 
@@ -167,7 +167,7 @@ namespace TransLucid
       boost::recursive_wrapper<BinaryOpExpr>,
       boost::recursive_wrapper<IfExpr>,
       boost::recursive_wrapper<HashExpr>,
-      boost::recursive_wrapper<BuildTupleExpr>,
+      boost::recursive_wrapper<TupleExpr>,
       boost::recursive_wrapper<AtExpr>
     > Expr;
 
@@ -256,7 +256,7 @@ namespace TransLucid
       Expr e;
     };
 
-    struct BuildTupleExpr
+    struct TupleExpr
     {
       typedef
       std::vector<boost::fusion::vector<Expr, Expr>>
@@ -264,9 +264,9 @@ namespace TransLucid
 
       TuplePairs pairs;
 
-      BuildTupleExpr() = default;
+      TupleExpr() = default;
 
-      BuildTupleExpr(const TuplePairs& p)
+      TupleExpr(const TuplePairs& p)
       : pairs(p)
       {}
     };
@@ -300,7 +300,7 @@ namespace TransLucid
     PRINT_NODE(BinaryOpExpr)
     PRINT_NODE(IfExpr)
     PRINT_NODE(HashExpr)
-    PRINT_NODE(BuildTupleExpr)
+    PRINT_NODE(TupleExpr)
     PRINT_NODE(AtExpr)
 
   }

@@ -205,10 +205,10 @@ namespace TransLucid
       u32string m_symbol;
     };
 
-    class IsSpecial : public HD
+    class IsSpecialHD : public HD
     {
       public:
-      IsSpecial(const u32string& special, HD* e)
+      IsSpecialHD(const u32string& special, HD* e)
       : m_special(special),
       m_e(e)
       {}
@@ -221,10 +221,10 @@ namespace TransLucid
       HD* m_e;
     };
 
-    class IsType : public HD
+    class IsTypeHD : public HD
     {
       public:
-      IsType(const u32string& type, HD* e)
+      IsTypeHD(const u32string& type, HD* e)
       : m_type(type), m_e(e)
       {}
 
@@ -236,10 +236,10 @@ namespace TransLucid
       HD* m_e;
     };
 
-    class Convert : public HD
+    class ConvertHD : public HD
     {
       public:
-      Convert(const u32string& to, HD* e)
+      ConvertHD(const u32string& to, HD* e)
       : m_to(to), m_e(e)
       {}
 
@@ -309,11 +309,11 @@ namespace TransLucid
     };
 #endif
 
-    class BuildTupleHD : public HD
+    class TupleHD : public HD
     {
       public:
 
-      BuildTupleHD(HD* system,
+      TupleHD(HD* system,
                  const std::list<std::pair<HD*, HD*>>& elements)
       : m_system(system), m_elements(elements)
       {}
