@@ -106,9 +106,9 @@ main(int argc, char** argv)
     }
   }
 
-  typedef std::pair<TL::Constant, TL::Tuple> ValueContextPair;
+  typedef std::pair<TL::Constant, TL::Tuple> TaggedConstant;
 
-  std::vector<ValueContextPair> evaluated;
+  std::vector<TaggedConstant> evaluated;
 
   bool evaluate = true;
   try
@@ -131,7 +131,7 @@ main(int argc, char** argv)
 
     //TL::TypeRegistry& registry = system.typeRegistry();
     #if 0
-    BOOST_FOREACH(ValueContextPair& p, evaluated)
+    BOOST_FOREACH(TaggedConstant& p, evaluated)
     {
       const TL::Constant& v = p.first;
       std::cout << "type index: " << v.index() << std::endl;

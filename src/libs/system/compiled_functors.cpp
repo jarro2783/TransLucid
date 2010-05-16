@@ -300,12 +300,12 @@ OperationHD::operator()(const Tuple& k)
 
 #if 0
 TaggedConstant
-Pair::operator()(const Tuple& k)
+PairHD::operator()(const Tuple& k)
 {
   TaggedConstant l = (*m_lhs)(k);
   TaggedConstant r = (*m_rhs)(k);
 
-  return TaggedConstant(Constant(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
+  return TaggedConstant(Constant(Pair((*m_lhs)(k).first, (*m_rhs)(k).first),
                      TYPE_INDEX_PAIR), k);
 }
 #endif
@@ -341,7 +341,7 @@ TupleHD::operator()(const Tuple& k)
   tuple_t kp;
   BOOST_FOREACH(auto& pair, m_elements)
   {
-    //const PairType& p = v.first.value<PairType>();
+    //const Pair& p = v.first.value<Pair>();
     TaggedConstant left = (*pair.first)(k);
     TaggedConstant right = (*pair.second)(k);
 

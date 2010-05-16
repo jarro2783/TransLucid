@@ -293,10 +293,10 @@ namespace TransLucid
 
 #if 0
     //TODO: What is this?
-    class Pair : public HD
+    class PairHD : public HD
     {
       public:
-      Pair(HD* lhs, HD* rhs)
+      PairHD(HD* lhs, HD* rhs)
       : m_lhs(lhs), m_rhs(rhs)
       {}
 

@@ -399,10 +399,10 @@ namespace TransLucid
     GuardHD m_g;
   };
 
-  class PairType : public TypedValue
+  class Pair : public TypedValue
   {
     public:
-    PairType(const Constant& first, const Constant& second)
+    Pair(const Constant& first, const Constant& second)
     : m_first(first), m_second(second)
     {
     }
@@ -426,13 +426,13 @@ namespace TransLucid
     }
 
     bool
-    operator==(const PairType&) const
+    operator==(const Pair&) const
     {
       return true;
     }
 
     bool
-    operator<(const PairType&) const
+    operator<(const Pair&) const
     {
       return false;
     }
