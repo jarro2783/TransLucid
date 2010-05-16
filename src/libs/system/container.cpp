@@ -25,17 +25,17 @@ namespace TransLucid
 {
 
 uuid
-GeneralContainer::addExpr(const Tuple& k, HD* e)
+ContainerHD::addExpr(const Tuple& k, HD* e)
 {
 }
 
 TaggedConstant
-GeneralContainer::operator()(const Tuple& k)
+ContainerHD::operator()(const Tuple& k)
 {
 }
 
 void
-GeneralContainer::push_back(HD* v, int time)
+ContainerHD::push_back(HD* v, int time)
 {
   mpq_class next = m_storage.size() == 0
                  ? mpq_class(0)
@@ -48,7 +48,7 @@ GeneralContainer::push_back(HD* v, int time)
 }
 
 void
-GeneralContainer::push_front(HD* v, int time)
+ContainerHD::push_front(HD* v, int time)
 {
   mpq_class previous = m_storage.size() == 0
                      ? mpq_class(0)
@@ -61,7 +61,7 @@ GeneralContainer::push_front(HD* v, int time)
 }
 
 void
-GeneralContainer::replace_at(HD* v, const mpq_class& pos, int time)
+ContainerHD::replace_at(HD* v, const mpq_class& pos, int time)
 {
   Storage::iterator iter = m_storage.lower_bound(pos);
 
@@ -80,7 +80,7 @@ GeneralContainer::replace_at(HD* v, const mpq_class& pos, int time)
 }
 
 void
-GeneralContainer::insert_before(HD* v, const mpq_class& pos, int time)
+ContainerHD::insert_before(HD* v, const mpq_class& pos, int time)
 {
 
   #if 0
@@ -124,7 +124,7 @@ GeneralContainer::insert_before(HD* v, const mpq_class& pos, int time)
 }
 
 void
-GeneralContainer::insert_after(HD* v, const mpq_class& pos, int time)
+ContainerHD::insert_after(HD* v, const mpq_class& pos, int time)
 {
   Storage::iterator iter = m_storage.upper_bound(pos);
 
@@ -142,7 +142,7 @@ GeneralContainer::insert_after(HD* v, const mpq_class& pos, int time)
 }
 
 void
-GeneralContainer::remove
+ContainerHD::remove
 (
   const mpq_class& start,
   const mpq_class& end,
