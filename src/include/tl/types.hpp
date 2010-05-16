@@ -103,6 +103,8 @@ namespace TransLucid
     public:
     virtual ~TypedValue() {}
 
+    virtual TypedValue* clone() const = 0;
+
     /**
      * @brief Compute the hash of a typed value.
      **/
@@ -141,26 +143,23 @@ namespace TransLucid
     {
     }
 
-    //puts the T& into a flyweight
-    //T has to extend TypedValue
     /**
      * @brief Construct a typed value.
      *
      * The type is referenced by @a index which must be a valid index
-     * in TransLucid::TypeRegistry. T must inherit from TypeValueBase.
+     * in TransLucid::TypeRegistry. T must inherit from TypedValue.
      **/
     template <typename T>
     Constant(const T& value, type_index index)
-    : 
-    //m_value((value))
+    : m_value(new T(value)),
     m_index(index)
     {
     }
 
-    Constant(const Constant& other)
+    Constant(const Constant& rhs)
     : 
-    //m_value(other.m_value != 0 ? other.m_value->clone() : 0)
-    m_index(other.m_index)
+    m_value(rhs.m_value != 0 ? rhs.m_value->clone() : 0),
+    m_index(rhs.m_index)
     {
     }
 
@@ -173,7 +172,12 @@ namespace TransLucid
     {
       if (this != &rhs)
       {
-      //TODO clone all the objects
+        //if this throws nothing else happens, the object stays as it is
+        //and the exception goes on
+        TypedValue* v = rhs.m_value->clone();
+        delete m_value;
+        m_value = v;
+        m_index = rhs.m_index;
       }
 
       return *this;
@@ -311,6 +315,16 @@ namespace TransLucid
 
     explicit Tuple(const tuple_t& tuple);
     Tuple();
+
+    Tuple(const Tuple& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Tuple* clone() const
+    {
+      return new Tuple(*this);
+    }
 
     Tuple&
     operator=(const tuple_t& t)

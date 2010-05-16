@@ -35,6 +35,16 @@ namespace IntLib
     : m_value(value)
     {}
 
+    Int(const Int& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Int* clone() const
+    {
+      return new Int<T>(*this);
+    }
+
     void
     print(std::ostream& os) const;
 

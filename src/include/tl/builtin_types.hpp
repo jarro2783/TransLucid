@@ -49,6 +49,16 @@ namespace TransLucid
     : m_v(v)
     {}
 
+    Special(const Special& rhs)
+    : m_v(rhs.m_v)
+    {
+    }
+
+    Special* clone() const
+    {
+      return new Special(*this);
+    }
+
     const Value
     value() const
     {
@@ -118,6 +128,16 @@ namespace TransLucid
     {
     }
 
+    String(const String& rhs)
+    : m_s(rhs.m_s)
+    {
+    }
+
+    String* clone() const
+    {
+      return new String(*this);
+    }
+
     size_t
     hash() const
     {
@@ -165,6 +185,16 @@ namespace TransLucid
     {
     }
 
+    Boolean(const Boolean& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Boolean* clone() const
+    {
+      return new Boolean(*this);
+    }
+
     operator bool() const
     {
       return m_value;
@@ -199,6 +229,16 @@ namespace TransLucid
     Intmp(const mpz_class& value)
     : m_value(value)
     {
+    }
+
+    Intmp(const Intmp& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Intmp* clone() const
+    {
+      return new Intmp(*this);
     }
 
     size_t
@@ -243,6 +283,16 @@ namespace TransLucid
     : m_value(value)
     {}
 
+    Dimension(const Dimension& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Dimension* clone() const
+    {
+      return new Dimension(*this);
+    }
+
     size_t
     value() const
     {
@@ -284,6 +334,11 @@ namespace TransLucid
     public:
     Set();
 
+    Set* clone() const
+    {
+      return 0;
+    }
+
     bool
     operator==(const Set& rhs) const;
 
@@ -300,6 +355,11 @@ namespace TransLucid
   class ValueCalc : public TypedValue
   {
     public:
+    ValueCalc* clone() const
+    {
+      return 0;
+    }
+
     size_t
     hash() const
     {
@@ -325,6 +385,16 @@ namespace TransLucid
     Char(char32_t c)
     : m_c(c)
     {
+    }
+
+    Char(const Char& rhs)
+    : m_c(rhs.m_c)
+    {
+    }
+
+    Char* clone() const
+    {
+      return new Char(*this);
     }
 
     char32_t
@@ -365,6 +435,16 @@ namespace TransLucid
     : m_g(g)
     {}
 
+    EquationGuardType(const EquationGuardType& rhs)
+    : m_g(rhs.m_g)
+    {
+    }
+
+    EquationGuardType* clone() const
+    {
+      return new EquationGuardType(*this);
+    }
+
     const EquationGuard&
     value() const
     {
@@ -403,8 +483,20 @@ namespace TransLucid
   {
     public:
     PairType(const Constant& first, const Constant& second)
-    : m_first(first), m_second(second)
+    : m_first(first)
+    ,m_second(second)
     {
+    }
+
+    PairType(const PairType& rhs)
+    : m_first(rhs.m_first)
+    ,m_second(rhs.m_second)
+    {
+    }
+
+    PairType* clone() const
+    {
+      return new PairType(*this);
     }
 
     const Constant&
@@ -470,6 +562,17 @@ namespace TransLucid
     : m_value(v)
     {}
 
+    SetType(const SetType& rhs)
+    {
+      //TODO this is being worked on
+    }
+
+    SetType* clone() const
+    {
+      //return new SetType(*this);
+      return 0;
+    }
+
     bool
     operator==(const SetType& rhs) const
     {
@@ -499,6 +602,16 @@ namespace TransLucid
     TypeType(size_t index)
     : m_index(index)
     {}
+
+    TypeType(const TypeType& rhs)
+    : m_index(rhs.m_index)
+    {
+    }
+    
+    TypeType* clone() const
+    {
+      return new TypeType(*this);
+    }
 
     bool
     operator==(const TypeType& rhs) const
