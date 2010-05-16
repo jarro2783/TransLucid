@@ -166,7 +166,7 @@ namespace TransLucid
   valueRefines(const Constant& a, const Constant& b);
 
   bool
-  booleanTrue(const EquationGuard& g, const Tuple& c);
+  booleanTrue(const GuardHD& g, const Tuple& c);
 
   inline tuple_t
   create_add_eqn_context
@@ -181,7 +181,7 @@ namespace TransLucid
       {DIM_ID, generate_string(name)},
       {
         DIM_VALID_GUARD,
-        Constant(EquationGuardType(EquationGuard(guard, boolean)),
+        Constant(Guard(GuardHD(guard, boolean)),
                    TYPE_INDEX_GUARD)
       },
     };

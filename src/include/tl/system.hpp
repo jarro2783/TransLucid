@@ -46,7 +46,7 @@ namespace TransLucid
     addInput(const IOList& input);
 
     void
-    addDemand(const u32string& id, const EquationGuard& guard);
+    addDemand(const u32string& id, const GuardHD& guard);
 
     void
     tick();
@@ -59,7 +59,7 @@ namespace TransLucid
     IOList m_outputs;
     IOList m_inputs;
 
-    typedef std::map<u32string, EquationGuard> DemandStore;
+    typedef std::map<u32string, GuardHD> DemandStore;
     DemandStore m_demands;
 
     //initialises the type indexes

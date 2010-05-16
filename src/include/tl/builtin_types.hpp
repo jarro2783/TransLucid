@@ -358,27 +358,27 @@ namespace TransLucid
     char32_t m_c;
   };
 
-  class EquationGuardType : public TypedValue
+  class Guard : public TypedValue
   {
     public:
-    EquationGuardType(const EquationGuard& g)
+    Guard(const GuardHD& g)
     : m_g(g)
     {}
 
-    const EquationGuard&
+    const GuardHD&
     value() const
     {
       return m_g;
     }
 
     bool
-    operator==(const EquationGuardType& rhs) const
+    operator==(const Guard& rhs) const
     {
       return true;
     }
 
     bool
-    operator<(const EquationGuardType& rhs) const
+    operator<(const Guard& rhs) const
     {
       return false;
     }
@@ -396,7 +396,7 @@ namespace TransLucid
     }
 
     private:
-    EquationGuard m_g;
+    GuardHD m_g;
   };
 
   class PairType : public TypedValue

@@ -80,7 +80,7 @@ namespace TransLucid
 
   class HD;
 
-  //class EquationGuard;
+  //class GuardHD;
 
   typedef uint16_t type_index;
   typedef std::u32string u32string;

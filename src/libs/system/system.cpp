@@ -185,7 +185,7 @@ SystemHD::addInput(const IOList& input)
 }
 
 void
-SystemHD::addDemand(const u32string& id, const EquationGuard& guard)
+SystemHD::addDemand(const u32string& id, const GuardHD& guard)
 {
   m_demands.insert(std::make_pair(id, guard));
 }

@@ -484,7 +484,7 @@ register_one_op
   {
     {
       TL::DIM_VALID_GUARD,
-      TL::Constant(TL::EquationGuardType(TL::EquationGuard(TL::Tuple(guard))),
+      TL::Constant(TL::Guard(TL::GuardHD(TL::Tuple(guard))),
                      TL::TYPE_INDEX_GUARD)
     },
     {

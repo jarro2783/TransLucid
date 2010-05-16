@@ -46,7 +46,7 @@ VariableHD::~VariableHD()
 }
 
 Tuple
-EquationGuard::evaluate(const Tuple& k) const
+GuardHD::evaluate(const Tuple& k) const
 throw (InvalidGuard)
 {
   tuple_t t = m_dimensions;
@@ -82,11 +82,11 @@ throw (InvalidGuard)
 inline std::pair<uuid, VariableHD::Equations::iterator>
 VariableHD::addExprActual(const Tuple& k, HD* h)
 {
-  const EquationGuard* g = 0;
+  const GuardHD* g = 0;
   Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
   if (giter != k.end())
   {
-    g = &giter->second.value<EquationGuardType const&>().value();
+    g = &giter->second.value<Guard const&>().value();
   }
 
   auto adder =
@@ -104,7 +104,7 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   }
   else
   {
-    return adder(EquationHD(m_name, EquationGuard(), h));
+    return adder(EquationHD(m_name, GuardHD(), h));
   }
 }
 
@@ -166,7 +166,7 @@ VariableHD::operator()(const Tuple& k)
     {
       try
       {
-        const EquationGuard& guard = eqn_i->second.validContext();
+        const GuardHD& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
         if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
         {
@@ -312,7 +312,7 @@ VariableHD::delexpr(uuid id, size_t time)
 }
 
 bool
-VariableHD::replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr)
+VariableHD::replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr)
 {
 }
 

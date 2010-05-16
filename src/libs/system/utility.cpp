@@ -149,7 +149,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
 }
 
 bool
-booleanTrue(const EquationGuard& g, const Tuple& k)
+booleanTrue(const GuardHD& g, const Tuple& k)
 {
   HD* b = g.boolean();
 

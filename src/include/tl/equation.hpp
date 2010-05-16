@@ -45,7 +45,7 @@ namespace TransLucid
    * The system can impose elements of the guard, it is an error for
    * the user to specify those ones too.
    **/
-  class EquationGuard
+  class GuardHD
   {
     public:
 
@@ -54,7 +54,7 @@ namespace TransLucid
      *
      * Specifies the AST to use for the guard.
      **/
-    EquationGuard(HD* g, HD* b)
+    GuardHD(HD* g, HD* b)
     : m_guard(g), m_boolean(b)
     {
     }
@@ -65,12 +65,12 @@ namespace TransLucid
      * There are no user dimensions in the guard. System imposed
      * dimensions can still be added.
      **/
-    EquationGuard()
+    GuardHD()
     : m_guard(0), m_boolean(0)
     {
     }
 
-    EquationGuard(const Tuple& t)
+    GuardHD(const Tuple& t)
     : m_guard(0), m_boolean(0)
     {
        for (Tuple::const_iterator iter = t.begin();
@@ -137,7 +137,7 @@ namespace TransLucid
   class EquationHD : public HD
   {
     public:
-    EquationHD(const u32string& name, const EquationGuard& valid, HD* h)
+    EquationHD(const u32string& name, const GuardHD& valid, HD* h)
     : m_name(name), m_validContext(valid), m_h(h),
     m_id(boost::uuids::random_generator()())
     {
@@ -154,7 +154,7 @@ namespace TransLucid
        return m_name;
     }
 
-    const EquationGuard&
+    const GuardHD&
     validContext() const
     {
        return m_validContext;
@@ -188,7 +188,7 @@ namespace TransLucid
 
     private:
     u32string m_name;
-    EquationGuard m_validContext;
+    GuardHD m_validContext;
     HD* m_h;
     boost::uuids::uuid m_id;
     size_t m_validStart;
@@ -215,7 +215,7 @@ namespace TransLucid
 
     bool delexpr(uuid id, size_t time);
 
-    bool replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr);
+    bool replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr);
 
     protected:
 

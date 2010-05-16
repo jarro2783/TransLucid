@@ -50,7 +50,7 @@ main(int argc, char *argv[])
   //set up the context for addExpr
   tuple_t k2;
   k2[get_dimension_index(&h, U"_validguard")] =
-     Constant(EquationGuardType(EquationGuard(Tuple(guard))),
+     Constant(Guard(GuardHD(Tuple(guard))),
                 TYPE_INDEX_GUARD);
 
   //x @ [value : 10] = 10;;

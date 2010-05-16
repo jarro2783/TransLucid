@@ -89,14 +89,14 @@ main(int argc, char* argv[])
   i.addOutput(map_list_of(U"out", &r));
   i.addInput(map_list_of(U"keyboard", &s));
 
-  i.addDemand(U"out", EquationGuard());
+  i.addDemand(U"out", GuardHD());
 
   //set out = keyboard
   Hyperdatons::IdentHD ident(&i, U"keyboard");
   tuple_t context =
     map_list_of(size_t(DIM_ID), generate_string(U"out"))
                (get_dimension_index(&i, U"_validguard"),
-                Constant(EquationGuardType(EquationGuard()),
+                Constant(Guard(GuardHD()),
                 TYPE_INDEX_GUARD));
   i.addExpr(Tuple(context), &ident);
 
