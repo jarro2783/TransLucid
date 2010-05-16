@@ -151,13 +151,16 @@ namespace TransLucid
      **/
     template <typename T>
     Constant(const T& value, type_index index)
-    : m_value(new Storage<T>(value)), m_index(index)
+    : 
+    //m_value((value))
+    m_index(index)
     {
     }
 
     Constant(const Constant& other)
-    : m_value(other.m_value != 0 ? other.m_value->clone() : 0),
-      m_index(other.m_index)
+    : 
+    //m_value(other.m_value != 0 ? other.m_value->clone() : 0)
+    m_index(other.m_index)
     {
     }
 
@@ -170,13 +173,7 @@ namespace TransLucid
     {
       if (this != &rhs)
       {
-        //if this throws then leave the value as it is, having
-        //a 0 here would be bad since Constant should always have
-        //a value, so it's better to leave the old value
-        StorageBase* copy = rhs.m_value->clone();
-        delete m_value;
-        m_value = copy;
-        m_index = rhs.m_index;
+      //TODO clone all the objects
       }
 
       return *this;
@@ -186,7 +183,7 @@ namespace TransLucid
     operator==(const Constant& rhs) const
     {
       return m_index == rhs.m_index
-      && m_value->equalTo(*rhs.m_value);
+      && m_value->hash() == rhs.m_value->hash();
     }
 
     bool
@@ -195,6 +192,7 @@ namespace TransLucid
       return !(*this == rhs);
     }
 
+    #if 0
     bool
     operator<(const Constant& rhs) const
     {
@@ -207,6 +205,7 @@ namespace TransLucid
         return m_value->less(*rhs.m_value);
       }
     }
+    #endif
 
     /**
      * @brief Computes the hash of the typed value.
@@ -217,7 +216,7 @@ namespace TransLucid
     hash() const
     {
       size_t seed = m_index;
-      boost::hash_combine(seed, m_value->value().hash());
+      boost::hash_combine(seed, m_value->hash());
       return seed;
     }
 
@@ -234,7 +233,7 @@ namespace TransLucid
     const T&
     value() const
     {
-      return dynamic_cast<const T&>(m_value->value());
+      return dynamic_cast<const T&>(*m_value);
     }
 
     /**
@@ -245,7 +244,7 @@ namespace TransLucid
     const TypedValue&
     value() const
     {
-      return m_value->value();
+      return *m_value;
     }
 
     /**
@@ -257,7 +256,7 @@ namespace TransLucid
     const T*
     valuep() const
     {
-      return dynamic_cast<const T*>(&m_value->value());
+      return dynamic_cast<const T*>(m_value);
     }
 
     /**
@@ -274,89 +273,12 @@ namespace TransLucid
     void
     print(std::ostream& os) const
     {
-      m_value->print(os);
+      //m_value->print(os);
     }
 
     private:
 
-    //allows us to store values of any type
-    class StorageBase
-    {
-      public:
-      virtual ~StorageBase() {}
-      virtual const TypedValue& value() const = 0;
-      virtual StorageBase* clone() const = 0;
-      virtual bool equalTo(const StorageBase& other) const = 0;
-      virtual bool less(const StorageBase& other) const = 0;
-      virtual void print(std::ostream& os) const = 0;
-    };
-
-    //stores a value of type T
-    template <class T>
-    class Storage : public StorageBase
-    {
-      public:
-      Storage(const T& v)
-      : m_value(v)
-      {
-      }
-
-      Storage(const Storage& other)
-      : m_value(other.m_value)
-      {
-      }
-
-      const TypedValue&
-      value() const
-      {
-        return m_value;
-      }
-
-      Storage<T>*
-      clone() const
-      {
-        return new Storage<T>(*this);
-      }
-
-      bool
-      equalTo(const StorageBase& other) const
-      {
-        const Storage<T>* o = dynamic_cast<const Storage<T>*>(&other);
-        if (o)
-        {
-          return m_value == o->m_value;
-        }
-        else
-        {
-          return false;
-        }
-      }
-
-      bool
-      less(const StorageBase& other) const
-      {
-        const Storage<T>* o = dynamic_cast<const Storage<T>*>(&other);
-        if (o)
-        {
-          return m_value < o->m_value;
-        }
-        else
-        {
-          throw "tried to compare less than for two values of different types";
-        }
-      }
-
-      void
-      print(std::ostream& os) const
-      {
-        m_value.print(os);
-      }
-
-      private:
-      T m_value;
-    };
-
-    StorageBase* m_value;
+    TypedValue* m_value;
     type_index m_index;
   };
 
@@ -448,11 +370,13 @@ namespace TransLucid
       return Tuple(new tuple_t(*m_value));
     }
 
+    #if 0
     bool
     operator<(const Tuple& rhs) const
     {
-      return *m_value < *rhs.m_value;
+      //return *m_value < *rhs.m_value;
     }
+    #endif
 
     private:
 
@@ -480,214 +404,6 @@ namespace TransLucid
    **/
   typedef std::vector<type_index> type_vec;
 
-  #if 0
-
-  //keeps track of types
-  /**
-   * @brief Stores types and operations on a types.
-   *
-   * Stores all the types in a system and their associated printer, parser
-   * and operations.
-   **/
-  class TypeRegistry
-  {
-    public:
-
-    //the registry is tied to a specific interpreter
-    TypeRegistry(Interpreter& i);
-    ~TypeRegistry();
-
-    type_index
-    generateIndex()
-    {
-      return m_nextIndex++;
-    }
-
-    size_t
-    registerType(const u32string& name);
-
-    size_t
-    lookupType(const u32string& name) const;
-
-    #if 0
-    void
-    registerOp
-    (const Glib::ustring& name, const type_vec& operands, OpFunction op)
-    {
-      op_map& ops = opsMap[name];
-      ops[operands] = op;
-    }
-
-    OpFunction
-    findOp(const Glib::ustring& name, const type_vec& tv) const
-    {
-      ops_map::const_iterator opsit = opsMap.find(name);
-      if (opsit == opsMap.end())
-      {
-        return makeOpTypeError;
-      }
-      op_map::const_iterator opit = opsit->second.find(tv);
-      if (opit == opsit->second.end())
-      {
-        return makeOpTypeError;
-      }
-      return opit->second;
-    }
-
-    //a variadic op takes a list of operands all of the same type
-    void
-    registerVariadicOp(const u32string& name, type_index t, OpFunction op)
-    {
-      m_variadicOperators[name][t] = op;
-    }
-
-    OpFunction
-    findVariadicOp(const Glib::ustring& name, type_index t) const
-    {
-      VariadicOpMap::const_iterator opsit = m_variadicOperators.find(name);
-      if (opsit == m_variadicOperators.end())
-      {
-        return makeOpTypeError;
-      }
-      VariadicOpMap::mapped_type::const_iterator opit =
-        opsit->second.find(t);
-      if (opit == opsit->second.end())
-      {
-        return makeOpTypeError;
-      }
-      return opit->second;
-    }
-    #endif
-
-    Interpreter&
-    interpreter() const
-    {
-      return m_interpreter;
-    }
-
-    //indexes for built in types
-    type_index
-    indexSpecial() const
-    {
-      return m_indexSpecial;
-    }
-
-    type_index
-    indexBoolean() const
-    {
-      return m_indexBool;
-    }
-
-    type_index
-    indexTuple() const
-    {
-      return m_indexTuple;
-    }
-
-    type_index
-    indexUneval() const
-    {
-      return m_indexUneval;
-    }
-
-    type_index
-    indexIntmp() const
-    {
-      return m_indexIntmp;
-    }
-
-    type_index
-    indexDimension() const
-    {
-      return m_indexDimension;
-    }
-
-    type_index
-    indexRange() const
-    {
-      return m_indexRange;
-    }
-
-    type_index
-    indexExpr() const
-    {
-      return m_indexExpr;
-    }
-
-    type_index
-    indexString() const
-    {
-      return m_indexString;
-    }
-
-    type_index
-    indexCalc() const
-    {
-      return m_indexCalc;
-    }
-
-    type_index
-    indexGuard() const
-    {
-      return m_indexGuard;
-    }
-
-    type_index
-    indexPair() const
-    {
-      return m_indexPair;
-    }
-
-    type_index
-    indexChar() const
-    {
-      return m_indexChar;
-    }
-
-    private:
-
-    type_index m_nextIndex;
-
-    type_index m_indexError;
-    type_index m_indexSpecial;
-    type_index m_indexBool;
-    type_index m_indexTuple;
-    type_index m_indexUneval;
-    type_index m_indexIntmp;
-    type_index m_indexDimension;
-    type_index m_indexRange;
-    type_index m_indexExpr;
-    type_index m_indexString;
-    type_index m_indexChar;
-    type_index m_indexCalc;
-    type_index m_indexGuard;
-    type_index m_indexPair;
-
-    Interpreter& m_interpreter;
-
-    public:
-    #if 0
-    ConvertFunction
-    findConverter(type_index to, type_index from) const
-    {
-      ConvertorsMap::const_iterator iter = m_convertors.find(to);
-
-      if (iter == m_convertors.end())
-      {
-        return makeConvertTypeError;
-      }
-
-      IndexConvertMap::const_iterator iter2 = iter->second.find(from);
-      if (iter2 == iter->second.end())
-      {
-        return makeConvertTypeError;
-      }
-
-      return iter2->second;
-    }
-    #endif
-  };
-  #endif
 
 } //namespace TransLucid
 
