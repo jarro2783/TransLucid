@@ -18,7 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/equation.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/consthd.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
@@ -30,16 +30,16 @@ using namespace TL;
 int
 main(int argc, char *argv[])
 {
-  TL::Interpreter i;
+  TL::SystemHD i;
   HD& h = i;
 
-  TL::Variable x(U"x", &i);
+  TL::VariableHD x(U"x", &i);
   TL::Hyperdatons::IntmpConst i1(5);
   TL::Tuple k;
   x.addExpr(k, &i1);
 
   //x = 5;;
-  TL::TaggedValue r = x(k);
+  TL::TaggedConstant r = x(k);
   std::cout << r.first.value<TL::Intmp>().value() << std::endl;
 
   //set up the equation guard

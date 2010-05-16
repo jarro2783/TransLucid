@@ -31,31 +31,31 @@ const char32_t* Intmp::name =     U"intmp";
 const char32_t* UChar::name =     U"uchar";
 const char32_t* UString::name =   U"ustring";
 
-TaggedValue
+TaggedConstant
 Intmp::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedValue(Constant(Special(Special::DIMENSION),
+    return TaggedConstant(Constant(Special(Special::DIMENSION),
                        TYPE_INDEX_SPECIAL), k);
   }
 
   try
   {
-    return TaggedValue(Constant(TransLucid::Intmp(
+    return TaggedConstant(Constant(TransLucid::Intmp(
              mpz_class(u32_to_ascii(value->second.value<String>().value()))),
              TYPE_INDEX_INTMP), k);
   }
   catch (...)
   {
-    return TaggedValue(Constant(Special(Special::CONST),
+    return TaggedConstant(Constant(Special(Special::CONST),
                        TYPE_INDEX_SPECIAL), k);
   }
 }
 
-TaggedValue
+TaggedConstant
 UChar::operator()(const Tuple& k)
 {
   size_t valueindex = get_dimension_index(m_system, U"text");
@@ -63,32 +63,32 @@ UChar::operator()(const Tuple& k)
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedValue(Constant(Special(Special::DIMENSION),
+    return TaggedConstant(Constant(Special(Special::DIMENSION),
                        TYPE_INDEX_SPECIAL), k);
   }
 
   const u32string& s = value->second.value<String>().value();
-  //return TaggedValue(m_i.typeRegistry().findType("uchar")
+  //return TaggedConstant(m_i.typeRegistry().findType("uchar")
   //         ->parse(s.value(), k, m_i), k);
   if (s.length() != 1)
   {
-    return TaggedValue(Constant(Special(Special::CONST),
+    return TaggedConstant(Constant(Special(Special::CONST),
                        TYPE_INDEX_SPECIAL), k);
   }
-  return TaggedValue(Constant(Char(s[0]), TYPE_INDEX_UCHAR), k);
+  return TaggedConstant(Constant(Char(s[0]), TYPE_INDEX_UCHAR), k);
 }
 
-TaggedValue
+TaggedConstant
 UString::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedValue(Constant(Special(Special::DIMENSION),
+    return TaggedConstant(Constant(Special(Special::DIMENSION),
                        TYPE_INDEX_SPECIAL), k);
   }
-  return TaggedValue(value->second, k);
+  return TaggedConstant(value->second, k);
 }
 
 } //namespace Hyperdatons

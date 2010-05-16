@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #if 0
 
 #include <tl/expr_parser.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <iostream>
 #include <ltdl.h>
 #include <boost/program_options.hpp>
@@ -91,7 +91,7 @@ main(int argc, char** argv)
 
   if (vm.count("verbose"))
   {
-    //interpreter.verbose();
+    //system.verbose();
     std::clog << "running in source directory: " <<
     Glib::get_current_dir() + "/" + input << std::endl;
   }
@@ -115,7 +115,7 @@ main(int argc, char** argv)
   {
     if (!system.parseSystem(input))
     {
-      //std::cerr << interpreter.errorCount() << " errors parsing input: "
+      //std::cerr << system.errorCount() << " errors parsing input: "
       //"demands not evaluated" << std::endl;
       evaluate = false;
     }
@@ -129,7 +129,7 @@ main(int argc, char** argv)
   {
     system.evaluateSystem(std::back_inserter(evaluated));
 
-    //TL::TypeRegistry& registry = interpreter.typeRegistry();
+    //TL::TypeRegistry& registry = system.typeRegistry();
     #if 0
     BOOST_FOREACH(ValueContextPair& p, evaluated)
     {

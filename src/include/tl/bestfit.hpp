@@ -21,14 +21,14 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid 
 {
-  class Variable;
+  class VariableHD;
   class Equation;
 
   class BestFit
   {
     public:
     virtual ~BestFit() {}
-    virtual TaggedValue operator()(const Tuple& k) = 0;
+    virtual TaggedConstant operator()(const Tuple& k) = 0;
   };
 
   class BestFittable
@@ -47,7 +47,7 @@ namespace TransLucid
       return old;
     }
 
-    TaggedValue operator()(Tuple& k)
+    TaggedConstant operator()(Tuple& k)
     {
       return (*m_bestFit)(k);
     }
@@ -59,9 +59,9 @@ namespace TransLucid
   class CompileBestFit : public BestFit
   {
     public:
-    //CompileBestFit(Equation& e, Variable& v);
+    //CompileBestFit(Equation& e, VariableHD& v);
 
-    TaggedValue operator()(const Tuple& k);
+    TaggedConstant operator()(const Tuple& k);
 
     private:
     ~CompileBestFit() {}
@@ -72,7 +72,7 @@ namespace TransLucid
   class BruteForceBestFit : public BestFit
   {
     public:
-    TaggedValue operator()(Tuple& k);
+    TaggedConstant operator()(Tuple& k);
   };
 
   class SingleDefinitionBestFit : public BestFit

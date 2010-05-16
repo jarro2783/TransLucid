@@ -135,7 +135,7 @@ namespace TransLucid
     : m_f(f)
     {}
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
       return m_f(k);

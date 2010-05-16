@@ -29,7 +29,7 @@ GeneralContainer::addExpr(const Tuple& k, HD* e)
 {
 }
 
-TaggedValue
+TaggedConstant
 GeneralContainer::operator()(const Tuple& k)
 {
 }

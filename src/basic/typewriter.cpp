@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   TL::Translator translator;
   TL::HD* h = translator.translate_expr(L"42");
 
-  TL::TaggedValue v = (*h)(TL::Tuple());
+  TL::TaggedConstant v = (*h)(TL::Tuple());
   std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;
 
   delete h;

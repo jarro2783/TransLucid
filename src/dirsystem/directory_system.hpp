@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef DIRECTORY_SYSTEM_HPP_INCLUDED
 #define DIRECTORY_SYSTEM_HPP_INCLUDED
 
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/expr_compiler.hpp>
@@ -73,7 +73,7 @@ namespace TransLucid
 
       Libtool m_lt;
 
-      TransLucid::Interpreter m_interpreter;
+      TransLucid::SystemHD m_system;
 
       Parser::HeaderGrammar<Parser::iterator_t> m_header_parser;
       Parser::ExprGrammar<Parser::iterator_t> m_expr_parser;
@@ -109,10 +109,10 @@ namespace TransLucid
         Tuple c(tuple);
 
         //Equation e = findEquation("demand", c);
-        //Variable* v = lookupVariable("demand");
-        *out = m_interpreter(c);
+        //VariableHD* v = lookupVariable("demand");
+        *out = m_system(c);
         #if 0
-        Variable* v = 0;
+        VariableHD* v = 0;
 
         if (v)
         {
@@ -121,7 +121,7 @@ namespace TransLucid
         }
         else
         {
-          *out = TaggedValue(Constant(Special(Special::UNDEF),
+          *out = TaggedConstant(Constant(Special(Special::UNDEF),
                               typeRegistry().indexSpecial()), c);
         }
         #endif

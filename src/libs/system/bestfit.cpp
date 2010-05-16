@@ -1,4 +1,4 @@
-/* Header type.
+/* Equations (ident = expr)
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,56 +17,20 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#if 0
-
-#include <tl/header_type.hpp>
-#include <tl/parser.hpp>
+#include <tl/bestfit.hpp>
 
 namespace TransLucid
 {
 
-size_t
-HeaderType::hash() const
+//TODO finish this
+TaggedConstant CompileBestFit::operator()(const Tuple& k)
 {
-   return 0;
+  BestFit* b = 0;
+  BestFit* old = m_bestFittable->setBestFit(b);
+  if (old != this) {
+  }
+
+  return (*b)(k);
 }
 
-void
-HeaderType::parseString
-(
-  const u32string& s,
-  const Tuple& c,
-  Interpreter& i
-)
-{
-  #if 0
-  Parser::HeaderGrammar hg(m_header, i.parsers());
-
-  Parser::UIterator iter(s);
-
-  Parser::iterator_t begin(Parser::Iterator(iter),
-                           Parser::Iterator(iter.make_end()));
-
-  i.parseRange(begin, Parser::iterator_t(), hg);
-  #endif
-}
-
-void
-HeaderType::parseFile
-(
-  const u32string& file,
-  const Tuple& c,
-  Interpreter& i
-)
-{
-}
-
-bool
-HeaderType::operator==(const HeaderType& rhs) const
-{
-  return m_header == rhs.m_header;
-}
-
-}
-
-#endif
+} //namespace TransLucid

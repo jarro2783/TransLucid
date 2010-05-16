@@ -28,7 +28,7 @@ namespace TransLucid
   {
     public:
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k);
   };
 }

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
 #include <tl/consthd.hpp>
@@ -38,10 +38,10 @@ namespace
     {
     }
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
-      return TaggedValue(Constant(Intmp(m_index++), TYPE_INDEX_INTMP), k);
+      return TaggedConstant(Constant(Intmp(m_index++), TYPE_INDEX_INTMP), k);
     }
 
     private:
@@ -56,7 +56,7 @@ namespace
     : m_d(d)
     {}
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
       Tuple::const_iterator iter = k.find(DIM_TEXT);
@@ -64,7 +64,7 @@ namespace
       {
         throw "called dim lookup without text dimension";
       }
-      return TaggedValue(Constant(Intmp(
+      return TaggedConstant(Constant(Intmp(
         m_d.lookup(iter->second.value<String>().value())),
                    TYPE_INDEX_INTMP), k);
     }
@@ -81,7 +81,7 @@ namespace
     : m_d(d)
     {}
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
       Tuple::const_iterator iter = k.find(DIM_VALUE);
@@ -89,7 +89,7 @@ namespace
       {
         throw "called dim lookup without value dimension";
       }
-      return TaggedValue(Constant(Intmp(
+      return TaggedConstant(Constant(Intmp(
         m_d.lookup(iter->second)), TYPE_INDEX_INTMP), k);
     }
 
@@ -100,7 +100,7 @@ namespace
 
 template <typename T>
 HD*
-Interpreter::buildConstantHD(size_t index)
+SystemHD::buildConstantHD(size_t index)
 {
   HD* h = new T(this);
 
@@ -115,7 +115,7 @@ Interpreter::buildConstantHD(size_t index)
 }
 
 void
-Interpreter::init_types()
+SystemHD::init_types()
 {
   BOOST_FOREACH(auto v, builtin_name_to_index)
   {
@@ -123,8 +123,8 @@ Interpreter::init_types()
   }
 }
 
-Interpreter::Interpreter()
-: Variable(U"", this),
+SystemHD::SystemHD()
+: VariableHD(U"", this),
   m_time(0),
   builtin_name_to_index
   {
@@ -168,13 +168,13 @@ Interpreter::Interpreter()
 }
 
 void
-Interpreter::addOutput(const IOList& output)
+SystemHD::addOutput(const IOList& output)
 {
   m_outputs.insert(output.begin(), output.end());
 }
 
 void
-Interpreter::addInput(const IOList& input)
+SystemHD::addInput(const IOList& input)
 {
   m_inputs.insert(input.begin(), input.end());
 
@@ -185,13 +185,13 @@ Interpreter::addInput(const IOList& input)
 }
 
 void
-Interpreter::addDemand(const u32string& id, const EquationGuard& guard)
+SystemHD::addDemand(const u32string& id, const EquationGuard& guard)
 {
   m_demands.insert(std::make_pair(id, guard));
 }
 
 void
-Interpreter::tick()
+SystemHD::tick()
 {
 
   tuple_t current;
@@ -212,7 +212,7 @@ Interpreter::tick()
       if (iter != m_variables.end())
       {
         //evaluate the demand
-        TaggedValue r = (*iter->second)(k);
+        TaggedConstant r = (*iter->second)(k);
         //save it in the output
         toSave[DIM_VALUE] = r.first;
         IOList::iterator iter = m_outputs.find(d.first);

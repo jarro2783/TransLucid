@@ -20,11 +20,13 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef HEADER_TYPE_HPP_INCLUDED
 #define HEADER_TYPE_HPP_INCLUDED
 
+// TODO: This file is under construction.  It is not junk.
+
 #if 0
 
 #include <tl/types.hpp>
 #include <tl/parser_fwd.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 
 namespace TransLucid
 {
@@ -51,10 +53,10 @@ namespace TransLucid
     operator==(const HeaderType& rhs) const;
 
     void
-    parseString(const u32string& s, const Tuple& c, Interpreter& i);
+    parseString(const u32string& s, const Tuple& c, SystemHD& i);
 
     void
-    parseFile(const u32string& file, const Tuple& c, Interpreter& i);
+    parseFile(const u32string& file, const Tuple& c, SystemHD& i);
 
     bool
     operator<(const HeaderType& rhs) const
@@ -82,7 +84,7 @@ namespace TransLucid
         HeaderType& h,
         const u32string& s,
         const Tuple& c,
-        Interpreter& i
+        SystemHD& i
       ) const
       {
         h.parseString(s, c, i);
@@ -98,7 +100,7 @@ namespace TransLucid
         HeaderType& h,
         const u32string& s,
         const Tuple& c,
-        Interpreter& i
+        SystemHD& i
       ) const
       {
          h.parseFile(s, c, i);

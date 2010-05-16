@@ -20,13 +20,13 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef INTERACTIVE_HPP_INCLUDED
 #define INTERACTIVE_HPP_INCLUDED
 
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/parser_fwd.hpp>
 
 namespace TLInteractive
 {
   namespace TL = TransLucid;
-  class System : public TL::Interpreter
+  class System : public TL::SystemHD
   {
     public:
 

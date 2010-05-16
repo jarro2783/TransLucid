@@ -43,7 +43,7 @@ along with TransLucid; see the file COPYING.  If not see
 // before unloading libraries with
 // lt_exit
 // as long as all typed values are destructed
-// before the interpreter class is then this
+// before the system class is then this
 // will work fine
 // ----------------------------------
 
@@ -76,7 +76,7 @@ namespace boost
 namespace TransLucid
 {
 
-  class Interpreter;
+  class SystemHD;
 
   class HD;
 
@@ -360,7 +360,7 @@ namespace TransLucid
     }
 
     //void
-    //print(const Interpreter& i, std::ostream& os, const Tuple& c) const;
+    //print(const SystemHD& i, std::ostream& os, const Tuple& c) const;
 
     void print(std::ostream& os) const;
 
@@ -392,7 +392,7 @@ namespace TransLucid
    *
    * A Constant and the context it was evaluated in.
    **/
-  typedef std::pair<Constant, Tuple> TaggedValue;
+  typedef std::pair<Constant, Tuple> TaggedConstant;
 
   //typedef boost::function<Constant
   //        (const Constant&, const Constant&, const Tuple&)> OpFunction;

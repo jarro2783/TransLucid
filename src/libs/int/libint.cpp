@@ -27,7 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <gmpxx.h>
 #include <boost/ref.hpp>
 #include <tl/builtin_types.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
@@ -414,7 +414,7 @@ class OpHD : public TL::HD
   //takes the two operands out of the tuple and passes them to the
   //op as arguments
   //variadic templates would be really really good here
-  TL::TaggedValue
+  TL::TaggedConstant
   operator()(const TL::Tuple& k)
   {
     try
@@ -422,7 +422,7 @@ class OpHD : public TL::HD
       size_t index_arg0 = TL::get_dimension_index(&m_system, U"arg0");
       size_t index_arg1 = TL::get_dimension_index(&m_system, U"arg1");
 
-      return TL::TaggedValue(m_op(TL::get_dimension(k, index_arg0),
+      return TL::TaggedConstant(m_op(TL::get_dimension(k, index_arg0),
                                   TL::get_dimension(k, index_arg1),
                                   k),
                              k);
@@ -432,7 +432,7 @@ class OpHD : public TL::HD
       //H @ [id : "CONST", type : "special", value : "dimension"]
       //or we could leave these since it is slightly more efficient,
       // however it will all come out in the wash when we compile anyway
-      return TL::TaggedValue(TL::Constant(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
                TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
     }
   }
@@ -498,7 +498,7 @@ register_one_op
 
 template<class T>
 void
-register_int_ops(TL::Interpreter& i, size_t index)
+register_int_ops(TL::SystemHD& i, size_t index)
 {
   register_one_op<T, std::plus>(i, U"operator+", index);
   register_one_op<T, std::minus>(i, U"operator-", index);
@@ -521,13 +521,13 @@ template <typename T>
 class IntHD : public TL::HD
 {
   public:
-  IntHD(const TL::u32string& name, size_t index, TL::Interpreter& system)
+  IntHD(const TL::u32string& name, size_t index, TL::SystemHD& system)
   : m_system(system), m_index(index)
   {
     //m_index = system.typeRegistry().registerType(name);
   }
 
-  TL::TaggedValue
+  TL::TaggedConstant
   operator()(const TL::Tuple& k)
   {
     //retrieve the text and parse it
@@ -537,32 +537,32 @@ class IntHD : public TL::HD
 
     if (text == k.end())
     {
-      return TL::TaggedValue(TL::Constant(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
         TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
     }
 
     try
     {
-      return TL::TaggedValue(TL::Constant(
+      return TL::TaggedConstant(TL::Constant(
         Int<T>(boost::lexical_cast<T>(TL::utf32_to_utf8(
           text->second.value<TL::String>().value()))), m_index), k)
          ;
     }
     catch (...)
     {
-      return TL::TaggedValue(TL::Constant(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
         TL::Special::CONST), TL::TYPE_INDEX_SPECIAL), k);
     }
   }
 
   private:
-  TL::Interpreter& m_system;
+  TL::SystemHD& m_system;
   size_t m_index;
 };
 
 template <class T>
 void
-registerType(const TL::u32string& name, TL::Interpreter& i)
+registerType(const TL::u32string& name, TL::SystemHD& i)
 {
   mpz_class unique = TL::get_unique(&i);
 
@@ -591,7 +591,7 @@ Int<T>::print(std::ostream& os) const
 }
 
 void
-registerTypes(TransLucid::Interpreter& i)
+registerTypes(TransLucid::SystemHD& i)
 {
   #if 0
   TransLucid::TypeRegistry& r = i.typeRegistry();
@@ -626,7 +626,7 @@ extern "C"
 {
 
 void
-lib_int_init(TransLucid::Interpreter& i)
+lib_int_init(TransLucid::SystemHD& i)
 {
   IntLib::registerTypes(i);
 }

@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/signals2.hpp>
 #include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
 #include <boost/spirit/home/phoenix/statement/switch.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 
 namespace TLInteractive
 {
@@ -45,18 +45,18 @@ namespace TLInteractive
       TL::Parser::Parsers& parsers,
       TL::Parser::Header& header,
       TL::Parser::EquationAdder& adder,
-      TL::Interpreter& interpreter
+      TL::SystemHD& system
     )
     : parsers(parsers),
       header(header),
       adder(adder),
-      interpreter(interpreter)
+      system(system)
     {}
 
     TL::Parser::Parsers& parsers;
     TL::Parser::Header& header;
     TL::Parser::EquationAdder& adder;
-    TL::Interpreter& interpreter;
+    TL::SystemHD& system;
 
     Signals::signal<void (std::vector<TL::AST::Expr*> const&)> postParseInput;
 
@@ -75,7 +75,7 @@ namespace TLInteractive
       : m_self(self),
       expect_dbl_semi(TL::Parser::error_expected_dbl_semi),
       eqnGrammar(self.header, self.parsers, self.adder),
-      equationSet(self.interpreter.createEquationSet(TL::EquationGuard()))
+      equationSet(self.system.createEquationSet(TL::EquationGuard()))
       {
         equations = new TL::Parser::equation_v;
         self.adder.setEquations(equations);

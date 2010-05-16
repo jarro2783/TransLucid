@@ -25,14 +25,14 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class Interpreter;
+  class SystemHD;
 
   class LazyWarehouse
   {
     public:
 
-    LazyWarehouse(Interpreter& i)
-    : m_interpreter(i)
+    LazyWarehouse(SystemHD& i)
+    : m_system(i)
     {}
 
     //looks up and if not found adds a calc entry
@@ -46,7 +46,7 @@ namespace TransLucid
     typedef std::map<Tuple, Constant> TupleToValue;
     typedef std::map<u32string, TupleToValue> CacheMapping;
     CacheMapping m_cache;
-    Interpreter& m_interpreter;
+    SystemHD& m_system;
   };
 
 }

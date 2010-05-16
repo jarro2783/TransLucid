@@ -34,7 +34,7 @@ namespace TransLucid
     uuid
     addExpr(const Tuple& k, HD* e);
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k);
 
     private:

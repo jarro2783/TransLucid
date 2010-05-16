@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define CONSTHD_HPP_INCLUDED
 
 #include <tl/hyperdaton.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/fixed_indexes.hpp>
 
@@ -52,7 +52,7 @@ namespace TransLucid
       : ValueHD(system)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
     };
 
@@ -65,7 +65,7 @@ namespace TransLucid
       : ValueHD(system)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
     };
 
@@ -78,7 +78,7 @@ namespace TransLucid
       : ValueHD(system)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
     };
 
@@ -91,10 +91,10 @@ namespace TransLucid
       : m_v(v)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k)
       {
-        return TaggedValue(Constant(TransLucid::Intmp(m_v),
+        return TaggedConstant(Constant(TransLucid::Intmp(m_v),
                            TYPE_INDEX_INTMP), k);
       }
 
@@ -117,10 +117,10 @@ namespace TransLucid
       : ValueHD(0), m_index(index)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k)
       {
-        return TaggedValue(Constant(TypeType(m_index),
+        return TaggedConstant(Constant(TypeType(m_index),
                            TYPE_INDEX_TYPE), k);
       }
 

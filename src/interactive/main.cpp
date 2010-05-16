@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #if 0
 #include "interactive.hpp"
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <boost/program_options.hpp>
 
 #ifdef HAVE_CONFIG_H

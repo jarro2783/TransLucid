@@ -30,7 +30,7 @@ namespace TransLucid
    * @brief Internal exceptions.
    *
    * An enum describing the possible internal exceptions that
-   * can be thrown by the interpreter.
+   * can be thrown by the system.
    **/
   enum ExceptionType
   {

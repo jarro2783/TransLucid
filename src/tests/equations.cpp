@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE ( single )
 
   TL::HD& system = translator.system();
 
-  TL::TaggedValue v = system
+  TL::TaggedConstant v = system
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"x")}
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
 
   TL::HD& system = translator.system();
 
-  TL::TaggedValue v = system
+  TL::TaggedConstant v = system
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"a")}
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE ( functions )
 {
   std::cerr << "Third test case" << std::endl;
   TL::HD* h = 0;
-  TL::TaggedValue v;
+  TL::TaggedConstant v;
 
   translator.translate_and_add_equation_set
   (

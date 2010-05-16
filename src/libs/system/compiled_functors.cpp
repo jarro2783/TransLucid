@@ -90,7 +90,7 @@ insert_tuple(tuple_t& k, HD* h, size_t index)
 
 }
 
-TaggedValue
+TaggedConstant
 BinaryOpHD::operator()(const Tuple& k)
 {
   //Constant v1 = (*m_operands.at(0))(k).first;
@@ -109,18 +109,18 @@ BinaryOpHD::operator()(const Tuple& k)
 
   //std::cerr << "finding OP @ [name : " << utf32_to_utf8(m_name) << " ..." << std::endl;
 
-  TaggedValue v = (*m_system)(Tuple(t));
+  TaggedConstant v = (*m_system)(Tuple(t));
   //std::cerr << "result: " << v.first << std::endl;
-  return TaggedValue(v.first, k);
+  return TaggedConstant(v.first, k);
 }
 
-TaggedValue
+TaggedConstant
 BoolHD::operator()(const Tuple& k)
 {
-  return TaggedValue(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
+  return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
 }
 
-TaggedValue
+TaggedConstant
 TypedValueHD::operator()(const Tuple& k)
 {
   //evaluate CONST
@@ -140,22 +140,22 @@ TypedValueHD::operator()(const Tuple& k)
   return (*m_system)(Tuple(kp));
 }
 
-TaggedValue
+TaggedConstant
 Convert::operator()(const Tuple& k)
 {
   //going away
-  return TaggedValue();
+  return TaggedConstant();
 }
 
-TaggedValue
+TaggedConstant
 DimensionHD::operator()(const Tuple& k)
 {
   size_t id = get_dimension_index(m_system, m_name);
-  return TaggedValue (Constant(TransLucid::Dimension(id),
+  return TaggedConstant (Constant(TransLucid::Dimension(id),
                       TYPE_INDEX_DIMENSION), k);
 }
 
-TaggedValue
+TaggedConstant
 IdentHD::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
@@ -167,10 +167,10 @@ IdentHD::operator()(const Tuple& k)
   return (*m_system)(Tuple(kp));
 }
 
-TaggedValue
+TaggedConstant
 IfHD::operator()(const Tuple& k)
 {
-  TaggedValue cond = (*m_condition)(k);
+  TaggedConstant cond = (*m_condition)(k);
   Constant& condv = cond.first;
 
   if (condv.index() == TYPE_INDEX_SPECIAL)
@@ -193,7 +193,7 @@ IfHD::operator()(const Tuple& k)
       while (iter != m_elsifs.end())
       {
         //std::auto_ptr<ValueV> cond(makeValue((*iter)->visit(this, d)));
-        TaggedValue cond = (*iter)->operator()(k);
+        TaggedConstant cond = (*iter)->operator()(k);
 
         type_index index = cond.first.index();
 
@@ -212,7 +212,7 @@ IfHD::operator()(const Tuple& k)
         }
         else
         {
-          return TaggedValue(Constant(Special(Special::TYPEERROR),
+          return TaggedConstant(Constant(Special(Special::TYPEERROR),
                              TYPE_INDEX_SPECIAL), k);
         }
 
@@ -224,15 +224,15 @@ IfHD::operator()(const Tuple& k)
   }
   else
   {
-    return TaggedValue(Constant(Special(Special::TYPEERROR),
+    return TaggedConstant(Constant(Special(Special::TYPEERROR),
                        TYPE_INDEX_SPECIAL), k);
   }
 }
 
-TaggedValue
+TaggedConstant
 HashHD::operator()(const Tuple& k)
 {
-  TaggedValue r = (*m_e)(k);
+  TaggedConstant r = (*m_e)(k);
   //std::cerr << "hash " << r.first << " = ";
   size_t index;
   if (r.first.index() == TYPE_INDEX_DIMENSION)
@@ -248,36 +248,36 @@ HashHD::operator()(const Tuple& k)
   if (iter != k.end())
   {
     //std::cerr << iter->second << std::endl;
-    return TaggedValue(iter->second, k);
+    return TaggedConstant(iter->second, k);
   }
   else
   {
-    return TaggedValue(Constant(Special(Special::DIMENSION),
+    return TaggedConstant(Constant(Special(Special::DIMENSION),
                        TYPE_INDEX_SPECIAL), k);
   }
 }
 
-TaggedValue
+TaggedConstant
 IntegerConstHD::operator()(const Tuple& k)
 {
-  return TaggedValue(Constant(Intmp(m_value), TYPE_INDEX_INTMP), k);
+  return TaggedConstant(Constant(Intmp(m_value), TYPE_INDEX_INTMP), k);
 }
 
-TaggedValue
+TaggedConstant
 IsSpecial::operator()(const Tuple& k)
 {
   //this is going away, but to stop warnings
-  return TaggedValue();
+  return TaggedConstant();
 }
 
-TaggedValue
+TaggedConstant
 IsType::operator()(const Tuple& k)
 {
   //this is going away, but to stop warnings
-  return TaggedValue();
+  return TaggedConstant();
 }
 
-TaggedValue
+TaggedConstant
 OperationHD::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
@@ -299,51 +299,51 @@ OperationHD::operator()(const Tuple& k)
 }
 
 #if 0
-TaggedValue
+TaggedConstant
 Pair::operator()(const Tuple& k)
 {
-  TaggedValue l = (*m_lhs)(k);
-  TaggedValue r = (*m_rhs)(k);
+  TaggedConstant l = (*m_lhs)(k);
+  TaggedConstant r = (*m_rhs)(k);
 
-  return TaggedValue(Constant(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
+  return TaggedConstant(Constant(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
                      TYPE_INDEX_PAIR), k);
 }
 #endif
 
-TaggedValue
+TaggedConstant
 SpecialHD::operator()(const Tuple& k)
 {
-  return TaggedValue(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
+  return TaggedConstant(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
 }
 
-TaggedValue
+TaggedConstant
 StringConstHD::operator()(const Tuple& k)
 {
-  return TaggedValue(Constant(String(m_value), TYPE_INDEX_USTRING), k);
+  return TaggedConstant(Constant(String(m_value), TYPE_INDEX_USTRING), k);
 }
 
-TaggedValue
+TaggedConstant
 UcharConstHD::operator()(const Tuple& k)
 {
-  return TaggedValue(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
+  return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
 }
 
-TaggedValue
+TaggedConstant
 UnaryOpHD::operator()(const Tuple& k)
 {
   //TODO: resolve what to do with operations
-  return TaggedValue();
+  return TaggedConstant();
 }
 
-TaggedValue
+TaggedConstant
 BuildTupleHD::operator()(const Tuple& k)
 {
   tuple_t kp;
   BOOST_FOREACH(auto& pair, m_elements)
   {
     //const PairType& p = v.first.value<PairType>();
-    TaggedValue left = (*pair.first)(k);
-    TaggedValue right = (*pair.second)(k);
+    TaggedConstant left = (*pair.first)(k);
+    TaggedConstant right = (*pair.second)(k);
 
     if (left.first.index() == TYPE_INDEX_DIMENSION)
     {
@@ -354,16 +354,16 @@ BuildTupleHD::operator()(const Tuple& k)
       kp[get_dimension_index(m_system, left.first)] = right.first;
     }
   }
-  return TaggedValue(Constant(Tuple(kp), TYPE_INDEX_TUPLE), k);
+  return TaggedConstant(Constant(Tuple(kp), TYPE_INDEX_TUPLE), k);
 }
 
-TaggedValue
+TaggedConstant
 AtAbsoluteHD::operator()(const Tuple& k)
 {
-  TaggedValue kp = (*e1)(k);
+  TaggedConstant kp = (*e1)(k);
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
-    return TaggedValue(Constant(Special(Special::TYPEERROR),
+    return TaggedConstant(Constant(Special(Special::TYPEERROR),
       TYPE_INDEX_SPECIAL), k);
   }
   else
@@ -372,14 +372,14 @@ AtAbsoluteHD::operator()(const Tuple& k)
   }
 }
 
-TaggedValue
+TaggedConstant
 AtRelativeHD::operator()(const Tuple& k)
 {
   tuple_t kNew = k.tuple();
-  TaggedValue kp = (*e1)(k);
+  TaggedConstant kp = (*e1)(k);
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
-    return TaggedValue(Constant(Special(Special::TYPEERROR),
+    return TaggedConstant(Constant(Special(Special::TYPEERROR),
       TYPE_INDEX_SPECIAL), k);
   }
   else
