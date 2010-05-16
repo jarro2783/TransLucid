@@ -18,7 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/equation.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/consthd.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>

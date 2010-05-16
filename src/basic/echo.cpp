@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <boost/assign/list_of.hpp>
 #include <iostream>
 #include <tl/builtin_types.hpp>

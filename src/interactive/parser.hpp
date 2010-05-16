@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/signals2.hpp>
 #include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
 #include <boost/spirit/home/phoenix/statement/switch.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 
 namespace TLInteractive
 {

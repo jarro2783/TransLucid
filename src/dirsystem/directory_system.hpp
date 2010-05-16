@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef DIRECTORY_SYSTEM_HPP_INCLUDED
 #define DIRECTORY_SYSTEM_HPP_INCLUDED
 
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/expr_compiler.hpp>

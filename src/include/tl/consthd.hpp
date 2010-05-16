@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define CONSTHD_HPP_INCLUDED
 
 #include <tl/hyperdaton.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/fixed_indexes.hpp>
 

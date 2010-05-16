@@ -27,7 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <gmpxx.h>
 #include <boost/ref.hpp>
 #include <tl/builtin_types.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>

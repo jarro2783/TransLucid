@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define HYPERDATON_HPP_INCLUDED
 
 #include <tl/types.hpp>
-//#include <tl/interpreter.hpp>
+//#include <tl/system.hpp>
 
 namespace TransLucid
 {

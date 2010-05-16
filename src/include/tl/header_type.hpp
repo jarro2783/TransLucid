@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 #include <tl/parser_fwd.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 
 namespace TransLucid
 {

@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #if 0
 
 #include <tl/expr_parser.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <iostream>
 #include <ltdl.h>
 #include <boost/program_options.hpp>
