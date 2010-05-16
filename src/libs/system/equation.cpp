@@ -142,7 +142,7 @@ VariableHD::operator()(const Tuple& k)
       {
         //std::cerr << "not found" << std::endl;
         return TaggedConstant(Constant(Special(Special::UNDEF),
-                           TYPE_INDEX_SPECIAL), k);
+                              TYPE_INDEX_SPECIAL), k);
       }
       else
       {
@@ -154,7 +154,7 @@ VariableHD::operator()(const Tuple& k)
     catch (std::bad_cast& e)
     {
       return TaggedConstant(Constant(Special(Special::DIMENSION),
-                         TYPE_INDEX_SPECIAL), k);
+                            TYPE_INDEX_SPECIAL), k);
     }
   }
 
@@ -193,7 +193,7 @@ VariableHD::operator()(const Tuple& k)
   if (applicable.size() == 0)
   {
     return TaggedConstant(Constant(Special(Special::UNDEF),
-                       TYPE_INDEX_SPECIAL),k);
+                          TYPE_INDEX_SPECIAL),k);
   }
   else if (applicable.size() == 1)
   {
@@ -224,7 +224,7 @@ VariableHD::operator()(const Tuple& k)
   if (bestIter == applicable.end())
   {
     return TaggedConstant(Constant(Special(Special::UNDEF),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 
   for (applicable_list::const_iterator iter = applicable.begin();
@@ -236,7 +236,7 @@ VariableHD::operator()(const Tuple& k)
         !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
       return TaggedConstant(Constant(Special(Special::MULTIDEF),
-                         TYPE_INDEX_SPECIAL), k);
+                            TYPE_INDEX_SPECIAL), k);
     }
   }
 

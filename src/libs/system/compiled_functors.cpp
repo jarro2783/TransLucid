@@ -152,7 +152,7 @@ DimensionHD::operator()(const Tuple& k)
 {
   size_t id = get_dimension_index(m_system, m_name);
   return TaggedConstant (Constant(TransLucid::Dimension(id),
-                      TYPE_INDEX_DIMENSION), k);
+                         TYPE_INDEX_DIMENSION), k);
 }
 
 TaggedConstant
@@ -213,7 +213,7 @@ IfHD::operator()(const Tuple& k)
         else
         {
           return TaggedConstant(Constant(Special(Special::TYPEERROR),
-                             TYPE_INDEX_SPECIAL), k);
+                                TYPE_INDEX_SPECIAL), k);
         }
 
         ++iter;
@@ -225,7 +225,7 @@ IfHD::operator()(const Tuple& k)
   else
   {
     return TaggedConstant(Constant(Special(Special::TYPEERROR),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 }
 
@@ -253,7 +253,7 @@ HashHD::operator()(const Tuple& k)
   else
   {
     return TaggedConstant(Constant(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 }
 
@@ -364,7 +364,7 @@ AtAbsoluteHD::operator()(const Tuple& k)
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
     return TaggedConstant(Constant(Special(Special::TYPEERROR),
-      TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
   else
   {
@@ -380,7 +380,7 @@ AtRelativeHD::operator()(const Tuple& k)
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
     return TaggedConstant(Constant(Special(Special::TYPEERROR),
-      TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
   else
   {

@@ -39,7 +39,7 @@ IntmpHD::operator()(const Tuple& k)
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
     return TaggedConstant(Constant(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 
   try
@@ -51,7 +51,7 @@ IntmpHD::operator()(const Tuple& k)
   catch (...)
   {
     return TaggedConstant(Constant(Special(Special::CONST),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 }
 
@@ -64,7 +64,7 @@ UCharHD::operator()(const Tuple& k)
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
     return TaggedConstant(Constant(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 
   const u32string& s = value->second.value<String>().value();
@@ -73,7 +73,7 @@ UCharHD::operator()(const Tuple& k)
   if (s.length() != 1)
   {
     return TaggedConstant(Constant(Special(Special::CONST),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
   return TaggedConstant(Constant(Char(s[0]), TYPE_INDEX_UCHAR), k);
 }
@@ -86,7 +86,7 @@ UStringHD::operator()(const Tuple& k)
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
     return TaggedConstant(Constant(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
   return TaggedConstant(value->second, k);
 }
