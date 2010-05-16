@@ -3,7 +3,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 add_executable(tl main.cpp directory_system.cpp)
-target_link_libraries(tl tlinterpreter ${TLLIBS} ${Boost_LIBRARIES})
+target_link_libraries(tl tlsystem ${TLLIBS} ${Boost_LIBRARIES})
 add_definitions(${TLCFLAGS})
 
 install(TARGETS tl
