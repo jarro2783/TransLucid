@@ -492,22 +492,22 @@ namespace TransLucid
     SetBase* m_value;
   };
 
-  class TypeType : public TypedValue
+  class Type : public TypedValue
   {
     public:
 
-    TypeType(size_t index)
+    Type(size_t index)
     : m_index(index)
     {}
 
     bool
-    operator==(const TypeType& rhs) const
+    operator==(const Type& rhs) const
     {
       return m_index == rhs.m_index;
     }
 
     bool
-    operator<(const TypeType& rhs) const
+    operator<(const Type& rhs) const
     {
       return m_index < rhs.m_index;
     }

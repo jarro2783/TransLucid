@@ -468,11 +468,11 @@ register_one_op
   {
     {
       TL::get_dimension_index(&system, U"arg0"),
-      TL::Constant(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+      TL::Constant(TL::Type(index), TL::TYPE_INDEX_TYPE)
     },
     {
       TL::get_dimension_index(&system, U"arg1"),
-      TL::Constant(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+      TL::Constant(TL::Type(index), TL::TYPE_INDEX_TYPE)
     },
     {
       TL::DIM_NAME,

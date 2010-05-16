@@ -109,18 +109,18 @@ namespace TransLucid
     };
 
     //TODO: move this to a ConstantHD
-    class TypeConst : public ValueHD
+    class TypeHD : public ValueHD
     {
       public:
 
-      TypeConst(size_t index)
+      TypeHD(size_t index)
       : ValueHD(0), m_index(index)
       {}
 
       TaggedConstant
       operator()(const Tuple& k)
       {
-        return TaggedConstant(Constant(TypeType(m_index),
+        return TaggedConstant(Constant(Type(m_index),
                            TYPE_INDEX_TYPE), k);
       }
 
