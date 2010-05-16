@@ -1,4 +1,4 @@
 check that 2 - -a works - make it work if it doesn't
 footer for output
 add error checking for all parsing
-
+make tuple dim_index -> constant and change everywhere that uses it
