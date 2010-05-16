@@ -50,13 +50,13 @@ ExprCompiler::operator()(const Tree::nil& n)
 HD*
 ExprCompiler::operator()(bool b)
 {
-  return new Hyperdatons::BoolHD(b);
+  return new Hyperdatons::BoolConstHD(b);
 }
 
 HD*
 ExprCompiler::operator()(Special::Value s)
 {
-  return new Hyperdatons::SpecialHD(s);
+  return new Hyperdatons::SpecialConstHD(s);
 }
 
 HD*

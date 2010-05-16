@@ -130,7 +130,7 @@ namespace TransLucid
                >> prefix_expr
               )
               [
-                _a = ph::bind(&Tree::insert_binary_operation, _1, _a, _2)
+                _a = ph::bind(&Tree::insert_binary_operator, _1, _a, _2)
               ]
            )
            [

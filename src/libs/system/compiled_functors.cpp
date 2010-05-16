@@ -115,7 +115,7 @@ BinaryOpHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-BoolHD::operator()(const Tuple& k)
+BoolConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
 }
@@ -278,7 +278,7 @@ IsTypeHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-OperationHD::operator()(const Tuple& k)
+VariableOpHD::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
 
@@ -311,7 +311,7 @@ PairHD::operator()(const Tuple& k)
 #endif
 
 TaggedConstant
-SpecialHD::operator()(const Tuple& k)
+SpecialConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
 }
@@ -331,7 +331,7 @@ UCharConstHD::operator()(const Tuple& k)
 TaggedConstant
 UnaryOpHD::operator()(const Tuple& k)
 {
-  //TODO: resolve what to do with operations
+  //TODO: resolve what to do with operators
   return TaggedConstant();
 }
 

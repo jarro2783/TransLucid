@@ -29,11 +29,11 @@ namespace TransLucid
 {
   namespace Hyperdatons
   {
-    class BoolHD : public HD
+    class BoolConstHD : public HD
     {
       public:
 
-      BoolHD(bool value)
+      BoolConstHD(bool value)
       : m_value(value)
       {}
 
@@ -44,10 +44,10 @@ namespace TransLucid
       bool m_value;
     };
 
-    class SpecialHD : public HD
+    class SpecialConstHD : public HD
     {
       public:
-      SpecialHD(Special::Value v)
+      SpecialConstHD(Special::Value v)
       : m_value(v)
       {}
 
@@ -152,7 +152,7 @@ namespace TransLucid
     class UnaryOpHD : public HD
     {
       public:
-      UnaryOpHD(Tree::UnaryOperation op, HD* e)
+      UnaryOpHD(Tree::UnaryOperator op, HD* e)
       : m_op(op), m_e(e)
       {}
 
@@ -160,7 +160,7 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      Tree::UnaryOperation m_op;
+      Tree::UnaryOperator m_op;
       HD* m_e;
     };
 
@@ -186,10 +186,10 @@ namespace TransLucid
       u32string m_name;
     };
 
-    class OperationHD : public HD
+    class VariableOpHD : public HD
     {
       public:
-      OperationHD(HD* system,
+      VariableOpHD(HD* system,
                 const std::vector<HD*>& operands,
                 const u32string& symbol)
       : m_system(system), m_operands(operands), m_symbol(symbol)

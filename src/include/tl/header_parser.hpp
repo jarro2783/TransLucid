@@ -54,7 +54,7 @@ namespace TransLucid
       h.binary_op_symbols.add
       (
         symbol.c_str(),
-        Tree::BinaryOperation
+        Tree::BinaryOperator
         (
           assoc,
           to_u32string(opName),
@@ -90,7 +90,7 @@ namespace TransLucid
       const string_type& op
     )
     {
-      Tree::UnaryOperation opinfo
+      Tree::UnaryOperator opinfo
       (
         to_u32string(op),
         to_u32string(symbol),
@@ -242,7 +242,7 @@ namespace TransLucid
         {
           const u32string& csymbol =
             boost::get<const u32string&>(symbol);
-          const u32string& coperation =
+          const u32string& coperator =
             boost::get<const u32string&>(op);
 
           Tree::UnaryType actual_type;
@@ -260,7 +260,7 @@ namespace TransLucid
             header,
             actual_type,
             string_type(csymbol.begin(), csymbol.end()),
-            string_type(coperation.begin(), coperation.end())
+            string_type(coperator.begin(), coperator.end())
           );
         }
         catch (const boost::bad_get&)

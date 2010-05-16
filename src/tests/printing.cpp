@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE ( integer )
 
   ast = Tree::BinaryOpExpr
   (
-    Tree::BinaryOperation
+    Tree::BinaryOperator
     (
       Tree::ASSOC_LEFT,
       U"operator+",

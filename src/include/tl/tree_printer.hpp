@@ -59,7 +59,7 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
-  TransLucid::Tree::BinaryOperation,
+  TransLucid::Tree::BinaryOperator,
   (TransLucid::u32string, symbol)
 )
 
@@ -67,7 +67,7 @@ BOOST_FUSION_ADAPT_STRUCT
 (
   TransLucid::Tree::BinaryOpExpr,
   (TransLucid::Tree::Expr, lhs)
-  (TransLucid::Tree::BinaryOperation, op)
+  (TransLucid::Tree::BinaryOperator, op)
   (TransLucid::Tree::Expr, rhs)
 )
 
@@ -185,7 +185,7 @@ namespace TransLucid
       karma::rule<Iterator, Tree::ConstantExpr()> constant;
       karma::rule<Iterator, Tree::DimensionExpr()> dimension;
       karma::rule<Iterator, Tree::IdentExpr()> ident;
-      karma::rule<Iterator, Tree::BinaryOperation()> binary_symbol;
+      karma::rule<Iterator, Tree::BinaryOperator()> binary_symbol;
       karma::rule<Iterator, Tree::BinaryOpExpr()> binary;
       karma::rule<Iterator, Tree::HashExpr()> hash_expr;
       karma::rule<Iterator, Tree::TupleExpr()> tuple;

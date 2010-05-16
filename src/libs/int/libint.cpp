@@ -442,11 +442,11 @@ class OpHD : public TL::HD
   TL::HD& m_system;
 };
 
-template <typename Operation>
+template <typename Operator>
 TL::HD*
-build_op_hd(TL::HD& i, const Operation& op)
+build_op_hd(TL::HD& i, const Operator& op)
 {
-  return new OpHD<Operation>(i, op);
+  return new OpHD<Operator>(i, op);
 }
 
 template <typename T, template <typename> class Op>
