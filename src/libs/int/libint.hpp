@@ -28,7 +28,7 @@ namespace IntLib
 {
 
   template <class T>
-  class Int : public TransLucid::TypedValueBase
+  class Int : public TransLucid::TypedValue
   {
     public:
     Int(T value)

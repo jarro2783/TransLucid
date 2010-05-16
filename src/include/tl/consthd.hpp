@@ -94,7 +94,7 @@ namespace TransLucid
       TaggedValue
       operator()(const Tuple& k)
       {
-        return TaggedValue(TypedValue(TransLucid::Intmp(m_v),
+        return TaggedValue(Constant(TransLucid::Intmp(m_v),
                            TYPE_INDEX_INTMP), k);
       }
 
@@ -120,7 +120,7 @@ namespace TransLucid
       TaggedValue
       operator()(const Tuple& k)
       {
-        return TaggedValue(TypedValue(TypeType(m_index),
+        return TaggedValue(Constant(TypeType(m_index),
                            TYPE_INDEX_TYPE), k);
       }
 

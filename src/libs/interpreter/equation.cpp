@@ -141,7 +141,7 @@ Variable::operator()(const Tuple& k)
       if (viter == m_variables.end())
       {
         //std::cerr << "not found" << std::endl;
-        return TaggedValue(TypedValue(Special(Special::UNDEF),
+        return TaggedValue(Constant(Special(Special::UNDEF),
                            TYPE_INDEX_SPECIAL), k);
       }
       else
@@ -153,7 +153,7 @@ Variable::operator()(const Tuple& k)
     }
     catch (std::bad_cast& e)
     {
-      return TaggedValue(TypedValue(Special(Special::DIMENSION),
+      return TaggedValue(Constant(Special(Special::DIMENSION),
                          TYPE_INDEX_SPECIAL), k);
     }
   }
@@ -192,7 +192,7 @@ Variable::operator()(const Tuple& k)
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
-    return TaggedValue(TypedValue(Special(Special::UNDEF),
+    return TaggedValue(Constant(Special(Special::UNDEF),
                        TYPE_INDEX_SPECIAL),k);
   }
   else if (applicable.size() == 1)
@@ -223,7 +223,7 @@ Variable::operator()(const Tuple& k)
 
   if (bestIter == applicable.end())
   {
-    return TaggedValue(TypedValue(Special(Special::UNDEF),
+    return TaggedValue(Constant(Special(Special::UNDEF),
                        TYPE_INDEX_SPECIAL), k);
   }
 
@@ -235,7 +235,7 @@ Variable::operator()(const Tuple& k)
         &&
         !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
-      return TaggedValue(TypedValue(Special(Special::MULTIDEF),
+      return TaggedValue(Constant(Special(Special::MULTIDEF),
                          TYPE_INDEX_SPECIAL), k);
     }
   }
@@ -271,7 +271,7 @@ Variable::addExprInternal(const Tuple& k, HD* e)
     tuple_t kp = k.tuple();
     if (end.size() != 0)
     {
-      kp[dim_id] = TypedValue(String(end), TYPE_INDEX_USTRING);
+      kp[dim_id] = Constant(String(end), TYPE_INDEX_USTRING);
     }
     else
     {

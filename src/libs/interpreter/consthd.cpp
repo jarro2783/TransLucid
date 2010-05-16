@@ -38,19 +38,19 @@ Intmp::operator()(const Tuple& k)
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedValue(TypedValue(Special(Special::DIMENSION),
+    return TaggedValue(Constant(Special(Special::DIMENSION),
                        TYPE_INDEX_SPECIAL), k);
   }
 
   try
   {
-    return TaggedValue(TypedValue(TransLucid::Intmp(
+    return TaggedValue(Constant(TransLucid::Intmp(
              mpz_class(u32_to_ascii(value->second.value<String>().value()))),
              TYPE_INDEX_INTMP), k);
   }
   catch (...)
   {
-    return TaggedValue(TypedValue(Special(Special::CONST),
+    return TaggedValue(Constant(Special(Special::CONST),
                        TYPE_INDEX_SPECIAL), k);
   }
 }
@@ -63,7 +63,7 @@ UChar::operator()(const Tuple& k)
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedValue(TypedValue(Special(Special::DIMENSION),
+    return TaggedValue(Constant(Special(Special::DIMENSION),
                        TYPE_INDEX_SPECIAL), k);
   }
 
@@ -72,10 +72,10 @@ UChar::operator()(const Tuple& k)
   //         ->parse(s.value(), k, m_i), k);
   if (s.length() != 1)
   {
-    return TaggedValue(TypedValue(Special(Special::CONST),
+    return TaggedValue(Constant(Special(Special::CONST),
                        TYPE_INDEX_SPECIAL), k);
   }
-  return TaggedValue(TypedValue(Char(s[0]), TYPE_INDEX_UCHAR), k);
+  return TaggedValue(Constant(Char(s[0]), TYPE_INDEX_UCHAR), k);
 }
 
 TaggedValue
@@ -85,7 +85,7 @@ UString::operator()(const Tuple& k)
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedValue(TypedValue(Special(Special::DIMENSION),
+    return TaggedValue(Constant(Special(Special::DIMENSION),
                        TYPE_INDEX_SPECIAL), k);
   }
   return TaggedValue(value->second, k);

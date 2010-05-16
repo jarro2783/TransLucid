@@ -56,7 +56,7 @@ tupleApplicable(const Tuple& def, const Tuple& c)
 
 //does value a refine value b
 bool
-valueRefines(const TypedValue& a, const TypedValue& b)
+valueRefines(const Constant& a, const Constant& b)
 {
   //if b is a range, a has to be a range and within or equal,
   //or an int and inside, otherwise they have to be equal

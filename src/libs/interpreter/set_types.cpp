@@ -28,7 +28,7 @@ TypeAsSet::TypeAsSet(size_t index)
 }
 
 bool
-TypeAsSet::is_member(const TypedValue& v)
+TypeAsSet::is_member(const Constant& v)
 {
   return v.index() == m_index;
 }

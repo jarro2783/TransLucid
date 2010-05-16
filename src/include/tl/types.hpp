@@ -39,7 +39,7 @@ along with TransLucid; see the file COPYING.  If not see
 // ----------------------------------
 // WARNING !!!
 // Caveat with using boost flyweight
-// all TypedValues must be destructed
+// all Constants must be destructed
 // before unloading libraries with
 // lt_exit
 // as long as all typed values are destructed
@@ -98,10 +98,10 @@ namespace TransLucid
    *
    * The actual representation for typed values are derived from this.
    **/
-  class TypedValueBase
+  class TypedValue
   {
     public:
-    virtual ~TypedValueBase() {}
+    virtual ~TypedValue() {}
 
     /**
      * @brief Compute the hash of a typed value.
@@ -112,10 +112,10 @@ namespace TransLucid
   };
 
   /**
-   * @brief Computes the hash of a TypedValueBase.
+   * @brief Computes the hash of a TypedValue.
    **/
   inline size_t
-  hash_value(const TypedValueBase& v)
+  hash_value(const TypedValue& v)
   {
     return v.hash();
   }
@@ -125,7 +125,7 @@ namespace TransLucid
    *
    * Stores a cooked type value pair.
    **/
-  class TypedValue
+  class Constant
   {
     public:
 
@@ -136,13 +136,13 @@ namespace TransLucid
      * This represents the internal error value. Nothing should ever
      * have this value.
      **/
-    TypedValue()
+    Constant()
     : m_value(0), m_index(0)
     {
     }
 
     //puts the T& into a flyweight
-    //T has to extend TypedValueBase
+    //T has to extend TypedValue
     /**
      * @brief Construct a typed value.
      *
@@ -150,28 +150,28 @@ namespace TransLucid
      * in TransLucid::TypeRegistry. T must inherit from TypeValueBase.
      **/
     template <typename T>
-    TypedValue(const T& value, type_index index)
+    Constant(const T& value, type_index index)
     : m_value(new Storage<T>(value)), m_index(index)
     {
     }
 
-    TypedValue(const TypedValue& other)
+    Constant(const Constant& other)
     : m_value(other.m_value != 0 ? other.m_value->clone() : 0),
       m_index(other.m_index)
     {
     }
 
-    ~TypedValue() {
+    ~Constant() {
       delete m_value;
     }
 
-    TypedValue&
-    operator=(const TypedValue& rhs)
+    Constant&
+    operator=(const Constant& rhs)
     {
       if (this != &rhs)
       {
         //if this throws then leave the value as it is, having
-        //a 0 here would be bad since TypedValue should always have
+        //a 0 here would be bad since Constant should always have
         //a value, so it's better to leave the old value
         StorageBase* copy = rhs.m_value->clone();
         delete m_value;
@@ -183,20 +183,20 @@ namespace TransLucid
     }
 
     bool
-    operator==(const TypedValue& rhs) const
+    operator==(const Constant& rhs) const
     {
       return m_index == rhs.m_index
       && m_value->equalTo(*rhs.m_value);
     }
 
     bool
-    operator!=(const TypedValue& rhs) const
+    operator!=(const Constant& rhs) const
     {
       return !(*this == rhs);
     }
 
     bool
-    operator<(const TypedValue& rhs) const
+    operator<(const Constant& rhs) const
     {
       if (m_index != rhs.m_index)
       {
@@ -240,9 +240,9 @@ namespace TransLucid
     /**
      * @brief Retrieve the value stored.
      *
-     * Returns the value stored as a TypedValueBase reference.
+     * Returns the value stored as a TypedValue reference.
      **/
-    const TypedValueBase&
+    const TypedValue&
     value() const
     {
       return m_value->value();
@@ -284,7 +284,7 @@ namespace TransLucid
     {
       public:
       virtual ~StorageBase() {}
-      virtual const TypedValueBase& value() const = 0;
+      virtual const TypedValue& value() const = 0;
       virtual StorageBase* clone() const = 0;
       virtual bool equalTo(const StorageBase& other) const = 0;
       virtual bool less(const StorageBase& other) const = 0;
@@ -306,7 +306,7 @@ namespace TransLucid
       {
       }
 
-      const TypedValueBase&
+      const TypedValue&
       value() const
       {
         return m_value;
@@ -361,10 +361,10 @@ namespace TransLucid
   };
 
   /**
-   * @brief Computes the hash of a TypedValue.
+   * @brief Computes the hash of a Constant.
    **/
   inline size_t
-  hash_value(const TypedValue& value)
+  hash_value(const Constant& value)
   {
     return value.hash();
   }
@@ -372,16 +372,16 @@ namespace TransLucid
   /**
    * The underlying data structure of a tuple.
    **/
-  typedef std::map<size_t, TypedValue> tuple_t;
+  typedef std::map<size_t, Constant> tuple_t;
 
   /**
    * @brief Stores a Tuple.
    *
-   * A tuple is a map from dimension to TypedValue. Tuple can store
+   * A tuple is a map from dimension to Constant. Tuple can store
    * unevaluated expressions as a mapped value, TransLucid::TupleIterator
    * will ensure that these are evaluated when their value is required.
    **/
-  class Tuple : public TypedValueBase
+  class Tuple : public TypedValue
   {
     public:
     typedef tuple_t::const_iterator const_iterator;
@@ -410,7 +410,7 @@ namespace TransLucid
     }
 
     Tuple
-    insert(size_t key, const TypedValue& value) const;
+    insert(size_t key, const Constant& value) const;
 
     const_iterator
     find(size_t key) const
@@ -466,14 +466,14 @@ namespace TransLucid
   /**
    * @brief A value context pair.
    *
-   * A TypedValue and the context it was evaluated in.
+   * A Constant and the context it was evaluated in.
    **/
-  typedef std::pair<TypedValue, Tuple> TaggedValue;
+  typedef std::pair<Constant, Tuple> TaggedValue;
 
-  //typedef boost::function<TypedValue
-  //        (const TypedValue&, const TypedValue&, const Tuple&)> OpFunction;
-  //typedef boost::function<TypedValue
-  //        (const TypedValue&, const Tuple&)> ConvertFunction;
+  //typedef boost::function<Constant
+  //        (const Constant&, const Constant&, const Tuple&)> OpFunction;
+  //typedef boost::function<Constant
+  //        (const Constant&, const Tuple&)> ConvertFunction;
 
   /**
    * @brief Vector of type indexes.
@@ -692,7 +692,7 @@ namespace TransLucid
 } //namespace TransLucid
 
 inline std::ostream&
-operator<<(std::ostream& os, const TransLucid::TypedValue& v)
+operator<<(std::ostream& os, const TransLucid::Constant& v)
 {
   v.print(os);
   return os;

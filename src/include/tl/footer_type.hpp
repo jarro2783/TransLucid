@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class FooterType : public TypedValueBase
+  class FooterType : public TypedValue
   {
   };
 }

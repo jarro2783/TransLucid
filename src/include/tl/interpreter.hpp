@@ -78,8 +78,8 @@ namespace TransLucid
     std::map<u32string, size_t> builtin_name_to_index;
   };
 
-  TypedValue hash(const TypedValue& dimension, const Tuple& context);
-  TypedValue hash(size_t dimension, const Tuple& context);
+  Constant hash(const Constant& dimension, const Tuple& context);
+  Constant hash(size_t dimension, const Tuple& context);
 }
 
 #endif // INTERPRETER_HPP_INCLUDED

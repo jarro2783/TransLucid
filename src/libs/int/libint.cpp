@@ -61,7 +61,7 @@ namespace
 
 typedef boost::function
   <
-  TL::TypedValue(const TL::TypedValue&, const TL::TypedValue&, const TL::Tuple&)
+  TL::Constant(const TL::Constant&, const TL::Constant&, const TL::Tuple&)
   > OpFunction;
 
 BOOST_PARAMETER_TEMPLATE_KEYWORD(pre_type);
@@ -273,15 +273,15 @@ struct BigStore <TL::Intmp>
 };
 
 template <class T, template <typename> class Op, class Arg1, class Arg2>
-//TL::TypedValue
+//TL::Constant
 //int_bin_op(const T& lhs, const T& rhs, TL::TypeManager& m, int)
 //{
-TL::TypedValue int_bin_op
+TL::Constant int_bin_op
 (
-  //const std::vector<TL::TypedValue>& operands,
+  //const std::vector<TL::Constant>& operands,
   size_t index,
-  const TL::TypedValue& l,
-  const TL::TypedValue& r,
+  const TL::Constant& l,
+  const TL::Constant& r,
   const TL::Tuple& k
 )
 {
@@ -306,7 +306,7 @@ TL::TypedValue int_bin_op
 
   if (Pre().template operator()<typename IntTraits<T>::type>(lhs, rhs, k))
   {
-    return TL::TypedValue(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
+    return TL::Constant(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
   }
 
   typename IntTraits<T>::big value =
@@ -314,22 +314,22 @@ TL::TypedValue int_bin_op
 
   if (Post().template operator()<typename IntTraits<T>::type>(value, k))
   {
-    return TL::TypedValue(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
+    return TL::Constant(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
   }
 
-  return TL::TypedValue(T(convert<type>(value)), index);
+  return TL::Constant(T(convert<type>(value)), index);
 };
 
 template <class T, template <typename> class Op, class Arg1>
-TL::TypedValue
+TL::Constant
 int_bin_op
 (
-  //const std::vector<TL::TypedValue>& operands,
+  //const std::vector<TL::Constant>& operands,
   //const TL::TypeManager& m,
   //int
   size_t index,
-  const TL::TypedValue& l,
-  const TL::TypedValue& r,
+  const TL::Constant& l,
+  const TL::Constant& r,
   const TL::Tuple& k
 )
 {
@@ -337,15 +337,15 @@ int_bin_op
 }
 
 template <class T, template <typename> class Op>
-TL::TypedValue
+TL::Constant
 int_bin_op
 (
-  //const std::vector<TL::TypedValue>& operands,
+  //const std::vector<TL::Constant>& operands,
   //const TL::TypeManager& m,
   //int
   size_t index,
-  const TL::TypedValue& l,
-  const TL::TypedValue& r,
+  const TL::Constant& l,
+  const TL::Constant& r,
   const TL::Tuple& k)
 {
   return int_bin_op<T, Op, boost::parameter::void_, boost::parameter::void_>
@@ -377,10 +377,10 @@ bindBinOp(TL::HD& i, size_t index)
 
 #if 0
 template <class T, template <typename> class Op>
-TL::TypedValue
+TL::Constant
 int_comp_op
 (
-  const std::vector<TL::TypedValue>& values,
+  const std::vector<TL::Constant>& values,
   const TL::TypeRegistry& r
 )
 {
@@ -389,7 +389,7 @@ int_comp_op
   result = Op<typename IntTraits<T>::type>()(
     values.at(0).value<T>().value(),
     values.at(1).value<T>().value());
-  return TL::TypedValue(TL::Boolean(result), r.indexBoolean());
+  return TL::Constant(TL::Boolean(result), r.indexBoolean());
 }
 #endif
 
@@ -432,7 +432,7 @@ class OpHD : public TL::HD
       //H @ [id : "CONST", type : "special", value : "dimension"]
       //or we could leave these since it is slightly more efficient,
       // however it will all come out in the wash when we compile anyway
-      return TL::TaggedValue(TL::TypedValue(TL::Special(
+      return TL::TaggedValue(TL::Constant(TL::Special(
                TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
     }
   }
@@ -468,11 +468,11 @@ register_one_op
   {
     {
       TL::get_dimension_index(&system, U"arg0"),
-      TL::TypedValue(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+      TL::Constant(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
     },
     {
       TL::get_dimension_index(&system, U"arg1"),
-      TL::TypedValue(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+      TL::Constant(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
     },
     {
       TL::DIM_NAME,
@@ -484,12 +484,12 @@ register_one_op
   {
     {
       TL::DIM_VALID_GUARD,
-      TL::TypedValue(TL::EquationGuardType(TL::EquationGuard(TL::Tuple(guard))),
+      TL::Constant(TL::EquationGuardType(TL::EquationGuard(TL::Tuple(guard))),
                      TL::TYPE_INDEX_GUARD)
     },
     {
       TL::DIM_ID,
-      TL::TypedValue(TL::String(U"OP"), TL::TYPE_INDEX_USTRING)
+      TL::Constant(TL::String(U"OP"), TL::TYPE_INDEX_USTRING)
     }
   };
 
@@ -537,20 +537,20 @@ class IntHD : public TL::HD
 
     if (text == k.end())
     {
-      return TL::TaggedValue(TL::TypedValue(TL::Special(
+      return TL::TaggedValue(TL::Constant(TL::Special(
         TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
     }
 
     try
     {
-      return TL::TaggedValue(TL::TypedValue(
+      return TL::TaggedValue(TL::Constant(
         Int<T>(boost::lexical_cast<T>(TL::utf32_to_utf8(
           text->second.value<TL::String>().value()))), m_index), k)
          ;
     }
     catch (...)
     {
-      return TL::TaggedValue(TL::TypedValue(TL::Special(
+      return TL::TaggedValue(TL::Constant(TL::Special(
         TL::Special::CONST), TL::TYPE_INDEX_SPECIAL), k);
     }
   }

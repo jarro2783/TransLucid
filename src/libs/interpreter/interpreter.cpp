@@ -41,7 +41,7 @@ namespace
     TaggedValue
     operator()(const Tuple& k)
     {
-      return TaggedValue(TypedValue(Intmp(m_index++), TYPE_INDEX_INTMP), k);
+      return TaggedValue(Constant(Intmp(m_index++), TYPE_INDEX_INTMP), k);
     }
 
     private:
@@ -64,7 +64,7 @@ namespace
       {
         throw "called dim lookup without text dimension";
       }
-      return TaggedValue(TypedValue(Intmp(
+      return TaggedValue(Constant(Intmp(
         m_d.lookup(iter->second.value<String>().value())),
                    TYPE_INDEX_INTMP), k);
     }
@@ -89,7 +89,7 @@ namespace
       {
         throw "called dim lookup without value dimension";
       }
-      return TaggedValue(TypedValue(Intmp(
+      return TaggedValue(Constant(Intmp(
         m_d.lookup(iter->second)), TYPE_INDEX_INTMP), k);
     }
 
@@ -107,8 +107,8 @@ Interpreter::buildConstantHD(size_t index)
   tuple_t k;
   Tuple empty;
   //k[m_dimTranslator.lookup("id")] =
-  //  TypedValue(String("CONST"), m_typeRegistry.indexString());
-  k[DIM_TYPE] = TypedValue(String(T::name), TYPE_INDEX_USTRING);
+  //  Constant(String("CONST"), m_typeRegistry.indexString());
+  k[DIM_TYPE] = Constant(String(T::name), TYPE_INDEX_USTRING);
   addToVariableActual(U"CONST", Tuple(k), h);
   addToVariableActual(U"TYPE_INDEX", empty, new Hyperdatons::IntmpConst(index));
   return h;
@@ -195,7 +195,7 @@ Interpreter::tick()
 {
 
   tuple_t current;
-  current[DIM_TIME] = TypedValue(Intmp(m_time), TYPE_INDEX_INTMP);
+  current[DIM_TIME] = Constant(Intmp(m_time), TYPE_INDEX_INTMP);
 
   tuple_t toSave = current;
 

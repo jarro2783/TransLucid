@@ -111,7 +111,7 @@ namespace TransLucid
      * change.
      **/
     void
-    addDimension(size_t dim, const TypedValue& v)
+    addDimension(size_t dim, const Constant& v)
     {
        m_dimensions[dim] = v;
     }
@@ -125,7 +125,7 @@ namespace TransLucid
     private:
     HD* m_guard;
     HD* m_boolean;
-    std::map<size_t, TypedValue> m_dimensions;
+    std::map<size_t, Constant> m_dimensions;
     size_t validStart;
     size_t validEnd;
   };

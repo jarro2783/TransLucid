@@ -69,7 +69,7 @@ TaggedValue
 Sender::operator()(const Tuple& k)
 {
   //std::cin.getline(m_buf, BUF_SIZE);
-  //return TaggedValue(TypedValue(String(m_buf), TYPE_INDEX_USTRING), k);
+  //return TaggedValue(Constant(String(m_buf), TYPE_INDEX_USTRING), k);
 }
 
 uuid
@@ -96,7 +96,7 @@ main(int argc, char* argv[])
   tuple_t context =
     map_list_of(size_t(DIM_ID), generate_string(U"out"))
                (get_dimension_index(&i, U"_validguard"),
-                TypedValue(EquationGuardType(EquationGuard()),
+                Constant(EquationGuardType(EquationGuard()),
                 TYPE_INDEX_GUARD));
   i.addExpr(Tuple(context), &ident);
 

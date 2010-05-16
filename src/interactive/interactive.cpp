@@ -253,7 +253,7 @@ System::postInputSignal(std::vector<TL::AST::Expr*> const& ev)
 
   TL::tuple_t tuple =
     map_list_of(dimTime,
-    TL::TypedValue(TL::Intmp(time), typeRegistry().indexIntmp()));
+    TL::Constant(TL::Intmp(time), typeRegistry().indexIntmp()));
   TL::Tuple c(tuple);
 
   TL::AST::Expr* lastExpr = 0;

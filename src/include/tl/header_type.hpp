@@ -28,7 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class HeaderType : public TypedValueBase
+  class HeaderType : public TypedValue
   {
     public:
 

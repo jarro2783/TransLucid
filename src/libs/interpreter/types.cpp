@@ -40,7 +40,7 @@ Tuple::Tuple(const tuple_t& tuple)
 }
 
 Tuple
-Tuple::insert(size_t key, const TypedValue& value) const
+Tuple::insert(size_t key, const Constant& value) const
 {
   tuple_t t = *m_value;
   t.insert(std::make_pair(key, value));

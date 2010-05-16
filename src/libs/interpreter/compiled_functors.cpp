@@ -43,7 +43,7 @@ contextInsert
   size_t index
 )
 {
-  k[get_dimension_index(h, dim)] = TypedValue(T(value), index);
+  k[get_dimension_index(h, dim)] = Constant(T(value), index);
 }
 
 inline void
@@ -52,7 +52,7 @@ contextInsert
   tuple_t& k,
   HD* i,
   const u32string& dim,
-  const TypedValue& v
+  const Constant& v
 )
 {
   k[get_dimension_index(i, dim)] = v;
@@ -71,7 +71,7 @@ class TupleInserter
   const TupleInserter<T>&
   operator()(const u32string& dim, const V& v) const
   {
-    m_k[get_dimension_index(m_h, dim)] = TypedValue(T(v), m_index);
+    m_k[get_dimension_index(m_h, dim)] = Constant(T(v), m_index);
     return *this;
   }
 
@@ -93,8 +93,8 @@ insert_tuple(tuple_t& k, HD* h, size_t index)
 TaggedValue
 BinaryOpHD::operator()(const Tuple& k)
 {
-  //TypedValue v1 = (*m_operands.at(0))(k).first;
-  //TypedValue v2 = (*m_operands.at(1))(k).first;
+  //Constant v1 = (*m_operands.at(0))(k).first;
+  //Constant v2 = (*m_operands.at(1))(k).first;
   //std::cerr << "operands to binary op " << m_name << ":" << std::endl;
   //std::cerr << v1 << std::endl;
   //std::cerr << v2 << std::endl;
@@ -117,7 +117,7 @@ BinaryOpHD::operator()(const Tuple& k)
 TaggedValue
 BoolHD::operator()(const Tuple& k)
 {
-  return TaggedValue(TypedValue(Boolean(m_value), TYPE_INDEX_BOOL), k);
+  return TaggedValue(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
 }
 
 TaggedValue
@@ -126,7 +126,7 @@ TypedValueHD::operator()(const Tuple& k)
   //evaluate CONST
   tuple_t kp = k.tuple();
   //kp[m_system.dimTranslator().lookup("id")] =
-  //  TypedValue(String("CONST"), m_system.typeRegistry().indexString());
+  //  Constant(String("CONST"), m_system.typeRegistry().indexString());
   //contextInsertString(kp, m_system, "id", "CONST", indexString);
   //contextInsertString(kp, m_system, "type", m_type, indexString);
   //contextInsertString(kp, m_system, "text", m_text, indexString);
@@ -151,7 +151,7 @@ TaggedValue
 DimensionHD::operator()(const Tuple& k)
 {
   size_t id = get_dimension_index(m_system, m_name);
-  return TaggedValue (TypedValue(TransLucid::Dimension(id),
+  return TaggedValue (Constant(TransLucid::Dimension(id),
                       TYPE_INDEX_DIMENSION), k);
 }
 
@@ -171,7 +171,7 @@ TaggedValue
 IfHD::operator()(const Tuple& k)
 {
   TaggedValue cond = (*m_condition)(k);
-  TypedValue& condv = cond.first;
+  Constant& condv = cond.first;
 
   if (condv.index() == TYPE_INDEX_SPECIAL)
   {
@@ -212,7 +212,7 @@ IfHD::operator()(const Tuple& k)
         }
         else
         {
-          return TaggedValue(TypedValue(Special(Special::TYPEERROR),
+          return TaggedValue(Constant(Special(Special::TYPEERROR),
                              TYPE_INDEX_SPECIAL), k);
         }
 
@@ -224,7 +224,7 @@ IfHD::operator()(const Tuple& k)
   }
   else
   {
-    return TaggedValue(TypedValue(Special(Special::TYPEERROR),
+    return TaggedValue(Constant(Special(Special::TYPEERROR),
                        TYPE_INDEX_SPECIAL), k);
   }
 }
@@ -252,7 +252,7 @@ HashHD::operator()(const Tuple& k)
   }
   else
   {
-    return TaggedValue(TypedValue(Special(Special::DIMENSION),
+    return TaggedValue(Constant(Special(Special::DIMENSION),
                        TYPE_INDEX_SPECIAL), k);
   }
 }
@@ -260,7 +260,7 @@ HashHD::operator()(const Tuple& k)
 TaggedValue
 IntegerConstHD::operator()(const Tuple& k)
 {
-  return TaggedValue(TypedValue(Intmp(m_value), TYPE_INDEX_INTMP), k);
+  return TaggedValue(Constant(Intmp(m_value), TYPE_INDEX_INTMP), k);
 }
 
 TaggedValue
@@ -305,7 +305,7 @@ Pair::operator()(const Tuple& k)
   TaggedValue l = (*m_lhs)(k);
   TaggedValue r = (*m_rhs)(k);
 
-  return TaggedValue(TypedValue(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
+  return TaggedValue(Constant(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
                      TYPE_INDEX_PAIR), k);
 }
 #endif
@@ -313,19 +313,19 @@ Pair::operator()(const Tuple& k)
 TaggedValue
 SpecialHD::operator()(const Tuple& k)
 {
-  return TaggedValue(TypedValue(Special(m_value), TYPE_INDEX_SPECIAL), k);
+  return TaggedValue(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
 }
 
 TaggedValue
 StringConstHD::operator()(const Tuple& k)
 {
-  return TaggedValue(TypedValue(String(m_value), TYPE_INDEX_USTRING), k);
+  return TaggedValue(Constant(String(m_value), TYPE_INDEX_USTRING), k);
 }
 
 TaggedValue
 UcharConstHD::operator()(const Tuple& k)
 {
-  return TaggedValue(TypedValue(Char(m_value), TYPE_INDEX_UCHAR), k);
+  return TaggedValue(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
 }
 
 TaggedValue
@@ -354,7 +354,7 @@ BuildTupleHD::operator()(const Tuple& k)
       kp[get_dimension_index(m_system, left.first)] = right.first;
     }
   }
-  return TaggedValue(TypedValue(Tuple(kp), TYPE_INDEX_TUPLE), k);
+  return TaggedValue(Constant(Tuple(kp), TYPE_INDEX_TUPLE), k);
 }
 
 TaggedValue
@@ -363,7 +363,7 @@ AtAbsoluteHD::operator()(const Tuple& k)
   TaggedValue kp = (*e1)(k);
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
-    return TaggedValue(TypedValue(Special(Special::TYPEERROR),
+    return TaggedValue(Constant(Special(Special::TYPEERROR),
       TYPE_INDEX_SPECIAL), k);
   }
   else
@@ -379,7 +379,7 @@ AtRelativeHD::operator()(const Tuple& k)
   TaggedValue kp = (*e1)(k);
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
-    return TaggedValue(TypedValue(Special(Special::TYPEERROR),
+    return TaggedValue(Constant(Special(Special::TYPEERROR),
       TYPE_INDEX_SPECIAL), k);
   }
   else

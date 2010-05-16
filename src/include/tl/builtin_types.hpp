@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class Special : public TypedValueBase
+  class Special : public TypedValue
   {
     public:
     enum Value
@@ -110,7 +110,7 @@ namespace TransLucid
     }
   };
 
-  class String : public TypedValueBase
+  class String : public TypedValue
   {
     public:
     String(const u32string& s)
@@ -156,7 +156,7 @@ namespace TransLucid
     u32string m_s;
   };
 
-  class Boolean : public TypedValueBase
+  class Boolean : public TypedValue
   {
     public:
 
@@ -193,7 +193,7 @@ namespace TransLucid
     bool m_value;
   };
 
-  class Intmp : public TypedValueBase
+  class Intmp : public TypedValue
   {
     public:
     Intmp(const mpz_class& value)
@@ -236,7 +236,7 @@ namespace TransLucid
     mpz_class m_value;
   };
 
-  class Dimension : public TypedValueBase
+  class Dimension : public TypedValue
   {
     public:
     Dimension(size_t value)
@@ -277,9 +277,9 @@ namespace TransLucid
     size_t m_value;
   };
 
-  typedef std::set<TypedValue> set_t;
+  typedef std::set<Constant> set_t;
 
-  class Set : public TypedValueBase
+  class Set : public TypedValue
   {
     public:
     Set();
@@ -297,7 +297,7 @@ namespace TransLucid
     value() const;
   };
 
-  class ValueCalc : public TypedValueBase
+  class ValueCalc : public TypedValue
   {
     public:
     size_t
@@ -319,7 +319,7 @@ namespace TransLucid
     }
   };
 
-  class Char : public TypedValueBase
+  class Char : public TypedValue
   {
     public:
     Char(char32_t c)
@@ -358,7 +358,7 @@ namespace TransLucid
     char32_t m_c;
   };
 
-  class EquationGuardType : public TypedValueBase
+  class EquationGuardType : public TypedValue
   {
     public:
     EquationGuardType(const EquationGuard& g)
@@ -399,21 +399,21 @@ namespace TransLucid
     EquationGuard m_g;
   };
 
-  class PairType : public TypedValueBase
+  class PairType : public TypedValue
   {
     public:
-    PairType(const TypedValue& first, const TypedValue& second)
+    PairType(const Constant& first, const Constant& second)
     : m_first(first), m_second(second)
     {
     }
 
-    const TypedValue&
+    const Constant&
     first() const
     {
       return m_first;
     }
 
-    const TypedValue&
+    const Constant&
     second() const
     {
       return m_second;
@@ -443,8 +443,8 @@ namespace TransLucid
     }
 
     private:
-    TypedValue m_first;
-    TypedValue m_second;
+    Constant m_first;
+    Constant m_second;
   };
 
   class SetBase
@@ -452,7 +452,7 @@ namespace TransLucid
     public:
     //is v a member of this
     virtual bool
-    is_member(const TypedValue& v) = 0;
+    is_member(const Constant& v) = 0;
 
     //is s a subset of this
     virtual bool
@@ -462,7 +462,7 @@ namespace TransLucid
   //the general set type
   //all the actual sets will put a derived class in here and then
   //have an is member function.
-  class SetType : public TypedValueBase
+  class SetType : public TypedValue
   {
     public:
 
@@ -492,7 +492,7 @@ namespace TransLucid
     SetBase* m_value;
   };
 
-  class TypeType : public TypedValueBase
+  class TypeType : public TypedValue
   {
     public:
 

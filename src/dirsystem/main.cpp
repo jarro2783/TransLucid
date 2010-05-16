@@ -106,7 +106,7 @@ main(int argc, char** argv)
     }
   }
 
-  typedef std::pair<TL::TypedValue, TL::Tuple> ValueContextPair;
+  typedef std::pair<TL::Constant, TL::Tuple> ValueContextPair;
 
   std::vector<ValueContextPair> evaluated;
 
@@ -133,7 +133,7 @@ main(int argc, char** argv)
     #if 0
     BOOST_FOREACH(ValueContextPair& p, evaluated)
     {
-      const TL::TypedValue& v = p.first;
+      const TL::Constant& v = p.first;
       std::cout << "type index: " << v.index() << std::endl;
       switch (v.index())
       {
@@ -173,7 +173,7 @@ main(int argc, char** argv)
       TL::tuple_t k;
       k[TL::DIM_ID] = TL::generate_string("PRINT");
       k[TL::DIM_VALUE] = p.first;
-      TL::TypedValue s = system(TL::Tuple(k)).first;
+      TL::Constant s = system(TL::Tuple(k)).first;
       if (s.index() != TL::TYPE_INDEX_USTRING)
       {
         //std::cout << "oops";

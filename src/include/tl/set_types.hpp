@@ -31,7 +31,7 @@ namespace TransLucid
     TypeAsSet(size_t index);
 
     bool
-    is_member(const TypedValue& v);
+    is_member(const Constant& v);
 
     //is s a subset of this
     bool

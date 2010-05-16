@@ -57,6 +57,7 @@ BOOST_AUTO_TEST_SUITE( expressions_tests )
 
 BOOST_AUTO_TEST_CASE ( single )
 {
+  std::cerr << "First test case" << std::endl;
   translator.translate_and_add_equation_set(U" x = 5;; y = 6;;");
 
   TL::HD& system = translator.system();
@@ -99,6 +100,7 @@ BOOST_AUTO_TEST_CASE ( single )
 
 BOOST_AUTO_TEST_CASE ( simple_expressions )
 {
+  std::cerr << "Second test case" << std::endl;
   //TL::Parser::Header& header = translator.header();
 
   translator.translate_and_add_equation_set
@@ -157,6 +159,7 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
 
 BOOST_AUTO_TEST_CASE ( functions )
 {
+  std::cerr << "Third test case" << std::endl;
   TL::HD* h = 0;
   TL::TaggedValue v;
 

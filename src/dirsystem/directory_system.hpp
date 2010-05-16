@@ -95,16 +95,16 @@ namespace TransLucid
       size_t dimTime = DIM_TIME;
       //size_t dim_id = dimTranslator().lookup("id");
       size_t dim_id = DIM_ID;
-      //TypedValue demandString
+      //Constant demandString
       //            (String("demand"), typeRegistry().indexString());
-      TypedValue demandString = generate_string(U"demand");
+      Constant demandString = generate_string(U"demand");
 
       //evaluate from time 1 to end
       for (size_t time = 1; time <= m_maxClock; ++time)
       {
         //just do one thread
         tuple_t tuple = map_list_of
-          (dimTime, TypedValue(Intmp(time), TYPE_INDEX_INTMP))
+          (dimTime, Constant(Intmp(time), TYPE_INDEX_INTMP))
           (dim_id, demandString);
         Tuple c(tuple);
 
@@ -121,7 +121,7 @@ namespace TransLucid
         }
         else
         {
-          *out = TaggedValue(TypedValue(Special(Special::UNDEF),
+          *out = TaggedValue(Constant(Special(Special::UNDEF),
                               typeRegistry().indexSpecial()), c);
         }
         #endif
