@@ -90,7 +90,7 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   }
 
   auto adder =
-    [this] (const Equation& e) -> std::pair<uuid, Equations::iterator>
+    [this] (const EquationHD& e) -> std::pair<uuid, Equations::iterator>
   {
     return std::make_pair(
       e.id(),
@@ -100,15 +100,15 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
 
   if (g)
   {
-    return adder(Equation(m_name, *g, h));
+    return adder(EquationHD(m_name, *g, h));
   }
   else
   {
-    return adder(Equation(m_name, EquationGuard(), h));
+    return adder(EquationHD(m_name, EquationGuard(), h));
   }
 }
 
-bool VariableHD::equationValid(const Equation& e, const Tuple& k)
+bool VariableHD::equationValid(const EquationHD& e, const Tuple& k)
 {
 }
 

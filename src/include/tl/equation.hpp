@@ -134,16 +134,16 @@ namespace TransLucid
 
   typedef std::map<u32string, VariableHD*> VariableMap;
 
-  class Equation : public HD
+  class EquationHD : public HD
   {
     public:
-    Equation(const u32string& name, const EquationGuard& valid, HD* h)
+    EquationHD(const u32string& name, const EquationGuard& valid, HD* h)
     : m_name(name), m_validContext(valid), m_h(h),
     m_id(boost::uuids::random_generator()())
     {
     }
 
-    Equation()
+    EquationHD()
     : m_h(0), m_id(boost::uuids::nil_generator()())
     {
     }
