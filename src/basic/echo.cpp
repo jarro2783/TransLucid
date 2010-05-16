@@ -31,18 +31,18 @@ using boost::assign::map_list_of;
 class Receiver : public HD
 {
   public:
-  TaggedValue operator()(const Tuple& k);
+  TaggedConstant operator()(const Tuple& k);
 
   uuid addExpr(const Tuple& k, HD *h);
 
   private:
-  TaggedValue m_value;
+  TaggedConstant m_value;
 };
 
 class Sender : public HD
 {
   public:
-  TaggedValue operator()(const Tuple& k);
+  TaggedConstant operator()(const Tuple& k);
 
   uuid addExpr(const Tuple& k, HD* h);
 
@@ -51,7 +51,7 @@ class Sender : public HD
   char32_t m_buf[BUF_SIZE];
 };
 
-TaggedValue
+TaggedConstant
 Receiver::operator()(const Tuple& k)
 {
   return m_value;
@@ -61,15 +61,15 @@ uuid
 Receiver::addExpr(const Tuple& k, HD* h)
 {
   Tuple::const_iterator iter = k.find(DIM_VALUE);
-  m_value = TaggedValue(iter->second, k);
+  m_value = TaggedConstant(iter->second, k);
   return boost::uuids::random_generator()();
 }
 
-TaggedValue
+TaggedConstant
 Sender::operator()(const Tuple& k)
 {
   //std::cin.getline(m_buf, BUF_SIZE);
-  //return TaggedValue(Constant(String(m_buf), TYPE_INDEX_USTRING), k);
+  //return TaggedConstant(Constant(String(m_buf), TYPE_INDEX_USTRING), k);
 }
 
 uuid
@@ -103,7 +103,7 @@ main(int argc, char* argv[])
   while (true)
   {
     i.tick();
-    TaggedValue result = r(Tuple());
+    TaggedConstant result = r(Tuple());
     //std::cout << result.first.value<String>().value() << std::endl;
   }
 

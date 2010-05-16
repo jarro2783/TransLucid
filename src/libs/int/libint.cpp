@@ -414,7 +414,7 @@ class OpHD : public TL::HD
   //takes the two operands out of the tuple and passes them to the
   //op as arguments
   //variadic templates would be really really good here
-  TL::TaggedValue
+  TL::TaggedConstant
   operator()(const TL::Tuple& k)
   {
     try
@@ -422,7 +422,7 @@ class OpHD : public TL::HD
       size_t index_arg0 = TL::get_dimension_index(&m_system, U"arg0");
       size_t index_arg1 = TL::get_dimension_index(&m_system, U"arg1");
 
-      return TL::TaggedValue(m_op(TL::get_dimension(k, index_arg0),
+      return TL::TaggedConstant(m_op(TL::get_dimension(k, index_arg0),
                                   TL::get_dimension(k, index_arg1),
                                   k),
                              k);
@@ -432,7 +432,7 @@ class OpHD : public TL::HD
       //H @ [id : "CONST", type : "special", value : "dimension"]
       //or we could leave these since it is slightly more efficient,
       // however it will all come out in the wash when we compile anyway
-      return TL::TaggedValue(TL::Constant(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
                TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
     }
   }
@@ -527,7 +527,7 @@ class IntHD : public TL::HD
     //m_index = system.typeRegistry().registerType(name);
   }
 
-  TL::TaggedValue
+  TL::TaggedConstant
   operator()(const TL::Tuple& k)
   {
     //retrieve the text and parse it
@@ -537,20 +537,20 @@ class IntHD : public TL::HD
 
     if (text == k.end())
     {
-      return TL::TaggedValue(TL::Constant(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
         TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
     }
 
     try
     {
-      return TL::TaggedValue(TL::Constant(
+      return TL::TaggedConstant(TL::Constant(
         Int<T>(boost::lexical_cast<T>(TL::utf32_to_utf8(
           text->second.value<TL::String>().value()))), m_index), k)
          ;
     }
     catch (...)
     {
-      return TL::TaggedValue(TL::Constant(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
         TL::Special::CONST), TL::TYPE_INDEX_SPECIAL), k);
     }
   }

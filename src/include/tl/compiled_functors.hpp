@@ -37,7 +37,7 @@ namespace TransLucid
       : m_value(value)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -51,7 +51,7 @@ namespace TransLucid
       : m_value(v)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -65,7 +65,7 @@ namespace TransLucid
       : m_system(system), m_value(value)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -80,7 +80,7 @@ namespace TransLucid
       : m_value(c)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -94,7 +94,7 @@ namespace TransLucid
       : m_value(s)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -110,7 +110,7 @@ namespace TransLucid
       : m_system(system), m_type(type), m_text(text)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -126,7 +126,7 @@ namespace TransLucid
       : m_system(system), m_name(name)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -141,7 +141,7 @@ namespace TransLucid
       : m_system(system), m_name(name)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -156,7 +156,7 @@ namespace TransLucid
       : m_op(op), m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -177,7 +177,7 @@ namespace TransLucid
       : m_system(system), m_operands(operands), m_name(name)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -196,7 +196,7 @@ namespace TransLucid
       {
       }
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -213,7 +213,7 @@ namespace TransLucid
       m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -228,7 +228,7 @@ namespace TransLucid
       : m_type(type), m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -243,7 +243,7 @@ namespace TransLucid
       : m_to(to), m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -264,7 +264,7 @@ namespace TransLucid
         m_else(else_)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -283,7 +283,7 @@ namespace TransLucid
       : m_system(system), m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -300,7 +300,7 @@ namespace TransLucid
       : m_lhs(lhs), m_rhs(rhs)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -318,7 +318,7 @@ namespace TransLucid
       : m_system(system), m_elements(elements)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -335,7 +335,7 @@ namespace TransLucid
       : e2(e2), e1(e1)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -351,7 +351,7 @@ namespace TransLucid
       : e2(e2), e1(e1)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:

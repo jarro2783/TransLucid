@@ -53,7 +53,7 @@ throw (InvalidGuard)
 
   if (m_guard)
   {
-    TaggedValue v = (*m_guard)(k);
+    TaggedConstant v = (*m_guard)(k);
 
     //still need to remove this magic
     if (v.first.index() == TYPE_INDEX_TUPLE)
@@ -76,7 +76,7 @@ throw (InvalidGuard)
   }
 
   return Tuple(t);
-  //TaggedValue v = (*m_guard)(k);
+  //TaggedConstant v = (*m_guard)(k);
 }
 
 inline std::pair<uuid, Variable::Equations::iterator>
@@ -112,7 +112,7 @@ bool Variable::equationValid(const Equation& e, const Tuple& k)
 {
 }
 
-TaggedValue
+TaggedConstant
 Variable::operator()(const Tuple& k)
 {
 
@@ -141,7 +141,7 @@ Variable::operator()(const Tuple& k)
       if (viter == m_variables.end())
       {
         //std::cerr << "not found" << std::endl;
-        return TaggedValue(Constant(Special(Special::UNDEF),
+        return TaggedConstant(Constant(Special(Special::UNDEF),
                            TYPE_INDEX_SPECIAL), k);
       }
       else
@@ -153,7 +153,7 @@ Variable::operator()(const Tuple& k)
     }
     catch (std::bad_cast& e)
     {
-      return TaggedValue(Constant(Special(Special::DIMENSION),
+      return TaggedConstant(Constant(Special(Special::DIMENSION),
                          TYPE_INDEX_SPECIAL), k);
     }
   }
@@ -192,7 +192,7 @@ Variable::operator()(const Tuple& k)
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
-    return TaggedValue(Constant(Special(Special::UNDEF),
+    return TaggedConstant(Constant(Special(Special::UNDEF),
                        TYPE_INDEX_SPECIAL),k);
   }
   else if (applicable.size() == 1)
@@ -223,7 +223,7 @@ Variable::operator()(const Tuple& k)
 
   if (bestIter == applicable.end())
   {
-    return TaggedValue(Constant(Special(Special::UNDEF),
+    return TaggedConstant(Constant(Special(Special::UNDEF),
                        TYPE_INDEX_SPECIAL), k);
   }
 
@@ -235,7 +235,7 @@ Variable::operator()(const Tuple& k)
         &&
         !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
-      return TaggedValue(Constant(Special(Special::MULTIDEF),
+      return TaggedConstant(Constant(Special(Special::MULTIDEF),
                          TYPE_INDEX_SPECIAL), k);
     }
   }

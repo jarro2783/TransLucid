@@ -38,10 +38,10 @@ namespace
     {
     }
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
-      return TaggedValue(Constant(Intmp(m_index++), TYPE_INDEX_INTMP), k);
+      return TaggedConstant(Constant(Intmp(m_index++), TYPE_INDEX_INTMP), k);
     }
 
     private:
@@ -56,7 +56,7 @@ namespace
     : m_d(d)
     {}
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
       Tuple::const_iterator iter = k.find(DIM_TEXT);
@@ -64,7 +64,7 @@ namespace
       {
         throw "called dim lookup without text dimension";
       }
-      return TaggedValue(Constant(Intmp(
+      return TaggedConstant(Constant(Intmp(
         m_d.lookup(iter->second.value<String>().value())),
                    TYPE_INDEX_INTMP), k);
     }
@@ -81,7 +81,7 @@ namespace
     : m_d(d)
     {}
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
       Tuple::const_iterator iter = k.find(DIM_VALUE);
@@ -89,7 +89,7 @@ namespace
       {
         throw "called dim lookup without value dimension";
       }
-      return TaggedValue(Constant(Intmp(
+      return TaggedConstant(Constant(Intmp(
         m_d.lookup(iter->second)), TYPE_INDEX_INTMP), k);
     }
 
@@ -212,7 +212,7 @@ Interpreter::tick()
       if (iter != m_variables.end())
       {
         //evaluate the demand
-        TaggedValue r = (*iter->second)(k);
+        TaggedConstant r = (*iter->second)(k);
         //save it in the output
         toSave[DIM_VALUE] = r.first;
         IOList::iterator iter = m_outputs.find(d.first);

@@ -180,7 +180,7 @@ namespace TransLucid
     void
     del(size_t time);
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
       return (*m_h)(k);
@@ -205,7 +205,7 @@ namespace TransLucid
     
     ~Variable();
 
-    TaggedValue operator()(const Tuple& k);
+    TaggedConstant operator()(const Tuple& k);
 
     uuid
     addExpr(const Tuple& k, HD* h)

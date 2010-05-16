@@ -39,7 +39,7 @@ main(int argc, char *argv[])
   x.addExpr(k, &i1);
 
   //x = 5;;
-  TL::TaggedValue r = x(k);
+  TL::TaggedConstant r = x(k);
   std::cout << r.first.value<TL::Intmp>().value() << std::endl;
 
   //set up the equation guard

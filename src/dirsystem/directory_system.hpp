@@ -121,7 +121,7 @@ namespace TransLucid
         }
         else
         {
-          *out = TaggedValue(Constant(Special(Special::UNDEF),
+          *out = TaggedConstant(Constant(Special(Special::UNDEF),
                               typeRegistry().indexSpecial()), c);
         }
         #endif

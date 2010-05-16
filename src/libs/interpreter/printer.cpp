@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-TaggedValue
+TaggedConstant
 ValuePrinter::operator()(const Tuple& k)
 {
   u32string s = U"<";

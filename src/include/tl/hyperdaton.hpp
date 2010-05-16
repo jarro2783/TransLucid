@@ -30,7 +30,7 @@ namespace TransLucid
     public:
     virtual ~HD() {}
 
-    virtual TaggedValue
+    virtual TaggedConstant
     operator()(const Tuple& k) = 0;
 
     virtual uuid

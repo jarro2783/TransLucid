@@ -155,7 +155,7 @@ booleanTrue(const EquationGuard& g, const Tuple& k)
 
   if (b)
   {
-    TaggedValue v = (*b)(k);// = i.evaluate(g.boolean(), c);
+    TaggedConstant v = (*b)(k);// = i.evaluate(g.boolean(), c);
 
     return v.first.index() == TYPE_INDEX_BOOL
     && v.first.value<Boolean>();

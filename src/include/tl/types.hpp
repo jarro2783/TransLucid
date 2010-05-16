@@ -468,7 +468,7 @@ namespace TransLucid
    *
    * A Constant and the context it was evaluated in.
    **/
-  typedef std::pair<Constant, Tuple> TaggedValue;
+  typedef std::pair<Constant, Tuple> TaggedConstant;
 
   //typedef boost::function<Constant
   //        (const Constant&, const Constant&, const Tuple&)> OpFunction;
