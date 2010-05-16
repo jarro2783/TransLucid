@@ -17,14 +17,14 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST = CMakeLists.txt
 
-lib_LTLIBRARIES = libtlinterpreter.la
+lib_LTLIBRARIES = libtlsystem.la
 
-libtlinterpreter_la_LDFLAGS = -version-info 0:0:0 \
+libtlsystem_la_LDFLAGS = -version-info 0:0:0 \
 $(BOOST_LDFLAGS) $(TL_LDFLAGS)
-libtlinterpreter_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
+libtlsystem_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
 -lltdl
 
-libtlinterpreter_la_SOURCES = interpreter.cpp expr_parser.cpp \
+libtlsystem_la_SOURCES = system.cpp expr_parser.cpp \
 library.cpp types.cpp \
 dimtranslator.cpp \
 range.cpp parser.cpp \
@@ -33,5 +33,5 @@ cache.cpp utility.cpp compiled_functors.cpp \
 expr_compiler.cpp consthd.cpp printer.cpp container.cpp set_types.cpp \
 translator.cpp ast.cpp tuple_parser.cpp bestfit.cpp
 
-libtlinterpreter_la_CPPFLAGS = -I$(top_srcdir)/src/include \
+libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)

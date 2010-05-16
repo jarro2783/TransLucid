@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 includesdir = $(prefix)/include/tl
 includes_HEADERS = types.hpp library.hpp dimtranslator.hpp \
-interpreter.hpp parser_fwd.hpp header_parser.hpp range.hpp \
+system.hpp parser_fwd.hpp header_parser.hpp range.hpp \
 expr_parser.hpp tuple_parser.hpp equation_parser.hpp \
 builtin_types.hpp header_type.hpp equation.hpp expr_compiler.hpp \
 cache.hpp parser_util.hpp exception.hpp \
