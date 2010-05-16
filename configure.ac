@@ -74,7 +74,7 @@ AC_CONFIG_FILES([Makefile
                  src/include/tl/Makefile
                  src/libs/Makefile
                  src/libs/int/Makefile
-                 src/libs/interpreter/Makefile
+                 src/libs/system/Makefile
                  src/dirsystem/Makefile
                  src/interactive/Makefile
                  src/tests/Makefile
