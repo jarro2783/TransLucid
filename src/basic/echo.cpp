@@ -81,7 +81,7 @@ Sender::addExpr(const Tuple& k, HD* h)
 int
 main(int argc, char* argv[])
 {
-  Interpreter i;
+  SystemHD i;
 
   Receiver r;
   Sender s;

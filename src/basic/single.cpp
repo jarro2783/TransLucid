@@ -30,10 +30,10 @@ using namespace TL;
 int
 main(int argc, char *argv[])
 {
-  TL::Interpreter i;
+  TL::SystemHD i;
   HD& h = i;
 
-  TL::Variable x(U"x", &i);
+  TL::VariableHD x(U"x", &i);
   TL::Hyperdatons::IntmpConst i1(5);
   TL::Tuple k;
   x.addExpr(k, &i1);

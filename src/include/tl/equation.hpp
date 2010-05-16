@@ -31,7 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class Interpreter;
+  class SystemHD;
 
   class InvalidGuard : public Exception
   {
@@ -130,9 +130,9 @@ namespace TransLucid
     size_t validEnd;
   };
 
-  class Variable;
+  class VariableHD;
 
-  typedef std::map<u32string, Variable*> VariableMap;
+  typedef std::map<u32string, VariableHD*> VariableMap;
 
   class Equation : public HD
   {
@@ -197,13 +197,13 @@ namespace TransLucid
 
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
-  class Variable : public HD
+  class VariableHD : public HD
   {
     public:
 
-    Variable(const u32string& name, HD* system);
+    VariableHD(const u32string& name, HD* system);
     
-    ~Variable();
+    ~VariableHD();
 
     TaggedConstant operator()(const Tuple& k);
 

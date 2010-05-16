@@ -66,7 +66,7 @@ namespace TransLucid
     HD&
     system()
     {
-      return m_interpreter;
+      return m_system;
     }
 
     Parser::Header&
@@ -78,7 +78,7 @@ namespace TransLucid
     void
     loadLibrary(const u32string& s)
     {
-      m_lt.loadLibrary(s, &m_interpreter);
+      m_lt.loadLibrary(s, &m_system);
     }
 
     const Tree::Expr&
@@ -96,7 +96,7 @@ namespace TransLucid
     Parser::TupleGrammar<Parser::iterator_t>* m_tuple;
     Parser::SkipGrammar<Parser::iterator_t>* m_skipper;
 
-    Interpreter m_interpreter;
+    SystemHD m_system;
 
     ExprCompiler m_compiler;
 

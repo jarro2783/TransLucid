@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TLInteractive
 {
   namespace TL = TransLucid;
-  class System : public TL::Interpreter
+  class System : public TL::SystemHD
   {
     public:
 

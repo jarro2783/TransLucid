@@ -184,7 +184,7 @@ class DirectoryGrammar : public qi::grammar<DirectoryGrammar>
 #endif
 
 DirectorySystem::DirectorySystem()
-: m_compiler(m_interpreter), m_expr_parser(m_header)
+: m_compiler(m_system), m_expr_parser(m_header)
 {
   m_expr_parser.set_context_perturb(m_tuple_parser);
   m_tuple_parser.set_expr(m_expr_parser);
@@ -293,7 +293,7 @@ DirectorySystem::parseSystem(const ustring_t& path)
 
           default:
             throw InternalError(
-              __FILE__ ": Interpreter::parseSystem() line: "
+              __FILE__ ": SystemHD::parseSystem() line: "
               STRING_(__LINE__)
               " should not have been reached");
         }

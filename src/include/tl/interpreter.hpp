@@ -27,15 +27,15 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
   /**
-   * @brief Interpreter base class.
+   * @brief SystemHD base class.
    *
-   * Holds all the data necessary for an interpreter.
+   * Holds all the data necessary for an system.
    **/
-  class Interpreter : public Variable
+  class SystemHD : public VariableHD
   {
     public:
 
-    Interpreter();
+    SystemHD();
 
     typedef std::map<u32string, HD*> IOList;
 

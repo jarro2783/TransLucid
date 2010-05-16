@@ -73,7 +73,7 @@ namespace TransLucid
 
       Libtool m_lt;
 
-      TransLucid::Interpreter m_interpreter;
+      TransLucid::SystemHD m_system;
 
       Parser::HeaderGrammar<Parser::iterator_t> m_header_parser;
       Parser::ExprGrammar<Parser::iterator_t> m_expr_parser;
@@ -109,10 +109,10 @@ namespace TransLucid
         Tuple c(tuple);
 
         //Equation e = findEquation("demand", c);
-        //Variable* v = lookupVariable("demand");
-        *out = m_interpreter(c);
+        //VariableHD* v = lookupVariable("demand");
+        *out = m_system(c);
         #if 0
-        Variable* v = 0;
+        VariableHD* v = 0;
 
         if (v)
         {

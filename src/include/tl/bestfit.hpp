@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid 
 {
-  class Variable;
+  class VariableHD;
   class Equation;
 
   class BestFit
@@ -59,7 +59,7 @@ namespace TransLucid
   class CompileBestFit : public BestFit
   {
     public:
-    //CompileBestFit(Equation& e, Variable& v);
+    //CompileBestFit(Equation& e, VariableHD& v);
 
     TaggedConstant operator()(const Tuple& k);
 

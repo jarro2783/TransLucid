@@ -43,7 +43,7 @@ along with TransLucid; see the file COPYING.  If not see
 // before unloading libraries with
 // lt_exit
 // as long as all typed values are destructed
-// before the interpreter class is then this
+// before the system class is then this
 // will work fine
 // ----------------------------------
 
@@ -76,7 +76,7 @@ namespace boost
 namespace TransLucid
 {
 
-  class Interpreter;
+  class SystemHD;
 
   class HD;
 
@@ -438,7 +438,7 @@ namespace TransLucid
     }
 
     //void
-    //print(const Interpreter& i, std::ostream& os, const Tuple& c) const;
+    //print(const SystemHD& i, std::ostream& os, const Tuple& c) const;
 
     void print(std::ostream& os) const;
 
@@ -493,8 +493,8 @@ namespace TransLucid
   {
     public:
 
-    //the registry is tied to a specific interpreter
-    TypeRegistry(Interpreter& i);
+    //the registry is tied to a specific system
+    TypeRegistry(SystemHD& i);
     ~TypeRegistry();
 
     type_index
@@ -559,10 +559,10 @@ namespace TransLucid
     }
     #endif
 
-    Interpreter&
-    interpreter() const
+    SystemHD&
+    system() const
     {
-      return m_interpreter;
+      return m_system;
     }
 
     //indexes for built in types
@@ -663,7 +663,7 @@ namespace TransLucid
     type_index m_indexGuard;
     type_index m_indexPair;
 
-    Interpreter& m_interpreter;
+    SystemHD& m_system;
 
     public:
     #if 0

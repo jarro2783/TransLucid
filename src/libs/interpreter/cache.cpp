@@ -37,7 +37,7 @@ LazyWarehouse::lookupCalc(const u32string& name, const Tuple& c)
     //add calc because it wasn't found
     TupleToValue m;
     m.insert(std::make_pair
-      (c, Constant(ValueCalc(), m_interpreter.typeRegistry().indexCalc())));
+      (c, Constant(ValueCalc(), m_system.typeRegistry().indexCalc())));
     m_cache.insert(std::make_pair(name, m));
   }
   else
@@ -50,7 +50,7 @@ LazyWarehouse::lookupCalc(const u32string& name, const Tuple& c)
       iter->second.insert
         (std::make_pair
           (c, Constant(ValueCalc(),
-                         m_interpreter.typeRegistry().indexCalc())));
+                         m_system.typeRegistry().indexCalc())));
     }
     else
     {

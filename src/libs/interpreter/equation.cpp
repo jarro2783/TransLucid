@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-Variable::Variable(const u32string& name, HD* system)
+VariableHD::VariableHD(const u32string& name, HD* system)
 : m_name(name)
  ,m_system(system)
 #if 0
@@ -40,7 +40,7 @@ Variable::Variable(const u32string& name, HD* system)
 {
 }
 
-Variable::~Variable()
+VariableHD::~VariableHD()
 {
   //cleanup best fit variables
 }
@@ -79,8 +79,8 @@ throw (InvalidGuard)
   //TaggedConstant v = (*m_guard)(k);
 }
 
-inline std::pair<uuid, Variable::Equations::iterator>
-Variable::addExprActual(const Tuple& k, HD* h)
+inline std::pair<uuid, VariableHD::Equations::iterator>
+VariableHD::addExprActual(const Tuple& k, HD* h)
 {
   const EquationGuard* g = 0;
   Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
@@ -108,12 +108,12 @@ Variable::addExprActual(const Tuple& k, HD* h)
   }
 }
 
-bool Variable::equationValid(const Equation& e, const Tuple& k)
+bool VariableHD::equationValid(const Equation& e, const Tuple& k)
 {
 }
 
 TaggedConstant
-Variable::operator()(const Tuple& k)
+VariableHD::operator()(const Tuple& k)
 {
 
   //std::cout << "evaluating variable "
@@ -245,8 +245,8 @@ Variable::operator()(const Tuple& k)
   return (*std::get<1>(*bestIter)->second.equation())(k);
 }
 
-std::pair<uuid, Variable::Equations::iterator>
-Variable::addExprInternal(const Tuple& k, HD* e)
+std::pair<uuid, VariableHD::Equations::iterator>
+VariableHD::addExprInternal(const Tuple& k, HD* e)
 {
   size_t dim_id = DIM_ID;
   Tuple::const_iterator iter = k.find(dim_id);
@@ -282,8 +282,8 @@ Variable::addExprInternal(const Tuple& k, HD* e)
   }
 }
 
-std::pair<uuid, Variable::Equations::iterator>
-Variable::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
+std::pair<uuid, VariableHD::Equations::iterator>
+VariableHD::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
 {
   //std::cerr << "addToVariableActual: " <<
   //   id << std::endl;
@@ -293,14 +293,14 @@ Variable::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
   {
     //std::cerr << "constructing new variable" << std::endl;
     iter = m_variables.insert(std::make_pair
-                              (id, new Variable(id, m_system))).first;
+                              (id, new VariableHD(id, m_system))).first;
   }
   return iter->second->addExprInternal(k, h);
 }
 
 
 bool
-Variable::delexpr(uuid id, size_t time)
+VariableHD::delexpr(uuid id, size_t time)
 {
   Equations::iterator iter = m_equations.find(id);
 
@@ -312,7 +312,7 @@ Variable::delexpr(uuid id, size_t time)
 }
 
 bool
-Variable::replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr)
+VariableHD::replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr)
 {
 }
 

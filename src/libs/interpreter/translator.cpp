@@ -106,7 +106,7 @@ namespace
 }
 
 Translator::Translator()
-: m_compiler(&m_interpreter)
+: m_compiler(&m_system)
 {
   m_header = new Parser::Header;
 
@@ -213,7 +213,7 @@ Translator::translate_and_add_equation_set(const u32string& s)
 
   BOOST_FOREACH(auto& v, equations)
   {
-    uuid id = m_interpreter.addExpr(
+    uuid id = m_system.addExpr(
       Tuple(create_add_eqn_context(to_u32string(std::get<0>(v)),
                                      std::get<1>(v),
                                      std::get<2>(v))),

@@ -498,7 +498,7 @@ register_one_op
 
 template<class T>
 void
-register_int_ops(TL::Interpreter& i, size_t index)
+register_int_ops(TL::SystemHD& i, size_t index)
 {
   register_one_op<T, std::plus>(i, U"operator+", index);
   register_one_op<T, std::minus>(i, U"operator-", index);
@@ -521,7 +521,7 @@ template <typename T>
 class IntHD : public TL::HD
 {
   public:
-  IntHD(const TL::u32string& name, size_t index, TL::Interpreter& system)
+  IntHD(const TL::u32string& name, size_t index, TL::SystemHD& system)
   : m_system(system), m_index(index)
   {
     //m_index = system.typeRegistry().registerType(name);
@@ -556,13 +556,13 @@ class IntHD : public TL::HD
   }
 
   private:
-  TL::Interpreter& m_system;
+  TL::SystemHD& m_system;
   size_t m_index;
 };
 
 template <class T>
 void
-registerType(const TL::u32string& name, TL::Interpreter& i)
+registerType(const TL::u32string& name, TL::SystemHD& i)
 {
   mpz_class unique = TL::get_unique(&i);
 
@@ -591,7 +591,7 @@ Int<T>::print(std::ostream& os) const
 }
 
 void
-registerTypes(TransLucid::Interpreter& i)
+registerTypes(TransLucid::SystemHD& i)
 {
   #if 0
   TransLucid::TypeRegistry& r = i.typeRegistry();
@@ -626,7 +626,7 @@ extern "C"
 {
 
 void
-lib_int_init(TransLucid::Interpreter& i)
+lib_int_init(TransLucid::SystemHD& i)
 {
   IntLib::registerTypes(i);
 }
