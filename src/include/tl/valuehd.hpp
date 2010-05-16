@@ -1,4 +1,4 @@
-/* The "true" constant hyperdatons.
+/* The value hyperdatons.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef CONSTHD_HPP_INCLUDED
-#define CONSTHD_HPP_INCLUDED
+#ifndef VALUEHD_HPP_INCLUDED
+#define VALUEHD_HPP_INCLUDED
 
 #include <tl/hyperdaton.hpp>
 #include <tl/system.hpp>
@@ -43,12 +43,12 @@ namespace TransLucid
       HD* m_system;
     };
 
-    class Intmp : public ValueHD
+    class IntmpHD : public ValueHD
     {
       public:
       static const char32_t* name;
 
-      Intmp(HD* system)
+      IntmpHD(HD* system)
       : ValueHD(system)
       {}
 
@@ -130,4 +130,4 @@ namespace TransLucid
   } //namespace Hyperdatons
 } //namespace TransLucid
 
-#endif // CONSTHD_HPP_INCLUDED
+#endif // VALUEHD_HPP_INCLUDED

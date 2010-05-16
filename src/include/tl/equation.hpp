@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef EQUATION_INCLUDED
+#ifndef EQUATION_HPP_INCLUDED
 #define EQUATION_HPP_INCLUDED
 
 #include <tl/types.hpp>

@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
-#include <tl/consthd.hpp>
+#include <tl/valuehd.hpp>
 #include <algorithm>
 
 namespace TransLucid
@@ -160,7 +160,7 @@ SystemHD::SystemHD()
 
   //build the constant creators
   buildConstantHD<Hyperdatons::UCharHD>(TYPE_INDEX_UCHAR);
-  HD* intmpHD = buildConstantHD<Hyperdatons::Intmp>(TYPE_INDEX_INTMP);
+  HD* intmpHD = buildConstantHD<Hyperdatons::IntmpHD>(TYPE_INDEX_INTMP);
   buildConstantHD<Hyperdatons::UStringHD>(TYPE_INDEX_USTRING);
 
   //set this as the default int too

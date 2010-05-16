@@ -19,7 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/equation.hpp>
 #include <tl/system.hpp>
-#include <tl/consthd.hpp>
+#include <tl/valuehd.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
 #include <tl/builtin_types.hpp>

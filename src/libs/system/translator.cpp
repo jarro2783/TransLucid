@@ -108,7 +108,7 @@ namespace
 Translator::Translator()
 : m_compiler(&m_system)
 {
-  m_header = new Parser::Header;
+  m_header = new Parser::HeaderStruct;
 
   m_expr = new Parser::ExprGrammar<Parser::iterator_t>(*m_header);
   m_equation = new Parser::EquationGrammar<Parser::iterator_t>;

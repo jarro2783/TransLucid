@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/consthd.hpp>
+#include <tl/valuehd.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
 
@@ -27,12 +27,12 @@ namespace TransLucid
 namespace Hyperdatons
 {
 
-const char32_t* Intmp::name =     U"intmp";
+const char32_t* IntmpHD::name =     U"intmp";
 const char32_t* UCharHD::name =     U"uchar";
 const char32_t* UStringHD::name =   U"ustring";
 
 TaggedConstant
-Intmp::operator()(const Tuple& k)
+IntmpHD::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 

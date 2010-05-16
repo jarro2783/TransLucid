@@ -58,10 +58,10 @@ namespace TransLucid
       Special::Value m_value;
     };
 
-    class IntegerConstHD : public HD
+    class IntmpConstHD : public HD
     {
       public:
-      IntegerConstHD(HD* system, const mpz_class& value)
+      IntmpConstHD(HD* system, const mpz_class& value)
       : m_system(system), m_value(value)
       {}
 

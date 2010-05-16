@@ -258,7 +258,7 @@ HashHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-IntegerConstHD::operator()(const Tuple& k)
+IntmpConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Intmp(m_value), TYPE_INDEX_INTMP), k);
 }
