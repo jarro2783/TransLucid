@@ -219,7 +219,7 @@ namespace TransLucid
 
     protected:
 
-    typedef std::map<uuid, Equation> Equations;
+    typedef std::map<uuid, EquationHD> Equations;
 
     std::pair<uuid, Equations::iterator>
     addToVariableActual(const u32string& id, const Tuple& k, HD* h);
@@ -232,7 +232,7 @@ namespace TransLucid
     std::pair<uuid, Equations::iterator>
     addExprActual(const Tuple& k, HD* e);
 
-    bool equationValid(const Equation& e, const Tuple& k);
+    bool equationValid(const EquationHD& e, const Tuple& k);
 
     Equations m_equations;
     VariableMap m_variables;

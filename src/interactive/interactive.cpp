@@ -271,7 +271,7 @@ System::postInputSignal(std::vector<TL::AST::Expr*> const& ev)
   if (lastExpr != 0)
   {
     demands.addEquation
-      (TL::Equation("demand",
+      (TL::EquationHD("demand",
                     TL::EquationGuard(c),
                     new TL::ASTEquation(lastExpr)));
   }
