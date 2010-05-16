@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef INTERPRETER_FWD_HPP_INCLUDED
-#define INTERPRETER_FWD_HPP_INCLUDED
+#ifndef EQUATION_INCLUDED
+#define EQUATION_HPP_INCLUDED
 
 #include <tl/types.hpp>
 #include <boost/shared_ptr.hpp>
@@ -246,4 +246,4 @@ namespace TransLucid
   };
 };
 
-#endif // INTERPRETER_FWD_HPP_INCLUDED
+#endif // EQUATION_HPP_INCLUDED

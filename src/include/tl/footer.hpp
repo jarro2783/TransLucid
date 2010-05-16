@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef FOOTER_TYPE_HPP_INCLUDED
-#define FOOTER_TYPE_HPP_INCLUDED
+#ifndef FOOTER_HPP_INCLUDED
+#define FOOTER_HPP_INCLUDED
 
 #include <tl/types.hpp>
 
 namespace TransLucid
 {
-  class FooterType : public TypedValue
+  class Footer : public TypedValue
   {
   };
 }
 
-#endif // FOOTER_TYPE_HPP_INCLUDED
+#endif // FOOTER_HPP_INCLUDED

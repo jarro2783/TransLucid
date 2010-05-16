@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef INTERPRETER_HPP_INCLUDED
-#define INTERPRETER_HPP_INCLUDED
+#ifndef SYSTEM_HPP_INCLUDED
+#define SYSTEM_HPP_INCLUDED
 
 #include <tl/types.hpp>
 #include <tl/dimtranslator.hpp>
@@ -82,4 +82,4 @@ namespace TransLucid
   Constant hash(size_t dimension, const Tuple& context);
 }
 
-#endif // INTERPRETER_HPP_INCLUDED
+#endif // SYSTEM_HPP_INCLUDED
