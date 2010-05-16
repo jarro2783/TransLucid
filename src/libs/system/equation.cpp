@@ -317,7 +317,7 @@ VariableHD::replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr)
 }
 
 void
-Equation::del(size_t time)
+EquationHD::del(size_t time)
 {
   m_validEnd = time;
 }
