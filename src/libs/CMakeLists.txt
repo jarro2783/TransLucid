@@ -1,2 +1,2 @@
-add_subdirectory(interpreter)
+add_subdirectory(system)
 add_subdirectory(int)
