@@ -71,7 +71,7 @@ namespace TransLucid
     {
       public:
 
-      ExprGrammar(Header& h)
+      ExprGrammar(HeaderStruct& h)
       : ExprGrammar::base_type(expr), header(h)
       {
         //using qi::_val;
@@ -311,7 +311,7 @@ namespace TransLucid
       escaped_string_parser<Iterator> angle_string;
       ident_parser<Iterator> ident;
 
-      Header &header;
+      HeaderStruct &header;
 
       qi::symbols<char_type, Special::Value> specials;
 

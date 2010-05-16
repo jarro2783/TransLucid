@@ -118,7 +118,7 @@ namespace TransLucid
     typedef qi::symbols<char_type, Tree::BinaryOperation> binary_symbols;
     typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
 
-    struct Header
+    struct HeaderStruct
     {
       symbols_t dimension_symbols;
 
