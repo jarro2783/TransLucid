@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/interpreter.hpp>
 
+// TODO: This file is under construction.  It is not junk.
+
 namespace TransLucid
 {
 

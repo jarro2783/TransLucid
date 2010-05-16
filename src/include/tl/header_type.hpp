@@ -20,6 +20,8 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef HEADER_TYPE_HPP_INCLUDED
 #define HEADER_TYPE_HPP_INCLUDED
 
+// TODO: This file is under construction.  It is not junk.
+
 #if 0
 
 #include <tl/types.hpp>

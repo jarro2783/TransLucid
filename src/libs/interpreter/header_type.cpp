@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+// TODO: This file is under construction.  It is not junk.
+
 #if 0
 
 #include <tl/header_type.hpp>
