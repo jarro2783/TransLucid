@@ -82,32 +82,6 @@ namespace TransLucid
       operator()(const Tuple& k);
     };
 
-    //this is not the intmp builder, this returns a constant intmp
-    //TODO: This is probably Hyperdatons::Integer
-    class IntmpConst : public HD
-    {
-      public:
-      IntmpConst(const mpz_class& v)
-      : m_v(v)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k)
-      {
-        return TaggedConstant(Constant(TransLucid::Intmp(m_v),
-                           TYPE_INDEX_INTMP), k);
-      }
-
-      uuid
-      addExpr(const Tuple& k, HD* h)
-      {
-        return nil_uuid();
-      }
-
-      private:
-      mpz_class m_v;
-    };
-
     //TODO: move this to a ConstantHD
     class TypeHD : public ValueHD
     {

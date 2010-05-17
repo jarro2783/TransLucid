@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/compiled_functors.hpp>
 namespace TL = TransLucid;
 
 using namespace TL;
@@ -34,7 +35,7 @@ main(int argc, char *argv[])
   HD& h = i;
 
   TL::VariableHD x(U"x", &i);
-  TL::Hyperdatons::IntmpConst i1(5);
+  TL::Hyperdatons::IntmpConstHD i1(&i, 5);
   TL::Tuple k;
   x.addExpr(k, &i1);
 
@@ -44,7 +45,7 @@ main(int argc, char *argv[])
 
   //set up the equation guard
   TL::tuple_t guard;
-  TL::Hyperdatons::IntmpConst i2(10);
+  TL::Hyperdatons::IntmpConstHD i2(&i, 10);
   guard[DIM_VALUE] = Constant(TL::Intmp(10), TL::TYPE_INDEX_INTMP);
 
   //set up the context for addExpr

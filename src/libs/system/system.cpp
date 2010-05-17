@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
 #include <tl/valuehd.hpp>
+#include <tl/compiled_functors.hpp>
 #include <algorithm>
 
 namespace TransLucid
@@ -110,7 +111,12 @@ SystemHD::buildConstantHD(size_t index)
   //  Constant(String("CONST"), m_typeRegistry.indexString());
   k[DIM_TYPE] = Constant(String(T::name), TYPE_INDEX_USTRING);
   addToVariableActual(U"CONST", Tuple(k), h);
-  addToVariableActual(U"TYPE_INDEX", empty, new Hyperdatons::IntmpConst(index));
+  addToVariableActual
+  (
+    U"TYPE_INDEX", 
+    empty, 
+    new Hyperdatons::IntmpConstHD(this, index)
+  );
   return h;
 }
 
