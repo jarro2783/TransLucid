@@ -114,11 +114,11 @@ namespace TransLucid
       return os;
     }
 
-    typedef qi::symbols<char_type, Tree::UnaryOperation> unary_symbols;
-    typedef qi::symbols<char_type, Tree::BinaryOperation> binary_symbols;
+    typedef qi::symbols<char_type, Tree::UnaryOperator> unary_symbols;
+    typedef qi::symbols<char_type, Tree::BinaryOperator> binary_symbols;
     typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
 
-    struct Header
+    struct HeaderStruct
     {
       symbols_t dimension_symbols;
 

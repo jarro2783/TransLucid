@@ -75,7 +75,7 @@ namespace TLInteractive
       : m_self(self),
       expect_dbl_semi(TL::Parser::error_expected_dbl_semi),
       eqnGrammar(self.header, self.parsers, self.adder),
-      equationSet(self.system.createEquationSet(TL::EquationGuard()))
+      equationSet(self.system.createEquationSet(TL::GuardHD()))
       {
         equations = new TL::Parser::equation_v;
         self.adder.setEquations(equations);

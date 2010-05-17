@@ -28,9 +28,9 @@ libtlsystem_la_SOURCES = system.cpp expr_parser.cpp \
 library.cpp types.cpp \
 dimtranslator.cpp \
 range.cpp parser.cpp \
-builtin_types.cpp header_type.cpp equation.cpp \
+builtin_types.cpp header.cpp equation.cpp \
 cache.cpp utility.cpp compiled_functors.cpp \
-expr_compiler.cpp consthd.cpp printer.cpp container.cpp set_types.cpp \
+expr_compiler.cpp valuehd.cpp printer.cpp container.cpp set_types.cpp \
 translator.cpp ast.cpp tuple_parser.cpp bestfit.cpp
 
 libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \

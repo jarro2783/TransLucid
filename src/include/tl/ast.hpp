@@ -37,11 +37,11 @@ namespace TransLucid
       UNARY_POSTFIX
     };
 
-    struct UnaryOperation
+    struct UnaryOperator
     {
-      UnaryOperation() = default;
+      UnaryOperator() = default;
 
-      UnaryOperation
+      UnaryOperator
       (
         const u32string& op,
         const u32string& symbol,
@@ -55,7 +55,7 @@ namespace TransLucid
       UnaryType type;
 
       bool
-      operator==(const UnaryOperation& rhs) const
+      operator==(const UnaryOperator& rhs) const
       {
         return op == rhs.op && symbol == rhs.symbol && type == rhs.type;
       }
@@ -70,11 +70,11 @@ namespace TransLucid
       ASSOC_COMPARISON
     };
 
-    struct BinaryOperation
+    struct BinaryOperator
     {
-      BinaryOperation() = default;
+      BinaryOperator() = default;
 
-      BinaryOperation
+      BinaryOperator
       (
         InfixAssoc assoc,
         const u32string& op,
@@ -85,14 +85,14 @@ namespace TransLucid
       {}
 
       bool
-      operator==(const BinaryOperation& rhs) const
+      operator==(const BinaryOperator& rhs) const
       {
         return op == rhs.op && symbol == rhs.symbol &&
         assoc == rhs.assoc && precedence == rhs.precedence;
       }
 
       bool
-      operator!=(const BinaryOperation& rhs) const
+      operator!=(const BinaryOperator& rhs) const
       {
         return !(*this == rhs);
       }
@@ -175,11 +175,11 @@ namespace TransLucid
     {
       UnaryOpExpr() = default;
 
-      UnaryOpExpr(const UnaryOperation& o, const Expr& e)
+      UnaryOpExpr(const UnaryOperator& o, const Expr& e)
       : op(o), e(e)
       {}
 
-      UnaryOperation op;
+      UnaryOperator op;
       Expr e;
     };
 
@@ -189,28 +189,28 @@ namespace TransLucid
 
       BinaryOpExpr
       (
-        BinaryOperation o,
+        BinaryOperator o,
         const Expr& l,
         const Expr& r
       )
       : op(o), lhs(l), rhs(r)
       {}
 
-      BinaryOperation op;
+      BinaryOperator op;
       Expr lhs;
       Expr rhs;
 
       void
-      add_right(const BinaryOperation& op, Expr& rhs);
+      add_right(const BinaryOperator& op, Expr& rhs);
 
       void
       add_leaf(Expr& e);
     };
 
     Expr
-    insert_binary_operation
+    insert_binary_operator
     (
-      const BinaryOperation& info,
+      const BinaryOperator& info,
       Expr& lhs,
       Expr& rhs
     );

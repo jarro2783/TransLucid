@@ -31,7 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/hyperdaton.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
-#include <tl/consthd.hpp>
+#include <tl/valuehd.hpp>
 #include <boost/function.hpp>
 #include <tl/utility.hpp>
 
@@ -442,11 +442,11 @@ class OpHD : public TL::HD
   TL::HD& m_system;
 };
 
-template <typename Operation>
+template <typename Operator>
 TL::HD*
-build_op_hd(TL::HD& i, const Operation& op)
+build_op_hd(TL::HD& i, const Operator& op)
 {
-  return new OpHD<Operation>(i, op);
+  return new OpHD<Operator>(i, op);
 }
 
 template <typename T, template <typename> class Op>
@@ -468,11 +468,11 @@ register_one_op
   {
     {
       TL::get_dimension_index(&system, U"arg0"),
-      TL::Constant(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+      TL::Constant(TL::Type(index), TL::TYPE_INDEX_TYPE)
     },
     {
       TL::get_dimension_index(&system, U"arg1"),
-      TL::Constant(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+      TL::Constant(TL::Type(index), TL::TYPE_INDEX_TYPE)
     },
     {
       TL::DIM_NAME,
@@ -484,7 +484,7 @@ register_one_op
   {
     {
       TL::DIM_VALID_GUARD,
-      TL::Constant(TL::EquationGuardType(TL::EquationGuard(TL::Tuple(guard))),
+      TL::Constant(TL::Guard(TL::GuardHD(TL::Tuple(guard))),
                      TL::TYPE_INDEX_GUARD)
     },
     {

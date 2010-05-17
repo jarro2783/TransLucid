@@ -27,7 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class GeneralContainer : public HD
+  class ContainerHD : public HD
   {
     public:
 

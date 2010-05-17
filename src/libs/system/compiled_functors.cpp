@@ -115,7 +115,7 @@ BinaryOpHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-BoolHD::operator()(const Tuple& k)
+BoolConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
 }
@@ -152,7 +152,7 @@ DimensionHD::operator()(const Tuple& k)
 {
   size_t id = get_dimension_index(m_system, m_name);
   return TaggedConstant (Constant(TransLucid::Dimension(id),
-                      TYPE_INDEX_DIMENSION), k);
+                         TYPE_INDEX_DIMENSION), k);
 }
 
 TaggedConstant
@@ -213,7 +213,7 @@ IfHD::operator()(const Tuple& k)
         else
         {
           return TaggedConstant(Constant(Special(Special::TYPEERROR),
-                             TYPE_INDEX_SPECIAL), k);
+                                TYPE_INDEX_SPECIAL), k);
         }
 
         ++iter;
@@ -225,7 +225,7 @@ IfHD::operator()(const Tuple& k)
   else
   {
     return TaggedConstant(Constant(Special(Special::TYPEERROR),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 }
 
@@ -253,12 +253,12 @@ HashHD::operator()(const Tuple& k)
   else
   {
     return TaggedConstant(Constant(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 }
 
 TaggedConstant
-IntegerConstHD::operator()(const Tuple& k)
+IntmpConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Intmp(m_value), TYPE_INDEX_INTMP), k);
 }
@@ -278,7 +278,7 @@ IsTypeHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-OperationHD::operator()(const Tuple& k)
+VariableOpHD::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
 
@@ -300,30 +300,30 @@ OperationHD::operator()(const Tuple& k)
 
 #if 0
 TaggedConstant
-Pair::operator()(const Tuple& k)
+PairHD::operator()(const Tuple& k)
 {
   TaggedConstant l = (*m_lhs)(k);
   TaggedConstant r = (*m_rhs)(k);
 
-  return TaggedConstant(Constant(PairType((*m_lhs)(k).first, (*m_rhs)(k).first),
+  return TaggedConstant(Constant(Pair((*m_lhs)(k).first, (*m_rhs)(k).first),
                      TYPE_INDEX_PAIR), k);
 }
 #endif
 
 TaggedConstant
-SpecialHD::operator()(const Tuple& k)
+SpecialConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
 }
 
 TaggedConstant
-StringConstHD::operator()(const Tuple& k)
+UStringConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(String(m_value), TYPE_INDEX_USTRING), k);
 }
 
 TaggedConstant
-UcharConstHD::operator()(const Tuple& k)
+UCharConstHD::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
 }
@@ -331,7 +331,7 @@ UcharConstHD::operator()(const Tuple& k)
 TaggedConstant
 UnaryOpHD::operator()(const Tuple& k)
 {
-  //TODO: resolve what to do with operations
+  //TODO: resolve what to do with operators
   return TaggedConstant();
 }
 
@@ -341,7 +341,7 @@ TupleHD::operator()(const Tuple& k)
   tuple_t kp;
   BOOST_FOREACH(auto& pair, m_elements)
   {
-    //const PairType& p = v.first.value<PairType>();
+    //const Pair& p = v.first.value<Pair>();
     TaggedConstant left = (*pair.first)(k);
     TaggedConstant right = (*pair.second)(k);
 
@@ -364,7 +364,7 @@ AtAbsoluteHD::operator()(const Tuple& k)
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
     return TaggedConstant(Constant(Special(Special::TYPEERROR),
-      TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
   else
   {
@@ -380,7 +380,7 @@ AtRelativeHD::operator()(const Tuple& k)
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
     return TaggedConstant(Constant(Special(Special::TYPEERROR),
-      TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
   else
   {

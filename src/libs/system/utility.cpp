@@ -87,9 +87,9 @@ valueRefines(const Constant& a, const Constant& b)
   }
   else if (b.index() == TYPE_INDEX_TYPE)
   {
-    //std::cerr << "type type index == " << b.value<TypeType>().index()
+    //std::cerr << "type type index == " << b.value<Type>().index()
     //<< std::endl;
-    if (a.index() == b.value<TypeType>().index())
+    if (a.index() == b.value<Type>().index())
     {
       return true;
     }
@@ -149,7 +149,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
 }
 
 bool
-booleanTrue(const EquationGuard& g, const Tuple& k)
+booleanTrue(const GuardHD& g, const Tuple& k)
 {
   HD* b = g.boolean();
 

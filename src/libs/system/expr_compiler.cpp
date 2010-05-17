@@ -50,31 +50,31 @@ ExprCompiler::operator()(const Tree::nil& n)
 HD*
 ExprCompiler::operator()(bool b)
 {
-  return new Hyperdatons::BoolHD(b);
+  return new Hyperdatons::BoolConstHD(b);
 }
 
 HD*
 ExprCompiler::operator()(Special::Value s)
 {
-  return new Hyperdatons::SpecialHD(s);
+  return new Hyperdatons::SpecialConstHD(s);
 }
 
 HD*
 ExprCompiler::operator()(const mpz_class& i)
 {
-  return new Hyperdatons::IntegerConstHD(m_i, i);
+  return new Hyperdatons::IntmpConstHD(m_i, i);
 }
 
 HD*
 ExprCompiler::operator()(char32_t c)
 {
-  return new Hyperdatons::UcharConstHD(c);
+  return new Hyperdatons::UCharConstHD(c);
 }
 
 HD*
 ExprCompiler::operator()(const u32string& s)
 {
-  return new Hyperdatons::StringConstHD(s);
+  return new Hyperdatons::UStringConstHD(s);
 }
 
 HD*

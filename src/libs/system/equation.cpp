@@ -46,7 +46,7 @@ VariableHD::~VariableHD()
 }
 
 Tuple
-EquationGuard::evaluate(const Tuple& k) const
+GuardHD::evaluate(const Tuple& k) const
 throw (InvalidGuard)
 {
   tuple_t t = m_dimensions;
@@ -82,11 +82,11 @@ throw (InvalidGuard)
 inline std::pair<uuid, VariableHD::Equations::iterator>
 VariableHD::addExprActual(const Tuple& k, HD* h)
 {
-  const EquationGuard* g = 0;
+  const GuardHD* g = 0;
   Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
   if (giter != k.end())
   {
-    g = &giter->second.value<EquationGuardType const&>().value();
+    g = &giter->second.value<Guard const&>().value();
   }
 
   auto adder =
@@ -104,7 +104,7 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   }
   else
   {
-    return adder(EquationHD(m_name, EquationGuard(), h));
+    return adder(EquationHD(m_name, GuardHD(), h));
   }
 }
 
@@ -142,7 +142,7 @@ VariableHD::operator()(const Tuple& k)
       {
         //std::cerr << "not found" << std::endl;
         return TaggedConstant(Constant(Special(Special::UNDEF),
-                           TYPE_INDEX_SPECIAL), k);
+                              TYPE_INDEX_SPECIAL), k);
       }
       else
       {
@@ -154,19 +154,18 @@ VariableHD::operator()(const Tuple& k)
     catch (std::bad_cast& e)
     {
       return TaggedConstant(Constant(Special(Special::DIMENSION),
-                         TYPE_INDEX_SPECIAL), k);
+                            TYPE_INDEX_SPECIAL), k);
     }
   }
 
   for (Equations::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
-    #if 0
     if (eqn_i->second.validContext())
     {
       try
       {
-        const EquationGuard& guard = eqn_i->second.validContext();
+        const GuardHD& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
         if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
         {
@@ -183,17 +182,19 @@ VariableHD::operator()(const Tuple& k)
       applicable.push_back
         (ApplicableTuple(Tuple(), eqn_i));
     }
-    #endif
+    #warning redo best fitting
+    #if 0
     if (equationValid(eqn_i->second, k))
     {
     }
+    #endif
   }
 
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
     return TaggedConstant(Constant(Special(Special::UNDEF),
-                       TYPE_INDEX_SPECIAL),k);
+                          TYPE_INDEX_SPECIAL),k);
   }
   else if (applicable.size() == 1)
   {
@@ -224,7 +225,7 @@ VariableHD::operator()(const Tuple& k)
   if (bestIter == applicable.end())
   {
     return TaggedConstant(Constant(Special(Special::UNDEF),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 
   for (applicable_list::const_iterator iter = applicable.begin();
@@ -236,7 +237,7 @@ VariableHD::operator()(const Tuple& k)
         !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
       return TaggedConstant(Constant(Special(Special::MULTIDEF),
-                         TYPE_INDEX_SPECIAL), k);
+                            TYPE_INDEX_SPECIAL), k);
     }
   }
 
@@ -312,7 +313,7 @@ VariableHD::delexpr(uuid id, size_t time)
 }
 
 bool
-VariableHD::replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr)
+VariableHD::replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr)
 {
 }
 

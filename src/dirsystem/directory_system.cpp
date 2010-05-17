@@ -282,7 +282,7 @@ DirectorySystem::parseSystem(const ustring_t& path)
               HD* guardTuple = m_compiler.compile(std::get<0>(std::get<1>(e)));
               HD* guardBool = m_compiler.compile(std::get<1>(std::get<1>(e)));
               k.insert(std::make_pair(dim_valid,
-                Constant(EquationGuardType(EquationGuard(guardTuple, guardBool)),
+                Constant(Guard(GuardHD(guardTuple, guardBool)),
                 TYPE_INDEX_GUARD)));
 
               HD* h = m_compiler.compile(std::get<2>(e));

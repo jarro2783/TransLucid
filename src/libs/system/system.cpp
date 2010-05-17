@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
-#include <tl/consthd.hpp>
+#include <tl/valuehd.hpp>
 #include <algorithm>
 
 namespace TransLucid
@@ -119,7 +119,7 @@ SystemHD::init_types()
 {
   BOOST_FOREACH(auto v, builtin_name_to_index)
   {
-    addToVariableActual(v.first, Tuple(), new Hyperdatons::TypeConst(v.second));
+    addToVariableActual(v.first, Tuple(), new Hyperdatons::TypeHD(v.second));
   }
 }
 
@@ -159,9 +159,9 @@ SystemHD::SystemHD()
   init_types();
 
   //build the constant creators
-  buildConstantHD<Hyperdatons::UChar>(TYPE_INDEX_UCHAR);
-  HD* intmpHD = buildConstantHD<Hyperdatons::Intmp>(TYPE_INDEX_INTMP);
-  buildConstantHD<Hyperdatons::UString>(TYPE_INDEX_USTRING);
+  buildConstantHD<Hyperdatons::UCharHD>(TYPE_INDEX_UCHAR);
+  HD* intmpHD = buildConstantHD<Hyperdatons::IntmpHD>(TYPE_INDEX_INTMP);
+  buildConstantHD<Hyperdatons::UStringHD>(TYPE_INDEX_USTRING);
 
   //set this as the default int too
   addToVariableActual(U"DEFAULTINT", Tuple(), intmpHD);
@@ -185,7 +185,7 @@ SystemHD::addInput(const IOList& input)
 }
 
 void
-SystemHD::addDemand(const u32string& id, const EquationGuard& guard)
+SystemHD::addDemand(const u32string& id, const GuardHD& guard)
 {
   m_demands.insert(std::make_pair(id, guard));
 }

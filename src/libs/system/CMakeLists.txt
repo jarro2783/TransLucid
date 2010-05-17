@@ -9,8 +9,8 @@ add_library(tlsystem SHARED system.cpp expr_parser.cpp
 library.cpp dimtranslator.cpp types.cpp
 range.cpp parser.cpp
 builtin_types.cpp equation.cpp
-header_type.cpp cache.cpp utility.cpp 
-compiled_functors.cpp expr_compiler.cpp consthd.cpp printer.cpp
+header.cpp cache.cpp utility.cpp 
+compiled_functors.cpp expr_compiler.cpp valuehd.cpp printer.cpp
 container.cpp set_types.cpp translator.cpp ast.cpp
 tuple_parser.cpp bestfit.cpp)
 

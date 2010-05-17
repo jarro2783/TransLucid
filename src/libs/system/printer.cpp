@@ -24,7 +24,7 @@ namespace TransLucid
 {
 
 TaggedConstant
-ValuePrinter::operator()(const Tuple& k)
+ValuePrinterHD::operator()(const Tuple& k)
 {
   u32string s = U"<";
 

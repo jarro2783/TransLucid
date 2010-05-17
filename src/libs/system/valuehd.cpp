@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/consthd.hpp>
+#include <tl/valuehd.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
 
@@ -27,19 +27,19 @@ namespace TransLucid
 namespace Hyperdatons
 {
 
-const char32_t* Intmp::name =     U"intmp";
-const char32_t* UChar::name =     U"uchar";
-const char32_t* UString::name =   U"ustring";
+const char32_t* IntmpHD::name =     U"intmp";
+const char32_t* UCharHD::name =     U"uchar";
+const char32_t* UStringHD::name =   U"ustring";
 
 TaggedConstant
-Intmp::operator()(const Tuple& k)
+IntmpHD::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
     return TaggedConstant(Constant(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 
   try
@@ -51,12 +51,12 @@ Intmp::operator()(const Tuple& k)
   catch (...)
   {
     return TaggedConstant(Constant(Special(Special::CONST),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 }
 
 TaggedConstant
-UChar::operator()(const Tuple& k)
+UCharHD::operator()(const Tuple& k)
 {
   size_t valueindex = get_dimension_index(m_system, U"text");
   Tuple::const_iterator value = k.find(valueindex);
@@ -64,7 +64,7 @@ UChar::operator()(const Tuple& k)
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
     return TaggedConstant(Constant(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
 
   const u32string& s = value->second.value<String>().value();
@@ -73,20 +73,20 @@ UChar::operator()(const Tuple& k)
   if (s.length() != 1)
   {
     return TaggedConstant(Constant(Special(Special::CONST),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
   return TaggedConstant(Constant(Char(s[0]), TYPE_INDEX_UCHAR), k);
 }
 
 TaggedConstant
-UString::operator()(const Tuple& k)
+UStringHD::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
     return TaggedConstant(Constant(Special(Special::DIMENSION),
-                       TYPE_INDEX_SPECIAL), k);
+                          TYPE_INDEX_SPECIAL), k);
   }
   return TaggedConstant(value->second, k);
 }

@@ -80,7 +80,7 @@ namespace TransLucid
 
   class HD;
 
-  //class EquationGuard;
+  //class GuardHD;
 
   typedef uint16_t type_index;
   typedef std::u32string u32string;
@@ -277,7 +277,7 @@ namespace TransLucid
     void
     print(std::ostream& os) const
     {
-      //m_value->print(os);
+      m_value->print(os);
     }
 
     private:

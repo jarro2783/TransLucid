@@ -272,7 +272,7 @@ System::postInputSignal(std::vector<TL::AST::Expr*> const& ev)
   {
     demands.addEquation
       (TL::EquationHD("demand",
-                    TL::EquationGuard(c),
+                    TL::GuardHD(c),
                     new TL::ASTEquation(lastExpr)));
   }
 

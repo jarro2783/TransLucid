@@ -428,37 +428,38 @@ namespace TransLucid
     char32_t m_c;
   };
 
-  class EquationGuardType : public TypedValue
+  class Guard : public TypedValue
   {
     public:
-    EquationGuardType(const EquationGuard& g)
+    Guard(const GuardHD& g)
     : m_g(g)
     {}
 
-    EquationGuardType(const EquationGuardType& rhs)
+    Guard(const Guard& rhs)
     : m_g(rhs.m_g)
     {
     }
 
-    EquationGuardType* clone() const
+    Guard* 
+    clone() const
     {
-      return new EquationGuardType(*this);
+      return new Guard(*this);
     }
 
-    const EquationGuard&
+    const GuardHD&
     value() const
     {
       return m_g;
     }
 
     bool
-    operator==(const EquationGuardType& rhs) const
+    operator==(const Guard& rhs) const
     {
       return true;
     }
 
     bool
-    operator<(const EquationGuardType& rhs) const
+    operator<(const Guard& rhs) const
     {
       return false;
     }
@@ -476,27 +477,28 @@ namespace TransLucid
     }
 
     private:
-    EquationGuard m_g;
+    GuardHD m_g;
   };
 
-  class PairType : public TypedValue
+  class Pair : public TypedValue
   {
     public:
-    PairType(const Constant& first, const Constant& second)
+    Pair(const Constant& first, const Constant& second)
     : m_first(first)
     ,m_second(second)
     {
     }
 
-    PairType(const PairType& rhs)
+    Pair(const Pair& rhs)
     : m_first(rhs.m_first)
     ,m_second(rhs.m_second)
     {
     }
 
-    PairType* clone() const
+    Pair* 
+    clone() const
     {
-      return new PairType(*this);
+      return new Pair(*this);
     }
 
     const Constant&
@@ -518,13 +520,13 @@ namespace TransLucid
     }
 
     bool
-    operator==(const PairType&) const
+    operator==(const Pair&) const
     {
       return true;
     }
 
     bool
-    operator<(const PairType&) const
+    operator<(const Pair&) const
     {
       return false;
     }
@@ -595,32 +597,32 @@ namespace TransLucid
     SetBase* m_value;
   };
 
-  class TypeType : public TypedValue
+  class Type : public TypedValue
   {
     public:
 
-    TypeType(size_t index)
+    Type(size_t index)
     : m_index(index)
     {}
 
-    TypeType(const TypeType& rhs)
+    Type(const Type& rhs)
     : m_index(rhs.m_index)
     {
     }
     
-    TypeType* clone() const
+    Type* clone() const
     {
-      return new TypeType(*this);
+      return new Type(*this);
     }
 
     bool
-    operator==(const TypeType& rhs) const
+    operator==(const Type& rhs) const
     {
       return m_index == rhs.m_index;
     }
 
     bool
-    operator<(const TypeType& rhs) const
+    operator<(const Type& rhs) const
     {
       return m_index < rhs.m_index;
     }
