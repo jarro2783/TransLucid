@@ -110,7 +110,9 @@ SystemHD::buildConstantHD(size_t index)
   //k[m_dimTranslator.lookup("id")] =
   //  Constant(String("CONST"), m_typeRegistry.indexString());
   k[DIM_TYPE] = Constant(String(T::name), TYPE_INDEX_USTRING);
+  //sets the following
   addToVariableActual(U"CONST", Tuple(k), h);
+  //TYPE_INDEX = index;;  what am I doing here???
   addToVariableActual
   (
     U"TYPE_INDEX", 
