@@ -115,7 +115,7 @@ SystemHD::buildConstantHD(size_t index)
   (
     U"TYPE_INDEX", 
     empty, 
-    new Hyperdatons::IntmpConstHD(this, index)
+    new Hyperdatons::IntmpConstHD(index)
   );
   return h;
 }

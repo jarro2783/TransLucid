@@ -62,7 +62,7 @@ ExprCompiler::operator()(Special::Value s)
 HD*
 ExprCompiler::operator()(const mpz_class& i)
 {
-  return new Hyperdatons::IntmpConstHD(m_i, i);
+  return new Hyperdatons::IntmpConstHD(i);
 }
 
 HD*

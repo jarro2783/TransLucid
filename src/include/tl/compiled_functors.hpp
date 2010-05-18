@@ -61,15 +61,14 @@ namespace TransLucid
     class IntmpConstHD : public HD
     {
       public:
-      IntmpConstHD(HD* system, const mpz_class& value)
-      : m_system(system), m_value(value)
+      IntmpConstHD(const mpz_class& value)
+      : m_value(value)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
       mpz_class m_value;
     };
 
