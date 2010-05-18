@@ -29,6 +29,21 @@ namespace TransLucid
 {
   namespace Hyperdatons
   {
+    class TypeConstHD : public HD
+    {
+      public:
+
+      TypeConstHD(size_t index)
+      : m_value(value)
+      {}
+
+      TaggedConstant
+      operator()(const Tuple& k);
+
+      private:
+      size_t m_value;
+    };
+
     class BoolConstHD : public HD
     {
       public:

@@ -125,7 +125,8 @@ SystemHD::init_types()
 {
   BOOST_FOREACH(auto v, builtin_name_to_index)
   {
-    addToVariableActual(v.first, Tuple(), new Hyperdatons::TypeHD(v.second));
+    addToVariableActual(v.first, Tuple(),
+                        new Hyperdatons::TypeConstHD(v.second));
   }
 }
 

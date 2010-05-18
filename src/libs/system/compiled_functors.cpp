@@ -121,6 +121,13 @@ BoolConstHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
+TypeConstHD::operator()(const Tuple& k)
+{
+  return TaggedConstant(Constant(Type(m_value), TYPE_INDEX_TYPE), k);
+}
+
+
+TaggedConstant
 TypedValueHD::operator()(const Tuple& k)
 {
   //evaluate CONST
