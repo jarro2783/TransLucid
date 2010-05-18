@@ -43,6 +43,19 @@ namespace TransLucid
       HD* m_system;
     };
 
+    class BoolHD : public ValueHD
+    {
+      public:
+      static const char32_t* name;
+
+      BoolHD(HD* system)
+      : ValueHD(system)
+      {}
+
+      TaggedConstant
+      operator()(const Tuple& k);
+    };
+
     class IntmpHD : public ValueHD
     {
       public:

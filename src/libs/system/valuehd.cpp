@@ -27,9 +27,32 @@ namespace TransLucid
 namespace Hyperdatons
 {
 
+const char32_t* BoolHD::name =      U"bool";
 const char32_t* IntmpHD::name =     U"intmp";
 const char32_t* UCharHD::name =     U"uchar";
 const char32_t* UStringHD::name =   U"ustring";
+
+TaggedConstant
+BoolHD::operator()(const Tuple& k)
+{
+  Tuple::const_iterator value = k.find(DIM_TEXT);
+
+  if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
+  {
+    return TaggedConstant(Constant(Special(Special::DIMENSION),
+                          TYPE_INDEX_SPECIAL), k);
+  }
+
+  if (value->second.value<String>().value() == U"true")
+    return TaggedConstant(Constant(Boolean(true),
+                          TYPE_INDEX_BOOL), k);
+  else if (value->second.value<String>().value() == U"false")
+    return TaggedConstant(Constant(Boolean(false),
+                          TYPE_INDEX_BOOL), k);
+  else
+    return TaggedConstant(Constant(Special(Special::CONST),
+                          TYPE_INDEX_SPECIAL), k);
+}
 
 TaggedConstant
 IntmpHD::operator()(const Tuple& k)
