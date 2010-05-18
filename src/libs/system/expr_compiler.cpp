@@ -100,7 +100,7 @@ HD*
 ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {
   HD* operand = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::UnaryOpHD(e.op, operand);
+  return new Hyperdatons::UnaryOpHD(m_i, e.op, operand);
 }
 
 HD*

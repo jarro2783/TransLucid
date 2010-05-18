@@ -148,12 +148,14 @@ TypedValueHD::operator()(const Tuple& k)
   return (*m_system)(Tuple(kp));
 }
 
+//TODO work out type conversion
+#if 0
 TaggedConstant
 ConvertHD::operator()(const Tuple& k)
 {
-  //going away
   return TaggedConstant();
 }
+#endif
 
 TaggedConstant
 DimensionHD::operator()(const Tuple& k)

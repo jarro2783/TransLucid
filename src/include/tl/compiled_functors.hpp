@@ -90,14 +90,20 @@ namespace TransLucid
     class UnaryOpHD : public HD
     {
       public:
-      UnaryOpHD(Tree::UnaryOperator op, HD* e)
-      : m_op(op), m_e(e)
+      UnaryOpHD
+      (
+        HD* system,
+        Tree::UnaryOperator op, 
+        HD* e
+      )
+      : m_system(system), m_op(op), m_e(e)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
+      HD* m_system;
       Tree::UnaryOperator m_op;
       HD* m_e;
     };
@@ -146,7 +152,7 @@ namespace TransLucid
     class IsSpecialHD : public HD
     {
       public:
-      IsSpecialHD(const u32string& special, HD* e)
+      IsSpecialHD(HD* system, const u32string& special, HD* e)
       : m_special(special),
       m_e(e)
       {}
@@ -155,6 +161,7 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
+      HD* m_system;
       u32string m_special;
       HD* m_e;
     };
@@ -162,18 +169,21 @@ namespace TransLucid
     class IsTypeHD : public HD
     {
       public:
-      IsTypeHD(const u32string& type, HD* e)
-      : m_type(type), m_e(e)
+      IsTypeHD(HD* system, const u32string& type, HD* e)
+      : m_system(system), m_type(type), m_e(e)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
+      HD* m_system;
       u32string m_type;
       HD* m_e;
     };
 
+    //TODO work out what converting is
+    #if 0
     class ConvertHD : public HD
     {
       public:
@@ -188,6 +198,7 @@ namespace TransLucid
       u32string m_to;
       HD* m_e;
     };
+    #endif
 
     class IfHD : public HD
     {
