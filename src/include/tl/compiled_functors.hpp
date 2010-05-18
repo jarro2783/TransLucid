@@ -33,7 +33,7 @@ namespace TransLucid
     {
       public:
 
-      TypeConstHD(size_t index)
+      TypeConstHD(size_t value)
       : m_value(value)
       {}
 
