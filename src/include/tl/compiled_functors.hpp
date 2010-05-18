@@ -25,6 +25,16 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/ast.hpp>
 
+//Some of these functors are constructed with the system, some are not.
+//The ones that are make a demand of the system.
+//For example, BoolConstHD is returning a constant boolean. If one types in
+//true, the value true is created with index TYPE_INDEX_BOOL, the system is
+//not required for this.
+//On the other hand, IdentHD is used whenever an arbitrary identifier is 
+//referred to.
+//For an identifier x:
+//IdentHD makes the demand system([id : "x"]) & k
+
 namespace TransLucid
 {
   namespace Hyperdatons
