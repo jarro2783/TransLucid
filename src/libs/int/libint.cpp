@@ -580,7 +580,7 @@ registerType(const TL::u32string& name, TL::SystemHD& i)
   i.addExpr
   (
     TransLucid::Tuple(k), 
-    new TL::Hyperdatons::IntmpConstHD(&i, unique)
+    new TL::Hyperdatons::IntmpConstHD(unique)
   );
 
   register_int_ops<Int<T>>(i, unique.get_ui());

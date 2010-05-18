@@ -117,7 +117,7 @@ SystemHD::buildConstantHD(size_t index)
   (
     U"TYPE_INDEX", 
     empty, 
-    new Hyperdatons::IntmpConstHD(this, index)
+    new Hyperdatons::IntmpConstHD(index)
   );
   return h;
 }
@@ -127,7 +127,8 @@ SystemHD::init_types()
 {
   BOOST_FOREACH(auto v, builtin_name_to_index)
   {
-    addToVariableActual(v.first, Tuple(), new Hyperdatons::TypeHD(v.second));
+    addToVariableActual(v.first, Tuple(),
+                        new Hyperdatons::TypeConstHD(v.second));
   }
 }
 

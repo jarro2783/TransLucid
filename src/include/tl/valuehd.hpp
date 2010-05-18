@@ -29,9 +29,9 @@ namespace TransLucid
 {
   namespace Hyperdatons
   {
-    //TODO: as soon as inheriting constructors is done, these
-    //classes can do
-    //using ValueHD::ConstantHD;
+    //TODO: as soon as inheriting constructors is done,
+    //      these classes can do
+    //using ValueHD::ValueHD;
     class ValueHD : public HD
     {
       public:
@@ -82,25 +82,6 @@ namespace TransLucid
       operator()(const Tuple& k);
     };
 
-    //TODO: move this to a ConstantHD
-    class TypeHD : public ValueHD
-    {
-      public:
-
-      TypeHD(size_t index)
-      : ValueHD(0), m_index(index)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k)
-      {
-        return TaggedConstant(Constant(Type(m_index),
-                           TYPE_INDEX_TYPE), k);
-      }
-
-      private:
-      size_t m_index;
-    };
   } //namespace Hyperdatons
 } //namespace TransLucid
 

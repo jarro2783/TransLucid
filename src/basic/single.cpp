@@ -35,7 +35,7 @@ main(int argc, char *argv[])
   HD& h = i;
 
   TL::VariableHD x(U"x", &i);
-  TL::Hyperdatons::IntmpConstHD i1(&i, 5);
+  TL::Hyperdatons::IntmpConstHD i1(5);
   TL::Tuple k;
   x.addExpr(k, &i1);
 
@@ -45,7 +45,7 @@ main(int argc, char *argv[])
 
   //set up the equation guard
   TL::tuple_t guard;
-  TL::Hyperdatons::IntmpConstHD i2(&i, 10);
+  TL::Hyperdatons::IntmpConstHD i2(10);
   guard[DIM_VALUE] = Constant(TL::Intmp(10), TL::TYPE_INDEX_INTMP);
 
   //set up the context for addExpr
