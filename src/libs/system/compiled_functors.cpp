@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
+#include <tl/consthd.hpp>
 
 namespace TransLucid
 {

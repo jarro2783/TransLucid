@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
 #include <tl/builtin_types.hpp>
-#include <tl/compiled_functors.hpp>
+#include <tl/consthd.hpp>
 namespace TL = TransLucid;
 
 using namespace TL;

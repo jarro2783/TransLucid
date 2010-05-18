@@ -34,7 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/valuehd.hpp>
 #include <boost/function.hpp>
 #include <tl/utility.hpp>
-#include <tl/compiled_functors.hpp>
+#include <tl/consthd.hpp>
 
 namespace std
 {

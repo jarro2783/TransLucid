@@ -21,8 +21,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/utility.hpp>
 #include <tl/valuehd.hpp>
-#include <tl/compiled_functors.hpp>
+//#include <tl/compiled_functors.hpp>
 #include <algorithm>
+#include <tl/consthd.hpp>
 
 namespace TransLucid
 {
