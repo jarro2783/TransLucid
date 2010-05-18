@@ -168,6 +168,7 @@ SystemHD::SystemHD()
   init_types();
 
   //build the constant creators
+  buildConstantHD<Hyperdatons::BoolHD>(TYPE_INDEX_BOOL);
   buildConstantHD<Hyperdatons::UCharHD>(TYPE_INDEX_UCHAR);
   HD* intmpHD = buildConstantHD<Hyperdatons::IntmpHD>(TYPE_INDEX_INTMP);
   buildConstantHD<Hyperdatons::UStringHD>(TYPE_INDEX_USTRING);
