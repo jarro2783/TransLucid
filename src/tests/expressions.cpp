@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/utility.hpp>
 #include <string>
 #include <tl/tree_printer.hpp>
-#include <tl/header_parser.hpp>
+#include <tl/parser_util.hpp>
 
 #define BOOST_TEST_MODULE expressions
 #include <boost/test/included/unit_test.hpp>
@@ -244,16 +244,21 @@ BOOST_AUTO_TEST_CASE ( context_change )
 BOOST_AUTO_TEST_CASE ( header )
 {
   TL::Translator t2;
-  t2.parse_header
+  BOOST_REQUIRE(t2.parse_header
   (
     U"delimiter uchar<\"> uchar<\"> ustring<ustring>;;"
     U"prefix ustring<-> ustring<operator->;;"
     U"infixl ustring<%> ustring<operator%> 20;;"
-  );
+  ) 
+  != 0);
 
   TL::HD *h = t2.translate_expr(L"4 % 5");
 
   BOOST_REQUIRE(h != 0);
+
+  BOOST_REQUIRE_THROW(
+    t2.parse_header(U"delimiter uchar<\"> uchar<\"> ustring<ustring>;;"),
+    TL::ParseError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

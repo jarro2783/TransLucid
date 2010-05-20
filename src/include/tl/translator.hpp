@@ -43,6 +43,9 @@ namespace TransLucid
 
     template <typename Iterator>
     class SkipGrammar;
+
+    template <typename Iterator>
+    class HeaderGrammar;
   }
 
   class Translator
@@ -60,7 +63,7 @@ namespace TransLucid
     equation_v
     translate_equation_set(const u32string& s);
 
-    void
+    bool
     parse_header(const u32string& s);
 
     HD&
@@ -95,6 +98,7 @@ namespace TransLucid
     Parser::EquationGrammar<Parser::iterator_t>* m_equation;
     Parser::TupleGrammar<Parser::iterator_t>* m_tuple;
     Parser::SkipGrammar<Parser::iterator_t>* m_skipper;
+    Parser::HeaderGrammar<Parser::iterator_t>* m_header_grammar;
 
     SystemHD m_system;
 

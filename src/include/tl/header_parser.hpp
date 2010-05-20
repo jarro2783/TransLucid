@@ -25,8 +25,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 
-#warning check for duplicate added symbols
-
 namespace TransLucid
 {
   namespace Parser
@@ -34,90 +32,9 @@ namespace TransLucid
     namespace ph = boost::phoenix;
     using namespace ph;
 
-    inline void
-    addDimensionSymbol(HeaderStruct& h, const u32string& name)
-    {
-      string_type wsname(name.begin(), name.end());
-      h.dimension_symbols.add(wsname.c_str(), name);
-    }
-
-    inline void
-    addBinaryOpSymbol
-    (
-      HeaderStruct& h,
-      const string_type& symbol,
-      const string_type& opName,
-      Tree::InfixAssoc assoc,
-      const mpz_class& precedence
-    )
-    {
-      h.binary_op_symbols.add
-      (
-        symbol.c_str(),
-        Tree::BinaryOperator
-        (
-          assoc,
-          to_u32string(opName),
-          to_u32string(symbol),
-          precedence
-        )
-      );
-    }
-
-    inline void
-    addDelimiterSymbol
-    (
-      HeaderStruct& header,
-      const u32string& type,
-      char32_t open,
-      char32_t close
-    )
-    {
-      string_type open_string(1, open);
-      header.delimiter_start_symbols.add
-      (
-        open_string.c_str(),
-        Delimiter(type, (char_type)open, (char_type)close)
-      );
-    }
-
-    inline void
-    addUnaryOpSymbol
-    (
-      HeaderStruct& header,
-      Tree::UnaryType type,
-      const string_type& symbol,
-      const string_type& op
-    )
-    {
-      Tree::UnaryOperator opinfo
-      (
-        to_u32string(op),
-        to_u32string(symbol),
-        type
-      );
-
-      if (type == Tree::UNARY_PREFIX)
-      {
-        header.prefix_op_symbols.add
-        (
-          symbol.c_str(),
-          opinfo
-        );
-      }
-      else
-      {
-        header.postfix_op_symbols.add
-        (
-          symbol.c_str(),
-          opinfo
-        );
-      }
-    }
-
     template <typename Iterator>
     class HeaderGrammar :
-      public qi::grammar<Iterator, skip, HeaderStruct()>
+      public qi::grammar<Iterator, SkipGrammar<Iterator>, HeaderStruct()>
     {
       public:
 
@@ -134,6 +51,12 @@ namespace TransLucid
            (L"infixm", Tree::ASSOC_VARIABLE)
          ;
 
+         unary_symbols.add
+           (L"prefix", Tree::UNARY_PREFIX)
+           (L"postfix", Tree::UNARY_POSTFIX)
+         ;
+           
+
          headerp =
            *( headerItem(_val) > qi::lit( ";;" ))
             >> qi::eoi;
@@ -144,7 +67,7 @@ namespace TransLucid
              qi::lit("dimension")
                > expr
                  [
-                    ph::bind(&addDimensionSymbol, _r1, _1)
+                    ph::bind(&addDimension, _r1, _1)
                  ]
            )
          | (
@@ -158,7 +81,8 @@ namespace TransLucid
              ph::bind(&addBinary, _r1, _1, _2, _3, _4)
            ]
          | (
-               qi::string("delimiters")
+           //delimiters open close type
+               qi::lit("delimiters")
             >  expr
             >  expr
             >  expr
@@ -167,19 +91,20 @@ namespace TransLucid
              ph::bind(&addDelimiter, _r1, _1, _2, _3)
            ]
          | (
-               qi::string("library")
-            >> expr
+               qi::lit("library")
+            > expr
            )
          | (
-              (
-                qi::string("prefix")
-              | "postfix"
-              )
+              unary_symbols 
            >  expr
            >  expr
            )
            [
-             ph::bind(&HeaderGrammar<Iterator>::addUnary, _r1, _1, _2, _3)
+             ph::bind
+             (
+               &HeaderGrammar<Iterator>::addUnary, 
+               _r1, _1, _2, _3
+              )
            ]
          ;
 
@@ -195,6 +120,25 @@ namespace TransLucid
       }
 
       private:
+
+      static void
+      addDimension
+      (
+        HeaderStruct& h,
+        const Tree::Expr& name
+      )
+      {
+        try
+        {
+          const u32string& sname =
+            boost::get<const u32string&>(name);
+
+          addDimensionSymbol(h, sname);
+        } 
+        catch (const boost::bad_get&)
+        {
+        }
+      }
 
       static void
       addBinary
@@ -219,13 +163,14 @@ namespace TransLucid
           (
             h,
             string_type(ssymbol.begin(), ssymbol.end()),
-            string_type(sop.begin(), sop.end),
+            string_type(sop.begin(), sop.end()),
             type,
             iprecedence
           );
         }
         catch (const boost::bad_get&)
         {
+          throw ParseError(U"Invalid type in binary definition");
         }
       }
 
@@ -233,7 +178,7 @@ namespace TransLucid
       addUnary
       (
         HeaderStruct& header,
-        const string_type& type,
+        Tree::UnaryType type,
         const Tree::Expr& symbol,
         const Tree::Expr& op
       )
@@ -245,20 +190,10 @@ namespace TransLucid
           const u32string& coperator =
             boost::get<const u32string&>(op);
 
-          Tree::UnaryType actual_type;
-          if (type == L"prefix")
-          {
-            actual_type = Tree::UNARY_PREFIX;
-          }
-          else
-          {
-            actual_type = Tree::UNARY_POSTFIX;
-          }
-
           addUnaryOpSymbol
           (
             header,
-            actual_type,
+            type,
             string_type(csymbol.begin(), csymbol.end()),
             string_type(coperator.begin(), coperator.end())
           );
@@ -284,7 +219,7 @@ namespace TransLucid
           const char32_t& copen =
             boost::get<const char32_t&>(open);
           const char32_t& cclose =
-            boost::get<const char32_t&>(cclose);
+            boost::get<const char32_t&>(close);
 
           addDelimiterSymbol(header, ctype, copen, cclose);
         }
@@ -296,11 +231,11 @@ namespace TransLucid
         }
       }
 
-      qi::rule<Iterator, skip, HeaderStruct()>
+      qi::rule<Iterator, SkipGrammar<Iterator>, HeaderStruct()>
         headerp
       ;
 
-      qi::rule<Iterator, skip, void(HeaderStruct&)>
+      qi::rule<Iterator, SkipGrammar<Iterator>, void(HeaderStruct&)>
         headerItem
       ;
 
@@ -308,13 +243,14 @@ namespace TransLucid
         integer
       ;
 
-      qi::rule<Iterator>
+      qi::rule<Iterator, SkipGrammar<Iterator>, Tree::Expr()>
         expr
       ;
 
       escaped_string_parser<Iterator> angle_string;
 
       qi::symbols<char_type, Tree::InfixAssoc> assoc_symbols;
+      qi::symbols<char_type, Tree::UnaryType> unary_symbols;
     };
   }
 }

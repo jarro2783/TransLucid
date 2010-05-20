@@ -167,12 +167,111 @@ namespace TransLucid
       end = d.end;
     }
 
+    inline void
+    addDimensionSymbol(HeaderStruct& h, const u32string& name)
+    {
+      string_type wsname(name.begin(), name.end());
+      h.dimension_symbols.add(wsname.c_str(), name);
+    }
+
+    inline void
+    addBinaryOpSymbol
+    (
+      HeaderStruct& h,
+      const string_type& symbol,
+      const string_type& opName,
+      Tree::InfixAssoc assoc,
+      const mpz_class& precedence
+    )
+    {
+      if (h.binary_op_symbols.find(symbol.c_str()) != 0) 
+      {
+        throw ParseError(U"Existing binary operator");
+      }
+      h.binary_op_symbols.add
+      (
+        symbol.c_str(),
+        Tree::BinaryOperator
+        (
+          assoc,
+          to_u32string(opName),
+          to_u32string(symbol),
+          precedence
+        )
+      );
+    }
+
+    inline void
+    addDelimiterSymbol
+    (
+      HeaderStruct& header,
+      const u32string& type,
+      char32_t open,
+      char32_t close
+    )
+    {
+      string_type open_string(1, open);
+      if (header.delimiter_start_symbols.find(open_string) != 0) 
+      {
+        throw ParseError(U"Existing delimiter");
+      }
+      header.delimiter_start_symbols.add
+      (
+        open_string.c_str(),
+        Delimiter(type, (char_type)open, (char_type)close)
+      );
+    }
+
+    inline void
+    addUnaryOpSymbol
+    (
+      HeaderStruct& header,
+      Tree::UnaryType type,
+      const string_type& symbol,
+      const string_type& op
+    )
+    {
+      Tree::UnaryOperator opinfo
+      (
+        to_u32string(op),
+        to_u32string(symbol),
+        type
+      );
+
+      if (type == Tree::UNARY_PREFIX)
+      {
+        if (header.prefix_op_symbols.find(symbol) != 0) 
+        {
+          throw ParseError(U"Existing prefix symbol");
+        }
+        header.prefix_op_symbols.add
+        (
+          symbol.c_str(),
+          opinfo
+        );
+      }
+      else
+      {
+        if (header.postfix_op_symbols.find(symbol) != 0) 
+        {
+          throw ParseError(U"Existing postfix symbol");
+        }
+
+        header.postfix_op_symbols.add
+        (
+          symbol.c_str(),
+          opinfo
+        );
+      }
+    }
+
     //inline const
     //string_type& getDelimiterType(const Delimiter& d)
     //{
     //  return d.type;
     //}
 
+    //TODO this may be useful for handling errors
     #if 0
     struct handle_expr_error
     {

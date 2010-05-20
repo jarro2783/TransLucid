@@ -19,7 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/translator.hpp>
 #include <tl/utility.hpp>
-#include <tl/header_parser.hpp>
+#include <tl/parser_util.hpp>
 
 #define BOOST_TEST_MODULE equations
 #include <boost/test/included/unit_test.hpp>
