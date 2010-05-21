@@ -122,6 +122,8 @@ Translator::Translator()
   m_equation->set_expr(*m_expr);
   m_equation->set_context_perturb(*m_tuple);
 
+  m_header_grammar->set_expr(*m_expr);
+
   m_header->delimiter_start_symbols.add(L"«",
     Parser::Delimiter(U"ustring", L'«', L'»'));
   m_header->delimiter_start_symbols.add(L"\'",

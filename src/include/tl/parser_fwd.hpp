@@ -133,6 +133,13 @@ namespace TransLucid
     };
 
     typedef string_type::const_iterator iterator_t;
+
+    inline std::ostream& 
+    operator<<(std::ostream& os, const HeaderStruct& h) 
+    {
+      os << "Parser::HeaderStruct";
+      return os;
+    }
   }
 }
 

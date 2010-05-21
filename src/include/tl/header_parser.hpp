@@ -109,6 +109,10 @@ namespace TransLucid
          ;
 
          integer = qi::int_;
+
+         BOOST_SPIRIT_DEBUG_NODE(headerp);
+         BOOST_SPIRIT_DEBUG_NODE(headerItem);
+         BOOST_SPIRIT_DEBUG_NODE(expr);
       }
 
       template <class T>

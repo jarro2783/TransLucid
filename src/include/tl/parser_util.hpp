@@ -188,6 +188,8 @@ namespace TransLucid
       {
         throw ParseError(U"Existing binary operator");
       }
+      std::cerr << "adding " << 
+        utf32_to_utf8(u32string(symbol.begin(), symbol.end())) << std::endl;
       h.binary_op_symbols.add
       (
         symbol.c_str(),
