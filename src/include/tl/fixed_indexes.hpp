@@ -53,6 +53,7 @@ namespace TransLucid
     DIM_VALUE,
     DIM_TIME,
     DIM_VALID_GUARD,
+    DIM_ALL,
 
     //the last one
     DIM_INDEX_LAST
