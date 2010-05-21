@@ -229,9 +229,12 @@ namespace TransLucid
         }
         catch (const boost::bad_get&)
         {
+          std::cerr << "HeaderGrammar::addDelimeter: bad_get" << std::endl;
         }
         catch (const std::invalid_argument&)
         {
+          std::cerr << "HeaderGrammar::addDelimeter: invalid_argument" 
+            << std::endl;
         }
       }
 

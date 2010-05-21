@@ -54,15 +54,22 @@ namespace TransLucid
     }
 
     inline Tree::Expr
+    construct_typed_constant(const u32string& type, const u32string& value)
+    {
+      if (type == U"ustring") {
+        return value;
+      } else if (type == U"uchar") {
+      #warning should check here that the uchar is valid
+        return (char32_t)value[0];
+      } else {
+        return Tree::ConstantExpr(type, value);
+      }
+    }
+
+    inline Tree::Expr
     construct_delimited_constant(Delimiter& d, const u32string& v)
     {
-      if (d.type == U"ustring") {
-        return v;
-      } else if (d.type == U"uchar") {
-        return (char32_t)v[0];
-      } else {
-        return Tree::ConstantExpr(d.type, v);
-      }
+      return construct_typed_constant(d.type, v);
     }
 
     template <typename Iterator>
