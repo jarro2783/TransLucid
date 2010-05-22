@@ -69,7 +69,7 @@ namespace TransLucid
             > ']'
            )
            [
-             _val = construct<Tree::BuildTupleExpr>(_1)
+             _val = construct<Tree::TupleExpr>(_1)
            ]
         ;
 

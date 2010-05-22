@@ -1,4 +1,4 @@
-/* Basic types.
+/* Equations (ident = expr)
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,40 +17,20 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/types.hpp>
-#include <boost/foreach.hpp>
-//#include <boost/bind.hpp>
-#include <tl/range.hpp>
-#include <tl/interpreter.hpp>
-#include <tl/exception.hpp>
-#include <tl/header_type.hpp>
-#include <tl/footer_type.hpp>
+#include <tl/bestfit.hpp>
 
 namespace TransLucid
 {
 
-Tuple::Tuple()
-: m_value(new tuple_t)
+//TODO finish this
+TaggedConstant CompileBestFit::operator()(const Tuple& k)
 {
-}
+  BestFit* b = 0;
+  BestFit* old = m_bestFittable->setBestFit(b);
+  if (old != this) {
+  }
 
-Tuple::Tuple(const tuple_t& tuple)
-: m_value(new tuple_t(tuple))
-{
-}
-
-Tuple
-Tuple::insert(size_t key, const TypedValue& value) const
-{
-  tuple_t t = *m_value;
-  t.insert(std::make_pair(key, value));
-  return Tuple(t);
-}
-
-void
-Tuple::print(std::ostream& os) const
-{
-  os << "tuple";
+  return (*b)(k);
 }
 
 } //namespace TransLucid

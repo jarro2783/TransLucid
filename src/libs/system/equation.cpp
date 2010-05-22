@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-Variable::Variable(const u32string& name, HD* system)
+VariableHD::VariableHD(const u32string& name, HD* system)
 : m_name(name)
  ,m_system(system)
 #if 0
@@ -40,20 +40,20 @@ Variable::Variable(const u32string& name, HD* system)
 {
 }
 
-Variable::~Variable()
+VariableHD::~VariableHD()
 {
   //cleanup best fit variables
 }
 
 Tuple
-EquationGuard::evaluate(const Tuple& k) const
+GuardHD::evaluate(const Tuple& k) const
 throw (InvalidGuard)
 {
   tuple_t t = m_dimensions;
 
   if (m_guard)
   {
-    TaggedValue v = (*m_guard)(k);
+    TaggedConstant v = (*m_guard)(k);
 
     //still need to remove this magic
     if (v.first.index() == TYPE_INDEX_TUPLE)
@@ -76,21 +76,21 @@ throw (InvalidGuard)
   }
 
   return Tuple(t);
-  //TaggedValue v = (*m_guard)(k);
+  //TaggedConstant v = (*m_guard)(k);
 }
 
-inline std::pair<uuid, Variable::Equations::iterator>
-Variable::addExprActual(const Tuple& k, HD* h)
+inline std::pair<uuid, VariableHD::Equations::iterator>
+VariableHD::addExprActual(const Tuple& k, HD* h)
 {
-  const EquationGuard* g = 0;
+  const GuardHD* g = 0;
   Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
   if (giter != k.end())
   {
-    g = &giter->second.value<EquationGuardType const&>().value();
+    g = &giter->second.value<Guard const&>().value();
   }
 
   auto adder =
-    [this] (const Equation& e) -> std::pair<uuid, Equations::iterator>
+    [this] (const EquationHD& e) -> std::pair<uuid, Equations::iterator>
   {
     return std::make_pair(
       e.id(),
@@ -100,20 +100,20 @@ Variable::addExprActual(const Tuple& k, HD* h)
 
   if (g)
   {
-    return adder(Equation(m_name, *g, h));
+    return adder(EquationHD(m_name, *g, h));
   }
   else
   {
-    return adder(Equation(m_name, EquationGuard(), h));
+    return adder(EquationHD(m_name, GuardHD(), h));
   }
 }
 
-bool Variable::equationValid(const Equation& e, const Tuple& k)
+bool VariableHD::equationValid(const EquationHD& e, const Tuple& k)
 {
 }
 
-TaggedValue
-Variable::operator()(const Tuple& k)
+TaggedConstant
+VariableHD::operator()(const Tuple& k)
 {
 
   //std::cout << "evaluating variable "
@@ -141,8 +141,8 @@ Variable::operator()(const Tuple& k)
       if (viter == m_variables.end())
       {
         //std::cerr << "not found" << std::endl;
-        return TaggedValue(TypedValue(Special(Special::UNDEF),
-                           TYPE_INDEX_SPECIAL), k);
+        return TaggedConstant(Constant(Special(Special::UNDEF),
+                              TYPE_INDEX_SPECIAL), k);
       }
       else
       {
@@ -153,20 +153,19 @@ Variable::operator()(const Tuple& k)
     }
     catch (std::bad_cast& e)
     {
-      return TaggedValue(TypedValue(Special(Special::DIMENSION),
-                         TYPE_INDEX_SPECIAL), k);
+      return TaggedConstant(Constant(Special(Special::DIMENSION),
+                            TYPE_INDEX_SPECIAL), k);
     }
   }
 
   for (Equations::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
-    #if 0
     if (eqn_i->second.validContext())
     {
       try
       {
-        const EquationGuard& guard = eqn_i->second.validContext();
+        const GuardHD& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
         if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
         {
@@ -183,17 +182,19 @@ Variable::operator()(const Tuple& k)
       applicable.push_back
         (ApplicableTuple(Tuple(), eqn_i));
     }
-    #endif
+    #warning redo best fitting
+    #if 0
     if (equationValid(eqn_i->second, k))
     {
     }
+    #endif
   }
 
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
-    return TaggedValue(TypedValue(Special(Special::UNDEF),
-                       TYPE_INDEX_SPECIAL),k);
+    return TaggedConstant(Constant(Special(Special::UNDEF),
+                          TYPE_INDEX_SPECIAL),k);
   }
   else if (applicable.size() == 1)
   {
@@ -223,8 +224,8 @@ Variable::operator()(const Tuple& k)
 
   if (bestIter == applicable.end())
   {
-    return TaggedValue(TypedValue(Special(Special::UNDEF),
-                       TYPE_INDEX_SPECIAL), k);
+    return TaggedConstant(Constant(Special(Special::UNDEF),
+                          TYPE_INDEX_SPECIAL), k);
   }
 
   for (applicable_list::const_iterator iter = applicable.begin();
@@ -235,8 +236,8 @@ Variable::operator()(const Tuple& k)
         &&
         !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
     {
-      return TaggedValue(TypedValue(Special(Special::MULTIDEF),
-                         TYPE_INDEX_SPECIAL), k);
+      return TaggedConstant(Constant(Special(Special::MULTIDEF),
+                            TYPE_INDEX_SPECIAL), k);
     }
   }
 
@@ -245,8 +246,8 @@ Variable::operator()(const Tuple& k)
   return (*std::get<1>(*bestIter)->second.equation())(k);
 }
 
-std::pair<uuid, Variable::Equations::iterator>
-Variable::addExprInternal(const Tuple& k, HD* e)
+std::pair<uuid, VariableHD::Equations::iterator>
+VariableHD::addExprInternal(const Tuple& k, HD* e)
 {
   size_t dim_id = DIM_ID;
   Tuple::const_iterator iter = k.find(dim_id);
@@ -271,7 +272,7 @@ Variable::addExprInternal(const Tuple& k, HD* e)
     tuple_t kp = k.tuple();
     if (end.size() != 0)
     {
-      kp[dim_id] = TypedValue(String(end), TYPE_INDEX_USTRING);
+      kp[dim_id] = Constant(String(end), TYPE_INDEX_USTRING);
     }
     else
     {
@@ -282,8 +283,8 @@ Variable::addExprInternal(const Tuple& k, HD* e)
   }
 }
 
-std::pair<uuid, Variable::Equations::iterator>
-Variable::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
+std::pair<uuid, VariableHD::Equations::iterator>
+VariableHD::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
 {
   //std::cerr << "addToVariableActual: " <<
   //   id << std::endl;
@@ -293,14 +294,14 @@ Variable::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
   {
     //std::cerr << "constructing new variable" << std::endl;
     iter = m_variables.insert(std::make_pair
-                              (id, new Variable(id, m_system))).first;
+                              (id, new VariableHD(id, m_system))).first;
   }
   return iter->second->addExprInternal(k, h);
 }
 
 
 bool
-Variable::delexpr(uuid id, size_t time)
+VariableHD::delexpr(uuid id, size_t time)
 {
   Equations::iterator iter = m_equations.find(id);
 
@@ -312,12 +313,12 @@ Variable::delexpr(uuid id, size_t time)
 }
 
 bool
-Variable::replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr)
+VariableHD::replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr)
 {
 }
 
 void
-Equation::del(size_t time)
+EquationHD::del(size_t time)
 {
   m_validEnd = time;
 }

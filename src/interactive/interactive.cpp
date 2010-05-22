@@ -253,14 +253,14 @@ System::postInputSignal(std::vector<TL::AST::Expr*> const& ev)
 
   TL::tuple_t tuple =
     map_list_of(dimTime,
-    TL::TypedValue(TL::Intmp(time), typeRegistry().indexIntmp()));
+    TL::Constant(TL::Intmp(time), typeRegistry().indexIntmp()));
   TL::Tuple c(tuple);
 
   TL::AST::Expr* lastExpr = 0;
 
   BOOST_FOREACH(TL::AST::Expr* e, ev)
   {
-    TL::TaggedValue v = evaluate(e, c);
+    TL::TaggedConstant v = evaluate(e, c);
     TL::TypeRegistry& reg = typeRegistry();
     const TL::TypeManager* m = reg.findType(v.first.index());
     m->print(std::cout, v.first, v.second);
@@ -271,8 +271,8 @@ System::postInputSignal(std::vector<TL::AST::Expr*> const& ev)
   if (lastExpr != 0)
   {
     demands.addEquation
-      (TL::Equation("demand",
-                    TL::EquationGuard(c),
+      (TL::EquationHD("demand",
+                    TL::GuardHD(c),
                     new TL::ASTEquation(lastExpr)));
   }
 

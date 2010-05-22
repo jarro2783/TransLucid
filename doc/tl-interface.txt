@@ -16,7 +16,7 @@ The specials are recognised by adding sp as a prefix to the specials names.
 == Constants ==
 
 All the typed value creators for constants are defined in the
-interpreter under the identifier CONST.  CONST varies in the
+system under the identifier CONST.  CONST varies in the
 dimensions type and text. Varying the type dimension picks a specific
 constant builder, varying text changes the resulting value of the
 constant. Varying any other dimension might change how the text
@@ -38,7 +38,7 @@ varies in value dimension.
 === Predefined Dimensions ==
 
 The following dimensions are predefined and have special meaning inside the
-interpreter:
+system:
 
   id         DIM_ID        Used to refer to variables inside a hyperdator.
                            A request for X @ k translates to 

@@ -27,13 +27,14 @@ along with TransLucid; see the file COPYING.  If not see
 #include <gmpxx.h>
 #include <boost/ref.hpp>
 #include <tl/builtin_types.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
-#include <tl/consthd.hpp>
+#include <tl/valuehd.hpp>
 #include <boost/function.hpp>
 #include <tl/utility.hpp>
+#include <tl/consthd.hpp>
 
 namespace std
 {
@@ -61,7 +62,7 @@ namespace
 
 typedef boost::function
   <
-  TL::TypedValue(const TL::TypedValue&, const TL::TypedValue&, const TL::Tuple&)
+  TL::Constant(const TL::Constant&, const TL::Constant&, const TL::Tuple&)
   > OpFunction;
 
 BOOST_PARAMETER_TEMPLATE_KEYWORD(pre_type);
@@ -273,15 +274,15 @@ struct BigStore <TL::Intmp>
 };
 
 template <class T, template <typename> class Op, class Arg1, class Arg2>
-//TL::TypedValue
+//TL::Constant
 //int_bin_op(const T& lhs, const T& rhs, TL::TypeManager& m, int)
 //{
-TL::TypedValue int_bin_op
+TL::Constant int_bin_op
 (
-  //const std::vector<TL::TypedValue>& operands,
+  //const std::vector<TL::Constant>& operands,
   size_t index,
-  const TL::TypedValue& l,
-  const TL::TypedValue& r,
+  const TL::Constant& l,
+  const TL::Constant& r,
   const TL::Tuple& k
 )
 {
@@ -306,7 +307,7 @@ TL::TypedValue int_bin_op
 
   if (Pre().template operator()<typename IntTraits<T>::type>(lhs, rhs, k))
   {
-    return TL::TypedValue(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
+    return TL::Constant(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
   }
 
   typename IntTraits<T>::big value =
@@ -314,22 +315,22 @@ TL::TypedValue int_bin_op
 
   if (Post().template operator()<typename IntTraits<T>::type>(value, k))
   {
-    return TL::TypedValue(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
+    return TL::Constant(TL::Special(U"aritherr"), TL::TYPE_INDEX_SPECIAL);
   }
 
-  return TL::TypedValue(T(convert<type>(value)), index);
+  return TL::Constant(T(convert<type>(value)), index);
 };
 
 template <class T, template <typename> class Op, class Arg1>
-TL::TypedValue
+TL::Constant
 int_bin_op
 (
-  //const std::vector<TL::TypedValue>& operands,
+  //const std::vector<TL::Constant>& operands,
   //const TL::TypeManager& m,
   //int
   size_t index,
-  const TL::TypedValue& l,
-  const TL::TypedValue& r,
+  const TL::Constant& l,
+  const TL::Constant& r,
   const TL::Tuple& k
 )
 {
@@ -337,15 +338,15 @@ int_bin_op
 }
 
 template <class T, template <typename> class Op>
-TL::TypedValue
+TL::Constant
 int_bin_op
 (
-  //const std::vector<TL::TypedValue>& operands,
+  //const std::vector<TL::Constant>& operands,
   //const TL::TypeManager& m,
   //int
   size_t index,
-  const TL::TypedValue& l,
-  const TL::TypedValue& r,
+  const TL::Constant& l,
+  const TL::Constant& r,
   const TL::Tuple& k)
 {
   return int_bin_op<T, Op, boost::parameter::void_, boost::parameter::void_>
@@ -377,10 +378,10 @@ bindBinOp(TL::HD& i, size_t index)
 
 #if 0
 template <class T, template <typename> class Op>
-TL::TypedValue
+TL::Constant
 int_comp_op
 (
-  const std::vector<TL::TypedValue>& values,
+  const std::vector<TL::Constant>& values,
   const TL::TypeRegistry& r
 )
 {
@@ -389,7 +390,7 @@ int_comp_op
   result = Op<typename IntTraits<T>::type>()(
     values.at(0).value<T>().value(),
     values.at(1).value<T>().value());
-  return TL::TypedValue(TL::Boolean(result), r.indexBoolean());
+  return TL::Constant(TL::Boolean(result), r.indexBoolean());
 }
 #endif
 
@@ -414,7 +415,7 @@ class OpHD : public TL::HD
   //takes the two operands out of the tuple and passes them to the
   //op as arguments
   //variadic templates would be really really good here
-  TL::TaggedValue
+  TL::TaggedConstant
   operator()(const TL::Tuple& k)
   {
     try
@@ -422,7 +423,7 @@ class OpHD : public TL::HD
       size_t index_arg0 = TL::get_dimension_index(&m_system, U"arg0");
       size_t index_arg1 = TL::get_dimension_index(&m_system, U"arg1");
 
-      return TL::TaggedValue(m_op(TL::get_dimension(k, index_arg0),
+      return TL::TaggedConstant(m_op(TL::get_dimension(k, index_arg0),
                                   TL::get_dimension(k, index_arg1),
                                   k),
                              k);
@@ -432,7 +433,7 @@ class OpHD : public TL::HD
       //H @ [id : "CONST", type : "special", value : "dimension"]
       //or we could leave these since it is slightly more efficient,
       // however it will all come out in the wash when we compile anyway
-      return TL::TaggedValue(TL::TypedValue(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
                TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
     }
   }
@@ -442,11 +443,11 @@ class OpHD : public TL::HD
   TL::HD& m_system;
 };
 
-template <typename Operation>
+template <typename Operator>
 TL::HD*
-build_op_hd(TL::HD& i, const Operation& op)
+build_op_hd(TL::HD& i, const Operator& op)
 {
-  return new OpHD<Operation>(i, op);
+  return new OpHD<Operator>(i, op);
 }
 
 template <typename T, template <typename> class Op>
@@ -468,11 +469,11 @@ register_one_op
   {
     {
       TL::get_dimension_index(&system, U"arg0"),
-      TL::TypedValue(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+      TL::Constant(TL::Type(index), TL::TYPE_INDEX_TYPE)
     },
     {
       TL::get_dimension_index(&system, U"arg1"),
-      TL::TypedValue(TL::TypeType(index), TL::TYPE_INDEX_TYPE)
+      TL::Constant(TL::Type(index), TL::TYPE_INDEX_TYPE)
     },
     {
       TL::DIM_NAME,
@@ -484,12 +485,12 @@ register_one_op
   {
     {
       TL::DIM_VALID_GUARD,
-      TL::TypedValue(TL::EquationGuardType(TL::EquationGuard(TL::Tuple(guard))),
+      TL::Constant(TL::Guard(TL::GuardHD(TL::Tuple(guard))),
                      TL::TYPE_INDEX_GUARD)
     },
     {
       TL::DIM_ID,
-      TL::TypedValue(TL::String(U"OP"), TL::TYPE_INDEX_USTRING)
+      TL::Constant(TL::String(U"OP"), TL::TYPE_INDEX_USTRING)
     }
   };
 
@@ -498,7 +499,7 @@ register_one_op
 
 template<class T>
 void
-register_int_ops(TL::Interpreter& i, size_t index)
+register_int_ops(TL::SystemHD& i, size_t index)
 {
   register_one_op<T, std::plus>(i, U"operator+", index);
   register_one_op<T, std::minus>(i, U"operator-", index);
@@ -521,13 +522,13 @@ template <typename T>
 class IntHD : public TL::HD
 {
   public:
-  IntHD(const TL::u32string& name, size_t index, TL::Interpreter& system)
+  IntHD(const TL::u32string& name, size_t index, TL::SystemHD& system)
   : m_system(system), m_index(index)
   {
     //m_index = system.typeRegistry().registerType(name);
   }
 
-  TL::TaggedValue
+  TL::TaggedConstant
   operator()(const TL::Tuple& k)
   {
     //retrieve the text and parse it
@@ -537,32 +538,32 @@ class IntHD : public TL::HD
 
     if (text == k.end())
     {
-      return TL::TaggedValue(TL::TypedValue(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
         TL::Special::DIMENSION), TL::TYPE_INDEX_SPECIAL), k);
     }
 
     try
     {
-      return TL::TaggedValue(TL::TypedValue(
+      return TL::TaggedConstant(TL::Constant(
         Int<T>(boost::lexical_cast<T>(TL::utf32_to_utf8(
           text->second.value<TL::String>().value()))), m_index), k)
          ;
     }
     catch (...)
     {
-      return TL::TaggedValue(TL::TypedValue(TL::Special(
+      return TL::TaggedConstant(TL::Constant(TL::Special(
         TL::Special::CONST), TL::TYPE_INDEX_SPECIAL), k);
     }
   }
 
   private:
-  TL::Interpreter& m_system;
+  TL::SystemHD& m_system;
   size_t m_index;
 };
 
 template <class T>
 void
-registerType(const TL::u32string& name, TL::Interpreter& i)
+registerType(const TL::u32string& name, TL::SystemHD& i)
 {
   mpz_class unique = TL::get_unique(&i);
 
@@ -576,7 +577,11 @@ registerType(const TL::u32string& name, TL::Interpreter& i)
   k.clear();
   k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
   k.insert(std::make_pair(TL::DIM_ID, TL::generate_string(U"TYPE_INDEX")));
-  i.addExpr(TransLucid::Tuple(k), new TL::Hyperdatons::IntmpConst(unique));
+  i.addExpr
+  (
+    TransLucid::Tuple(k), 
+    new TL::Hyperdatons::IntmpConstHD(unique)
+  );
 
   register_int_ops<Int<T>>(i, unique.get_ui());
 }
@@ -591,7 +596,7 @@ Int<T>::print(std::ostream& os) const
 }
 
 void
-registerTypes(TransLucid::Interpreter& i)
+registerTypes(TransLucid::SystemHD& i)
 {
   #if 0
   TransLucid::TypeRegistry& r = i.typeRegistry();
@@ -626,7 +631,7 @@ extern "C"
 {
 
 void
-lib_int_init(TransLucid::Interpreter& i)
+lib_int_init(TransLucid::SystemHD& i)
 {
   IntLib::registerTypes(i);
 }

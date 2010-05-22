@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef INTERPRETER_FWD_HPP_INCLUDED
-#define INTERPRETER_FWD_HPP_INCLUDED
+#ifndef EQUATION_HPP_INCLUDED
+#define EQUATION_HPP_INCLUDED
 
 #include <tl/types.hpp>
 #include <boost/shared_ptr.hpp>
@@ -31,7 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class Interpreter;
+  class SystemHD;
 
   class InvalidGuard : public Exception
   {
@@ -45,7 +45,7 @@ namespace TransLucid
    * The system can impose elements of the guard, it is an error for
    * the user to specify those ones too.
    **/
-  class EquationGuard
+  class GuardHD
   {
     public:
 
@@ -54,7 +54,7 @@ namespace TransLucid
      *
      * Specifies the AST to use for the guard.
      **/
-    EquationGuard(HD* g, HD* b)
+    GuardHD(HD* g, HD* b)
     : m_guard(g), m_boolean(b)
     {
     }
@@ -65,12 +65,12 @@ namespace TransLucid
      * There are no user dimensions in the guard. System imposed
      * dimensions can still be added.
      **/
-    EquationGuard()
+    GuardHD()
     : m_guard(0), m_boolean(0)
     {
     }
 
-    EquationGuard(const Tuple& t)
+    GuardHD(const Tuple& t)
     : m_guard(0), m_boolean(0)
     {
        for (Tuple::const_iterator iter = t.begin();
@@ -111,7 +111,7 @@ namespace TransLucid
      * change.
      **/
     void
-    addDimension(size_t dim, const TypedValue& v)
+    addDimension(size_t dim, const Constant& v)
     {
        m_dimensions[dim] = v;
     }
@@ -125,25 +125,25 @@ namespace TransLucid
     private:
     HD* m_guard;
     HD* m_boolean;
-    std::map<size_t, TypedValue> m_dimensions;
+    std::map<size_t, Constant> m_dimensions;
     size_t validStart;
     size_t validEnd;
   };
 
-  class Variable;
+  class VariableHD;
 
-  typedef std::map<u32string, Variable*> VariableMap;
+  typedef std::map<u32string, VariableHD*> VariableMap;
 
-  class Equation : public HD
+  class EquationHD : public HD
   {
     public:
-    Equation(const u32string& name, const EquationGuard& valid, HD* h)
+    EquationHD(const u32string& name, const GuardHD& valid, HD* h)
     : m_name(name), m_validContext(valid), m_h(h),
     m_id(boost::uuids::random_generator()())
     {
     }
 
-    Equation()
+    EquationHD()
     : m_h(0), m_id(boost::uuids::nil_generator()())
     {
     }
@@ -154,7 +154,7 @@ namespace TransLucid
        return m_name;
     }
 
-    const EquationGuard&
+    const GuardHD&
     validContext() const
     {
        return m_validContext;
@@ -180,7 +180,7 @@ namespace TransLucid
     void
     del(size_t time);
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
       return (*m_h)(k);
@@ -188,7 +188,7 @@ namespace TransLucid
 
     private:
     u32string m_name;
-    EquationGuard m_validContext;
+    GuardHD m_validContext;
     HD* m_h;
     boost::uuids::uuid m_id;
     size_t m_validStart;
@@ -197,15 +197,15 @@ namespace TransLucid
 
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
-  class Variable : public HD
+  class VariableHD : public HD
   {
     public:
 
-    Variable(const u32string& name, HD* system);
+    VariableHD(const u32string& name, HD* system);
     
-    ~Variable();
+    ~VariableHD();
 
-    TaggedValue operator()(const Tuple& k);
+    TaggedConstant operator()(const Tuple& k);
 
     uuid
     addExpr(const Tuple& k, HD* h)
@@ -215,11 +215,11 @@ namespace TransLucid
 
     bool delexpr(uuid id, size_t time);
 
-    bool replexpr(uuid id, size_t time, const EquationGuard& guard, HD* expr);
+    bool replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr);
 
     protected:
 
-    typedef std::map<uuid, Equation> Equations;
+    typedef std::map<uuid, EquationHD> Equations;
 
     std::pair<uuid, Equations::iterator>
     addToVariableActual(const u32string& id, const Tuple& k, HD* h);
@@ -232,7 +232,7 @@ namespace TransLucid
     std::pair<uuid, Equations::iterator>
     addExprActual(const Tuple& k, HD* e);
 
-    bool equationValid(const Equation& e, const Tuple& k);
+    bool equationValid(const EquationHD& e, const Tuple& k);
 
     Equations m_equations;
     VariableMap m_variables;
@@ -246,4 +246,4 @@ namespace TransLucid
   };
 };
 
-#endif // INTERPRETER_FWD_HPP_INCLUDED
+#endif // EQUATION_HPP_INCLUDED

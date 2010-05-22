@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef INTERPRETER_HPP_INCLUDED
-#define INTERPRETER_HPP_INCLUDED
+#ifndef SYSTEM_HPP_INCLUDED
+#define SYSTEM_HPP_INCLUDED
 
 #include <tl/types.hpp>
 #include <tl/dimtranslator.hpp>
@@ -27,15 +27,15 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
   /**
-   * @brief Interpreter base class.
+   * @brief SystemHD base class.
    *
-   * Holds all the data necessary for an interpreter.
+   * Holds all the data necessary for an system.
    **/
-  class Interpreter : public Variable
+  class SystemHD : public VariableHD
   {
     public:
 
-    Interpreter();
+    SystemHD();
 
     typedef std::map<u32string, HD*> IOList;
 
@@ -46,7 +46,7 @@ namespace TransLucid
     addInput(const IOList& input);
 
     void
-    addDemand(const u32string& id, const EquationGuard& guard);
+    addDemand(const u32string& id, const GuardHD& guard);
 
     void
     tick();
@@ -59,7 +59,7 @@ namespace TransLucid
     IOList m_outputs;
     IOList m_inputs;
 
-    typedef std::map<u32string, EquationGuard> DemandStore;
+    typedef std::map<u32string, GuardHD> DemandStore;
     DemandStore m_demands;
 
     //initialises the type indexes
@@ -78,8 +78,8 @@ namespace TransLucid
     std::map<u32string, size_t> builtin_name_to_index;
   };
 
-  TypedValue hash(const TypedValue& dimension, const Tuple& context);
-  TypedValue hash(size_t dimension, const Tuple& context);
+  Constant hash(const Constant& dimension, const Tuple& context);
+  Constant hash(size_t dimension, const Tuple& context);
 }
 
-#endif // INTERPRETER_HPP_INCLUDED
+#endif // SYSTEM_HPP_INCLUDED

@@ -64,7 +64,7 @@ DimensionTranslator::lookup(const u32string& name)
 }
 
 size_t
-DimensionTranslator::lookup(const TypedValue& value)
+DimensionTranslator::lookup(const Constant& value)
 {
   std::pair<ustring_type_map::iterator,bool> result =
     m_typedDims.insert(std::make_pair(value, m_nextIndex));

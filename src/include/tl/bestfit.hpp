@@ -17,18 +17,21 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifndef BESTFIT_HPP_INCLUDED
+#define BESTFIT_HPP_INCLUDED
+
 #include <tl/types.hpp>
 
 namespace TransLucid 
 {
-  class Variable;
-  class Equation;
+  class VariableHD;
+  class EquationHD;
 
   class BestFit
   {
     public:
     virtual ~BestFit() {}
-    virtual TaggedValue operator()(const Tuple& k) = 0;
+    virtual TaggedConstant operator()(const Tuple& k) = 0;
   };
 
   class BestFittable
@@ -47,7 +50,7 @@ namespace TransLucid
       return old;
     }
 
-    TaggedValue operator()(Tuple& k)
+    TaggedConstant operator()(Tuple& k)
     {
       return (*m_bestFit)(k);
     }
@@ -59,9 +62,9 @@ namespace TransLucid
   class CompileBestFit : public BestFit
   {
     public:
-    //CompileBestFit(Equation& e, Variable& v);
+    //CompileBestFit(EquationHD& e, VariableHD& v);
 
-    TaggedValue operator()(const Tuple& k);
+    TaggedConstant operator()(const Tuple& k);
 
     private:
     ~CompileBestFit() {}
@@ -72,10 +75,12 @@ namespace TransLucid
   class BruteForceBestFit : public BestFit
   {
     public:
-    TaggedValue operator()(Tuple& k);
+    TaggedConstant operator()(Tuple& k);
   };
 
   class SingleDefinitionBestFit : public BestFit
   {
   };
 }
+
+#endif // BESTFIT_HPP_INCLUDED

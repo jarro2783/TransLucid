@@ -184,7 +184,7 @@ class DirectoryGrammar : public qi::grammar<DirectoryGrammar>
 #endif
 
 DirectorySystem::DirectorySystem()
-: m_compiler(m_interpreter), m_expr_parser(m_header)
+: m_compiler(m_system), m_expr_parser(m_header)
 {
   m_expr_parser.set_context_perturb(m_tuple_parser);
   m_tuple_parser.set_expr(m_expr_parser);
@@ -276,13 +276,13 @@ DirectorySystem::parseSystem(const ustring_t& path)
             {
               tuple_t k;
               k.insert(std::make_pair(dim_id,
-              TypedValue(String(std::get<0>(e)), TYPE_INDEX_USTRING)));
+              Constant(String(std::get<0>(e)), TYPE_INDEX_USTRING)));
 
               //need to compile the guard
               HD* guardTuple = m_compiler.compile(std::get<0>(std::get<1>(e)));
               HD* guardBool = m_compiler.compile(std::get<1>(std::get<1>(e)));
               k.insert(std::make_pair(dim_valid,
-                TypedValue(EquationGuardType(EquationGuard(guardTuple, guardBool)),
+                Constant(Guard(GuardHD(guardTuple, guardBool)),
                 TYPE_INDEX_GUARD)));
 
               HD* h = m_compiler.compile(std::get<2>(e));
@@ -293,7 +293,7 @@ DirectorySystem::parseSystem(const ustring_t& path)
 
           default:
             throw InternalError(
-              __FILE__ ": Interpreter::parseSystem() line: "
+              __FILE__ ": SystemHD::parseSystem() line: "
               STRING_(__LINE__)
               " should not have been reached");
         }
@@ -360,7 +360,7 @@ DirectorySystem::setClock(const Parser::equation_v& equations)
       std::get<0>(*(e = &equations.front())) == L"clock")
   {
     HD* h = m_compiler.compile(std::get<2>(*e));
-    TypedValue v = (*h)(Tuple()).first;//= evaluate(e->get<2>(), Tuple());
+    Constant v = (*h)(Tuple()).first;//= evaluate(e->get<2>(), Tuple());
     if (v.index() != TYPE_INDEX_INTMP)
     {
       throw ParseError("clock variable must be an intmp");

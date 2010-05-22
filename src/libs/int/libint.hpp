@@ -28,12 +28,22 @@ namespace IntLib
 {
 
   template <class T>
-  class Int : public TransLucid::TypedValueBase
+  class Int : public TransLucid::TypedValue
   {
     public:
     Int(T value)
     : m_value(value)
     {}
+
+    Int(const Int& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Int* clone() const
+    {
+      return new Int<T>(*this);
+    }
 
     void
     print(std::ostream& os) const;
@@ -55,7 +65,7 @@ namespace IntLib
     //(
     //  const TransLucid::u32string& text,
     //  const TransLucid::Tuple& k,
-    //  const TransLucid::Interpreter& i
+    //  const TransLucid::SystemHD& i
     //)
     //{
     //  return Int<T>(boost::lexical_cast<T>(text));

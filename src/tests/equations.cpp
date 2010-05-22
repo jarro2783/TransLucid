@@ -19,7 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/translator.hpp>
 #include <tl/utility.hpp>
-#include <tl/header_parser.hpp>
+#include <tl/parser_util.hpp>
 
 #define BOOST_TEST_MODULE equations
 #include <boost/test/included/unit_test.hpp>
@@ -35,7 +35,7 @@ struct translator_class {
   translator_class()
   {
     translator.loadLibrary(U"int");
-    TL::Parser::Header& header = translator.header();
+    TL::Parser::HeaderStruct& header = translator.header();
     TL::Parser::addBinaryOpSymbol
     (
       header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5
@@ -57,11 +57,12 @@ BOOST_AUTO_TEST_SUITE( expressions_tests )
 
 BOOST_AUTO_TEST_CASE ( single )
 {
+  std::cerr << "First test case" << std::endl;
   translator.translate_and_add_equation_set(U" x = 5;; y = 6;;");
 
   TL::HD& system = translator.system();
 
-  TL::TaggedValue v = system
+  TL::TaggedConstant v = system
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"x")}
@@ -99,6 +100,7 @@ BOOST_AUTO_TEST_CASE ( single )
 
 BOOST_AUTO_TEST_CASE ( simple_expressions )
 {
+  std::cerr << "Second test case" << std::endl;
   //TL::Parser::Header& header = translator.header();
 
   translator.translate_and_add_equation_set
@@ -110,7 +112,7 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
 
   TL::HD& system = translator.system();
 
-  TL::TaggedValue v = system
+  TL::TaggedConstant v = system
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"a")}
@@ -157,8 +159,9 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
 
 BOOST_AUTO_TEST_CASE ( functions )
 {
+  std::cerr << "Third test case" << std::endl;
   TL::HD* h = 0;
-  TL::TaggedValue v;
+  TL::TaggedConstant v;
 
   translator.translate_and_add_equation_set
   (

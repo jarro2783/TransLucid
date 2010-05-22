@@ -39,11 +39,11 @@ along with TransLucid; see the file COPYING.  If not see
 // ----------------------------------
 // WARNING !!!
 // Caveat with using boost flyweight
-// all TypedValues must be destructed
+// all Constants must be destructed
 // before unloading libraries with
 // lt_exit
 // as long as all typed values are destructed
-// before the interpreter class is then this
+// before the system class is then this
 // will work fine
 // ----------------------------------
 
@@ -76,11 +76,11 @@ namespace boost
 namespace TransLucid
 {
 
-  class Interpreter;
+  class SystemHD;
 
   class HD;
 
-  //class EquationGuard;
+  //class GuardHD;
 
   typedef uint16_t type_index;
   typedef std::u32string u32string;
@@ -98,10 +98,12 @@ namespace TransLucid
    *
    * The actual representation for typed values are derived from this.
    **/
-  class TypedValueBase
+  class TypedValue
   {
     public:
-    virtual ~TypedValueBase() {}
+    virtual ~TypedValue() {}
+
+    virtual TypedValue* clone() const = 0;
 
     /**
      * @brief Compute the hash of a typed value.
@@ -112,10 +114,10 @@ namespace TransLucid
   };
 
   /**
-   * @brief Computes the hash of a TypedValueBase.
+   * @brief Computes the hash of a TypedValue.
    **/
   inline size_t
-  hash_value(const TypedValueBase& v)
+  hash_value(const TypedValue& v)
   {
     return v.hash();
   }
@@ -125,7 +127,7 @@ namespace TransLucid
    *
    * Stores a cooked type value pair.
    **/
-  class TypedValue
+  class Constant
   {
     public:
 
@@ -136,46 +138,45 @@ namespace TransLucid
      * This represents the internal error value. Nothing should ever
      * have this value.
      **/
-    TypedValue()
+    Constant()
     : m_value(0), m_index(0)
     {
     }
 
-    //puts the T& into a flyweight
-    //T has to extend TypedValueBase
     /**
      * @brief Construct a typed value.
      *
      * The type is referenced by @a index which must be a valid index
-     * in TransLucid::TypeRegistry. T must inherit from TypeValueBase.
+     * in TransLucid::TypeRegistry. T must inherit from TypedValue.
      **/
     template <typename T>
-    TypedValue(const T& value, type_index index)
-    : m_value(new Storage<T>(value)), m_index(index)
+    Constant(const T& value, type_index index)
+    : m_value(new T(value)),
+    m_index(index)
     {
     }
 
-    TypedValue(const TypedValue& other)
-    : m_value(other.m_value != 0 ? other.m_value->clone() : 0),
-      m_index(other.m_index)
+    Constant(const Constant& rhs)
+    : 
+    m_value(rhs.m_value != 0 ? rhs.m_value->clone() : 0),
+    m_index(rhs.m_index)
     {
     }
 
-    ~TypedValue() {
+    ~Constant() {
       delete m_value;
     }
 
-    TypedValue&
-    operator=(const TypedValue& rhs)
+    Constant&
+    operator=(const Constant& rhs)
     {
       if (this != &rhs)
       {
-        //if this throws then leave the value as it is, having
-        //a 0 here would be bad since TypedValue should always have
-        //a value, so it's better to leave the old value
-        StorageBase* copy = rhs.m_value->clone();
+        //if this throws nothing else happens, the object stays as it is
+        //and the exception goes on
+        TypedValue* v = rhs.m_value->clone();
         delete m_value;
-        m_value = copy;
+        m_value = v;
         m_index = rhs.m_index;
       }
 
@@ -183,20 +184,21 @@ namespace TransLucid
     }
 
     bool
-    operator==(const TypedValue& rhs) const
+    operator==(const Constant& rhs) const
     {
       return m_index == rhs.m_index
-      && m_value->equalTo(*rhs.m_value);
+      && m_value->hash() == rhs.m_value->hash();
     }
 
     bool
-    operator!=(const TypedValue& rhs) const
+    operator!=(const Constant& rhs) const
     {
       return !(*this == rhs);
     }
 
+    #if 0
     bool
-    operator<(const TypedValue& rhs) const
+    operator<(const Constant& rhs) const
     {
       if (m_index != rhs.m_index)
       {
@@ -207,6 +209,7 @@ namespace TransLucid
         return m_value->less(*rhs.m_value);
       }
     }
+    #endif
 
     /**
      * @brief Computes the hash of the typed value.
@@ -217,7 +220,7 @@ namespace TransLucid
     hash() const
     {
       size_t seed = m_index;
-      boost::hash_combine(seed, m_value->value().hash());
+      boost::hash_combine(seed, m_value->hash());
       return seed;
     }
 
@@ -234,18 +237,18 @@ namespace TransLucid
     const T&
     value() const
     {
-      return dynamic_cast<const T&>(m_value->value());
+      return dynamic_cast<const T&>(*m_value);
     }
 
     /**
      * @brief Retrieve the value stored.
      *
-     * Returns the value stored as a TypedValueBase reference.
+     * Returns the value stored as a TypedValue reference.
      **/
-    const TypedValueBase&
+    const TypedValue&
     value() const
     {
-      return m_value->value();
+      return *m_value;
     }
 
     /**
@@ -257,7 +260,7 @@ namespace TransLucid
     const T*
     valuep() const
     {
-      return dynamic_cast<const T*>(&m_value->value());
+      return dynamic_cast<const T*>(m_value);
     }
 
     /**
@@ -279,92 +282,15 @@ namespace TransLucid
 
     private:
 
-    //allows us to store values of any type
-    class StorageBase
-    {
-      public:
-      virtual ~StorageBase() {}
-      virtual const TypedValueBase& value() const = 0;
-      virtual StorageBase* clone() const = 0;
-      virtual bool equalTo(const StorageBase& other) const = 0;
-      virtual bool less(const StorageBase& other) const = 0;
-      virtual void print(std::ostream& os) const = 0;
-    };
-
-    //stores a value of type T
-    template <class T>
-    class Storage : public StorageBase
-    {
-      public:
-      Storage(const T& v)
-      : m_value(v)
-      {
-      }
-
-      Storage(const Storage& other)
-      : m_value(other.m_value)
-      {
-      }
-
-      const TypedValueBase&
-      value() const
-      {
-        return m_value;
-      }
-
-      Storage<T>*
-      clone() const
-      {
-        return new Storage<T>(*this);
-      }
-
-      bool
-      equalTo(const StorageBase& other) const
-      {
-        const Storage<T>* o = dynamic_cast<const Storage<T>*>(&other);
-        if (o)
-        {
-          return m_value == o->m_value;
-        }
-        else
-        {
-          return false;
-        }
-      }
-
-      bool
-      less(const StorageBase& other) const
-      {
-        const Storage<T>* o = dynamic_cast<const Storage<T>*>(&other);
-        if (o)
-        {
-          return m_value < o->m_value;
-        }
-        else
-        {
-          throw "tried to compare less than for two values of different types";
-        }
-      }
-
-      void
-      print(std::ostream& os) const
-      {
-        m_value.print(os);
-      }
-
-      private:
-      T m_value;
-    };
-
-    StorageBase* m_value;
+    TypedValue* m_value;
     type_index m_index;
   };
 
   /**
-   * @brief Computes the hash of a TypedValue.
+   * @brief Computes the hash of a Constant.
    **/
   inline size_t
-  hash_value(const TypedValue& value)
+  hash_value(const Constant& value)
   {
     return value.hash();
   }
@@ -372,16 +298,16 @@ namespace TransLucid
   /**
    * The underlying data structure of a tuple.
    **/
-  typedef std::map<size_t, TypedValue> tuple_t;
+  typedef std::map<size_t, Constant> tuple_t;
 
   /**
    * @brief Stores a Tuple.
    *
-   * A tuple is a map from dimension to TypedValue. Tuple can store
+   * A tuple is a map from dimension to Constant. Tuple can store
    * unevaluated expressions as a mapped value, TransLucid::TupleIterator
    * will ensure that these are evaluated when their value is required.
    **/
-  class Tuple : public TypedValueBase
+  class Tuple : public TypedValue
   {
     public:
     typedef tuple_t::const_iterator const_iterator;
@@ -389,6 +315,16 @@ namespace TransLucid
 
     explicit Tuple(const tuple_t& tuple);
     Tuple();
+
+    Tuple(const Tuple& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Tuple* clone() const
+    {
+      return new Tuple(*this);
+    }
 
     Tuple&
     operator=(const tuple_t& t)
@@ -410,7 +346,7 @@ namespace TransLucid
     }
 
     Tuple
-    insert(size_t key, const TypedValue& value) const;
+    insert(size_t key, const Constant& value) const;
 
     const_iterator
     find(size_t key) const
@@ -438,7 +374,7 @@ namespace TransLucid
     }
 
     //void
-    //print(const Interpreter& i, std::ostream& os, const Tuple& c) const;
+    //print(const SystemHD& i, std::ostream& os, const Tuple& c) const;
 
     void print(std::ostream& os) const;
 
@@ -448,11 +384,13 @@ namespace TransLucid
       return Tuple(new tuple_t(*m_value));
     }
 
+    #if 0
     bool
     operator<(const Tuple& rhs) const
     {
-      return *m_value < *rhs.m_value;
+      //return *m_value < *rhs.m_value;
     }
+    #endif
 
     private:
 
@@ -466,233 +404,25 @@ namespace TransLucid
   /**
    * @brief A value context pair.
    *
-   * A TypedValue and the context it was evaluated in.
+   * A Constant and the context it was evaluated in.
    **/
-  typedef std::pair<TypedValue, Tuple> TaggedValue;
+  typedef std::pair<Constant, Tuple> TaggedConstant;
 
-  //typedef boost::function<TypedValue
-  //        (const TypedValue&, const TypedValue&, const Tuple&)> OpFunction;
-  //typedef boost::function<TypedValue
-  //        (const TypedValue&, const Tuple&)> ConvertFunction;
+  //typedef boost::function<Constant
+  //        (const Constant&, const Constant&, const Tuple&)> OpFunction;
+  //typedef boost::function<Constant
+  //        (const Constant&, const Tuple&)> ConvertFunction;
 
   /**
    * @brief Vector of type indexes.
    **/
   typedef std::vector<type_index> type_vec;
 
-  #if 0
-
-  //keeps track of types
-  /**
-   * @brief Stores types and operations on a types.
-   *
-   * Stores all the types in a system and their associated printer, parser
-   * and operations.
-   **/
-  class TypeRegistry
-  {
-    public:
-
-    //the registry is tied to a specific interpreter
-    TypeRegistry(Interpreter& i);
-    ~TypeRegistry();
-
-    type_index
-    generateIndex()
-    {
-      return m_nextIndex++;
-    }
-
-    size_t
-    registerType(const u32string& name);
-
-    size_t
-    lookupType(const u32string& name) const;
-
-    #if 0
-    void
-    registerOp
-    (const Glib::ustring& name, const type_vec& operands, OpFunction op)
-    {
-      op_map& ops = opsMap[name];
-      ops[operands] = op;
-    }
-
-    OpFunction
-    findOp(const Glib::ustring& name, const type_vec& tv) const
-    {
-      ops_map::const_iterator opsit = opsMap.find(name);
-      if (opsit == opsMap.end())
-      {
-        return makeOpTypeError;
-      }
-      op_map::const_iterator opit = opsit->second.find(tv);
-      if (opit == opsit->second.end())
-      {
-        return makeOpTypeError;
-      }
-      return opit->second;
-    }
-
-    //a variadic op takes a list of operands all of the same type
-    void
-    registerVariadicOp(const u32string& name, type_index t, OpFunction op)
-    {
-      m_variadicOperators[name][t] = op;
-    }
-
-    OpFunction
-    findVariadicOp(const Glib::ustring& name, type_index t) const
-    {
-      VariadicOpMap::const_iterator opsit = m_variadicOperators.find(name);
-      if (opsit == m_variadicOperators.end())
-      {
-        return makeOpTypeError;
-      }
-      VariadicOpMap::mapped_type::const_iterator opit =
-        opsit->second.find(t);
-      if (opit == opsit->second.end())
-      {
-        return makeOpTypeError;
-      }
-      return opit->second;
-    }
-    #endif
-
-    Interpreter&
-    interpreter() const
-    {
-      return m_interpreter;
-    }
-
-    //indexes for built in types
-    type_index
-    indexSpecial() const
-    {
-      return m_indexSpecial;
-    }
-
-    type_index
-    indexBoolean() const
-    {
-      return m_indexBool;
-    }
-
-    type_index
-    indexTuple() const
-    {
-      return m_indexTuple;
-    }
-
-    type_index
-    indexUneval() const
-    {
-      return m_indexUneval;
-    }
-
-    type_index
-    indexIntmp() const
-    {
-      return m_indexIntmp;
-    }
-
-    type_index
-    indexDimension() const
-    {
-      return m_indexDimension;
-    }
-
-    type_index
-    indexRange() const
-    {
-      return m_indexRange;
-    }
-
-    type_index
-    indexExpr() const
-    {
-      return m_indexExpr;
-    }
-
-    type_index
-    indexString() const
-    {
-      return m_indexString;
-    }
-
-    type_index
-    indexCalc() const
-    {
-      return m_indexCalc;
-    }
-
-    type_index
-    indexGuard() const
-    {
-      return m_indexGuard;
-    }
-
-    type_index
-    indexPair() const
-    {
-      return m_indexPair;
-    }
-
-    type_index
-    indexChar() const
-    {
-      return m_indexChar;
-    }
-
-    private:
-
-    type_index m_nextIndex;
-
-    type_index m_indexError;
-    type_index m_indexSpecial;
-    type_index m_indexBool;
-    type_index m_indexTuple;
-    type_index m_indexUneval;
-    type_index m_indexIntmp;
-    type_index m_indexDimension;
-    type_index m_indexRange;
-    type_index m_indexExpr;
-    type_index m_indexString;
-    type_index m_indexChar;
-    type_index m_indexCalc;
-    type_index m_indexGuard;
-    type_index m_indexPair;
-
-    Interpreter& m_interpreter;
-
-    public:
-    #if 0
-    ConvertFunction
-    findConverter(type_index to, type_index from) const
-    {
-      ConvertorsMap::const_iterator iter = m_convertors.find(to);
-
-      if (iter == m_convertors.end())
-      {
-        return makeConvertTypeError;
-      }
-
-      IndexConvertMap::const_iterator iter2 = iter->second.find(from);
-      if (iter2 == iter->second.end())
-      {
-        return makeConvertTypeError;
-      }
-
-      return iter2->second;
-    }
-    #endif
-  };
-  #endif
 
 } //namespace TransLucid
 
 inline std::ostream&
-operator<<(std::ostream& os, const TransLucid::TypedValue& v)
+operator<<(std::ostream& os, const TransLucid::Constant& v)
 {
   v.print(os);
   return os;

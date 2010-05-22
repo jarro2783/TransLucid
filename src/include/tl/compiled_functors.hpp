@@ -25,82 +25,20 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/ast.hpp>
 
+//Some of these functors are constructed with the system, some are not.
+//The ones that are make a demand of the system.
+//For example, BoolConstHD is returning a constant boolean. If one types in
+//true, the value true is created with index TYPE_INDEX_BOOL, the system is
+//not required for this.
+//On the other hand, IdentHD is used whenever an arbitrary identifier is 
+//referred to.
+//For an identifier x:
+//IdentHD makes the demand system([id : "x"]) & k
+
 namespace TransLucid
 {
   namespace Hyperdatons
   {
-    class BoolHD : public HD
-    {
-      public:
-
-      BoolHD(bool value)
-      : m_value(value)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& k);
-
-      private:
-      bool m_value;
-    };
-
-    class SpecialHD : public HD
-    {
-      public:
-      SpecialHD(Special::Value v)
-      : m_value(v)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& k);
-
-      private:
-      Special::Value m_value;
-    };
-
-    class IntegerConstHD : public HD
-    {
-      public:
-      IntegerConstHD(HD* system, const mpz_class& value)
-      : m_system(system), m_value(value)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& k);
-
-      private:
-      HD* m_system;
-      mpz_class m_value;
-    };
-
-    class UcharConstHD : public HD
-    {
-      public:
-      UcharConstHD(char32_t c)
-      : m_value(c)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& k);
-
-      private:
-      char32_t m_value;
-    };
-
-    class StringConstHD : public HD
-    {
-      public:
-      StringConstHD(const u32string& s)
-      : m_value(s)
-      {}
-
-      TaggedValue
-      operator()(const Tuple& k);
-
-      private:
-      u32string m_value;
-    };
-
     class TypedValueHD : public HD
     {
       public:
@@ -110,7 +48,7 @@ namespace TransLucid
       : m_system(system), m_type(type), m_text(text)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -126,7 +64,7 @@ namespace TransLucid
       : m_system(system), m_name(name)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -141,7 +79,7 @@ namespace TransLucid
       : m_system(system), m_name(name)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -152,15 +90,21 @@ namespace TransLucid
     class UnaryOpHD : public HD
     {
       public:
-      UnaryOpHD(Tree::UnaryOperation op, HD* e)
-      : m_op(op), m_e(e)
+      UnaryOpHD
+      (
+        HD* system,
+        Tree::UnaryOperator op, 
+        HD* e
+      )
+      : m_system(system), m_op(op), m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      Tree::UnaryOperation m_op;
+      HD* m_system;
+      Tree::UnaryOperator m_op;
       HD* m_e;
     };
 
@@ -177,7 +121,7 @@ namespace TransLucid
       : m_system(system), m_operands(operands), m_name(name)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -186,17 +130,17 @@ namespace TransLucid
       u32string m_name;
     };
 
-    class OperationHD : public HD
+    class VariableOpHD : public HD
     {
       public:
-      OperationHD(HD* system,
+      VariableOpHD(HD* system,
                 const std::vector<HD*>& operands,
                 const u32string& symbol)
       : m_system(system), m_operands(operands), m_symbol(symbol)
       {
       }
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -205,51 +149,56 @@ namespace TransLucid
       u32string m_symbol;
     };
 
-    class IsSpecial : public HD
+    class IsSpecialHD : public HD
     {
       public:
-      IsSpecial(const u32string& special, HD* e)
+      IsSpecialHD(HD* system, const u32string& special, HD* e)
       : m_special(special),
       m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
+      HD* m_system;
       u32string m_special;
       HD* m_e;
     };
 
-    class IsType : public HD
+    class IsTypeHD : public HD
     {
       public:
-      IsType(const u32string& type, HD* e)
-      : m_type(type), m_e(e)
+      IsTypeHD(HD* system, const u32string& type, HD* e)
+      : m_system(system), m_type(type), m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
+      HD* m_system;
       u32string m_type;
       HD* m_e;
     };
 
-    class Convert : public HD
+    //TODO work out what converting is
+    #if 0
+    class ConvertHD : public HD
     {
       public:
-      Convert(const u32string& to, HD* e)
+      ConvertHD(const u32string& to, HD* e)
       : m_to(to), m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
       u32string m_to;
       HD* m_e;
     };
+    #endif
 
     class IfHD : public HD
     {
@@ -264,7 +213,7 @@ namespace TransLucid
         m_else(else_)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -283,7 +232,7 @@ namespace TransLucid
       : m_system(system), m_e(e)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -293,14 +242,14 @@ namespace TransLucid
 
 #if 0
     //TODO: What is this?
-    class Pair : public HD
+    class PairHD : public HD
     {
       public:
-      Pair(HD* lhs, HD* rhs)
+      PairHD(HD* lhs, HD* rhs)
       : m_lhs(lhs), m_rhs(rhs)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -309,16 +258,16 @@ namespace TransLucid
     };
 #endif
 
-    class BuildTupleHD : public HD
+    class TupleHD : public HD
     {
       public:
 
-      BuildTupleHD(HD* system,
+      TupleHD(HD* system,
                  const std::list<std::pair<HD*, HD*>>& elements)
       : m_system(system), m_elements(elements)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -335,7 +284,7 @@ namespace TransLucid
       : e2(e2), e1(e1)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:
@@ -351,7 +300,7 @@ namespace TransLucid
       : e2(e2), e1(e1)
       {}
 
-      TaggedValue
+      TaggedConstant
       operator()(const Tuple& k);
 
       private:

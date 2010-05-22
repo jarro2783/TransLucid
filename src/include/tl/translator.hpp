@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TRANSLATOR_HPP_INCLUDED
 
 #include <tl/hyperdaton.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/expr_compiler.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/library.hpp>
@@ -30,7 +30,7 @@ namespace TransLucid
 {
   namespace Parser
   {
-    class Header;
+    class HeaderStruct;
 
     template <typename Iterator>
     class ExprGrammar;
@@ -43,6 +43,9 @@ namespace TransLucid
 
     template <typename Iterator>
     class SkipGrammar;
+
+    template <typename Iterator>
+    class HeaderGrammar;
   }
 
   class Translator
@@ -60,16 +63,16 @@ namespace TransLucid
     equation_v
     translate_equation_set(const u32string& s);
 
-    void
+    bool
     parse_header(const u32string& s);
 
     HD&
     system()
     {
-      return m_interpreter;
+      return m_system;
     }
 
-    Parser::Header&
+    Parser::HeaderStruct&
     header()
     {
       return *m_header;
@@ -78,7 +81,7 @@ namespace TransLucid
     void
     loadLibrary(const u32string& s)
     {
-      m_lt.loadLibrary(s, &m_interpreter);
+      m_lt.loadLibrary(s, &m_system);
     }
 
     const Tree::Expr&
@@ -89,14 +92,15 @@ namespace TransLucid
 
     private:
 
-    Parser::Header* m_header;
+    Parser::HeaderStruct* m_header;
 
     Parser::ExprGrammar<Parser::iterator_t>* m_expr;
     Parser::EquationGrammar<Parser::iterator_t>* m_equation;
     Parser::TupleGrammar<Parser::iterator_t>* m_tuple;
     Parser::SkipGrammar<Parser::iterator_t>* m_skipper;
+    Parser::HeaderGrammar<Parser::iterator_t>* m_header_grammar;
 
-    Interpreter m_interpreter;
+    SystemHD m_system;
 
     ExprCompiler m_compiler;
 

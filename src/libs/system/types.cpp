@@ -1,4 +1,4 @@
-/* Header type.
+/* Basic types.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,56 +17,40 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#if 0
-
-#include <tl/header_type.hpp>
-#include <tl/parser.hpp>
+#include <tl/types.hpp>
+#include <boost/foreach.hpp>
+//#include <boost/bind.hpp>
+#include <tl/range.hpp>
+#include <tl/system.hpp>
+#include <tl/exception.hpp>
+#include <tl/header.hpp>
+#include <tl/footer.hpp>
 
 namespace TransLucid
 {
 
-size_t
-HeaderType::hash() const
+Tuple::Tuple()
+: m_value(new tuple_t)
 {
-   return 0;
+}
+
+Tuple::Tuple(const tuple_t& tuple)
+: m_value(new tuple_t(tuple))
+{
+}
+
+Tuple
+Tuple::insert(size_t key, const Constant& value) const
+{
+  tuple_t t = *m_value;
+  t.insert(std::make_pair(key, value));
+  return Tuple(t);
 }
 
 void
-HeaderType::parseString
-(
-  const u32string& s,
-  const Tuple& c,
-  Interpreter& i
-)
+Tuple::print(std::ostream& os) const
 {
-  #if 0
-  Parser::HeaderGrammar hg(m_header, i.parsers());
-
-  Parser::UIterator iter(s);
-
-  Parser::iterator_t begin(Parser::Iterator(iter),
-                           Parser::Iterator(iter.make_end()));
-
-  i.parseRange(begin, Parser::iterator_t(), hg);
-  #endif
+  os << "tuple";
 }
 
-void
-HeaderType::parseFile
-(
-  const u32string& file,
-  const Tuple& c,
-  Interpreter& i
-)
-{
-}
-
-bool
-HeaderType::operator==(const HeaderType& rhs) const
-{
-  return m_header == rhs.m_header;
-}
-
-}
-
-#endif
+} //namespace TransLucid

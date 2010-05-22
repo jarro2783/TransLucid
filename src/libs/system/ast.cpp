@@ -26,9 +26,9 @@ namespace Tree
 {
 
 Expr
-insert_binary_operation
+insert_binary_operator
 (
-  const BinaryOperation& op,
+  const BinaryOperator& op,
   Expr& lhs,
   Expr& rhs
 )
@@ -80,13 +80,13 @@ insert_binary_operation
 }
 
 void
-BinaryOpExpr::add_right(const BinaryOperation& op, Expr& r)
+BinaryOpExpr::add_right(const BinaryOperator& op, Expr& r)
 {
   //size_t last = operands.size()-1;
   //operands.at(last) =
-  //  insert_binary_operation(op, operands.at(last), r);
+  //  insert_binary_operator(op, operands.at(last), r);
   #warning hope this works rhs should be the last one when we dont have variadic
-  rhs = insert_binary_operation(op, rhs, r);
+  rhs = insert_binary_operator(op, rhs, r);
 }
 
 void

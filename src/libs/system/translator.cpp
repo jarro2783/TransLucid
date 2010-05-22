@@ -106,20 +106,23 @@ namespace
 }
 
 Translator::Translator()
-: m_compiler(&m_interpreter)
+: m_compiler(&m_system)
 {
-  m_header = new Parser::Header;
+  m_header = new Parser::HeaderStruct;
 
   m_expr = new Parser::ExprGrammar<Parser::iterator_t>(*m_header);
   m_equation = new Parser::EquationGrammar<Parser::iterator_t>;
   m_tuple = new Parser::TupleGrammar<Parser::iterator_t>;
   m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
+  m_header_grammar = new Parser::HeaderGrammar<Parser::iterator_t>;
 
   m_expr->set_context_perturb(*m_tuple);
   m_tuple->set_expr(*m_expr);
 
   m_equation->set_expr(*m_expr);
   m_equation->set_context_perturb(*m_tuple);
+
+  m_header_grammar->set_expr(*m_expr);
 
   m_header->delimiter_start_symbols.add(L"«",
     Parser::Delimiter(U"ustring", L'«', L'»'));
@@ -133,12 +136,17 @@ Translator::translate_expr(const Parser::string_type& s)
   Parser::iterator_t pos = s.begin();
   Tree::Expr e;
 
-  boost::spirit::qi::phrase_parse(
+  bool r = boost::spirit::qi::phrase_parse(
     pos,
     s.cend(),
     *m_expr,
     *m_skipper,
     e);
+
+  if (r == false || pos != s.cend()) 
+  {
+    return 0;
+  }
 
   m_lastExpr = e;
 
@@ -213,18 +221,37 @@ Translator::translate_and_add_equation_set(const u32string& s)
 
   BOOST_FOREACH(auto& v, equations)
   {
-    uuid id = m_interpreter.addExpr(
-      Tuple(create_add_eqn_context(to_u32string(std::get<0>(v)),
-                                     std::get<1>(v),
-                                     std::get<2>(v))),
-                          std::get<3>(v));
-    //std::cerr << "added equation: " << id  << std::endl;
+    m_system.addExpr
+    (
+      Tuple
+      (
+        create_add_eqn_context
+        (
+          to_u32string(std::get<0>(v)),
+          std::get<1>(v),
+          std::get<2>(v)
+        )
+      ),
+      std::get<3>(v)
+    );
   }
 }
 
-void
+bool
 Translator::parse_header(const u32string& s)
 {
+  Parser::string_type ws(s.begin(), s.end());
+  Parser::iterator_t pos = ws.begin();
+  std::vector<int> test;
+
+  bool r = boost::spirit::qi::phrase_parse(
+    pos,
+    ws.cend(),
+    *m_header_grammar,
+    *m_skipper,
+    *m_header);
+
+  return (r == false || pos != ws.cend());
 }
 
 }

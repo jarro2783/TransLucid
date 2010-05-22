@@ -17,18 +17,20 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef HEADER_TYPE_HPP_INCLUDED
-#define HEADER_TYPE_HPP_INCLUDED
+#ifndef HEADER_HPP_INCLUDED
+#define HEADER_HPP_INCLUDED
+
+// TODO: This file is under construction.  It is not junk.
 
 #if 0
 
 #include <tl/types.hpp>
 #include <tl/parser_fwd.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 
 namespace TransLucid
 {
-  class HeaderType : public TypedValueBase
+  class Header : public TypedValue
   {
     public:
 
@@ -41,23 +43,23 @@ namespace TransLucid
     size_t
     hash() const;
 
-    const Parser::Header&
+    const Parser::HeaderStruct&
     header() const
     {
       return m_header;
     }
 
     bool
-    operator==(const HeaderType& rhs) const;
+    operator==(const Header& rhs) const;
 
     void
-    parseString(const u32string& s, const Tuple& c, Interpreter& i);
+    parseString(const u32string& s, const Tuple& c, SystemHD& i);
 
     void
-    parseFile(const u32string& file, const Tuple& c, Interpreter& i);
+    parseFile(const u32string& file, const Tuple& c, SystemHD& i);
 
     bool
-    operator<(const HeaderType& rhs) const
+    operator<(const Header& rhs) const
     {
       return hash() < rhs.hash();
     }
@@ -68,21 +70,21 @@ namespace TransLucid
 
   namespace HeaderImp
   {
-    template <HeaderType::Input H>
+    template <Header::Input H>
     struct parser
     {
     };
 
     template <>
-    struct parser<HeaderType::DIRECT>
+    struct parser<Header::DIRECT>
     {
       void
       operator()
       (
-        HeaderType& h,
+        Header& h,
         const u32string& s,
         const Tuple& c,
-        Interpreter& i
+        SystemHD& i
       ) const
       {
         h.parseString(s, c, i);
@@ -90,28 +92,28 @@ namespace TransLucid
     };
 
     template <>
-    struct parser<HeaderType::FILE>
+    struct parser<Header::FILE>
     {
       void
       operator()
       (
-        HeaderType& h,
+        Header& h,
         const u32string& s,
         const Tuple& c,
-        Interpreter& i
+        SystemHD& i
       ) const
       {
          h.parseFile(s, c, i);
       }
     };
 
-    template <HeaderType::Input H>
+    template <Header::Input H>
     struct name
     {
     };
 
     template <>
-    struct name<HeaderType::DIRECT>
+    struct name<Header::DIRECT>
     {
       const char*
       operator()()
@@ -121,7 +123,7 @@ namespace TransLucid
     };
 
     template <>
-    struct name<HeaderType::FILE>
+    struct name<Header::FILE>
     {
       const char*
       operator()()
@@ -134,4 +136,4 @@ namespace TransLucid
 
 #endif
 
-#endif // HEADER_TYPE_HPP_INCLUDED
+#endif // HEADER_HPP_INCLUDED

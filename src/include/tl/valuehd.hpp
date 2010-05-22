@@ -1,4 +1,4 @@
-/* Hyperdatons which return constants.
+/* The value hyperdatons.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,101 +17,85 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef CONSTHD_HPP_INCLUDED
-#define CONSTHD_HPP_INCLUDED
+#ifndef VALUEHD_HPP_INCLUDED
+#define VALUEHD_HPP_INCLUDED
 
 #include <tl/hyperdaton.hpp>
+#include <tl/system.hpp>
+#include <tl/builtin_types.hpp>
+#include <tl/fixed_indexes.hpp>
 
-namespace TransLucid 
+namespace TransLucid
 {
   namespace Hyperdatons
   {
-    class TypeConstHD : public HD
+    //TODO: as soon as inheriting constructors is done,
+    //      these classes can do
+    //using ValueHD::ValueHD;
+    class ValueHD : public HD
     {
       public:
+      ValueHD(HD* system)
+      : m_system(system)
+      {}
 
-      TypeConstHD(size_t value)
-      : m_value(value)
+      protected:
+      HD* m_system;
+    };
+
+    class BoolHD : public ValueHD
+    {
+      public:
+      static const char32_t* name;
+
+      BoolHD(HD* system)
+      : ValueHD(system)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
-
-      private:
-      size_t m_value;
     };
 
-    class BoolConstHD : public HD
+    class IntmpHD : public ValueHD
     {
       public:
+      static const char32_t* name;
 
-      BoolConstHD(bool value)
-      : m_value(value)
+      IntmpHD(HD* system)
+      : ValueHD(system)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
-
-      private:
-      bool m_value;
     };
 
-    class SpecialConstHD : public HD
+    class UCharHD : public ValueHD
     {
       public:
-      SpecialConstHD(Special::Value v)
-      : m_value(v)
+      static const char32_t* name;
+
+      UCharHD(HD* system)
+      : ValueHD(system)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
-
-      private:
-      Special::Value m_value;
     };
 
-    class IntmpConstHD : public HD
+    class UStringHD : public ValueHD
     {
       public:
-      IntmpConstHD(const mpz_class& value)
-      : m_value(value)
+      static const char32_t* name;
+
+      UStringHD(HD* system)
+      : ValueHD(system)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
-
-      private:
-      mpz_class m_value;
     };
 
-    class UCharConstHD : public HD
-    {
-      public:
-      UCharConstHD(char32_t c)
-      : m_value(c)
-      {}
+  } //namespace Hyperdatons
+} //namespace TransLucid
 
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      char32_t m_value;
-    };
-
-    class UStringConstHD : public HD
-    {
-      public:
-      UStringConstHD(const u32string& s)
-      : m_value(s)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      u32string m_value;
-    };
-  }
-}
-
-#endif
+#endif // VALUEHD_HPP_INCLUDED

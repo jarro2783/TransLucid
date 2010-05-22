@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/expr_compiler.hpp>
 #include <tl/compiled_functors.hpp>
+#include <tl/consthd.hpp>
 #include <boost/variant.hpp>
 
 namespace TransLucid
@@ -50,31 +51,31 @@ ExprCompiler::operator()(const Tree::nil& n)
 HD*
 ExprCompiler::operator()(bool b)
 {
-  return new Hyperdatons::BoolHD(b);
+  return new Hyperdatons::BoolConstHD(b);
 }
 
 HD*
 ExprCompiler::operator()(Special::Value s)
 {
-  return new Hyperdatons::SpecialHD(s);
+  return new Hyperdatons::SpecialConstHD(s);
 }
 
 HD*
 ExprCompiler::operator()(const mpz_class& i)
 {
-  return new Hyperdatons::IntegerConstHD(m_i, i);
+  return new Hyperdatons::IntmpConstHD(i);
 }
 
 HD*
 ExprCompiler::operator()(char32_t c)
 {
-  return new Hyperdatons::UcharConstHD(c);
+  return new Hyperdatons::UCharConstHD(c);
 }
 
 HD*
 ExprCompiler::operator()(const u32string& s)
 {
-  return new Hyperdatons::StringConstHD(s);
+  return new Hyperdatons::UStringConstHD(s);
 }
 
 HD*
@@ -99,7 +100,7 @@ HD*
 ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {
   HD* operand = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::UnaryOpHD(e.op, operand);
+  return new Hyperdatons::UnaryOpHD(m_i, e.op, operand);
 }
 
 HD*
@@ -140,7 +141,7 @@ ExprCompiler::operator()(const Tree::HashExpr& e)
 }
 
 HD*
-ExprCompiler::operator()(const Tree::BuildTupleExpr& e)
+ExprCompiler::operator()(const Tree::TupleExpr& e)
 {
   std::list<std::pair<HD*, HD*>> elements;
   BOOST_FOREACH(auto& v, e.pairs)
@@ -149,7 +150,7 @@ ExprCompiler::operator()(const Tree::BuildTupleExpr& e)
     HD* rhs = boost::apply_visitor(*this, at_c<1>(v));
     elements.push_back(std::make_pair(lhs, rhs));
   }
-  return new Hyperdatons::BuildTupleHD(m_i, elements);
+  return new Hyperdatons::TupleHD(m_i, elements);
 }
 
 HD*

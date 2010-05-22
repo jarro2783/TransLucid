@@ -73,10 +73,10 @@ namespace TransLucid
     }
   };
 
-  inline TypedValue
+  inline Constant
   generate_string(const u32string& name)
   {
-    return TypedValue(String(name), TYPE_INDEX_USTRING);
+    return Constant(String(name), TYPE_INDEX_USTRING);
   }
 
   inline mpz_class
@@ -84,9 +84,9 @@ namespace TransLucid
   {
     tuple_t k;
     k[DIM_ID] = generate_string(U"TYPE_INDEX");
-    //TypedValue(String("TYPE_INDEX"), TYPE_INDEX_USTRING);
+    //Constant(String("TYPE_INDEX"), TYPE_INDEX_USTRING);
     k[DIM_TYPE] = generate_string(name);
-    //TypedValue(String(name), TYPE_INDEX_USTRING);
+    //Constant(String(name), TYPE_INDEX_USTRING);
     return (*h)(Tuple(k)).first.value<Intmp>().value();
   }
 
@@ -94,7 +94,7 @@ namespace TransLucid
   get_unique(HD* h)
   {
     tuple_t k;
-    k[DIM_ID] = TypedValue(String(U"_unique"), TYPE_INDEX_USTRING);
+    k[DIM_ID] = Constant(String(U"_unique"), TYPE_INDEX_USTRING);
     return (*h)(Tuple(k)).first.value<Intmp>().value();
   }
 
@@ -108,7 +108,7 @@ namespace TransLucid
   }
 
   inline size_t
-  get_dimension_index(HD* h, const TypedValue& v)
+  get_dimension_index(HD* h, const Constant& v)
   {
     tuple_t k;
     k[DIM_ID] = generate_string(U"DIMENSION_VALUE_INDEX");
@@ -116,7 +116,7 @@ namespace TransLucid
     return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
   }
 
-  inline TypedValue
+  inline Constant
   get_dimension(const Tuple& k, size_t index)
   {
     Tuple::const_iterator i = k.find(index);
@@ -135,7 +135,7 @@ namespace TransLucid
     : m_f(f)
     {}
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k)
     {
       return m_f(k);
@@ -163,10 +163,10 @@ namespace TransLucid
   tupleRefines(const Tuple& a, const Tuple& b);
 
   bool
-  valueRefines(const TypedValue& a, const TypedValue& b);
+  valueRefines(const Constant& a, const Constant& b);
 
   bool
-  booleanTrue(const EquationGuard& g, const Tuple& c);
+  booleanTrue(const GuardHD& g, const Tuple& c);
 
   inline tuple_t
   create_add_eqn_context
@@ -181,7 +181,7 @@ namespace TransLucid
       {DIM_ID, generate_string(name)},
       {
         DIM_VALID_GUARD,
-        TypedValue(EquationGuardType(EquationGuard(guard, boolean)),
+        Constant(Guard(GuardHD(guard, boolean)),
                    TYPE_INDEX_GUARD)
       },
     };

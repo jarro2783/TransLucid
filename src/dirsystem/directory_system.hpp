@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef DIRECTORY_SYSTEM_HPP_INCLUDED
 #define DIRECTORY_SYSTEM_HPP_INCLUDED
 
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/expr_compiler.hpp>
@@ -73,7 +73,7 @@ namespace TransLucid
 
       Libtool m_lt;
 
-      TransLucid::Interpreter m_interpreter;
+      TransLucid::SystemHD m_system;
 
       Parser::HeaderGrammar<Parser::iterator_t> m_header_parser;
       Parser::ExprGrammar<Parser::iterator_t> m_expr_parser;
@@ -95,24 +95,24 @@ namespace TransLucid
       size_t dimTime = DIM_TIME;
       //size_t dim_id = dimTranslator().lookup("id");
       size_t dim_id = DIM_ID;
-      //TypedValue demandString
+      //Constant demandString
       //            (String("demand"), typeRegistry().indexString());
-      TypedValue demandString = generate_string(U"demand");
+      Constant demandString = generate_string(U"demand");
 
       //evaluate from time 1 to end
       for (size_t time = 1; time <= m_maxClock; ++time)
       {
         //just do one thread
         tuple_t tuple = map_list_of
-          (dimTime, TypedValue(Intmp(time), TYPE_INDEX_INTMP))
+          (dimTime, Constant(Intmp(time), TYPE_INDEX_INTMP))
           (dim_id, demandString);
         Tuple c(tuple);
 
         //Equation e = findEquation("demand", c);
-        //Variable* v = lookupVariable("demand");
-        *out = m_interpreter(c);
+        //VariableHD* v = lookupVariable("demand");
+        *out = m_system(c);
         #if 0
-        Variable* v = 0;
+        VariableHD* v = 0;
 
         if (v)
         {
@@ -121,7 +121,7 @@ namespace TransLucid
         }
         else
         {
-          *out = TaggedValue(TypedValue(Special(Special::UNDEF),
+          *out = TaggedConstant(Constant(Special(Special::UNDEF),
                               typeRegistry().indexSpecial()), c);
         }
         #endif

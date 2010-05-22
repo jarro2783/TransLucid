@@ -24,11 +24,11 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class ValuePrinter : public HD
+  class ValuePrinterHD : public HD
   {
     public:
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k);
   };
 }

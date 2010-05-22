@@ -18,11 +18,12 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/equation.hpp>
-#include <tl/interpreter.hpp>
-#include <tl/consthd.hpp>
+#include <tl/system.hpp>
+#include <tl/valuehd.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/consthd.hpp>
 namespace TL = TransLucid;
 
 using namespace TL;
@@ -30,27 +31,27 @@ using namespace TL;
 int
 main(int argc, char *argv[])
 {
-  TL::Interpreter i;
+  TL::SystemHD i;
   HD& h = i;
 
-  TL::Variable x(U"x", &i);
-  TL::Hyperdatons::IntmpConst i1(5);
+  TL::VariableHD x(U"x", &i);
+  TL::Hyperdatons::IntmpConstHD i1(5);
   TL::Tuple k;
   x.addExpr(k, &i1);
 
   //x = 5;;
-  TL::TaggedValue r = x(k);
+  TL::TaggedConstant r = x(k);
   std::cout << r.first.value<TL::Intmp>().value() << std::endl;
 
   //set up the equation guard
   TL::tuple_t guard;
-  TL::Hyperdatons::IntmpConst i2(10);
-  guard[DIM_VALUE] = TypedValue(TL::Intmp(10), TL::TYPE_INDEX_INTMP);
+  TL::Hyperdatons::IntmpConstHD i2(10);
+  guard[DIM_VALUE] = Constant(TL::Intmp(10), TL::TYPE_INDEX_INTMP);
 
   //set up the context for addExpr
   tuple_t k2;
   k2[get_dimension_index(&h, U"_validguard")] =
-     TypedValue(EquationGuardType(EquationGuard(Tuple(guard))),
+     Constant(Guard(GuardHD(Tuple(guard))),
                 TYPE_INDEX_GUARD);
 
   //x @ [value : 10] = 10;;

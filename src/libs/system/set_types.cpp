@@ -1,4 +1,4 @@
-/* Prints typed values.
+/* Set values.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,22 +17,26 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/printer.hpp>
-#include <tl/fixed_indexes.hpp>
+#include <tl/set_types.hpp>
 
 namespace TransLucid
 {
 
-TaggedValue
-ValuePrinter::operator()(const Tuple& k)
+TypeAsSet::TypeAsSet(size_t index)
+: m_index(index)
 {
-  u32string s = U"<";
+}
 
-  Tuple::const_iterator iter = k.find(DIM_VALUE);
+bool
+TypeAsSet::is_member(const Constant& v)
+{
+  return v.index() == m_index;
+}
 
-  if (iter == k.end())
-  {
-  }
+//is s a subset of this
+bool
+TypeAsSet::is_subset(const SetBase& s)
+{
 }
 
 }

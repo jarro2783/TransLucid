@@ -20,7 +20,7 @@ bin_PROGRAMS = tl-interactive
 tl_interactive_CPPFLAGS = -I$(top_srcdir)/src/include \
 $(BOOST_CPPFLAGS)
 tl_interactive_LDFLAGS = \
-$(top_builddir)/src/libs/interpreter/libtlinterpreter.la \
+$(top_builddir)/src/libs/system/libtlsystem.la \
 $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
 
 tl_interactive_CXXFLAGS = -O2 -Wall

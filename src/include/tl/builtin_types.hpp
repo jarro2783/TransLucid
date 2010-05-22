@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class Special : public TypedValueBase
+  class Special : public TypedValue
   {
     public:
     enum Value
@@ -48,6 +48,16 @@ namespace TransLucid
     Special(Value v)
     : m_v(v)
     {}
+
+    Special(const Special& rhs)
+    : m_v(rhs.m_v)
+    {
+    }
+
+    Special* clone() const
+    {
+      return new Special(*this);
+    }
 
     const Value
     value() const
@@ -110,12 +120,22 @@ namespace TransLucid
     }
   };
 
-  class String : public TypedValueBase
+  class String : public TypedValue
   {
     public:
     String(const u32string& s)
     : m_s(s)
     {
+    }
+
+    String(const String& rhs)
+    : m_s(rhs.m_s)
+    {
+    }
+
+    String* clone() const
+    {
+      return new String(*this);
     }
 
     size_t
@@ -156,13 +176,23 @@ namespace TransLucid
     u32string m_s;
   };
 
-  class Boolean : public TypedValueBase
+  class Boolean : public TypedValue
   {
     public:
 
     Boolean(bool v)
     : m_value(v)
     {
+    }
+
+    Boolean(const Boolean& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Boolean* clone() const
+    {
+      return new Boolean(*this);
     }
 
     operator bool() const
@@ -193,12 +223,22 @@ namespace TransLucid
     bool m_value;
   };
 
-  class Intmp : public TypedValueBase
+  class Intmp : public TypedValue
   {
     public:
     Intmp(const mpz_class& value)
     : m_value(value)
     {
+    }
+
+    Intmp(const Intmp& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Intmp* clone() const
+    {
+      return new Intmp(*this);
     }
 
     size_t
@@ -236,12 +276,22 @@ namespace TransLucid
     mpz_class m_value;
   };
 
-  class Dimension : public TypedValueBase
+  class Dimension : public TypedValue
   {
     public:
     Dimension(size_t value)
     : m_value(value)
     {}
+
+    Dimension(const Dimension& rhs)
+    : m_value(rhs.m_value)
+    {
+    }
+
+    Dimension* clone() const
+    {
+      return new Dimension(*this);
+    }
 
     size_t
     value() const
@@ -277,12 +327,17 @@ namespace TransLucid
     size_t m_value;
   };
 
-  typedef std::set<TypedValue> set_t;
+  typedef std::set<Constant> set_t;
 
-  class Set : public TypedValueBase
+  class Set : public TypedValue
   {
     public:
     Set();
+
+    Set* clone() const
+    {
+      return 0;
+    }
 
     bool
     operator==(const Set& rhs) const;
@@ -297,9 +352,14 @@ namespace TransLucid
     value() const;
   };
 
-  class ValueCalc : public TypedValueBase
+  class ValueCalc : public TypedValue
   {
     public:
+    ValueCalc* clone() const
+    {
+      return 0;
+    }
+
     size_t
     hash() const
     {
@@ -319,12 +379,22 @@ namespace TransLucid
     }
   };
 
-  class Char : public TypedValueBase
+  class Char : public TypedValue
   {
     public:
     Char(char32_t c)
     : m_c(c)
     {
+    }
+
+    Char(const Char& rhs)
+    : m_c(rhs.m_c)
+    {
+    }
+
+    Char* clone() const
+    {
+      return new Char(*this);
     }
 
     char32_t
@@ -358,27 +428,38 @@ namespace TransLucid
     char32_t m_c;
   };
 
-  class EquationGuardType : public TypedValueBase
+  class Guard : public TypedValue
   {
     public:
-    EquationGuardType(const EquationGuard& g)
+    Guard(const GuardHD& g)
     : m_g(g)
     {}
 
-    const EquationGuard&
+    Guard(const Guard& rhs)
+    : m_g(rhs.m_g)
+    {
+    }
+
+    Guard* 
+    clone() const
+    {
+      return new Guard(*this);
+    }
+
+    const GuardHD&
     value() const
     {
       return m_g;
     }
 
     bool
-    operator==(const EquationGuardType& rhs) const
+    operator==(const Guard& rhs) const
     {
       return true;
     }
 
     bool
-    operator<(const EquationGuardType& rhs) const
+    operator<(const Guard& rhs) const
     {
       return false;
     }
@@ -396,24 +477,37 @@ namespace TransLucid
     }
 
     private:
-    EquationGuard m_g;
+    GuardHD m_g;
   };
 
-  class PairType : public TypedValueBase
+  class Pair : public TypedValue
   {
     public:
-    PairType(const TypedValue& first, const TypedValue& second)
-    : m_first(first), m_second(second)
+    Pair(const Constant& first, const Constant& second)
+    : m_first(first)
+    ,m_second(second)
     {
     }
 
-    const TypedValue&
+    Pair(const Pair& rhs)
+    : m_first(rhs.m_first)
+    ,m_second(rhs.m_second)
+    {
+    }
+
+    Pair* 
+    clone() const
+    {
+      return new Pair(*this);
+    }
+
+    const Constant&
     first() const
     {
       return m_first;
     }
 
-    const TypedValue&
+    const Constant&
     second() const
     {
       return m_second;
@@ -426,13 +520,13 @@ namespace TransLucid
     }
 
     bool
-    operator==(const PairType&) const
+    operator==(const Pair&) const
     {
       return true;
     }
 
     bool
-    operator<(const PairType&) const
+    operator<(const Pair&) const
     {
       return false;
     }
@@ -443,8 +537,8 @@ namespace TransLucid
     }
 
     private:
-    TypedValue m_first;
-    TypedValue m_second;
+    Constant m_first;
+    Constant m_second;
   };
 
   class SetBase
@@ -452,7 +546,7 @@ namespace TransLucid
     public:
     //is v a member of this
     virtual bool
-    is_member(const TypedValue& v) = 0;
+    is_member(const Constant& v) = 0;
 
     //is s a subset of this
     virtual bool
@@ -462,13 +556,24 @@ namespace TransLucid
   //the general set type
   //all the actual sets will put a derived class in here and then
   //have an is member function.
-  class SetType : public TypedValueBase
+  class SetType : public TypedValue
   {
     public:
 
     SetType(SetBase* v)
     : m_value(v)
     {}
+
+    SetType(const SetType& rhs)
+    {
+      //TODO this is being worked on
+    }
+
+    SetType* clone() const
+    {
+      //return new SetType(*this);
+      return 0;
+    }
 
     bool
     operator==(const SetType& rhs) const
@@ -492,22 +597,32 @@ namespace TransLucid
     SetBase* m_value;
   };
 
-  class TypeType : public TypedValueBase
+  class Type : public TypedValue
   {
     public:
 
-    TypeType(size_t index)
+    Type(size_t index)
     : m_index(index)
     {}
 
+    Type(const Type& rhs)
+    : m_index(rhs.m_index)
+    {
+    }
+    
+    Type* clone() const
+    {
+      return new Type(*this);
+    }
+
     bool
-    operator==(const TypeType& rhs) const
+    operator==(const Type& rhs) const
     {
       return m_index == rhs.m_index;
     }
 
     bool
-    operator<(const TypeType& rhs) const
+    operator<(const Type& rhs) const
     {
       return m_index < rhs.m_index;
     }

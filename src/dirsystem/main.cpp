@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #if 0
 
 #include <tl/expr_parser.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
 #include <iostream>
 #include <ltdl.h>
 #include <boost/program_options.hpp>
@@ -91,7 +91,7 @@ main(int argc, char** argv)
 
   if (vm.count("verbose"))
   {
-    //interpreter.verbose();
+    //system.verbose();
     std::clog << "running in source directory: " <<
     Glib::get_current_dir() + "/" + input << std::endl;
   }
@@ -106,16 +106,16 @@ main(int argc, char** argv)
     }
   }
 
-  typedef std::pair<TL::TypedValue, TL::Tuple> ValueContextPair;
+  typedef std::pair<TL::Constant, TL::Tuple> TaggedConstant;
 
-  std::vector<ValueContextPair> evaluated;
+  std::vector<TaggedConstant> evaluated;
 
   bool evaluate = true;
   try
   {
     if (!system.parseSystem(input))
     {
-      //std::cerr << interpreter.errorCount() << " errors parsing input: "
+      //std::cerr << system.errorCount() << " errors parsing input: "
       //"demands not evaluated" << std::endl;
       evaluate = false;
     }
@@ -129,11 +129,11 @@ main(int argc, char** argv)
   {
     system.evaluateSystem(std::back_inserter(evaluated));
 
-    //TL::TypeRegistry& registry = interpreter.typeRegistry();
+    //TL::TypeRegistry& registry = system.typeRegistry();
     #if 0
-    BOOST_FOREACH(ValueContextPair& p, evaluated)
+    BOOST_FOREACH(TaggedConstant& p, evaluated)
     {
-      const TL::TypedValue& v = p.first;
+      const TL::Constant& v = p.first;
       std::cout << "type index: " << v.index() << std::endl;
       switch (v.index())
       {
@@ -173,7 +173,7 @@ main(int argc, char** argv)
       TL::tuple_t k;
       k[TL::DIM_ID] = TL::generate_string("PRINT");
       k[TL::DIM_VALUE] = p.first;
-      TL::TypedValue s = system(TL::Tuple(k)).first;
+      TL::Constant s = system(TL::Tuple(k)).first;
       if (s.index() != TL::TYPE_INDEX_USTRING)
       {
         //std::cout << "oops";

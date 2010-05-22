@@ -56,7 +56,7 @@ tupleApplicable(const Tuple& def, const Tuple& c)
 
 //does value a refine value b
 bool
-valueRefines(const TypedValue& a, const TypedValue& b)
+valueRefines(const Constant& a, const Constant& b)
 {
   //if b is a range, a has to be a range and within or equal,
   //or an int and inside, otherwise they have to be equal
@@ -87,9 +87,9 @@ valueRefines(const TypedValue& a, const TypedValue& b)
   }
   else if (b.index() == TYPE_INDEX_TYPE)
   {
-    //std::cerr << "type type index == " << b.value<TypeType>().index()
+    //std::cerr << "type type index == " << b.value<Type>().index()
     //<< std::endl;
-    if (a.index() == b.value<TypeType>().index())
+    if (a.index() == b.value<Type>().index())
     {
       return true;
     }
@@ -149,13 +149,13 @@ tupleRefines(const Tuple& a, const Tuple& b)
 }
 
 bool
-booleanTrue(const EquationGuard& g, const Tuple& k)
+booleanTrue(const GuardHD& g, const Tuple& k)
 {
   HD* b = g.boolean();
 
   if (b)
   {
-    TaggedValue v = (*b)(k);// = i.evaluate(g.boolean(), c);
+    TaggedConstant v = (*b)(k);// = i.evaluate(g.boolean(), c);
 
     return v.first.index() == TYPE_INDEX_BOOL
     && v.first.value<Boolean>();

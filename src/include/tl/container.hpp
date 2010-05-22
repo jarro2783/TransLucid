@@ -27,14 +27,14 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class GeneralContainer : public HD
+  class ContainerHD : public HD
   {
     public:
 
     uuid
     addExpr(const Tuple& k, HD* e);
 
-    TaggedValue
+    TaggedConstant
     operator()(const Tuple& k);
 
     private:

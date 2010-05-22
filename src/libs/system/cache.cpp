@@ -20,12 +20,14 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/cache.hpp>
 #include <tl/types.hpp>
 #include <tl/builtin_types.hpp>
-#include <tl/interpreter.hpp>
+#include <tl/system.hpp>
+
+// TODO: This file is under construction.  It is not junk.
 
 namespace TransLucid
 {
 
-std::pair<bool, TypedValue>
+std::pair<bool, Constant>
 LazyWarehouse::lookupCalc(const u32string& name, const Tuple& c)
 {
   #if 0
@@ -35,7 +37,7 @@ LazyWarehouse::lookupCalc(const u32string& name, const Tuple& c)
     //add calc because it wasn't found
     TupleToValue m;
     m.insert(std::make_pair
-      (c, TypedValue(ValueCalc(), m_interpreter.typeRegistry().indexCalc())));
+      (c, Constant(ValueCalc(), m_system.typeRegistry().indexCalc())));
     m_cache.insert(std::make_pair(name, m));
   }
   else
@@ -47,8 +49,8 @@ LazyWarehouse::lookupCalc(const u32string& name, const Tuple& c)
       //add calc because it wasn't found
       iter->second.insert
         (std::make_pair
-          (c, TypedValue(ValueCalc(),
-                         m_interpreter.typeRegistry().indexCalc())));
+          (c, Constant(ValueCalc(),
+                         m_system.typeRegistry().indexCalc())));
     }
     else
     {
@@ -57,12 +59,12 @@ LazyWarehouse::lookupCalc(const u32string& name, const Tuple& c)
     }
   }
   #endif
-  return std::make_pair(false, TypedValue());
+  return std::make_pair(false, Constant());
 }
 
 void
 LazyWarehouse::add
-(const u32string& name, const TypedValue& value, const Tuple& c)
+(const u32string& name, const Constant& value, const Tuple& c)
 {
   #if 0
   CacheMapping::iterator iter = m_cache.find(name);
