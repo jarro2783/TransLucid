@@ -286,16 +286,16 @@ VariableHD::addExprInternal(const Tuple& k, HD* e)
 std::pair<uuid, VariableHD::Equations::iterator>
 VariableHD::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
 {
-  //std::cerr << "addToVariableActual: " <<
-  //   id << std::endl;
   //find the variable
   VariableMap::const_iterator iter = m_variables.find(id);
   if (iter == m_variables.end())
   {
-    //std::cerr << "constructing new variable" << std::endl;
-    iter = m_variables.insert(std::make_pair
-                              (id, new VariableHD(id, m_system))).first;
+    iter = m_variables.insert
+    (
+      std::make_pair(id, new VariableHD(id, m_system))
+    ).first;
   }
+  //add it
   return iter->second->addExprInternal(k, h);
 }
 

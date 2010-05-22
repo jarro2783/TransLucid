@@ -37,7 +37,7 @@ Range::Range(const Range& other)
 : m_lower(other.m_lower != 0 ? new mpz_class(*other.m_lower) : 0),
 m_upper(other.m_upper != 0 ? new mpz_class(*other.m_upper) : 0)
 {
-  mpz_class* lower = nullptr;
+  mpz_class* lower = 0;
   mpz_class* upper = 0;
   try
   {

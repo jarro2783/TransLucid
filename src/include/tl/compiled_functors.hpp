@@ -43,8 +43,7 @@ namespace TransLucid
     {
       public:
 
-      TypedValueHD(HD* system,
-               const std::u32string& type, const std::u32string& text)
+      TypedValueHD(HD* system, const u32string& type, const u32string& text)
       : m_system(system), m_type(type), m_text(text)
       {}
 
