@@ -8,3 +8,4 @@ make tuple dim_index -> constant and change everywhere that uses it
 check for redefinition of symbols in parser
 guarantee that the parser takes the longest match for operators
 subdimensions
+make specials be called sp

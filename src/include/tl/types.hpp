@@ -137,9 +137,8 @@ namespace TransLucid
      * The type is referenced by @a index which must be a valid index
      * in TransLucid::TypeRegistry. T must inherit from TypedValue.
      **/
-    template <typename T>
-    Constant(const T& value, type_index index)
-    : m_value(new T(value)),
+    Constant(const TypedValue& value, type_index index)
+    : m_value(value.clone()),
     m_index(index)
     {
     }

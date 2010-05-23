@@ -90,8 +90,9 @@ namespace TransLucid
           (L"sptype", Special::TYPEERROR)
           (L"spdim", Special::DIMENSION)
           (L"spundef", Special::UNDEF)
-          (L"const", Special::CONST)
-          (L"loop", Special::LOOP)
+          (L"spconst", Special::CONST)
+          (L"sploop", Special::LOOP)
+          (L"spmultidef", Special::MULTIDEF)
         ;
 
         expr %= if_expr
