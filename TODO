@@ -1,6 +1,9 @@
 check that 2 - -a works - make it work if it doesn't
+-2- - -2-
 footer for output
 add error checking for all parsing
+aether and all in tuples
+optional parens in pretty printer
 make tuple dim_index -> constant and change everywhere that uses it
 check for redefinition of symbols in parser
 guarantee that the parser takes the longest match for operators

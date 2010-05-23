@@ -34,18 +34,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #define STRING(x) #x
 #define STRING_(x) STRING(x)
-//#include <tl/exception.hpp>
-
-// ----------------------------------
-// WARNING !!!
-// Caveat with using boost flyweight
-// all Constants must be destructed
-// before unloading libraries with
-// lt_exit
-// as long as all typed values are destructed
-// before the system class is then this
-// will work fine
-// ----------------------------------
 
 inline size_t
 hash_value(const mpz_class& v)
