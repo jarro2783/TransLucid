@@ -195,8 +195,14 @@ namespace TransLucid
         | ident [_a = _1]
           >> ( angle_string
                [
-                 _val = construct<Tree::ConstantExpr>(make_u32string(_a),
-                                                      make_u32string(_1))
+                 //_val = construct<Tree::ConstantExpr>(make_u32string(_a),
+                 //                                     make_u32string(_1))
+                 _val = ph::bind
+                 (
+                   &construct_typed_constant, 
+                   make_u32string(_a), 
+                   make_u32string(_1)
+                 )
                ]
              | qi::eps
                [
