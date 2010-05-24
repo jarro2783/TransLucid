@@ -9,3 +9,5 @@ check for redefinition of symbols in parser
 guarantee that the parser takes the longest match for operators
 subdimensions
 make specials be called sp
+fix special symbols and make them come from the same definition in both the 
+parser and the special type
