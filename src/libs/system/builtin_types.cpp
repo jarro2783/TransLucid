@@ -27,7 +27,7 @@ using boost::assign::map_list_of;
 namespace TransLucid
 {
 
-Special::StringValueInitialiser Special::m_sv;
+const Special::StringValueInitialiser Special::m_sv;
 
 Special::StringValueInitialiser::StringValueInitialiser()
 : vtos
@@ -57,7 +57,7 @@ String::print(std::ostream& os) const
 void
 Special::print(std::ostream& os) const
 {
-  os << "special<" << utf32_to_utf8(m_sv.vtos[m_v]) << ">";
+  os << "special<" << utf32_to_utf8(m_sv.vtos.find(m_v)->second) << ">";
 }
 
 void Char::print(std::ostream& os) const

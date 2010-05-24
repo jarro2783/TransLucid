@@ -94,6 +94,17 @@ namespace TransLucid
           (L"sploop", Special::LOOP)
           (L"spmultidef", Special::MULTIDEF)
         ;
+        for 
+        (
+          auto iter = Special::m_sv.stov.begin(); 
+          iter != Special::m_sv.stov.end();
+          ++iter
+        )
+        {
+          specials.add(
+            Parser::string_type(iter->first.begin(), iter->first.end()), 
+            iter->second);
+        }
 
         expr %= if_expr
         ;

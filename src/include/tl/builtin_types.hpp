@@ -89,6 +89,8 @@ namespace TransLucid
     private:
     Value m_v;
 
+    public:
+
     struct StringValueInitialiser
     {
       typedef boost::unordered_map<u32string, Value> StringValueMap;
@@ -100,9 +102,7 @@ namespace TransLucid
       StringValueInitialiser();
     };
 
-    static StringValueInitialiser m_sv;
-
-    public:
+    static const StringValueInitialiser m_sv;
 
     static Value
     stringToValue(const u32string& s)
