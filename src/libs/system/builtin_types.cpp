@@ -38,7 +38,8 @@ Special::StringValueInitialiser::StringValueInitialiser()
   {Special::DIMENSION, U"dim"},
   {Special::UNDEF, U"undef"},
   {Special::CONST, U"const"},
-  {Special::LOOP, U"loop"}
+  {Special::LOOP, U"loop"},
+  {Special::MULTIDEF, U"multidef"}
 }
 {
   BOOST_FOREACH(ValueStringMap::value_type const& v, vtos)
