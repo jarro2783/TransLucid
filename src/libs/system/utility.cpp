@@ -111,8 +111,8 @@ valueRefines(const Constant& a, const Constant& b)
 bool
 tupleRefines(const Tuple& a, const Tuple& b)
 {
-  //for a to refine b, everything in b must be in a, and for the values that are,
-  //they have to be either equal, or their ranges must be more specific
+  //for a to refine b, everything in b must be in a, and for the values that 
+  //are, they have to be either equal, or their ranges must be more specific
   Tuple::const_iterator it1 = a.begin();
   Tuple::const_iterator it2 = b.begin();
   while (it1 != a.end() && it2 != b.end())
