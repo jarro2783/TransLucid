@@ -81,7 +81,7 @@ namespace TransLucid
              ph::bind(&addBinary, _r1, _1, _2, _3, _4)
            ]
          | (
-           //delimiters open close type
+           //delimiters type open close
                qi::lit("delimiters")
             >  expr
             >  expr
@@ -219,15 +219,15 @@ namespace TransLucid
         try
         {
           const u32string& ctype =
-            boost::get<u32string&>(type);
+            boost::get<u32string>(type);
           const char32_t& copen =
-            boost::get<const char32_t&>(open);
+            boost::get<const char32_t>(open);
           const char32_t& cclose =
-            boost::get<const char32_t&>(close);
+            boost::get<const char32_t>(close);
 
           addDelimiterSymbol(header, ctype, copen, cclose);
         }
-        catch (const boost::bad_get&)
+        catch (const boost::bad_get& e)
         {
           std::cerr << "HeaderGrammar::addDelimeter: bad_get" << std::endl;
         }

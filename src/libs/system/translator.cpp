@@ -251,7 +251,7 @@ Translator::parse_header(const u32string& s)
     *m_skipper,
     *m_header);
 
-  return (r == false || pos != ws.cend());
+  return (r && pos == ws.cend());
 }
 
 }

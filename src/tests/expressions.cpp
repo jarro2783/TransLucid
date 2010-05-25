@@ -59,10 +59,12 @@ struct translator_class {
     (
       header, TL::Tree::UNARY_PREFIX, L"-", L"operator-"
     );
+    #if 0
     TL::Parser::addUnaryOpSymbol
     (
       header, TL::Tree::UNARY_POSTFIX, L"-", L"operator-"
     );
+    #endif
     translator.loadLibrary(U"int");
   }
 };
@@ -250,18 +252,18 @@ BOOST_AUTO_TEST_CASE ( header )
   TL::Translator t2;
   BOOST_REQUIRE(t2.parse_header
   (
-    U"delimiters uchar<\"> uchar<\"> ustring<ustring>;;"
+    U"delimiters ustring<ustring> uchar<\"> uchar<\">;;"
     U"prefix ustring<-> ustring<operator->;;"
     U"infixl ustring<%> ustring<operator%> 20;;"
   ) 
-  != 0);
+  != false);
 
   TL::HD *h = t2.translate_expr(L"4 % 5");
 
   BOOST_REQUIRE(h != 0);
 
   BOOST_REQUIRE_THROW(
-    t2.parse_header(U"delimiter uchar<\"> uchar<\"> ustring<ustring>;;"),
+    t2.parse_header(U"delimiters ustring<ustring> uchar<\"> uchar<\">;;"),
     TL::ParseError);
 }
 
