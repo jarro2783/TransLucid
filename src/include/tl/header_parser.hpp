@@ -135,7 +135,7 @@ namespace TransLucid
         try
         {
           const u32string& sname =
-            boost::get<const u32string&>(name);
+            boost::get<const u32string>(name);
 
           addDimensionSymbol(h, sname);
         } 
@@ -157,11 +157,11 @@ namespace TransLucid
         try
         {
           const u32string& ssymbol =
-            boost::get<const u32string&>(symbol);
+            boost::get<const u32string>(symbol);
           const u32string& sop =
-            boost::get<const u32string&>(op);
+            boost::get<const u32string>(op);
           const mpz_class& iprecedence =
-            boost::get<const mpz_class&>(precedence);
+            boost::get<const mpz_class>(precedence);
 
           addBinaryOpSymbol
           (
@@ -190,9 +190,9 @@ namespace TransLucid
         try
         {
           const u32string& csymbol =
-            boost::get<const u32string&>(symbol);
+            boost::get<const u32string>(symbol);
           const u32string& coperator =
-            boost::get<const u32string&>(op);
+            boost::get<const u32string>(op);
 
           addUnaryOpSymbol
           (
