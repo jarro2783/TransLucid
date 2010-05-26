@@ -10,3 +10,5 @@ add_definitions(${TLCFLAGS})
 add_executable(echo echo.cpp)
 
 add_executable(typewriter typewriter.cpp)
+
+add_executable(fact1 fact1.cpp)

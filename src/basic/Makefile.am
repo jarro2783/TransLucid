@@ -15,13 +15,15 @@
 #   You should have received a copy of the GNU General Public License
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
-noinst_PROGRAMS = single echo typewriter
+noinst_PROGRAMS = single echo typewriter fact1
 
 single_SOURCES = single.cpp
 
 echo_SOURCES = echo.cpp
 
 typewriter_SOURCES = typewriter.cpp
+
+fact1_SOURCES = fact1.cpp
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
