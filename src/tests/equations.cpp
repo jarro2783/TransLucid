@@ -170,17 +170,17 @@ BOOST_AUTO_TEST_CASE ( functions )
     U"fib | [1 : 1] = 1;;"
   );
 
-  h = translator.translate_expr(L"fib @ [1 : 0]");
+  h = translator.translate_expr(U"fib @ [1 : 0]");
   v = (*h)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 0);
 
-  h = translator.translate_expr(L"fib @ [1 : 1]");
+  h = translator.translate_expr(U"fib @ [1 : 1]");
   v = (*h)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
 
-  h = translator.translate_expr(L"fib @ [1 : 2]");
+  h = translator.translate_expr(U"fib @ [1 : 2]");
   v = (*h)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);

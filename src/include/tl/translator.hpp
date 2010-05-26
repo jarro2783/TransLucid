@@ -55,7 +55,7 @@ namespace TransLucid
     Translator();
 
     HD*
-    translate_expr(const Parser::string_type& s);
+    translate_expr(const u32string& s);
 
     void
     translate_and_add_equation_set(const u32string& s);

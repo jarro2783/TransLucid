@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE ( integer )
 
 BOOST_AUTO_TEST_CASE ( tuple )
 {
-  Parser::string_type input = L"[1:1]";
+  u32string input = U"[1:1]";
   translator.translate_expr(input);
 
   generated.clear();
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE ( tuple )
 
 BOOST_AUTO_TEST_CASE ( hash_expr )
 {
-  Parser::string_type input(L"#1");
+  u32string input(U"#1");
   translator.translate_expr(input);
 
   generated.clear();
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE ( hash_expr )
 
 BOOST_AUTO_TEST_CASE ( at )
 {
-  Parser::string_type input(L"#1 @ [1:2]");
+  u32string input(U"#1 @ [1:2]");
   translator.translate_expr(input);
 
   generated.clear();

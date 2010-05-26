@@ -27,14 +27,14 @@ namespace TL = TransLucid;
 int main(int argc, char *argv[])
 {
   TL::Translator translator;
-  TL::HD* h = translator.translate_expr(L"42");
+  TL::HD* h = translator.translate_expr(U"42");
 
   TL::TaggedConstant v = (*h)(TL::Tuple());
   std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;
 
   delete h;
 
-  h = translator.translate_expr(L"«hello é world»");
+  h = translator.translate_expr(U"«hello é world»");
 
   v = (*h)(TL::Tuple());
   std::u32string s = v.first.value<TL::String>().value();
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
   std::cout << TL::utf32_to_utf8(s) << std::endl;
   delete h;
 
-  h = translator.translate_expr(L"\'è\'");
+  h = translator.translate_expr(U"\'è\'");
   v = (*h)(TL::Tuple());
   //std::cout << "char value = " << v.first.value<TL::Char>().value() << std::endl;
   s.clear();
@@ -50,11 +50,11 @@ int main(int argc, char *argv[])
   std::cout << TL::utf32_to_utf8(s) << std::endl;
 
   delete h;
-  h = translator.translate_expr(L"spdim");
+  h = translator.translate_expr(U"spdim");
   v = (*h)(TL::Tuple());
   std::cout << v.first.value<TL::Special>().value() << std::endl;
 
-  h = translator.translate_expr(L"0X10");
+  h = translator.translate_expr(U"0X10");
   v = (*h)(TL::Tuple());
   std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;
   return 0;

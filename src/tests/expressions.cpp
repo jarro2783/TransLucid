@@ -84,8 +84,7 @@ test_base(size_t base, uint32_t number, TL::Translator& t)
     value += num.get_str(base);
   }
 
-  TL::HD* h = t.translate_expr(TL::Parser::string_type(value.begin(),
-                                                       value.end()));
+  TL::HD* h = t.translate_expr(TL::u32string(value.begin(), value.end()));
   TL::TaggedConstant v = (*h)(TL::Tuple());
 
   uint32_t result = v.first.value<TL::Intmp>().value().get_ui();
@@ -97,7 +96,9 @@ test_base(size_t base, uint32_t number, TL::Translator& t)
 void
 test_integer(int n, TL::Translator& translator)
 {
-  TL::HD* h = translator.translate_expr(std::to_wstring(n));
+  std::string value = std::to_string(n);
+  TL::HD* h = 
+    translator.translate_expr(TL::u32string(value.begin(), value.end()));
   TL::TaggedConstant v = (*h)(TL::Tuple());
   //std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value().get_ui(), (unsigned)n);
@@ -131,7 +132,7 @@ BOOST_AUTO_TEST_CASE ( strings ) {
 
   TL::HD* h;
 
-  h = translator.translate_expr(L"«hello é world»");
+  h = translator.translate_expr(U"«hello é world»");
 
   TL::TaggedConstant v = (*h)(TL::Tuple());
   std::u32string s = v.first.value<TL::String>().value();
@@ -146,7 +147,7 @@ BOOST_AUTO_TEST_CASE ( chars ) {
 
   TL::HD* h;
 
-  h = translator.translate_expr(L"\'è\'");
+  h = translator.translate_expr(U"\'è\'");
   TL::TaggedConstant v = (*h)(TL::Tuple());
 
   std::string generated;
@@ -167,16 +168,16 @@ BOOST_AUTO_TEST_CASE ( specials ) {
 
   using TL::Special;
 
-  typedef std::list<std::pair<const wchar_t*, Special::Value>> SpecialList;
+  typedef std::list<std::pair<const char32_t*, Special::Value>> SpecialList;
   SpecialList specials =
   {
-    {L"sperror", Special::ERROR},
-    {L"spaccess", Special::ACCESS},
-    {L"sptype", Special::TYPEERROR},
-    {L"spdim", Special::DIMENSION},
-    {L"spundef", Special::UNDEF},
-    {L"const", Special::CONST},
-    {L"loop", Special::LOOP}
+    {U"sperror", Special::ERROR},
+    {U"spaccess", Special::ACCESS},
+    {U"sptype", Special::TYPEERROR},
+    {U"spdim", Special::DIMENSION},
+    {U"spundef", Special::UNDEF},
+    {U"const", Special::CONST},
+    {U"loop", Special::LOOP}
   };
 
   std::for_each(specials.begin(), specials.end(),
@@ -200,7 +201,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
 {
   TL::HD* h = 0;
 
-  h = translator.translate_expr(L"1");
+  h = translator.translate_expr(U"1");
   BOOST_CHECK_EQUAL
   (
     TL::get_dimension_index
@@ -215,16 +216,16 @@ BOOST_AUTO_TEST_CASE ( context_change )
     )
   );
 
-  TL::HD* context1 = translator.translate_expr(L"[1 : 5]");
+  TL::HD* context1 = translator.translate_expr(U"[1 : 5]");
   TL::TaggedConstant tuple1 = (*context1)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple1.first.index(), TL::TYPE_INDEX_TUPLE);
 
-  h = translator.translate_expr(L"#1");
+  h = translator.translate_expr(U"#1");
   TL::TaggedConstant v = (*h)(tuple1.first.value<TL::Tuple>());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 5);
 
-  TL::HD* context2 = translator.translate_expr(L"[1 : 42]");
+  TL::HD* context2 = translator.translate_expr(U"[1 : 42]");
   TL::TaggedConstant tuple2 = (*context2)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple2.first.index(), TL::TYPE_INDEX_TUPLE);
 
@@ -232,7 +233,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 42);
 
-  TL::HD* context3 = translator.translate_expr(L"[1 : 42, 2 : 16, 3 : 47]");
+  TL::HD* context3 = translator.translate_expr(U"[1 : 42, 2 : 16, 3 : 47]");
   TL::TaggedConstant tuple3 = (*context3)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple3.first.index(), TL::TYPE_INDEX_TUPLE);
 
@@ -240,7 +241,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 42);
 
-  h = translator.translate_expr(L"(#1-2) @ [1 : 5]");
+  h = translator.translate_expr(U"(#1-2) @ [1 : 5]");
   v = (*h)(TL::Tuple());
 
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
@@ -258,9 +259,17 @@ BOOST_AUTO_TEST_CASE ( header )
   ) 
   != false);
 
-  TL::HD *h = t2.translate_expr(L"4 % 5");
-
+  TL::HD *h = t2.translate_expr(U"4 % -5");
   BOOST_REQUIRE(h != 0);
+
+  #if 0
+  std::string generated;
+  print_iter outit(generated);
+  TL::Printer::karma::generate(outit, print_grammar,
+                               t2.lastExpression());
+
+  BOOST_CHECK_EQUAL("(4%(-5))", generated);
+  #endif
 
   BOOST_REQUIRE_THROW(
     t2.parse_header(U"delimiters ustring<ustring> uchar<\"> uchar<\">;;"),

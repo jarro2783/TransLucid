@@ -131,8 +131,9 @@ Translator::Translator()
 }
 
 HD*
-Translator::translate_expr(const Parser::string_type& s)
+Translator::translate_expr(const u32string& u32s)
 {
+  Parser::string_type s(u32s.begin(), u32s.end());
   Parser::iterator_t pos = s.begin();
   Tree::Expr e;
 
