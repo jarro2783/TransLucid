@@ -27,8 +27,8 @@ namespace TransLucid
 
 using boost::fusion::at_c;
 
-ExprCompiler::ExprCompiler(HD* i)
-: m_i(i)
+ExprCompiler::ExprCompiler(HD* system)
+: m_system(system)
 {
 }
 
@@ -81,26 +81,26 @@ ExprCompiler::operator()(const u32string& s)
 HD*
 ExprCompiler::operator()(const Tree::ConstantExpr& e)
 {
-  return new Hyperdatons::TypedValueHD(m_i, e.type, e.text);
+  return new Hyperdatons::TypedValueHD(m_system, e.type, e.text);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::DimensionExpr& e)
 {
-  return new Hyperdatons::DimensionHD(m_i, e.text);
+  return new Hyperdatons::DimensionHD(m_system, e.text);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::IdentExpr& e)
 {
-  return new Hyperdatons::IdentHD(m_i, e.text);
+  return new Hyperdatons::IdentHD(m_system, e.text);
 }
 
 HD*
 ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {
   HD* operand = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::UnaryOpHD(m_i, e.op, operand);
+  return new Hyperdatons::UnaryOpHD(m_system, e.op, operand);
 }
 
 HD*
@@ -109,7 +109,7 @@ ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
   HD* lhs = boost::apply_visitor(*this, e.lhs);
   HD* rhs = boost::apply_visitor(*this, e.rhs);
 
-  return new Hyperdatons::BinaryOpHD(m_i, {lhs, rhs}, e.op.op);
+  return new Hyperdatons::BinaryOpHD(m_system, {lhs, rhs}, e.op.op);
 }
 
 HD*
@@ -137,7 +137,7 @@ HD*
 ExprCompiler::operator()(const Tree::HashExpr& e)
 {
   HD* expr = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::HashHD(m_i, expr);
+  return new Hyperdatons::HashHD(m_system, expr);
 }
 
 HD*
@@ -150,7 +150,7 @@ ExprCompiler::operator()(const Tree::TupleExpr& e)
     HD* rhs = boost::apply_visitor(*this, at_c<1>(v));
     elements.push_back(std::make_pair(lhs, rhs));
   }
-  return new Hyperdatons::TupleHD(m_i, elements);
+  return new Hyperdatons::TupleHD(m_system, elements);
 }
 
 HD*
