@@ -16,11 +16,12 @@
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
 includesdir = $(prefix)/include/tl
-includes_HEADERS = types.hpp library.hpp dimtranslator.hpp \
-system.hpp parser_fwd.hpp header_parser.hpp range.hpp \
-expr_parser.hpp tuple_parser.hpp equation_parser.hpp \
-builtin_types.hpp header.hpp equation.hpp expr_compiler.hpp \
-cache.hpp parser_util.hpp exception.hpp \
-footer.hpp hyperdaton.hpp utility.hpp compiled_functors.hpp \
-valuehd.hpp fixed_indexes.hpp printer.hpp container.hpp set_types.hpp \
-translator.hpp consthd.hpp
+
+includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp cache.hpp \
+  charset.hpp compiled_functors.hpp consthd.hpp container.hpp \
+  dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
+  expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp footer.hpp \
+  header.hpp header_parser.hpp hyperdaton.hpp library.hpp \
+  parser_fwd.hpp parser_util.hpp printer.hpp range.hpp \
+  set_types.hpp system.hpp translator.hpp tree_printer.hpp \
+  tuple_parser.hpp types.hpp utility.hpp valuehd.hpp
