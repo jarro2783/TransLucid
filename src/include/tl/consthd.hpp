@@ -24,6 +24,12 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid 
 {
+  /** 
+   * @brief All of the hyperdatons.
+   *
+   * The namespace that contains all of the hyperdatons which are
+   * in the system.
+   */
   namespace Hyperdatons
   {
     class TypeConstHD : public HD
@@ -41,6 +47,11 @@ namespace TransLucid
       size_t m_value;
     };
 
+    /**
+     * @brief Constant boolean.
+     *
+     * Returns the same boolean no matter what the context.
+     */
     class BoolConstHD : public HD
     {
       public:
