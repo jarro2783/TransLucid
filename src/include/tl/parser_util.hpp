@@ -267,6 +267,15 @@ namespace TransLucid
       }
     }
 
+    inline void
+    addLibrary
+    (
+      HeaderStruct& header,
+      const u32string& library
+    )
+    {
+    }
+
     //inline const
     //string_type& getDelimiterType(const Delimiter& d)
     //{

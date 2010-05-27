@@ -238,6 +238,25 @@ namespace TransLucid
         }
       }
 
+      static void
+      addLibrary
+      (
+        HeaderStruct& header,
+        const Tree::Expr& library
+      )
+      {
+        try
+        {
+          const u32string& slibrary =
+            boost::get<u32string>(library);
+
+          addLibrary(header, slibrary);
+        }
+        catch (const boost::bad_get& e)
+        {
+        }
+      }
+
       qi::rule<Iterator, SkipGrammar<Iterator>, HeaderStruct()>
         headerp
       ;

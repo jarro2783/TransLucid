@@ -1,3 +1,5 @@
+//this is segfaulting because the library isn't loaded and it is overflowing
+//the stack, this shouldn't happen, it should just die.
 #include <tl/translator.hpp>
 
 using namespace TransLucid;
@@ -13,7 +15,6 @@ int main(int argc, char* argv[])
       U"dimension ustring<n>;;"
       U"infixl ustring<-> ustring<operator-> 5;;"
       U"infixl ustring<*> ustring<operator*> 10;;"
-      U"library ustring<int>;;"
     );
 
     t.translate_and_add_equation_set
