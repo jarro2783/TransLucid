@@ -106,7 +106,7 @@ namespace
 }
 
 Translator::Translator()
-: m_compiler(&m_system)
+: m_compiler(&m_system), m_nextLib(0)
 {
   m_header = new Parser::HeaderStruct;
 
@@ -252,7 +252,19 @@ Translator::parse_header(const u32string& s)
     *m_skipper,
     *m_header);
 
+  //load any more libraries specified in the header
+  loadLibraries();
+
   return (r && pos == ws.cend());
+}
+
+void
+Translator::loadLibraries()
+{
+  for(int i = m_nextLib; i != m_header->libraries.size(); ++i) 
+  {
+    const u32string& l = m_header->libraries.at(i);
+  }
 }
 
 }

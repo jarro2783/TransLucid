@@ -92,6 +92,8 @@ namespace TransLucid
 
     private:
 
+    void loadLibraries();
+
     Parser::HeaderStruct* m_header;
 
     Parser::ExprGrammar<Parser::iterator_t>* m_expr;
@@ -107,6 +109,8 @@ namespace TransLucid
     Libtool m_lt;
 
     Tree::Expr m_lastExpr;
+
+    int m_nextLib;
   };
 }
 
