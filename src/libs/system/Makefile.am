@@ -24,14 +24,12 @@ $(BOOST_LDFLAGS) $(TL_LDFLAGS)
 libtlsystem_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
 -lltdl
 
-libtlsystem_la_SOURCES = system.cpp expr_parser.cpp \
-library.cpp types.cpp \
-dimtranslator.cpp \
-range.cpp parser.cpp \
-builtin_types.cpp header.cpp equation.cpp \
-cache.cpp utility.cpp compiled_functors.cpp \
-expr_compiler.cpp valuehd.cpp printer.cpp container.cpp set_types.cpp \
-translator.cpp ast.cpp tuple_parser.cpp bestfit.cpp
+libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp cache.cpp \
+  compiled_functors.cpp container.cpp dimtranslator.cpp equation.cpp \
+  expr_compiler.cpp expr_parser.cpp header.cpp library.cpp \
+  parser.cpp printer.cpp range.cpp set_types.cpp \
+  system.cpp translator.cpp tuple_parser.cpp types.cpp \
+  utility.cpp valuehd.cpp
 
 libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
