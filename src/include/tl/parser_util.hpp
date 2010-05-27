@@ -274,6 +274,7 @@ namespace TransLucid
       const u32string& library
     )
     {
+      header.libraries.push_back(library);
     }
 
     //inline const

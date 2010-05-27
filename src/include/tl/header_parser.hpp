@@ -97,7 +97,7 @@ namespace TransLucid
            [
              ph::bind
              (
-               &HeaderGrammar::addLibrary,
+               &HeaderGrammar::addLibraryInternal,
                _r1,
                _1
              )
@@ -247,7 +247,7 @@ namespace TransLucid
       }
 
       static void
-      addLibrary
+      addLibraryInternal
       (
         HeaderStruct& header,
         const Tree::Expr& library
@@ -255,6 +255,7 @@ namespace TransLucid
       {
         try
         {
+          std::cout << "header parsed library load" << std::endl;
           const u32string& slibrary =
             boost::get<u32string>(library);
 
@@ -262,6 +263,7 @@ namespace TransLucid
         }
         catch (const boost::bad_get& e)
         {
+          std::cerr << "bad_get loading library" << std::endl;
         }
       }
 
