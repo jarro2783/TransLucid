@@ -13,3 +13,10 @@ fix special symbols and make them come from the same definition in both the
 parser and the special type
 check out tuple_refines, it looks wrong - really need better tests for best 
 fitting
+
+-- Added by John
+
+configure should check for doxygen and graphviz.
+m4 macros should be created to look for the tl libraries and includes,
+  in order that other applications can use tl,
+  or maybe we can set up pkg-config for tl.
