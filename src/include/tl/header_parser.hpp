@@ -94,6 +94,14 @@ namespace TransLucid
                qi::lit("library")
             > expr
            )
+           [
+             ph::bind
+             (
+               &HeaderGrammar::addLibrary,
+               _r1,
+               _1
+             )
+           ]
          | (
               unary_symbols 
            >  expr
