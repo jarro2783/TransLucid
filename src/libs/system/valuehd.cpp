@@ -91,8 +91,8 @@ UCharHD::operator()(const Tuple& k)
   }
 
   const u32string& s = value->second.value<String>().value();
-  //return TaggedConstant(m_i.typeRegistry().findType("uchar")
-  //         ->parse(s.value(), k, m_i), k);
+  //return TaggedConstant(m_system.typeRegistry().findType("uchar")
+  //         ->parse(s.value(), k, m_system), k);
   if (s.length() != 1)
   {
     return TaggedConstant(Constant(Special(Special::CONST),

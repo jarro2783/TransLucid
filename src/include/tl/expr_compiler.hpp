@@ -54,7 +54,7 @@ namespace TransLucid
 
     private:
     //the system to compile with
-    HD* m_i;
+    HD* m_system;
   };
 
 } //namespace TransLucid
