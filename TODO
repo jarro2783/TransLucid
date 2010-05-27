@@ -13,6 +13,7 @@ fix special symbols and make them come from the same definition in both the
 parser and the special type
 check out tuple_refines, it looks wrong - really need better tests for best 
 fitting
+fix memory management
 
 -- Added by John
 
