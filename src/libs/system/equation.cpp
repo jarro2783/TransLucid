@@ -92,9 +92,10 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   auto adder =
     [this] (const EquationHD& e) -> std::pair<uuid, Equations::iterator>
   {
+    auto& id = e.id();
     return std::make_pair(
-      e.id(),
-      this->m_equations.insert(std::make_pair(e.id(), e)).first
+      id,
+      this->m_equations.insert(std::make_pair(id, e)).first
     );
   };
 

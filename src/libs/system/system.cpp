@@ -107,7 +107,12 @@ SystemHD::buildConstantHD(size_t index)
   HD* h = new T(this);
 
   tuple_t k;
-  Tuple empty;
+  #if 0
+  Tuple guard =
+  {
+    {DIM_}
+  };
+  #endif
   //k[m_dimTranslator.lookup("id")] =
   //  Constant(String("CONST"), m_typeRegistry.indexString());
   k[DIM_TYPE] = Constant(String(T::name), TYPE_INDEX_USTRING);
@@ -117,7 +122,8 @@ SystemHD::buildConstantHD(size_t index)
   addToVariableActual
   (
     U"TYPE_INDEX", 
-    empty, 
+    //empty,
+    Tuple(k), 
     new Hyperdatons::IntmpConstHD(index)
   );
   return h;
