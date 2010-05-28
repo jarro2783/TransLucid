@@ -271,12 +271,13 @@ namespace TransLucid
       {}
     };
 
+    #warning implement absolute @ 
     struct AtExpr
     {
       AtExpr() = default;
 
       AtExpr(const Expr& lhs, const Expr& rhs)
-      : lhs(lhs), rhs(rhs)
+      : lhs(lhs), rhs(rhs), relative(true)
       {}
 
       Expr lhs;
