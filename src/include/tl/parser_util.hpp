@@ -168,7 +168,7 @@ namespace TransLucid
     }
 
     inline void
-    addDimensionSymbol(HeaderStruct& h, const u32string& name)
+    addDimensionSymbol(Header& h, const u32string& name)
     {
       string_type wsname(name.begin(), name.end());
       h.dimension_symbols.add(wsname.c_str(), name);
@@ -177,7 +177,7 @@ namespace TransLucid
     inline void
     addBinaryOpSymbol
     (
-      HeaderStruct& h,
+      Header& h,
       const string_type& symbol,
       const string_type& opName,
       Tree::InfixAssoc assoc,
@@ -206,7 +206,7 @@ namespace TransLucid
     inline void
     addDelimiterSymbol
     (
-      HeaderStruct& header,
+      Header& header,
       const u32string& type,
       char32_t open,
       char32_t close
@@ -227,7 +227,7 @@ namespace TransLucid
     inline void
     addUnaryOpSymbol
     (
-      HeaderStruct& header,
+      Header& header,
       Tree::UnaryType type,
       const string_type& symbol,
       const string_type& op
@@ -270,7 +270,7 @@ namespace TransLucid
     inline void
     addLibrary
     (
-      HeaderStruct& header,
+      Header& header,
       const u32string& library
     )
     {

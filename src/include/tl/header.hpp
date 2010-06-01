@@ -43,7 +43,7 @@ namespace TransLucid
     size_t
     hash() const;
 
-    const Parser::HeaderStruct&
+    const Parser::Header&
     header() const
     {
       return m_header;

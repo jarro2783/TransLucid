@@ -30,7 +30,7 @@ namespace TransLucid
 {
   namespace Parser
   {
-    class HeaderStruct;
+    class Header;
 
     template <typename Iterator>
     class ExprGrammar;
@@ -53,6 +53,7 @@ namespace TransLucid
     public:
 
     Translator();
+    ~Translator();
 
     HD*
     translate_expr(const u32string& s);
@@ -72,7 +73,7 @@ namespace TransLucid
       return m_system;
     }
 
-    Parser::HeaderStruct&
+    Parser::Header&
     header()
     {
       return *m_header;
@@ -94,7 +95,9 @@ namespace TransLucid
 
     void loadLibraries();
 
-    Parser::HeaderStruct* m_header;
+    void cleanup();
+
+    Parser::Header* m_header;
 
     Parser::ExprGrammar<Parser::iterator_t>* m_expr;
     Parser::EquationGrammar<Parser::iterator_t>* m_equation;

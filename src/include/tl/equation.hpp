@@ -139,7 +139,10 @@ namespace TransLucid
     public:
     EquationHD(const u32string& name, const GuardHD& valid, HD* h)
     : m_name(name), m_validContext(valid), m_h(h),
-    m_id(boost::uuids::random_generator()())
+    //m_id(boost::uuids::random_generator()())
+    //m_id(boost::uuids::nil_generator()())
+    //m_id(boost::uuids::basic_random_generator<boost::rand48>()())
+    m_id(m_generator())
     {
     }
 
@@ -193,6 +196,9 @@ namespace TransLucid
     boost::uuids::uuid m_id;
     size_t m_validStart;
     size_t m_validEnd;
+
+    static boost::uuids::basic_random_generator<boost::rand48>
+    m_generator;
   };
 
   //represents all definitions of a variable, is responsible for

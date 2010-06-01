@@ -80,7 +80,7 @@ namespace TransLucid
 
       template <typename T>
       void
-      set_context_perturb(const T& t)
+      set_tuple(const T& t)
       {
         using namespace qi::labels;
         context_perturb = t[_val = _1];

@@ -80,7 +80,7 @@ namespace TransLucid
     {
       public:
 
-      ExprGrammar(HeaderStruct& h)
+      ExprGrammar(Header& h)
       : ExprGrammar::base_type(expr), header(h)
       {
         //using qi::_val;
@@ -297,7 +297,7 @@ namespace TransLucid
 
       template <typename T>
       void
-      set_context_perturb(const T& t)
+      set_tuple(const T& t)
       {
         context_perturb = t;
       }
@@ -338,7 +338,7 @@ namespace TransLucid
       escaped_string_parser<Iterator> angle_string;
       ident_parser<Iterator> ident;
 
-      HeaderStruct &header;
+      Header &header;
 
       qi::symbols<char_type, Special::Value> specials;
 

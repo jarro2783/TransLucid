@@ -24,6 +24,9 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+boost::uuids::basic_random_generator<boost::rand48>
+EquationHD::m_generator;
+
 VariableHD::VariableHD(const u32string& name, HD* system)
 : m_name(name)
  ,m_system(system)

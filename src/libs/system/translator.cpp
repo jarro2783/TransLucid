@@ -106,28 +106,48 @@ namespace
 }
 
 Translator::Translator()
-: m_compiler(&m_system), m_nextLib(0)
+:  m_header(0)
+  ,m_expr(0)
+  ,m_equation(0)
+  ,m_tuple(0)
+  ,m_skipper(0)
+  ,m_header_grammar(0)
+  ,m_compiler(&m_system)
+  ,m_nextLib(0)
 {
-  m_header = new Parser::HeaderStruct;
+  try
+  {
+    m_header = new Parser::Header;
 
-  m_expr = new Parser::ExprGrammar<Parser::iterator_t>(*m_header);
-  m_equation = new Parser::EquationGrammar<Parser::iterator_t>;
-  m_tuple = new Parser::TupleGrammar<Parser::iterator_t>;
-  m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
-  m_header_grammar = new Parser::HeaderGrammar<Parser::iterator_t>;
+    m_expr = new Parser::ExprGrammar<Parser::iterator_t>(*m_header);
+    m_equation = new Parser::EquationGrammar<Parser::iterator_t>;
+    m_tuple = new Parser::TupleGrammar<Parser::iterator_t>;
+    m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
+    m_header_grammar = new Parser::HeaderGrammar<Parser::iterator_t>;
 
-  m_expr->set_context_perturb(*m_tuple);
-  m_tuple->set_expr(*m_expr);
+    m_expr->set_tuple(*m_tuple);
+    m_tuple->set_expr(*m_expr);
 
-  m_equation->set_expr(*m_expr);
-  m_equation->set_context_perturb(*m_tuple);
+    m_equation->set_expr(*m_expr);
+    m_equation->set_tuple(*m_tuple);
 
-  m_header_grammar->set_expr(*m_expr);
+    m_header_grammar->set_expr(*m_expr);
 
-  m_header->delimiter_start_symbols.add(L"«",
-    Parser::Delimiter(U"ustring", L'«', L'»'));
-  m_header->delimiter_start_symbols.add(L"\'",
-    Parser::Delimiter(U"uchar", '\'', '\''));
+    m_header->delimiter_start_symbols.add(L"«",
+      Parser::Delimiter(U"ustring", L'«', L'»'));
+    m_header->delimiter_start_symbols.add(L"\'",
+      Parser::Delimiter(U"uchar", '\'', '\''));
+  }
+  catch (...)
+  {
+    cleanup();
+    throw;
+  }
+}
+
+Translator::~Translator()
+{
+  cleanup();
 }
 
 HD*
@@ -266,6 +286,17 @@ Translator::loadLibraries()
     const u32string& l = m_header->libraries.at(i);
     loadLibrary(l);
   }
+}
+
+void
+Translator::cleanup()
+{
+  delete m_skipper;
+  delete m_tuple;
+  delete m_equation;
+  delete m_expr;
+  delete m_header_grammar;
+  delete m_header;
 }
 
 }

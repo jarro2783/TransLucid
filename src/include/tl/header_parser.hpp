@@ -1,4 +1,4 @@
-/* Parser HeaderStruct.
+/* Parser Header.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -34,7 +34,7 @@ namespace TransLucid
 
     template <typename Iterator>
     class HeaderGrammar :
-      public qi::grammar<Iterator, SkipGrammar<Iterator>, HeaderStruct()>
+      public qi::grammar<Iterator, SkipGrammar<Iterator>, Header()>
     {
       public:
 
@@ -136,7 +136,7 @@ namespace TransLucid
       static void
       addDimension
       (
-        HeaderStruct& h,
+        Header& h,
         const Tree::Expr& name
       )
       {
@@ -155,7 +155,7 @@ namespace TransLucid
       static void
       addBinary
       (
-        HeaderStruct& h,
+        Header& h,
         const Tree::InfixAssoc& type,
         const Tree::Expr& symbol,
         const Tree::Expr& op,
@@ -189,7 +189,7 @@ namespace TransLucid
       static void
       addUnary
       (
-        HeaderStruct& header,
+        Header& header,
         Tree::UnaryType type,
         const Tree::Expr& symbol,
         const Tree::Expr& op
@@ -218,7 +218,7 @@ namespace TransLucid
       static void
       addDelimiter
       (
-        HeaderStruct& header,
+        Header& header,
         const Tree::Expr& type,
         const Tree::Expr& open,
         const Tree::Expr& close
@@ -249,7 +249,7 @@ namespace TransLucid
       static void
       addLibraryInternal
       (
-        HeaderStruct& header,
+        Header& header,
         const Tree::Expr& library
       )
       {
@@ -267,11 +267,11 @@ namespace TransLucid
         }
       }
 
-      qi::rule<Iterator, SkipGrammar<Iterator>, HeaderStruct()>
+      qi::rule<Iterator, SkipGrammar<Iterator>, Header()>
         headerp
       ;
 
-      qi::rule<Iterator, SkipGrammar<Iterator>, void(HeaderStruct&)>
+      qi::rule<Iterator, SkipGrammar<Iterator>, void(Header&)>
         headerItem
       ;
 

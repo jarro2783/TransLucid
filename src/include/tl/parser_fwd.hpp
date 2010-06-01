@@ -118,7 +118,7 @@ namespace TransLucid
     typedef qi::symbols<char_type, Tree::BinaryOperator> binary_symbols;
     typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
 
-    struct HeaderStruct
+    struct Header
     {
       symbols_t dimension_symbols;
 
@@ -135,9 +135,9 @@ namespace TransLucid
     typedef string_type::const_iterator iterator_t;
 
     inline std::ostream& 
-    operator<<(std::ostream& os, const HeaderStruct& h) 
+    operator<<(std::ostream& os, const Header& h) 
     {
-      os << "Parser::HeaderStruct";
+      os << "Parser::Header";
       return os;
     }
   }

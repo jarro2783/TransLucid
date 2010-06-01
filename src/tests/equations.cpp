@@ -35,7 +35,7 @@ struct translator_class {
   translator_class()
   {
     translator.loadLibrary(U"int");
-    TL::Parser::HeaderStruct& header = translator.header();
+    TL::Parser::Header& header = translator.header();
     TL::Parser::addBinaryOpSymbol
     (
       header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5
