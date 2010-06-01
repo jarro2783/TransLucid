@@ -29,6 +29,8 @@ int main(int argc, char* argv[])
     std::cout << result.first.value<Intmp>().value() << std::endl;
   } catch (const char* c) {
     std::cerr << "Terminated with exception: " << c << std::endl;
+  } catch (std::string& s) {
+    std::cerr << "Terminated with exception: " << s << std::endl;
   } catch (std::exception& e) {
     std::cerr << "Terminated with exception: " << e.what() << std::endl;
   } catch (...) {
