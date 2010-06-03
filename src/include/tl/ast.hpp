@@ -271,18 +271,17 @@ namespace TransLucid
       {}
     };
 
-    #warning implement absolute @ 
     struct AtExpr
     {
       AtExpr() = default;
 
-      AtExpr(const Expr& lhs, const Expr& rhs)
-      : lhs(lhs), rhs(rhs), relative(true)
+      AtExpr(const Expr& lhs, const Expr& rhs, bool absolute)
+      : lhs(lhs), rhs(rhs), absolute(absolute)
       {}
 
       Expr lhs;
       Expr rhs;
-      bool relative;
+      bool absolute;
     };
 
     #define PRINT_NODE(n) \

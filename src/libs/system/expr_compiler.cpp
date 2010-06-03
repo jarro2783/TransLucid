@@ -159,13 +159,13 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
   HD* lhs = boost::apply_visitor(*this, e.lhs);
   HD* rhs = boost::apply_visitor(*this, e.rhs);
 
-  if (e.relative)
+  if (e.absolute)
   {
-    return new Hyperdatons::AtRelativeHD(lhs, rhs);
+    return new Hyperdatons::AtAbsoluteHD(lhs, rhs);
   }
   else
   {
-    return new Hyperdatons::AtAbsoluteHD(lhs, rhs);
+    return new Hyperdatons::AtRelativeHD(lhs, rhs);
   }
 }
 

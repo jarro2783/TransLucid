@@ -185,10 +185,15 @@ namespace TransLucid
         at_expr =
            hash_expr [_a = _1]
         >> (
-             ('@' >> at_expr)
-             [
-               _val = construct<Tree::AtExpr>(_a, _1)
-             ]
+               ("@@" >> at_expr)
+               [
+                 _val = construct<Tree::AtExpr>(_a, _1, true)
+               ]
+             |
+               ('@' >> at_expr)
+               [
+                 _val = construct<Tree::AtExpr>(_a, _1, false)
+               ]
            | qi::eps [_val = _a]
            )
         ;
