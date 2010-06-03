@@ -36,6 +36,25 @@ namespace TransLucid
   {
     return u32string(s.begin(), s.end());
   }
+
+  inline bool 
+  validate_uchar(char32_t c)
+  {
+    #warning check that it is a valid uchar
+    return true;
+  }
+
+  inline bool 
+  validate_ustring(const u32string& s) {
+    size_t i = 0;
+    bool valid = true;
+    while (i != s.size() && valid)
+    {
+      valid = validate_uchar(s[i]);
+      ++i;
+    }
+    return valid;
+  }
 }
 
 namespace std

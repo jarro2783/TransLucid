@@ -57,12 +57,13 @@ namespace TransLucid
     construct_typed_constant(const u32string& type, const u32string& value)
     {
       if (type == U"ustring") {
-        std::cout << "creating ustring " << utf32_to_utf8(value) << std::endl;
         return value;
       } else if (type == U"uchar") {
-      #warning should check here that the uchar is valid
-        std::cout << "creating uchar " << utf32_to_utf8(value) << std::endl;
-        return (char32_t)value[0];
+        char32_t v = value[0];
+        if (!validate_uchar(v)) {
+          throw ParseError(U"Invalid character");
+        }
+        return v;
       } else {
         return Tree::ConstantExpr(type, value);
       }
