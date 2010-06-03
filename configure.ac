@@ -65,6 +65,10 @@ fi
 
 # Checks for library functions.
 
+# Check if we can build documentation
+DX_INIT_DOXYGEN([TransLucid], [doc])
+DX_DOT_FEATURE([ON])
+
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  doc/Doxyfile
