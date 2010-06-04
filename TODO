@@ -15,6 +15,7 @@ check out tuple_refines, it looks wrong - really need better tests for best
 fitting
 fix memory management
 document the API more
+clean up exception handling and parse error handling
 
 -- Added by John
 

@@ -350,8 +350,6 @@ namespace TransLucid
       Header &header;
 
       qi::symbols<char_type, Special::Value> specials;
-
-      #warning do error checking properly
     };
 
     extern template class ExprGrammar<string_type::const_iterator>;
