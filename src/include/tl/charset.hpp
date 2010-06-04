@@ -40,8 +40,13 @@ namespace TransLucid
   inline bool 
   validate_uchar(char32_t c)
   {
-    #warning check that it is a valid uchar
-    return true;
+    if (c < 0xd800)
+      return true;
+    if (c < 0xe000)
+      return false;
+    if (c < 0x110000)
+      return true;
+    return false;
   }
 
   inline bool 
