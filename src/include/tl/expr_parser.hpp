@@ -57,6 +57,9 @@ namespace TransLucid
     construct_typed_constant(const u32string& type, const u32string& value)
     {
       if (type == U"ustring") {
+        if (!validate_ustring(value)) {
+          throw ParseError(U"Invalid character in ustring");
+        }
         return value;
       } else if (type == U"uchar") {
         char32_t v = value[0];
