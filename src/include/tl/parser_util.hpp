@@ -23,6 +23,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_bind.hpp>
 #include <boost/spirit/home/phoenix/function/function.hpp>
+#include <boost/spirit/include/qi_rule.hpp>
+#include <boost/spirit/include/qi_grammar.hpp>
+#include <boost/spirit/include/qi_char_.hpp>
+#include <boost/spirit/include/qi_int.hpp>
+#include <boost/spirit/include/qi_action.hpp>
+#include <boost/spirit/include/qi_lexeme.hpp>
 
 #include <gmpxx.h>
 #include <tl/types.hpp>
@@ -33,6 +39,23 @@ namespace TransLucid
 {
   namespace Parser
   {
+    template <typename Iterator>
+    struct SkipGrammar : public qi::grammar<Iterator>
+    {
+
+      SkipGrammar()
+      : SkipGrammar::base_type(skip)
+      {
+        skip =
+          qi::char_(' ') | '\n' | '\t'
+        | "//"
+        | ("/*" >> *(qi::char_ - "/*") >> "*/")
+        ;
+      }
+
+      qi::rule<Iterator> skip;
+    };
+
     struct make_u32string_impl
     {
       template <typename Arg>
@@ -160,122 +183,6 @@ namespace TransLucid
 
       qi::rule<Iterator, string_type(), SkipGrammar<Iterator>> ident;
     };
-
-    inline void
-    setEndDelimiter(Delimiter& d, wchar_t& end)
-    {
-      end = d.end;
-    }
-
-    inline void
-    addDimensionSymbol(Header& h, const u32string& name)
-    {
-      string_type wsname(name.begin(), name.end());
-      h.dimension_symbols.add(wsname.c_str(), name);
-    }
-
-    inline void
-    addBinaryOpSymbol
-    (
-      Header& h,
-      const string_type& symbol,
-      const string_type& opName,
-      Tree::InfixAssoc assoc,
-      const mpz_class& precedence
-    )
-    {
-      if (h.binary_op_symbols.find(symbol.c_str()) != 0) 
-      {
-        throw ParseError(U"Existing binary operator");
-      }
-      std::cerr << "adding " << 
-        utf32_to_utf8(u32string(symbol.begin(), symbol.end())) << std::endl;
-      h.binary_op_symbols.add
-      (
-        symbol.c_str(),
-        Tree::BinaryOperator
-        (
-          assoc,
-          to_u32string(opName),
-          to_u32string(symbol),
-          precedence
-        )
-      );
-    }
-
-    inline void
-    addDelimiterSymbol
-    (
-      Header& header,
-      const u32string& type,
-      char32_t open,
-      char32_t close
-    )
-    {
-      string_type open_string(1, open);
-      if (header.delimiter_start_symbols.find(open_string) != 0) 
-      {
-        throw ParseError(U"Existing delimiter");
-      }
-      header.delimiter_start_symbols.add
-      (
-        open_string.c_str(),
-        Delimiter(type, (char_type)open, (char_type)close)
-      );
-    }
-
-    inline void
-    addUnaryOpSymbol
-    (
-      Header& header,
-      Tree::UnaryType type,
-      const string_type& symbol,
-      const string_type& op
-    )
-    {
-      Tree::UnaryOperator opinfo
-      (
-        to_u32string(op),
-        to_u32string(symbol),
-        type
-      );
-
-      if (type == Tree::UNARY_PREFIX)
-      {
-        if (header.prefix_op_symbols.find(symbol) != 0) 
-        {
-          throw ParseError(U"Existing prefix symbol");
-        }
-        header.prefix_op_symbols.add
-        (
-          symbol.c_str(),
-          opinfo
-        );
-      }
-      else
-      {
-        if (header.postfix_op_symbols.find(symbol) != 0) 
-        {
-          throw ParseError(U"Existing postfix symbol");
-        }
-
-        header.postfix_op_symbols.add
-        (
-          symbol.c_str(),
-          opinfo
-        );
-      }
-    }
-
-    inline void
-    addLibrary
-    (
-      Header& header,
-      const u32string& library
-    )
-    {
-      header.libraries.push_back(library);
-    }
 
     //inline const
     //string_type& getDelimiterType(const Delimiter& d)

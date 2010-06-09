@@ -1,4 +1,4 @@
-/* Parses [blah]
+/* Parses [E11:E12, ..., En1:En2]
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/object/new.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 #include <boost/spirit/home/phoenix/container.hpp>
+#include <boost/spirit/include/classic_debug.hpp>
+#include <boost/spirit/include/qi_core.hpp>
 #include <tl/ast.hpp>
 
 namespace TransLucid

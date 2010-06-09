@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_fwd.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
+#include <boost/spirit/include/classic_debug.hpp>
 
 namespace TransLucid
 {

@@ -21,13 +21,12 @@ along with TransLucid; see the file COPYING.  If not see
 #define PARSER_FWD_HPP_INCLUDED
 
 #include <tuple>
-#include <boost/spirit/include/qi_core.hpp>
+//#include <boost/spirit/include/qi_core.hpp>
+#include <boost/spirit/include/qi_symbols.hpp>
 #include <vector>
-#include <boost/spirit/include/qi_rule.hpp>
-#include <boost/spirit/include/qi_grammar.hpp>
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
+//#include <boost/fusion/include/adapt_struct.hpp>
 #include <tl/ast.hpp>
 #include <tl/utility.hpp>
 
@@ -63,28 +62,6 @@ namespace TransLucid
     typedef wchar_t char_type;
     typedef qi::symbols<char_type, std::u32string> symbols_t;
 
-    typedef qi::standard_wide::space_type skip;
-
-    template <typename Iterator>
-    struct SkipGrammar : public qi::grammar<Iterator>
-    {
-
-      SkipGrammar()
-      : SkipGrammar::base_type(skip)
-      {
-        skip =
-          qi::char_(' ') | '\n' | '\t'
-        | "//"
-        | ("/*" >> *(qi::char_ - "/*") >> "*/")
-        ;
-      }
-
-      qi::rule<Iterator> skip;
-    };
-
-    template <typename Iterator>
-    class ExprGrammar;
-
     struct Delimiter
     {
       Delimiter() = default;
@@ -114,32 +91,7 @@ namespace TransLucid
       return os;
     }
 
-    typedef qi::symbols<char_type, Tree::UnaryOperator> unary_symbols;
-    typedef qi::symbols<char_type, Tree::BinaryOperator> binary_symbols;
-    typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
-
-    struct Header
-    {
-      symbols_t dimension_symbols;
-
-      binary_symbols binary_op_symbols;
-
-      unary_symbols prefix_op_symbols;
-      unary_symbols postfix_op_symbols;
-
-      delimiter_symbols delimiter_start_symbols;
-
-      std::vector<u32string> libraries;
-    };
-
     typedef string_type::const_iterator iterator_t;
-
-    inline std::ostream& 
-    operator<<(std::ostream& os, const Header& h) 
-    {
-      os << "Parser::Header";
-      return os;
-    }
   }
 }
 
