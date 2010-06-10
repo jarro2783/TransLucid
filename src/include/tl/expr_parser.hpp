@@ -24,7 +24,13 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_fwd.hpp>
 #include <tl/utility.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/parser_header_util.hpp>
+
 #include <boost/spirit/include/qi_auxiliary.hpp>
+#include <boost/spirit/include/qi_nonterminal.hpp>
+#include <boost/spirit/include/qi_sequence.hpp>
+#include <boost/spirit/include/qi_action.hpp>
+#include <boost/spirit/include/qi_core.hpp>
 
 #include <boost/spirit/home/phoenix/object/new.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
@@ -215,11 +221,11 @@ namespace TransLucid
             _val = construct<Tree::DimensionExpr>(make_u32string(_1))
           ]
         | specials [_val = _1]
-        | ident [_a = _1]
+        | ident_constant
+        #if 0
+        ident [_a = _1]
           >> ( angle_string
                [
-                 //_val = construct<Tree::ConstantExpr>(make_u32string(_a),
-                 //                                     make_u32string(_1))
                  _val = ph::bind
                  (
                    &construct_typed_constant, 
@@ -232,10 +238,30 @@ namespace TransLucid
                 _val = construct<Tree::IdentExpr>(make_u32string(_a))
                ]
              )
+        #endif
         | context_perturb [_val = _1]
         | ('(' >> expr >> ')') [_val = _1]
         | delimiters [_val = _1]
         ;
+
+        ident_constant = 
+          ident [_a = _1]
+        >> ( angle_string
+             [
+               _val = ph::bind
+               (
+                 &construct_typed_constant, 
+                 make_u32string(_a), 
+                 make_u32string(_1)
+               )
+             ]
+           | qi::eps
+             [
+              _val = construct<Tree::IdentExpr>(make_u32string(_a))
+             ]
+           )
+        ;
+        
 
         delimiters = 
           (   header.delimiter_start_symbols
@@ -341,6 +367,11 @@ namespace TransLucid
                SkipGrammar<Iterator>>
         primary_expr,
         delimiters
+      ;
+
+      qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>,
+               SkipGrammar<Iterator>>
+        ident_constant
       ;
 
       integer_parser<Iterator> integer_grammar;

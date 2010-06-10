@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/parser_util.hpp>
 #include <tl/parser_fwd.hpp>
+#include <tl/parser_header_util.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 

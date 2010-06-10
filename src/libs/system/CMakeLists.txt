@@ -5,20 +5,16 @@ endif(COMMAND cmake_policy)
 add_definitions(${TLCFLAGS} 
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
 -Wall)
-add_library(tlsystem SHARED system.cpp expr_parser.cpp 
-library.cpp dimtranslator.cpp types.cpp
-range.cpp parser.cpp
-builtin_types.cpp equation.cpp
-header.cpp cache.cpp utility.cpp 
-compiled_functors.cpp expr_compiler.cpp valuehd.cpp printer.cpp
-container.cpp set_types.cpp translator.cpp ast.cpp
-tuple_parser.cpp bestfit.cpp)
+add_library(tlsystem SHARED 
+ast.cpp bestfit.cpp builtin_types.cpp cache.cpp 
+compiled_functors.cpp container.cpp dimtranslator.cpp 
+equation.cpp equation_parser.cpp expr_compiler.cpp 
+expr_parser.cpp header.cpp library.cpp parser.cpp printer.cpp
+range.cpp set_types.cpp system.cpp translator.cpp
+tuple_parser.cpp types.cpp utility.cpp valuehd.cpp
+)
 
-#add_precompiled_header(tlsystem ${PROJECT_SOURCE_DIR}/src/include/tl/expr_parser.hpp)
-
-#link_directories(${GLIBMM_LIBRARY_DIRS})
-#target_link_libraries(tlsystem ${GLIBMM_LIBRARIES})
-target_link_libraries(tlsystem ${GLIBMM_LDFLAGS} ltdl rt gmpxx)
+target_link_libraries(tlsystem ltdl rt gmpxx)
 INSTALL(TARGETS tlsystem
    LIBRARY DESTINATION lib
 )
