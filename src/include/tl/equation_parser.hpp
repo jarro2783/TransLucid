@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 #include <boost/spirit/include/classic_debug.hpp>
+#include <boost/spirit/include/qi_core.hpp>
 
 namespace TransLucid
 {
@@ -110,6 +111,8 @@ namespace TransLucid
 
       ident_parser<Iterator> ident;
     };
+
+    extern template class EquationGrammar<string_type::const_iterator>;
   }
 }
 
