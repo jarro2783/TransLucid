@@ -82,10 +82,6 @@ insert_binary_operator
 void
 BinaryOpExpr::add_right(const BinaryOperator& op, Expr& r)
 {
-  //size_t last = operands.size()-1;
-  //operands.at(last) =
-  //  insert_binary_operator(op, operands.at(last), r);
-  #warning hope this works rhs should be the last one when we dont have variadic
   rhs = insert_binary_operator(op, rhs, r);
 }
 

@@ -29,14 +29,31 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  /** 
+   * Abstract syntax tree. Contains all of the classes, types and functions
+   * related to the abstract syntax tree.
+   */
   namespace Tree
   {
+    /** 
+     * Type of unary operator. Symbols for the two types of unary operators.
+     */
     enum UnaryType
     {
+      /**
+       * prefix operator.
+       */
       UNARY_PREFIX,
+      /**
+       * postfix operator
+       */
       UNARY_POSTFIX
     };
 
+    /**
+     * A parsed unary operator. Stores the symbol and the operator which
+     * it maps to.
+     */
     struct UnaryOperator
     {
       UnaryOperator() = default;
@@ -50,8 +67,19 @@ namespace TransLucid
       : op(op), symbol(symbol), type(type)
       {}
 
+      /**
+       * The full name of the operation.
+       */
       u32string op;
+
+      /**
+       * The symbol that was parsed to create this operation.
+       */
       u32string symbol;
+
+      /**
+       * The type of operator.
+       */
       UnaryType type;
 
       bool
@@ -61,15 +89,43 @@ namespace TransLucid
       }
     };
 
+    /**
+     * The associativity of infix operators. They can either be
+     * left, right or non associative, or variadic operators treated as one
+     * operation, or multiple comparison operators.
+     */
     enum InfixAssoc
     {
+      /**
+       * Left associative.
+       */
       ASSOC_LEFT,
+
+      /**
+       * Right associative.
+       */
       ASSOC_RIGHT,
+
+      /**
+       * Non associative.
+       */
       ASSOC_NON,
+
+      /**
+       * Variadic.
+       */
       ASSOC_VARIABLE,
+
+      /**
+       * Multiple comparison.
+       */
       ASSOC_COMPARISON
     };
 
+    /**
+     * A binary operator. Represents a single binary operator and its
+     * symbol, mapped to operation, associativity and precedence.
+     */
     struct BinaryOperator
     {
       BinaryOperator() = default;
@@ -97,28 +153,60 @@ namespace TransLucid
         return !(*this == rhs);
       }
 
+      /**
+       * The operation.
+       */
       std::u32string op;
+
+      /**
+       * The symbol that is parsed.
+       */
       std::u32string symbol;
+
+      /**
+       * The associativity.
+       */
       InfixAssoc assoc;
+
+      /**
+       * The precedence.
+       */
       mpz_class precedence;
     };
 
+    /**
+     * Nothing. An nothing node in the AST, it is an error to have a node
+     * of this type, but necessary for functioning of the parser.
+     */
     struct nil
     {
     };
 
+    /**
+     * A constant expression node. The representation of type<value> 
+     * after being parsed.
+     */
     struct ConstantExpr
     {
       ConstantExpr() = default;
 
-      ConstantExpr(const u32string& t, const u32string& v)
-      : type(t), text(v)
+      /**
+       * ConstantExpr constructor.
+       * @param type type name.
+       * @param text the text in the <>.
+       */
+      ConstantExpr(const u32string& type, const u32string& text)
+      : type(type), text(text)
       {}
 
       u32string type;
       u32string text;
     };
 
+    /**
+     * A dimension. An identifier that has been declared in the header as a
+     * dimension will be parsed to DimensionExpr.
+     */
     struct DimensionExpr
     {
       DimensionExpr() = default;
@@ -130,6 +218,9 @@ namespace TransLucid
       u32string text;
     };
 
+    /**
+     * An identifier. Any identifier that isn't a dimension.
+     */
     struct IdentExpr
     {
       IdentExpr() = default;
@@ -171,6 +262,10 @@ namespace TransLucid
       boost::recursive_wrapper<AtExpr>
     > Expr;
 
+    /**
+     * A unary operation. The operation and operand of a unary operation
+     * expression.
+     */
     struct UnaryOpExpr
     {
       UnaryOpExpr() = default;
@@ -183,10 +278,20 @@ namespace TransLucid
       Expr e;
     };
 
+    /**
+     * A binary operation. The operation and operands of a binary operation
+     * expression.
+     */
     struct BinaryOpExpr
     {
       BinaryOpExpr() = default;
 
+      /**
+       * Constructs a BinaryOpExpr.
+       * @param o The operation.
+       * @param l The left hand side expression.
+       * @param r The right hand side expression.
+       */
       BinaryOpExpr
       (
         BinaryOperator o,
@@ -200,13 +305,32 @@ namespace TransLucid
       Expr lhs;
       Expr rhs;
 
+      /**
+       * Adds rhs into the right hand side expression of the current
+       * BinaryOpExpr. Used by the variable precedence tree builder
+       * when a right associative operator is encountered.
+       */
       void
       add_right(const BinaryOperator& op, Expr& rhs);
 
+      /**
+       * Set the right hand side expression of a binary operation. Used by
+       * the variable precedence tree builder to add an expression onto the
+       * right hand side of an operation.
+       */
       void
       add_leaf(Expr& e);
     };
 
+    /**
+     * Creates a binary operation from the op and the left and right hand
+     * sides. Inserts one into the tree of the other depending on the
+     * precedence and associativity to create the correct tree for evaluation.
+     * @param info The binary operation.
+     * @param lhs The left hand side expression.
+     * @param rhs The right hand side expression.
+     * @return The resulting operation.
+     */
     Expr
     insert_binary_operator
     (
