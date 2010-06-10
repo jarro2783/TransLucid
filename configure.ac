@@ -74,14 +74,15 @@ AC_CONFIG_FILES([Makefile
                  doc/Doxyfile
                  src/Makefile
                  src/basic/Makefile
+                 src/dirsystem/Makefile
                  src/include/Makefile
                  src/include/tl/Makefile
+                 src/interactive/Makefile
                  src/libs/Makefile
                  src/libs/int/Makefile
                  src/libs/system/Makefile
-                 src/dirsystem/Makefile
-                 src/interactive/Makefile
                  src/tests/Makefile
+                 src/tlcore/Makefile
                  tests/Makefile
                  tests/atlocal
                  tests/sanity/Makefile
