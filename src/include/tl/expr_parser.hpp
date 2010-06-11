@@ -221,7 +221,7 @@ namespace TransLucid
             _val = construct<Tree::DimensionExpr>(make_u32string(_1))
           ]
         | specials [_val = _1]
-        | ident_constant
+        | ident_constant [_val = _1]
         #if 0
         ident [_a = _1]
           >> ( angle_string
