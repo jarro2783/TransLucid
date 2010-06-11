@@ -21,11 +21,43 @@ along with TransLucid; see the file COPYING.  If not see
 #define CHARSET_HPP_INCLUDED
 
 #include <tl/types.hpp>
+#include <iconv.h>
 
 namespace TransLucid
 {
+  class Iconv
+  {
+    public:
+    Iconv(const char* to, const char* from)
+    {
+      m_iconv = iconv_open(to, from);
+      if (m_iconv == (iconv_t)-1) 
+      {
+        throw std::string("Failed to initialise iconv");
+      }
+    }
+
+    ~Iconv()
+    {
+      iconv_close(m_iconv);
+    }
+
+    size_t
+    iconv(char** inbuf, size_t* inbytesleft,
+          char** outbuf, size_t* outbytesleft)
+    {
+      return ::iconv(m_iconv, inbuf, inbytesleft, outbuf, outbytesleft);
+    }
+
+    private:
+    iconv_t m_iconv;
+  };
+
   std::string
   utf32_to_utf8(const u32string& s);
+
+  std::u32string
+  utf8_to_utf32(const std::string& s);
 
   std::string
   u32_to_ascii(const u32string& s);

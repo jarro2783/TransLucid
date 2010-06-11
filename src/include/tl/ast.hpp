@@ -243,6 +243,11 @@ namespace TransLucid
     class OpExpr;
     class RangeExpr;
     //TODO: rename ConstantExpr to TypedValueExpr
+    /**
+     * Abstract syntax tree node. A single expression node in the 
+     * abstract syntax tree which is created by the parser.
+     * @todo rename ConstantExpr to TypedValueExpr
+     */
     typedef boost::variant
     <
       nil,

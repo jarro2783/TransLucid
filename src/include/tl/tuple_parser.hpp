@@ -36,6 +36,9 @@ namespace TransLucid
     typedef std::vector<boost::fusion::vector<Tree::Expr, Tree::Expr>>
       vector_pair_expr;
 
+    /**
+     * Parses a tuple. A tuple is [E:E, ...].
+     */
     template <typename Iterator>
     class TupleGrammar
     : public qi::grammar<Iterator, Tree::Expr(), SkipGrammar<Iterator>>

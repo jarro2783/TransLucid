@@ -39,6 +39,9 @@ operator<<(std::ostream& os, char32_t c)
 
 namespace TransLucid
 {
+  /**
+   * The parser namespace. All the parsing is in here.
+   */
   namespace Parser
   {
     enum ParseErrorType

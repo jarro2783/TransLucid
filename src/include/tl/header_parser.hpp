@@ -33,6 +33,9 @@ namespace TransLucid
     namespace ph = boost::phoenix;
     using namespace ph;
 
+    /**
+     * The header grammar. The grammar required to parse a TransLucid header.
+     */
     template <typename Iterator>
     class HeaderGrammar :
       public qi::grammar<Iterator, SkipGrammar<Iterator>, Header()>

@@ -166,7 +166,6 @@ booleanTrue(const GuardHD& g, const Tuple& k)
   }
 }
 
-
 std::string
 utf32_to_utf8(const std::u32string& s) {
   const size_t buffer_size = 8000;
@@ -187,7 +186,7 @@ utf32_to_utf8(const std::u32string& s) {
   memcpy(in, s.c_str(), s.size()*sizeof(char32_t));
 
   char* outp = out;
-  char* inp = (char*)in;
+  char* inp = reinterpret_cast<char*>(in);
 
   while (inSize > 0) {
     size_t r = iconv(id, &inp, &inSize, &outp, &outSize);
@@ -203,6 +202,42 @@ utf32_to_utf8(const std::u32string& s) {
   iconv_close(id);
   *outp = '\0';
   return std::string(out);
+}
+
+std::u32string
+utf8_to_utf32(const std::string& s)
+{
+  const size_t buffer_size = 8000;
+  if (s.size()+1 > buffer_size/sizeof(char32_t))
+  {
+    return U"string too big";
+  }
+  Iconv id("UTF32LE", "UTF8");
+
+  //we don't actually know how many characters the output will be
+  //it is at most sizeof(char32_t) * input size
+  size_t inSize = s.size();
+  size_t outSize = buffer_size * sizeof(char32_t);
+  char32_t out[buffer_size];
+  char in[buffer_size];
+  memcpy(in, s.c_str(), s.size());
+
+  char* outp = reinterpret_cast<char*>(out);
+  char* inp = in;
+
+  while (inSize > 0) {
+    size_t r = id.iconv(&inp, &inSize, &outp, &outSize);
+    if (r == (size_t)-1)
+    {
+      //std::cerr << "iconv failed: " << errno << std::endl;
+      perror("iconv failed: ");
+      inSize = 0;
+      return std::u32string();
+    }
+  }
+
+  *outp = '\0';
+  return std::u32string(out);
 }
 
 std::string
