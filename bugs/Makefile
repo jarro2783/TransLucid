@@ -42,6 +42,6 @@ static_unused: static_unused.o
 	g++ -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm -rf $(BIN) *.o
+	rm -rf $(BIN) *.o *.s *.ii
 
 .PHONY: clean
