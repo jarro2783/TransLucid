@@ -17,11 +17,17 @@ namespace TransLucid
         m_verbose = v;
       }
 
+      void reactive(bool r)
+      {
+        m_reactive = r;
+      }
+
       void run();
 
       private:
       bool m_verbose;
-      Grammar<Parser::string_type::const_iterator>* m_parser;
+      bool m_reactive;
+      Grammar<Parser::string_type::const_iterator>* m_grammar;
     };
   }
 }

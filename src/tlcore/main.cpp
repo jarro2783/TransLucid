@@ -54,6 +54,11 @@ int main(int argc, char *argv[])
     tlcore.verbose(true);
   }
 
+  if (vm.count("reactive"))
+  {
+    tlcore.reactive(true);
+  }
+
   tlcore.run();
 
   return 0;
