@@ -27,25 +27,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/utility.hpp>
 
-namespace std
-{
-  ostream& operator<<
-  (
-    std::ostream& os,
-    const TransLucid::Parser::ParsedEquation& e
-  )
-  {
-    #if 0
-    os
-    << "<"
-    << TransLucid::utf32_to_utf8(TransLucid::to_u32string(std::get<0>(e)))
-    << ", " << std::get<1>(e) << ", " <<
-      std::get<2>(e) << ", " << std::get<3>(e) << ">";
-    #endif
-    return os;
-  }
-}
-
 namespace TransLucid
 {
 
@@ -268,9 +249,9 @@ Translator::parse_header(const u32string& s)
   bool r = boost::spirit::qi::phrase_parse(
     pos,
     ws.cend(),
-    *m_header_grammar,
-    *m_skipper,
-    *m_header);
+    (*m_header_grammar)(boost::phoenix::ref(*m_header)),
+    *m_skipper
+    );
 
   //load any more libraries specified in the header
   loadLibraries();

@@ -18,10 +18,17 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/parser_fwd.hpp>
+#include <tl/system.hpp>
 #include <iostream>
 
 namespace TransLucid
 {
+  namespace Parser
+  {
+    template <typename Iterator>
+    class SkipGrammar;
+  }
+
   namespace TLCore
   {
     template <typename Iterator>
@@ -63,9 +70,13 @@ namespace TransLucid
       bool m_verbose;
       bool m_reactive;
       Grammar<Parser::string_type::const_iterator>* m_grammar;
+      Parser::SkipGrammar<Parser::string_type::const_iterator>* m_skipper;      
 
       std::istream* m_is;
       std::ostream* m_os;
+
+      SystemHD m_system;
+      std::vector<HD*> m_exprs;
 
       std::u32string 
       read_input();

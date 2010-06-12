@@ -73,11 +73,11 @@ namespace TransLucid
         | qi::eps [_val = construct<Tree::nil>()]
         ;
 
-        BOOST_SPIRIT_DEBUG_NODE(boolean);
-        BOOST_SPIRIT_DEBUG_NODE(guard);
-        BOOST_SPIRIT_DEBUG_NODE(equation);
-        BOOST_SPIRIT_DEBUG_NODE(expr);
-        BOOST_SPIRIT_DEBUG_NODE(context_perturb);
+        //BOOST_SPIRIT_DEBUG_NODE(boolean);
+        //BOOST_SPIRIT_DEBUG_NODE(guard);
+        //BOOST_SPIRIT_DEBUG_NODE(equation);
+        //BOOST_SPIRIT_DEBUG_NODE(expr);
+        //BOOST_SPIRIT_DEBUG_NODE(context_perturb);
       }
 
       template <typename T>
@@ -113,6 +113,16 @@ namespace TransLucid
     };
 
     extern template class EquationGrammar<string_type::const_iterator>;
+  }
+}
+
+namespace std
+{
+  inline ostream&
+  operator<<(ostream& os, const TransLucid::Parser::ParsedEquation& e)
+  {
+    os << "parsed equation";
+    return os;
   }
 }
 

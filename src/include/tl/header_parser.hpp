@@ -38,7 +38,7 @@ namespace TransLucid
      */
     template <typename Iterator>
     class HeaderGrammar :
-      public qi::grammar<Iterator, SkipGrammar<Iterator>, Header()>
+      public qi::grammar<Iterator, SkipGrammar<Iterator>, void(Header&)>
     {
       public:
 
@@ -62,7 +62,7 @@ namespace TransLucid
            
 
          headerp =
-           *( headerItem(_val) > qi::lit( ";;" ))
+           *( headerItem(_r1) > qi::lit( ";;" ))
             >> qi::eoi;
          ;
 
@@ -271,7 +271,7 @@ namespace TransLucid
         }
       }
 
-      qi::rule<Iterator, SkipGrammar<Iterator>, Header()>
+      qi::rule<Iterator, SkipGrammar<Iterator>, void(Header&)>
         headerp
       ;
 
