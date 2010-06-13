@@ -49,7 +49,7 @@ AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_THREAD
 
 TL_LDFLAGS="-std=gnu++0x"
-TL_CFLAGS="-std=gnu++0x"
+TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing"
 
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_CFLAGS)
