@@ -63,7 +63,6 @@ namespace TransLucid
 
          headerp =
            *( headerItem(_r1) > qi::lit( ";;" ))
-            >> qi::eoi;
          ;
 
          headerItem =

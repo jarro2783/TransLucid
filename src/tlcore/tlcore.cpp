@@ -49,19 +49,20 @@ class Grammar :
     m_expr.set_tuple(m_tuple);
     m_eqn.set_expr(m_expr);
     m_eqn.set_tuple(m_tuple);
+    m_header_parser.set_expr(m_expr);
 
     r_program = 
-       m_header_parser(ph::ref(m_header))
-    >> "%%"
-    >> r_eqns
-    >> "%%"
-    >> r_exprs
-    >> Parser::qi::eoi
+      -m_header_parser(ph::ref(m_header))
+    > "%%"
+    > r_eqns
+    > "%%"
+    > r_exprs
+    > Parser::qi::eoi
     ;
 
     r_eqns = 
       *(
-         (m_eqn >> ";;")
+         (m_eqn > ";;")
          [
            ph::bind(&addEquation, ph::ref(m_system), _1)
          ]
@@ -70,12 +71,25 @@ class Grammar :
 
     r_exprs = 
       *(
-         (m_expr >> ";;")
+         (m_expr > ";;")
          [
            ph::bind(&addExpression, ph::ref(m_system), ph::ref(m_exprs), _1)
          ]
        )
     ;
+    
+    Parser::qi::on_error<Parser::qi::fail>
+      (
+        r_program,
+        std::cerr
+        << ph::val("Error! Expecting ")
+        << _4
+        << ph::val(" here: \"")
+        << ph::construct<std::string>(_3, _2)
+        << ph::val("\"")
+        << std::endl
+      );
+      
   }
 
   private:
@@ -97,7 +111,7 @@ class Grammar :
   static void
   addEquation(SystemHD& system, const Parser::ParsedEquation& eqn)
   {
-    std::cout << "adding equation" << std::endl;
+    std::cerr << "adding equation" << std::endl;
     ExprCompiler compiler(&system);
 
     HD* guard = 0;
@@ -137,7 +151,7 @@ class Grammar :
   static void
   addExpression(SystemHD& system, std::vector<HD*>& exprs, const Tree::Expr& e)
   {
-    std::cout << "adding expression" << std::endl;
+    std::cerr << "adding expression" << std::endl;
     ExprCompiler compiler(&system);
 
     HD* ce = 0;
@@ -173,21 +187,39 @@ void
 TLCore::run()
 {
   std::u32string input = read_input();
-  std::cout << "parsing: " << utf32_to_utf8(input) << std::endl;
 
   Parser::string_type ws(input.begin(), input.end());
   Parser::iterator_t pos = ws.begin();
-  boost::spirit::qi::phrase_parse(
+  bool r = boost::spirit::qi::phrase_parse(
     pos,
     ws.cend(),
     *m_grammar,
     *m_skipper
   );
 
+  if (r)
+  {
+   std::cerr << "parsing successful" << std::endl;
+  }
+  else
+  {
+    std::cerr << "parsing unsuccessful" << std::endl;
+  }
+
+  if (pos != ws.cend())
+  {
+    std::cerr << "didn't consume all input" << std::endl;
+  }
+  else
+  {
+    std::cerr << "consumed all input" << std::endl;
+  }
+
   for (auto iter = m_exprs.begin(); iter != m_exprs.end(); ++iter)
   {
     TaggedConstant result = (**iter)(Tuple());
-    (*m_os) << "would print something here" << std::endl;
+    (*m_os) << result.first << std::endl;
+    //(*m_os) << "would print something here" << std::endl;
   }
 }
 

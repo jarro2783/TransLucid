@@ -27,23 +27,34 @@ int main(int argc, char *argv[])
 {
   setlocale(LC_ALL, "");
 
+  po::variables_map vm;
   po::options_description desc("tlcore options");
   desc.add_options()
     ("help,h", "show this message")
     ("input", po::value<std::string>(), "input file")
     ("output", po::value<std::string>(), "output file")
-    ("reactive", po::value<std::string>(), "reactive system")
-    ("verbose", po::value<std::string>(), "verbose output")
-    ("version", po::value<std::string>(), "show version")
+    ("reactive", "reactive system")
+    ("verbose", "verbose output")
+    ("version", "show version")
   ;
 
-  po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, desc), vm);
-  po::notify(vm);
+  try
+  {
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+  }
+  catch (std::exception& e)
+  {
+    std::cerr << "error parsing command line arguments: " << 
+      e.what() << std::endl;
+    std::cerr << desc << std::endl;
+
+    return -1;
+  }
 
   if (vm.count("help"))
   {
-    std::cout << desc << std::endl;
+    std::cerr << desc << std::endl;
     return 0;
   }
 
