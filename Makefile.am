@@ -19,3 +19,16 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS=src tests doc
 EXTRA_DIST=CMakeLists.txt tl.cbp
+
+doc:
+if DX_COND_doc
+if DX_COND_dot
+	make -C doc doc
+else
+  echo dot not installed: cannot build docs
+endif
+else
+  echo doxygen not installed: cannot build docs
+endif
+  
+.PHONY: doc

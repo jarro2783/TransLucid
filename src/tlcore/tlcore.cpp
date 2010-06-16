@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <tl/expr_compiler.hpp>
 #include <tl/header_parser.hpp>
+#include <tl/tree_printer.hpp>
 
 namespace TransLucid
 {
@@ -197,29 +198,25 @@ TLCore::run()
     *m_skipper
   );
 
-  if (r)
+  if (!r && pos != ws.cend())
   {
-   std::cerr << "parsing successful" << std::endl;
-  }
-  else
-  {
-    std::cerr << "parsing unsuccessful" << std::endl;
+    throw "Failed parsing";
   }
 
-  if (pos != ws.cend())
-  {
-    std::cerr << "didn't consume all input" << std::endl;
-  }
-  else
-  {
-    std::cerr << "consumed all input" << std::endl;
-  }
+  typedef std::back_insert_iterator<std::string> out_iter;
+  Printer::ExprPrinter<out_iter> printer;
 
   for (auto iter = m_exprs.begin(); iter != m_exprs.end(); ++iter)
   {
     TaggedConstant result = (iter->second)->operator()(Tuple());
+    if (m_verbose)
+    {
+      std::string output;
+      std::back_insert_iterator<std::string> outit(output);
+      Printer::karma::generate(outit, printer, iter->first);
+      (*m_os) << output << " -> ";
+    }
     (*m_os) << result.first << std::endl;
-    //(*m_os) << "would print something here" << std::endl;
   }
 }
 
