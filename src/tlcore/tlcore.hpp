@@ -31,6 +31,8 @@ namespace TransLucid
 
   namespace TLCore
   {
+    typedef std::vector<std::pair<Tree::Expr, HD*>> ExprList;
+
     template <typename Iterator>
     class Grammar;
 
@@ -76,7 +78,7 @@ namespace TransLucid
       std::ostream* m_os;
 
       SystemHD m_system;
-      std::vector<HD*> m_exprs;
+      ExprList m_exprs;
 
       std::u32string 
       read_input();

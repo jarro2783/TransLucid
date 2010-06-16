@@ -36,7 +36,7 @@ class Grammar :
   public Parser::qi::grammar<Iterator, Parser::SkipGrammar<Iterator>>
 {
   public:
-  Grammar(SystemHD& system, std::vector<HD*>& exprs)
+  Grammar(SystemHD& system, ExprList& exprs)
   : Grammar::base_type(r_program)
    ,m_expr(m_header)
    ,m_system(system)
@@ -106,7 +106,7 @@ class Grammar :
   ;
 
   SystemHD& m_system;
-  std::vector<HD*>& m_exprs;
+  ExprList& m_exprs;
 
   static void
   addEquation(SystemHD& system, const Parser::ParsedEquation& eqn)
@@ -149,7 +149,7 @@ class Grammar :
   }
   
   static void
-  addExpression(SystemHD& system, std::vector<HD*>& exprs, const Tree::Expr& e)
+  addExpression(SystemHD& system, ExprList& exprs, const Tree::Expr& e)
   {
     std::cerr << "adding expression" << std::endl;
     ExprCompiler compiler(&system);
@@ -160,7 +160,7 @@ class Grammar :
       ce = compiler.compile(e);
       if (ce == 0) {
       } else {
-        exprs.push_back(ce);
+        exprs.push_back(std::make_pair(e, ce));
       }
     }
     catch (...)
@@ -217,7 +217,7 @@ TLCore::run()
 
   for (auto iter = m_exprs.begin(); iter != m_exprs.end(); ++iter)
   {
-    TaggedConstant result = (**iter)(Tuple());
+    TaggedConstant result = (iter->second)->operator()(Tuple());
     (*m_os) << result.first << std::endl;
     //(*m_os) << "would print something here" << std::endl;
   }
