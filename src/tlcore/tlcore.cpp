@@ -112,7 +112,6 @@ class Grammar :
   static void
   addEquation(SystemHD& system, const Parser::ParsedEquation& eqn)
   {
-    std::cerr << "adding equation" << std::endl;
     ExprCompiler compiler(&system);
 
     HD* guard = 0;
@@ -152,7 +151,6 @@ class Grammar :
   static void
   addExpression(SystemHD& system, ExprList& exprs, const Tree::Expr& e)
   {
-    std::cerr << "adding expression" << std::endl;
     ExprCompiler compiler(&system);
 
     HD* ce = 0;

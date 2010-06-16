@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <boost/program_options.hpp>
 #include <iostream>
 #include "tlcore.hpp"
@@ -55,6 +59,12 @@ int main(int argc, char *argv[])
   if (vm.count("help"))
   {
     std::cerr << desc << std::endl;
+    return 0;
+  }
+
+  if (vm.count("version"))
+  {
+    std::cerr << "tlcore " << PACKAGE_VERSION << std::endl;
     return 0;
   }
 
