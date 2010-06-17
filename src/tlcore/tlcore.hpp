@@ -53,6 +53,12 @@ namespace TransLucid
         m_reactive = r;
       }
 
+      void
+      demands(bool d)
+      {
+        m_demands = d;
+      }
+
       void 
       run();
 
@@ -71,6 +77,7 @@ namespace TransLucid
       private:
       bool m_verbose;
       bool m_reactive;
+      bool m_demands;
       Grammar<Parser::string_type::const_iterator>* m_grammar;
       Parser::SkipGrammar<Parser::string_type::const_iterator>* m_skipper;      
 

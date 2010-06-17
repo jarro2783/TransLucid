@@ -174,6 +174,7 @@ TLCore::TLCore()
 : 
   m_verbose(false)
  ,m_reactive(false)
+ ,m_demands(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
 {

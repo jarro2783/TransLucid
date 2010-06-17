@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
   po::variables_map vm;
   po::options_description desc("tlcore options");
   desc.add_options()
+    ("demands", "demand system")
     ("help,h", "show this message")
     ("input", po::value<std::string>(), "input file")
     ("output", po::value<std::string>(), "output file")
