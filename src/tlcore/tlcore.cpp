@@ -52,7 +52,10 @@ class Grammar :
     m_eqn.set_tuple(m_tuple);
     m_header_parser.set_expr(m_expr);
 
-    r_program = 
+    //reactive will make this a zero or more rule with ## terminating
+    r_program = r_onetime;
+
+    r_onetime =
       -m_header_parser(ph::ref(m_header))
     > "%%"
     > r_eqns
@@ -78,6 +81,8 @@ class Grammar :
          ]
        )
     ;
+
+    r_demands = *('(' > m_expr > ',' > m_tuple > ')');
     
     Parser::qi::on_error<Parser::qi::fail>
       (
@@ -103,7 +108,9 @@ class Grammar :
   Parser::qi::rule<Iterator, Parser::SkipGrammar<Iterator>> 
     r_program,
     r_exprs,
-    r_eqns
+    r_eqns,
+    r_demands,
+    r_onetime
   ;
 
   SystemHD& m_system;
