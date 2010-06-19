@@ -37,7 +37,7 @@ class Grammar :
   public Parser::qi::grammar<Iterator, Parser::SkipGrammar<Iterator>>
 {
   public:
-  Grammar(SystemHD& system, ExprList& exprs)
+  Grammar(SystemHD& system, ExprList& exprs, bool reactive, bool demands)
   : Grammar::base_type(r_program)
    ,m_expr(m_header)
    ,m_system(system)
@@ -53,15 +53,22 @@ class Grammar :
     m_header_parser.set_expr(m_expr);
 
     //reactive will make this a zero or more rule with ## terminating
-    r_program = r_onetime;
+    if (reactive)
+    {
+      r_program = *(r_onetime >> -Parser::qi::lit("##")) > Parser::qi::eoi;
+    }
+    else
+    {
+      r_program = r_onetime > Parser::qi::eoi;
+    }
 
     r_onetime =
       -m_header_parser(ph::ref(m_header))
     > "%%"
     > r_eqns
+    > r_demands_conditional
     > "%%"
     > r_exprs
-    > Parser::qi::eoi
     ;
 
     r_eqns = 
@@ -84,6 +91,15 @@ class Grammar :
 
     r_demands = *('(' > m_expr > ',' > m_tuple > ')');
     
+    if (demands)
+    {
+      r_demands_conditional = r_demands > "%%";
+    }
+    else
+    {
+      r_demands_conditional = r_demands;
+    }
+
     Parser::qi::on_error<Parser::qi::fail>
       (
         r_program,
@@ -110,6 +126,7 @@ class Grammar :
     r_exprs,
     r_eqns,
     r_demands,
+    r_demands_conditional,
     r_onetime
   ;
 
@@ -186,7 +203,8 @@ TLCore::TLCore()
  ,m_os(&std::cout)
 {
   m_grammar = 
-    new Grammar<Parser::string_type::const_iterator>(m_system, m_exprs);
+    new Grammar<Parser::string_type::const_iterator>
+      (m_system, m_exprs, m_reactive, m_demands);
   m_skipper = new Parser::SkipGrammar<Parser::string_type::const_iterator>;
 }
 
