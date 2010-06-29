@@ -29,6 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 //#include <boost/fusion/include/adapt_struct.hpp>
 #include <tl/ast.hpp>
 #include <tl/utility.hpp>
+#include <tl/parser_iterator.hpp>
 
 inline std::ostream&
 operator<<(std::ostream& os, char32_t c)

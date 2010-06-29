@@ -20,13 +20,25 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PARSER_ITERATOR_HPP_INCLUDED
 #define PARSER_ITERATOR_HPP_INCLUDED
 
+#include <iterator>
+
 namespace TransLucid
 {
   namespace Parser
   {
-    class U32Iterator
+    class U32Iterator : 
+      public std::iterator
+      <
+        std::input_iterator_tag,
+        char32_t,
+        size_t,
+        char32_t*,
+        char32_t&
+      >
     {
       public:
+
+      U32Iterator();
 
       U32Iterator& operator++();
 

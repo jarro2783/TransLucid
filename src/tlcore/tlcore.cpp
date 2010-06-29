@@ -52,7 +52,6 @@ class Grammar :
     m_eqn.set_tuple(m_tuple);
     m_header_parser.set_expr(m_expr);
 
-    //reactive will make this a zero or more rule with ## terminating
     if (reactive)
     {
       r_program = *(r_onetime >> -Parser::qi::lit("##")) > Parser::qi::eoi;
