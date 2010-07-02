@@ -78,8 +78,8 @@ namespace TransLucid
       bool m_verbose;
       bool m_reactive;
       bool m_demands;
-      Grammar<Parser::string_type::const_iterator>* m_grammar;
-      Parser::SkipGrammar<Parser::string_type::const_iterator>* m_skipper;      
+      Grammar<Parser::iterator_t>* m_grammar;
+      Parser::SkipGrammar<Parser::iterator_t>* m_skipper;      
 
       std::istream* m_is;
       std::ostream* m_os;

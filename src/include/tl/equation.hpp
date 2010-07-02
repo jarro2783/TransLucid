@@ -197,7 +197,7 @@ namespace TransLucid
     size_t m_validStart;
     size_t m_validEnd;
 
-    static boost::uuids::basic_random_generator<boost::rand48>
+    static boost::uuids::basic_random_generator<boost::mt19937>
     m_generator;
   };
 

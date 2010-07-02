@@ -69,6 +69,25 @@ namespace TransLucid
     return u32string(s.begin(), s.end());
   }
 
+  template <typename T>
+  std::basic_string<uint32_t>
+  to_unsigned_u32string(const T& s)
+  {
+    return std::basic_string<uint32_t>(s.begin(), s.end());
+  }
+
+  template <typename T>
+  std::basic_string<uint32_t>
+  chars_to_unsigned_u32string(T* s)
+  {
+    std::basic_string<uint32_t> ustring;
+    for (auto i = s; *i != 0; ++i)
+    {
+      ustring += *i; 
+    }
+    return ustring;
+  }
+
   inline bool 
   validate_uchar(char32_t c)
   {
@@ -92,6 +111,28 @@ namespace TransLucid
     }
     return valid;
   }
+
+  inline
+  std::basic_string<unsigned int>
+  literal(const char* s)
+  {
+    std::basic_string<unsigned int> dest;
+    const char* c = s;
+    while (*c != 0)
+    {
+      dest += *c;
+      ++c;
+    }
+
+    return dest;
+  }
+
+  inline
+  std::basic_string<unsigned int>
+  literal(char c)
+  {
+    return std::basic_string<unsigned int>(c, 1);
+  }
 }
 
 namespace std
@@ -100,6 +141,14 @@ namespace std
   operator<<(ostream& os, const u32string& s)
   {
     os << TransLucid::utf32_to_utf8(s);
+    return os;
+  }
+
+  inline ostream&
+  operator<<(ostream& os, const std::basic_string<unsigned int>& s)
+  {
+    u32string u32s(s.begin(), s.end());
+    os << u32s;
     return os;
   }
 }

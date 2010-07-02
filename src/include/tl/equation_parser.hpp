@@ -55,7 +55,7 @@ namespace TransLucid
               ident[_a = _1]
            >> guard
            >> boolean
-           >> L'='
+           >> qi::lit('=')
            >> expr
           )
           [

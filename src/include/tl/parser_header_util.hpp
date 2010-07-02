@@ -61,13 +61,14 @@ namespace TransLucid
     addBinaryOpSymbol
     (
       Header& h,
-      const string_type& symbol,
-      const string_type& opName,
+      const u32string& symbol,
+      const u32string& opName,
       Tree::InfixAssoc assoc,
       const mpz_class& precedence
     )
     {
-      if (h.binary_op_symbols.find(symbol.c_str()) != 0) 
+      auto usymbol = to_unsigned_u32string(symbol);
+      if (h.binary_op_symbols.find(usymbol.c_str()) != 0) 
       {
         throw ParseError(U"Existing binary operator");
       }
@@ -75,12 +76,12 @@ namespace TransLucid
         utf32_to_utf8(u32string(symbol.begin(), symbol.end())) << std::endl;
       h.binary_op_symbols.add
       (
-        symbol.c_str(),
+        usymbol.c_str(),
         Tree::BinaryOperator
         (
           assoc,
-          to_u32string(opName),
-          to_u32string(symbol),
+          opName,
+          symbol,
           precedence
         )
       );
@@ -112,16 +113,18 @@ namespace TransLucid
     (
       Header& header,
       Tree::UnaryType type,
-      const string_type& symbol,
-      const string_type& op
+      const u32string& symbol,
+      const u32string& op
     )
     {
       Tree::UnaryOperator opinfo
       (
-        to_u32string(op),
-        to_u32string(symbol),
+        op,
+        symbol,
         type
       );
+
+      auto usymbol = to_unsigned_u32string(symbol);
 
       if (type == Tree::UNARY_PREFIX)
       {
@@ -131,7 +134,7 @@ namespace TransLucid
         }
         header.prefix_op_symbols.add
         (
-          symbol.c_str(),
+          usymbol.c_str(),
           opinfo
         );
       }
@@ -144,7 +147,7 @@ namespace TransLucid
 
         header.postfix_op_symbols.add
         (
-          symbol.c_str(),
+          usymbol.c_str(),
           opinfo
         );
       }

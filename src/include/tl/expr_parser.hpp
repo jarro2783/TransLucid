@@ -96,25 +96,15 @@ namespace TransLucid
         //using qi::_val;
         using namespace qi::labels;
 
-        specials.add
-          (L"sperror", Special::ERROR)
-          (L"spaccess", Special::ACCESS)
-          (L"sptype", Special::TYPEERROR)
-          (L"spdim", Special::DIMENSION)
-          (L"spundef", Special::UNDEF)
-          (L"spconst", Special::CONST)
-          (L"sploop", Special::LOOP)
-          (L"spmultidef", Special::MULTIDEF)
-        ;
         for 
         (
-          auto iter = Special::m_sv.stov.begin(); 
-          iter != Special::m_sv.stov.end();
+          auto iter = Special::m_sv.parser_stov.begin(); 
+          iter != Special::m_sv.parser_stov.end();
           ++iter
         )
         {
           specials.add(
-            Parser::string_type(iter->first.begin(), iter->first.end()), 
+            iter->first.c_str(),
             iter->second);
         }
 
@@ -123,19 +113,20 @@ namespace TransLucid
 
         if_expr =
           (
-              qi::lit("if")
+              //qi::lit("if")
+              literal("if")
            >> if_expr
-           >> qi::lit("then")
+           >> literal("then")
            >> if_expr
            >> *(
-                    "elsif"
+                    literal("elsif")
                  >> if_expr
-                 >> qi::lit("then")
+                 >> literal("then")
                  >> if_expr
                )
-           >> qi::lit("else")
+           >> literal("else")
            >> if_expr
-           >> qi::lit("fi")
+           >> literal("fi")
           )
           [
             qi::_val = construct<Tree::IfExpr>(_1, _2, _3, _4)
@@ -195,12 +186,12 @@ namespace TransLucid
         at_expr =
            hash_expr [_a = _1]
         >> (
-               ("@@" >> at_expr)
+               (literal("@@") >> at_expr)
                [
                  _val = construct<Tree::AtExpr>(_a, _1, true)
                ]
              |
-               ('@' >> at_expr)
+               (literal('@') >> at_expr)
                [
                  _val = construct<Tree::AtExpr>(_a, _1, false)
                ]
@@ -209,7 +200,7 @@ namespace TransLucid
         ;
 
         hash_expr =
-          ( '#' > hash_expr [_val = construct<Tree::HashExpr>(_1)])
+          ( literal('#') > hash_expr [_val = construct<Tree::HashExpr>(_1)])
           | primary_expr [_val = _1]
         ;
 
@@ -240,7 +231,7 @@ namespace TransLucid
              )
         #endif
         | context_perturb [_val = _1]
-        | ('(' >> expr >> ')') [_val = _1]
+        | (literal('(') >> expr >> literal(')')) [_val = _1]
         | delimiters [_val = _1]
         ;
 
@@ -272,7 +263,7 @@ namespace TransLucid
            >> (
                qi::lexeme
                [
-                 *(qi::standard_wide::char_ -
+                 *(qi::unicode::char_ -
                    end_delimiter(ph::bind(&get_end_char, _b)))
                   [
                     _a += _1
@@ -288,11 +279,11 @@ namespace TransLucid
         ;
 
         boolean =
-          qi::ascii::string("true")
+          qi::unicode::string(literal("true"))
           [
             _val = true
           ]
-        | qi::ascii::string("false")
+        | qi::unicode::string(literal("false"))
           [
             _val = false
           ]
@@ -300,9 +291,9 @@ namespace TransLucid
 
         integer = integer_grammar[_val = _1];
 
-        end_delimiter = qi::standard_wide::char_(_r1);
+        end_delimiter = qi::unicode::char_(_r1);
 
-        BOOST_SPIRIT_DEBUG_NODE(if_expr);
+        //BOOST_SPIRIT_DEBUG_NODE(if_expr);
         BOOST_SPIRIT_DEBUG_NODE(expr);
         BOOST_SPIRIT_DEBUG_NODE(boolean);
         BOOST_SPIRIT_DEBUG_NODE(range_expr);

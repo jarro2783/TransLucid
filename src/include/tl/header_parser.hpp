@@ -48,26 +48,26 @@ namespace TransLucid
          using namespace qi::labels;
 
          assoc_symbols.add
-           (L"infixl", Tree::ASSOC_LEFT)
-           (L"infixr", Tree::ASSOC_RIGHT)
-           (L"infixn", Tree::ASSOC_NON)
-           (L"infixp", Tree::ASSOC_COMPARISON)
-           (L"infixm", Tree::ASSOC_VARIABLE)
+           (chars_to_unsigned_u32string(U"infixl"), Tree::ASSOC_LEFT)
+           (chars_to_unsigned_u32string(U"infixr"), Tree::ASSOC_RIGHT)
+           (chars_to_unsigned_u32string(U"infixn"), Tree::ASSOC_NON)
+           (chars_to_unsigned_u32string(U"infixp"), Tree::ASSOC_COMPARISON)
+           (chars_to_unsigned_u32string(U"infixm"), Tree::ASSOC_VARIABLE)
          ;
 
          unary_symbols.add
-           (L"prefix", Tree::UNARY_PREFIX)
-           (L"postfix", Tree::UNARY_POSTFIX)
+           (chars_to_unsigned_u32string(U"prefix"), Tree::UNARY_PREFIX)
+           (chars_to_unsigned_u32string(U"postfix"), Tree::UNARY_POSTFIX)
          ;
            
 
          headerp =
-           *( headerItem(_r1) > qi::lit( ";;" ))
+           *( headerItem(_r1) > literal(";;") )
          ;
 
          headerItem =
            (
-             qi::lit("dimension")
+             literal("dimension")
                > expr
                  [
                     ph::bind(&addDimension, _r1, _1)
@@ -85,7 +85,7 @@ namespace TransLucid
            ]
          | (
            //delimiters type open close
-               qi::lit("delimiters")
+               literal("delimiters")
             >  expr
             >  expr
             >  expr
@@ -94,7 +94,7 @@ namespace TransLucid
              ph::bind(&addDelimiter, _r1, _1, _2, _3)
            ]
          | (
-               qi::lit("library")
+               literal("library")
             > expr
            )
            [
@@ -177,8 +177,8 @@ namespace TransLucid
           addBinaryOpSymbol
           (
             h,
-            string_type(ssymbol.begin(), ssymbol.end()),
-            string_type(sop.begin(), sop.end()),
+            ssymbol,
+            sop,
             type,
             iprecedence
           );
@@ -209,8 +209,8 @@ namespace TransLucid
           (
             header,
             type,
-            string_type(csymbol.begin(), csymbol.end()),
-            string_type(coperator.begin(), coperator.end())
+            csymbol,
+            coperator
           );
         }
         catch (const boost::bad_get&)

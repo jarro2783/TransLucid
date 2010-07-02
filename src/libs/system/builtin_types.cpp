@@ -42,9 +42,13 @@ Special::StringValueInitialiser::StringValueInitialiser()
   {Special::MULTIDEF, U"multidef"}
 }
 {
+  std::basic_string<unsigned int> prefix({'s', 'p', '\0'});
   BOOST_FOREACH(ValueStringMap::value_type const& v, vtos)
   {
     stov.insert(std::make_pair(v.second, v.first));
+    std::basic_string<unsigned int> parser_string = prefix + 
+      std::basic_string<unsigned int>(v.second.begin(), v.second.end());
+    parser_stov.insert(std::make_pair(parser_string, v.first));
   }
 }
 

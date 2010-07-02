@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/expr_compiler.hpp>
 #include <tl/header_parser.hpp>
 #include <tl/tree_printer.hpp>
+#include <iterator>
+#include <iostream>
 
 namespace TransLucid
 {
@@ -54,7 +56,9 @@ class Grammar :
 
     if (reactive)
     {
-      r_program = *(r_onetime >> -Parser::qi::lit("##")) > Parser::qi::eoi;
+      r_program = 
+      *(r_onetime >> -Parser::qi::lit(literal("##"))) 
+      > Parser::qi::eoi;
     }
     else
     {
@@ -63,16 +67,16 @@ class Grammar :
 
     r_onetime =
       -m_header_parser(ph::ref(m_header))
-    > "%%"
+    > literal("%%")
     > r_eqns
     > r_demands_conditional
-    > "%%"
+    > literal("%%")
     > r_exprs
     ;
 
     r_eqns = 
       *(
-         (m_eqn > ";;")
+         (m_eqn > literal(";;"))
          [
            ph::bind(&addEquation, ph::ref(m_system), _1)
          ]
@@ -81,18 +85,22 @@ class Grammar :
 
     r_exprs = 
       *(
-         (m_expr > ";;")
+         (m_expr > literal(";;"))
          [
            ph::bind(&addExpression, ph::ref(m_system), ph::ref(m_exprs), _1)
          ]
        )
     ;
 
-    r_demands = *('(' > m_expr > ',' > m_tuple > ')');
+    r_demands = 
+    *(
+        literal('(') 
+      > m_expr > literal(',')
+      > m_tuple > literal(')'));
     
     if (demands)
     {
-      r_demands_conditional = r_demands > "%%";
+      r_demands_conditional = r_demands > literal("%%");
     }
     else
     {
@@ -202,9 +210,9 @@ TLCore::TLCore()
  ,m_os(&std::cout)
 {
   m_grammar = 
-    new Grammar<Parser::string_type::const_iterator>
+    new Grammar<Parser::iterator_t>
       (m_system, m_exprs, m_reactive, m_demands);
-  m_skipper = new Parser::SkipGrammar<Parser::string_type::const_iterator>;
+  m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
 }
 
 void 
@@ -212,16 +220,19 @@ TLCore::run()
 {
   std::u32string input = read_input();
 
-  Parser::string_type ws(input.begin(), input.end());
-  Parser::iterator_t pos = ws.begin();
+  Parser::iterator_t pos(Parser::makeUTF8Iterator(
+    std::istream_iterator<char>(*m_is)));
+  Parser::iterator_t end(Parser::makeUTF8Iterator(
+    std::istream_iterator<char>()));
+
   bool r = boost::spirit::qi::phrase_parse(
     pos,
-    ws.cend(),
+    end,
     *m_grammar,
     *m_skipper
   );
 
-  if (!r && pos != ws.cend())
+  if (!r && pos != end)
   {
     throw "Failed parsing";
   }

@@ -21,22 +21,24 @@ along with TransLucid; see the file COPYING.  If not see
 #define TREE_PRINTER_HPP_INCLUDED
 
 #include <tl/ast.hpp>
+#include <tl/charset.hpp>
+#include <tl/utility.hpp>
 
+#include <boost/spirit/home/phoenix/bind/bind_function.hpp>
+#include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
+#include <boost/spirit/home/phoenix/object/construct.hpp>
+#include <boost/spirit/home/phoenix/object/dynamic_cast.hpp>
+#include <boost/spirit/home/phoenix/operator/comparison.hpp>
+#include <boost/spirit/home/phoenix/operator/self.hpp>
+#include <boost/spirit/home/phoenix/statement/sequence.hpp>
+#include <boost/spirit/home/phoenix/statement/if.hpp>
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/home/phoenix/operator/self.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
+
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <tl/utility.hpp>
-#include <boost/spirit/home/phoenix/bind/bind_function.hpp>
-#include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
-#include <boost/spirit/home/phoenix/object/dynamic_cast.hpp>
-#include <boost/spirit/home/phoenix/statement/sequence.hpp>
-#include <boost/spirit/home/phoenix/statement/if.hpp>
-#include <boost/spirit/home/phoenix/operator/comparison.hpp>
-#include <boost/spirit/home/phoenix/object/construct.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT
 (
@@ -60,7 +62,10 @@ BOOST_FUSION_ADAPT_STRUCT
 BOOST_FUSION_ADAPT_STRUCT
 (
   TransLucid::Tree::BinaryOperator,
+  (TransLucid::u32string, op)
   (TransLucid::u32string, symbol)
+  (TransLucid::Tree::InfixAssoc, assoc)
+  (mpz_class, precedence)
 )
 
 BOOST_FUSION_ADAPT_STRUCT
@@ -134,19 +139,20 @@ namespace TransLucid
 
         constant =
            karma::string[_1 = bind(&utf32_to_utf8, ph::at_c<0>(_val))]
-        << '<'
+        << literal('<')
         << karma::string[_1 = bind(&utf32_to_utf8, ph::at_c<1>(_val))]
-        << '>'
+        << literal('>')
         ;
         dimension = ustring[_1 = at_c<0>(_val)];
         ident = ustring[_1 = at_c<0>(_val)];
 
-        binary_symbol = ustring[_1 = at_c<0>(_val)];
-        binary %= '(' << expr << binary_symbol << expr << ')';
+        binary_symbol = ustring[_1 = at_c<1>(_val)];
+        binary %= ('(') << expr << binary_symbol << expr 
+        << literal(')');
 
-        hash_expr = "(#" << expr[_1 = at_c<0>(_val)] << ')';
+        hash_expr = literal("(#") << expr[_1 = at_c<0>(_val)] << literal(')');
         pairs %= (expr << ":" << expr) % ", ";
-        tuple = '[' << pairs[_1 = ph::at_c<0>(_val)] << ']';
+        tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
         at_expr = '(' << expr << '@' << expr << ')';
 
         // TODO: Missing unary

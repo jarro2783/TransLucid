@@ -29,7 +29,8 @@ endif()
 
 find_package(PkgConfig REQUIRED)
 
-set(TLCFLAGS -Wall -std=gnu++0x -DPACKAGE_VERSION=\"0.0.30\")
+set(TLCFLAGS -Wall -std=gnu++0x -DPACKAGE_VERSION=\"0.0.30\"
+-DBOOST_SPIRIT_UNICODE)
 set(TLLIBS -std=gnu++0x)
 
 set(CMAKE_BUILD_TYPE build)

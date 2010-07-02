@@ -99,6 +99,10 @@ namespace TransLucid
       typedef boost::unordered_map<Value, u32string> ValueStringMap;
       ValueStringMap vtos;
 
+      typedef boost::unordered_map<std::basic_string<unsigned int>, Value> 
+      UnsignedStringValueMap;
+      UnsignedStringValueMap parser_stov;
+
       StringValueInitialiser();
     };
 

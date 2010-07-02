@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
 #include <boost/parameter.hpp>
+#include <boost/optional.hpp>
 #include <limits>
 #include <gmpxx.h>
 #include <boost/ref.hpp>

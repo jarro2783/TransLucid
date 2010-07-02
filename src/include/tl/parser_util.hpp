@@ -29,11 +29,13 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_int.hpp>
 #include <boost/spirit/include/qi_action.hpp>
 #include <boost/spirit/include/qi_lexeme.hpp>
+#include <boost/spirit/include/qi_char_class.hpp>
 
 #include <gmpxx.h>
 #include <tl/types.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/utility.hpp>
+#include <tl/charset.hpp>
 
 namespace TransLucid
 {
@@ -48,8 +50,8 @@ namespace TransLucid
       {
         skip =
           qi::char_(' ') | '\n' | '\t'
-        | "//"
-        | ("/*" >> *(qi::char_ - "/*") >> "*/")
+        | literal("//")
+        | (literal("/*") >> *(qi::char_ - literal("/*")) >> literal("*/"))
         ;
       }
 
@@ -144,18 +146,18 @@ namespace TransLucid
         using namespace qi::labels;
 
         string =
-          '<'
+          literal('<')
             >> (
-                *(escaped | (qi::standard_wide::char_ - '>'))
+                *(escaped | (qi::unicode::char_ - literal('>')))
                  [
                    _val += _1
                  ]
                )
-            >> '>'
+            >> literal('>')
         ;
 
         escaped =
-          ('\\' >> qi::standard_wide::char_)
+          ('\\' >> qi::unicode::char_)
           [_val = _1]
         ;
       }
@@ -177,7 +179,7 @@ namespace TransLucid
       ident_parser()
       : ident_parser::base_type(ident)
       {
-        ident %= qi::ascii::alpha >> *(qi::ascii::alnum | '_')
+        ident %= qi::unicode::alpha >> *(qi::unicode::alnum | '_')
         ;
       }
 

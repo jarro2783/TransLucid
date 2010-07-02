@@ -40,15 +40,15 @@ struct translator_class {
     TL::Parser::Header& header = translator.header();
     TL::Parser::addBinaryOpSymbol
     (
-      header, L"+", L"operator+", TL::Tree::ASSOC_LEFT, 5
+      header, U"+", U"operator+", TL::Tree::ASSOC_LEFT, 5
     );
     TL::Parser::addBinaryOpSymbol
     (
-      header, L"*", L"operator*", TL::Tree::ASSOC_LEFT, 10
+      header, U"*", U"operator*", TL::Tree::ASSOC_LEFT, 10
     );
     TL::Parser::addBinaryOpSymbol
     (
-      header, L"-", L"operator-", TL::Tree::ASSOC_LEFT, 5
+      header, U"-", U"operator-", TL::Tree::ASSOC_LEFT, 5
     );
   }
 };

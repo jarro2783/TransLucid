@@ -62,8 +62,9 @@ namespace TransLucid
     namespace qi = boost::spirit::qi;
     namespace fusion = boost::fusion;
 
-    typedef std::basic_string<wchar_t> string_type;
-    typedef wchar_t char_type;
+    //typedef std::basic_string<wchar_t> string_type;
+    typedef std::basic_string<unsigned int> string_type;
+    typedef unsigned int char_type;
     typedef qi::symbols<char_type, std::u32string> symbols_t;
 
     struct Delimiter
@@ -95,10 +96,11 @@ namespace TransLucid
       return os;
     }
 
-    typedef string_type::const_iterator iterator_t;
+    typedef U32Iterator iterator_t;
   }
 }
 
+#if 0
 namespace std
 {
   inline ostream&
@@ -108,5 +110,6 @@ namespace std
     return os;
   }
 }
+#endif
 
 #endif // PARSER_FWD_HPP_INCLUDED
