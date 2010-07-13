@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define PARSER_ITERATOR_HPP_INCLUDED
 
 #include <iterator>
+#include <typeinfo>
 
 namespace TransLucid
 {
