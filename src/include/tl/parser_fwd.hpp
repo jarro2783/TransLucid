@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tuple>
 //#include <boost/spirit/include/qi_core.hpp>
 #include <boost/spirit/include/qi_symbols.hpp>
+#include <boost/spirit/include/classic_multi_pass.hpp>
 #include <vector>
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
@@ -65,7 +66,7 @@ namespace TransLucid
     //typedef std::basic_string<wchar_t> string_type;
     typedef std::basic_string<unsigned int> string_type;
     typedef unsigned int char_type;
-    typedef qi::symbols<char_type, std::u32string> symbols_t;
+    typedef qi::symbols<char_type, u32string> symbols_t;
 
     struct Delimiter
     {
@@ -96,7 +97,7 @@ namespace TransLucid
       return os;
     }
 
-    typedef U32Iterator iterator_t;
+    typedef boost::spirit::classic::multi_pass<U32Iterator> iterator_t;
   }
 }
 

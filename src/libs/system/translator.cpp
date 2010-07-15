@@ -136,21 +136,37 @@ Translator::~Translator()
 HD*
 Translator::translate_expr(const u32string& u32s)
 {
-  Parser::iterator_t pos(Parser::makeUTF32Iterator(u32s.begin()));
-  Parser::iterator_t end(Parser::makeUTF32Iterator(u32s.end()));
+  Parser::iterator_t pos(Parser::U32Iterator(
+    Parser::makeUTF32Iterator(u32s.begin()),
+    Parser::makeUTF32Iterator(u32s.end())));
   Tree::Expr e;
 
   bool r = boost::spirit::qi::phrase_parse(
     pos,
-    end,
+    Parser::iterator_t(),
     *m_expr,
     *m_skipper,
     e);
 
-  if (r == false || pos != end) 
+  //std::cerr << "pos at: ";
+  //std::cerr << *pos << std::endl;
+
+  if (r == false)
+  {
+    std::cerr << "failed to parse" << std::endl;
+  }
+
+  if (pos != Parser::iterator_t())
+  {
+    std::cerr << "didn't read all input" << std::endl;
+  }
+
+  #if 0
+  if (r == false || pos != Parser::iterator_t()) 
   {
     return 0;
   }
+  #endif
 
   m_lastExpr = e;
 
@@ -160,15 +176,16 @@ Translator::translate_expr(const u32string& u32s)
 equation_v
 Translator::translate_equation_set(const u32string& s)
 {
-  Parser::string_type ws(s.begin(), s.end());
-  Parser::iterator_t pos(Parser::makeUTF32Iterator(ws.begin()));
+  Parser::iterator_t pos(Parser::U32Iterator(
+    Parser::makeUTF32Iterator(s.begin()),
+    Parser::makeUTF32Iterator(s.end())));
 
   EquationSetGrammar<Parser::iterator_t> equation_set(*m_equation);
   std::vector<Parser::ParsedEquation> parsedEquations;
 
   bool success = boost::spirit::qi::phrase_parse(
     pos,
-    Parser::iterator_t(Parser::makeUTF32Iterator(ws.end())),
+    Parser::iterator_t(),
     equation_set,
     *m_skipper,
     parsedEquations);
@@ -244,14 +261,14 @@ Translator::translate_and_add_equation_set(const u32string& s)
 bool
 Translator::parse_header(const u32string& s)
 {
-  Parser::string_type ws(s.begin(), s.end());
-  Parser::iterator_t pos(Parser::makeUTF32Iterator(ws.begin()));
-  Parser::iterator_t end(Parser::makeUTF32Iterator(ws.end()));
+  Parser::iterator_t pos(Parser::U32Iterator(
+    Parser::makeUTF32Iterator(s.begin()),
+    Parser::makeUTF32Iterator(s.end())));
   std::vector<int> test;
 
   bool r = boost::spirit::qi::phrase_parse(
     pos,
-    Parser::iterator_t(Parser::makeUTF32Iterator(ws.end())),
+    Parser::iterator_t(),
     (*m_header_grammar)(boost::phoenix::ref(*m_header)),
     *m_skipper
     );
@@ -259,7 +276,7 @@ Translator::parse_header(const u32string& s)
   //load any more libraries specified in the header
   loadLibraries();
 
-  return (r && pos == end);
+  return (r && pos == Parser::iterator_t());
 }
 
 void

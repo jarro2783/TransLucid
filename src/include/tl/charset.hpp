@@ -131,7 +131,7 @@ namespace TransLucid
   std::basic_string<unsigned int>
   literal(char c)
   {
-    return std::basic_string<unsigned int>(c, 1);
+    return std::basic_string<unsigned int>(1, static_cast<unsigned int>(c));
   }
 }
 

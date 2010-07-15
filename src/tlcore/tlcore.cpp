@@ -220,19 +220,20 @@ TLCore::run()
 {
   std::u32string input = read_input();
 
-  Parser::iterator_t pos(Parser::makeUTF8Iterator(
-    std::istream_iterator<char>(*m_is)));
-  Parser::iterator_t end(Parser::makeUTF8Iterator(
-    std::istream_iterator<char>()));
+  Parser::iterator_t pos(Parser::U32Iterator(
+    Parser::makeUTF8Iterator(
+      std::istream_iterator<char>(*m_is)),
+    Parser::makeUTF8Iterator(std::istream_iterator<char>())
+  ));
 
   bool r = boost::spirit::qi::phrase_parse(
     pos,
-    end,
+    Parser::iterator_t(),
     *m_grammar,
     *m_skipper
   );
 
-  if (!r && pos != end)
+  if (!r && pos != Parser::iterator_t())
   {
     throw "Failed parsing";
   }

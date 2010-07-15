@@ -135,6 +135,7 @@ BOOST_AUTO_TEST_CASE ( strings ) {
   TL::HD* h;
 
   h = translator.translate_expr(U"«hello é world»");
+  BOOST_REQUIRE(h != 0);
 
   TL::TaggedConstant v = (*h)(TL::Tuple());
   std::u32string s = v.first.value<TL::String>().value();
@@ -147,9 +148,8 @@ BOOST_AUTO_TEST_CASE ( strings ) {
 
 BOOST_AUTO_TEST_CASE ( chars ) {
 
-  TL::HD* h;
-
-  h = translator.translate_expr(U"\'è\'");
+  std::auto_ptr<TL::HD> h(translator.translate_expr(U"\'h\'"));
+  BOOST_REQUIRE(h.get() != 0);
   TL::TaggedConstant v = (*h)(TL::Tuple());
 
   std::string generated;
@@ -157,13 +157,19 @@ BOOST_AUTO_TEST_CASE ( chars ) {
   TL::Printer::karma::generate(outit, print_grammar,
                                translator.lastExpression());
 
-  //std::cerr << "tree:" << std::endl
-  //<< generated <<
-  //"end tree" << std::endl;
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_UCHAR);
+  BOOST_CHECK(v.first.value<TL::Char>().value() == U'h');
+
+  h.reset(translator.translate_expr(U"\'è\'"));
+  BOOST_REQUIRE(h.get() != 0);
+  v = (*h)(TL::Tuple());
+
+  generated.clear();
+  TL::Printer::karma::generate(outit, print_grammar,
+                               translator.lastExpression());
 
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_UCHAR);
   BOOST_CHECK(v.first.value<TL::Char>().value() == U'è');
-  delete h;
 }
 
 BOOST_AUTO_TEST_CASE ( specials ) {
@@ -178,8 +184,8 @@ BOOST_AUTO_TEST_CASE ( specials ) {
     {U"sptype", Special::TYPEERROR},
     {U"spdim", Special::DIMENSION},
     {U"spundef", Special::UNDEF},
-    {U"const", Special::CONST},
-    {U"loop", Special::LOOP}
+    {U"spconst", Special::CONST},
+    {U"sploop", Special::LOOP}
   };
 
   std::for_each(specials.begin(), specials.end(),

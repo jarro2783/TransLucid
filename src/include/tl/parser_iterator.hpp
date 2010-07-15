@@ -22,6 +22,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iterator>
 #include <typeinfo>
+#include <iostream>
+
+#include <tl/charset.hpp>
 
 namespace TransLucid
 {
@@ -33,8 +36,8 @@ namespace TransLucid
       //TODO work out what type of iterator this is
       //maybe I should make it a forward iterator and implement my
       //own buffering when reading straight from cin.
-        //std::input_iterator_tag,
-        std::forward_iterator_tag,
+        std::input_iterator_tag,
+        //std::forward_iterator_tag,
         unsigned int,
         int64_t
       >
@@ -61,35 +64,73 @@ namespace TransLucid
     {
       public:
 
-      U32Iterator(const Iterator& i)
+      U32Iterator()
+      : m_iter(0)
+      , m_end(0)
+      {
+      }
+
+      U32Iterator(const Iterator& i, const Iterator& end)
       : m_iter(i.clone())
+      , m_end(end.clone())
       {
       }
 
       U32Iterator(const U32Iterator& other)
-      : m_iter(other.m_iter->clone())
+      : m_iter(other.m_iter != 0 ? other.m_iter->clone() : 0)
+      , m_end(other.m_end != 0 ? other.m_end->clone() : 0)
       {
       }
 
       U32Iterator& operator=(const U32Iterator& rhs)
       {
-        if (this != & rhs)
+        if (this != &rhs)
         {
-          Iterator* copy = rhs.m_iter->clone();
-          delete m_iter;
-          m_iter = copy;
+          Iterator* iter_copy = 0;
+          Iterator* end_copy = 0;
+
+          try
+          {
+            iter_copy = rhs.m_iter != 0 ? rhs.m_iter->clone() : 0;
+            end_copy = rhs.m_end != 0 ? rhs.m_end->clone() : 0;
+
+            delete m_iter;
+            delete m_end;
+
+            m_iter = iter_copy;
+            m_end = end_copy;
+          }
+          catch (...)
+          {
+            delete iter_copy;
+            delete end_copy;
+            throw;
+          }
         }
         return *this;
       }
       
       bool operator==(const U32Iterator& rhs) const
       {
-        return m_iter->operator==(*rhs.m_iter);
+        bool lhs_end = false;
+        bool rhs_end = false;
+
+        if (m_iter == 0 || *m_iter == *m_end)
+        {
+          lhs_end = true;
+        }
+
+        if (rhs.m_iter == 0 || *rhs.m_iter == *rhs.m_end)
+        {
+          rhs_end = true;
+        }
+
+        return lhs_end == rhs_end;
       }
 
       bool operator!=(const U32Iterator& rhs) const
       {
-        return !m_iter->operator==(*rhs.m_iter);
+        return !this->operator==(rhs);
       }
 
       U32Iterator& operator++()
@@ -107,6 +148,9 @@ namespace TransLucid
 
       reference operator*() const
       {
+        u32string s;
+        s += **m_iter;
+        std::cerr << utf32_to_utf8(s) << std::endl;
         return **m_iter;
       }
 
@@ -117,6 +161,7 @@ namespace TransLucid
 
       private:
       Iterator* m_iter;
+      Iterator* m_end;
     };
 
     /**
@@ -133,6 +178,8 @@ namespace TransLucid
 
       UTF8Iterator(const UTF8Iterator& other)
       : m_iter(other.m_iter)
+      , m_value(other.m_value)
+      , m_haveReadCurrent(other.m_haveReadCurrent)
       {
       }
 
@@ -160,6 +207,8 @@ namespace TransLucid
         {
           readNext();
         }
+
+        m_haveReadCurrent = false;
 
         return *this;
       }
@@ -233,6 +282,8 @@ namespace TransLucid
           nextShift -= 6;
           ++m_iter;
         }
+
+        std::cerr << "readNext() " << m_value << std::endl;
 
         m_haveReadCurrent = true;
       }
@@ -350,6 +401,8 @@ namespace TransLucid
 
       UTF32Iterator(const UTF32Iterator& other)
       : m_iter(other.m_iter)
+      , m_reference(other.m_reference)
+      , m_pointer(other.m_pointer)
       {
       }
 
@@ -363,11 +416,12 @@ namespace TransLucid
         try
         {
           const UTF32Iterator<T>& rhs_cast = 
-            dynamic_cast<const UTF32Iterator&>(rhs);
+            dynamic_cast<const UTF32Iterator<T>&>(rhs);
           return m_iter == rhs_cast.m_iter;
         }
         catch (std::bad_cast)
         {
+          std::cerr << "bad cast in operator==" << std::endl;
           return false;
         }
       }
