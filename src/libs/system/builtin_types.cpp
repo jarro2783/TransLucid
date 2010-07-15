@@ -48,8 +48,8 @@ Special::StringValueInitialiser::StringValueInitialiser()
     stov.insert(std::make_pair(v.second, v.first));
     std::basic_string<unsigned int> parser_string = prefix + 
       std::basic_string<unsigned int>(v.second.begin(), v.second.end());
-    std::cerr << "mapping " << utf32_to_utf8(to_u32string(parser_string))
-      << " to " << v.first << std::endl;
+    //std::cerr << "mapping " << utf32_to_utf8(to_u32string(parser_string))
+    //  << " to " << v.first << std::endl;
     parser_stov.insert(std::make_pair(parser_string, v.first));
   }
 }

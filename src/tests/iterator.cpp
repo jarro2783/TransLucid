@@ -73,8 +73,7 @@ BOOST_AUTO_TEST_CASE ( copying )
   while (iter != TL::Parser::U32Iterator())
   {
     unsigned int c = *iter;
-    std::cerr << c << std::endl;
-    copy += c; //*iter;
+    copy += c;
     ++iter;
   }
 

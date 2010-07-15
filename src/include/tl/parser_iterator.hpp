@@ -148,9 +148,9 @@ namespace TransLucid
 
       reference operator*() const
       {
-        u32string s;
-        s += **m_iter;
-        std::cerr << utf32_to_utf8(s) << std::endl;
+        //u32string s;
+        //s += **m_iter;
+        //std::cerr << utf32_to_utf8(s) << std::endl;
         return **m_iter;
       }
 
@@ -283,7 +283,7 @@ namespace TransLucid
           ++m_iter;
         }
 
-        std::cerr << "readNext() " << m_value << std::endl;
+        //std::cerr << "readNext() " << m_value << std::endl;
 
         m_haveReadCurrent = true;
       }
@@ -421,7 +421,7 @@ namespace TransLucid
         }
         catch (std::bad_cast)
         {
-          std::cerr << "bad cast in operator==" << std::endl;
+          //std::cerr << "bad cast in operator==" << std::endl;
           return false;
         }
       }
