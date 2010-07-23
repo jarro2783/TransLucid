@@ -219,6 +219,7 @@ namespace TransLucid
         {
           readNext();
         }
+        //std::cerr << utf32_to_utf8(u32string({m_value})) << std::endl;;
         return m_value;
       }
 
@@ -235,10 +236,13 @@ namespace TransLucid
 
       void readNext() const
       {
+        //std::cerr << "readNext() ";
         m_value = 0;
         char c = *m_iter;
         int toRead = 0;
         int nextShift = 0;
+
+        //std::cerr << c << " ";
 
         if ((c & 0x80) == 0)
         {
@@ -274,6 +278,7 @@ namespace TransLucid
         for (int i = 0; i != toRead; ++i)
         {
           c = *m_iter;
+          //std::cerr << c << " ";
           if ((c & 0xC0) != 0x80)
           {
             //invalid character
@@ -282,6 +287,8 @@ namespace TransLucid
           nextShift -= 6;
           ++m_iter;
         }
+
+        //std::cerr << std::endl;
 
         //std::cerr << "readNext() " << m_value << std::endl;
 

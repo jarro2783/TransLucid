@@ -237,7 +237,7 @@ namespace TransLucid
 
         ident_constant = 
           ident [_a = _1]
-        >> ( angle_string
+        >> ( qi::lexeme[angle_string]
              [
                _val = ph::bind
                (
@@ -261,7 +261,7 @@ namespace TransLucid
                 _a = construct<string_type>()
               ]
            >> (
-               qi::lexeme
+               qi::no_skip
                [
                  *(qi::unicode::char_ -
                    end_delimiter(ph::bind(&get_end_char, _b)))

@@ -134,13 +134,13 @@ BOOST_AUTO_TEST_CASE ( strings ) {
 
   TL::HD* h;
 
-  h = translator.translate_expr(U"«hello é world»");
+  h = translator.translate_expr(U"« hello é world»");
   BOOST_REQUIRE(h != 0);
 
   TL::TaggedConstant v = (*h)(TL::Tuple());
   std::u32string s = v.first.value<TL::String>().value();
 
-  BOOST_CHECK(s == U"hello é world");
+  BOOST_CHECK(s == U" hello é world");
   //std::cout << TL::utf32_to_utf8(s) << std::endl;
   delete h;
 

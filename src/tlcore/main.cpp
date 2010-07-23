@@ -81,6 +81,11 @@ int main(int argc, char *argv[])
     tlcore.reactive(true);
   }
 
+  if (vm.count("demands"))
+  {
+    tlcore.demands(true);
+  }
+
   tlcore.run();
 
   return 0;

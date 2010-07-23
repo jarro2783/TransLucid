@@ -54,6 +54,13 @@ class Grammar :
     m_eqn.set_tuple(m_tuple);
     m_header_parser.set_expr(m_expr);
 
+    m_header.delimiter_start_symbols.add(
+      to_unsigned_u32string(u32string(U"\"")).c_str(),
+      Parser::Delimiter(U"ustring", U'\"', U'\"'));
+    m_header.delimiter_start_symbols.add(
+      to_unsigned_u32string(u32string(U"\'")).c_str(),
+      Parser::Delimiter(U"uchar", '\'', '\''));
+
     if (reactive)
     {
       r_program = 
@@ -206,19 +213,23 @@ TLCore::TLCore()
   m_verbose(false)
  ,m_reactive(false)
  ,m_demands(false)
+ ,m_grammar(0)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
 {
-  m_grammar = 
-    new Grammar<Parser::iterator_t>
-      (m_system, m_exprs, m_reactive, m_demands);
   m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
 }
 
 void 
 TLCore::run()
 {
-  std::u32string input = read_input();
+  delete m_grammar;
+  m_grammar = 
+    new Grammar<Parser::iterator_t>
+      (m_system, m_exprs, m_reactive, m_demands);
+  //std::u32string input = read_input();
+  
+  *m_is >> std::noskipws;
 
   Parser::iterator_t pos(Parser::U32Iterator(
     Parser::makeUTF8Iterator(
