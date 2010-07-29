@@ -64,7 +64,7 @@ class Grammar :
     if (reactive)
     {
       r_program = 
-      *(r_onetime >> -Parser::qi::lit(literal("##"))) 
+      *(r_onetime % literal("$$"))
       > Parser::qi::eoi;
     }
     else
@@ -74,7 +74,7 @@ class Grammar :
 
     r_onetime =
       -m_header_parser(ph::ref(m_header))
-    > literal("%%")
+    >> literal("%%")
     > r_eqns
     > r_demands_conditional
     > literal("%%")

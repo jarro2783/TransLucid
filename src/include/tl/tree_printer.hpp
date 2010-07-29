@@ -150,10 +150,10 @@ namespace TransLucid
         binary %= ('(') << expr << binary_symbol << expr 
         << literal(')');
 
-        hash_expr = literal("(#") << expr[_1 = at_c<0>(_val)] << literal(')');
+        hash_expr = ("(#") << expr[_1 = at_c<0>(_val)] << (')');
         pairs %= (expr << ":" << expr) % ", ";
         tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
-        at_expr = '(' << expr << '@' << expr << ')';
+        at_expr = literal('(') << expr << literal('@') << expr << literal(')');
 
         // TODO: Missing unary
         expr %=
