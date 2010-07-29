@@ -125,7 +125,17 @@ class Grammar :
         << ph::val("\"")
         << std::endl
       );
-      
+
+    r_program.name("r_program");
+    r_eqns.name("r_eqns");
+    m_header_parser.name("header_parser");
+    BOOST_SPIRIT_DEBUG_NODE(r_program);
+    BOOST_SPIRIT_DEBUG_NODE(r_exprs);
+    BOOST_SPIRIT_DEBUG_NODE(r_eqns);
+    BOOST_SPIRIT_DEBUG_NODE(r_demands);
+    BOOST_SPIRIT_DEBUG_NODE(r_demands_conditional);
+    BOOST_SPIRIT_DEBUG_NODE(r_onetime);
+
   }
 
   private:
