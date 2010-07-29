@@ -24,8 +24,24 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/program_options.hpp>
 #include <iostream>
 #include "tlcore.hpp"
+#include <fstream>
 
 namespace po = boost::program_options;
+
+namespace
+{
+
+std::unique_ptr<std::ifstream> openInput(const std::string& input)
+{
+  std::unique_ptr<std::ifstream> is(new std::ifstream(input.c_str()));
+  if (!is->is_open())
+  {
+    throw "Could not open file";
+  }
+  return is;
+}
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -86,7 +102,26 @@ int main(int argc, char *argv[])
     tlcore.demands(true);
   }
 
-  tlcore.run();
+  std::unique_ptr<std::ifstream> input;
+  if (vm.count("input"))
+  {
+    input = openInput(vm["input"].as<std::string>());
+    tlcore.set_input(input.get());
+  }
+
+  try
+  {
+    tlcore.run();
+  }
+  catch (const char* c)
+  {
+    std::cerr << "terminated with exception: " << c << std::endl;
+  }
+  catch (...)
+  {
+    std::cerr << "error running system" << std::endl;
+    return 1;
+  }
 
   return 0;
 }
