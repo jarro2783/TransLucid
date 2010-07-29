@@ -33,11 +33,7 @@ namespace TransLucid
     struct iterator_traits :
       public std::iterator
       <
-      //TODO work out what type of iterator this is
-      //maybe I should make it a forward iterator and implement my
-      //own buffering when reading straight from cin.
         std::input_iterator_tag,
-        //std::forward_iterator_tag,
         unsigned int,
         int64_t
       >
@@ -238,11 +234,11 @@ namespace TransLucid
       {
         //std::cerr << "readNext() ";
         m_value = 0;
-        char c = *m_iter;
+        typename T::value_type c = *m_iter;
         int toRead = 0;
         int nextShift = 0;
 
-        //std::cerr << c << " ";
+        //std::cerr << std::hex << (int)c << " ";
 
         if ((c & 0x80) == 0)
         {
@@ -271,6 +267,7 @@ namespace TransLucid
         else
         {
           //invalid character
+          std::cerr << "warning: invalid initial unicode byte" << std::endl;
         }
 
         ++m_iter;
@@ -278,19 +275,20 @@ namespace TransLucid
         for (int i = 0; i != toRead; ++i)
         {
           c = *m_iter;
-          //std::cerr << c << " ";
+          //std::cerr << (int)c << " ";
           if ((c & 0xC0) != 0x80)
           {
             //invalid character
+            std::cerr << "warning: invalid unicode byte" << std::endl;
           }
-          m_value |= (0x3F << nextShift);
+          m_value |= ((0x3F & c) << nextShift);
           nextShift -= 6;
           ++m_iter;
         }
 
         //std::cerr << std::endl;
 
-        //std::cerr << "readNext() " << m_value << std::endl;
+        //std::cerr << "readNext() = " << m_value << std::endl;
 
         m_haveReadCurrent = true;
       }

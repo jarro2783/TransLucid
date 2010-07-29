@@ -81,6 +81,17 @@ BOOST_AUTO_TEST_CASE ( copying )
   BOOST_CHECK(copy == correct);
 }
 
+BOOST_AUTO_TEST_CASE ( nonascii )
+{
+  std::string s = u8"\u00e9";
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
+    TL::Parser::makeUTF8Iterator(s.end()));
+
+  unsigned int c = *iter;
+
+  BOOST_CHECK_EQUAL(c, U'\u00e9');
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE( utf32_iterator_tests)
