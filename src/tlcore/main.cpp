@@ -41,6 +41,16 @@ std::unique_ptr<std::ifstream> openInput(const std::string& input)
   return is;
 }
 
+std::unique_ptr<std::ofstream> openOutput(const std::string& output)
+{
+  std::unique_ptr<std::ofstream> os(new std::ofstream(output.c_str()));
+  if (!os->is_open())
+  {
+    throw "Unable to open file";
+  }
+  return os;
+}
+
 }
 
 int main(int argc, char *argv[])
@@ -107,6 +117,13 @@ int main(int argc, char *argv[])
   {
     input = openInput(vm["input"].as<std::string>());
     tlcore.set_input(input.get());
+  }
+
+  std::unique_ptr<std::ofstream> output;
+  if (vm.count("output"))
+  {
+    output = openOutput(vm["output"].as<std::string>());
+    tlcore.set_output(output.get());
   }
 
   try
