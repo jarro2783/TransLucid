@@ -68,7 +68,7 @@ Special::print(std::ostream& os) const
 
 void Char::print(std::ostream& os) const
 {
-  u32string s(m_c, 1);
+  u32string s(1, m_c);
   os << "uchar<" << utf32_to_utf8(s) << ">";
 }
 
