@@ -24,7 +24,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_fwd.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
-#include <boost/spirit/include/classic_debug.hpp>
 #include <boost/spirit/include/qi_core.hpp>
 
 namespace TransLucid
@@ -73,11 +72,11 @@ namespace TransLucid
         | qi::eps [_val = construct<Tree::nil>()]
         ;
 
-        //BOOST_SPIRIT_DEBUG_NODE(boolean);
-        //BOOST_SPIRIT_DEBUG_NODE(guard);
-        //BOOST_SPIRIT_DEBUG_NODE(equation);
-        //BOOST_SPIRIT_DEBUG_NODE(expr);
-        //BOOST_SPIRIT_DEBUG_NODE(context_perturb);
+        BOOST_SPIRIT_DEBUG_NODE(boolean);
+        BOOST_SPIRIT_DEBUG_NODE(guard);
+        BOOST_SPIRIT_DEBUG_NODE(equation);
+        BOOST_SPIRIT_DEBUG_NODE(expr);
+        BOOST_SPIRIT_DEBUG_NODE(context_perturb);
       }
 
       template <typename T>
