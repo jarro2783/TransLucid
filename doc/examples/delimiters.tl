@@ -1,3 +1,5 @@
+//tlcore -i delimiters.tl
+
 delimiters "uchar" '‘' '’';;
 delimiters "ustring" ‘“’ ‘”’;;
 %%
