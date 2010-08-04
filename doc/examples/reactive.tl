@@ -1,4 +1,5 @@
 //tlcore --reactive -i reactive.tl
+//this example doesn't work properly yet
 
 %%
 x = 1;;
