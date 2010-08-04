@@ -1,3 +1,5 @@
+//tlcore -i unicode.tl
+
 %%
 %%
 uchar<é>;;

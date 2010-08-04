@@ -50,7 +50,7 @@ namespace TransLucid
       {
         skip =
           qi::char_(' ') | '\n' | '\t'
-        | literal("//")
+        | (literal("//") >> *(qi::char_ - '\n') >> '\n')
         | (literal("/*") >> *(qi::char_ - literal("/*")) >> literal("*/"))
         ;
       }
