@@ -21,6 +21,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <iostream>
 #include <tl/ast.hpp>
+#include <tl/library.hpp>
+#include <tl/parser_header_util.hpp>
 
 namespace TransLucid
 {
@@ -51,7 +53,7 @@ namespace TransLucid
       evaluateInstant() = 0;
 
       virtual void
-      postHeader() = 0;
+      postHeader(const Parser::Header& header) = 0;
     };
 
     class TLCore : public Evaluator
@@ -102,7 +104,7 @@ namespace TransLucid
       evaluateInstant();
 
       void
-      postHeader();
+      postHeader(const Parser::Header& header);
 
       private:
       bool m_verbose;
@@ -118,6 +120,10 @@ namespace TransLucid
       ExprList m_exprs;
 
       mpz_class m_time;
+
+      size_t m_lastLibLoaded;
+
+      Libtool m_libtool;
 
       std::u32string 
       read_input();

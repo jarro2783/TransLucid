@@ -82,7 +82,7 @@ class Grammar :
 
     r_onetime =
       -m_header_parser(ph::ref(m_header))
-        [ph::bind(&postHeader, ph::ref(m_evaluator))]
+        [ph::bind(&postHeader, ph::ref(m_evaluator), ph::ref(m_header))]
     >> literal("%%")
     > r_eqns
     > r_demands_conditional
@@ -242,9 +242,9 @@ class Grammar :
   }
 
   static void
-  postHeader(Evaluator& e)
+  postHeader(Evaluator& e, const Parser::Header& header)
   {
-    e.postHeader();
+    e.postHeader(header);
   }
 };
 
@@ -257,6 +257,7 @@ TLCore::TLCore()
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_time(0)
+ ,m_lastLibLoaded(0)
 {
   m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
 }
@@ -341,10 +342,16 @@ TLCore::evaluateInstant()
 {
 }
 
-void TLCore::postHeader()
+void TLCore::postHeader(const Parser::Header& header)
 {
+  while (m_lastLibLoaded < header.libraries.size())
+  {
+    m_libtool.loadLibrary(header.libraries.at(m_lastLibLoaded), &m_system);
+    ++m_lastLibLoaded;
+  }
 }
 
 } //namespace TLCore
 
 } //namespace TransLucid
+
