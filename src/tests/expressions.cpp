@@ -260,6 +260,14 @@ BOOST_AUTO_TEST_CASE ( context_change )
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 3);
 }
 
+BOOST_AUTO_TEST_CASE ( misc )
+{
+  TL::HD* h = 0;
+
+  h = translator.translate_expr(U"0 @ [t:11, w:11, x:5, y:7, z:42]");
+  BOOST_REQUIRE(h != 0);
+}
+
 BOOST_AUTO_TEST_CASE ( header )
 {
   TL::Translator t2;

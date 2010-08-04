@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_fwd.hpp>
 #include <tl/system.hpp>
 #include <iostream>
+#include <tl/ast.hpp>
 
 namespace TransLucid
 {
@@ -36,7 +37,21 @@ namespace TransLucid
     template <typename Iterator>
     class Grammar;
 
-    class TLCore
+    class Evaluator
+    {
+      public:
+
+      virtual void 
+      addEquation(const Parser::ParsedEquation& eqn) = 0;
+
+      virtual void
+      addExpression(const Tree::Expr& e) = 0;
+
+      virtual void
+      evaluateInstant() = 0;
+    };
+
+    class TLCore : public Evaluator
     {
       public:
       TLCore();
@@ -74,6 +89,15 @@ namespace TransLucid
         m_os = os;
       }
 
+      void 
+      addEquation(const Parser::ParsedEquation& eqn);
+
+      void
+      addExpression(const Tree::Expr& e);
+
+      void 
+      evaluateInstant();
+
       private:
       bool m_verbose;
       bool m_reactive;
@@ -86,6 +110,8 @@ namespace TransLucid
 
       SystemHD m_system;
       ExprList m_exprs;
+
+      mpz_class m_time;
 
       std::u32string 
       read_input();

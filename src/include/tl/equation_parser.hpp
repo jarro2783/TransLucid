@@ -33,10 +33,6 @@ namespace TransLucid
     namespace ph = boost::phoenix;
     using namespace ph;
 
-    //name, | [], & bool, = HD
-    typedef std::tuple<string_type, Tree::Expr, Tree::Expr, Tree::Expr>
-    ParsedEquation;
-
     template <typename Iterator>
     class EquationGrammar
     : public qi::grammar<Iterator, ParsedEquation(),qi::locals<string_type>,

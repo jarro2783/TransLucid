@@ -98,6 +98,11 @@ namespace TransLucid
     }
 
     typedef boost::spirit::classic::multi_pass<U32Iterator> iterator_t;
+
+    //name, | [], & bool, = HD
+    typedef std::tuple<string_type, Tree::Expr, Tree::Expr, Tree::Expr>
+    ParsedEquation;
+
   }
 }
 

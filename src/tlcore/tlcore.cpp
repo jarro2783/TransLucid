@@ -39,11 +39,14 @@ class Grammar :
   public Parser::qi::grammar<Iterator, Parser::SkipGrammar<Iterator>>
 {
   public:
-  Grammar(SystemHD& system, ExprList& exprs, bool reactive, bool demands)
+  Grammar(SystemHD& system, ExprList& exprs, bool reactive, bool demands,
+    Evaluator& evaluate
+  )
   : Grammar::base_type(r_program)
    ,m_expr(m_header)
    ,m_system(system)
    ,m_exprs(exprs)
+   ,m_evaluator(evaluate)
   {
     namespace ph = boost::phoenix;
     using namespace boost::spirit::qi::labels;
@@ -64,7 +67,12 @@ class Grammar :
     if (reactive)
     {
       r_program = 
-      *(r_onetime % literal("$$"))
+      *(r_onetime % 
+          Parser::qi::lit(literal("$$"))
+          [
+            ph::bind(&evaluateInstant, ph::ref(m_evaluator))
+          ]
+       )
       > Parser::qi::eoi;
     }
     else
@@ -85,7 +93,7 @@ class Grammar :
       *(
          (m_eqn > literal(";;"))
          [
-           ph::bind(&addEquation, ph::ref(m_system), _1)
+           ph::bind(&addEquation, ph::ref(m_system), _1, ph::ref(m_evaluator))
          ]
        )
     ;
@@ -156,9 +164,12 @@ class Grammar :
 
   SystemHD& m_system;
   ExprList& m_exprs;
+  Evaluator& m_evaluator;
 
   static void
-  addEquation(SystemHD& system, const Parser::ParsedEquation& eqn)
+  addEquation(SystemHD& system, const Parser::ParsedEquation& eqn,
+    Evaluator& evaluate
+  )
   {
     ExprCompiler compiler(&system);
 
@@ -194,6 +205,8 @@ class Grammar :
       delete expr;
       throw;
     }
+
+    evaluate.addEquation(eqn);
   }
   
   static void
@@ -216,6 +229,12 @@ class Grammar :
       throw;
     }
   }
+  
+  static void
+  evaluateInstant(Evaluator& e)
+  {
+    e.evaluateInstant();
+  }
 };
 
 TLCore::TLCore()
@@ -226,6 +245,7 @@ TLCore::TLCore()
  ,m_grammar(0)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
+ ,m_time(0)
 {
   m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
 }
@@ -236,8 +256,7 @@ TLCore::run()
   delete m_grammar;
   m_grammar = 
     new Grammar<Parser::iterator_t>
-      (m_system, m_exprs, m_reactive, m_demands);
-  //std::u32string input = read_input();
+      (m_system, m_exprs, m_reactive, m_demands, *this);
   
   *m_is >> std::noskipws;
 
@@ -294,6 +313,21 @@ TLCore::read_input()
   input = utf8_to_utf32(buffer);
 
   return input;
+}
+
+void 
+TLCore::addEquation(const Parser::ParsedEquation& eqn)
+{
+}
+
+void
+TLCore::addExpression(const Tree::Expr& e)
+{
+}
+
+void
+TLCore::evaluateInstant()
+{
 }
 
 } //namespace TLCore
