@@ -82,6 +82,7 @@ class Grammar :
 
     r_onetime =
       -m_header_parser(ph::ref(m_header))
+        [ph::bind(&postHeader, ph::ref(m_evaluator))]
     >> literal("%%")
     > r_eqns
     > r_demands_conditional
@@ -102,7 +103,8 @@ class Grammar :
       *(
          (m_expr > literal(";;"))
          [
-           ph::bind(&addExpression, ph::ref(m_system), ph::ref(m_exprs), _1)
+           ph::bind(&addExpression, ph::ref(m_system), ph::ref(m_exprs), _1,
+            ph::ref(m_evaluator))
          ]
        )
     ;
@@ -210,7 +212,8 @@ class Grammar :
   }
   
   static void
-  addExpression(SystemHD& system, ExprList& exprs, const Tree::Expr& e)
+  addExpression(SystemHD& system, ExprList& exprs, const Tree::Expr& e,
+    Evaluator& evaluate)
   {
     ExprCompiler compiler(&system);
 
@@ -228,12 +231,20 @@ class Grammar :
       delete ce;
       throw;
     }
+
+    evaluate.addExpression(e);
   }
   
   static void
   evaluateInstant(Evaluator& e)
   {
     e.evaluateInstant();
+  }
+
+  static void
+  postHeader(Evaluator& e)
+  {
+    e.postHeader();
   }
 };
 
@@ -327,6 +338,10 @@ TLCore::addExpression(const Tree::Expr& e)
 
 void
 TLCore::evaluateInstant()
+{
+}
+
+void TLCore::postHeader()
 {
 }
 

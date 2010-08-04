@@ -49,6 +49,9 @@ namespace TransLucid
 
       virtual void
       evaluateInstant() = 0;
+
+      virtual void
+      postHeader() = 0;
     };
 
     class TLCore : public Evaluator
@@ -97,6 +100,9 @@ namespace TransLucid
 
       void 
       evaluateInstant();
+
+      void
+      postHeader();
 
       private:
       bool m_verbose;
