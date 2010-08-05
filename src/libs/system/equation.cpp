@@ -186,7 +186,6 @@ VariableHD::operator()(const Tuple& k)
       applicable.push_back
         (ApplicableTuple(Tuple(), eqn_i));
     }
-    #warning redo best fitting
     #if 0
     if (equationValid(eqn_i->second, k))
     {
@@ -232,6 +231,8 @@ VariableHD::operator()(const Tuple& k)
                           TYPE_INDEX_SPECIAL), k);
   }
 
+  //I suspect that this is buggy
+  #if 0
   for (applicable_list::const_iterator iter = applicable.begin();
        iter != applicable.end(); ++iter)
   {
@@ -244,7 +245,22 @@ VariableHD::operator()(const Tuple& k)
                             TYPE_INDEX_SPECIAL), k);
     }
   }
+  #endif
 
+  for (applicable_list::const_iterator iter = applicable.begin();
+       iter != applicable.end(); ++iter)
+  {
+    if (iter != bestIter &&
+        //std::get<1>(*bestIter)->second.equation()
+        //  != std::get<1>(*iter)->second.equation()
+        //&&
+        !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
+    {
+      return TaggedConstant(Constant(Special(Special::MULTIDEF),
+                            TYPE_INDEX_SPECIAL), k);
+    }
+  }
+  
   //std::cerr << "running equation " << std::get<1>(*bestIter)->id()
   //<< std::endl;
   return (*std::get<1>(*bestIter)->second.equation())(k);

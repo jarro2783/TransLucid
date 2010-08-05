@@ -113,6 +113,8 @@ tupleRefines(const Tuple& a, const Tuple& b)
 {
   //for a to refine b, everything in b must be in a, and for the values that 
   //are, they have to be either equal, or their ranges must be more specific
+  //but a cannot equal b
+  bool equal = true;
   Tuple::const_iterator it1 = a.begin();
   Tuple::const_iterator it2 = b.begin();
   while (it1 != a.end() && it2 != b.end())
@@ -130,12 +132,21 @@ tupleRefines(const Tuple& a, const Tuple& b)
     if (d1 > d2)
     {
       ++it1;
+      //a is more specific if the rest passes
+      equal = false;
       continue;
     }
 
     if (!valueRefines(it1->second, it2->second))
     {
       return false;
+    }
+    //if they both refine each other they are equal
+    else if (valueRefines(it2->second, it1->second))
+    {
+      //the a value is contained in the b value, so a is more
+      //specific as long as the rest passes
+      equal = false;
     }
     ++it1;
     ++it2;
@@ -145,7 +156,9 @@ tupleRefines(const Tuple& a, const Tuple& b)
   {
     return false;
   }
-  return true;
+  //if we get here then a is either equal to be or refines it
+  //if not equal then the variable equal would have been changed somewhere
+  return !equal;
 }
 
 bool
