@@ -250,7 +250,8 @@ Translator::translate_and_add_equation_set(const u32string& s)
         (
           to_u32string(std::get<0>(v)),
           std::get<1>(v),
-          std::get<2>(v)
+          std::get<2>(v),
+          0
         )
       ),
       std::get<3>(v)

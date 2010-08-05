@@ -101,8 +101,7 @@ namespace TransLucid
      * dimension.
      **/
     Tuple
-    evaluate(const Tuple& k) const
-    throw(InvalidGuard);
+    evaluate(const Tuple& k) const;
 
     /**
      * @brief Adds a system imposed dimension.
@@ -126,8 +125,6 @@ namespace TransLucid
     HD* m_guard;
     HD* m_boolean;
     std::map<size_t, Constant> m_dimensions;
-    size_t validStart;
-    size_t validEnd;
   };
 
   class VariableHD;

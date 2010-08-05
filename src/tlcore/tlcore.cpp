@@ -210,7 +210,6 @@ TLCore::TLCore()
  ,m_os(&std::cout)
  ,m_compiler(&m_system)
  ,m_time(0)
- ,m_dimTime(get_dimension_index(&m_system, U"time"))
  ,m_lastLibLoaded(0)
 {
   m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
@@ -297,7 +296,7 @@ TLCore::addEquation(const Parser::ParsedEquation& eqn)
     guard = m_compiler.compile(std::get<1>(eqn));
     boolean = m_compiler.compile(std::get<2>(eqn));
     expr = m_compiler.compile(std::get<3>(eqn));
-    
+
     m_system.addExpr
     (
       Tuple
@@ -306,7 +305,8 @@ TLCore::addEquation(const Parser::ParsedEquation& eqn)
         (
           to_u32string(std::get<0>(eqn)),
           guard,
-          boolean
+          boolean,
+          m_time
         )
       ),
       expr
@@ -349,7 +349,7 @@ TLCore::evaluateInstant()
 
   for (auto iter = m_exprs.begin(); iter != m_exprs.end(); ++iter)
   {
-    tuple_t k = {{m_dimTime, Constant(Intmp(m_time), TYPE_INDEX_INTMP)}};
+    tuple_t k = {{DIM_TIME, Constant(Intmp(m_time), TYPE_INDEX_INTMP)}};
     TaggedConstant result = (iter->second)->operator()(Tuple(k));
     if (m_verbose)
     {

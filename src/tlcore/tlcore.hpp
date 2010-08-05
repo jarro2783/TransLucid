@@ -122,7 +122,6 @@ namespace TransLucid
       ExprCompiler m_compiler;
 
       mpz_class m_time;
-      size_t m_dimTime;
 
       size_t m_lastLibLoaded;
 

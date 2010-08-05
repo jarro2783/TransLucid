@@ -173,7 +173,8 @@ namespace TransLucid
   (
     const u32string& name,
     HD* guard,
-    HD* boolean
+    HD* boolean,
+    const mpz_class& time
   )
   {
     return tuple_t
@@ -184,6 +185,7 @@ namespace TransLucid
         Constant(Guard(GuardHD(guard, boolean)),
                    TYPE_INDEX_GUARD)
       },
+      {DIM_TIME, Constant(Intmp(time), TYPE_INDEX_INTMP)}
     };
   }
 }

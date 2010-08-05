@@ -50,7 +50,13 @@ Tuple::insert(size_t key, const Constant& value) const
 void
 Tuple::print(std::ostream& os) const
 {
-  os << "tuple";
+  std::cerr << "printing tuple" << std::endl;
+  os << "[";
+  BOOST_FOREACH(const tuple_t::value_type& v, *m_value)
+  {
+    os << v.first << ":";
+    v.second.print(os);
+  }
 }
 
 } //namespace TransLucid

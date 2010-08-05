@@ -121,7 +121,7 @@ Range::hash() const
 }
 
 void
-Range::print(std::ostream& os, const Tuple& context) const
+Range::print(std::ostream& os) const
 {
   if (m_lower == 0)
   {

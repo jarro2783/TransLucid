@@ -38,7 +38,7 @@ namespace TransLucid
     ~Range();
 
     void
-    print(std::ostream& os, const Tuple& context) const;
+    print(std::ostream& os) const;
 
     size_t
     hash() const;
@@ -51,6 +51,11 @@ namespace TransLucid
 
     bool
     within(const Range& other) const;
+
+    Range* clone() const
+    {
+      return new Range(*this);
+    }
 
     bool
     operator<(const Range& rhs) const
