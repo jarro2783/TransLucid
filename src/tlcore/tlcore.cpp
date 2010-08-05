@@ -67,17 +67,23 @@ class Grammar :
     if (reactive)
     {
       r_program = 
-      *(r_onetime % 
-          Parser::qi::lit(literal("$$"))
+        (
+          r_onetime 
           [
             ph::bind(&evaluateInstant, ph::ref(m_evaluator))
           ]
-       )
+          % Parser::qi::lit(literal("$$"))
+        )
+        
+      >> -Parser::qi::lit(literal("$$"))
       > Parser::qi::eoi;
     }
     else
     {
-      r_program = r_onetime > Parser::qi::eoi;
+      r_program = (r_onetime > Parser::qi::eoi)
+        [
+          ph::bind(&evaluateInstant, ph::ref(m_evaluator))
+        ];
     }
 
     r_onetime =
@@ -103,8 +109,7 @@ class Grammar :
       *(
          (m_expr > literal(";;"))
          [
-           ph::bind(&addExpression, ph::ref(m_system), ph::ref(m_exprs), _1,
-            ph::ref(m_evaluator))
+           ph::bind(&addExpression, _1, ph::ref(m_evaluator))
          ]
        )
     ;
@@ -173,65 +178,12 @@ class Grammar :
     Evaluator& evaluate
   )
   {
-    ExprCompiler compiler(&system);
-
-    HD* guard = 0;
-    HD* boolean = 0;
-    HD* expr = 0;
-
-    try 
-    {
-      guard = compiler.compile(std::get<1>(eqn));
-      boolean = compiler.compile(std::get<2>(eqn));
-      expr = compiler.compile(std::get<3>(eqn));
-      
-      system.addExpr
-      (
-        Tuple
-        (
-          create_add_eqn_context
-          (
-            to_u32string(std::get<0>(eqn)),
-            guard,
-            boolean
-          )
-        ),
-        expr
-      );
-    
-    }
-    catch (...)
-    {
-      delete guard;
-      delete boolean;
-      delete expr;
-      throw;
-    }
-
     evaluate.addEquation(eqn);
   }
   
   static void
-  addExpression(SystemHD& system, ExprList& exprs, const Tree::Expr& e,
-    Evaluator& evaluate)
+  addExpression(const Tree::Expr& e, Evaluator& evaluate)
   {
-    ExprCompiler compiler(&system);
-
-    HD* ce = 0;
-    
-    try {
-      ce = compiler.compile(e);
-      if (ce == 0) {
-      } else {
-        exprs.push_back(std::make_pair(e, ce));
-      }
-    }
-    catch (...)
-    {
-      delete ce;
-      throw;
-    }
-
     evaluate.addExpression(e);
   }
   
@@ -256,7 +208,9 @@ TLCore::TLCore()
  ,m_grammar(0)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
+ ,m_compiler(&m_system)
  ,m_time(0)
+ ,m_dimTime(get_dimension_index(&m_system, U"time"))
  ,m_lastLibLoaded(0)
 {
   m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
@@ -290,6 +244,7 @@ TLCore::run()
     throw "Failed parsing";
   }
 
+  #if 0
   typedef std::back_insert_iterator<std::string> out_iter;
   Printer::ExprPrinter<out_iter> printer;
 
@@ -305,6 +260,7 @@ TLCore::run()
     }
     (*m_os) << result.first << std::endl;
   }
+  #endif
 }
 
 std::u32string 
@@ -330,16 +286,84 @@ TLCore::read_input()
 void 
 TLCore::addEquation(const Parser::ParsedEquation& eqn)
 {
+  //ExprCompiler compiler(&m_system);
+
+  HD* guard = 0;
+  HD* boolean = 0;
+  HD* expr = 0;
+
+  try 
+  {
+    guard = m_compiler.compile(std::get<1>(eqn));
+    boolean = m_compiler.compile(std::get<2>(eqn));
+    expr = m_compiler.compile(std::get<3>(eqn));
+    
+    m_system.addExpr
+    (
+      Tuple
+      (
+        create_add_eqn_context
+        (
+          to_u32string(std::get<0>(eqn)),
+          guard,
+          boolean
+        )
+      ),
+      expr
+    );
+  
+  }
+  catch (...)
+  {
+    delete guard;
+    delete boolean;
+    delete expr;
+    throw;
+  }
 }
 
 void
 TLCore::addExpression(const Tree::Expr& e)
 {
+  HD* ce = 0;
+  
+  try {
+    ce = m_compiler.compile(e);
+    if (ce == 0) {
+    } else {
+      m_exprs.push_back(std::make_pair(e, ce));
+    }
+  }
+  catch (...)
+  {
+    delete ce;
+    throw;
+  }
 }
 
 void
 TLCore::evaluateInstant()
 {
+  typedef std::back_insert_iterator<std::string> out_iter;
+  Printer::ExprPrinter<out_iter> printer;
+
+  for (auto iter = m_exprs.begin(); iter != m_exprs.end(); ++iter)
+  {
+    tuple_t k = {{m_dimTime, Constant(Intmp(m_time), TYPE_INDEX_INTMP)}};
+    TaggedConstant result = (iter->second)->operator()(Tuple(k));
+    if (m_verbose)
+    {
+      std::string output;
+      std::back_insert_iterator<std::string> outit(output);
+      Printer::karma::generate(outit, printer, iter->first);
+      (*m_os) << output << " -> ";
+    }
+    (*m_os) << result.first << std::endl;
+  }
+
+  //clear the expressions at the end
+  m_exprs.clear();
+  ++m_time;
 }
 
 void TLCore::postHeader(const Parser::Header& header)

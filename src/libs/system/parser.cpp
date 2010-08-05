@@ -20,12 +20,20 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_fwd.hpp>
 #include <tl/exception.hpp>
 #include <boost/format.hpp>
+#include <tl/parser_header_util.hpp>
+#include <tl/charset.hpp>
 
 namespace TransLucid
 {
 
 namespace Parser
 {
+
+Header::Header()
+{
+  //add predefined dimensions
+  dimension_symbols.add(chars_to_unsigned_u32string("time"), U"time");
+}
 
 //I'll keep this for now because it could be of use
 //TODO: clean up error handling

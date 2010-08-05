@@ -32,6 +32,8 @@ namespace TransLucid
 
     struct Header
     {
+      Header();
+
       symbols_t dimension_symbols;
 
       binary_symbols binary_op_symbols;

@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/ast.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_header_util.hpp>
+#include <tl/expr_compiler.hpp>
 
 namespace TransLucid
 {
@@ -118,8 +119,10 @@ namespace TransLucid
 
       SystemHD m_system;
       ExprList m_exprs;
+      ExprCompiler m_compiler;
 
       mpz_class m_time;
+      size_t m_dimTime;
 
       size_t m_lastLibLoaded;
 
