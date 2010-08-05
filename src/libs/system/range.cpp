@@ -214,11 +214,21 @@ Range::within(const Range& other) const
 {
   //is the other range inside this range
   //lower must be <= other.lower and upper must be >= other.upper
-  return (m_lower == 0
+  bool w = (m_lower == 0
   || (other.m_lower != 0 &&  *m_lower <= *other.m_lower))
   &&
   (m_upper == 0
   || (other.m_upper != 0 && *m_upper >= *other.m_upper));
+
+  std::cerr << "Range::within()" << std::endl;
+  other.print(std::cerr);
+  std::cerr << std::endl << " in " << std::endl;
+  this->print(std::cerr);
+  std::cerr << std::endl;
+
+  std::cerr << "within: " << w << std::endl;
+
+  return w;
 }
 
 }

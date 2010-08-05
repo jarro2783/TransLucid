@@ -83,6 +83,7 @@ valueRefines(const Constant& a, const Constant& b)
     {
       return false;
     }
+    std::cerr << "valueRefines = true" << std::endl;
     return true;
   }
   else if (b.index() == TYPE_INDEX_TYPE)
@@ -111,6 +112,11 @@ valueRefines(const Constant& a, const Constant& b)
 bool
 tupleRefines(const Tuple& a, const Tuple& b)
 {
+  std::cerr << "tupleRefines()" << std::endl;
+  a.print(std::cerr);
+  std::cerr << std::endl;
+  b.print(std::cerr);
+  std::cerr << std::endl;
   //for a to refine b, everything in b must be in a, and for the values that 
   //are, they have to be either equal, or their ranges must be more specific
   //but a cannot equal b
@@ -139,13 +145,15 @@ tupleRefines(const Tuple& a, const Tuple& b)
 
     if (!valueRefines(it1->second, it2->second))
     {
+      std::cerr << "does not refine" << std::endl;
       return false;
     }
     //if they both refine each other they are equal
-    else if (valueRefines(it2->second, it1->second))
+    else if (!valueRefines(it2->second, it1->second))
     {
       //the a value is contained in the b value, so a is more
       //specific as long as the rest passes
+      std::cerr << "they are not equal" << std::endl;
       equal = false;
     }
     ++it1;
@@ -158,6 +166,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
   }
   //if we get here then a is either equal to be or refines it
   //if not equal then the variable equal would have been changed somewhere
+  std::cerr << "refines: " << !equal << std::endl;
   return !equal;
 }
 

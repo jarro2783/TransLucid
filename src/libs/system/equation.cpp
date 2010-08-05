@@ -252,7 +252,7 @@ VariableHD::operator()(const Tuple& k)
 
   if (bestIter == applicable.end())
   {
-    return TaggedConstant(Constant(Special(Special::UNDEF),
+    return TaggedConstant(Constant(Special(Special::MULTIDEF),
                           TYPE_INDEX_SPECIAL), k);
   }
 
