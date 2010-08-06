@@ -170,10 +170,21 @@ IdentHD::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
 
-  insert_tuple<String>
-    (kp, m_system, TYPE_INDEX_USTRING)
-    (U"id", m_name)
-    ;
+  tuple_t::iterator itid = kp.find(DIM_ID);
+  if (itid != kp.end())
+  {
+    itid->second = Constant(
+      String(m_name + U"." + itid->second.value<String>().value()),
+      TYPE_INDEX_USTRING
+     );
+  }
+  else 
+  {
+    insert_tuple<String>
+      (kp, m_system, TYPE_INDEX_USTRING)
+      (U"id", m_name)
+      ;
+  }
   return (*m_system)(Tuple(kp));
 }
 

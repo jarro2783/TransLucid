@@ -155,10 +155,18 @@ VariableHD::operator()(const Tuple& k)
   {
     try
     {
+      
+      const u32string& id = iditer->second.value<String>().value();
+      SplitID split(id);
+      u32string begin = split.first();
+      u32string end = split.last();
+
       //std::cerr << "looking for id: " <<
         //utf32_to_utf8(iditer->second.value<String>().value()) << std::endl;
+      //VariableMap::const_iterator viter =
+      //  m_variables.find(iditer->second.value<String>().value());
       VariableMap::const_iterator viter =
-        m_variables.find(iditer->second.value<String>().value());
+        m_variables.find(begin);
       //std::cout << "looking for "
       //          << iditer->second.value<String>().value() << std::endl;
       if (viter == m_variables.end())
@@ -170,7 +178,14 @@ VariableHD::operator()(const Tuple& k)
       else
       {
         tuple_t kp = k.tuple();
-        kp.erase(DIM_ID);
+        if (end.empty())
+        {
+          kp.erase(DIM_ID);
+        }
+        else
+        {
+          kp[DIM_ID] = Constant(String(end), TYPE_INDEX_USTRING);
+        }
         return (*viter->second)(Tuple(kp));
       }
     }
