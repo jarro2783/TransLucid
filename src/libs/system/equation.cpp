@@ -77,9 +77,6 @@ GuardHD::evaluate(const Tuple& k) const
     }
   }
 
-  Tuple(t).print(std::cerr);
-  std::cerr << std::endl;
-
   return Tuple(t);
   //TaggedConstant v = (*m_guard)(k);
 }
@@ -95,7 +92,6 @@ GuardHD makeGuardWithTime(const mpz_class& start)
 inline std::pair<uuid, VariableHD::Equations::iterator>
 VariableHD::addExprActual(const Tuple& k, HD* h)
 {
-  std::cerr << "defining an equation" << std::endl;
   GuardHD g;
   Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
   if (giter != k.end())
@@ -106,7 +102,6 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   Tuple::const_iterator titer = k.find(DIM_TIME);
   if (titer != k.end())
   {
-    std::cerr << "adding time to equation definition" << std::endl;
     g.addDimension(DIM_TIME, 
       Constant(Range(&titer->second.value<Intmp>().value(), 0), 
                TYPE_INDEX_RANGE));
@@ -141,10 +136,12 @@ TaggedConstant
 VariableHD::operator()(const Tuple& k)
 {
 
+  #if 0
   std::cerr << "evaluating variable "
             << m_name << ", context: " << std::endl;
   k.print(std::cerr);
   std::cerr << std::endl;
+  #endif
 
   typedef std::tuple<Tuple, Equations::const_iterator> ApplicableTuple;
   typedef std::list<ApplicableTuple> applicable_list;
@@ -187,12 +184,10 @@ VariableHD::operator()(const Tuple& k)
   for (Equations::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
-    std::cerr << "best fitting" << std::endl;
     if (eqn_i->second.validContext())
     {
       try
       {
-        std::cerr << "has valid context" << std::endl;
         const GuardHD& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
         if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
@@ -207,7 +202,6 @@ VariableHD::operator()(const Tuple& k)
     }
     else
     {
-      std::cerr << "is applicable" << std::endl;
       applicable.push_back
         (ApplicableTuple(Tuple(), eqn_i));
     }
