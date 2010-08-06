@@ -166,6 +166,9 @@ SystemHD::SystemHD()
     ))
   );
 
+  //add this
+  addToVariableActual(U"this", Tuple(), this);
+
   //add variables for all the types
   //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
   init_types();
