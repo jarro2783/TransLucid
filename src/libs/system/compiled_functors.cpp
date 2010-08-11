@@ -254,7 +254,9 @@ TaggedConstant
 HashHD::operator()(const Tuple& k)
 {
   TaggedConstant r = (*m_e)(k);
+  return lookup_context(m_system, r.first, k);
   //std::cerr << "hash " << r.first << " = ";
+  #if 0
   size_t index;
   if (r.first.index() == TYPE_INDEX_DIMENSION)
   {
@@ -273,9 +275,19 @@ HashHD::operator()(const Tuple& k)
   }
   else
   {
-    return TaggedConstant(Constant(Special(Special::DIMENSION),
-                          TYPE_INDEX_SPECIAL), k);
+    //find the all dimension
+    Tuple::const_iterator all = k.find(DIM_ALL);
+    if (all == k.end())
+    {
+      return TaggedConstant(Constant(Special(Special::DIMENSION),
+                            TYPE_INDEX_SPECIAL), k);
+    }
+    else
+    {
+      return TaggedConstant(all->second, k);
+    }
   }
+  #endif
 }
 
 TaggedConstant

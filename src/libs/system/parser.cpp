@@ -34,6 +34,7 @@ Header::Header()
   //add predefined dimensions
   dimension_symbols.add(chars_to_unsigned_u32string("time"), U"time");
   dimension_symbols.add(chars_to_unsigned_u32string("id"), U"id");
+  dimension_symbols.add(chars_to_unsigned_u32string("all"), U"all");
 }
 
 //I'll keep this for now because it could be of use
