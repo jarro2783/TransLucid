@@ -458,6 +458,10 @@ namespace TransLucid
       {}
     };
 
+    /**
+     * A context change expression. E1 @ E2, evaluate E1 with the tuple
+     * returned by E2 as the new context.
+     */
     struct AtExpr
     {
       AtExpr() = default;
