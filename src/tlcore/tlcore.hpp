@@ -95,6 +95,7 @@ namespace TransLucid
         m_os = os;
       }
 
+      //adds to the list of equations to add at the end of the instant
       void 
       addEquation(const Parser::ParsedEquation& eqn);
 
@@ -127,8 +128,15 @@ namespace TransLucid
 
       Libtool m_libtool;
 
+      typedef std::tuple<u32string, HD*, HD*, HD*> CompiledEquation;
+      std::list<CompiledEquation> m_addEquations;
+
       std::u32string 
       read_input();
+
+      //does the actual adding to the system
+      void
+      addEquationActual();
     };
   }
 }
