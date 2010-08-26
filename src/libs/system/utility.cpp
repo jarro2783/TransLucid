@@ -122,10 +122,10 @@ bool
 tupleRefines(const Tuple& a, const Tuple& b)
 {
   //std::cerr << "== tuple refines ==" << std::endl;
-  a.print(std::cerr);
-  std::cerr << std::endl;
-  b.print(std::cerr);
-  std::cerr << std::endl;
+  //a.print(std::cerr);
+  //std::cerr << std::endl;
+  //b.print(std::cerr);
+  //std::cerr << std::endl;
   //for a to refine b, everything in b must be in a, and for the values that 
   //are, they have to be either equal, or their ranges must be more specific
   //but a cannot equal b

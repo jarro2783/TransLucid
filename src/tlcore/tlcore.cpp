@@ -343,6 +343,8 @@ TLCore::evaluateInstant()
   addNewEquations();
   m_addEquations.clear();
 
+  (*m_os) << "%%" << std::endl;
+
   for (auto iter = m_exprs.begin(); iter != m_exprs.end(); ++iter)
   {
     tuple_t k = {{DIM_TIME, Constant(Intmp(m_time), TYPE_INDEX_INTMP)}};
@@ -352,7 +354,7 @@ TLCore::evaluateInstant()
       std::string output;
       std::back_insert_iterator<std::string> outit(output);
       Printer::karma::generate(outit, printer, iter->first);
-      (*m_os) << output << " -> ";
+      (*m_os) << "expr<" << output << ">" << " -> ";
     }
     (*m_os) << result.first << std::endl;
   }
@@ -397,7 +399,7 @@ void TLCore::addNewEquations()
 
     if (m_uuids)
     {
-      (*m_os) << uuid << std::endl;
+      (*m_os) << "uuid<" << uuid << ">" << std::endl;
     }
   }
 }
