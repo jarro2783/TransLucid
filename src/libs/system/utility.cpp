@@ -58,6 +58,8 @@ tupleApplicable(const Tuple& def, const Tuple& c)
 bool
 valueRefines(const Constant& a, const Constant& b)
 {
+  //std::cerr << "== value refines ==" << std::endl;
+  //std::cerr << a << " r " << b << std::endl;
   //if b is a range, a has to be a range and within or equal,
   //or an int and inside, otherwise they have to be equal
 
@@ -69,6 +71,7 @@ valueRefines(const Constant& a, const Constant& b)
     {
       if (!b.value<Range>().within(a.value<Range>()))
       {
+        //std::cerr << "no" << std::endl;
         return false;
       }
     }
@@ -76,13 +79,16 @@ valueRefines(const Constant& a, const Constant& b)
     {
       if (!b.value<Range>().within(a.value<Intmp>()))
       {
+        //std::cerr << "no" << std::endl;
         return false;
       }
     }
     else
     {
+        //std::cerr << "no" << std::endl;
       return false;
     }
+        //std::cerr << "yes" << std::endl;
     return true;
   }
   else if (b.index() == TYPE_INDEX_TYPE)
@@ -91,19 +97,23 @@ valueRefines(const Constant& a, const Constant& b)
     //<< std::endl;
     if (a.index() == b.value<Type>().index())
     {
+        //std::cerr << "yes" << std::endl;
       return true;
     }
     else
     {
+        //std::cerr << "no" << std::endl;
       return false;
     }
   }
   else
   {
+    //std::cerr << (a==b ? "yes" : "no") << std::endl;
     return a == b;
   }
 
   //for now a and b just have to be equal
+    //std::cerr << (a==b ? "yes" : "no") << std::endl;
   return a == b;
 }
 
@@ -111,6 +121,11 @@ valueRefines(const Constant& a, const Constant& b)
 bool
 tupleRefines(const Tuple& a, const Tuple& b)
 {
+  //std::cerr << "== tuple refines ==" << std::endl;
+  a.print(std::cerr);
+  std::cerr << std::endl;
+  b.print(std::cerr);
+  std::cerr << std::endl;
   //for a to refine b, everything in b must be in a, and for the values that 
   //are, they have to be either equal, or their ranges must be more specific
   //but a cannot equal b
@@ -125,6 +140,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
     //extra dimension in b
     if (d2 < d1)
     {
+      //std::cerr << "no by extra dimension" << std::endl;
       return false;
     }
 
@@ -134,11 +150,13 @@ tupleRefines(const Tuple& a, const Tuple& b)
       ++it1;
       //a is more specific if the rest passes
       equal = false;
+      //std::cerr << "not equal by dimension" << std::endl;
       continue;
     }
 
     if (!valueRefines(it1->second, it2->second))
     {
+      //std::cerr << "no by not refines" << std::endl;
       return false;
     }
     //if they both refine each other they are equal
@@ -147,6 +165,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
       //the a value is contained in the b value, so a is more
       //specific as long as the rest passes
       equal = false;
+      //std::cerr << "not equal by value" << std::endl;
     }
     ++it1;
     ++it2;
@@ -154,10 +173,21 @@ tupleRefines(const Tuple& a, const Tuple& b)
 
   if (it2 != b.end())
   {
+    //b has stuff left, can't refine
+    //std::cerr << "no by b iter not at end" << std::endl;
     return false;
   }
+
+  if (it1 != a.end())
+  {
+    //there is stuff left in a that was never checked
+    //therefore it refines
+    return true;
+  }
+
   //if we get here then a is either equal to be or refines it
   //if not equal then the variable equal would have been changed somewhere
+  //std::cerr << (!equal ? "yes" : "no") << std::endl;
   return !equal;
 }
 
