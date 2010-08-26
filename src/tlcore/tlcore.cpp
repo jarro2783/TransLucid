@@ -303,25 +303,6 @@ TLCore::addEquation(const Parser::ParsedEquation& eqn)
       expr
     ));
 
-    #if 0
-
-    m_system.addExpr
-    (
-      Tuple
-      (
-        create_add_eqn_context
-        (
-          to_u32string(std::get<0>(eqn)),
-          guard,
-          boolean,
-          m_time
-        )
-      ),
-      expr
-    );
-
-    #endif
-  
   }
   catch (...)
   {
@@ -357,6 +338,10 @@ TLCore::evaluateInstant()
   typedef std::back_insert_iterator<std::string> out_iter;
   Printer::ExprPrinter<out_iter> printer;
 
+  //add the equations
+  addNewEquations();
+  m_addEquations.clear();
+
   for (auto iter = m_exprs.begin(); iter != m_exprs.end(); ++iter)
   {
     tuple_t k = {{DIM_TIME, Constant(Intmp(m_time), TYPE_INDEX_INTMP)}};
@@ -382,6 +367,32 @@ void TLCore::postHeader(const Parser::Header& header)
   {
     m_libtool.loadLibrary(header.libraries.at(m_lastLibLoaded), &m_system);
     ++m_lastLibLoaded;
+  }
+}
+
+void TLCore::addNewEquations()
+{
+  for 
+  (
+    auto iter = m_addEquations.begin();
+    iter != m_addEquations.end();
+    ++iter
+  )
+  {
+    m_system.addExpr
+    (
+      Tuple
+      (
+        create_add_eqn_context
+        (
+          std::get<0>(*iter),
+          std::get<1>(*iter),
+          std::get<2>(*iter),
+          m_time
+        )
+      ),
+      std::get<3>(*iter)
+    );
   }
 }
 

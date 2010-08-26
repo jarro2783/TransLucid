@@ -128,6 +128,7 @@ namespace TransLucid
 
       Libtool m_libtool;
 
+      //name, guard, boolean, expr
       typedef std::tuple<u32string, HD*, HD*, HD*> CompiledEquation;
       std::list<CompiledEquation> m_addEquations;
 
@@ -136,7 +137,7 @@ namespace TransLucid
 
       //does the actual adding to the system
       void
-      addEquationActual();
+      addNewEquations();
     };
   }
 }
