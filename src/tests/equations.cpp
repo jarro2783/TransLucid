@@ -67,7 +67,8 @@ BOOST_AUTO_TEST_CASE ( single )
   TL::TaggedConstant v = system
   (TL::Tuple(TL::tuple_t(
     {
-      {TL::DIM_ID, TL::generate_string(U"x")}
+      {TL::DIM_ID, TL::generate_string(U"x")},
+      {TL::DIM_TIME, TL::makeTime(1)}
     }
   )));
 
@@ -77,7 +78,8 @@ BOOST_AUTO_TEST_CASE ( single )
   v = system
   (TL::Tuple(TL::tuple_t(
     {
-      {TL::DIM_ID, TL::generate_string(U"y")}
+      {TL::DIM_ID, TL::generate_string(U"y")},
+      {TL::DIM_TIME, TL::makeTime(1)}
     }
   )));
 
@@ -117,7 +119,8 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   TL::TaggedConstant v = system
   (TL::Tuple(TL::tuple_t(
     {
-      {TL::DIM_ID, TL::generate_string(U"a")}
+      {TL::DIM_ID, TL::generate_string(U"a")},
+      {TL::DIM_TIME, TL::makeTime(1)}
     }
   )));
 
@@ -127,7 +130,8 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   v = system
   (TL::Tuple(TL::tuple_t(
     {
-      {TL::DIM_ID, TL::generate_string(U"b")}
+      {TL::DIM_ID, TL::generate_string(U"b")},
+      {TL::DIM_TIME, TL::makeTime(1)}
     }
   )));
 
@@ -137,7 +141,8 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   v = system
   (TL::Tuple(TL::tuple_t(
     {
-      {TL::DIM_ID, TL::generate_string(U"c")}
+      {TL::DIM_ID, TL::generate_string(U"c")},
+      {TL::DIM_TIME, TL::makeTime(1)}
     }
   )));
 
@@ -151,7 +156,8 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   v = system
   (TL::Tuple(TL::tuple_t(
     {
-      {TL::DIM_ID, TL::generate_string(U"d")}
+      {TL::DIM_ID, TL::generate_string(U"d")},
+      {TL::DIM_TIME, TL::makeTime(1)}
     }
   )));
 
@@ -164,6 +170,7 @@ BOOST_AUTO_TEST_CASE ( functions )
   std::cerr << "Third test case" << std::endl;
   TL::HD* h = 0;
   TL::TaggedConstant v;
+  TL::Tuple k(TL::tuple_t({{TL::DIM_TIME, TL::makeTime(0)}}));
 
   translator.translate_and_add_equation_set
   (
@@ -173,17 +180,17 @@ BOOST_AUTO_TEST_CASE ( functions )
   );
 
   h = translator.translate_expr(U"fib @ [1 : 0]");
-  v = (*h)(TL::Tuple());
+  v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 0);
 
   h = translator.translate_expr(U"fib @ [1 : 1]");
-  v = (*h)(TL::Tuple());
+  v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
 
   h = translator.translate_expr(U"fib @ [1 : 2]");
-  v = (*h)(TL::Tuple());
+  v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
 }

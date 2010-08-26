@@ -35,6 +35,12 @@ namespace TransLucid
   {
   };
 
+  inline Constant
+  makeTime(const mpz_class& time)
+  {
+    return Constant(Intmp(time), TYPE_INDEX_INTMP);
+  }
+
   class SplitID
   {
     private:
@@ -185,7 +191,7 @@ namespace TransLucid
         Constant(Guard(GuardHD(guard, boolean)),
                    TYPE_INDEX_GUARD)
       },
-      {DIM_TIME, Constant(Intmp(time), TYPE_INDEX_INTMP)}
+      {DIM_TIME, makeTime(time)}
     };
   }
 
