@@ -205,6 +205,7 @@ TLCore::TLCore()
   m_verbose(false)
  ,m_reactive(false)
  ,m_demands(false)
+ ,m_uuids(false)
  ,m_grammar(0)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
@@ -379,7 +380,7 @@ void TLCore::addNewEquations()
     ++iter
   )
   {
-    m_system.addExpr
+    auto uuid = m_system.addExpr
     (
       Tuple
       (
@@ -393,6 +394,11 @@ void TLCore::addNewEquations()
       ),
       std::get<3>(*iter)
     );
+
+    if (m_uuids)
+    {
+      (*m_os) << uuid << std::endl;
+    }
   }
 }
 

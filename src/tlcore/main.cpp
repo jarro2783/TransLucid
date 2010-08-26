@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
     ("input,i", po::value<std::string>(), "input file")
     ("output,o", po::value<std::string>(), "output file")
     ("reactive", "reactive system")
+    ("uuid", "print uuids")
     ("verbose", "verbose output")
     ("version", "show version")
   ;
@@ -110,6 +111,11 @@ int main(int argc, char *argv[])
   if (vm.count("demands"))
   {
     tlcore.demands(true);
+  }
+
+  if (vm.count("uuid"))
+  {
+    tlcore.uuids(true);
   }
 
   std::unique_ptr<std::ifstream> input;

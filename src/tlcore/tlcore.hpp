@@ -80,6 +80,12 @@ namespace TransLucid
         m_demands = d;
       }
 
+      void
+      uuids(bool u)
+      {
+        m_uuids = u;
+      }
+
       void 
       run();
 
@@ -112,6 +118,7 @@ namespace TransLucid
       bool m_verbose;
       bool m_reactive;
       bool m_demands;
+      bool m_uuids;
       Grammar<Parser::iterator_t>* m_grammar;
       Parser::SkipGrammar<Parser::iterator_t>* m_skipper;      
 
