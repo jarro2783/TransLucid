@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_SUITE( expressions_tests )
 BOOST_AUTO_TEST_CASE ( single )
 {
   std::cerr << "First test case" << std::endl;
-  translator.translate_and_add_equation_set(U"x = 5;;y = 6;;");
+  translator.translate_and_add_equation_set(U" x = 5;; y = 6;;");
 
   TL::HD& system = translator.system();
 

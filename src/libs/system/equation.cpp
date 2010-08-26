@@ -97,10 +97,12 @@ TaggedConstant
 VariableHD::operator()(const Tuple& k)
 {
 
+  #if 0
   std::cerr << "evaluating variable "
             << m_name << ", context: " << std::endl;
   k.print(std::cerr);
   std::cerr << std::endl;
+  #endif
 
   typedef std::tuple<Tuple, Equations::const_iterator> ApplicableTuple;
   typedef std::list<ApplicableTuple> applicable_list;
@@ -120,8 +122,8 @@ VariableHD::operator()(const Tuple& k)
       u32string begin = split.first();
       u32string end = split.last();
 
-      std::cerr << "looking for id: " <<
-        utf32_to_utf8(iditer->second.value<String>().value()) << std::endl;
+      //std::cerr << "looking for id: " <<
+        //utf32_to_utf8(iditer->second.value<String>().value()) << std::endl;
       //VariableMap::const_iterator viter =
       //  m_variables.find(iditer->second.value<String>().value());
       VariableMap::const_iterator viter =
@@ -130,7 +132,7 @@ VariableHD::operator()(const Tuple& k)
       //          << iditer->second.value<String>().value() << std::endl;
       if (viter == m_variables.end())
       {
-        std::cerr << "not found" << std::endl;
+        //std::cerr << "not found" << std::endl;
         return TaggedConstant(Constant(Special(Special::UNDEF),
                               TYPE_INDEX_SPECIAL), k);
       }
@@ -158,16 +160,12 @@ VariableHD::operator()(const Tuple& k)
   for (Equations::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
-    std::cerr << "visiting equation" << std::endl;
     if (eqn_i->second.validContext())
     {
-      std::cerr << "there is a context" << std::endl;
       try
       {
         const GuardHD& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
-        evalContext.print(std::cerr);
-        std::cerr << std::endl;
         if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
         {
           applicable.push_back
@@ -180,7 +178,6 @@ VariableHD::operator()(const Tuple& k)
     }
     else
     {
-      std::cerr << "no guard, therefore applicable" << std::endl;
       applicable.push_back
         (ApplicableTuple(Tuple(), eqn_i));
     }
@@ -191,7 +188,7 @@ VariableHD::operator()(const Tuple& k)
     #endif
   }
 
-  std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
+  //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
     return TaggedConstant(Constant(Special(Special::UNDEF),
@@ -230,6 +227,7 @@ VariableHD::operator()(const Tuple& k)
   }
 
   //I suspect that this is buggy
+  #if 0
   for (applicable_list::const_iterator iter = applicable.begin();
        iter != applicable.end(); ++iter)
   {
@@ -242,8 +240,8 @@ VariableHD::operator()(const Tuple& k)
                             TYPE_INDEX_SPECIAL), k);
     }
   }
+  #endif
 
-  #if 0
   for (applicable_list::const_iterator iter = applicable.begin();
        iter != applicable.end(); ++iter)
   {
@@ -257,7 +255,6 @@ VariableHD::operator()(const Tuple& k)
                             TYPE_INDEX_SPECIAL), k);
     }
   }
-  #endif
   
   //std::cerr << "running equation " << std::get<1>(*bestIter)->id()
   //<< std::endl;
@@ -324,28 +321,23 @@ VariableHD::addExprInternal(const Tuple& k, HD* e)
       return std::make_pair(nil_uuid(), m_equations.end());
     }
 
-    #if 0
     SplitID split(id->value());
 
     //add the equation, don't add any id dimension if the end is empty
     u32string begin = split.first();
     u32string end = split.last();
-    #endif
 
     tuple_t kp = k.tuple();
-    #if 0
     if (end.size() != 0)
     {
       kp[dim_id] = Constant(String(end), TYPE_INDEX_USTRING);
     }
     else
-    #endif
     {
       kp.erase(dim_id);
     }
 
-    //return addToVariableActual(begin, Tuple(kp), e);
-    return addToVariableActual(id->value(), Tuple(kp), e);
+    return addToVariableActual(begin, Tuple(kp), e);
   }
 }
 
