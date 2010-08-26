@@ -188,6 +188,11 @@ namespace TransLucid
       {DIM_TIME, Constant(Intmp(time), TYPE_INDEX_INTMP)}
     };
   }
+
+  //looks up a value in the current context and returns the value of the
+  //all dimension if it exists, otherwise special<dim> if not found
+  TaggedConstant
+  lookup_context(HD* system, const Constant& v, const Tuple& k);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

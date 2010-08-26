@@ -285,8 +285,6 @@ TLCore::read_input()
 void 
 TLCore::addEquation(const Parser::ParsedEquation& eqn)
 {
-  //ExprCompiler compiler(&m_system);
-
   HD* guard = 0;
   HD* boolean = 0;
   HD* expr = 0;
@@ -296,6 +294,16 @@ TLCore::addEquation(const Parser::ParsedEquation& eqn)
     guard = m_compiler.compile(std::get<1>(eqn));
     boolean = m_compiler.compile(std::get<2>(eqn));
     expr = m_compiler.compile(std::get<3>(eqn));
+
+    m_addEquations.push_back(CompiledEquation
+    ( 
+      to_u32string(std::get<0>(eqn)),
+      guard,
+      boolean,
+      expr
+    ));
+
+    #if 0
 
     m_system.addExpr
     (
@@ -311,6 +319,8 @@ TLCore::addEquation(const Parser::ParsedEquation& eqn)
       ),
       expr
     );
+
+    #endif
   
   }
   catch (...)

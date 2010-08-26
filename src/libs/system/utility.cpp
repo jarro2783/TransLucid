@@ -276,4 +276,39 @@ u32_to_ascii(const u32string& s)
   return r;
 }
 
+TaggedConstant
+lookup_context(HD* system, const Constant& v, const Tuple& k)
+{
+  size_t index;
+  if (v.index() == TYPE_INDEX_DIMENSION)
+  {
+    index = v.value<TransLucid::Dimension>().value();
+  }
+  else
+  {
+    index = get_dimension_index(system, v);
+  }
+
+  Tuple::const_iterator iter = k.find(index);
+  if (iter != k.end())
+  {
+    //std::cerr << iter->second << std::endl;
+    return TaggedConstant(iter->second, k);
+  }
+  else
+  {
+    //find the all dimension
+    Tuple::const_iterator all = k.find(DIM_ALL);
+    if (all == k.end())
+    {
+      return TaggedConstant(Constant(Special(Special::DIMENSION),
+                            TYPE_INDEX_SPECIAL), k);
+    }
+    else
+    {
+      return TaggedConstant(all->second, k);
+    }
+  }
+}
+
 }

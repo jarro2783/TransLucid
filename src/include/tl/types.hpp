@@ -32,6 +32,13 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
+/**
+ * @file types.hpp
+ * All of the core type definitions in the TransLucid interpreter. These
+ * are the types which are crucial for the operation of the interpreter,
+ * specifically Constant and Tuple.
+ */
+
 #define STRING(x) #x
 #define STRING_(x) STRING(x)
 

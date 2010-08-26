@@ -27,6 +27,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/container.hpp>
 
+/**
+ * @file ast.hpp
+ * Everything related to abstract syntax trees.
+ * Contains everything needed to build and traverse an abstract syntax tree.
+ */
+
 namespace TransLucid
 {
   /** 
@@ -40,14 +46,8 @@ namespace TransLucid
      */
     enum UnaryType
     {
-      /**
-       * prefix operator.
-       */
-      UNARY_PREFIX,
-      /**
-       * postfix operator
-       */
-      UNARY_POSTFIX
+      UNARY_PREFIX, /**< prefix operator */
+      UNARY_POSTFIX /**< postfix operator */
     };
 
     /**
@@ -58,6 +58,12 @@ namespace TransLucid
     {
       UnaryOperator() = default;
 
+      /**
+       * Construct a unary operator. 
+       * @param op The name of the operation.
+       * @param symbol The symbol that maps to the operation.
+       * @param type The type of operation, postfix or prefix.
+       */
       UnaryOperator
       (
         const u32string& op,
@@ -82,6 +88,9 @@ namespace TransLucid
        */
       UnaryType type;
 
+      /**
+       * Equality of two unary operations.
+       */
       bool
       operator==(const UnaryOperator& rhs) const
       {
@@ -96,30 +105,11 @@ namespace TransLucid
      */
     enum InfixAssoc
     {
-      /**
-       * Left associative.
-       */
-      ASSOC_LEFT,
-
-      /**
-       * Right associative.
-       */
-      ASSOC_RIGHT,
-
-      /**
-       * Non associative.
-       */
-      ASSOC_NON,
-
-      /**
-       * Variadic.
-       */
-      ASSOC_VARIABLE,
-
-      /**
-       * Multiple comparison.
-       */
-      ASSOC_COMPARISON
+      ASSOC_LEFT, /**< Left associative.*/
+      ASSOC_RIGHT, /**< Right associative.*/
+      ASSOC_NON, /**< Non associative.*/
+      ASSOC_VARIABLE, /**< Variadic.*/
+      ASSOC_COMPARISON /**< Multiple comparison.*/
     };
 
     /**
@@ -130,6 +120,12 @@ namespace TransLucid
     {
       BinaryOperator() = default;
 
+      /**
+       * Construct a binary operator.
+       * @param assoc The association.
+       * @param op The name of the operation.
+       * @param symbol The symbol that maps to this operation.
+       */
       BinaryOperator
       (
         InfixAssoc assoc,
@@ -140,6 +136,12 @@ namespace TransLucid
       : op(op), symbol(symbol), assoc(assoc), precedence(precedence)
       {}
 
+      /**
+       * Determine equality of two binary operators. They are equal if
+       * all the members are equal.
+       * @param rhs The other operator to compare to.
+       * @return All the members of *this equal to all the members of rhs.
+       */
       bool
       operator==(const BinaryOperator& rhs) const
       {
@@ -147,6 +149,11 @@ namespace TransLucid
         assoc == rhs.assoc && precedence == rhs.precedence;
       }
 
+      /**
+       * Determines if two binary operators are not equal.
+       * @param rhs The other operator to compare to.
+       * @return !(*this == rhs)
+       */
       bool
       operator!=(const BinaryOperator& rhs) const
       {
@@ -211,11 +218,15 @@ namespace TransLucid
     {
       DimensionExpr() = default;
 
+      /**
+       * Construct a dimension expression.
+       * @param text The name of the dimension.
+       */
       DimensionExpr(const u32string& text)
       : text(text)
       {}
 
-      u32string text;
+      u32string text; /**< The name of the dimension.*/
     };
 
     /**
@@ -225,11 +236,15 @@ namespace TransLucid
     {
       IdentExpr() = default;
 
+      /**
+       * Construct an identifier expression.
+       * @param t The name of the identifier.
+       */
       IdentExpr(const u32string& t)
       : text(t)
       {}
 
-      u32string text;
+      u32string text; /**< The name of the identifier.*/
     };
 
     class UnaryOpExpr;
@@ -275,12 +290,17 @@ namespace TransLucid
     {
       UnaryOpExpr() = default;
 
+      /**
+       * Construct a unary operation expression.
+       * @param o The type of unary operation.
+       * @param e The expression to operate on.
+       */
       UnaryOpExpr(const UnaryOperator& o, const Expr& e)
       : op(o), e(e)
       {}
 
-      UnaryOperator op;
-      Expr e;
+      UnaryOperator op; /**< The type of unary operation.*/
+      Expr e; /**< The expression to operate on.*/
     };
 
     /**
@@ -306,9 +326,9 @@ namespace TransLucid
       : op(o), lhs(l), rhs(r)
       {}
 
-      BinaryOperator op;
-      Expr lhs;
-      Expr rhs;
+      BinaryOperator op; /**< The binary operation.*/
+      Expr lhs; /**< The left hand side expression.*/
+      Expr rhs; /**< The right hand side expression.*/
 
       /**
        * Adds rhs into the right hand side expression of the current
@@ -344,10 +364,20 @@ namespace TransLucid
       Expr& rhs
     );
 
+    /**
+     * An if expression. Represents if e1 then elsif e2 else fi.
+     */
     struct IfExpr
     {
       IfExpr() = default;
 
+      /**
+       * Constructs an if expression.
+       * @param c The condition expression.
+       * @param t The then expression.
+       * @param eif A list of elsifs.
+       * @param e The else expression.
+       */
       template <typename List>
       IfExpr
       (
@@ -368,48 +398,99 @@ namespace TransLucid
         }
       }
 
-      Expr condition;
-      Expr then;
+      Expr condition; /**< The condition expression. */
+      Expr then; /**< The if true expression. */
+      /**
+       * Elsif condition/expression pairs. The conditions should evaluate to
+       * booleans, if they are true the expression is the result.
+       */
       std::vector<std::pair<Expr, Expr>> else_ifs;
-      Expr else_;
+      Expr else_; /**< The else expression.*/
     };
 
+    /**
+     * Hash expression. This is \#E.
+     */
     struct HashExpr
     {
       HashExpr() = default;
 
+      /**
+       * Construct a hash expression.
+       * @param e The sub expression.
+       */
       HashExpr(const Expr& e)
       : e(e)
       {}
 
+      /**
+       * The sub expression.
+       */
       Expr e;
     };
 
+    /**
+     * A tuple building expression. These are of the form
+     * [E11:E12, ..., En1:En2].
+     */
     struct TupleExpr
     {
+      /**
+       * The data structure which holds the pairs.
+       */
       typedef
       std::vector<boost::fusion::vector<Expr, Expr>>
       TuplePairs;
 
+      /**
+       * All of the pairs in the tuple.
+       */
       TuplePairs pairs;
 
       TupleExpr() = default;
 
+      /**
+       * Construct a TupleExpr.
+       * @param p The pairs of expressions.
+       */
       TupleExpr(const TuplePairs& p)
       : pairs(p)
       {}
     };
 
+    /**
+     * A context change expression. E1 @ E2, evaluate E1 with the tuple
+     * returned by E2 as the new context.
+     */
     struct AtExpr
     {
       AtExpr() = default;
 
+      /**
+       * Construct an AtExpr. Takes as parameters the subexpressions and
+       * whether it is a relative or absolute context change.
+       * @param lhs The left hand side expression.
+       * @param rhs The right hand side expression.
+       * @param absolute True if absolute context change, false if relative.
+       */
       AtExpr(const Expr& lhs, const Expr& rhs, bool absolute)
       : lhs(lhs), rhs(rhs), absolute(absolute)
       {}
 
+      /**
+       * The left hand side expression.
+       */
       Expr lhs;
+
+      /**
+       * The right hand side expression.
+       */
       Expr rhs;
+      
+      /**
+       * Absolute context change. True if this node is an absolute context
+       * change node, false if it is a relative context change node.
+       */
       bool absolute;
     };
 

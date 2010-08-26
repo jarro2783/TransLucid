@@ -89,45 +89,6 @@ GuardHD makeGuardWithTime(const mpz_class& start)
   return g;
 }
 
-inline std::pair<uuid, VariableHD::Equations::iterator>
-VariableHD::addExprActual(const Tuple& k, HD* h)
-{
-  GuardHD g;
-  Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
-  if (giter != k.end())
-  {
-    g = giter->second.value<Guard>().value();
-  }
-
-  Tuple::const_iterator titer = k.find(DIM_TIME);
-  if (titer != k.end())
-  {
-    g.addDimension(DIM_TIME, 
-      Constant(Range(&titer->second.value<Intmp>().value(), 0), 
-               TYPE_INDEX_RANGE));
-  }
-
-  auto adder =
-    [this] (const EquationHD& e) -> std::pair<uuid, Equations::iterator>
-  {
-    auto& id = e.id();
-    return std::make_pair(
-      id,
-      this->m_equations.insert(std::make_pair(id, e)).first
-    );
-  };
-
-  //if (g)
-  //{
-    return adder(EquationHD(m_name, g, h));
-  //}
-  //else
-  //{
-  //  return adder(EquationHD(m_name, 
-  //    makeGuardWithTime(titer->second.value<Intmp>.value()), h));
-  //}
-}
-
 bool VariableHD::equationValid(const EquationHD& e, const Tuple& k)
 {
 }
@@ -303,6 +264,49 @@ VariableHD::operator()(const Tuple& k)
   return (*std::get<1>(*bestIter)->second.equation())(k);
 }
 
+inline std::pair<uuid, VariableHD::Equations::iterator>
+VariableHD::addExprActual(const Tuple& k, HD* h)
+{
+  GuardHD g;
+  Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
+  if (giter != k.end())
+  {
+    g = giter->second.value<Guard>().value();
+  }
+
+  Tuple::const_iterator titer = k.find(DIM_TIME);
+  if (titer != k.end())
+  {
+    g.addDimension(DIM_TIME, 
+      Constant(Range(&titer->second.value<Intmp>().value(), 0), 
+               TYPE_INDEX_RANGE));
+  }
+
+  auto adder =
+    [this] (const EquationHD& e) -> std::pair<uuid, Equations::iterator>
+  {
+    auto& id = e.id();
+    auto added = std::make_pair(
+      id,
+      this->m_equations.insert(std::make_pair(id, e)).first
+    );
+
+    this->m_uuidVars.insert(std::make_pair(id, this));
+
+    return added;
+  };
+
+  //if (g)
+  //{
+    return adder(EquationHD(m_name, g, h));
+  //}
+  //else
+  //{
+  //  return adder(EquationHD(m_name, 
+  //    makeGuardWithTime(titer->second.value<Intmp>.value()), h));
+  //}
+}
+
 std::pair<uuid, VariableHD::Equations::iterator>
 VariableHD::addExprInternal(const Tuple& k, HD* e)
 {
@@ -358,7 +362,10 @@ VariableHD::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
     ).first;
   }
   //add it
-  return iter->second->addExprInternal(k, h);
+  //and add the resulting uuid mapping to the variable that we added to
+  auto result = iter->second->addExprInternal(k, h);
+  m_uuidVars.insert(std::make_pair(result.first, iter->second));
+  return result;
 }
 
 

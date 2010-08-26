@@ -34,7 +34,8 @@ DimensionTranslator::DimensionTranslator()
    {U"id", DIM_ID},
    {U"value", DIM_VALUE},
    {U"time", DIM_TIME},
-   {U"_validguard", DIM_VALID_GUARD}
+   {U"_validguard", DIM_VALID_GUARD},
+   {U"all", DIM_ALL}
   }
 {
 }
