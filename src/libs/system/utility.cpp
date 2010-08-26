@@ -119,8 +119,8 @@ tupleRefines(const Tuple& a, const Tuple& b)
   Tuple::const_iterator it2 = b.begin();
   while (it1 != a.end() && it2 != b.end())
   {
-    type_index d1 = it1->first;
-    type_index d2 = it2->first;
+    size_t d1 = it1->first;
+    size_t d2 = it2->first;
 
     //extra dimension in b
     if (d2 < d1)
@@ -137,6 +137,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
       continue;
     }
 
+    //if the a value doesn't refine the b value then terminate
     if (!valueRefines(it1->second, it2->second))
     {
       return false;
@@ -152,6 +153,8 @@ tupleRefines(const Tuple& a, const Tuple& b)
     ++it2;
   }
 
+  //we got to the end of a and haven't finished with b, so something in b
+  //isn't in a
   if (it2 != b.end())
   {
     return false;

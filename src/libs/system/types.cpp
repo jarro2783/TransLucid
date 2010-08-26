@@ -57,6 +57,7 @@ Tuple::print(std::ostream& os) const
     os << v.first << ":";
     v.second.print(os);
   }
+  os << "]";
 }
 
 } //namespace TransLucid
