@@ -229,6 +229,10 @@ namespace TransLucid
 
     private:
 
+    //maps uuid to variables so that we know which child owns the equation
+    //belonging to a uuid
+    typedef std::map<uuid, VariableHD*> UUIDVarMap;
+
     std::pair<uuid, Equations::iterator>
     addExprInternal(const Tuple& k, HD* h);
 
@@ -237,6 +241,7 @@ namespace TransLucid
 
     bool equationValid(const EquationHD& e, const Tuple& k);
 
+    UUIDVarMap m_uuidVars;
     Equations m_equations;
     VariableMap m_variables;
 
