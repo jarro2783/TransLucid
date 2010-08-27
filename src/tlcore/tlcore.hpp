@@ -25,6 +25,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_header_util.hpp>
 #include <tl/expr_compiler.hpp>
 
+/**
+ * @file tlcore.hpp
+ * The main header for tlcore. Contains all the definitions that a main
+ * file needs to run the tlcore application.
+ */
+
 namespace TransLucid
 {
   namespace Parser
@@ -33,6 +39,9 @@ namespace TransLucid
     class SkipGrammar;
   }
 
+  /**
+   * The TLCore namespace. Contains all of the tlcore implementation.
+   */
   namespace TLCore
   {
     typedef std::vector<std::pair<Tree::Expr, HD*>> ExprList;

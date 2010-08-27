@@ -20,6 +20,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PARSER_HEADER_UTIL_INCLUDED
 #define PARSER_HEADER_UTIL_INCLUDED
 
+/**
+ * @file parser_header_util.hpp
+ * Utility functions for the TransLucid header.
+ */
+
 namespace TransLucid
 {
 

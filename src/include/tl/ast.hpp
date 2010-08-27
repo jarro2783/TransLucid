@@ -125,6 +125,7 @@ namespace TransLucid
        * @param assoc The association.
        * @param op The name of the operation.
        * @param symbol The symbol that maps to this operation.
+       * @param precedence The precedence of the operator.
        */
       BinaryOperator
       (
@@ -206,8 +207,8 @@ namespace TransLucid
       : type(type), text(text)
       {}
 
-      u32string type;
-      u32string text;
+      u32string type; /**< The typename.*/
+      u32string text; /**< The text in the angle brackets.*/
     };
 
     /**

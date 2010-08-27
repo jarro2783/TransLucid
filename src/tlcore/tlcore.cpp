@@ -28,6 +28,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iterator>
 #include <iostream>
 
+/**
+ * @file tlcore.cpp
+ * The tlcore application. All of the code which runs the main tlcore
+ * application.
+ */
+
 namespace TransLucid
 {
 
