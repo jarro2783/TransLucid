@@ -22,16 +22,21 @@ along with TransLucid; see the file COPYING.  If not see
 #include <algorithm>
 #include <tl/utility.hpp>
 #include <string>
-#include <tl/tree_printer.hpp>
+//#include <tl/tree_printer.hpp>
 #include <tl/parser_header_util.hpp>
 
 #define BOOST_TEST_MODULE expressions
 #include <boost/test/included/unit_test.hpp>
 
+/**
+ * @file expressions.cpp
+ * Expression tests. Test that the interpreter handles expressions correctly.
+ */
+
 namespace TL = TransLucid;
 
-typedef std::back_insert_iterator<std::string> print_iter;
-TL::Printer::ExprPrinter<print_iter> print_grammar;
+//typedef std::back_insert_iterator<std::string> print_iter;
+//TL::Printer::ExprPrinter<print_iter> print_grammar;
 
 
 namespace
@@ -96,27 +101,38 @@ test_base(size_t base, uint32_t number, TL::Translator& t)
 void
 test_integer(int n, TL::Translator& translator)
 {
-  std::string value = std::to_string(n);
+  std::string value;
+  if (n < 0)
+  { 
+    value = "~" + std::to_string(-n);
+  }
+  else
+  {
+    value = std::to_string(n);
+  }
+
+  std::cerr << "testing int: '" << value << "'" << std::endl;
+
   TL::HD* h = 
     translator.translate_expr(TL::u32string(value.begin(), value.end()));
+  BOOST_REQUIRE(h != 0);
   TL::TaggedConstant v = (*h)(TL::Tuple());
   //std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;
-  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value().get_ui(), (unsigned)n);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value().get_si(), n);
   delete h;
 }
 
 BOOST_AUTO_TEST_SUITE( expressions_tests )
 
-#if 0
-#ifndef DISABLE_INTEGER_TESTS
 
 BOOST_AUTO_TEST_CASE( integers )
 {
-  for (int i = 0; i != 500; ++i)
+  for (int i = -1000; i < 1000; i += 77)
   {
     test_integer(i, translator);
   }
 
+#if 0
   for (int i = 0; i != 1000; ++i)
   {
     for (int j = 2; j != 62; ++j)
@@ -124,11 +140,9 @@ BOOST_AUTO_TEST_CASE( integers )
       test_base(j, i, translator);
     }
   }
-
+#endif
 }
 
-#endif
-#endif
 
 BOOST_AUTO_TEST_CASE ( strings ) {
 
@@ -152,10 +166,10 @@ BOOST_AUTO_TEST_CASE ( chars ) {
   BOOST_REQUIRE(h.get() != 0);
   TL::TaggedConstant v = (*h)(TL::Tuple());
 
-  std::string generated;
-  print_iter outit(generated);
-  TL::Printer::karma::generate(outit, print_grammar,
-                               translator.lastExpression());
+  //std::string generated;
+  //print_iter outit(generated);
+  //TL::Printer::karma::generate(outit, print_grammar,
+  //                             translator.lastExpression());
 
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_UCHAR);
   BOOST_CHECK(v.first.value<TL::Char>().value() == U'h');
@@ -164,9 +178,9 @@ BOOST_AUTO_TEST_CASE ( chars ) {
   BOOST_REQUIRE(h.get() != 0);
   v = (*h)(TL::Tuple());
 
-  generated.clear();
-  TL::Printer::karma::generate(outit, print_grammar,
-                               translator.lastExpression());
+  //generated.clear();
+  //TL::Printer::karma::generate(outit, print_grammar,
+  //                             translator.lastExpression());
 
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_UCHAR);
   BOOST_CHECK(v.first.value<TL::Char>().value() == U'è');

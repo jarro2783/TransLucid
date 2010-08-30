@@ -101,7 +101,14 @@ namespace TransLucid
       {
         actualBase = base - 'a' + 26 + 10;
       }
-      return mpz_class(u32_to_ascii(s), actualBase);
+      if (negative)
+      {
+        return -mpz_class(u32_to_ascii(s), actualBase);
+      }
+      else
+      {
+        return mpz_class(u32_to_ascii(s), actualBase);
+      }
     }
 
     template <typename Iterator>
