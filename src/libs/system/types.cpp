@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file types.cpp
+ * The implementation file for the basic types.
+ */
+
 #include <tl/types.hpp>
 #include <boost/foreach.hpp>
 //#include <boost/bind.hpp>

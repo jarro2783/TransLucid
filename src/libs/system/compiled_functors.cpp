@@ -17,12 +17,18 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file compiled_functors.cpp
+ * The HDs that implement the evaluation of expressions.
+ */
+
 #include <tl/compiled_functors.hpp>
 #include <boost/assign/list_of.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
 #include <tl/consthd.hpp>
+#include <sstream>
 
 namespace TransLucid
 {

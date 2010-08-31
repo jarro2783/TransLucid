@@ -29,7 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 //#include <tl/equation.hpp>
 //#include <boost/fusion/include/adapt_struct.hpp>
 #include <tl/ast.hpp>
-#include <tl/utility.hpp>
+//#include <tl/utility.hpp>
 #include <tl/parser_iterator.hpp>
 
 inline std::ostream&
