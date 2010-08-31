@@ -104,7 +104,7 @@ VariableHD::operator()(const Tuple& k)
   std::cerr << std::endl;
   #endif
 
-  typedef std::tuple<Tuple, Equations::const_iterator> ApplicableTuple;
+  typedef std::tuple<Tuple, UUIDEquationMap::const_iterator> ApplicableTuple;
   typedef std::list<ApplicableTuple> applicable_list;
   applicable_list applicable;
 
@@ -157,7 +157,7 @@ VariableHD::operator()(const Tuple& k)
     }
   }
 
-  for (Equations::const_iterator eqn_i = m_equations.begin();
+  for (UUIDEquationMap::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
     if (eqn_i->second.validContext())
@@ -261,7 +261,7 @@ VariableHD::operator()(const Tuple& k)
   return (*std::get<1>(*bestIter)->second.equation())(k);
 }
 
-inline std::pair<uuid, VariableHD::Equations::iterator>
+inline std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
 VariableHD::addExprActual(const Tuple& k, HD* h)
 {
   GuardHD g;
@@ -280,7 +280,7 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   }
 
   auto adder =
-    [this] (const EquationHD& e) -> std::pair<uuid, Equations::iterator>
+    [this] (const EquationHD& e) -> std::pair<uuid, UUIDEquationMap::iterator>
   {
     auto& id = e.id();
     auto added = std::make_pair(
@@ -304,7 +304,7 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   //}
 }
 
-std::pair<uuid, VariableHD::Equations::iterator>
+std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
 VariableHD::addExprInternal(const Tuple& k, HD* e)
 {
   size_t dim_id = DIM_ID;
@@ -341,7 +341,7 @@ VariableHD::addExprInternal(const Tuple& k, HD* e)
   }
 }
 
-std::pair<uuid, VariableHD::Equations::iterator>
+std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
 VariableHD::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
 {
   //find the variable
@@ -364,7 +364,7 @@ VariableHD::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
 bool
 VariableHD::delexpr(uuid id, size_t time)
 {
-  Equations::iterator iter = m_equations.find(id);
+  UUIDEquationMap::iterator iter = m_equations.find(id);
 
   if (iter != m_equations.end())
   {

@@ -203,6 +203,7 @@ namespace TransLucid
   class VariableHD : public HD
   {
     public:
+    typedef std::map<uuid, EquationHD> UUIDEquationMap;
 
     VariableHD(const u32string& name, HD* system);
     
@@ -220,11 +221,19 @@ namespace TransLucid
 
     bool replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr);
 
+    /**
+     * The equations belonging directly to this variable. Returns the map of
+     * UUIDs to equations for the current variable.
+     * @return A map of UUID to the current variable's equations.
+     */
+    const UUIDEquationMap& equations() const
+    {
+      return m_equations;
+    }
+
     protected:
 
-    typedef std::map<uuid, EquationHD> Equations;
-
-    std::pair<uuid, Equations::iterator>
+    std::pair<uuid, UUIDEquationMap::iterator>
     addToVariableActual(const u32string& id, const Tuple& k, HD* h);
 
     private:
@@ -233,16 +242,16 @@ namespace TransLucid
     //belonging to a uuid
     typedef std::map<uuid, VariableHD*> UUIDVarMap;
 
-    std::pair<uuid, Equations::iterator>
+    std::pair<uuid, UUIDEquationMap::iterator>
     addExprInternal(const Tuple& k, HD* h);
 
-    std::pair<uuid, Equations::iterator>
+    std::pair<uuid, UUIDEquationMap::iterator>
     addExprActual(const Tuple& k, HD* e);
 
     bool equationValid(const EquationHD& e, const Tuple& k);
 
     UUIDVarMap m_uuidVars;
-    Equations m_equations;
+    UUIDEquationMap m_equations;
     VariableMap m_variables;
 
     u32string m_name;
