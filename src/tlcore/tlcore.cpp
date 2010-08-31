@@ -45,6 +45,15 @@ class Grammar :
   public Parser::qi::grammar<Iterator, Parser::SkipGrammar<Iterator>>
 {
   public:
+  /**
+   * Construct a tlcore Grammar object.
+   * @param system The translucid system.
+   * @param exprs The expression list to add to.
+   * @param reactive If it is a reactive system.
+   * @param demands If we are using demands.
+   * @param evaluate The evaluator to inform of events.
+   * @todo Remove exprs because we don't use it anymore.
+   */
   Grammar(SystemHD& system, ExprList& exprs, bool reactive, bool demands,
     Evaluator& evaluate
   )

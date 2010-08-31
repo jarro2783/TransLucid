@@ -95,18 +95,34 @@ namespace TransLucid
       {
       }
 
+      /**
+       * Construct a U32Iterator.
+       * We need to know where the end of the stream is to decide when we
+       * have reached the end.
+       */
       U32Iterator(const Iterator& i, const Iterator& end)
       : m_iter(i.clone())
       , m_end(end.clone())
       {
       }
 
+      /**
+       * Copy construct a U32Iterator.
+       * @param other The U32Iterator to make a copy of.
+       */
       U32Iterator(const U32Iterator& other)
       : m_iter(other.m_iter != 0 ? other.m_iter->clone() : 0)
       , m_end(other.m_end != 0 ? other.m_end->clone() : 0)
       {
       }
 
+      /**
+       * Assign two iterators.
+       * Clones the underlying iterators of the rhs and assigns them to
+       * *this.
+       * @param rhs The iterator to assign to.
+       * @return *this.
+       */
       U32Iterator& operator=(const U32Iterator& rhs)
       {
         if (this != &rhs)
@@ -135,6 +151,15 @@ namespace TransLucid
         return *this;
       }
       
+      /**
+       * Equality test. Tests if two iterators are equal.
+       * Two iterators are equal if they are both end iterators
+       * or if they are the same iterator.
+       * An iterator is an end iterator if its iterator is zero or if
+       * its iterator equals its end iterator.
+       * @param rhs The iterator to compare to.
+       * @return @b True if the iterators are equal.
+       */
       bool operator==(const U32Iterator& rhs) const
       {
         bool lhs_end = false;
@@ -153,17 +178,31 @@ namespace TransLucid
         return lhs_end == rhs_end;
       }
 
+      /**
+       * Equality test.
+       * @param rhs The other iterator to compare to.
+       * @return !(*this == rhs)
+       * @see U32Iterator::operator==
+       */
       bool operator!=(const U32Iterator& rhs) const
       {
         return !this->operator==(rhs);
       }
 
+      /**
+       * Pre-increment. Increments the iterator.
+       * @return The value after being iterated.
+       */
       U32Iterator& operator++()
       {
         ++*m_iter;
         return *this;
       }
 
+      /**
+       * Post-increment. Increments the iterator.
+       * @return The value before being iterated.
+       */
       const U32Iterator operator++(int)
       {
         U32Iterator old(*this);
@@ -171,14 +210,19 @@ namespace TransLucid
         return old;
       }
 
+      /**
+       * Dereference operator. Returns a reference.
+       * @return A reference to the pointed to value.
+       */
       reference operator*() const
       {
-        //u32string s;
-        //s += **m_iter;
-        //std::cerr << utf32_to_utf8(s) << std::endl;
         return **m_iter;
       }
 
+      /**
+       * Dereference operator. Returns a pointer.
+       * @return A pointer to the pointed to value.
+       */
       pointer operator->() const
       {
         return m_iter->operator->();
@@ -190,17 +234,26 @@ namespace TransLucid
     };
 
     /**
-     * Iterates through a UTF-8 stream.
+     * Iterates through a UTF-8 stream. The character type of the stream
+     * will be interpreted as individual bytes in a UTF-8 sequence.
      */
     template <typename T>
     class UTF8Iterator : public Iterator
     {
       public:
+      /**
+       * Construct a UTF8Iterator.
+       * @param iter The underlying iterator.
+       */
       UTF8Iterator(const T& iter)
       : m_iter(iter), m_haveReadCurrent(false)
       {
       }
 
+      /**
+       * Copy a UTFIterator.
+       * @param other The UTF8Iterator to copy.
+       */
       UTF8Iterator(const UTF8Iterator& other)
       : m_iter(other.m_iter)
       , m_value(other.m_value)
@@ -333,22 +386,32 @@ namespace TransLucid
       return UTF8Iterator<T>(iter);
     }
 
+    /**
+     * Remove reference metafunction.
+     * If we don't have a reference then remove reference is just the type.
+     */
     template <typename T>
     struct remove_reference
     {
-      typedef T type;
+      typedef T type;/**<The same type.*/
     };
 
+    /**
+     * Remove reference. Removes a reference from the type.
+     */
     template <typename T>
     struct remove_reference<T&>
     {
-      typedef T type;
+      typedef T type;/**<The type without the reference.*/
     };
 
+    /**
+     * Remove pointer. Removes a pointer from the type.
+     */
     template <typename T>
     struct remove_reference<T*>
     {
-      typedef T type;
+      typedef T type; /**<The type without the pointer.*/
     };
 
     template <typename T>
@@ -356,71 +419,138 @@ namespace TransLucid
     {
     };
 
+    /**
+     * Create a reference to a value. This one is for when we already have
+     * a reference, so just return the value.
+     */
     template <typename T>
     struct create_reference<T&>
     {
+      /**
+       * Creates the actual reference. Since we already have a reference just
+       * return the actual value.
+       */
       T& operator()(T& t)
       {
         return t;
       }
     };
 
+    /**
+     * Create a reference when we want a pointer. Takes the address of
+     * the value.
+     */
     template <typename T>
     struct create_reference<T*>
     {
+      /**
+       * Create the actual reference. We wanted a pointer reference,
+       * so return the address of the value.
+       */
       T* operator()(T& t)
       {
         return &t;
       }
     };
 
+    /**
+     * Dereference an object. The default is just to return the
+     * object because it's not a pointer.
+     */
     template <typename T>
     struct dereference
     {
+      /**
+       * Do the dereference. Nothing is needed here though because we
+       * don't have a pointer, just return the actual value.
+       */
       T operator()(T t)
       {
         return t;
       }
     };
 
+    /**
+     * Dereference an object. If the object is a pointer, return the
+     * thing that is pointed to.
+     */
     template <typename T>
     struct dereference<T*>
     {
+      /**
+       * Do the actual dereference. If we have a pointer then dereference it.
+       */
       T& operator()(T* t)
       {
         return *t;
       }
     };
 
+    /**
+     * Buffer a value to return a reference.
+     * A buffer for storing a value and returning a reference when 
+     * the type of the value to return is different to the type 
+     * we actually have.
+     */
     template <typename HasType, typename NeedsType>
     struct Buffer
     {
+      /**
+       * Buffer a value and return the value of the new type.
+       * Stores the value that we have in the type that we want, then
+       * returns the stored value.
+       * We need to remove the reference from the type we want so that
+       * we store an actual value and not a pointer or reference.
+       * Returns a pointer or a reference depending on what we needed.
+       */
       NeedsType operator()(HasType v)
       {
         m_buf = dereference<HasType>()(v);
         return create_reference<NeedsType>()(m_buf);
       }
 
+      private:
       typename remove_reference<NeedsType>::type m_buf;
     };
 
+    /**
+     * Buffer a value to return a reference.
+     * This template is instantiated when the type we need is the same as the
+     * type that we have. In this case just return the value.
+     */
     template <typename HasType>
     struct Buffer<HasType, HasType>
     {
+      /**
+       * Returns the actual value. The types are the same so we just
+       * return what we have.
+       */
       HasType operator()(HasType v)
       {
         return v;
       }
     };
 
+    /**
+     * Dereference an iterator. Uses Buffer to store an object of the type
+     * that we actually want or not store it if we have the type that we want.
+     */
     template <typename HasType, typename NeedsRetType>
     struct IteratorDereference
     {
+      /**
+       * Dereference the iterator. Returns the value from the buffer,
+       * the buffer may or may not actually store something depending
+       * on the type that we need and have.
+       * @param v The value that we actually have.
+       * @return A reference to the value of the type that we actually need.
+       */
       NeedsRetType operator()(HasType v) const
       {
         return m_buf(v);
       }
 
+      private:
       mutable Buffer<HasType, NeedsRetType> m_buf;
     };
 
