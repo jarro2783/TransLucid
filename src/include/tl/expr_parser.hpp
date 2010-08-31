@@ -373,7 +373,7 @@ namespace TransLucid
       qi::symbols<char_type, Special::Value> specials;
     };
 
-    extern template class ExprGrammar<string_type::const_iterator>;
+    extern template class ExprGrammar<iterator_t>;
   }
 }
 

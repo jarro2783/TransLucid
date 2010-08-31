@@ -17,12 +17,17 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file equation_parser.cpp 
+ * The equations parser template instantiation.
+ */
+
 #include <tl/equation_parser.hpp>
 
 namespace TransLucid
 {
   namespace Parser
   {
-    template class EquationGrammar<string_type::const_iterator>;
+    template class EquationGrammar<iterator_t>;
   }
 }

@@ -120,7 +120,7 @@ namespace TransLucid
       ;
     };
 
-    extern template class TupleGrammar<string_type::const_iterator>;
+    extern template class TupleGrammar<iterator_t>;
   }
 }
 

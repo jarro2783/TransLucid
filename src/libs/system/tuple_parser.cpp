@@ -23,6 +23,6 @@ namespace TransLucid
 {
   namespace Parser
   {
-    template class TupleGrammar<string_type::const_iterator>;
+    template class TupleGrammar<iterator_t>;
   }
 }

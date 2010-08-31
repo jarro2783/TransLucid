@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/classic_multi_pass.hpp>
 #include <vector>
 #include <tl/types.hpp>
-#include <tl/equation.hpp>
+//#include <tl/equation.hpp>
 //#include <boost/fusion/include/adapt_struct.hpp>
 #include <tl/ast.hpp>
 #include <tl/utility.hpp>
@@ -102,7 +102,6 @@ namespace TransLucid
     //name, | [], & bool, = HD
     typedef std::tuple<string_type, Tree::Expr, Tree::Expr, Tree::Expr>
     ParsedEquation;
-
   }
 }
 

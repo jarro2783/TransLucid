@@ -107,7 +107,7 @@ namespace TransLucid
       ident_parser<Iterator> ident;
     };
 
-    extern template class EquationGrammar<string_type::const_iterator>;
+    extern template class EquationGrammar<iterator_t>;
   }
 }
 
