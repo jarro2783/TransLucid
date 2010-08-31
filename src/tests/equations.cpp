@@ -50,6 +50,10 @@ struct translator_class {
     (
       header, U"-", U"operator-", TL::Tree::ASSOC_LEFT, 5
     );
+    TL::Parser::addDimensionSymbol(header, U"n");
+    TL::Parser::addDimensionSymbol(header, U"h");
+    TL::Parser::addDimensionSymbol(header, U"i");
+    TL::Parser::addDimensionSymbol(header, U"j");
   }
 };
 
@@ -180,11 +184,13 @@ BOOST_AUTO_TEST_CASE ( functions )
   );
 
   h = translator.translate_expr(U"fib @ [1 : 0]");
+  BOOST_REQUIRE(h != 0);
   v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 0);
 
   h = translator.translate_expr(U"fib @ [1 : 1]");
+  BOOST_REQUIRE(h != 0);
   v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
@@ -193,6 +199,36 @@ BOOST_AUTO_TEST_CASE ( functions )
   v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
+
+  #if 0
+  BOOST_REQUIRE(
+  translator.parse_header
+  (
+    U"dimension \"n\";;"
+    U"dimension \"h\";;"
+    U"dimension \"i\";;"
+  )
+  != false);
+  #endif
+
+  translator.translate_and_add_equation_set
+  (
+    U"fact = #n * (fact @ [n:#n-1]);;"
+    U"fact | [n:0] = 1;;"
+  );
+
+  h = translator.translate_expr(U"(fact + #i) @ [time:0, n:3, i:25, h:50]");
+  BOOST_REQUIRE(h != 0);
+  v = (*h)(k);
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 31);
+
+  h = translator.translate_expr(
+    U"(fact + #i) @ [time:0, n:3, i:25, h:50, j:60]");
+  BOOST_REQUIRE(h != 0);
+  v = (*h)(k);
+  BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
+  BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 31);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
