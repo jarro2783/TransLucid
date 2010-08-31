@@ -31,6 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_lexeme.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
 #include <boost/spirit/home/qi/auxiliary/eps.hpp>
+#include <boost/spirit/home/qi/nonterminal/debug_handler.hpp>
 
 #include <gmpxx.h>
 #include <tl/types.hpp>
@@ -130,6 +131,7 @@ namespace TransLucid
         namespace ph = boost::phoenix;
         using namespace qi::labels;
 
+        #if 0
         integer =
           ((qi::char_('~')[_b = true] | qi::eps[_b = false])
           >>
@@ -147,14 +149,34 @@ namespace TransLucid
             ]
           )
         ;
+        #endif
+
+        integer = qi::lexeme[negative[_a = _1] >> (basenum(_a) | num(_a))];
+
+        BOOST_SPIRIT_DEBUG_NODE(integer);
       }
 
       qi::rule<
         Iterator,
         mpz_class(),
-        qi::locals<string_type, bool, char>,
+        qi::locals<bool>,
         SkipGrammar<Iterator>
       > integer;
+
+      qi::rule<
+        Iterator,
+        bool()
+      > negative;
+
+      qi::rule<
+        Iterator,
+        mpz_class(bool)
+      >
+        basenum,
+        num
+      ;
+
+
     };
 
     template <typename Iterator>
