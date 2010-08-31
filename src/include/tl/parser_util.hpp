@@ -55,6 +55,7 @@ namespace TransLucid
         ;
       }
 
+      private:
       qi::rule<Iterator> skip;
     };
 
@@ -63,15 +64,26 @@ namespace TransLucid
       template <typename Arg>
       struct result
       {
-        typedef std::u32string type;
+        typedef std::u32string type; /**<The return type.*/
       };
 
+      /**
+       * Create a u32string from any type.
+       * @param arg1 The value to create a u32string from.
+       * @return The resulting u32string.
+       */
       template <typename Arg>
       std::u32string operator()(Arg arg1) const
       {
         return std::u32string(arg1.begin(), arg1.end());
       }
 
+      /**
+       * Create a u32string from a u32string. When this functor is used with a
+       * u32string it just returns the argument.
+       * @param arg1 The u32string.
+       * @return arg1.
+       */
       std::u32string operator()(const u32string& arg1) const
       {
         return arg1;
@@ -128,6 +140,7 @@ namespace TransLucid
         ;
       }
 
+      private:
       qi::rule<
         Iterator,
         mpz_class(),
@@ -183,6 +196,7 @@ namespace TransLucid
         ;
       }
 
+      private:
       qi::rule<Iterator, string_type(), SkipGrammar<Iterator>> ident;
     };
 

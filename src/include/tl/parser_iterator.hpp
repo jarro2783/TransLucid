@@ -40,14 +40,43 @@ namespace TransLucid
     {
     };
 
+    /**
+     * A unicode iterator. The base class for the unicode iterators.
+     */
     class Iterator : public iterator_traits
     {
       public:
       virtual ~Iterator() = 0;
+      
+      /**
+       * Clone an iterator.
+       * @return The cloned iterator.
+       */
       virtual Iterator* clone() const = 0;
+
+      /**
+       * Equality. Checks if two iterators are equal.
+       */
       virtual bool operator==(const Iterator& rhs) const = 0;
+
+      /**
+       * Increment. Increments the iterator and returns a reference to itself.
+       * @return *this.
+       */
       virtual Iterator& operator++() = 0;
+
+      /**
+       * Dereference. Dereference the iterator and return a reference to
+       * the value.
+       * @return A reference to the value which the iterator points to.
+       */
       virtual reference operator*() const = 0;
+
+      /**
+       * Dereference. Dereference the iterator and return a pointer to the
+       * value.
+       * @return A pointer to the value which the iterator points to.
+       */
       virtual pointer operator->() const = 0;
     };
 
@@ -395,15 +424,30 @@ namespace TransLucid
       mutable Buffer<HasType, NeedsRetType> m_buf;
     };
 
+    /**
+     * An iterator which iterates through a stream of complete unicode
+     * characters. Each character in the stream is one unicode character,
+     * and dereferencing the stream's iterator should return one unicode
+     * character.
+     */
     template <typename T>
     class UTF32Iterator : public Iterator
     {
       public:
+      /**
+       * Construct a UTF32Iterator from any other type of iterator.
+       * The iterator must iterate through complete unicode values.
+       */
       UTF32Iterator(const T& iter)
       : m_iter(iter)
       {
       }
 
+      /**
+       * Copy constructor. Construct a UTF32Iterator from another 
+       * UTF32Iterator.
+       * @param other The UTF32Iterator to copy.
+       */
       UTF32Iterator(const UTF32Iterator& other)
       : m_iter(other.m_iter)
       , m_reference(other.m_reference)
@@ -431,18 +475,21 @@ namespace TransLucid
         }
       }
 
-      Iterator& operator++()
+      Iterator& 
+      operator++()
       {
         ++m_iter;
         return *this;
       }
 
-      reference operator*() const
+      reference 
+      operator*() const
       {
         return m_reference(*m_iter);
       }
 
-      pointer operator->() const
+      pointer 
+      operator->() const
       {
         return m_pointer(m_iter.operator->());
       }

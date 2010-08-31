@@ -87,6 +87,11 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(tuple_inside);
       }
 
+      /**
+       * Set the expression parser. The tuple parser requires an expression
+       * parser.
+       * @param t The expression parser to use.
+       */
       template <typename T>
       void
       set_expr(const T& t)
