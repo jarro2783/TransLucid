@@ -306,7 +306,6 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(at_expr);
         BOOST_SPIRIT_DEBUG_NODE(binary_op);
         BOOST_SPIRIT_DEBUG_NODE(primary_expr);
-        //BOOST_SPIRIT_DEBUG_NODE(integer_grammar);
 
         qi::on_error<qi::fail>
         (

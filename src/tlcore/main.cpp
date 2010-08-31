@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * \file src/tlcore/main.cpp
+ * The main tlcore driver file.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -53,6 +58,12 @@ std::unique_ptr<std::ofstream> openOutput(const std::string& output)
 
 }
 
+/**
+ * The main function. tlcore starts here.
+ * @param argc The number of arguments.
+ * @param argv The arguments.
+ * @return The program exit code.
+ */
 int main(int argc, char *argv[])
 {
   setlocale(LC_ALL, "");

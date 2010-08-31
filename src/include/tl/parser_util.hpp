@@ -30,6 +30,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_action.hpp>
 #include <boost/spirit/include/qi_lexeme.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
+#include <boost/spirit/home/qi/auxiliary/eps.hpp>
+#include <boost/spirit/home/qi/nonterminal/debug_handler.hpp>
 
 #include <gmpxx.h>
 #include <tl/types.hpp>
@@ -96,7 +98,7 @@ namespace TransLucid
     }
 
     inline mpz_class
-    create_mpz(char base, const u32string& s)
+    create_mpz(char base, const u32string& s, bool negative)
     {
       //0-9A-Za-z
       int actualBase;
@@ -112,7 +114,14 @@ namespace TransLucid
       {
         actualBase = base - 'a' + 26 + 10;
       }
-      return mpz_class(u32_to_ascii(s), actualBase);
+      if (negative)
+      {
+        return -mpz_class(u32_to_ascii(s), actualBase);
+      }
+      else
+      {
+        return mpz_class(u32_to_ascii(s), actualBase);
+      }
     }
 
     template <typename Iterator>
@@ -120,8 +129,13 @@ namespace TransLucid
 
     template <typename Iterator>
     struct integer_parser
-    : public qi::grammar<Iterator, mpz_class(), qi::locals<string_type>,
-                         SkipGrammar<Iterator>>
+    : public qi::grammar
+      <
+        Iterator, 
+        mpz_class(), 
+        qi::locals<string_type, bool, char>,
+        SkipGrammar<Iterator>
+      >
     {
       integer_parser()
         : integer_parser::base_type(integer)
@@ -129,24 +143,53 @@ namespace TransLucid
         namespace ph = boost::phoenix;
         using namespace qi::labels;
 
+        #if 0
         integer =
+          ((qi::char_('~')[_b = true] | qi::eps[_b = false])
+          >>
           (( '0'
-          >> (qi::char_('2', '9') | qi::ascii::alpha)
+          >> (qi::char_('2', '9') | qi::ascii::alpha)[_c = _1])
+          //bit of a hack, should compute the base with a function
+          //and pass it as an int to create_mpz
           >> +(qi::ascii::digit | qi::ascii::alpha)[_a += _1])
             [
-               _val = ph::bind(&create_mpz, _1, make_u32string(_a))
+              _val = ph::bind(&create_mpz, _c, make_u32string(_a), _b)
             ]
-          | qi::int_ [qi::_val = qi::_1])
+          | (+qi::ascii::digit)
+            [
+              _val = ph::bind(&create_mpz, 'A', make_u32string(_1), _b)
+            ]
+          )
         ;
+        #endif
+
+        integer = qi::lexeme[negative[_a = _1] >> (basenum(_a) | num(_a))];
+
+        BOOST_SPIRIT_DEBUG_NODE(integer);
       }
 
       private:
       qi::rule<
         Iterator,
         mpz_class(),
-        qi::locals<string_type>,
+        qi::locals<bool>,
         SkipGrammar<Iterator>
       > integer;
+
+      qi::rule<
+        Iterator,
+        bool()
+      > negative;
+
+      qi::rule<
+        Iterator,
+        mpz_class(bool)
+      >
+        basenum,
+        num
+      ;
+
+
     };
 
     template <typename Iterator>

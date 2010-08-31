@@ -22,11 +22,11 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 #include <tl/ast.hpp>
 #include <tl/library.hpp>
-#include <tl/parser_header_util.hpp>
+//#include <tl/parser_header_util.hpp>
 #include <tl/expr_compiler.hpp>
 
 /**
- * @file tlcore.hpp
+ * @file src/tlcore/tlcore.hpp
  * The main header for tlcore. Contains all the definitions that a main
  * file needs to run the tlcore application.
  */
@@ -37,6 +37,9 @@ namespace TransLucid
   {
     template <typename Iterator>
     class SkipGrammar;
+
+    //class ParsedEquation; 
+    class Header;
   }
 
   /**

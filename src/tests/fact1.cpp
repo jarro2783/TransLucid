@@ -12,6 +12,7 @@ int main(int argc, char* argv[])
 
     t.parse_header
     (
+      U"library ustring<int>;;"
       U"dimension ustring<n>;;"
       U"infixl ustring<-> ustring<operator-> 5;;"
       U"infixl ustring<*> ustring<operator*> 10;;"

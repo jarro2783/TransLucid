@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
  * Utility functions for the TransLucid header.
  */
 
+#include <tl/parser_fwd.hpp>
+
 namespace TransLucid
 {
 

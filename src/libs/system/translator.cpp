@@ -140,7 +140,7 @@ Translator::translate_expr(const u32string& u32s)
     Parser::makeUTF32Iterator(u32s.begin()),
     Parser::makeUTF32Iterator(u32s.end())));
   Tree::Expr e;
-
+  
   bool r = boost::spirit::qi::phrase_parse(
     pos,
     Parser::iterator_t(),
