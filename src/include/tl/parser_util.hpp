@@ -133,7 +133,7 @@ namespace TransLucid
       <
         Iterator, 
         mpz_class(), 
-        qi::locals<string_type, bool, char>,
+        qi::locals<bool>,
         SkipGrammar<Iterator>
       >
     {
@@ -163,7 +163,25 @@ namespace TransLucid
         ;
         #endif
 
-        integer = qi::lexeme[negative[_a = _1] >> (basenum(_a) | num(_a))];
+        integer = qi::lexeme[negative[_a = _1] 
+          >> (basenum(_a) | num(_a))[_val = _1]
+          ];
+
+        negative = qi::char_('~')[_val = true] | qi::eps[_val = false];
+
+        num = (+qi::ascii::digit)
+              [
+                _val = ph::bind(&create_mpz, 'A', make_u32string(_1), _r1)
+              ];
+
+        basenum = 
+           qi::char_('0')
+        >> (qi::char_('2', '9') | qi::ascii::alpha)[_a = _1]
+        >> (+(qi::ascii::digit | qi::ascii::alpha))
+           [
+             _val = ph::bind(&create_mpz, _a, make_u32string(_1), _r1)
+           ]
+        ;
 
         BOOST_SPIRIT_DEBUG_NODE(integer);
       }
@@ -184,12 +202,14 @@ namespace TransLucid
       qi::rule<
         Iterator,
         mpz_class(bool)
-      >
-        basenum,
-        num
-      ;
-
-
+      > num;
+ 
+      qi::rule<
+        Iterator,
+        mpz_class(bool),
+        qi::locals<char>
+      > basenum;
+ 
     };
 
     template <typename Iterator>
