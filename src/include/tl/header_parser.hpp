@@ -126,6 +126,10 @@ namespace TransLucid
          BOOST_SPIRIT_DEBUG_NODE(expr);
       }
 
+      /**
+       * Set the expression parser to use with this header.
+       * @param e The expression parser.
+       */
       template <class T>
       void
       set_expr(const T& e)

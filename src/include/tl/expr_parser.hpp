@@ -90,6 +90,10 @@ namespace TransLucid
     {
       public:
 
+      /**
+       * Construct an expression grammar.
+       * @param h The parser header to use.
+       */
       ExprGrammar(Header& h)
       : ExprGrammar::base_type(expr), header(h)
       {
@@ -320,6 +324,10 @@ namespace TransLucid
         );
       }
 
+      /**
+       * Set the tuple parser for this expression parser.
+       * @param t The tuple parser.
+       */
       template <typename T>
       void
       set_tuple(const T& t)

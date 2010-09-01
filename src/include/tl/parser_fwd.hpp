@@ -68,10 +68,22 @@ namespace TransLucid
     typedef unsigned int char_type;
     typedef qi::symbols<char_type, u32string> symbols_t;
 
+    /**
+     * A delimiter in the parser.
+     * Delimiters are a short hand way of writing a typed value. A delimited
+     * typed value is a starting character, and then all the text until the
+     * ending character.
+     */
     struct Delimiter
     {
       Delimiter() = default;
 
+      /**
+       * Construct a delimiter.
+       * @param type The type name.
+       * @param start The start character.
+       * @param end The end character.
+       */
       Delimiter(
         const u32string& type,
         char_type start,
@@ -79,15 +91,21 @@ namespace TransLucid
       : type(type), start(start), end(end)
       {}
 
+      /**
+       * Determine if two delimiters are equal.
+       * Compares all the members.
+       * @param rhs The other delimiter to compare to.
+       * @return @b True if they are equal.
+       */
       bool
       operator==(const Delimiter& rhs) const
       {
         return type == rhs.type && start == rhs.start && end == rhs.end;
       }
 
-      u32string type;
-      char_type start;
-      char_type end;
+      u32string type; /**<The typename.*/
+      char_type start;/**<The start character.*/
+      char_type end;/**<The end character.*/
     };
 
     inline std::ostream&

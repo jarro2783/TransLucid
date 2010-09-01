@@ -380,6 +380,13 @@ namespace TransLucid
       mutable bool m_haveReadCurrent;
     };
 
+    /**
+     * Create a UTF8Iterator. A generator function which creates a UTF8Iterator
+     * of the type of the passed parameter.
+     * @param iter The underlying iterator.
+     * @return A UTF8Iterator with the passed iterator as the underlying
+     * iterator.
+     */
     template <typename T>
     UTF8Iterator<T> makeUTF8Iterator(const T& iter)
     {
@@ -630,6 +637,13 @@ namespace TransLucid
       IteratorDereference<typename T::pointer, pointer> m_pointer;
     };
 
+    /**
+     * Create a UTF32Iterator. A generator function which creates a 
+     * UTF32Iterator with the template parameter of the passed object.
+     * @param iter The iterator to create the UTF32Iterator from.
+     * @return A UTF32Iterator with the passed iterator as the underlying
+     * iterator.
+     */
     template <typename T>
     UTF32Iterator<T>
     makeUTF32Iterator(const T& iter)

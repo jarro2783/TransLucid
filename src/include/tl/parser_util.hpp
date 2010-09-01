@@ -20,13 +20,18 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PARSER_UTIL_HPP_INCLUDED
 #define PARSER_UTIL_HPP_INCLUDED
 
+/**
+ * @file parser_util.hpp
+ * Parsing utility functions and definitions.
+ */
+
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_bind.hpp>
 #include <boost/spirit/home/phoenix/function/function.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_char_.hpp>
-#include <boost/spirit/include/qi_int.hpp>
+//#include <boost/spirit/include/qi_int.hpp>
 #include <boost/spirit/include/qi_action.hpp>
 #include <boost/spirit/include/qi_lexeme.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
@@ -97,6 +102,16 @@ namespace TransLucid
       boost::phoenix::function<make_u32string_impl> make_u32string;
     }
 
+    /**
+     * Create an integer from a string. Takes a string of just the number
+     * and creates an integer from the string given the base of the string
+     * and whether it is negative or not.
+     * @param base The base of the text in @a s.
+     * @param s The string with the text of the number.
+     * @param negative If the number is negative.
+     * @return An mpz_class object of the number represented by the base
+     * and the string and with the correct negativity set.
+     */
     inline mpz_class
     create_mpz(char base, const u32string& s, bool negative)
     {

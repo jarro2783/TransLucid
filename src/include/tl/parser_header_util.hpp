@@ -39,26 +39,40 @@ namespace TransLucid
 
     struct Header
     {
+      /**
+       * Construct a header. Adds the default dimension symbols.
+       */
       Header();
 
-      symbols_t dimension_symbols;
+      symbols_t dimension_symbols;/**<Dimensions.*/
 
-      binary_symbols binary_op_symbols;
+      binary_symbols binary_op_symbols;/**<Binary operations.*/
 
-      unary_symbols prefix_op_symbols;
-      unary_symbols postfix_op_symbols;
+      unary_symbols prefix_op_symbols;/**<Prefix operations.*/
+      unary_symbols postfix_op_symbols;/**<Postfix operations.*/
 
-      delimiter_symbols delimiter_start_symbols;
+      delimiter_symbols delimiter_start_symbols; /**<The delimiters.*/
 
-      std::vector<u32string> libraries;
+      std::vector<u32string> libraries; /**<All the libraries that have been 
+                                            loaded.*/
     };
 
+    /**
+     * Set the end delimiter for a delimiter.
+     * @param d The delimiter to change the end character of.
+     * @param end The end character.
+     */
     inline void
     setEndDelimiter(Delimiter& d, wchar_t& end)
     {
       end = d.end;
     }
 
+    /**
+     * Add a dimension symbol to a header.
+     * @param h The header to add to.
+     * @param name The name of the dimension.
+     */
     inline void
     addDimensionSymbol(Header& h, const u32string& name)
     {
@@ -66,6 +80,14 @@ namespace TransLucid
       h.dimension_symbols.add(wsname.c_str(), name);
     }
 
+    /**
+     * Add a binary operation symbol to a header.
+     * @param h The header to add.
+     * @param symbol The symbol which represents the operator.
+     * @param opName The name of the operation.
+     * @param assoc The associativity.
+     * @param precedence The precedence.
+     */
     inline void
     addBinaryOpSymbol
     (
@@ -96,6 +118,13 @@ namespace TransLucid
       );
     }
 
+    /**
+     * Add a delimiter symbol to a header.
+     * @param header The header to add to.
+     * @param type The typename.
+     * @param open The opening symbol.
+     * @param close The closing symbol.
+     */
     inline void
     addDelimiterSymbol
     (
@@ -117,6 +146,13 @@ namespace TransLucid
       );
     }
 
+    /**
+     * Add a unary operation symbol to a header.
+     * @param header The header to add to.
+     * @param type The type of the operation. UNARY_PREFIX or UNARY_POSTFIX.
+     * @param symbol The symbol to add.
+     * @param op The name of the operation.
+     */
     inline void
     addUnaryOpSymbol
     (
@@ -162,6 +198,11 @@ namespace TransLucid
       }
     }
 
+    /**
+     * Add a library to a header.
+     * @param header The header to add to.
+     * @param library The library name to add.
+     */
     inline void
     addLibrary
     (
@@ -172,6 +213,12 @@ namespace TransLucid
       header.libraries.push_back(library);
     }
 
+    /**
+     * Print a header.
+     * @param os The output stream.
+     * @param h The header to print.
+     * @return os.
+     */
     inline std::ostream& 
     operator<<(std::ostream& os, const Header& h) 
     {

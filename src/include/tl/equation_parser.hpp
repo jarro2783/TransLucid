@@ -75,6 +75,10 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(context_perturb);
       }
 
+      /**
+       * Set the tuple parser for this equation parser.
+       * @param t The tuple parser.
+       */
       template <typename T>
       void
       set_tuple(const T& t)
@@ -83,6 +87,10 @@ namespace TransLucid
         context_perturb = t[_val = _1];
       }
 
+      /**
+       * Set the expression parser for this equation parser.
+       * @param t The expression parser.
+       */
       template <typename T>
       void
       set_expr(const T& t)
