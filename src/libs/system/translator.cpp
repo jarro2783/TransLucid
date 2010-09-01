@@ -283,9 +283,9 @@ Translator::parse_header(const u32string& s)
 void
 Translator::loadLibraries()
 {
-  for(unsigned int i = m_nextLib; i != m_header->libraries.size(); ++i) 
+  for(; m_nextLib != m_header->libraries.size(); ++m_nextLib) 
   {
-    const u32string& l = m_header->libraries.at(i);
+    const u32string& l = m_header->libraries.at(m_nextLib);
     loadLibrary(l);
   }
 }

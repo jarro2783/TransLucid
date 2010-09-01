@@ -119,7 +119,7 @@ namespace TransLucid
 
     Tree::Expr m_lastExpr;
 
-    int m_nextLib;
+    unsigned int m_nextLib;
   };
 }
 

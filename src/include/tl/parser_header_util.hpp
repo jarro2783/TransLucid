@@ -69,9 +69,9 @@ namespace TransLucid
     }
 
     /**
-     * Add a dimension symbol to a header.
-     * @param h The header to add to.
-     * @param name The name of the dimension.
+     * Adds a dimension symbol to the header.
+     * @param h The header to add the symbol to.
+     * @param name The name of the dimension symbol.
      */
     inline void
     addDimensionSymbol(Header& h, const u32string& name)
@@ -81,6 +81,17 @@ namespace TransLucid
     }
 
     /**
+     * Removes a dimension symbol from a header.
+     * @param h The header to remove the symbol from.
+     * @param name The name of the dimension symbol.
+     */
+    inline void
+    removeDimensionSymbol(Header& h, const u32string& name)
+    {
+      h.dimension_symbols.remove(name);
+    }
+
+     /**
      * Add a binary operation symbol to a header.
      * @param h The header to add.
      * @param symbol The symbol which represents the operator.
