@@ -29,10 +29,14 @@ namespace TransLucid
   class Special : public TypedValue
   {
     public:
+    /**
+     * Special values. The enum values of the specials.
+     */
     enum Value
     {
-      ERROR,
-      ACCESS,
+      ERROR, /**<Error value. Should never have this value, having a special
+      of this value means an error occured somewhere.*/
+      ACCESS, /**<Access error. Something requested could not be accessed.*/
       TYPEERROR,
       DIMENSION,
       UNDEF,
