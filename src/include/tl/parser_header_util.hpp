@@ -67,6 +67,12 @@ namespace TransLucid
     }
 
     inline void
+    removeDimensionSymbol(Header& h, const u32string& name)
+    {
+      h.dimension_symbols.remove(name);
+    }
+
+    inline void
     addBinaryOpSymbol
     (
       Header& h,
