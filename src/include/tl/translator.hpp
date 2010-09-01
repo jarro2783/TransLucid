@@ -64,6 +64,12 @@ namespace TransLucid
     equation_v
     translate_equation_set(const u32string& s);
 
+    /**
+     * Add to the header. Parses the input string as a sequence of header
+     * items and add them to the header.
+     * @param s The header string.
+     * @return @b True if the parsing was successful, @b false otherwise.
+     */
     bool
     parse_header(const u32string& s);
 
