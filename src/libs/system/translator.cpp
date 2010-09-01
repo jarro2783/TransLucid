@@ -287,6 +287,7 @@ Translator::loadLibraries()
   {
     const u32string& l = m_header->libraries.at(i);
     loadLibrary(l);
+    m_nextLib = i;
   }
 }
 

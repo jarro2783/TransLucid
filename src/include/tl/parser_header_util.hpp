@@ -59,6 +59,11 @@ namespace TransLucid
       end = d.end;
     }
 
+    /**
+     * Adds a dimension symbol to the header.
+     * @param h The header to add the symbol to.
+     * @param name The name of the dimension symbol.
+     */
     inline void
     addDimensionSymbol(Header& h, const u32string& name)
     {
@@ -66,6 +71,11 @@ namespace TransLucid
       h.dimension_symbols.add(wsname.c_str(), name);
     }
 
+    /**
+     * Removes a dimension symbol from a header.
+     * @param h The header to remove the symbol from.
+     * @param name The name of the dimension symbol.
+     */
     inline void
     removeDimensionSymbol(Header& h, const u32string& name)
     {
