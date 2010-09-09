@@ -45,6 +45,7 @@ namespace TransLucid
     HD* operator()(const Tree::ConstantExpr& e);
     HD* operator()(const Tree::DimensionExpr& e);
     HD* operator()(const Tree::IdentExpr& e);
+    HD* operator()(const Tree::ParenExpr& e);
     HD* operator()(const Tree::UnaryOpExpr& e);
     HD* operator()(const Tree::BinaryOpExpr& e);
     HD* operator()(const Tree::IfExpr& e);

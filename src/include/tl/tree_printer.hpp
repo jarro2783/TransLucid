@@ -70,6 +70,12 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
+  TransLucid::Tree::ParenExpr,
+  (TransLucid::Tree::Expr, e)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
   TransLucid::Tree::BinaryOpExpr,
   (TransLucid::Tree::Expr, lhs)
   (TransLucid::Tree::BinaryOperator, op)
@@ -150,6 +156,8 @@ namespace TransLucid
         binary %= ('(') << expr << binary_symbol << expr 
         << literal(')');
 
+        paren_expr = literal('(') << expr << ')';
+
         hash_expr = ("(#") << expr[_1 = at_c<0>(_val)] << (')');
         pairs %= (expr << ":" << expr) % ", ";
         tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
@@ -166,6 +174,7 @@ namespace TransLucid
         | constant
         | dimension
         | ident
+        | paren_expr
         // | unary -- where is it?
         | binary
         | hash_expr
@@ -191,6 +200,7 @@ namespace TransLucid
       karma::rule<Iterator, Tree::ConstantExpr()> constant;
       karma::rule<Iterator, Tree::DimensionExpr()> dimension;
       karma::rule<Iterator, Tree::IdentExpr()> ident;
+      karma::rule<Iterator, Tree::ParenExpr()> paren_expr;
       karma::rule<Iterator, Tree::BinaryOperator()> binary_symbol;
       karma::rule<Iterator, Tree::BinaryOpExpr()> binary;
       karma::rule<Iterator, Tree::HashExpr()> hash_expr;

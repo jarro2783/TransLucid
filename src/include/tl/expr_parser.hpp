@@ -235,7 +235,10 @@ namespace TransLucid
              )
         #endif
         | context_perturb [_val = _1]
-        | (literal('(') >> expr > literal(')')) [_val = _1]
+        | (literal('(') >> expr > literal(')')) 
+          [
+            _val = construct<Tree::ParenExpr>(_1)
+          ]
         | delimiters [_val = _1]
         ;
 
