@@ -1,8 +1,0 @@
-demand @ [time : 1] = 10 + 10 * 10;;
-demand @ [time : 2] = 10 ≺ 11 ≺ 12;;
-demand @ [time : 3] = 10 ≺ 5+6 ≺ 3*4+5;;
-demand @ [time : 4] = f @ [x : 5];;
-demand @ [time : 5] = f @ [x : 15];;
-demand @ [time : 6] = compten @ [x : 3];;
-demand @ [time : 7] = compten @ [x : 10];;
-demand @ [time : 8] = compten @ [x : 15];;
