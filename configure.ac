@@ -79,6 +79,7 @@ AC_CONFIG_FILES([Makefile
                  src/libs/Makefile
                  src/libs/int/Makefile
                  src/libs/system/Makefile
+                 src/tests/Makefile
                  src/tlcore/Makefile
                  ])
 AC_OUTPUT

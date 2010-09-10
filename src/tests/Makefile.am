@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt
 
-noinst_PROGRAMS = expressions equations printing
+check_PROGRAMS = expressions equations printing
 
 AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -31,3 +31,12 @@ expressions_SOURCES = expressions.cpp
 equations_SOURCES = equations.cpp
 
 printing_SOURCES = printing.cpp
+
+TESTS_ENVIRONMENT = LIBRARY_PATH=$(top_builddir)/src/libs/int \
+  RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh $(SHELL) -x
+TESTS = $(patsubst %,run_%.sh,$(check_PROGRAMS))
+
+run_%.sh: runtest
+	sed 's&PROGRAM_NAME&$(top_builddir)/src/tests/$*&' < \
+	  $(top_srcdir)/src/tests/runtest > $@
+	chmod +x $@
