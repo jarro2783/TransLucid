@@ -24,8 +24,6 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([dist-bzip2])
 
-AC_CONFIG_TESTDIR(tests, [src])
-
 # Checks for programs.
 AC_PROG_CXX
 
@@ -83,10 +81,5 @@ AC_CONFIG_FILES([Makefile
                  src/libs/system/Makefile
                  src/tests/Makefile
                  src/tlcore/Makefile
-                 tests/Makefile
-                 tests/atlocal
-                 tests/sanity/Makefile
-                 tests/simple/Makefile
-                 tests/operations/Makefile
-                 tests/range/Makefile])
+                 ])
 AC_OUTPUT

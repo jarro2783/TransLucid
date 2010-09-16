@@ -1,9 +1,0 @@
-dimension<x>;;
-library ustring<int>;;
-infixl ustring<operator+> ustring<+> 10;;
-infixl ustring<operator*> ustring<*> 100;;
-infixp ustring<operator\<> ustring<≺> 1;;
-infixl ustring<operator\<> ustring<\<> 8;;
-infixl ustring<operator\>> ustring<\>> 8;;
-infixl ustring<operator-> ustring<-> 10;;
-//infixp ustring<operator\<> ustring<\<> 15;;

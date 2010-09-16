@@ -96,6 +96,12 @@ ExprCompiler::operator()(const Tree::IdentExpr& e)
   return new Hyperdatons::IdentHD(m_system, e.text);
 }
 
+HD* 
+ExprCompiler::operator()(const Tree::ParenExpr& e)
+{
+  return boost::apply_visitor(*this, e.e);
+}
+
 HD*
 ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {

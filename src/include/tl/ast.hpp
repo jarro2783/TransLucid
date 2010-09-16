@@ -248,6 +248,7 @@ namespace TransLucid
       u32string text; /**< The name of the identifier.*/
     };
 
+    class ParenExpr;
     class UnaryOpExpr;
     class BinaryOpExpr;
     class HashExpr;
@@ -275,6 +276,7 @@ namespace TransLucid
       ConstantExpr,
       DimensionExpr,
       IdentExpr,
+      boost::recursive_wrapper<ParenExpr>,
       boost::recursive_wrapper<UnaryOpExpr>,
       boost::recursive_wrapper<BinaryOpExpr>,
       boost::recursive_wrapper<IfExpr>,
@@ -282,6 +284,18 @@ namespace TransLucid
       boost::recursive_wrapper<TupleExpr>,
       boost::recursive_wrapper<AtExpr>
     > Expr;
+
+    struct ParenExpr
+    {
+      ParenExpr() = default;
+
+      ParenExpr(const Expr& e)
+      : e(e)
+      {
+      }
+
+      Expr e;
+    };
 
     /**
      * A unary operation. The operation and operand of a unary operation

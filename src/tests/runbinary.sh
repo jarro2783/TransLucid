@@ -1,11 +1,17 @@
 #!/bin/sh
-# Run a binary file, adding one or more directories temporarily to LD_LIBRARY_PATH
+# Run a binary file, adding one or more directories 
+# temporarily to LD_LIBRARY_PATH and passing the remaining arguments to
+# the binary
 
-if [ "$#" -ne "2" ]
+if [ "$#" -lt "2" ]
 then
-  echo "Usage: runbinary.sh libraryPath binaryFile"
+  echo "Usage: runbinary.sh libraryPath binaryFile args"
   exit 1
 fi
 
 export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
-./$2
+BINARY=$2
+
+shift 2
+
+$BINARY "$@"
