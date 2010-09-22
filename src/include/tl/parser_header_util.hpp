@@ -45,6 +45,7 @@ namespace TransLucid
       Header();
 
       symbols_t dimension_symbols;/**<Dimensions.*/
+      symbols_t system_dimension_symbols;
 
       binary_symbols binary_op_symbols;/**<Binary operations.*/
 

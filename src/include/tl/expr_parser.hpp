@@ -20,11 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef EXPR_PARSER_HPP_INCLUDED
 #define EXPR_PARSER_HPP_INCLUDED
 
-#include <tl/parser_util.hpp>
-#include <tl/parser_fwd.hpp>
-#include <tl/utility.hpp>
+#include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/parser_fwd.hpp>
 #include <tl/parser_header_util.hpp>
+#include <tl/parser_util.hpp>
+#include <tl/utility.hpp>
 
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/include/qi_nonterminal.hpp>
@@ -37,8 +38,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/container.hpp>
 #include <boost/spirit/home/phoenix/bind/bind_function.hpp>
 #include <boost/spirit/home/phoenix/statement/sequence.hpp>
-
-#include <tl/ast.hpp>
 
 namespace TransLucid
 {
@@ -76,6 +75,15 @@ namespace TransLucid
       } else {
         return Tree::ConstantExpr(type, value);
       }
+    }
+
+    inline u32string
+    construct_arg_delim(int a)
+    {
+      std::ostringstream os;
+      os << "arg" << a;
+      const std::string& s = os.str();
+      return std::u32string(s.begin(), s.end());
     }
 
     inline Tree::Expr
@@ -211,7 +219,7 @@ namespace TransLucid
         primary_expr =
           integer [_val = _1]
         | boolean [_val = _1]
-        | header.dimension_symbols
+        | dimensions
           [
             _val = construct<Tree::DimensionExpr>(make_u32string(_1))
           ]
@@ -260,7 +268,6 @@ namespace TransLucid
            )
         ;
         
-
         delimiters = 
           (   header.delimiter_start_symbols
               [
@@ -282,6 +289,22 @@ namespace TransLucid
           [
             _val = ph::bind(&construct_delimited_constant, _b,
                             make_u32string(_a))
+          ]
+        ;
+
+        dimensions %= 
+          header.dimension_symbols
+        | header.system_dimension_symbols
+        | arg_dimensions
+        ;
+
+        arg_dimensions = 
+          qi::lexeme
+          [
+            (literal("arg") >> qi::int_)
+            [
+              _val = ph::bind(&construct_arg_delim, _1)
+            ]
           ]
         ;
 
@@ -350,7 +373,12 @@ namespace TransLucid
         integer,
         prefix_expr,
         hash_expr,
-        context_perturb
+        context_perturb,
+      ;
+
+      qi::rule<Iterator, u32string(), SkipGrammar<Iterator>>
+        dimensions,
+        arg_dimensions
       ;
 
       qi::rule<Iterator, void(char_type)>
