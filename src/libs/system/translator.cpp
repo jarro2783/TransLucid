@@ -263,7 +263,7 @@ Translator::translate_and_add_equation_set(const u32string& s)
       std::get<3>(v)
     );
 
-    m_uuidEqnsTree.insert(std::make_pair(id, ptv.first));
+    m_uuidParsedEqns.insert(std::make_pair(id, ptv.first));
   }
 }
 
@@ -307,6 +307,11 @@ Translator::cleanup()
   delete m_expr;
   delete m_header_grammar;
   delete m_header;
+}
+
+std::string Translator::EquationIterator::print() const
+{
+  return Parser::printEquation(m_iter->second);
 }
 
 }

@@ -54,7 +54,67 @@ namespace TransLucid
 
   class Translator
   {
+    private:
+    typedef std::map<uuid, Parser::ParsedEquation> UUIDToParsedEquation;
+
     public:
+
+    class EquationIterator
+    {
+      public:
+      EquationIterator(const UUIDToParsedEquation::const_iterator& iter)
+      : m_iter(iter)
+      {
+      }
+
+      EquationIterator(const EquationIterator& other)
+      : m_iter(other.m_iter)
+      {
+      }
+
+      EquationIterator& operator=(const EquationIterator& rhs)
+      {
+        if (&rhs != this)
+        {
+          m_iter = rhs.m_iter;
+        }
+        return *this;
+      }
+
+      bool operator==(const EquationIterator& rhs) const
+      {
+        return m_iter == rhs.m_iter;
+      }
+
+      bool operator!=(const EquationIterator& rhs) const
+      {
+        return m_iter != rhs.m_iter;
+      }
+
+      EquationIterator& operator++() 
+      {
+        ++m_iter;
+        return *this;
+      }
+
+      EquationIterator operator++(int)
+      {
+        EquationIterator i(m_iter);
+        ++m_iter;
+
+        return i;
+      }
+
+      uuid id() const
+      {
+        return m_iter->first;
+      }
+
+      std::string print() const;
+
+      private:
+      UUIDToParsedEquation::const_iterator m_iter;
+    };
 
     Translator();
     ~Translator();
@@ -101,11 +161,39 @@ namespace TransLucid
       return m_lastExpr;
     }
 
+    /**
+     * Print a single equation. Prints the equation with the uuid @id if
+     * it was added to the system by this Translator object.
+     * @param id The equation uuid.
+     * @return A textual representation of the equation.
+     */
     std::string
     printEquation(const uuid& id) const;
 
+    /**
+     * Retrieve an iterator to the beginning of the equations.
+     * The equations will be sorted by their uuids.
+     * @return An EquationIterator object which can iterator through all the
+     * equations added so far.
+     */
+    EquationIterator
+    beginEquations() const
+    {
+      return EquationIterator(m_uuidParsedEqns.begin());
+    }
+
+    /**
+     * Retrieve an iterator to the end of the equations. Use with 
+     * beginEquations to determine when to stop iterating.
+     * @return An end iterator.
+     */
+    EquationIterator
+    endEquations() const
+    {
+      return EquationIterator(m_uuidParsedEqns.end());
+    }
+
     private:
-    typedef std::map<uuid, Parser::ParsedEquation> UUIDToParsedEquation;
 
     void loadLibraries();
 
@@ -126,7 +214,7 @@ namespace TransLucid
     Libtool m_lt;
 
     Tree::Expr m_lastExpr;
-    UUIDToParsedEquation m_uuidEqnsTree;
+    UUIDToParsedEquation m_uuidParsedEqns;
 
     unsigned int m_nextLib;
   };
