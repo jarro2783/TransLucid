@@ -20,6 +20,13 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PARSER_FWD_HPP_INCLUDED
 #define PARSER_FWD_HPP_INCLUDED
 
+/**
+ * @file parser_fwd.hpp
+ * Forward declarations of parser constructs so that other headers can include
+ * definitions needed for parsing, but not include any of the parser
+ * grammars.
+ */
+
 #include <tuple>
 //#include <boost/spirit/include/qi_core.hpp>
 #include <boost/spirit/include/qi_symbols.hpp>
@@ -66,6 +73,10 @@ namespace TransLucid
     //typedef std::basic_string<wchar_t> string_type;
     typedef std::basic_string<unsigned int> string_type;
     typedef unsigned int char_type;
+
+    /**
+     * The symbol table type, maps the symbol name to itself.
+     */
     typedef qi::symbols<char_type, u32string> symbols_t;
 
     /**
