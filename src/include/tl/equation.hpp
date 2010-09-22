@@ -20,14 +20,17 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef EQUATION_HPP_INCLUDED
 #define EQUATION_HPP_INCLUDED
 
-#include <tl/types.hpp>
-#include <boost/shared_ptr.hpp>
+//#include <tl/ast.hpp>
 #include <tl/exception.hpp>
-#include <list>
-#include <deque>
-#include <tl/hyperdaton.hpp>
-#include <boost/uuid/uuid_generators.hpp>
 #include <tl/bestfit.hpp>
+#include <tl/hyperdaton.hpp>
+#include <tl/types.hpp>
+
+#include <deque>
+#include <list>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 
 namespace TransLucid
 {

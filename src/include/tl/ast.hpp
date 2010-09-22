@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <boost/variant.hpp>
 #include <tl/types.hpp>
+#include <tl/exception.hpp>
 #include <gmpxx.h>
 #include <tl/builtin_types.hpp>
 #include <boost/fusion/include/vector.hpp>

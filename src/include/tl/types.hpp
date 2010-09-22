@@ -20,17 +20,18 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_H_INCLUDED
 #define TYPES_H_INCLUDED
 
-#include <iostream>
-
-#include <boost/functional/hash.hpp>
-#include <map>
-#include <boost/unordered_map.hpp>
-#include <vector>
-#include <boost/shared_ptr.hpp>
-#include <gmpxx.h>
 #include <boost/foreach.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/unordered_map.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
+
+#include <iostream>
+#include <map>
+#include <vector>
+
+#include <gmpxx.h>
 
 /**
  * @file types.hpp

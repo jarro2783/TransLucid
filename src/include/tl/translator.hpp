@@ -20,11 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TRANSLATOR_HPP_INCLUDED
 #define TRANSLATOR_HPP_INCLUDED
 
-#include <tl/hyperdaton.hpp>
-#include <tl/system.hpp>
 #include <tl/expr_compiler.hpp>
-#include <tl/parser_fwd.hpp>
+#include <tl/hyperdaton.hpp>
 #include <tl/library.hpp>
+#include <tl/parser_fwd.hpp>
+#include <tl/system.hpp>
+#include <tl/types.hpp>
 
 namespace TransLucid
 {
@@ -48,6 +49,9 @@ namespace TransLucid
     class HeaderGrammar;
   }
 
+  typedef std::pair<Parser::ParsedEquation, TranslatedEquation> PTEquation;
+  typedef std::vector<PTEquation> PTEquationVector;
+
   class Translator
   {
     public:
@@ -61,7 +65,7 @@ namespace TransLucid
     void
     translate_and_add_equation_set(const u32string& s);
 
-    equation_v
+    PTEquationVector
     translate_equation_set(const u32string& s);
 
     /**
@@ -97,7 +101,11 @@ namespace TransLucid
       return m_lastExpr;
     }
 
+    std::string
+    printEquation(const uuid& id) const;
+
     private:
+    typedef std::map<uuid, Parser::ParsedEquation> UUIDToParsedEquation;
 
     void loadLibraries();
 
@@ -118,6 +126,7 @@ namespace TransLucid
     Libtool m_lt;
 
     Tree::Expr m_lastExpr;
+    UUIDToParsedEquation m_uuidEqnsTree;
 
     unsigned int m_nextLib;
   };

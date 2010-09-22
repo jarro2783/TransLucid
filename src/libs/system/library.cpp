@@ -17,10 +17,13 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/charset.hpp>
 #include <tl/library.hpp>
-#include <ltdl.h>
-#include <iostream>
 #include <tl/utility.hpp>
+
+#include <iostream>
+
+#include <ltdl.h>
 
 namespace TransLucid
 {

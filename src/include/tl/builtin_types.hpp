@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define BUILTIN_TYPES_HPP_INCLUDED
 
 #include <tl/types.hpp>
-#include <tl/equation.hpp>
+//#include <tl/equation.hpp>
 #include <set>
 
 namespace TransLucid
@@ -436,17 +436,14 @@ namespace TransLucid
     char32_t m_c;
   };
 
+  class GuardHD;
+
   class Guard : public TypedValue
   {
     public:
-    Guard(const GuardHD& g)
-    : m_g(g)
-    {}
+    Guard(const GuardHD& g);
 
-    Guard(const Guard& rhs)
-    : m_g(rhs.m_g)
-    {
-    }
+    Guard(const Guard& rhs);
 
     Guard* 
     clone() const
@@ -457,7 +454,7 @@ namespace TransLucid
     const GuardHD&
     value() const
     {
-      return m_g;
+      return *m_g;
     }
 
     bool
@@ -485,7 +482,7 @@ namespace TransLucid
     }
 
     private:
-    GuardHD m_g;
+    GuardHD* m_g;
   };
 
   class Pair : public TypedValue
