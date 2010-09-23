@@ -70,7 +70,7 @@ printEquation(const ParsedEquation& e)
   Printer::karma::generate(outit, print_grammar, std::get<3>(e));
   result += generated;
 
-  return generated;
+  return result;
 }
 
 //I'll keep this for now because it could be of use
