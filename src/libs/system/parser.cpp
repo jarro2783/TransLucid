@@ -39,6 +39,18 @@ Header::Header()
   ;
 }
 
+std::ostream& 
+operator<<(std::ostream& os, const Header& h)
+{
+  for (auto iter = h.loaded_libraries.begin(); 
+    iter != h.loaded_libraries.end();
+    ++iter
+  )
+  {
+    os << "library ustring<" << utf32_to_utf8(*iter) << ">;;";
+  }
+}
+
 //I'll keep this for now because it could be of use
 //TODO: clean up error handling
 #if 0

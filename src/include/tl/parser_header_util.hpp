@@ -54,8 +54,8 @@ namespace TransLucid
 
       delimiter_symbols delimiter_start_symbols; /**<The delimiters.*/
 
-      std::vector<u32string> libraries; /**<All the libraries that have been 
-                                            loaded.*/
+      std::vector<u32string> libraries; /**<Libraries not yet loaded.*/
+      std::vector<u32string> loaded_libraries; /**<The loaded libraries.*/
     };
 
     /**
@@ -232,11 +232,7 @@ namespace TransLucid
      * @return os.
      */
     inline std::ostream& 
-    operator<<(std::ostream& os, const Header& h) 
-    {
-      os << "Parser::Header";
-      return os;
-    }
+    operator<<(std::ostream& os, const Header& h);
   } //namespace Parser
 } //namespace TransLucid
 
