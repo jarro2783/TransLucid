@@ -111,8 +111,6 @@ test_integer(int n, TL::Translator& translator)
     value = std::to_string(n);
   }
 
-  std::cerr << "testing int: '" << value << "'" << std::endl;
-
   TL::HD* h = 
     translator.translate_expr(TL::u32string(value.begin(), value.end()));
   BOOST_REQUIRE(h != 0);
