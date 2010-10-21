@@ -23,31 +23,40 @@ namespace TransLucid
 {
   namespace OpHDImp
   {
-    template <template <typename...> class T, typename ...Args1>
-    struct concatenate
+    template 
+    <
+      template <typename...> class List,
+      template<type_index> class Mod,
+      type_index ...Args
+    >
+    struct modify_type_index_list
     {
-      template <typename ...Args2>
-      struct with
-      {
-        typedef T<Args1..., Args2...> type;
-      };
+      typedef List<typename Mod<Args>::type...> type;
     };
 
-    template <type_index ...Args>
-    struct generate_args_tuple_type;
-
-    template <>
-    struct generate_args_tuple_type<>
+    template <type_index T>
+    struct make_size_t
     {
       typedef size_t type;
     };
 
     //creates a tuple with length of Args integers as parameters
-    template <type_index First, type_index ...Args>
-    struct generate_args_tuple_type<First, Args...>
+    template <type_index ...Args>
+    struct generate_args_tuple_type
     {
-      typedef typename concatenate<std::tuple, size_t>::
-        with<generate_args_tuple_type<Args...>>::type type;
+      typedef typename modify_type_index_list
+        <std::tuple, make_size_t, Args...>::type type;
+    };
+
+    struct lookup_index
+    {
+      lookup_index(SystemHD& i)
+      {
+      }
+
+      size_t operator()(type_index index)
+      {
+      }
     };
   }
 
@@ -59,11 +68,16 @@ namespace TransLucid
     template <typename> class ArgType, type_index ...Args>
   class OpHD : public HD
   {
+    private:
+    typedef typename OpHDImp::generate_args_tuple_type<Args...>::type DimsType;
+    DimsType m_args;
+
     //generates all of the args, then extracts them and checks that they
     //are the right type and passes them all to the functor
     public:
     OpHD(SystemHD& i)
     {
+      m_args = DimsType(OpHDImp::lookup_index(i)(Args)...);
     }
 
     TaggedConstant operator()(const Tuple& c)
@@ -71,9 +85,6 @@ namespace TransLucid
     }
 
     private:
-    typedef typename OpHDImp::generate_args_tuple_type<Args...>::type DimsType;
-    DimsType m_args;
-
     T m_t;
   };
 }
