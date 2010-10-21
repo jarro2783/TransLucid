@@ -3,6 +3,7 @@
 #include <tl/equation.hpp>
 #include <tl/utility.hpp>
 #include <tl/system.hpp>
+#include <tl/ophd.hpp>
 
 namespace TransLucid
 {
@@ -10,9 +11,21 @@ namespace TransLucid
 namespace LibString
 {
 
-HD*
-create_plus()
+template <typename>
+struct StringArgType
 {
+  typedef String type;
+};
+
+struct StringAdder
+{
+};
+
+HD*
+create_plus(SystemHD& i)
+{
+  return new OpHD<StringAdder, 
+    StringArgType, TYPE_INDEX_USTRING, TYPE_INDEX_USTRING>(i);
 }
 
 void
@@ -53,7 +66,7 @@ register_one_op(HD* hd, SystemHD& i)
 void
 register_string_ops(SystemHD& i)
 {
-  register_one_op(create_plus(), i);
+  register_one_op(create_plus(i), i);
 }
 
 }
