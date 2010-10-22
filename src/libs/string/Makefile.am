@@ -15,5 +15,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
-SUBDIRS = system int string
-EXTRA_DIST=CMakeLists.txt
+EXTRA_DIST = CMakeLists.txt
+
+pkglib_LTLIBRARIES = libstring.la
+
+libstring_la_SOURCES = libstring.hpp libstring.cpp 
+
+libstring_la_CPPFLAGS = -I$(top_srcdir)/src/include -Wall \
+$(BOOST_CPPFLAGS) $(TL_CFLAGS)
+
+libstring_la_LDFLAGS = -version-info 0:0:0 -lgmpxx -lgmp $(TL_LDFLAGS)

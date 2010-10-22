@@ -63,14 +63,14 @@ printEquation(const ParsedEquation& e)
   std::string result = utf32_to_utf8(to_u32string(std::get<0>(e)));
 
   const Tree::Expr& guard = std::get<1>(e);
-  if (boost::get<Tree::nil>(&guard) != 0)
+  if (boost::get<Tree::nil>(&guard) == 0)
   {
     Printer::karma::generate(outit, print_grammar, guard);
     result += " | " + generated;
   }
 
   const Tree::Expr& boolean = std::get<2>(e);
-  if (boost::get<Tree::nil>(&boolean) != 0)
+  if (boost::get<Tree::nil>(&boolean) == 0)
   {
     generated.clear();
     Printer::karma::generate(outit, print_grammar, boolean);
