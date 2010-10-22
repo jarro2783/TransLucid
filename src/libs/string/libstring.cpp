@@ -11,7 +11,7 @@ namespace TransLucid
 namespace LibString
 {
 
-template <typename>
+template <int index>
 struct StringArgType
 {
   typedef String type;
@@ -19,6 +19,10 @@ struct StringArgType
 
 struct StringAdder
 {
+  TaggedConstant
+  operator()(const String& lhs, const String& rhs) const
+  {
+  }
 };
 
 HD*

@@ -48,14 +48,129 @@ namespace TransLucid
         <std::tuple, make_size_t, Args...>::type type;
     };
 
+    //TODO this needs to lookup the argN indices and build the List
+    //template <template <typename...> class List>
     struct lookup_index
     {
       lookup_index(SystemHD& i)
+      : m_i(i)
       {
       }
 
-      size_t operator()(type_index index)
+      size_t operator()(type_index index) const
       {
+        //return get_type_index(&m_i, 
+      }
+
+      SystemHD& m_i;
+    };
+
+    //TODO finish this
+    template
+    <
+      template <int> class ArgType,
+      type_index type
+    >
+    struct make_constant
+    {
+      typedef typename ArgType<type>::type ret;
+
+      ret 
+      operator()(const Tuple& c, size_t index)
+      {
+        Tuple::const_iterator iter = c.find(index);
+        if (iter != c.end())
+        {
+          if (iter->second.index() == type)
+          {
+            return iter->second.value<ret>();
+          }
+        }
+      }
+    };
+
+    template
+    <
+      int N, 
+      template <int> class ArgType,
+      type_index ...Args
+    >
+    struct build_arguments_imp;
+
+    template
+    <
+      int N,
+      template <int> class ArgType
+    >
+    struct build_arguments_imp<N, ArgType>
+    {
+      template
+      <
+        typename F,
+        typename List,
+        typename ...Constants
+      >
+      TaggedConstant
+      operator()
+      (
+        const F& f, const List& args, const Tuple& c, Constants... constants
+      )
+      {
+        return f(constants...);
+      }
+    };
+
+    template
+    <
+      int N, 
+      template <int> class ArgType,
+      type_index First,
+      type_index ...Args
+    >
+    struct build_arguments_imp<N, ArgType, First, Args...>
+    {
+      template 
+      <
+        typename F, 
+        typename List,
+        typename ...Constants
+      >
+      TaggedConstant 
+      operator()
+      (
+        const F& f, 
+        const List& args, 
+        const Tuple& c,
+        Constants... constants
+      )
+      {
+        return build_arguments_imp<N+1, ArgType, Args...>()
+          (f, args, c, constants..., 
+            make_constant<ArgType, First>()(c, std::get<N>(args)));
+      }
+    };
+ 
+    template
+    <
+      template <int> class ArgType,
+      type_index ...Args
+    >
+    struct build_arguments
+    {
+      template 
+      <
+        typename F, 
+        typename List
+      >
+      TaggedConstant 
+      operator()
+      (
+        const F& f, 
+        const List& args, 
+        const Tuple& c
+      )
+      {
+        return build_arguments_imp<0, ArgType, Args...>()(f, args, c);
       }
     };
   }
@@ -65,7 +180,7 @@ namespace TransLucid
   //by its index, Args are the indices
   //this is the index-known-at-compile-time version
   template <typename T, 
-    template <typename> class ArgType, type_index ...Args>
+    template <int> class ArgType, type_index ...Args>
   class OpHD : public HD
   {
     private:
@@ -82,6 +197,7 @@ namespace TransLucid
 
     TaggedConstant operator()(const Tuple& c)
     {
+      return OpHDImp::build_arguments<ArgType, Args...>()(m_t, m_args, c);
     }
 
     private:
