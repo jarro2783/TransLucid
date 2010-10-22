@@ -131,6 +131,9 @@ namespace TransLucid
     //name, | [], & bool, = HD
     typedef std::tuple<string_type, Tree::Expr, Tree::Expr, Tree::Expr>
     ParsedEquation;
+
+    std::string
+    printEquation(const ParsedEquation& e);
   }
 }
 

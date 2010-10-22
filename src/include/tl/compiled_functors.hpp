@@ -20,10 +20,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef SET_EVALUATOR_HPP_INCLUDED
 #define SET_EVALUATOR_HPP_INCLUDED
 
-#include <tl/hyperdaton.hpp>
-//#include <tl/parser_fwd.hpp>
-#include <tl/builtin_types.hpp>
 #include <tl/ast.hpp>
+#include <tl/builtin_types.hpp>
+#include <tl/hyperdaton.hpp>
+
+#include <list>
 
 //Some of these functors are constructed with the system, some are not.
 //The ones that are make a demand of the system.

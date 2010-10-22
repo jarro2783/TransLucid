@@ -338,4 +338,25 @@ lookup_context(HD* system, const Constant& v, const Tuple& k)
   }
 }
 
+tuple_t
+create_add_eqn_context
+(
+  const u32string& name,
+  HD* guard,
+  HD* boolean,
+  const mpz_class& time
+)
+{
+  return tuple_t
+  {
+    {DIM_ID, generate_string(name)},
+    {
+      DIM_VALID_GUARD,
+      Constant(Guard(GuardHD(guard, boolean)),
+                 TYPE_INDEX_GUARD)
+    },
+    {DIM_TIME, makeTime(time)}
+  };
+}
+
 }

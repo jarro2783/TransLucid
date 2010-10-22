@@ -20,14 +20,16 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_UTILITY_HPP_INCLUDED
 #define TL_UTILITY_HPP_INCLUDED
 
-#include <tl/types.hpp>
-#include <vector>
-#include <boost/algorithm/string/find.hpp>
-#include <boost/algorithm/string/classification.hpp>
+#include <tl/builtin_types.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/hyperdaton.hpp>
-#include <tl/builtin_types.hpp>
 #include <tl/range.hpp>
+#include <tl/types.hpp>
+
+#include <vector>
+
+#include <boost/algorithm/string/find.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 namespace TransLucid
 {
@@ -174,26 +176,14 @@ namespace TransLucid
   bool
   booleanTrue(const GuardHD& g, const Tuple& c);
 
-  inline tuple_t
+  tuple_t
   create_add_eqn_context
   (
     const u32string& name,
     HD* guard,
     HD* boolean,
     const mpz_class& time
-  )
-  {
-    return tuple_t
-    {
-      {DIM_ID, generate_string(name)},
-      {
-        DIM_VALID_GUARD,
-        Constant(Guard(GuardHD(guard, boolean)),
-                   TYPE_INDEX_GUARD)
-      },
-      {DIM_TIME, makeTime(time)}
-    };
-  }
+  );
 
   //looks up a value in the current context and returns the value of the
   //all dimension if it exists, otherwise special<dim> if not found

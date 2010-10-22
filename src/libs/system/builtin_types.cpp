@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/builtin_types.hpp>
+#include <tl/equation.hpp>
 #include <boost/foreach.hpp>
 #include <boost/assign.hpp>
 #include <tl/utility.hpp>
@@ -70,6 +71,16 @@ void Char::print(std::ostream& os) const
 {
   u32string s(1, m_c);
   os << "uchar<" << utf32_to_utf8(s) << ">";
+}
+
+Guard::Guard(const GuardHD& g)
+: m_g(new GuardHD(g))
+{
+}
+
+Guard::Guard(const Guard& rhs)
+: m_g(new GuardHD(*rhs.m_g))
+{
 }
 
 }

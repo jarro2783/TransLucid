@@ -173,7 +173,7 @@ Translator::translate_expr(const u32string& u32s)
   return m_compiler.compile(e);
 }
 
-equation_v
+PTEquationVector
 Translator::translate_equation_set(const u32string& s)
 {
   Parser::iterator_t pos(Parser::U32Iterator(
@@ -195,18 +195,23 @@ Translator::translate_equation_set(const u32string& s)
     throw "failed parsing equations";
   }
 
-  equation_v equations;
+  PTEquationVector equations;
 
   BOOST_FOREACH(auto& v, parsedEquations)
   {
     HD* context = m_compiler.compile(std::get<1>(v));
     HD* boolean = m_compiler.compile(std::get<2>(v));
     HD* e = m_compiler.compile(std::get<3>(v));
-    equations.push_back(TranslatedEquation(
-      to_u32string(std::get<0>(v)),
-      context,
-      boolean,
-      e));
+    equations.push_back(
+      std::make_pair(
+      v,
+      TranslatedEquation(
+        to_u32string(std::get<0>(v)),
+        context,
+        boolean,
+        e)
+      )
+    );
 
     #if 0
 
@@ -238,11 +243,12 @@ Translator::translate_equation_set(const u32string& s)
 void
 Translator::translate_and_add_equation_set(const u32string& s)
 {
-  equation_v equations = translate_equation_set(s);
+  PTEquationVector equations = translate_equation_set(s);
 
-  BOOST_FOREACH(auto& v, equations)
+  BOOST_FOREACH(auto& ptv, equations)
   {
-    m_system.addExpr
+    auto v = ptv.second;
+    uuid id = m_system.addExpr
     (
       Tuple
       (
@@ -256,6 +262,8 @@ Translator::translate_and_add_equation_set(const u32string& s)
       ),
       std::get<3>(v)
     );
+
+    m_uuidParsedEqns.insert(std::make_pair(id, ptv.first));
   }
 }
 
@@ -299,6 +307,11 @@ Translator::cleanup()
   delete m_expr;
   delete m_header_grammar;
   delete m_header;
+}
+
+std::string Translator::EquationIterator::print() const
+{
+  return Parser::printEquation(m_iter->second);
 }
 
 }

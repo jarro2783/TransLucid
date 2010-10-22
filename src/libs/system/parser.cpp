@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/parser_fwd.hpp>
-#include <tl/exception.hpp>
-#include <boost/format.hpp>
-#include <tl/parser_header_util.hpp>
 #include <tl/charset.hpp>
+#include <tl/exception.hpp>
+#include <tl/parser_fwd.hpp>
+#include <tl/parser_header_util.hpp>
+#include <tl/tree_printer.hpp>
 
 namespace TransLucid
 {
@@ -49,6 +49,41 @@ operator<<(std::ostream& os, const Header& h)
   {
     os << "library ustring<" << utf32_to_utf8(*iter) << ">;;";
   }
+  return os;
+}
+
+std::string
+printEquation(const ParsedEquation& e)
+{
+  typedef std::back_insert_iterator<std::string> out_iter;
+  Printer::ExprPrinter<out_iter> print_grammar;
+  std::string generated;
+  std::back_insert_iterator<std::string> outit(generated);
+
+  std::string result = utf32_to_utf8(to_u32string(std::get<0>(e)));
+
+  const Tree::Expr& guard = std::get<1>(e);
+  if (boost::get<Tree::nil>(&guard) != 0)
+  {
+    Printer::karma::generate(outit, print_grammar, guard);
+    result += " | " + generated;
+  }
+
+  const Tree::Expr& boolean = std::get<2>(e);
+  if (boost::get<Tree::nil>(&boolean) != 0)
+  {
+    generated.clear();
+    Printer::karma::generate(outit, print_grammar, boolean);
+    result += " & " + generated;
+  }
+
+  result += " = ";
+
+  generated.clear();
+  Printer::karma::generate(outit, print_grammar, std::get<3>(e));
+  result += generated;
+
+  return result;
 }
 
 //I'll keep this for now because it could be of use
