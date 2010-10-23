@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/hyperdaton.hpp>
+#include <sstream>
 
 namespace TransLucid
 {
@@ -48,21 +49,54 @@ namespace TransLucid
         <std::tuple, make_size_t, Args...>::type type;
     };
 
-    //TODO this needs to lookup the argN indices and build the List
-    //template <template <typename...> class List>
-    struct lookup_index
+    template 
+    <
+      int N, 
+      typename Ret,
+      template <typename...> class List,
+      type_index ...Args
+    >
+    struct lookup_index;
+
+    template
+    <
+      int N,
+      typename Ret,
+      template <typename...> class List
+    >
+    struct lookup_index<N, Ret, List>
     {
-      lookup_index(SystemHD& i)
-      : m_i(i)
+      template <typename ...DimIndexes>
+      Ret
+      operator()(SystemHD& i, DimIndexes... dims) const
       {
+        return Ret(dims...);
       }
-
-      size_t operator()(type_index index) const
+    };
+ 
+    //TODO this needs to lookup the argN indices and build the List
+    template 
+    <
+      int N, 
+      typename Ret,
+      template <typename...> class List,
+      type_index First,
+      type_index ...Args
+    >
+    struct lookup_index<N, Ret, List, First, Args...>
+    {
+      template
+      <
+        typename ...DimIndexes
+      >
+      Ret 
+      operator()(SystemHD& i, DimIndexes... dims) const
       {
-        //return get_type_index(&m_i, 
+        std::ostringstream os;
+        os << "arg" << N;
+        return lookup_index<N+1, Ret, List, Args...>()
+          (i, dims..., get_dimension_index(&i, to_u32string(os.str())));
       }
-
-      SystemHD& m_i;
     };
 
     //TODO finish this
@@ -79,12 +113,13 @@ namespace TransLucid
       operator()(const Tuple& c, size_t index)
       {
         Tuple::const_iterator iter = c.find(index);
-        if (iter != c.end())
+        if (iter == c.end() || iter->second.index() != type)
         {
-          if (iter->second.index() == type)
-          {
-            return iter->second.value<ret>();
-          }
+          throw DimensionNotFound();
+        }
+        else
+        {
+          return iter->second.value<ret>();
         }
       }
     };
@@ -116,7 +151,7 @@ namespace TransLucid
         const F& f, const List& args, const Tuple& c, Constants... constants
       )
       {
-        return f(constants...);
+        return f(constants..., c);
       }
     };
 
@@ -184,6 +219,7 @@ namespace TransLucid
   class OpHD : public HD
   {
     private:
+    //a tuple of all the argN indexes
     typedef typename OpHDImp::generate_args_tuple_type<Args...>::type DimsType;
     DimsType m_args;
 
@@ -192,15 +228,20 @@ namespace TransLucid
     public:
     OpHD(SystemHD& i)
     {
-      m_args = DimsType(OpHDImp::lookup_index(i)(Args)...);
+      m_args = OpHDImp::lookup_index<0, DimsType, std::tuple, Args...>()(i);
     }
 
     TaggedConstant operator()(const Tuple& c)
     {
+      //uses variadic template parameters passed to operator() to call
+      //T::operator()(args...)
+      //it extracts the arguments out of the context and checks that they are
+      //of the right type
       return OpHDImp::build_arguments<ArgType, Args...>()(m_t, m_args, c);
     }
 
     private:
+    //the op functor
     T m_t;
   };
 }

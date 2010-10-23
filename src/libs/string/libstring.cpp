@@ -20,8 +20,13 @@ struct StringArgType
 struct StringAdder
 {
   TaggedConstant
-  operator()(const String& lhs, const String& rhs) const
+  operator()(const String& lhs, const String& rhs, const Tuple& c) const
   {
+    return TaggedConstant
+    (
+      Constant(String(lhs.value() + rhs.value()), TYPE_INDEX_USTRING),
+      c
+    );
   }
 };
 

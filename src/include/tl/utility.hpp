@@ -189,6 +189,12 @@ namespace TransLucid
   //all dimension if it exists, otherwise special<dim> if not found
   TaggedConstant
   lookup_context(HD* system, const Constant& v, const Tuple& k);
+
+  inline Constant
+  make_special(Special::Value s)
+  {
+    return Constant(Special(s), TYPE_INDEX_SPECIAL);
+  }
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED
