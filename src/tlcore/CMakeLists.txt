@@ -1,7 +1,8 @@
 enable_testing()
 
 set(RUN ${CMAKE_SOURCE_DIR}/src/tests/runbinary.sh)
-set(LIBDIR ${CMAKE_BINARY_DIR}/src/libs/int)
+set(LIBDIR
+${CMAKE_BINARY_DIR}/src/libs/int:${CMAKE_BINARY_DIR}/src/libs/string)
 set(TESTFILE ${CMAKE_SOURCE_DIR}/src/tlcore/runtests.sh)
 set(TLCOREFILE ${CMAKE_BINARY_DIR}/src/tlcore/tlcore)
 set(TESTPATH ${CMAKE_SOURCE_DIR}/src/tlcore/tests)
