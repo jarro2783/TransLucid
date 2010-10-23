@@ -262,7 +262,6 @@ namespace TransLucid
       {
         try
         {
-          std::cout << "header parsed library load" << std::endl;
           const u32string& slibrary =
             boost::get<u32string>(library);
 

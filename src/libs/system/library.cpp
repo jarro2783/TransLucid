@@ -42,7 +42,7 @@ namespace
     bool success = true;
     std::string filename = utf32_to_utf8(file);
 
-    std::cout << "opening " << filename << std::endl;
+    //std::cout << "opening " << filename << std::endl;
 
     lt_dlhandle h = lt_dlopenext(filename.c_str());
 
@@ -125,7 +125,7 @@ Libtool::loadLibrary(const u32string& name, HD* system)
   #endif
   char wd[1000];
   getcwd(wd, 1000);
-  std::cout << "working directory: " << wd << std::endl;
+  //std::cout << "working directory: " << wd << std::endl;
   bool result = attemptLibraryOpen(U"lib" + name, name, system);
 
   if (!result)

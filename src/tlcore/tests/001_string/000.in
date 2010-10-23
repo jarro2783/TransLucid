@@ -1,0 +1,5 @@
+library "string";;
+infixl "+" "operator+" 10;;
+%%
+%%
+"hello " + "world";;
