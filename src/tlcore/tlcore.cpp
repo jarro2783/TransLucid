@@ -28,6 +28,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iterator>
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 /**
  * @file tlcore.cpp
  * The tlcore application. All of the code which runs the main tlcore
@@ -229,6 +233,7 @@ TLCore::TLCore()
  ,m_lastLibLoaded(0)
 {
   m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
+  m_libtool.addSearchPath(to_u32string(std::string(PREFIX "/share/tl")));
 }
 
 void 

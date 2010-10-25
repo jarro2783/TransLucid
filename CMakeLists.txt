@@ -29,22 +29,24 @@ endif()
 
 find_package(PkgConfig REQUIRED)
 
-set(TLCFLAGS -Wall -std=gnu++0x -DPACKAGE_VERSION=\"0.0.30\"
--DBOOST_SPIRIT_UNICODE)
+set(TLCFLAGS -Wall -std=gnu++0x -DPACKAGE_VERSION=\"0.0.35\"
+-DBOOST_SPIRIT_UNICODE -DHAVE_CONFIG_H)
 set(TLLIBS -std=gnu++0x)
 
 set(CMAKE_BUILD_TYPE build)
 
 set (Boost_USE_STATIC_LIBS OFF)
-set (Boost_ADDITIONAL_VERSIONS 1.43 1.43.0)
+#set (Boost_ADDITIONAL_VERSIONS 1.43 1.43.0)
 set (Boost_USE_MULTITHREADED ON)
-set (CMAKE_MODULE_PATH /home/jarrydb)
 find_package(Boost 1.42.0 REQUIRED COMPONENTS program_options)
 
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
-INCLUDE_DIRECTORIES(src/include)
+INCLUDE_DIRECTORIES(src/include ${CMAKE_BINARY_DIR})
+
+set(PREFIX \"${CMAKE_INSTALL_PREFIX}\")
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
 add_subdirectory(src)
