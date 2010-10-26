@@ -505,6 +505,8 @@ register_int_ops(TL::SystemHD& i, size_t index)
   register_one_op<T, std::plus>(i, U"operator+", index);
   register_one_op<T, std::minus>(i, U"operator-", index);
   register_one_op<T, std::multiplies>(i, U"operator*", index);
+  register_one_op<T, std::modulus>(i, U"operator%", index);
+  register_one_op<T, std::divides>(i, U"operator/", index);
 
   #if 0
   r.registerOp("operator+", ops, bindBinOp<T, std::plus>(m));
