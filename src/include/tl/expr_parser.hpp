@@ -219,29 +219,9 @@ namespace TransLucid
         primary_expr =
           integer [_val = _1]
         | boolean [_val = _1]
-        | dimensions
-          [
-            _val = construct<Tree::DimensionExpr>(make_u32string(_1))
-          ]
+        | dimensions [_val = _1]
         | specials [_val = _1]
         | ident_constant [_val = _1]
-        #if 0
-        ident [_a = _1]
-          >> ( angle_string
-               [
-                 _val = ph::bind
-                 (
-                   &construct_typed_constant, 
-                   make_u32string(_a), 
-                   make_u32string(_1)
-                 )
-               ]
-             | qi::eps
-               [
-                _val = construct<Tree::IdentExpr>(make_u32string(_a))
-               ]
-             )
-        #endif
         | context_perturb [_val = _1]
         | (literal('(') >> expr > literal(')')) 
           [
@@ -292,10 +272,15 @@ namespace TransLucid
           ]
         ;
 
-        dimensions %= 
+        dimensions = 
+        (
           header.dimension_symbols
         | header.system_dimension_symbols
         | arg_dimensions
+        )
+        [
+          _val = construct<Tree::DimensionExpr>(make_u32string(_1))
+        ]
         ;
 
         arg_dimensions = 
@@ -374,10 +359,10 @@ namespace TransLucid
         prefix_expr,
         hash_expr,
         context_perturb,
+        dimensions
       ;
 
       qi::rule<Iterator, u32string(), SkipGrammar<Iterator>>
-        dimensions,
         arg_dimensions
       ;
 
