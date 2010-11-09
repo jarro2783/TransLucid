@@ -201,11 +201,23 @@ VariableHD::operator()(const Tuple& k)
     return (*std::get<1>(applicable.front())->second.equation())(k);
   }
 
-  applicable_list::const_iterator bestIter = applicable.end();
+  //find the best ones
+  std::list<applicable_list::const_iterator> bestIters;
 
-  for (applicable_list::const_iterator iter = applicable.begin();
-       iter != applicable.end(); ++iter)
+  for (applicable_list::const_iterator i = applicable.begin();
+       i != applicable.end(); ++i)
   {
+    bool best = true;
+    for (applicable_list::const_iterator j = applicable.begin();
+         j != applicable.end(); ++j)
+    {
+
+      if (i != j && !tupleRefines(std::get<0>(*i), std::get<0>(*j)))
+      {
+        best = false;
+      }
+
+    #if 0
     if (bestIter == applicable.end())
     {
       bestIter = iter;
@@ -218,47 +230,28 @@ VariableHD::operator()(const Tuple& k)
     {
       bestIter = applicable.end();
     }
-  }
+    #endif
 
-  if (bestIter == applicable.end())
-  {
-    return TaggedConstant(Constant(Special(Special::MULTIDEF),
-                          TYPE_INDEX_SPECIAL), k);
-  }
+    }
 
-  //I suspect that this is buggy
-  #if 0
-  for (applicable_list::const_iterator iter = applicable.begin();
-       iter != applicable.end(); ++iter)
-  {
-    if (std::get<1>(*bestIter)->second.equation()
-          != std::get<1>(*iter)->second.equation()
-        &&
-        !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
+    if (best)
     {
-      return TaggedConstant(Constant(Special(Special::MULTIDEF),
-                            TYPE_INDEX_SPECIAL), k);
+      bestIters.push_back(i);
     }
   }
-  #endif
-
-  for (applicable_list::const_iterator iter = applicable.begin();
-       iter != applicable.end(); ++iter)
-  {
-    if (iter != bestIter &&
-        //std::get<1>(*bestIter)->second.equation()
-        //  != std::get<1>(*iter)->second.equation()
-        //&&
-        !tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
-    {
-      return TaggedConstant(Constant(Special(Special::MULTIDEF),
-                            TYPE_INDEX_SPECIAL), k);
-    }
-  }
-  
+ 
   //std::cerr << "running equation " << std::get<1>(*bestIter)->id()
   //<< std::endl;
-  return (*std::get<1>(*bestIter)->second.equation())(k);
+
+  if (bestIters.size() == 1)
+  {
+    return (*std::get<1>(*bestIters.front())->second.equation())(k);
+  }
+  else
+  {
+    return TaggedConstant(Constant(Special(Special::MULTIDEF),
+                          TYPE_INDEX_SPECIAL),k);
+  }
 }
 
 inline std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
