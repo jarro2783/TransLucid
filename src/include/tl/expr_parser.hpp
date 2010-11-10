@@ -198,12 +198,7 @@ namespace TransLucid
         at_expr =
            hash_expr [_a = _1]
         >> (
-               (literal("@@") >> at_expr)
-               [
-                 _val = construct<Tree::AtExpr>(_a, _1, true)
-               ]
-             |
-               (literal('@') >> at_expr)
+             (literal('@') >> at_expr)
                [
                  _val = construct<Tree::AtExpr>(_a, _1, false)
                ]
@@ -333,6 +328,7 @@ namespace TransLucid
           << val("\"")
           << std::endl
         );
+
       }
 
       /**
