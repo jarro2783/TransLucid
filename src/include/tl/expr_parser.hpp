@@ -223,6 +223,7 @@ namespace TransLucid
             _val = construct<Tree::ParenExpr>(_1)
           ]
         | delimiters [_val = _1]
+        | function_abstraction
         ;
 
         ident_constant = 
@@ -355,7 +356,8 @@ namespace TransLucid
         prefix_expr,
         hash_expr,
         context_perturb,
-        dimensions
+        dimensions,
+        function_abstraction
       ;
 
       qi::rule<Iterator, u32string(), SkipGrammar<Iterator>>

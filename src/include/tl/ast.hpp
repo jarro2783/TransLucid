@@ -256,6 +256,8 @@ namespace TransLucid
     class TupleExpr;
     class IfExpr;
     class AtExpr;
+    class PhiExpr;
+    class LambdaExpr;
 
     // Not defined in ast.hpp
     class OpExpr;
@@ -283,7 +285,9 @@ namespace TransLucid
       boost::recursive_wrapper<IfExpr>,
       boost::recursive_wrapper<HashExpr>,
       boost::recursive_wrapper<TupleExpr>,
-      boost::recursive_wrapper<AtExpr>
+      boost::recursive_wrapper<AtExpr>,
+      boost::recursive_wrapper<PhiExpr>,
+      boost::recursive_wrapper<LambdaExpr>
     > Expr;
 
     struct ParenExpr
@@ -508,6 +512,14 @@ namespace TransLucid
        * change node, false if it is a relative context change node.
        */
       bool absolute;
+    };
+
+    struct PhiExpr
+    {
+    };
+
+    struct LambdaExpr
+    {
     };
 
     #define PRINT_NODE(n) \
