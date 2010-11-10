@@ -48,8 +48,17 @@ namespace TransLucid
     void
     addDemand(const u32string& id, const GuardHD& guard);
 
+    size_t 
+    theTime()
+    {
+      return m_time;
+    }
+
     void
-    tick();
+    commit()
+    {
+      ++m_time;
+    }
 
     private:
     DimensionTranslator m_dimTranslator;
@@ -74,6 +83,9 @@ namespace TransLucid
 
     void
     addDimensionSymbol(const u32string& s);
+
+    void
+    tick();
 
     std::map<u32string, size_t> builtin_name_to_index;
   };
