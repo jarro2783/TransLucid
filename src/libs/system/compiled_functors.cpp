@@ -423,7 +423,16 @@ AtRelativeHD::operator()(const Tuple& k)
   }
   else
   {
-    BOOST_FOREACH(tuple_t::value_type v, kp.first.value<Tuple>().tuple())
+    //validate time
+    auto& delta = kp.first.value<Tuple>().tuple();
+    const auto& dimTime = delta.find(DIM_TIME);
+    if (dimTime != delta.end() && dimTime->second.value<Intmp>().value() > 
+      kNew[DIM_TIME].value<Intmp>().value())
+    {
+      return TaggedConstant(make_special(Special::ACCESS), k);
+    }
+
+    BOOST_FOREACH(tuple_t::value_type v, delta)
     {
       kNew[v.first] = v.second;
     }
