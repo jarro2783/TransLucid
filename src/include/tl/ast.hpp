@@ -258,6 +258,8 @@ namespace TransLucid
     class AtExpr;
     class PhiExpr;
     class LambdaExpr;
+    class NameAppExpr;
+    class ValueAppExpr;
 
     // Not defined in ast.hpp
     class OpExpr;
@@ -287,7 +289,9 @@ namespace TransLucid
       boost::recursive_wrapper<TupleExpr>,
       boost::recursive_wrapper<AtExpr>,
       boost::recursive_wrapper<PhiExpr>,
-      boost::recursive_wrapper<LambdaExpr>
+      boost::recursive_wrapper<LambdaExpr>,
+      boost::recursive_wrapper<NameAppExpr>,
+      boost::recursive_wrapper<ValueAppExpr>
     > Expr;
 
     struct ParenExpr
@@ -520,6 +524,32 @@ namespace TransLucid
 
     struct LambdaExpr
     {
+    };
+
+    struct NameAppExpr
+    {
+      NameAppExpr() = default;
+
+      NameAppExpr(const Expr& lhs, const Expr& rhs)
+      : lhs(lhs), rhs(rhs)
+      {
+      }
+
+      Expr lhs;
+      Expr rhs;
+    };
+
+    struct ValueAppExpr
+    {
+      ValueAppExpr() = default;
+
+      ValueAppExpr(const Expr& lhs, const Expr& rhs)
+      : lhs(lhs), rhs(rhs)
+      {
+      }
+
+      Expr lhs;
+      Expr rhs;
     };
 
     #define PRINT_NODE(n) \

@@ -208,22 +208,53 @@ namespace TransLucid
 
         hash_expr =
           ( literal('#') > hash_expr [_val = construct<Tree::HashExpr>(_1)])
-          | primary_expr [_val = _1]
+          | phi_application [_val = _1]
         ;
 
-        primary_expr =
-          integer [_val = _1]
-        | boolean [_val = _1]
-        | dimensions [_val = _1]
-        | specials [_val = _1]
-        | ident_constant [_val = _1]
-        | context_perturb [_val = _1]
-        | (literal('(') >> expr > literal(')')) 
+        phi_application = 
+          ( 
+           lambda_application[_a = _1]
+        >> +(
+              lambda_application[_a = construct<Tree::ValueAppExpr>(_a, _1)]
+            )
+          )
+          [
+            _val = _a
+          ]
+        ;
+
+        lambda_application =
+          (
+           primary_expr[_a = _1] 
+        >> +(
+              (literal(".") >> primary_expr)
+              [
+                _a = construct<Tree::NameAppExpr>(_a, _1)
+              ]
+            )
+          )
+          [
+            _val = _a
+          ]
+        ;
+
+        primary_expr %=
+          integer
+        | boolean
+        | dimensions
+        | specials
+        | ident_constant
+        | context_perturb
+        | paren_expr 
+        | delimiters
+        | function_abstraction
+        ;
+
+        paren_expr =
+          (literal('(') >> expr > literal(')')) 
           [
             _val = construct<Tree::ParenExpr>(_1)
           ]
-        | delimiters [_val = _1]
-        | function_abstraction
         ;
 
         ident_constant = 
@@ -304,6 +335,19 @@ namespace TransLucid
 
         end_delimiter = qi::unicode::char_(_r1);
 
+        function_abstraction = 
+            //phi abstraction
+            (literal("\\\\") > ident > literal("->") > expr)
+            [
+              _val = construct<Tree::PhiExpr>()
+            ]
+            //lambda abstraction
+          | (literal("\\") > ident > literal("->") > expr)
+            [
+              _val = construct<Tree::LambdaExpr>()
+            ]
+        ;
+
         //BOOST_SPIRIT_DEBUG_NODE(if_expr);
         BOOST_SPIRIT_DEBUG_NODE(expr);
         BOOST_SPIRIT_DEBUG_NODE(boolean);
@@ -357,7 +401,14 @@ namespace TransLucid
         hash_expr,
         context_perturb,
         dimensions,
+        paren_expr,
         function_abstraction
+      ;
+
+      qi::rule<Iterator, Tree::Expr(), SkipGrammar<Iterator>,
+               qi::locals<Tree::Expr>>
+        lambda_application,
+        phi_application
       ;
 
       qi::rule<Iterator, u32string(), SkipGrammar<Iterator>>

@@ -54,6 +54,8 @@ namespace TransLucid
     HD* operator()(const Tree::AtExpr& e);
     HD* operator()(const Tree::PhiExpr& e);
     HD* operator()(const Tree::LambdaExpr& e);
+    HD* operator()(const Tree::NameAppExpr& e);
+    HD* operator()(const Tree::ValueAppExpr& e);
 
     private:
     //the system to compile with

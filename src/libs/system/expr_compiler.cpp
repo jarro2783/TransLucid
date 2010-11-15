@@ -185,4 +185,14 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
 {
 }
 
+HD* 
+ExprCompiler::operator()(const Tree::NameAppExpr& e)
+{
+}
+
+HD* 
+ExprCompiler::operator()(const Tree::ValueAppExpr& e)
+{
+}
+
 } //namespace TransLucid
