@@ -308,6 +308,14 @@ namespace TransLucid
       HD* e1;
     };
 
+    class LambdaAbstractionHD : public HD
+    {
+    };
+
+    class LambdaApplicationHD : public HD
+    {
+    };
+
   }
 
 }

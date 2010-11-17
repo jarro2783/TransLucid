@@ -653,6 +653,26 @@ namespace TransLucid
     private:
     size_t m_index;
   };
+
+  class FunctionApplicationType : public TypedValue
+  {
+    public:
+    virtual ~FunctionApplicationType() = 0;
+
+    virtual TaggedConstant
+    applyLambda(const Tuple& k);
+
+    virtual TaggedConstant
+    applyPhi(const Tuple& k);
+  };
+
+  class LambdaApplicationType : public FunctionApplicationType
+  {
+  };
+
+  class PhiApplicationType : public FunctionApplicationType
+  {
+  };
 }
 
 #endif // BUILTIN_TYPES_HPP_INCLUDED
