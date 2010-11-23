@@ -27,7 +27,7 @@ namespace TransLucid
 
 using boost::fusion::at_c;
 
-ExprCompiler::ExprCompiler(HD* system)
+ExprCompiler::ExprCompiler(SystemHD* system)
 : m_system(system)
 {
 }
@@ -39,7 +39,16 @@ ExprCompiler::~ExprCompiler()
 HD*
 ExprCompiler::compile(const Tree::Expr& e)
 {
-  return boost::apply_visitor(*this, e);
+  HD* h = boost::apply_visitor(*this, e);
+
+  if (h == 0)
+  {
+    return 0;
+  }
+  else
+  {
+    return new Hyperdatons::SystemEvaluationHD(m_system, h);
+  }
 }
 
 HD*

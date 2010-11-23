@@ -38,8 +38,30 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  class SystemHD;
+
   namespace Hyperdatons
   {
+    /**
+     * @brief The outermost hyperdaton which starts an evaluation.
+     * Sets up the right context so that evaluation works.
+     */
+    class SystemEvaluationHD : public HD
+    {
+      public:
+      SystemEvaluationHD(SystemHD* system, HD* e)
+      : m_system(system), m_e(e)
+      {
+      }
+
+      TaggedConstant 
+      operator()(const Tuple& k);
+
+      private:
+      SystemHD* m_system;
+      HD* m_e;
+    };
+
     class TypedValueHD : public HD
     {
       public:

@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define EXPR_COMPILER_HPP_INCLUDED
 
 #include <tl/ast.hpp>
+#include <tl/system.hpp>
 
 namespace TransLucid
 {
@@ -31,7 +32,7 @@ namespace TransLucid
     //boost::apply_visitor requires this
     typedef HD* result_type;
 
-    ExprCompiler(HD* i);
+    ExprCompiler(SystemHD* system);
     ~ExprCompiler();
 
     HD* compile(const Tree::Expr&);
@@ -59,7 +60,7 @@ namespace TransLucid
 
     private:
     //the system to compile with
-    HD* m_system;
+    SystemHD* m_system;
   };
 
 } //namespace TransLucid

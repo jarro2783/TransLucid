@@ -28,6 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
 #include <tl/consthd.hpp>
+#include <tl/system.hpp>
 #include <sstream>
 
 namespace TransLucid
@@ -95,6 +96,14 @@ insert_tuple(tuple_t& k, HD* h, size_t index)
   return TupleInserter<T>(k, h, index);
 }
 
+}
+
+TaggedConstant
+SystemEvaluationHD::operator()(const Tuple& k)
+{
+  tuple_t newK = k.tuple();
+  newK[DIM_TIME] = Constant(Intmp(m_system->theTime()), TYPE_INDEX_INTMP);
+  return (*m_e)(Tuple(newK));
 }
 
 TaggedConstant
