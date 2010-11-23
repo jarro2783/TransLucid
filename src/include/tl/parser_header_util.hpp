@@ -231,7 +231,7 @@ namespace TransLucid
      * @param h The header to print.
      * @return os.
      */
-    inline std::ostream& 
+    std::ostream& 
     operator<<(std::ostream& os, const Header& h);
   } //namespace Parser
 } //namespace TransLucid

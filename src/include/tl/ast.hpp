@@ -524,6 +524,15 @@ namespace TransLucid
 
     struct LambdaExpr
     {
+      LambdaExpr() = default;
+
+      LambdaExpr(const u32string& name, Expr& rhs)
+      : name(name), rhs(rhs)
+      {
+      }
+
+      u32string name;
+      Expr rhs;
     };
 
     struct NameAppExpr
@@ -564,12 +573,17 @@ namespace TransLucid
     PRINT_NODE(ConstantExpr)
     PRINT_NODE(DimensionExpr)
     PRINT_NODE(IdentExpr)
+    PRINT_NODE(ParenExpr)
     PRINT_NODE(UnaryOpExpr)
     PRINT_NODE(BinaryOpExpr)
     PRINT_NODE(IfExpr)
     PRINT_NODE(HashExpr)
     PRINT_NODE(TupleExpr)
     PRINT_NODE(AtExpr)
+    PRINT_NODE(PhiExpr)
+    PRINT_NODE(LambdaExpr)
+    PRINT_NODE(NameAppExpr)
+    PRINT_NODE(ValueAppExpr)
 
   }
 }

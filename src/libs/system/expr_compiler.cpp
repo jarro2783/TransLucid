@@ -176,22 +176,27 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
 }
 
 HD*
-ExprCompiler::operator()(const Tree::PhiExpr& e)
+ExprCompiler::operator()(const Tree::LambdaExpr& e)
 {
+  //generate a new dimension
+  //generate a unique name alpha
+  //rename name to alpha in the sub expression
+  //make a LambdaAbstractionHD
 }
 
 HD*
-ExprCompiler::operator()(const Tree::LambdaExpr& e)
-{
-}
-
-HD* 
-ExprCompiler::operator()(const Tree::NameAppExpr& e)
+ExprCompiler::operator()(const Tree::PhiExpr& e)
 {
 }
 
 HD* 
 ExprCompiler::operator()(const Tree::ValueAppExpr& e)
+{
+  //create a LambdaApplicationHD with the compiled sub expression
+}
+
+HD* 
+ExprCompiler::operator()(const Tree::NameAppExpr& e)
 {
 }
 

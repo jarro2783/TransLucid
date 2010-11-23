@@ -310,6 +310,10 @@ namespace TransLucid
 
     class LambdaAbstractionHD : public HD
     {
+      public:
+      LambdaAbstractionHD(HD* system, const u32string& name, HD* rhs)
+      {
+      }
     };
 
     class LambdaApplicationHD : public HD

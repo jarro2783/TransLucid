@@ -668,10 +668,20 @@ namespace TransLucid
 
   class LambdaApplicationType : public FunctionApplicationType
   {
+    LambdaApplicationType(const u32string& name, HD* expr)
+    : m_name(name), m_expr(expr)
+    {
+    }
+
+    private:
+    u32string m_name;
+    HD* m_expr;
   };
 
   class PhiApplicationType : public FunctionApplicationType
   {
+    private:
+    HD* m_expr;
   };
 }
 

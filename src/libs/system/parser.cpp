@@ -42,13 +42,7 @@ Header::Header()
 std::ostream& 
 operator<<(std::ostream& os, const Header& h)
 {
-  for (auto iter = h.loaded_libraries.begin(); 
-    iter != h.loaded_libraries.end();
-    ++iter
-  )
-  {
-    os << "library ustring<" << utf32_to_utf8(*iter) << ">;;";
-  }
+  os << "header";
   return os;
 }
 

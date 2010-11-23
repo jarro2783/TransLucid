@@ -211,8 +211,8 @@ namespace TransLucid
           | phi_application [_val = _1]
         ;
 
-        phi_application %= lambda_application;
         #if 0
+        phi_application =
           ( 
            lambda_application[_a = _1]
         >> *(
@@ -224,12 +224,13 @@ namespace TransLucid
           ]
         ;
         #endif
+        phi_application %= lambda_application;
 
         lambda_application =
           (
            primary_expr[_a = _1] 
         >> *(
-              (literal(".") >> primary_expr)
+              (literal(".") > primary_expr)
               [
                 _a = construct<Tree::NameAppExpr>(_a, _1)
               ]
@@ -363,6 +364,8 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(at_expr);
         BOOST_SPIRIT_DEBUG_NODE(binary_op);
         BOOST_SPIRIT_DEBUG_NODE(primary_expr);
+        BOOST_SPIRIT_DEBUG_NODE(phi_application);
+        BOOST_SPIRIT_DEBUG_NODE(lambda_application);
 
         qi::on_error<qi::fail>
         (

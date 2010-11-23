@@ -49,6 +49,17 @@ namespace TransLucid
     size_t
     lookup(const Constant& value);
 
+    /**
+     * @brief Returns the value of a unique dimension.
+     * The next index counter is incremented, and it isn't mapped to a name,
+     * therefore, it is unique and hidden.
+     */
+    size_t
+    unique()
+    {
+      return m_nextIndex++;
+    }
+
     private:
 
     size_t m_nextIndex;

@@ -98,6 +98,24 @@ namespace
     private:
     DimensionTranslator& m_d;
   };
+
+  class UniqueDimensionHD : public HD
+  {
+    public:
+
+    UniqueDimensionHD(DimensionTranslator& d)
+    : m_d(d)
+    {
+    }
+
+    TaggedConstant
+    operator()(const Tuple& k)
+    {
+    }
+
+    private:
+    DimensionTranslator& m_d;
+  };
 }
 
 template <typename T>
