@@ -312,9 +312,9 @@ TLCore::addEquation(const Parser::ParsedEquation& eqn)
 
   try 
   {
-    guard = m_compiler.compile(std::get<1>(eqn));
-    boolean = m_compiler.compile(std::get<2>(eqn));
-    expr = m_compiler.compile(std::get<3>(eqn));
+    guard = m_compiler.compile_for_equation(std::get<1>(eqn));
+    boolean = m_compiler.compile_for_equation(std::get<2>(eqn));
+    expr = m_compiler.compile_for_equation(std::get<3>(eqn));
 
     m_addEquations.push_back(CompiledEquation
     ( 
@@ -340,7 +340,7 @@ TLCore::addExpression(const Tree::Expr& e)
   HD* ce = 0;
   
   try {
-    ce = m_compiler.compile(e);
+    ce = m_compiler.compile_top_level(e);
     if (ce == 0) {
     } else {
       m_exprs.push_back(std::make_pair(e, ce));
