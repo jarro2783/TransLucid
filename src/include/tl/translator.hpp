@@ -137,7 +137,7 @@ namespace TransLucid
     bool
     parse_header(const u32string& s);
 
-    HD&
+    SystemHD&
     system()
     {
       return m_system;
