@@ -37,6 +37,9 @@ namespace TransLucid
 
     SystemHD();
 
+    //don't want to copy
+    SystemHD(const SystemHD&) = delete;
+
     typedef std::map<u32string, HD*> IOList;
 
     void
