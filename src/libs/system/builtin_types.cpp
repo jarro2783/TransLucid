@@ -86,16 +86,16 @@ Guard::Guard(const Guard& rhs)
 //the default for function application is that there was a type mismatch
 //concrete base classes will implement the correct functionality
 TaggedConstant
-FunctionApplicationType::applyLambda(const Tuple& k)
+FunctionType::applyLambda(const Tuple& k)
 {
 }
 
 TaggedConstant
-FunctionApplicationType::applyPhi(const Tuple& k)
+FunctionType::applyPhi(const Tuple& k)
 {
 }
 
-FunctionApplicationType::~FunctionApplicationType()
+FunctionType::~FunctionType()
 {
 }
 

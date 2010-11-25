@@ -351,6 +351,21 @@ namespace TransLucid
 
     class LambdaApplicationHD : public HD
     {
+      public:
+      LambdaApplicationHD(HD* system, HD* lhs, HD* rhs)
+      : m_system(system)
+      , m_lhs(lhs)
+      , m_rhs(rhs)
+      {
+      }
+
+      TaggedConstant
+      operator()(const Tuple& k);
+
+      private:
+      HD* m_system;
+      HD* m_lhs;
+      HD* m_rhs;
     };
 
   }

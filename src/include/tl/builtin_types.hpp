@@ -654,10 +654,10 @@ namespace TransLucid
     size_t m_index;
   };
 
-  class FunctionApplicationType : public TypedValue
+  class FunctionType : public TypedValue
   {
     public:
-    virtual ~FunctionApplicationType() = 0;
+    virtual ~FunctionType() = 0;
 
     virtual TaggedConstant
     applyLambda(const Tuple& k);
@@ -666,11 +666,30 @@ namespace TransLucid
     applyPhi(const Tuple& k);
   };
 
-  class LambdaApplicationType : public FunctionApplicationType
+  class LambdaFunctionType : public FunctionType
   {
-    LambdaApplicationType(const u32string& name, HD* expr)
+    public:
+    LambdaFunctionType(const u32string& name, HD* expr)
     : m_name(name), m_expr(expr)
     {
+    }
+
+    LambdaFunctionType* 
+    clone() const
+    {
+      return new LambdaFunctionType(*this);
+    }
+
+    size_t 
+    hash() const
+    {
+      return reinterpret_cast<size_t>(m_expr);
+    }
+
+    void
+    print(std::ostream& os) const
+    {
+      os << "LambdaFunction";
     }
 
     private:
@@ -678,7 +697,7 @@ namespace TransLucid
     HD* m_expr;
   };
 
-  class PhiApplicationType : public FunctionApplicationType
+  class PhiFunctionType : public FunctionType
   {
     private:
     HD* m_expr;

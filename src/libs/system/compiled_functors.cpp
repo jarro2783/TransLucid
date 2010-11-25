@@ -452,7 +452,14 @@ AtRelativeHD::operator()(const Tuple& k)
 TaggedConstant
 LambdaAbstractionHD::operator()(const Tuple& k)
 {
-  //return a LambdaApplicationType
+  return TaggedConstant(Constant(LambdaFunctionType(m_name, m_rhs), 
+                                 TYPE_INDEX_FUNCTION), 
+                        k);
+}
+
+TaggedConstant
+LambdaApplicationHD::operator()(const Tuple& k)
+{
 }
 
 } //namespace Hyperdatons

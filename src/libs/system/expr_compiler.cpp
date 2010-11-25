@@ -208,6 +208,9 @@ HD*
 ExprCompiler::operator()(const Tree::ValueAppExpr& e)
 {
   //create a LambdaApplicationHD with the compiled sub expression
+  HD* lhs = boost::apply_visitor(*this, e.lhs);
+  HD* rhs = boost::apply_visitor(*this, e.rhs);
+  return new Hyperdatons::LambdaApplicationHD(m_system, lhs, rhs);
 }
 
 HD* 
