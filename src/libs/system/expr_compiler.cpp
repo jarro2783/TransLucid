@@ -37,7 +37,13 @@ ExprCompiler::~ExprCompiler()
 }
 
 HD*
-ExprCompiler::compile(const Tree::Expr& e)
+ExprCompiler::compile_for_equation(const Tree::Expr& e)
+{
+  return boost::apply_visitor(*this, e);
+}
+
+HD*
+ExprCompiler::compile_top_level(const Tree::Expr& e)
 {
   HD* h = boost::apply_visitor(*this, e);
 

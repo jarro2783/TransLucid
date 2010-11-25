@@ -35,7 +35,8 @@ namespace TransLucid
     ExprCompiler(SystemHD* system);
     ~ExprCompiler();
 
-    HD* compile(const Tree::Expr&);
+    HD* compile_for_equation(const Tree::Expr&);
+    HD* compile_top_level(const Tree::Expr&);
 
     HD* operator()(const Tree::nil& n);
     HD* operator()(bool b);

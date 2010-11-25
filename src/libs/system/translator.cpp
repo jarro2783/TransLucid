@@ -170,7 +170,7 @@ Translator::translate_expr(const u32string& u32s)
 
   m_lastExpr = e;
 
-  return m_compiler.compile(e);
+  return m_compiler.compile_top_level(e);
 }
 
 PTEquationVector
@@ -199,9 +199,9 @@ Translator::translate_equation_set(const u32string& s)
 
   BOOST_FOREACH(auto& v, parsedEquations)
   {
-    HD* context = m_compiler.compile(std::get<1>(v));
-    HD* boolean = m_compiler.compile(std::get<2>(v));
-    HD* e = m_compiler.compile(std::get<3>(v));
+    HD* context = m_compiler.compile_for_equation(std::get<1>(v));
+    HD* boolean = m_compiler.compile_for_equation(std::get<2>(v));
+    HD* e = m_compiler.compile_for_equation(std::get<3>(v));
     equations.push_back(
       std::make_pair(
       v,
