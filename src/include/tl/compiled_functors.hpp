@@ -334,8 +334,19 @@ namespace TransLucid
     {
       public:
       LambdaAbstractionHD(HD* system, const u32string& name, HD* rhs)
+      : m_system(system)
+      , m_name(name)
+      , m_rhs(rhs)
       {
       }
+
+      TaggedConstant
+      operator()(const Tuple& k);
+
+      private:
+      HD* m_system;
+      u32string m_name;
+      HD* m_rhs;
     };
 
     class LambdaApplicationHD : public HD

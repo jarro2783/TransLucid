@@ -38,6 +38,7 @@ namespace TransLucid
     TYPE_INDEX_TYPE,
     TYPE_INDEX_GUARD,
     TYPE_INDEX_RANGE,
+    TYPE_INDEX_FUNCTION,
 
     //the last one
     TYPE_INDEX_LAST

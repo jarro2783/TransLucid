@@ -449,6 +449,12 @@ AtRelativeHD::operator()(const Tuple& k)
   }
 }
 
+TaggedConstant
+LambdaAbstractionHD::operator()(const Tuple& k)
+{
+  //return a LambdaApplicationType
+}
+
 } //namespace Hyperdatons
 
 } //namespace TransLucid
