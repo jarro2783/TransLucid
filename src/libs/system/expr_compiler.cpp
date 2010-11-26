@@ -20,7 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/expr_compiler.hpp>
 #include <tl/compiled_functors.hpp>
 #include <tl/consthd.hpp>
+#include <tl/fixed_indexes.hpp>
+#include <tl/utility.hpp>
+
 #include <boost/variant.hpp>
+
+#include <sstream>
 
 namespace TransLucid
 {
@@ -194,7 +199,17 @@ HD*
 ExprCompiler::operator()(const Tree::LambdaExpr& e)
 {
   //generate a new dimension
+  tuple_t k = {{DIM_ID, generate_string(U"_uniquedim")}};
+  Intmp uniqueIndex = (*m_system)(Tuple(k)).first.value<Intmp>();
+  dimension_index index = uniqueIndex.value().get_ui();
+
   //generate a unique name alpha
+  k[DIM_ID] = generate_string(U"_unique");
+  Intmp nameNum = (*m_system)(Tuple(k)).first.value<Intmp>();
+  std::ostringstream os;
+  os << nameNum.value() << "_lambdaparam";
+  u32string uniqueName = to_u32string(os.str());
+
   //rename name to alpha in the sub expression
   //make a LambdaAbstractionHD
 }

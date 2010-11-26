@@ -290,10 +290,11 @@ namespace TransLucid
     return value.hash();
   }
 
+  typedef size_t dimension_index;
   /**
    * The underlying data structure of a tuple.
    **/
-  typedef std::map<size_t, Constant> tuple_t;
+  typedef std::map<dimension_index, Constant> tuple_t;
 
   /**
    * @brief Stores a Tuple.

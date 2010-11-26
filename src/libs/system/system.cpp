@@ -111,6 +111,8 @@ namespace
     TaggedConstant
     operator()(const Tuple& k)
     {
+      size_t i = m_d.unique();
+      return TaggedConstant(Constant(Intmp(i), TYPE_INDEX_INTMP), k);
     }
 
     private:
@@ -194,6 +196,12 @@ SystemHD::SystemHD()
       static_cast<int>(TYPE_INDEX_LAST),
       static_cast<int>(DIM_INDEX_LAST)
     ))
+  );
+
+  addToVariableActual
+  (
+    U"_uniquedim", Tuple(),
+    new UniqueDimensionHD(m_dimTranslator)
   );
 
   //add this
