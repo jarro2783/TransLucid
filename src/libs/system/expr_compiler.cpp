@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/expr_compiler.hpp>
 #include <tl/compiled_functors.hpp>
 #include <tl/consthd.hpp>
+#include <tl/expr_compiler.hpp>
 #include <tl/fixed_indexes.hpp>
+#include <tl/rename.hpp>
 #include <tl/utility.hpp>
 
 #include <boost/variant.hpp>
@@ -211,6 +212,8 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
   u32string uniqueName = to_u32string(os.str());
 
   //rename name to alpha in the sub expression
+  Tree::Expr renamed = RenameIdentifier(e.name, uniqueName).rename(e.rhs);
+
   //make a LambdaAbstractionHD
 }
 
