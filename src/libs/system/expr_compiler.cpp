@@ -214,7 +214,14 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
   //rename name to alpha in the sub expression
   Tree::Expr renamed = RenameIdentifier(e.name, uniqueName).rename(e.rhs);
 
+  //add alpha = #_uniquedim to the system
+  HD* hashUnique = new HashIndexHD(index);
+  tuple_t addContext = {{DIM_ID, generate_string(uniqueName)}};
+  m_system->addExpr(Tuple(addContext), hashUnique);
+
   //make a LambdaAbstractionHD
+  HD* rhs = boost::apply_visitor(*this, e.rhs);
+  return new Hyperdatons::LambdaAbstractionHD(m_system, e.name, rhs);
 }
 
 HD*

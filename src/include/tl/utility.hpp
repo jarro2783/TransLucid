@@ -195,6 +195,33 @@ namespace TransLucid
   {
     return Constant(Special(s), TYPE_INDEX_SPECIAL);
   }
+
+  //returns the hash of a dimension when we only have the index
+  class HashIndexHD : public HD
+  {
+    public:
+    HashIndexHD(dimension_index index)
+    : m_index(index)
+    {
+    }
+
+    TaggedConstant
+    operator()(const Tuple& k)
+    {
+      Tuple::const_iterator iter = k.find(m_index);
+      if (iter != k.end())
+      {
+        return TaggedConstant(iter->second, k);
+      }
+      else
+      {
+        return TaggedConstant(make_special(Special::DIMENSION), k);
+      }
+    }
+
+    private:
+    dimension_index m_index;
+  };
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED
