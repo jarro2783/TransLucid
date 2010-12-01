@@ -221,7 +221,7 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
 
   //make a LambdaAbstractionHD
   HD* rhs = boost::apply_visitor(*this, e.rhs);
-  return new Hyperdatons::LambdaAbstractionHD(m_system, e.name, rhs);
+  return new Hyperdatons::LambdaAbstractionHD(m_system, e.name, index, rhs);
 }
 
 HD*

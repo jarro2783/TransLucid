@@ -86,17 +86,26 @@ Guard::Guard(const Guard& rhs)
 //the default for function application is that there was a type mismatch
 //concrete base classes will implement the correct functionality
 TaggedConstant
-FunctionType::applyLambda(const Tuple& k)
+FunctionType::applyLambda(const Tuple& k, const Constant& value) const
 {
 }
 
 TaggedConstant
-FunctionType::applyPhi(const Tuple& k)
+FunctionType::applyPhi(const Tuple& k, HD* expr) const
 {
 }
 
 FunctionType::~FunctionType()
 {
+}
+
+TaggedConstant
+LambdaFunctionType::applyLambda(const Tuple& k, const Constant& value) const
+{
+  //set m_dim = value in the context and evaluate the expr
+  tuple_t k_f = k.tuple();
+  k_f[m_dim] = value;
+  return (*m_expr)(Tuple(k_f));
 }
 
 }

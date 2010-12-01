@@ -333,9 +333,16 @@ namespace TransLucid
     class LambdaAbstractionHD : public HD
     {
       public:
-      LambdaAbstractionHD(HD* system, const u32string& name, HD* rhs)
+      LambdaAbstractionHD
+      (
+        HD* system, 
+        const u32string& name, 
+        dimension_index dim, 
+        HD* rhs
+      )
       : m_system(system)
       , m_name(name)
+      , m_dim(dim)
       , m_rhs(rhs)
       {
       }
@@ -346,6 +353,7 @@ namespace TransLucid
       private:
       HD* m_system;
       u32string m_name;
+      dimension_index m_dim;
       HD* m_rhs;
     };
 

@@ -42,9 +42,92 @@ namespace TransLucid
     }
 
     Tree::Expr
+    operator()(const Tree::UnaryOpExpr& e)
+    {
+      return Tree::UnaryOpExpr(e.op, boost::apply_visitor(*this, e.e));
+    }
+
+    Tree::Expr
+    operator()(const Tree::BinaryOpExpr& e)
+    {
+      return Tree::BinaryOpExpr
+      (
+        e.op,
+        boost::apply_visitor(*this, e.lhs),
+        boost::apply_visitor(*this, e.rhs)
+      );
+    }
+
+    Tree::Expr
+    operator()(const Tree::IfExpr& e)
+    {
+      return Tree::IfExpr
+      (
+        boost::apply_visitor(*this, e.condition),
+        boost::apply_visitor(*this, e.then),
+        rename_list(e.else_ifs),
+        boost::apply_visitor(*this, e.else_)
+      );
+    }
+
+    Tree::Expr
+    operator()(const Tree::HashExpr& e)
+    {
+      return Tree::HashExpr(boost::apply_visitor(*this, e.e));
+    }
+
+    Tree::Expr
+    operator()(const Tree::TupleExpr& e)
+    {
+      using boost::fusion::at_c;
+
+      std::vector<boost::fusion::vector<Tree::Expr, Tree::Expr>> renamed;
+
+      for (auto iter = e.pairs.begin(); iter != e.pairs.end(); ++iter)
+      {
+        renamed.push_back(boost::fusion::vector<Tree::Expr, Tree::Expr>
+        (
+          boost::apply_visitor(*this, at_c<0>(*iter)),
+          boost::apply_visitor(*this, at_c<1>(*iter))
+        ));
+      }
+
+      return renamed;
+    }
+
+    Tree::Expr
+    operator()(const Tree::AtExpr& e)
+    {
+      return Tree::AtExpr
+      (
+        boost::apply_visitor(*this, e.lhs),
+        boost::apply_visitor(*this, e.rhs),
+        e.absolute
+      );
+    }
+
+    Tree::Expr
     rename(const Tree::Expr& e)
     {
       return boost::apply_visitor(*this, e);
+    }
+
+    std::vector<std::pair<Tree::Expr, Tree::Expr>>
+    rename_list(const std::vector<std::pair<Tree::Expr, Tree::Expr>>& list)
+    {
+      std::vector<std::pair<Tree::Expr, Tree::Expr>> renamed;
+
+      for (auto iter = list.begin(); iter != list.end(); ++iter)
+      {
+        renamed.push_back(std::make_pair
+          (
+            boost::apply_visitor(*this, iter->first),
+            boost::apply_visitor(*this, iter->second)
+          )
+        );
+      }
+
+      return renamed;
     }
 
     private:

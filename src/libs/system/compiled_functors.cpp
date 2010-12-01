@@ -452,7 +452,7 @@ AtRelativeHD::operator()(const Tuple& k)
 TaggedConstant
 LambdaAbstractionHD::operator()(const Tuple& k)
 {
-  return TaggedConstant(Constant(LambdaFunctionType(m_name, m_rhs), 
+  return TaggedConstant(Constant(LambdaFunctionType(m_name, m_dim, m_rhs),
                                  TYPE_INDEX_FUNCTION), 
                         k);
 }
@@ -460,6 +460,19 @@ LambdaAbstractionHD::operator()(const Tuple& k)
 TaggedConstant
 LambdaApplicationHD::operator()(const Tuple& k)
 {
+  //evaluate the lhs, evaluate the rhs
+  //and pass the value to the function to evaluate
+
+  Constant lhs = (*m_lhs)(k).first;
+  //first make sure that it is a function
+  if (lhs.index() != TYPE_INDEX_FUNCTION)
+  {
+  }
+
+  Constant rhs = (*m_rhs)(k).first;
+  const FunctionType& f = lhs.value<FunctionType>();
+
+  return f.applyLambda(k, rhs);
 }
 
 } //namespace Hyperdatons

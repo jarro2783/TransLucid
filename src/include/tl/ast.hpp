@@ -422,6 +422,21 @@ namespace TransLucid
         }
       }
 
+      //when we already have a vector
+      IfExpr
+      (
+        const Expr& c,
+        const Expr& t,
+        const std::vector<std::pair<Expr, Expr>>& eif,
+        const Expr& e
+      )
+      : condition(c)
+      , then(t)
+      , else_ifs(eif)
+      , else_(e)
+      {
+      }
+
       Expr condition; /**< The condition expression. */
       Expr then; /**< The if true expression. */
       /**

@@ -660,19 +660,22 @@ namespace TransLucid
     virtual ~FunctionType() = 0;
 
     virtual TaggedConstant
-    applyLambda(const Tuple& k);
+    applyLambda(const Tuple& k, const Constant& value) const;
 
     virtual TaggedConstant
-    applyPhi(const Tuple& k);
+    applyPhi(const Tuple& k, HD* expr) const;
   };
 
   class LambdaFunctionType : public FunctionType
   {
     public:
-    LambdaFunctionType(const u32string& name, HD* expr)
-    : m_name(name), m_expr(expr)
+    LambdaFunctionType(const u32string& name, dimension_index dim, HD* expr)
+    : m_name(name), m_dim(dim), m_expr(expr)
     {
     }
+
+    TaggedConstant
+    applyLambda(const Tuple& k, const Constant& value) const;
 
     LambdaFunctionType* 
     clone() const
@@ -694,6 +697,7 @@ namespace TransLucid
 
     private:
     u32string m_name;
+    dimension_index m_dim;
     HD* m_expr;
   };
 
