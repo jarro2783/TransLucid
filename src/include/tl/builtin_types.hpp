@@ -690,10 +690,7 @@ namespace TransLucid
     }
 
     void
-    print(std::ostream& os) const
-    {
-      os << "LambdaFunction";
-    }
+    print(std::ostream& os) const;
 
     private:
     u32string m_name;

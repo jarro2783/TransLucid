@@ -467,6 +467,7 @@ LambdaApplicationHD::operator()(const Tuple& k)
   //first make sure that it is a function
   if (lhs.index() != TYPE_INDEX_FUNCTION)
   {
+    return TaggedConstant(make_special(Special::TYPEERROR), k);
   }
 
   Constant rhs = (*m_rhs)(k).first;

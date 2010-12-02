@@ -306,6 +306,12 @@ TLCore::read_input()
 void 
 TLCore::addEquation(const Parser::ParsedEquation& eqn)
 {
+  //print the equation
+  if (m_verbose)
+  {
+    (*m_os) << "eqn<" << Parser::printEquation(eqn) << ">" << std::endl;
+  }
+
   HD* guard = 0;
   HD* boolean = 0;
   HD* expr = 0;
@@ -367,15 +373,17 @@ TLCore::evaluateInstant()
 
   for (auto iter = m_exprs.begin(); iter != m_exprs.end(); ++iter)
   {
-    tuple_t k = {{DIM_TIME, Constant(Intmp(m_time), TYPE_INDEX_INTMP)}};
-    TaggedConstant result = (iter->second)->operator()(Tuple(k));
+    //print the expr first in case evaluation goes wrong
     if (m_verbose)
     {
       std::string output;
       std::back_insert_iterator<std::string> outit(output);
       Printer::karma::generate(outit, printer, iter->first);
       (*m_os) << "expr<" << output << ">" << " -> ";
+      (*m_os) << std::flush;
     }
+    tuple_t k = {{DIM_TIME, Constant(Intmp(m_time), TYPE_INDEX_INTMP)}};
+    TaggedConstant result = (iter->second)->operator()(Tuple(k));
     (*m_os) << result.first << std::endl;
   }
 

@@ -108,4 +108,9 @@ LambdaFunctionType::applyLambda(const Tuple& k, const Constant& value) const
   return (*m_expr)(Tuple(k_f));
 }
 
+void
+LambdaFunctionType::print(std::ostream& os) const
+{
+}
+
 }

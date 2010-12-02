@@ -17,10 +17,17 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+//iconv is being silly, so we'll see what happens with this
+#define HAND_CONVERT
+//#define ICONV_CONVERT
+
 #include <tl/utility.hpp>
 #include <tl/equation.hpp>
 #include <tl/types.hpp>
+
+#ifdef ICONV_CONVERT
 #include <iconv.h>
+#endif
 
 namespace TransLucid
 {
@@ -213,6 +220,7 @@ booleanTrue(const GuardHD& g, const Tuple& k)
 //TODO fix these
 std::string
 utf32_to_utf8(const std::u32string& s) {
+  #ifdef ICONV_CONVERT
   const size_t buffer_size = 8000;
   if (s.size()+1 > buffer_size/sizeof(char32_t))
   {
@@ -239,6 +247,7 @@ utf32_to_utf8(const std::u32string& s) {
     {
       //std::cerr << "iconv failed: " << errno << std::endl;
       perror("iconv failed: ");
+      iconv_close(id);
       inSize = 0;
       return std::string();
     }
@@ -247,6 +256,27 @@ utf32_to_utf8(const std::u32string& s) {
   iconv_close(id);
   *outp = '\0';
   return std::string(out);
+  #endif
+
+  #ifdef HAND_CONVERT
+  //TODO need to fix this so that all characters are output
+  std::string result;
+  u32string::const_iterator iter = s.begin();
+  while (iter != s.end())
+  {
+    if (*iter <= 0x7F)
+    {
+      result += *iter;
+    }
+    else
+    {
+      result += ' ';
+    }
+    ++iter;
+  }
+
+  return result;
+  #endif
 }
 
 std::u32string

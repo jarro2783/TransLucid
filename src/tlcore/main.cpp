@@ -129,27 +129,28 @@ int main(int argc, char *argv[])
     tlcore.uuids(true);
   }
 
-  std::unique_ptr<std::ifstream> input;
-  if (vm.count("input"))
-  {
-    input = openInput(vm["input"].as<std::string>());
-    tlcore.set_input(input.get());
-  }
-
-  std::unique_ptr<std::ofstream> output;
-  if (vm.count("output"))
-  {
-    output = openOutput(vm["output"].as<std::string>());
-    tlcore.set_output(output.get());
-  }
-
   try
   {
+    std::unique_ptr<std::ifstream> input;
+    if (vm.count("input"))
+    {
+      input = openInput(vm["input"].as<std::string>());
+      tlcore.set_input(input.get());
+    }
+
+    std::unique_ptr<std::ofstream> output;
+    if (vm.count("output"))
+    {
+      output = openOutput(vm["output"].as<std::string>());
+      tlcore.set_output(output.get());
+    }
+
     tlcore.run();
   }
   catch (const char* c)
   {
     std::cerr << "terminated with exception: " << c << std::endl;
+    return 1;
   }
   catch (...)
   {

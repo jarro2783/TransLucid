@@ -230,9 +230,9 @@ namespace TransLucid
           (
            primary_expr[_a = _1] 
         >> *(
-              (literal(".") > primary_expr)
+              literal(".") > primary_expr
               [
-                _a = construct<Tree::NameAppExpr>(_a, _1)
+                _a = construct<Tree::ValueAppExpr>(_a, _1)
               ]
             )
           )
@@ -347,7 +347,7 @@ namespace TransLucid
             //lambda abstraction
           | (literal("\\") > ident > literal("->") > expr)
             [
-              _val = construct<Tree::LambdaExpr>()
+              _val = construct<Tree::LambdaExpr>(make_u32string(_1), _2)
             ]
         ;
 

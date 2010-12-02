@@ -101,6 +101,20 @@ BOOST_FUSION_ADAPT_STRUCT
   (TransLucid::Tree::Expr, rhs)
 )
 
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::LambdaExpr,
+  (TransLucid::u32string, name)
+  (TransLucid::Tree::Expr, rhs)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::ValueAppExpr,
+  (TransLucid::Tree::Expr, lhs)
+  (TransLucid::Tree::Expr, rhs)
+)
+
 namespace TransLucid
 {
   namespace Printer
@@ -163,6 +177,14 @@ namespace TransLucid
         tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
         at_expr = literal('(') << expr << literal('@') << expr << literal(')');
 
+        lambda_function = karma::string(literal("(\\")) 
+          << ustring[_1 = ph::at_c<0>(_val)] 
+          << literal(" -> ") << expr[_1 = ph::at_c<1>(_val)] 
+          << literal(")");
+
+        lambda_application = literal("(") << expr << literal(".") << expr 
+          << literal(")");
+
         // TODO: Missing unary
         expr %=
           nil
@@ -180,6 +202,8 @@ namespace TransLucid
         | hash_expr
         | tuple
         | at_expr
+        | lambda_function
+        | lambda_application
         ;
       }
 
@@ -206,6 +230,8 @@ namespace TransLucid
       karma::rule<Iterator, Tree::HashExpr()> hash_expr;
       karma::rule<Iterator, Tree::TupleExpr()> tuple;
       karma::rule<Iterator, Tree::AtExpr()> at_expr;
+      karma::rule<Iterator, Tree::LambdaExpr()> lambda_function;
+      karma::rule<Iterator, Tree::ValueAppExpr()> lambda_application;
 
       karma::rule
       <
