@@ -303,14 +303,21 @@ namespace TransLucid
         ;
 
         dimensions = 
-        (
-          header.dimension_symbols
-        | header.system_dimension_symbols
-        | arg_dimensions
-        )
-        [
-          _val = construct<Tree::DimensionExpr>(make_u32string(_1))
-        ]
+          qi::lexeme
+          [
+            (
+              (
+                header.dimension_symbols
+              | header.system_dimension_symbols
+              | arg_dimensions
+              )
+              >> !qi::alpha
+            )
+            [
+              _val = construct<Tree::DimensionExpr>(make_u32string(_1))
+            ]
+          ]
+          
         ;
 
         arg_dimensions = 
@@ -416,7 +423,7 @@ namespace TransLucid
         phi_application
       ;
 
-      qi::rule<Iterator, u32string(), SkipGrammar<Iterator>>
+      qi::rule<Iterator, u32string()> //, SkipGrammar<Iterator>>
         arg_dimensions
       ;
 
