@@ -111,6 +111,7 @@ LambdaFunctionType::applyLambda(const Tuple& k, const Constant& value) const
 void
 LambdaFunctionType::print(std::ostream& os) const
 {
+  os << "LambdaFunction";
 }
 
 }

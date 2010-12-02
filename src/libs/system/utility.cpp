@@ -18,8 +18,9 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 //iconv is being silly, so we'll see what happens with this
-#define HAND_CONVERT
-//#define ICONV_CONVERT
+//possibly it was just a stack overflow from something else
+//#define HAND_CONVERT
+#define ICONV_CONVERT
 
 #include <tl/utility.hpp>
 #include <tl/equation.hpp>

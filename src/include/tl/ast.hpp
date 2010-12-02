@@ -540,8 +540,6 @@ namespace TransLucid
       LambdaExpr(const u32string& name, const Expr& rhs)
       : name(name), rhs(rhs)
       {
-        std::cerr << "constructing lambda expression with name " << name
-          << std::endl;
       }
 
       u32string name;
