@@ -153,14 +153,14 @@ namespace TransLucid
         integer = karma::stream;
         uchar   = karma::string
         [
-          _1 = bind(&utf32_to_utf8, construct<u32string>(1, _val))
+          _1 = ph::bind(&utf32_to_utf8, construct<u32string>(1, _val))
         ];
-        ustring = karma::string[_1 = bind(&utf32_to_utf8, _val)];
+        ustring = karma::string[_1 = ph::bind(&utf32_to_utf8, _val)];
 
         constant =
-           karma::string[_1 = bind(&utf32_to_utf8, ph::at_c<0>(_val))]
+           karma::string[_1 = ph::bind(&utf32_to_utf8, ph::at_c<0>(_val))]
         << literal('<')
-        << karma::string[_1 = bind(&utf32_to_utf8, ph::at_c<1>(_val))]
+        << karma::string[_1 = ph::bind(&utf32_to_utf8, ph::at_c<1>(_val))]
         << literal('>')
         ;
         dimension = ustring[_1 = at_c<0>(_val)];
