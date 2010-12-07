@@ -123,9 +123,12 @@ BinaryOpHD::operator()(const Tuple& k)
     {DIM_NAME, generate_string(m_name)}
   };
 
+  tuple_t kNew = k.tuple();
+  kNew.insert(t.begin(), t.end());
+
   //std::cerr << "finding OP @ [name : " << utf32_to_utf8(m_name) << " ..." << std::endl;
 
-  TaggedConstant v = (*m_system)(Tuple(t));
+  TaggedConstant v = (*m_system)(Tuple(kNew));
   //std::cerr << "result: " << v.first << std::endl;
   return TaggedConstant(v.first, k);
 }

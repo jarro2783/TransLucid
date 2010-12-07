@@ -48,6 +48,65 @@ VariableHD::~VariableHD()
   //cleanup best fit variables
 }
 
+GuardHD::GuardHD(const GuardHD& other)
+: m_guard(other.m_guard)
+, m_boolean(other.m_boolean)
+, m_dimensions(other.m_dimensions)
+, m_timeStart(0)
+, m_timeEnd(0)
+{
+  try
+  {
+    if (other.m_timeStart) 
+    {
+      m_timeStart = new mpz_class(*other.m_timeStart);
+    }
+
+    if (other.m_timeEnd)
+    {
+      m_timeEnd = new mpz_class(*other.m_timeEnd);
+    }
+  }
+  catch (...)
+  {
+    delete m_timeStart;
+    delete m_timeEnd;
+    throw;
+  }
+}
+
+GuardHD& 
+GuardHD::operator=(const GuardHD& rhs)
+{
+  delete m_timeStart;
+  delete m_timeEnd;
+  m_timeStart = 0;
+  m_timeEnd = 0;
+
+  m_guard = rhs.m_guard;
+  m_boolean = rhs.m_boolean;
+
+  try 
+  {
+    m_dimensions = rhs.m_dimensions;
+    if (rhs.m_timeStart)
+    {
+      m_timeStart = new mpz_class(*rhs.m_timeStart);
+    }
+
+    if (rhs.m_timeEnd)
+    {
+      m_timeEnd = new mpz_class(*rhs.m_timeEnd);
+    }
+  }
+  catch (...)
+  {
+    delete m_timeStart;
+    delete m_timeEnd;
+    throw;
+  }
+}
+
 Tuple
 GuardHD::evaluate(const Tuple& k) const
 {
@@ -75,6 +134,21 @@ GuardHD::evaluate(const Tuple& k) const
       throw ParseError(__FILE__ ":" STRING_(__LINE__)
                        U": guard is not a tuple");
     }
+  }
+
+  //add the time
+  tuple_t::const_iterator timeIter = t.find(DIM_TIME);
+  if (timeIter != t.end())
+  {
+    std::cerr << "warning: user specified time, don't know what to do" 
+      << std::endl;
+    //fix this, don't know what to do if the user has specified time
+  }
+  else
+  {
+    t[DIM_TIME] = 
+      Constant(Range(m_timeStart, m_timeEnd),
+               TYPE_INDEX_RANGE);
   }
 
   return Tuple(t);
@@ -267,10 +341,15 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   Tuple::const_iterator titer = k.find(DIM_TIME);
   if (titer != k.end())
   {
+    g.setTimeStart(titer->second.value<Intmp>().value());
+    #if 0
     g.addDimension(DIM_TIME, 
       Constant(Range(&titer->second.value<Intmp>().value(), 0), 
                TYPE_INDEX_RANGE));
+    #endif
   }
+
+  //set the time
 
   auto adder =
     [this] (const EquationHD& e) -> std::pair<uuid, UUIDEquationMap::iterator>

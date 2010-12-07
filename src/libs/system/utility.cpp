@@ -39,6 +39,11 @@ SplitID::m_split_match = U".";
 bool
 tupleApplicable(const Tuple& def, const Tuple& c)
 {
+  #if 0
+  std::cerr << "tupleApplicable: def = ";
+  def.print(std::cerr);
+  std::cerr << std::endl;
+  #endif
   //all of def has to be in c, and the values have to either be
   //equal or within the range
   for (Tuple::const_iterator iter = def.begin(); iter != def.end(); ++iter)

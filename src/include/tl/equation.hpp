@@ -58,7 +58,7 @@ namespace TransLucid
      * Specifies the AST to use for the guard.
      **/
     GuardHD(HD* g, HD* b)
-    : m_guard(g), m_boolean(b)
+    : m_guard(g), m_boolean(b), m_timeStart(0), m_timeEnd(0)
     {
     }
 
@@ -69,12 +69,12 @@ namespace TransLucid
      * dimensions can still be added.
      **/
     GuardHD()
-    : m_guard(0), m_boolean(0)
+    : m_guard(0), m_boolean(0), m_timeStart(0), m_timeEnd(0)
     {
     }
 
     GuardHD(const Tuple& t)
-    : m_guard(0), m_boolean(0)
+    : m_guard(0), m_boolean(0), m_timeStart(0), m_timeEnd(0)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();
@@ -83,6 +83,16 @@ namespace TransLucid
           addDimension(iter->first, iter->second);
        }
     }
+
+    GuardHD(const GuardHD&);
+
+    ~GuardHD()
+    {
+      delete m_timeStart;
+      delete m_timeEnd;
+    }
+
+    GuardHD& operator=(const GuardHD&);
 
     /**
      * @brief Determines if there are any dimensions in the guard.
@@ -124,10 +134,25 @@ namespace TransLucid
        return m_boolean;
     }
 
+    void 
+    setTimeStart(mpz_class time)
+    {
+      m_timeStart = new mpz_class(time);
+    }
+
+    void 
+    setTimeEnd(mpz_class time)
+    {
+      m_timeEnd = new mpz_class(time);
+    }
+
     private:
     HD* m_guard;
     HD* m_boolean;
     std::map<size_t, Constant> m_dimensions;
+
+    mpz_class *m_timeStart;
+    mpz_class *m_timeEnd;
   };
 
   class VariableHD;
