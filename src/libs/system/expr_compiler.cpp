@@ -227,6 +227,15 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
 HD*
 ExprCompiler::operator()(const Tree::PhiExpr& e)
 {
+  //generate a new dimension gamma
+
+  //generate a unique name alpha
+  
+  //tag e with j (just &e)
+
+  //add alpha | hd(#gamma) == j = e.rhs @ [gamma : tl(#gamma)]
+
+  //create a PhiAbstractionHD
   return 0;
 }
 

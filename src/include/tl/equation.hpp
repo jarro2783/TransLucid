@@ -219,8 +219,6 @@ namespace TransLucid
     GuardHD m_validContext;
     HD* m_h;
     boost::uuids::uuid m_id;
-    size_t m_validStart;
-    size_t m_validEnd;
 
     static boost::uuids::basic_random_generator<boost::mt19937>
     m_generator;
