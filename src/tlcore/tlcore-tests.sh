@@ -1,0 +1,3 @@
+#!/bin/sh
+
+bash -x $RUNBINARY $LIBPATH $RUNTESTS $TLCORE $TESTDIR
