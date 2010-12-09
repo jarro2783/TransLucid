@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo $PWD
+${RUNBINARY} ${LIBRARY_PATH} PROGRAM_NAME

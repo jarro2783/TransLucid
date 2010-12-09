@@ -78,33 +78,40 @@ GuardHD::GuardHD(const GuardHD& other)
 GuardHD& 
 GuardHD::operator=(const GuardHD& rhs)
 {
-  delete m_timeStart;
-  delete m_timeEnd;
-  m_timeStart = 0;
-  m_timeEnd = 0;
-
-  m_guard = rhs.m_guard;
-  m_boolean = rhs.m_boolean;
-
-  try 
-  {
-    m_dimensions = rhs.m_dimensions;
-    if (rhs.m_timeStart)
-    {
-      m_timeStart = new mpz_class(*rhs.m_timeStart);
-    }
-
-    if (rhs.m_timeEnd)
-    {
-      m_timeEnd = new mpz_class(*rhs.m_timeEnd);
-    }
-  }
-  catch (...)
+  if (this != &rhs)
   {
     delete m_timeStart;
     delete m_timeEnd;
-    throw;
+    m_timeStart = 0;
+    m_timeEnd = 0;
+
+    m_guard = rhs.m_guard;
+    m_boolean = rhs.m_boolean;
+
+    try 
+    {
+      m_dimensions = rhs.m_dimensions;
+      if (rhs.m_timeStart)
+      {
+        m_timeStart = new mpz_class(*rhs.m_timeStart);
+      }
+
+      if (rhs.m_timeEnd)
+      {
+        m_timeEnd = new mpz_class(*rhs.m_timeEnd);
+      }
+    }
+    catch (...)
+    {
+      delete m_timeStart;
+      delete m_timeEnd;
+      m_timeStart = 0;
+      m_timeEnd = 0;
+      throw;
+    }
   }
+
+  return *this;
 }
 
 Tuple
