@@ -10,6 +10,7 @@ add_executable(expressions expressions.cpp)
 add_executable(equations equations.cpp)
 add_executable(printing printing.cpp)
 add_executable(iterator iterator.cpp)
+add_executable(lexer lexer.cpp)
 add_definitions(${TLCFLAGS})
 
 add_test(iterator ./iterator)

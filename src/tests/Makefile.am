@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt
 
-check_PROGRAMS = expressions equations printing
+check_PROGRAMS = expressions equations printing lexer
 
 AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -31,6 +31,8 @@ expressions_SOURCES = expressions.cpp
 equations_SOURCES = equations.cpp
 
 printing_SOURCES = printing.cpp
+
+lexer_SOURCES = lexer.cpp
 
 TESTS_ENVIRONMENT = LIBRARY_PATH=$(top_builddir)/src/libs/int \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh $(SHELL) -x
