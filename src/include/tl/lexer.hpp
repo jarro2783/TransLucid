@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <boost/spirit/include/lex_lexertl.hpp>
 #include <boost/spirit/home/phoenix/operator.hpp>
+#include <boost/spirit/home/phoenix/bind.hpp>
 #include <tl/charset.hpp>
 
 namespace TransLucid
@@ -27,46 +28,60 @@ namespace TransLucid
   {
     namespace lex = boost::spirit::lex;
 
+    inline mpz_class 
+    create_mpz(std::wstring::iterator begin, const std::wstring::iterator& end)
+    {
+    }
+
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
     {
       lex_tl_tokens()
-      : any(L".")
-      , if_(L"if")
-      , fi(L"fi")
-      , where(L"where")
-      , then(L"when")
-      , elseif(L"elsif")
+      : if_(L"if")
+      , fi_(L"fi")
+      , where_(L"where")
+      , then_(L"then")
+      , elsif_(L"elsif")
       , true_(L"true")
       , false_(L"false")
+      , spaces(L"[ \\n\\t]")
       , identifier(L"[A-Za-z][_A-Za-z0-9]*")
-      , nondecint(L"0[2-9A-Za-z][0-9A-Za-z]+")
       {
         using boost::phoenix::ref;
+        using lex::_val;
+        using lex::_start;
+        using lex::_end;
         namespace ph = boost::phoenix;
 
+        this->self.add_pattern(L"DIGIT", L"[0-9]");
+        this->self.add_pattern(L"ADIGIT", L"[0-9A-Za-z]");
+        this->self.add_pattern(L"intDEC", L"[1-9]{DIGIT}*");
+        this->self.add_pattern(L"intNONDEC", L"0[2-9A-Za-z]{ADIGIT}+");
+        this->self.add_pattern(L"intUNARY", L"011+");
+
+        integer = L"0|~?({intDEC}|{intNONDEC}|{intUNARY})";
+
         this->self =
-          any[lex::_pass = lex::pass_flags::pass_ignore]
+          spaces[lex::_pass = lex::pass_flags::pass_ignore]
         | if_
-        | fi
-        | where
-        | then
-        | elsif
-        | true_
-        | false_
+        | fi_
         | identifier
-        | nondecint
+        | integer[boost::spirit::_val = ph::bind(&create_mpz, _start, _end)]
         ;
-    }
+      }
 
       lex::token_def<lex::unused_type, wchar_t> 
-        if_
-      , fi
-      , any
-      , identifier
+        if_, fi_, where_, then_, elsif_, true_, false_
+      , spaces
       ;
 
-      lex::token_def<mpz_class, wchar_t> nondecint;
+      lex::token_def<std::basic_string<wchar_t>, wchar_t>
+        identifier
+      ;
+
+      lex::token_def<mpz_class, wchar_t> 
+        integer
+      ;
     };
   }
 }
