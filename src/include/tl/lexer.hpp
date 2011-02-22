@@ -65,8 +65,13 @@ namespace TransLucid
           spaces[lex::_pass = lex::pass_flags::pass_ignore]
         | if_
         | fi_
+        | where_
+        | then_
+        | elsif_
+        | true_
+        | false_
         | identifier
-        | integer[boost::spirit::_val = ph::bind(&create_mpz, _start, _end)]
+        | integer[_val = ph::bind(&create_mpz, _start, _end)]
         ;
       }
 

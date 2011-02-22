@@ -64,6 +64,12 @@ enum Token
 
 //the types of values that we can have
 typedef boost::variant<Token, mpz_class, wstring> Values;
+
+inline std::string
+to_utf8(const wstring& ws)
+{
+  return TL::utf32_to_utf8(TL::u32string(ws.begin(), ws.end()));
+}
   
 //checks that the tokens are correct
 class Checker
@@ -79,7 +85,14 @@ class Checker
 	{
     BOOST_REQUIRE(m_current != m_tokens.end());
 
-    BOOST_CHECK(ws == boost::get<wstring>(*m_current));
+    const wstring* wsp = boost::get<wstring>(&*m_current);
+    if (wsp == 0)
+    {
+      std::cerr << to_utf8(ws) << std::endl;
+    }
+    BOOST_REQUIRE(wsp != 0);
+    BOOST_CHECK(*wsp == ws);
+    //BOOST_CHECK_EQUAL(to_utf8(ws), to_utf8(boost::get<wstring>(*m_current)));
 
     ++m_current;
 	}
@@ -164,7 +177,7 @@ BOOST_AUTO_TEST_CASE ( identifiers )
   tl_lexer lexer;
   cgrammar checkg(lexer, checker);
 
-  wstring input = L"ifififif0a9fifi testing hello world a a_b a5 b abc34";
+  wstring input = L"ifififif0a9fifi testing hello world a a_b a5 b abc34_";
 
   wstring::iterator first = input.begin();
   wstring::iterator last = input.end();
