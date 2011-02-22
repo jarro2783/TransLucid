@@ -114,7 +114,6 @@ BinaryOpHD::operator()(const Tuple& k)
   //std::cerr << "operands to binary op " << m_name << ":" << std::endl;
   //std::cerr << v1 << std::endl;
   //std::cerr << v2 << std::endl;
-  #warning at the moment hack it for binary, variadic will have to wait
   tuple_t t =
   {
     {get_dimension_index(m_system, U"arg0"), (*m_operands.at(0))(k).first},

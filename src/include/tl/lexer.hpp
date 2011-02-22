@@ -31,23 +31,33 @@ namespace TransLucid
     struct lex_tl_tokens : lex::lexer<Lexer>
     {
       lex_tl_tokens()
-      : if_(L"if")
+      : any(L".")
+      , if_(L"if")
       , fi(L"fi")
-      , any(L".")
+      , where(L"where")
+      , then(L"when")
+      , elseif(L"elsif")
+      , true_(L"true")
+      , false_(L"false")
       , identifier(L"[A-Za-z][_A-Za-z0-9]*")
       , nondecint(L"0[2-9A-Za-z][0-9A-Za-z]+")
       {
         using boost::phoenix::ref;
-	namespace ph = boost::phoenix;
+        namespace ph = boost::phoenix;
 
         this->self =
-	    any[lex::_pass = lex::pass_flags::pass_ignore]
-	  | if_
-	  | fi
-	  | identifier
-	  | nondecint
-	;
-      }
+          any[lex::_pass = lex::pass_flags::pass_ignore]
+        | if_
+        | fi
+        | where
+        | then
+        | elsif
+        | true_
+        | false_
+        | identifier
+        | nondecint
+        ;
+    }
 
       lex::token_def<lex::unused_type, wchar_t> 
         if_
