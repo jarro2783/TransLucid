@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <boost/spirit/include/lex_lexertl.hpp>
 #include <boost/spirit/home/phoenix/operator.hpp>
+#include <boost/spirit/home/phoenix/bind.hpp>
 #include <tl/charset.hpp>
 
 namespace TransLucid
@@ -26,6 +27,11 @@ namespace TransLucid
   namespace Parser
   {
     namespace lex = boost::spirit::lex;
+
+    inline mpz_class 
+    create_mpz(std::wstring::iterator begin, const std::wstring::iterator& end)
+    {
+    }
 
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
@@ -42,6 +48,9 @@ namespace TransLucid
       , identifier(L"[A-Za-z][_A-Za-z0-9]*")
       {
         using boost::phoenix::ref;
+	using lex::_val;
+	using lex::_start;
+	using lex::_end;
 	namespace ph = boost::phoenix;
 
 	this->self.add_pattern(L"DIGIT", L"[0-9]");
@@ -57,7 +66,7 @@ namespace TransLucid
 	  | if_
 	  | fi_
 	  | identifier
-	  | integer
+	  | integer[boost::spirit::_val = ph::bind(&create_mpz, _start, _end)]
 	;
       }
 

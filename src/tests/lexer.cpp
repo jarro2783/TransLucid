@@ -147,7 +147,7 @@ struct checker_grammar
 // This is the type of the grammar to parse
 typedef checker_grammar<iterator_type> cgrammar;
 
-BOOST_AUTO_TEST_CASE ( keywords )
+BOOST_AUTO_TEST_CASE ( identifiers )
 {
   Checker checker({
     L"ifififif0a9fifi", 
@@ -157,17 +157,42 @@ BOOST_AUTO_TEST_CASE ( keywords )
     L"a",
     L"a_b",
     L"a5",
+    L"b",
+    L"abc34_"
     })
   ;
   tl_lexer lexer;
   cgrammar checkg(lexer, checker);
 
-  wstring input = L"ifififif0a9fifi testing hello world a a_b a5";
+  wstring input = L"ifififif0a9fifi testing hello world a a_b a5 b abc34";
 
   wstring::iterator first = input.begin();
   wstring::iterator last = input.end();
 
 	lex::tokenize_and_parse(first, last, lexer, checkg);
+}
+
+BOOST_AUTO_TEST_CASE ( keywords )
+{
+  Checker checker({
+    TOKEN_IF,
+    TOKEN_FI,
+    TOKEN_WHERE,
+    TOKEN_THEN,
+    TOKEN_ELSIF,
+    TOKEN_TRUE,
+    TOKEN_FALSE
+  });
+
+  tl_lexer lexer;
+  cgrammar checkg(lexer, checker);
+
+  wstring input = L"if fi where then elsif true false";
+
+  wstring::iterator first = input.begin();
+  wstring::iterator last = input.end();
+
+  lex::tokenize_and_parse(first, last, lexer, checkg);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
