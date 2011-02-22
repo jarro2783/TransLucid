@@ -22,6 +22,20 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/bind.hpp>
 #include <tl/charset.hpp>
 
+namespace boost { namespace spirit { namespace traits
+{
+  template <typename Iterator>
+  struct assign_to_attribute_from_iterators<mpz_class, Iterator>
+  {
+    static void
+    call(Iterator const& first, Iterator const& last, mpz_class& attr)
+    {
+      Iterator current = first;
+      attr = 0;
+    }
+  };
+}}}
+
 namespace TransLucid
 {
   namespace Parser
@@ -71,7 +85,7 @@ namespace TransLucid
         | true_
         | false_
         | identifier
-        | integer[_val = ph::bind(&create_mpz, _start, _end)]
+        | integer//[_val = ph::bind(&create_mpz, _start, _end)]
         ;
       }
 
