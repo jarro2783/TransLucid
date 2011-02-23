@@ -30,8 +30,7 @@ namespace boost { namespace spirit { namespace traits
     static void
     call(Iterator const& first, Iterator const& last, mpz_class& attr)
     {
-      std::basic_string<wchar_t> s(first, last);
-      if (first - last == 1 && *first == L'0')
+      if (last - first == 1 && *first == L'0')
       {
         attr = 0;
       }
@@ -68,14 +67,22 @@ namespace boost { namespace spirit { namespace traits
 
           //we are guaranteed to have at least this character
           ++current;
-          attr = mpz_class(std::string(current, last), base);
+          if (base == 1)
+          {
+            attr = last - current;
+          }
+          else
+          {
+            attr = mpz_class(std::string(current, last), base);
+          }
         }
         else
         {
           //decint
           //the lexer is guaranteed to have given us digits in the range
           //0-9 now
-          attr = mpz_class(std::string(current, last));
+          attr = mpz_class(std::string(current, last), 10);
+          std::cerr << attr << std::endl;
         }
 
         if (negative)
@@ -120,7 +127,6 @@ namespace TransLucid
         this->self.add_pattern(L"intUNARY", L"011+");
 
         integer = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
-        //integer = L"[1-9]{DIGIT}*";
 
         this->self =
           spaces[lex::_pass = lex::pass_flags::pass_ignore]
@@ -132,7 +138,7 @@ namespace TransLucid
         | true_
         | false_
         | identifier
-        | integer//[_val = ph::bind(&create_mpz, _start, _end)]
+        | integer
         ;
       }
 

@@ -229,7 +229,9 @@ BOOST_AUTO_TEST_CASE ( keywords )
 
 BOOST_AUTO_TEST_CASE ( integers )
 {
-  wstring input = L"0 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111";
+  wstring input = L"0 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111"
+                  L" ~1 ~0Gab ~15 ~0111"
+  ;
   Checker checker({
     0,
     10,
@@ -239,9 +241,13 @@ BOOST_AUTO_TEST_CASE ( integers )
     5,
     25,
     10,
-    1245,
+    1279,
     1,
-    3
+    3,
+    -1,
+    -171,
+    -15,
+    -2
   });
   tl_lexer lexer;
   cgrammar checkg(lexer, checker);
