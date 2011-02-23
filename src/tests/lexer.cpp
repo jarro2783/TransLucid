@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/charset.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
+#include <boost/spirit/home/phoenix/operator.hpp>
+#include <boost/spirit/home/phoenix/core/reference.hpp>
 
 #define BOOST_TEST_MODULE lexer
 #include <boost/test/included/unit_test.hpp>
@@ -34,7 +36,7 @@ BOOST_AUTO_TEST_SUITE( lexer_tests )
 
 // iterator type used to expose the underlying input stream
 typedef std::basic_string<wchar_t> wstring;
-typedef wstring::iterator base_iterator_type;
+typedef wstring::const_iterator base_iterator_type;
 
 // This is the token type to return from the lexer iterator
 typedef lex::lexertl::token<
@@ -62,13 +64,21 @@ enum Keyword
 	KEYWORD_FALSE
 };
 
+enum Token
+{
+  TOKEN_AT,
+  TOKEN_OPAREN,
+  TOKEN_CPAREN,
+  TOKEN_EQUALS
+}
+
 //the types of values that we can have
 typedef boost::variant
 <
   Keyword, 
   mpz_class, 
   wstring, 
-  TL::Parser::Token
+  Token
 > Values;
 
 inline std::string
@@ -95,13 +105,11 @@ class Checker
 
 	void identifier(const wstring& ws)
 	{
+    std::cerr << "got identifier: " << to_utf8(ws) << std::endl;
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const wstring* wsp = boost::get<wstring>(&*m_current);
-    if (wsp == 0)
-    {
-      std::cerr << to_utf8(ws) << std::endl;
-    }
+
     //if this fails the type of the token is wrong
     BOOST_REQUIRE(wsp != 0);
     BOOST_CHECK(*wsp == ws);
@@ -111,6 +119,7 @@ class Checker
 
 	void integer(const mpz_class& i)
 	{
+    std::cerr << "got integer: " << i << std::endl;
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const mpz_class* ip = boost::get<mpz_class>(&*m_current);
@@ -123,6 +132,7 @@ class Checker
 
 	void keyword(Keyword t)
 	{
+    std::cerr << "got keyword: " << t << std::endl;
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const Keyword* tp = boost::get<Keyword>(&*m_current);
@@ -133,14 +143,15 @@ class Checker
     ++m_current;
 	}
 
-  void symbol(TL::Parser::Token t)
+  void symbol(Token s)
   {
+    std::cerr << "got symbol " << s << std::endl;
     BOOST_REQUIRE(m_current != m_tokens.end());
 
-    const TL::Parser::Token* tp = boost::get<TL::Parser::Token>(&*m_current);
+    const std::string* sp = boost::get<std::string>(&*m_current);
     //if this fails the type of the token is wrong
-    BOOST_REQUIRE(tp != 0);
-    BOOST_CHECK_EQUAL(*tp, t);
+    BOOST_REQUIRE(sp != 0);
+    BOOST_CHECK_EQUAL(*sp, s);
     ++m_current;
   }
 
@@ -186,8 +197,10 @@ struct checker_grammar
       using namespace TL::Parser;
 
       symbol = 
-        qi::token(TOKEN_OPAREN)[_val = TOKEN_OPAREN]
-      | qi::token(TOKEN_CPAREN)[_val = TOKEN_CPAREN]
+        qi::char_(L'@')[_val = TOKEN_AT]
+      | qi::char_(L'=')[_val = TOKEN_EQUALS]
+      | qi::char_(L'(')[_val = TOKEN_OPAREN]
+      | qi::char_(L')')[_val = TOKEN_CPAREN]
       ;
     }
 
@@ -200,7 +213,7 @@ struct checker_grammar
       keyword
     ;
 
-    qi::rule<Iterator, TL::Parser::Token()>
+    qi::rule<Iterator, Token()>
       symbol
     ;
 
@@ -210,8 +223,21 @@ struct checker_grammar
 // This is the type of the grammar to parse
 typedef checker_grammar<iterator_type> cgrammar;
 
+void check(const wstring& input, Checker& checker)
+{
+  tl_lexer lexer;
+  cgrammar checkg(lexer, checker);
+
+  wstring::const_iterator first = input.begin();
+  wstring::const_iterator last = input.end();
+
+	lex::tokenize_and_parse(first, last, lexer, checkg);
+}
+
 BOOST_AUTO_TEST_CASE ( identifiers )
 {
+  wstring input = L"ifififif0a9fifi testing hello world a a_b a5 b abc34_";
+  
   Checker checker({
     L"ifififif0a9fifi", 
     L"testing",
@@ -224,15 +250,18 @@ BOOST_AUTO_TEST_CASE ( identifiers )
     L"abc34_"
     })
   ;
+
+  check(input, checker);
+#if 0
   tl_lexer lexer;
   cgrammar checkg(lexer, checker);
 
-  wstring input = L"ifififif0a9fifi testing hello world a a_b a5 b abc34_";
 
   wstring::iterator first = input.begin();
   wstring::iterator last = input.end();
 
 	lex::tokenize_and_parse(first, last, lexer, checkg);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE ( keywords )
@@ -252,8 +281,8 @@ BOOST_AUTO_TEST_CASE ( keywords )
 
   wstring input = L"if fi where then elsif true false";
 
-  wstring::iterator first = input.begin();
-  wstring::iterator last = input.end();
+  wstring::const_iterator first = input.begin();
+  wstring::const_iterator last = input.end();
 
   lex::tokenize_and_parse(first, last, lexer, checkg);
 }
@@ -280,6 +309,10 @@ BOOST_AUTO_TEST_CASE ( integers )
     -15,
     -2
   });
+
+  check(input, checker);
+
+#if 0
   tl_lexer lexer;
   cgrammar checkg(lexer, checker);
 
@@ -287,16 +320,20 @@ BOOST_AUTO_TEST_CASE ( integers )
   wstring::iterator last = input.end();
 
   lex::tokenize_and_parse(first, last, lexer, checkg);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE ( symbols )
 {
   wstring input = L"()";
   Checker checker({
-    TL::Parser::TOKEN_OPAREN,
-    TL::Parser::TOKEN_CPAREN
+    TOKEN_OPAREN,
+    TOKEN_CPAREN
   });
 
+  check(input, checker);
+
+  #if 0
   tl_lexer lexer;
   cgrammar checkg(lexer, checker);
 
@@ -304,6 +341,24 @@ BOOST_AUTO_TEST_CASE ( symbols )
   wstring::iterator last = input.end();
 
   lex::tokenize_and_parse(first, last, lexer, checkg);
+  #endif
+}
+
+BOOST_AUTO_TEST_CASE ( mixed )
+{
+  wstring input = L"intmp @ 10 (hello if) cats";
+  Checker checker({
+    L"intmp",
+    TOKEN_AT,
+    10,
+    TOKEN_OPAREN,
+    L"hello",
+    KEYWORD_IF,
+    TOKEN_CPAREN,
+    L"cats"
+  });
+
+  check(input, checker);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

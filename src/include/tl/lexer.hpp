@@ -82,7 +82,6 @@ namespace boost { namespace spirit { namespace traits
           //the lexer is guaranteed to have given us digits in the range
           //0-9 now
           attr = mpz_class(std::string(current, last), 10);
-          std::cerr << attr << std::endl;
         }
 
         if (negative)
@@ -99,12 +98,6 @@ namespace TransLucid
   namespace Parser
   {
     namespace lex = boost::spirit::lex;
-
-    enum Token
-    {
-      TOKEN_OPAREN,
-      TOKEN_CPAREN
-    };
 
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
@@ -145,12 +138,19 @@ namespace TransLucid
         | false_
         | identifier
         | integer
+        | L'@'
+        | L'='
+        | L'('
+        | L')'
         ;
 
+        #if 0
         this->self.add
           (L'(', TOKEN_OPAREN)
           (L')', TOKEN_CPAREN)
+          ('=')
         ;
+        #endif
       }
 
       lex::token_def<lex::unused_type, wchar_t> 
