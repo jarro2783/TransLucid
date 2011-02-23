@@ -70,7 +70,7 @@ enum Token
   TOKEN_OPAREN,
   TOKEN_CPAREN,
   TOKEN_EQUALS
-}
+};
 
 //the types of values that we can have
 typedef boost::variant
@@ -148,7 +148,7 @@ class Checker
     std::cerr << "got symbol " << s << std::endl;
     BOOST_REQUIRE(m_current != m_tokens.end());
 
-    const std::string* sp = boost::get<std::string>(&*m_current);
+    const Token* sp = boost::get<Token>(&*m_current);
     //if this fails the type of the token is wrong
     BOOST_REQUIRE(sp != 0);
     BOOST_CHECK_EQUAL(*sp, s);
