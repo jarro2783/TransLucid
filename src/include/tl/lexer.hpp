@@ -100,6 +100,12 @@ namespace TransLucid
   {
     namespace lex = boost::spirit::lex;
 
+    enum Token
+    {
+      TOKEN_OPAREN,
+      TOKEN_CPAREN
+    };
+
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
     {
@@ -139,6 +145,11 @@ namespace TransLucid
         | false_
         | identifier
         | integer
+        ;
+
+        this->self.add
+          (L'(', TOKEN_OPAREN)
+          (L')', TOKEN_CPAREN)
         ;
       }
 
