@@ -30,8 +30,59 @@ namespace boost { namespace spirit { namespace traits
     static void
     call(Iterator const& first, Iterator const& last, mpz_class& attr)
     {
-      Iterator current = first;
-      attr = 0;
+      std::basic_string<wchar_t> s(first, last);
+      if (first - last == 1 && *first == L'0')
+      {
+        attr = 0;
+      }
+      else
+      {
+        //check for negative
+        bool negative = false;
+        Iterator current = first;
+        if (*current == L'~')
+        {
+          negative = true;
+          ++current;
+        }
+
+        if (*current == L'0')
+        {
+          //nondecint
+          ++current;
+          //this character is the base
+          int base = *current;
+
+          if (base >= '0' && base <= '9')
+          {
+            base = base - '0';
+          }
+          else if (base >= 'A' && base <= 'Z')
+          {
+            base = base - 'A' + 10;
+          }
+          else if (base >= 'a' && base <= 'z')
+          {
+            base = base - 'a' + 10 + 26;
+          }
+
+          //we are guaranteed to have at least this character
+          ++current;
+          attr = mpz_class(std::string(current, last), base);
+        }
+        else
+        {
+          //decint
+          //the lexer is guaranteed to have given us digits in the range
+          //0-9 now
+          attr = mpz_class(std::string(current, last));
+        }
+
+        if (negative)
+        {
+          attr = -attr;
+        }
+      }
     }
   };
 }}}
@@ -41,11 +92,6 @@ namespace TransLucid
   namespace Parser
   {
     namespace lex = boost::spirit::lex;
-
-    inline mpz_class 
-    create_mpz(std::wstring::iterator begin, const std::wstring::iterator& end)
-    {
-    }
 
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
@@ -73,7 +119,8 @@ namespace TransLucid
         this->self.add_pattern(L"intNONDEC", L"0[2-9A-Za-z]{ADIGIT}+");
         this->self.add_pattern(L"intUNARY", L"011+");
 
-        integer = L"0|~?({intDEC}|{intNONDEC}|{intUNARY})";
+        integer = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
+        //integer = L"[1-9]{DIGIT}*";
 
         this->self =
           spaces[lex::_pass = lex::pass_flags::pass_ignore]

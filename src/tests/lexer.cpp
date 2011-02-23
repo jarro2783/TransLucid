@@ -81,6 +81,12 @@ class Checker
 	{
 	}
 
+  //when we clean up the checker we must have lexed everything
+  ~Checker()
+  {
+    BOOST_CHECK(m_current == m_tokens.end());
+  }
+
 	void identifier(const wstring& ws)
 	{
     BOOST_REQUIRE(m_current != m_tokens.end());
@@ -99,11 +105,24 @@ class Checker
 
 	void integer(const mpz_class& i)
 	{
-	  std::cerr << "int: " << i << std::endl;
+    BOOST_REQUIRE(m_current != m_tokens.end());
+
+    const mpz_class* ip = boost::get<mpz_class>(&*m_current);
+    BOOST_REQUIRE(ip != 0);
+    BOOST_CHECK_EQUAL(*ip, i);
+
+    ++m_current;
 	}
 
 	void keyword(Token t)
 	{
+    BOOST_REQUIRE(m_current != m_tokens.end());
+
+    const Token* tp = boost::get<Token>(&*m_current);
+    BOOST_REQUIRE(tp != 0);
+    BOOST_CHECK_EQUAL(*tp, t);
+
+    ++m_current;
 	}
 
 	private:
@@ -127,13 +146,13 @@ struct checker_grammar
 
       start = 
         *(ident 
-        | integer 
+        | integer
         | keyword[ph::bind(&Checker::keyword, m_checker, _1)]
         )
       ;
 
       ident = tok.identifier[ph::bind(&Checker::identifier, m_checker, _1)];
-      integer = tok.integer; //[ph::bind(&Checker::integer, m_checker, _1)];
+      integer = tok.integer[ph::bind(&Checker::integer, m_checker, _1)];
       keyword = 
         tok.if_[_val = TOKEN_IF] 
       | tok.fi_[_val = TOKEN_FI]
@@ -141,7 +160,7 @@ struct checker_grammar
       | tok.then_[_val = TOKEN_THEN]
       | tok.elsif_[_val = TOKEN_ELSIF]
       | tok.true_[_val = TOKEN_TRUE]
-      | tok.false_[_val = TOKEN_TRUE]
+      | tok.false_[_val = TOKEN_FALSE]
       ;
     }
 
@@ -201,6 +220,31 @@ BOOST_AUTO_TEST_CASE ( keywords )
   cgrammar checkg(lexer, checker);
 
   wstring input = L"if fi where then elsif true false";
+
+  wstring::iterator first = input.begin();
+  wstring::iterator last = input.end();
+
+  lex::tokenize_and_parse(first, last, lexer, checkg);
+}
+
+BOOST_AUTO_TEST_CASE ( integers )
+{
+  wstring input = L"0 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111";
+  Checker checker({
+    0,
+    10,
+    50,
+    100,
+    1,
+    5,
+    25,
+    10,
+    1245,
+    1,
+    3
+  });
+  tl_lexer lexer;
+  cgrammar checkg(lexer, checker);
 
   wstring::iterator first = input.begin();
   wstring::iterator last = input.end();
