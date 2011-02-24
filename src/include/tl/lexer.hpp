@@ -127,6 +127,11 @@ namespace TransLucid
 
         integer = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
 
+        dblslash = L"\\\\\\\\";
+        range = L"\\.\\.";
+        arrow = L"->";
+        dblsemi = L";;";
+
         this->self =
           spaces[lex::_pass = lex::pass_flags::pass_ignore]
         | if_
@@ -138,24 +143,29 @@ namespace TransLucid
         | false_
         | identifier
         | integer
-        | L'@'
+        | L':'
+        | L'['
+        | L']'
+        | range
+        | L'.'
         | L'='
+        | L'&'
+        | L'#'
+        | L'@'
+        | dblslash
+        | L'\\'
         | L'('
         | L')'
+        | arrow
+        | L'|'
+        | dblsemi
         ;
-
-        #if 0
-        this->self.add
-          (L'(', TOKEN_OPAREN)
-          (L')', TOKEN_CPAREN)
-          ('=')
-        ;
-        #endif
       }
 
       lex::token_def<lex::unused_type, wchar_t> 
         if_, fi_, where_, then_, elsif_, true_, false_
       , spaces
+      , arrow, dblsemi, dblslash, range
       ;
 
       lex::token_def<std::basic_string<wchar_t>, wchar_t>

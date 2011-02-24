@@ -18,7 +18,6 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/lexer.hpp>
-#include <tl/parser_iterator.hpp>
 #include <tl/charset.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
@@ -62,14 +61,29 @@ enum Keyword
 	KEYWORD_ELSIF,
 	KEYWORD_TRUE,
 	KEYWORD_FALSE
+//  TOKEN_AT,
+//  TOKEN_OPAREN,
+//  TOKEN_CPAREN
 };
 
 enum Token
 {
+  TOKEN_COLON,
+  TOKEN_OBRACKET,
+  TOKEN_CBRACKET,
+  TOKEN_DOT,
+  TOKEN_EQUALS,
+  TOKEN_AMPERSAND,
+  TOKEN_HASH,
   TOKEN_AT,
+  TOKEN_SLASH,
+  TOKEN_DOUBLE_SLASH,
+  TOKEN_RANGE,
   TOKEN_OPAREN,
   TOKEN_CPAREN,
-  TOKEN_EQUALS
+  TOKEN_ARROW,
+  TOKEN_BAR,
+  TOKEN_DOUBLE_SEMI
 };
 
 //the types of values that we can have
@@ -77,7 +91,7 @@ typedef boost::variant
 <
   Keyword, 
   mpz_class, 
-  wstring, 
+  wstring,
   Token
 > Values;
 
@@ -145,7 +159,7 @@ class Checker
 
   void symbol(Token s)
   {
-    std::cerr << "got symbol " << s << std::endl;
+    BOOST_TEST_MESSAGE("Testing symbol: " << s);
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const Token* sp = boost::get<Token>(&*m_current);
@@ -179,6 +193,7 @@ struct checker_grammar
         | integer
         | keyword[ph::bind(&Checker::keyword, m_checker, _1)]
         | symbol[ph::bind(&Checker::symbol, m_checker, _1)]
+      //  | multi_char_symbol[ph::bind(&Checker::symbol, m_checker, _1)]
         )
       ;
 
@@ -194,13 +209,25 @@ struct checker_grammar
       | tok.false_[_val = KEYWORD_FALSE]
       ;
 
-      using namespace TL::Parser;
+      //using namespace TL::Parser;
 
       symbol = 
-        qi::char_(L'@')[_val = TOKEN_AT]
-      | qi::char_(L'=')[_val = TOKEN_EQUALS]
-      | qi::char_(L'(')[_val = TOKEN_OPAREN]
-      | qi::char_(L')')[_val = TOKEN_CPAREN]
+        qi::lit(L':')[_val = TOKEN_COLON]
+      | qi::lit(L'[')[_val = TOKEN_OBRACKET]
+      | qi::lit(L']')[_val = TOKEN_CBRACKET]
+      | qi::lit(L'.')[_val = TOKEN_DOT]
+      | qi::lit(L'=')[_val = TOKEN_EQUALS]
+      | qi::lit(L'&')[_val = TOKEN_AMPERSAND]
+      | qi::lit(L'#')[_val = TOKEN_HASH]
+      | qi::lit(L'@')[_val = TOKEN_AT]
+      | qi::lit(L"\\")[_val = TOKEN_SLASH]
+      | tok.dblslash[_val = TOKEN_DOUBLE_SLASH]
+      | tok.range[_val = TOKEN_RANGE]
+      | qi::lit(L'(')[_val = TOKEN_OPAREN]
+      | qi::lit(L')')[_val = TOKEN_CPAREN]
+      | tok.arrow[_val = TOKEN_ARROW]
+      | qi::lit(L'|')[_val = TOKEN_BAR]
+      | tok.dblsemi[_val = TOKEN_DOUBLE_SEMI]
       ;
     }
 
@@ -215,6 +242,7 @@ struct checker_grammar
 
     qi::rule<Iterator, Token()>
       symbol
+    , multi_char_symbol
     ;
 
 		Checker& m_checker;
@@ -325,10 +353,36 @@ BOOST_AUTO_TEST_CASE ( integers )
 
 BOOST_AUTO_TEST_CASE ( symbols )
 {
-  wstring input = L"()";
+  #if 0
+  wstring input1 = L"->";
+
+  Checker checker1({
+    TOKEN_ARROW
+  });
+
+  check(input1, checker1);
+  #endif
+
+  wstring input = L":[].=&#@\\ \\\\..()->|;;\\\\\\";
   Checker checker({
+    TOKEN_COLON,
+    TOKEN_OBRACKET,
+    TOKEN_CBRACKET,
+    TOKEN_DOT,
+    TOKEN_EQUALS,
+    TOKEN_AMPERSAND,
+    TOKEN_HASH,
+    TOKEN_AT,
+    TOKEN_SLASH,
+    TOKEN_DOUBLE_SLASH,
+    TOKEN_RANGE,
     TOKEN_OPAREN,
-    TOKEN_CPAREN
+    TOKEN_CPAREN,
+    TOKEN_ARROW,
+    TOKEN_BAR,
+    TOKEN_DOUBLE_SEMI,
+    TOKEN_DOUBLE_SLASH,
+    TOKEN_SLASH
   });
 
   check(input, checker);
