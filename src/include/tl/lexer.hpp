@@ -185,6 +185,23 @@ namespace TransLucid
         }
       };
 
+      struct build_float
+      {
+        template <typename Iterator, typename Idtype, typename Context>
+        void
+        operator()
+        (
+          Iterator& start, 
+          Iterator& end, 
+          lex::pass_flags& matched,
+          Idtype& id,
+          Context& ctx
+        ) const
+        {
+          ctx.set_value(value_wrapper<mpf_class>(mpf_class()));
+        }
+      };
+
       struct build_integer
       {
         template <typename Iterator, typename Idtype, typename Context>
@@ -324,7 +341,7 @@ namespace TransLucid
         | false_
         | identifier
         | integer[detail::build_integer()]
-        //| float_val
+        | float_val[detail::build_float()]
         | rational[detail::build_rational()]
         | L':'
         | L'['

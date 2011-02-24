@@ -192,6 +192,15 @@ class Checker
 
   void float_val(const value_wrapper<mpf_class>& f)
   {
+    BOOST_TEST_MESSAGE("Testing rational: " << f);
+    BOOST_REQUIRE(m_current != m_tokens.end());
+
+    const value_wrapper<mpf_class>* fp = 
+      boost::get<value_wrapper<mpf_class>>(&*m_current);
+    //if this fails the type of the token is wrong
+    BOOST_REQUIRE(fp != 0);
+    BOOST_CHECK_EQUAL(*fp, f);
+
   }
 
 	private:
