@@ -22,15 +22,140 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/bind.hpp>
 #include <tl/charset.hpp>
 
+namespace TransLucid
+{
+  namespace Parser
+  {
+    template <typename T>
+    struct value_wrapper;
+
+    #if 0
+    template <typename T>
+    bool
+    operator==(const T& lhs, const value_wrapper<T>& rhs);
+    #endif
+
+    template <typename T>
+    std::ostream&
+    operator<<(std::ostream&, const value_wrapper<T>& rhs);
+
+    template <typename T>
+    struct value_wrapper
+    {
+      public:
+      value_wrapper(const T& t)
+      : m_t(t)
+      {
+      }
+      
+      #if 0
+      bool operator==(const T& rhs) const
+      {
+        return m_t == rhs;
+      }
+      #endif
+
+      value_wrapper()
+      {
+      }
+
+      operator T const&() const
+      {
+        return m_t;
+      }
+
+      bool operator==(const value_wrapper<T>& rhs) const
+      {
+        return m_t == rhs.m_t;
+      }
+
+      friend 
+      bool 
+      operator==(const T& lhs, const value_wrapper<T>& rhs)
+      {
+        return lhs == rhs.m_t;
+      }
+
+      friend
+      bool
+      operator==(const value_wrapper<T>& lhs, const T& rhs)
+      {
+        return lhs.m_t == rhs;
+      }
+
+      friend
+      std::ostream&
+      operator<< <T>(std::ostream&, const value_wrapper<T>& rhs);
+
+      private:
+      T m_t;
+    };
+
+    template <typename T>
+    bool
+    operator==(const T& lhs, const value_wrapper<T>& rhs)
+    {
+      return lhs == rhs.m_t;
+    }
+
+    template <typename T>
+    std::ostream&
+    operator<<(std::ostream& os, const value_wrapper<T>& rhs)
+    {
+      os << rhs.m_t;
+      return os;
+    }
+  }
+}
+
 namespace boost { namespace spirit { namespace traits
 {
+  using TransLucid::Parser::value_wrapper;
   template <typename Iterator>
-  struct assign_to_attribute_from_iterators<mpz_class, Iterator>
+  struct assign_to_attribute_from_iterators<value_wrapper<mpz_class>, Iterator>
+  //struct assign_to_attribute_from_iterators<mpz_class, Iterator>
   {
     static void
-    call(Iterator const& first, Iterator const& last, mpz_class& attr)
+    call
+    (
+      Iterator const& first, 
+      Iterator const& last, 
+      value_wrapper<mpz_class>& attr
+      //mpz_class& attr
+    )
     {
       throw "construct mpz incorrectly called";
+    }
+  };
+
+  template <typename Iterator>
+  struct assign_to_attribute_from_iterators<value_wrapper<mpq_class>, Iterator>
+  //struct assign_to_attribute_from_iterators<mpq_class, Iterator>
+  {
+    static void
+    call
+    (
+      Iterator const& first, 
+      Iterator const& last, 
+      value_wrapper<mpq_class>& attr
+      //mpq_class& attr
+    )
+    {
+      throw "construct mpq incorrectly called";
+    }
+  };
+
+  template <typename Iterator>
+  struct assign_to_attribute_from_iterators<value_wrapper<mpf_class>, Iterator>
+  {
+    static void
+    call
+    (
+      Iterator const& first, 
+      Iterator const& last, value_wrapper<mpf_class>& attr
+    )
+    {
+      throw "construct mpf incorrectly called";
     }
   };
 }}}
@@ -56,6 +181,7 @@ namespace TransLucid
           Context& ctx
         ) const
         {
+          ctx.set_value(value_wrapper<mpq_class>(mpq_class()));
         }
       };
 
@@ -72,67 +198,75 @@ namespace TransLucid
           Context& ctx
         ) const
         {
-          mpz_class attr;
-          if (last - first == 1 && *first == L'0')
+          try
           {
-            attr = 0;
-          }
-          else
-          {
-            //check for negative
-            bool negative = false;
-            Iterator current = first;
-            if (*current == L'~')
+            mpz_class attr;
+            if (last - first == 1 && *first == L'0')
             {
-              negative = true;
-              ++current;
-            }
-
-            if (*current == L'0')
-            {
-              //nondecint
-              ++current;
-              //this character is the base
-              int base = *current;
-
-              if (base >= '0' && base <= '9')
-              {
-                base = base - '0';
-              }
-              else if (base >= 'A' && base <= 'Z')
-              {
-                base = base - 'A' + 10;
-              }
-              else if (base >= 'a' && base <= 'z')
-              {
-                base = base - 'a' + 10 + 26;
-              }
-
-              //we are guaranteed to have at least this character
-              ++current;
-              if (base == 1)
-              {
-                attr = last - current;
-              }
-              else
-              {
-                attr = mpz_class(std::string(current, last), base);
-              }
+              attr = 0;
             }
             else
             {
-              //decint
-              //the lexer is guaranteed to have given us digits in the range
-              //0-9 now
-              attr = mpz_class(std::string(current, last), 10);
-            }
+              //check for negative
+              bool negative = false;
+              Iterator current = first;
+              if (*current == L'~')
+              {
+                negative = true;
+                ++current;
+              }
 
-            if (negative)
-            {
-              attr = -attr;
+              if (*current == L'0')
+              {
+                //nondecint
+                ++current;
+                //this character is the base
+                int base = *current;
+
+                if (base >= '0' && base <= '9')
+                {
+                  base = base - '0';
+                }
+                else if (base >= 'A' && base <= 'Z')
+                {
+                  base = base - 'A' + 10;
+                }
+                else if (base >= 'a' && base <= 'z')
+                {
+                  base = base - 'a' + 10 + 26;
+                }
+
+                //we are guaranteed to have at least this character
+                ++current;
+                if (base == 1)
+                {
+                  attr = last - current;
+                }
+                else
+                {
+                  attr = mpz_class(std::string(current, last), base);
+                }
+              }
+              else
+              {
+                //decint
+                //the lexer is guaranteed to have given us digits in the range
+                //0-9 now
+                attr = mpz_class(std::string(current, last), 10);
+              }
+
+              if (negative)
+              {
+                attr = -attr;
+              }
             }
+            ctx.set_value(value_wrapper<mpz_class>(attr));
           }
-          ctx.set_value(attr);
+          catch(std::invalid_argument& e)
+          {
+            //an invalid number was input
+            matched = lex::pass_flags::pass_fail;
+          }
         }
       };
     }
@@ -190,7 +324,7 @@ namespace TransLucid
         | false_
         | identifier
         | integer[detail::build_integer()]
-        | float_val
+        //| float_val
         | rational[detail::build_rational()]
         | L':'
         | L'['
@@ -221,15 +355,17 @@ namespace TransLucid
         identifier
       ;
 
-      lex::token_def<mpz_class, wchar_t> 
+      lex::token_def<value_wrapper<mpz_class>, wchar_t> 
+      //lex::token_def<mpz_class, wchar_t> 
         integer
       ;
 
-      lex::token_def<mpf_class, wchar_t>
+      lex::token_def<value_wrapper<mpf_class>, wchar_t>
         float_val
       ;
 
-      lex::token_def<mpq_class, wchar_t>
+      lex::token_def<value_wrapper<mpq_class>, wchar_t>
+      //lex::token_def<mpq_class, wchar_t>
         rational
       ;
     };

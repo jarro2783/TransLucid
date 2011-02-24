@@ -30,27 +30,9 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TL = TransLucid;
 namespace lex = TL::Parser::lex;
 namespace qi = boost::spirit::qi;
+using TL::Parser::value_wrapper;
 
 BOOST_AUTO_TEST_SUITE( lexer_tests )
-
-// iterator type used to expose the underlying input stream
-typedef std::basic_string<wchar_t> wstring;
-typedef wstring::const_iterator base_iterator_type;
-
-// This is the token type to return from the lexer iterator
-typedef lex::lexertl::token<
-	base_iterator_type, 
-	boost::mpl::vector<mpz_class, wstring> 
-> token_type;
-
-// This is the lexer type to use to tokenize the input.
-// We use the lexertl based lexer engine.
-typedef lex::lexertl::actor_lexer<token_type> lexer_type;
-
-typedef TL::Parser::lex_tl_tokens<lexer_type> tl_lexer;
-
-// This is the iterator type exposed by the lexer 
-typedef tl_lexer::iterator_type iterator_type;
 
 enum Keyword
 {
@@ -61,9 +43,6 @@ enum Keyword
 	KEYWORD_ELSIF,
 	KEYWORD_TRUE,
 	KEYWORD_FALSE
-//  TOKEN_AT,
-//  TOKEN_OPAREN,
-//  TOKEN_CPAREN
 };
 
 enum Token
@@ -86,11 +65,40 @@ enum Token
   TOKEN_DOUBLE_SEMI
 };
 
+// iterator type used to expose the underlying input stream
+typedef std::basic_string<wchar_t> wstring;
+typedef wstring::const_iterator base_iterator_type;
+
+// This is the token type to return from the lexer iterator
+typedef lex::lexertl::token<
+	base_iterator_type, 
+	boost::mpl::vector
+  <
+    value_wrapper<mpz_class>, 
+    value_wrapper<mpq_class>,
+    value_wrapper<mpf_class>,
+    wstring, 
+    Keyword, 
+    Token
+  > 
+> token_type;
+
+// This is the lexer type to use to tokenize the input.
+// We use the lexertl based lexer engine.
+typedef lex::lexertl::actor_lexer<token_type> lexer_type;
+
+typedef TL::Parser::lex_tl_tokens<lexer_type> tl_lexer;
+
+// This is the iterator type exposed by the lexer 
+typedef tl_lexer::iterator_type iterator_type;
+
 //the types of values that we can have
 typedef boost::variant
 <
   Keyword, 
-  mpz_class, 
+  value_wrapper<mpz_class>, 
+  value_wrapper<mpq_class>,
+  value_wrapper<mpf_class>,
   wstring,
   Token
 > Values;
@@ -131,12 +139,13 @@ class Checker
     ++m_current;
 	}
 
-	void integer(const mpz_class& i)
+	void integer(const value_wrapper<mpz_class>& i)
 	{
     std::cerr << "got integer: " << i << std::endl;
     BOOST_REQUIRE(m_current != m_tokens.end());
 
-    const mpz_class* ip = boost::get<mpz_class>(&*m_current);
+    const value_wrapper<mpz_class>* ip = 
+      boost::get<value_wrapper<mpz_class>>(&*m_current);
     //if this fails the type of the token is wrong
     BOOST_REQUIRE(ip != 0);
     BOOST_CHECK_EQUAL(*ip, i);
@@ -169,6 +178,22 @@ class Checker
     ++m_current;
   }
 
+  void rational(const value_wrapper<mpq_class>& q)
+  {
+    BOOST_TEST_MESSAGE("Testing rational: " << q);
+    BOOST_REQUIRE(m_current != m_tokens.end());
+
+    const value_wrapper<mpq_class>* qp = 
+      boost::get<value_wrapper<mpq_class>>(&*m_current);
+    //if this fails the type of the token is wrong
+    BOOST_REQUIRE(qp != 0);
+    BOOST_CHECK_EQUAL(*qp, q);
+  }
+
+  void float_val(const value_wrapper<mpf_class>& f)
+  {
+  }
+
 	private:
   //the list of the expected tokens
   std::list<Values> m_tokens;
@@ -193,12 +218,14 @@ struct checker_grammar
         | integer
         | keyword[ph::bind(&Checker::keyword, m_checker, _1)]
         | symbol[ph::bind(&Checker::symbol, m_checker, _1)]
-      //  | multi_char_symbol[ph::bind(&Checker::symbol, m_checker, _1)]
         )
+        >> qi::eoi
       ;
 
       ident = tok.identifier[ph::bind(&Checker::identifier, m_checker, _1)];
       integer = tok.integer[ph::bind(&Checker::integer, m_checker, _1)];
+      rational = tok.rational[ph::bind(&Checker::rational, m_checker, _1)];
+      float_val = tok.float_val[ph::bind(&Checker::float_val, m_checker, _1)];
       keyword = 
         tok.if_[_val = KEYWORD_IF] 
       | tok.fi_[_val = KEYWORD_FI]
@@ -235,6 +262,8 @@ struct checker_grammar
       start
     , ident
     , integer
+    , rational
+    , float_val
 		;
 		qi::rule<Iterator, Keyword()>
       keyword
@@ -251,7 +280,7 @@ struct checker_grammar
 // This is the type of the grammar to parse
 typedef checker_grammar<iterator_type> cgrammar;
 
-void check(const wstring& input, Checker& checker)
+bool check(const wstring& input, Checker& checker)
 {
   tl_lexer lexer;
   cgrammar checkg(lexer, checker);
@@ -259,7 +288,7 @@ void check(const wstring& input, Checker& checker)
   wstring::const_iterator first = input.begin();
   wstring::const_iterator last = input.end();
 
-	lex::tokenize_and_parse(first, last, lexer, checkg);
+	return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last;
 }
 
 BOOST_AUTO_TEST_CASE ( identifiers )
@@ -303,7 +332,8 @@ BOOST_AUTO_TEST_CASE ( integers )
   wstring input = L"0 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111"
                   L" ~1 ~0Gab ~15 ~0111"
   ;
-  Checker checker({
+  std::list<mpz_class> values
+  ({
     0,
     10,
     50,
@@ -321,7 +351,30 @@ BOOST_AUTO_TEST_CASE ( integers )
     -2
   });
 
+  Checker checker(std::list<Values>(values.begin(), values.end()));
+
   check(input, checker);
+
+  wstring invalid = L"0AFB";
+  Checker check_invalid({});
+  BOOST_CHECK(check(invalid, check_invalid) == false);
+}
+
+BOOST_AUTO_TEST_CASE ( rationals )
+{
+  wstring input = L"0_1 123_124";
+  std::list<mpq_class> values
+  ({
+    mpq_class(),
+    mpq_class(123, 124)
+  });
+
+  Checker checker(std::list<Values>(values.begin(), values.end()));
+  check(input, checker);
+}
+
+BOOST_AUTO_TEST_CASE ( floats )
+{
 }
 
 BOOST_AUTO_TEST_CASE ( symbols )
@@ -357,7 +410,7 @@ BOOST_AUTO_TEST_CASE ( mixed )
   Checker checker({
     L"intmp",
     TOKEN_AT,
-    10,
+    mpz_class(10),
     TOKEN_OPAREN,
     L"hello",
     KEYWORD_IF,
