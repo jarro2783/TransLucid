@@ -280,20 +280,11 @@ BOOST_AUTO_TEST_CASE ( identifiers )
   ;
 
   check(input, checker);
-#if 0
-  tl_lexer lexer;
-  cgrammar checkg(lexer, checker);
-
-
-  wstring::iterator first = input.begin();
-  wstring::iterator last = input.end();
-
-	lex::tokenize_and_parse(first, last, lexer, checkg);
-#endif
 }
 
 BOOST_AUTO_TEST_CASE ( keywords )
 {
+  wstring input = L"if fi where then elsif true false";
   Checker checker({
     KEYWORD_IF,
     KEYWORD_FI,
@@ -304,15 +295,7 @@ BOOST_AUTO_TEST_CASE ( keywords )
     KEYWORD_FALSE
   });
 
-  tl_lexer lexer;
-  cgrammar checkg(lexer, checker);
-
-  wstring input = L"if fi where then elsif true false";
-
-  wstring::const_iterator first = input.begin();
-  wstring::const_iterator last = input.end();
-
-  lex::tokenize_and_parse(first, last, lexer, checkg);
+  check(input, checker);
 }
 
 BOOST_AUTO_TEST_CASE ( integers )
@@ -339,30 +322,10 @@ BOOST_AUTO_TEST_CASE ( integers )
   });
 
   check(input, checker);
-
-#if 0
-  tl_lexer lexer;
-  cgrammar checkg(lexer, checker);
-
-  wstring::iterator first = input.begin();
-  wstring::iterator last = input.end();
-
-  lex::tokenize_and_parse(first, last, lexer, checkg);
-#endif
 }
 
 BOOST_AUTO_TEST_CASE ( symbols )
 {
-  #if 0
-  wstring input1 = L"->";
-
-  Checker checker1({
-    TOKEN_ARROW
-  });
-
-  check(input1, checker1);
-  #endif
-
   wstring input = L":[].=&#@\\ \\\\..()->|;;\\\\\\";
   Checker checker({
     TOKEN_COLON,
@@ -386,16 +349,6 @@ BOOST_AUTO_TEST_CASE ( symbols )
   });
 
   check(input, checker);
-
-  #if 0
-  tl_lexer lexer;
-  cgrammar checkg(lexer, checker);
-
-  wstring::iterator first = input.begin();
-  wstring::iterator last = input.end();
-
-  lex::tokenize_and_parse(first, last, lexer, checkg);
-  #endif
 }
 
 BOOST_AUTO_TEST_CASE ( mixed )
