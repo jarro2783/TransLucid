@@ -30,65 +30,7 @@ namespace boost { namespace spirit { namespace traits
     static void
     call(Iterator const& first, Iterator const& last, mpz_class& attr)
     {
-      if (last - first == 1 && *first == L'0')
-      {
-        attr = 0;
-      }
-      else
-      {
-        //check for negative
-        bool negative = false;
-        Iterator current = first;
-        if (*current == L'~')
-        {
-          negative = true;
-          ++current;
-        }
-
-        if (*current == L'0')
-        {
-          //nondecint
-          ++current;
-          //this character is the base
-          int base = *current;
-
-          if (base >= '0' && base <= '9')
-          {
-            base = base - '0';
-          }
-          else if (base >= 'A' && base <= 'Z')
-          {
-            base = base - 'A' + 10;
-          }
-          else if (base >= 'a' && base <= 'z')
-          {
-            base = base - 'a' + 10 + 26;
-          }
-
-          //we are guaranteed to have at least this character
-          ++current;
-          if (base == 1)
-          {
-            attr = last - current;
-          }
-          else
-          {
-            attr = mpz_class(std::string(current, last), base);
-          }
-        }
-        else
-        {
-          //decint
-          //the lexer is guaranteed to have given us digits in the range
-          //0-9 now
-          attr = mpz_class(std::string(current, last), 10);
-        }
-
-        if (negative)
-        {
-          attr = -attr;
-        }
-      }
+      throw "construct mpz incorrectly called";
     }
   };
 }}}
@@ -98,6 +40,102 @@ namespace TransLucid
   namespace Parser
   {
     namespace lex = boost::spirit::lex;
+
+    namespace detail
+    {
+      struct build_rational
+      {
+        template <typename Iterator, typename Idtype, typename Context>
+        void
+        operator()
+        (
+          Iterator& start, 
+          Iterator& end, 
+          lex::pass_flags& matched,
+          Idtype& id,
+          Context& ctx
+        ) const
+        {
+        }
+      };
+
+      struct build_integer
+      {
+        template <typename Iterator, typename Idtype, typename Context>
+        void
+        operator()
+        (
+          Iterator& first, 
+          Iterator& last, 
+          lex::pass_flags& matched,
+          Idtype& id,
+          Context& ctx
+        ) const
+        {
+          mpz_class attr;
+          if (last - first == 1 && *first == L'0')
+          {
+            attr = 0;
+          }
+          else
+          {
+            //check for negative
+            bool negative = false;
+            Iterator current = first;
+            if (*current == L'~')
+            {
+              negative = true;
+              ++current;
+            }
+
+            if (*current == L'0')
+            {
+              //nondecint
+              ++current;
+              //this character is the base
+              int base = *current;
+
+              if (base >= '0' && base <= '9')
+              {
+                base = base - '0';
+              }
+              else if (base >= 'A' && base <= 'Z')
+              {
+                base = base - 'A' + 10;
+              }
+              else if (base >= 'a' && base <= 'z')
+              {
+                base = base - 'a' + 10 + 26;
+              }
+
+              //we are guaranteed to have at least this character
+              ++current;
+              if (base == 1)
+              {
+                attr = last - current;
+              }
+              else
+              {
+                attr = mpz_class(std::string(current, last), base);
+              }
+            }
+            else
+            {
+              //decint
+              //the lexer is guaranteed to have given us digits in the range
+              //0-9 now
+              attr = mpz_class(std::string(current, last), 10);
+            }
+
+            if (negative)
+            {
+              attr = -attr;
+            }
+          }
+          ctx.set_value(attr);
+        }
+      };
+    }
 
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
@@ -124,6 +162,12 @@ namespace TransLucid
         this->self.add_pattern(L"intDEC", L"[1-9]{DIGIT}*");
         this->self.add_pattern(L"intNONDEC", L"0[2-9A-Za-z]{ADIGIT}+");
         this->self.add_pattern(L"intUNARY", L"011+");
+        this->self.add_pattern(L"floatDEC", 
+          L"{intDEC}\\.{DIGIT}*(\\^~?{ADIGIT}+)?(#{DIGIT}+)?");
+        this->self.add_pattern(L"floatNONDEC",
+          L"{intNONDEC}\\.{ADIGIT}*(\\^~?{ADIGIT}+)?(#{ADIGIT}+)?");
+        this->self.add_pattern(L"ratDEC", L"{intDEC}_{intDEC}");
+        this->self.add_pattern(L"ratNONDEC", L"{intNONDEC}_{ADIGIT}+");
 
         integer = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
 
@@ -131,6 +175,9 @@ namespace TransLucid
         range = L"\\.\\.";
         arrow = L"->";
         dblsemi = L";;";
+
+        float_val = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";
+        rational = L"(0_1)|~?({ratDEC}|{ratNONDEC})";
 
         this->self =
           spaces[lex::_pass = lex::pass_flags::pass_ignore]
@@ -142,7 +189,9 @@ namespace TransLucid
         | true_
         | false_
         | identifier
-        | integer
+        | integer[detail::build_integer()]
+        | float_val
+        | rational[detail::build_rational()]
         | L':'
         | L'['
         | L']'
@@ -174,6 +223,14 @@ namespace TransLucid
 
       lex::token_def<mpz_class, wchar_t> 
         integer
+      ;
+
+      lex::token_def<mpf_class, wchar_t>
+        float_val
+      ;
+
+      lex::token_def<mpq_class, wchar_t>
+        rational
       ;
     };
   }
