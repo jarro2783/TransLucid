@@ -98,6 +98,26 @@ namespace TransLucid
     return (*h)(Tuple(k)).first.value<Intmp>().value();
   }
 
+  //pre: the base is valid, if not we will return 10
+  //but don't rely on this for error checking
+  template <typename Char>
+  int get_numeric_base(Char c)
+  {
+    if (c >= '0' && c <= '9')
+    {
+      return c - '0';
+    }
+    else if (c >= 'A' && c <= 'Z')
+    {
+      return c - 'A' + 10;
+    }
+    else if (c >= 'a' && c <= 'z')
+    {
+      return c - 'a' + 10 + 26;
+    }
+    return 10;
+  }
+
   inline mpz_class
   get_unique(HD* h)
   {

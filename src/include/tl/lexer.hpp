@@ -20,7 +20,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/lex_lexertl.hpp>
 #include <boost/spirit/home/phoenix/operator.hpp>
 #include <boost/spirit/home/phoenix/bind.hpp>
+
 #include <tl/charset.hpp>
+#include <tl/utility.hpp>
+#include <tl/lexer_util.hpp>
 
 namespace TransLucid
 {
@@ -110,6 +113,13 @@ namespace TransLucid
 
 namespace boost { namespace spirit { namespace traits
 {
+  ///////////////////////////////////////////////////////////////////////////
+  // These functions are all here so that parsers don't complain. They would
+  // normally convert a pair of iterators to the requested token value type.
+  // However, this is being done in the semantic action of the lexer. So
+  // these do nothing. The functors that do something are build_rational,
+  // build_float and build_integer.
+  //////////////////////////////////////////////////////////////////////////
   using TransLucid::Parser::value_wrapper;
   template <typename Iterator>
   struct assign_to_attribute_from_iterators<value_wrapper<mpz_class>, Iterator>
@@ -181,7 +191,50 @@ namespace TransLucid
           Context& ctx
         ) const
         {
-          ctx.set_value(value_wrapper<mpq_class>(mpq_class()));
+          std::cerr << "building rational from " << std::string(start, end)
+            << std::endl;
+          //pre: the input string is of the form .+_.+
+          mpq_class value;
+          Iterator current = start;
+          bool negative = false;
+          if (*current == L'~')
+          {
+            negative = true;
+          }
+
+          if (*current == L'0')
+          {
+            //either zero or a nondecrat
+            ++current;
+            if (*current == L'_')
+            {
+              //zero, no more needs to be done here
+            }
+            else
+            {
+              //nondecrat
+              //the current character is the base
+              int base = get_numeric_base(*current);
+              ++current;
+
+              value = mpq_class(std::string(current, end), base);
+            }
+          }
+          else
+          {
+            //decrat
+            value = init_mpq(start, end, 10);
+          }
+
+          if (negative)
+          {
+            value = -value;
+          }
+
+          value.canonicalize();
+
+          ctx.set_value(value_wrapper<mpq_class>(value));
+          std::cerr << "rational value: " << value << std::endl;
         }
       };
 
@@ -238,20 +291,7 @@ namespace TransLucid
                 //nondecint
                 ++current;
                 //this character is the base
-                int base = *current;
-
-                if (base >= '0' && base <= '9')
-                {
-                  base = base - '0';
-                }
-                else if (base >= 'A' && base <= 'Z')
-                {
-                  base = base - 'A' + 10;
-                }
-                else if (base >= 'a' && base <= 'z')
-                {
-                  base = base - 'a' + 10 + 26;
-                }
+                int base = get_numeric_base(*current);
 
                 //we are guaranteed to have at least this character
                 ++current;

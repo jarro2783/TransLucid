@@ -19,7 +19,15 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/lexer.hpp>
 #include <tl/charset.hpp>
-#include <boost/spirit/include/qi.hpp>
+//#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_grammar.hpp>
+#include <boost/spirit/include/qi_operator.hpp>
+#include <boost/spirit/include/qi_rule.hpp>
+#include <boost/spirit/include/qi_lit.hpp>
+#include <boost/spirit/include/qi_eoi.hpp>
+#include <boost/spirit/include/qi_kleene.hpp>
+#include <boost/spirit/include/qi_core.hpp>
+
 #include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
 #include <boost/spirit/home/phoenix/operator.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
@@ -180,6 +188,7 @@ class Checker
 
   void rational(const value_wrapper<mpq_class>& q)
   {
+    std::cerr << "in rational" << std::endl;
     BOOST_TEST_MESSAGE("Testing rational: " << q);
     BOOST_REQUIRE(m_current != m_tokens.end());
 
@@ -192,7 +201,7 @@ class Checker
 
   void float_val(const value_wrapper<mpf_class>& f)
   {
-    BOOST_TEST_MESSAGE("Testing rational: " << f);
+    BOOST_TEST_MESSAGE("Testing float: " << f);
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const value_wrapper<mpf_class>* fp = 
@@ -209,6 +218,12 @@ class Checker
   std::list<Values>::const_iterator m_current;
 };
 
+inline void
+print_no_match()
+{
+  std::cerr << "no token matched" << std::endl;
+}
+
 template <typename Iterator>
 struct checker_grammar 
   : qi::grammar<Iterator>
@@ -223,10 +238,14 @@ struct checker_grammar
       using boost::spirit::_1;
 
       start = 
-        *(ident 
+        *(
+          ident 
         | integer
         | keyword[ph::bind(&Checker::keyword, m_checker, _1)]
         | symbol[ph::bind(&Checker::symbol, m_checker, _1)]
+        | rational
+        | float_val
+        // ) | qi::eps[ph::bind(&print_no_match)]
         )
         >> qi::eoi
       ;
@@ -384,6 +403,15 @@ BOOST_AUTO_TEST_CASE ( rationals )
 
 BOOST_AUTO_TEST_CASE ( floats )
 {
+  wstring input = L"0.0";
+  std::list<mpq_class> values
+  ({
+    mpf_class()
+  });
+
+  Checker checker(std::list<Values>(values.begin(), values.end()));
+  check(input, checker);
+
 }
 
 BOOST_AUTO_TEST_CASE ( symbols )

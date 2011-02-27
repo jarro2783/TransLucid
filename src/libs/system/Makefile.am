@@ -27,7 +27,7 @@ libtlsystem_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
 libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp cache.cpp \
   compiled_functors.cpp container.cpp dimtranslator.cpp equation.cpp \
   equation_parser.cpp \
-  expr_compiler.cpp expr_parser.cpp header.cpp library.cpp \
+  expr_compiler.cpp expr_parser.cpp header.cpp lexer_util.cpp library.cpp \
   parser.cpp printer.cpp range.cpp set_types.cpp \
   system.cpp translator.cpp tuple_parser.cpp types.cpp \
   utility.cpp valuehd.cpp
