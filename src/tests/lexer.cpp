@@ -32,6 +32,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/operator.hpp>
 #include <boost/spirit/home/phoenix/core/reference.hpp>
 
+#include <ostream>
+
 #define BOOST_TEST_MODULE lexer
 #include <boost/test/included/unit_test.hpp>
 
@@ -39,6 +41,23 @@ namespace TL = TransLucid;
 namespace lex = TL::Parser::lex;
 namespace qi = boost::spirit::qi;
 using TL::Parser::value_wrapper;
+
+inline std::string
+to_utf8(const std::wstring& ws)
+{
+  return TL::utf32_to_utf8(TL::u32string(ws.begin(), ws.end()));
+}
+
+namespace std 
+{
+  
+ostream& operator<<(ostream& os, const wstring& s)
+{
+  os << to_utf8(s);
+  return os;
+}
+
+}
 
 BOOST_AUTO_TEST_SUITE( lexer_tests )
 
@@ -111,12 +130,6 @@ typedef boost::variant
   Token
 > Values;
 
-inline std::string
-to_utf8(const wstring& ws)
-{
-  return TL::utf32_to_utf8(TL::u32string(ws.begin(), ws.end()));
-}
-  
 //checks that the tokens are correct
 class Checker
 {
@@ -197,19 +210,35 @@ class Checker
     //if this fails the type of the token is wrong
     BOOST_REQUIRE(qp != 0);
     BOOST_CHECK_EQUAL(*qp, q);
+
+    ++m_current;
   }
 
   void float_val(const value_wrapper<mpf_class>& f)
   {
     BOOST_TEST_MESSAGE("Testing float: " << f);
     BOOST_REQUIRE(m_current != m_tokens.end());
+    
+    std::cerr << "the current value is " << *m_current << std::endl;
 
     const value_wrapper<mpf_class>* fp = 
       boost::get<value_wrapper<mpf_class>>(&*m_current);
+
+    const mpf_class& val = f;
+    const mpf_class& cf = *fp;
+    std::cerr << "value's precision = " << val.get_prec() << std::endl;
+    std::cerr << "comparing with precision " << cf.get_prec() << std::endl;
+    mp_exp_t exp;
+    std::cerr << "value = " << val.get_str(exp, 10, 50) << std::endl;
+    std::cerr << "exp: " << exp << std::endl;
+    std::cerr << "cf = " << cf.get_str(exp, 10, 50) << std::endl;
+    std::cerr << "exp: " << exp << std::endl;
     //if this fails the type of the token is wrong
     BOOST_REQUIRE(fp != 0);
+    //BOOST_CHECK_CLOSE(*fp, f, 0.001);
     BOOST_CHECK_EQUAL(*fp, f);
 
+    ++m_current;
   }
 
 	private:
@@ -390,11 +419,13 @@ BOOST_AUTO_TEST_CASE ( integers )
 
 BOOST_AUTO_TEST_CASE ( rationals )
 {
-  wstring input = L"0_1 123_124";
+  wstring input = L"0_1 123_124 0GA_3 ~3_2";
   std::list<mpq_class> values
   ({
     mpq_class(),
-    mpq_class(123, 124)
+    mpq_class(123, 124),
+    mpq_class(10,3),
+    mpq_class(-3,2)
   });
 
   Checker checker(std::list<Values>(values.begin(), values.end()));
@@ -403,10 +434,19 @@ BOOST_AUTO_TEST_CASE ( rationals )
 
 BOOST_AUTO_TEST_CASE ( floats )
 {
-  wstring input = L"0.0";
-  std::list<mpq_class> values
+  wstring input = L"0.0 1.0 5.25 0GA.BC ~3.4 1.1^10 12.123456^20#500 "
+    L"0G1.123456789123456789123456789123456789123456789123456789123456789"
+    L"123456789#FFF";
+  std::list<mpf_class> values
   ({
-    mpf_class()
+    mpf_class(0),
+    mpf_class(1),
+    mpf_class(5.25),
+    mpf_class("A.BC", 64, 16),
+    mpf_class("-3.4"),
+    mpf_class("1.1@10", 64),
+    mpf_class("12.123456@20", 500),
+    mpf_class("1.123456789123456789123456789123456789123456789123456789123456789123456789", 64, 16)
   });
 
   Checker checker(std::list<Values>(values.begin(), values.end()));

@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/lex_lexertl.hpp>
 #include <boost/spirit/home/phoenix/operator.hpp>
 #include <boost/spirit/home/phoenix/bind.hpp>
+#include <boost/spirit/home/phoenix/statement/sequence.hpp>
 
 #include <tl/charset.hpp>
 #include <tl/utility.hpp>
@@ -191,50 +192,54 @@ namespace TransLucid
           Context& ctx
         ) const
         {
-          std::cerr << "building rational from " << std::string(start, end)
-            << std::endl;
-          //pre: the input string is of the form .+_.+
-          mpq_class value;
-          Iterator current = start;
-          bool negative = false;
-          if (*current == L'~')
+          try
           {
-            negative = true;
-          }
-
-          if (*current == L'0')
-          {
-            //either zero or a nondecrat
-            ++current;
-            if (*current == L'_')
+            //pre: the input string is of the form .+_.+
+            mpq_class value;
+            Iterator current = start;
+            bool negative = false;
+            if (*current == L'~')
             {
-              //zero, no more needs to be done here
+              negative = true;
+              ++current;
+            }
+
+            if (*current == L'0')
+            {
+              //either zero or a nondecrat
+              ++current;
+              if (*current == L'_')
+              {
+                //zero, no more needs to be done here
+              }
+              else
+              {
+                //nondecrat
+                //the current character is the base
+                int base = get_numeric_base(*current);
+                ++current;
+
+                value = init_mpq(current, end, base);
+              }
             }
             else
             {
-              //nondecrat
-              //the current character is the base
-              int base = get_numeric_base(*current);
-              ++current;
-
-              value = mpq_class(std::string(current, end), base);
+              //decrat
+              value = init_mpq(current, end, 10);
             }
+            value.canonicalize();
+
+            if (negative)
+            {
+              value = -value;
+            }
+
+            ctx.set_value(value_wrapper<mpq_class>(value));
           }
-          else
+          catch (std::invalid_argument& e)
           {
-            //decrat
-            value = init_mpq(start, end, 10);
+            matched = lex::pass_flags::pass_fail;
           }
-
-          if (negative)
-          {
-            value = -value;
-          }
-
-          value.canonicalize();
-
-          ctx.set_value(value_wrapper<mpq_class>(value));
-          std::cerr << "rational value: " << value << std::endl;
         }
       };
 
@@ -251,7 +256,51 @@ namespace TransLucid
           Context& ctx
         ) const
         {
-          ctx.set_value(value_wrapper<mpf_class>(mpf_class()));
+          try {
+            std::cerr << "building float from " << std::string(start, end)
+              << std::endl;
+            Iterator current = start;
+            bool negative = false;
+            mpf_class value;
+
+            if (*current == '~')
+            {
+              negative = true;
+              ++current;
+            }
+
+            if (*current == '0')
+            {
+              //either nondec or 0
+              ++current;
+              if (*current == '.')
+              {
+                //zero, stop here
+              }
+              else
+              {
+                int base = get_numeric_base(*current);
+                ++current;
+                value = init_mpf(current, end, base);
+              }
+            }
+            else
+            {
+              //decimal
+              value = init_mpf(current, end, 10);
+            }
+
+            if (negative)
+            {
+              value = -value;
+            }
+
+            ctx.set_value(value_wrapper<mpf_class>(value));
+          }
+          catch (std::invalid_argument&)
+          {
+            matched = lex::pass_flags::pass_fail; 
+          }
         }
       };
 
@@ -328,6 +377,9 @@ namespace TransLucid
       };
     }
 
+    //for unnamed tokens
+    typedef lex::token_def<lex::unused_type, wchar_t> token_def_default;
+
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
     {
@@ -340,12 +392,13 @@ namespace TransLucid
       , true_(L"true")
       , false_(L"false")
       , spaces(L"[ \\n\\t]")
-      , identifier(L"[A-Za-z][_A-Za-z0-9]*")
       {
         using boost::phoenix::ref;
         using lex::_val;
         using lex::_start;
         using lex::_end;
+        using lex::_state;
+        using lex::_pass;
         namespace ph = boost::phoenix;
 
         this->self.add_pattern(L"DIGIT", L"[0-9]");
@@ -359,7 +412,10 @@ namespace TransLucid
           L"{intNONDEC}\\.{ADIGIT}*(\\^~?{ADIGIT}+)?(#{ADIGIT}+)?");
         this->self.add_pattern(L"ratDEC", L"{intDEC}_{intDEC}");
         this->self.add_pattern(L"ratNONDEC", L"{intNONDEC}_{ADIGIT}+");
+        this->self.add_pattern(L"IDENT", L"[A-Za-z][_A-Za-z0-9]*");
 
+        identifier = L"{IDENT}";
+        constant_begin = L"{IDENT}\\\"";
         integer = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
 
         dblslash = L"\\\\\\\\";
@@ -368,7 +424,7 @@ namespace TransLucid
         dblsemi = L";;";
 
         float_val = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";
-        rational = L"(0_1)|~?({ratDEC}|{ratNONDEC})";
+        rational = L"(0_1)|(~?)({ratDEC}|{ratNONDEC})";
 
         this->self =
           spaces[lex::_pass = lex::pass_flags::pass_ignore]
@@ -380,6 +436,11 @@ namespace TransLucid
         | true_
         | false_
         | identifier
+        | constant_begin
+          [
+            _state = L"CONSTANT",
+            _pass = lex::pass_flags::pass_ignore
+          ]
         | integer[detail::build_integer()]
         | float_val[detail::build_float()]
         | rational[detail::build_rational()]
@@ -400,6 +461,9 @@ namespace TransLucid
         | L'|'
         | dblsemi
         ;
+
+        this->self(L"CONSTANT") = lex::char_(L".")
+          | L"\\\"";
       }
 
       lex::token_def<lex::unused_type, wchar_t> 
@@ -424,6 +488,10 @@ namespace TransLucid
       lex::token_def<value_wrapper<mpq_class>, wchar_t>
       //lex::token_def<mpq_class, wchar_t>
         rational
+      ;
+
+      //lex::token_def<std::pair<std::wstring, std::wstring>, wchar_t>
+      token_def_default constant_begin
       ;
     };
   }
