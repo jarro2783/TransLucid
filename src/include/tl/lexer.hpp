@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/operator.hpp>
 #include <boost/spirit/home/phoenix/bind.hpp>
 #include <boost/spirit/home/phoenix/statement/sequence.hpp>
+#include <boost/spirit/home/phoenix/object/construct.hpp>
 
 #include <tl/charset.hpp>
 #include <tl/utility.hpp>
@@ -167,6 +168,38 @@ namespace boost { namespace spirit { namespace traits
     )
     {
       throw "construct mpf incorrectly called";
+    }
+  };
+
+  template <typename Iterator>
+  struct assign_to_attribute_from_iterators<
+    std::pair<std::wstring, std::wstring>, Iterator
+  >
+  {
+    static void
+    call
+    (
+      Iterator const& first,
+      Iterator const& last,
+      std::pair<std::wstring, std::wstring>& attr
+    )
+    {
+      throw "construct constant pair incorrectly called";
+    }
+  };
+  
+  template <typename Iterator>
+  struct assign_to_attribute_from_iterators<value_wrapper<wchar_t>, Iterator>
+  {
+    static void
+    call
+    (
+      Iterator const& first,
+      Iterator const& last,
+      value_wrapper<wchar_t>& attr
+    )
+    {
+      throw "construct character incorrectly called";
     }
   };
 }}}
@@ -377,6 +410,78 @@ namespace TransLucid
       };
     }
 
+    struct build_constant
+    {
+      template <typename Iterator, typename Idtype, typename Context>
+      void
+      operator()
+      (
+        Iterator& first, 
+        Iterator& last, 
+        lex::pass_flags& matched,
+        Idtype& id,
+        Context& ctx
+      ) const
+      {
+        std::wstring type, value;
+
+        Iterator current = first;
+        while (current != last && *current != '"' && *current != '`')
+        {
+          type += *current;
+          ++current;
+        }
+
+        if (type.empty())
+        {
+          type = L"ustring";
+        }
+
+        ++current;
+
+        if (*current == '"')
+        {
+          //interpreted
+        }
+        else
+        {
+          //raw
+          value.reserve(last - current);
+          while (*current != '`')
+          {
+            value += *current;
+            ++current;
+          }
+        }
+
+        std::cerr << "built constant of value " << type << "\"" << value <<
+          "\"" << std::endl;
+        ctx.set_value(std::make_pair(type, value));
+      }
+    };
+
+    struct build_character
+    {
+      template <typename Iterator, typename Idtype, typename Context>
+      void
+      operator()
+      (
+        Iterator& first, 
+        Iterator& last, 
+        lex::pass_flags& matched,
+        Idtype& id,
+        Context& ctx
+      ) const
+      {
+        if (last - first == 3)
+        {
+          Iterator current = first;
+          ++current;
+          ctx.set_value(value_wrapper<wchar_t>(*current));
+        }
+      }
+    };
+
     //for unnamed tokens
     typedef lex::token_def<lex::unused_type, wchar_t> token_def_default;
 
@@ -413,10 +518,15 @@ namespace TransLucid
         this->self.add_pattern(L"ratDEC", L"{intDEC}_{intDEC}");
         this->self.add_pattern(L"ratNONDEC", L"{intNONDEC}_{ADIGIT}+");
         this->self.add_pattern(L"IDENT", L"[A-Za-z][_A-Za-z0-9]*");
+        this->self.add_pattern(L"INTERPRETED_STRING", 
+          L"\\\"([^\\\"\\\\]|\\.)*\\\"");
+        this->self.add_pattern(L"RAW_STRING", L"`[^`]*`");
 
         identifier = L"{IDENT}";
-        constant_begin = L"{IDENT}\\\"";
+        constant_raw = L"{IDENT}?{RAW_STRING}";
+        constant_interpreted = L"{IDENT}?{INTERPRETED_STRING}";
         integer = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
+        character = L"'(.|\\\\[^\\\\]+)'";
 
         dblslash = L"\\\\\\\\";
         range = L"\\.\\.";
@@ -436,10 +546,17 @@ namespace TransLucid
         | true_
         | false_
         | identifier
-        | constant_begin
+        | constant_raw
           [
-            _state = L"CONSTANT",
-            _pass = lex::pass_flags::pass_ignore
+            build_constant()
+          ]
+        | constant_interpreted
+          [
+            build_constant()
+          ]
+        | character
+          [
+            build_character()
           ]
         | integer[detail::build_integer()]
         | float_val[detail::build_float()]
@@ -462,8 +579,41 @@ namespace TransLucid
         | dblsemi
         ;
 
-        this->self(L"CONSTANT") = lex::char_(L".")
-          | L"\\\"";
+        #if 0
+        this->self(L"CONSTANT_INTERPRETED") = 
+            constant_interpreted
+            [
+              build_constant(m_constant_type, m_constant_value)
+            ]
+          | constant_interpreted_escaped
+          | constant_interpreted_any
+            [
+              ph::ref(m_constant_value) +=
+                ph::construct<std::wstring>(_start, _end),
+              _pass = lex::pass_flags::pass_ignore
+            ]
+        ;
+
+        this->self(L"CONSTANT_RAW") =
+            constant_raw
+            [
+              build_constant(m_constant_type, m_constant_value)
+            ]
+          | constant_raw_any
+            [
+              ph::ref(m_constant_value) += 
+                ph::construct<std::wstring>(_start, _end),
+              _pass = lex::pass_flags::pass_ignore
+            ]
+        ;
+
+        constant_raw = L"`";
+        constant_raw_any = L".*";
+
+        constant_interpreted = L"\\\"";
+        constant_interpreted_escaped = L"\\t|\\a";
+        constant_interpreted_any = L".*";
+        #endif
       }
 
       lex::token_def<lex::unused_type, wchar_t> 
@@ -490,9 +640,17 @@ namespace TransLucid
         rational
       ;
 
-      //lex::token_def<std::pair<std::wstring, std::wstring>, wchar_t>
-      token_def_default constant_begin
+      lex::token_def<std::pair<std::wstring, std::wstring>, wchar_t>
+      //these are the two that the parser should match
+        constant_raw
+      , constant_interpreted
       ;
+
+      lex::token_def<value_wrapper<wchar_t>, wchar_t> character;
+
+      private:
+      std::wstring m_constant_type;
+      std::wstring m_constant_value;
     };
   }
 }

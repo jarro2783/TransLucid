@@ -57,6 +57,12 @@ ostream& operator<<(ostream& os, const wstring& s)
   return os;
 }
 
+ostream& operator<<(ostream& os, const pair<wstring, wstring>& p)
+{
+  os << p.first << "<" << p.second << ">";
+  return os;
+}
+
 }
 
 BOOST_AUTO_TEST_SUITE( lexer_tests )
@@ -106,7 +112,9 @@ typedef lex::lexertl::token<
     value_wrapper<mpf_class>,
     wstring, 
     Keyword, 
-    Token
+    Token,
+    std::pair<std::wstring, std::wstring>,
+    value_wrapper<wchar_t>
   > 
 > token_type;
 
@@ -127,7 +135,9 @@ typedef boost::variant
   value_wrapper<mpq_class>,
   value_wrapper<mpf_class>,
   wstring,
-  Token
+  Token,
+  std::pair<std::wstring, std::wstring>,
+  value_wrapper<wchar_t>
 > Values;
 
 //checks that the tokens are correct
@@ -219,25 +229,39 @@ class Checker
     BOOST_TEST_MESSAGE("Testing float: " << f);
     BOOST_REQUIRE(m_current != m_tokens.end());
     
-    std::cerr << "the current value is " << *m_current << std::endl;
-
     const value_wrapper<mpf_class>* fp = 
       boost::get<value_wrapper<mpf_class>>(&*m_current);
 
-    const mpf_class& val = f;
-    const mpf_class& cf = *fp;
-    std::cerr << "value's precision = " << val.get_prec() << std::endl;
-    std::cerr << "comparing with precision " << cf.get_prec() << std::endl;
-    mp_exp_t exp;
-    std::cerr << "value = " << val.get_str(exp, 10, 50) << std::endl;
-    std::cerr << "exp: " << exp << std::endl;
-    std::cerr << "cf = " << cf.get_str(exp, 10, 50) << std::endl;
-    std::cerr << "exp: " << exp << std::endl;
     //if this fails the type of the token is wrong
     BOOST_REQUIRE(fp != 0);
     //BOOST_CHECK_CLOSE(*fp, f, 0.001);
     BOOST_CHECK_EQUAL(*fp, f);
 
+    ++m_current;
+  }
+
+  void constant(const std::pair<std::wstring, std::wstring>& c)
+  {
+    BOOST_TEST_MESSAGE("Testing constant: " << c);
+    BOOST_REQUIRE(m_current != m_tokens.end());
+
+    auto cp = boost::get<std::pair<std::wstring, std::wstring>>(&*m_current);
+
+    BOOST_REQUIRE(cp != nullptr);
+    BOOST_CHECK(cp->first == c.first);
+    BOOST_CHECK(cp->second == c.second);
+    ++m_current;
+  }
+
+  void character(value_wrapper<wchar_t> c)
+  {
+    BOOST_TEST_MESSAGE("Testing character: " << c);
+    BOOST_REQUIRE(m_current != m_tokens.end());
+
+    auto cp = boost::get<value_wrapper<wchar_t>>(&*m_current);
+
+    BOOST_REQUIRE(cp != nullptr);
+    BOOST_CHECK(c == *cp);
     ++m_current;
   }
 
@@ -274,7 +298,8 @@ struct checker_grammar
         | symbol[ph::bind(&Checker::symbol, m_checker, _1)]
         | rational
         | float_val
-        // ) | qi::eps[ph::bind(&print_no_match)]
+        | constant
+        | tok.character[ph::bind(&Checker::character, m_checker, _1)]
         )
         >> qi::eoi
       ;
@@ -283,6 +308,11 @@ struct checker_grammar
       integer = tok.integer[ph::bind(&Checker::integer, m_checker, _1)];
       rational = tok.rational[ph::bind(&Checker::rational, m_checker, _1)];
       float_val = tok.float_val[ph::bind(&Checker::float_val, m_checker, _1)];
+      constant = (tok.constant_raw | tok.constant_interpreted)
+         [
+           ph::bind(&Checker::constant, m_checker, _1)
+         ]
+      ;
       keyword = 
         tok.if_[_val = KEYWORD_IF] 
       | tok.fi_[_val = KEYWORD_FI]
@@ -321,6 +351,7 @@ struct checker_grammar
     , integer
     , rational
     , float_val
+    , constant
 		;
 		qi::rule<Iterator, Keyword()>
       keyword
@@ -379,6 +410,17 @@ BOOST_AUTO_TEST_CASE ( keywords )
     KEYWORD_ELSIF,
     KEYWORD_TRUE,
     KEYWORD_FALSE
+  });
+
+  check(input, checker);
+}
+
+BOOST_AUTO_TEST_CASE ( constants )
+{
+  wstring input = L"`hello` 'a'";
+  Checker checker({
+    std::make_pair(L"ustring", L"hello"),
+    value_wrapper<wchar_t>('a')
   });
 
   check(input, checker);
