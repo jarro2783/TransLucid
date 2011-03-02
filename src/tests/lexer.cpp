@@ -417,21 +417,19 @@ BOOST_AUTO_TEST_CASE ( keywords )
 
 BOOST_AUTO_TEST_CASE ( constants )
 {
-  wstring input = L"`hello` 'a' '\\U00000041' '\\u0041' '\\xA3\\xA4'";
-//                  L"\"text\\u00E4\\xA3\\xA4\"";
+  wstring input = L"`hello` 'a' '\\U00000041' '\\u0041' '\\xC2\\xA2'"
+                  L"\"text\\u00E4\\xC2\\xA2\"";
   Checker checker({
     std::make_pair(L"ustring", L"hello"),
     char32_t('a'),
     U'\u0041',
     U'\u0041',
-    U'\u00e4'
-#if 0
+    U'\u00a2',
     std::make_pair(L"ustring", 
         [](const std::u32string& s) -> wstring 
       {return wstring(s.begin(), s.end());}
-      (U"text\u00e4\xa3\xa4")
+      (U"text\u00e4\xc2\xa2")
       )
-#endif
   });
 
   check(input, checker);

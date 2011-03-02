@@ -195,6 +195,8 @@ build_escaped_characters
     }
   }
 
+  std::cerr << "building = " << building << std::endl;
+
   std::cerr << "error: " << error << std::endl;
   std::cerr << "current ended on " << *current << std::endl;
   std::cerr << "remaining string = \"" << u32string(current, end) << "\""
