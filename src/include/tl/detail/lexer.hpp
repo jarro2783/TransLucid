@@ -290,6 +290,9 @@ namespace TransLucid
         {
           std::wstring type, value;
 
+          std::cerr << "constructing constant with string " << 
+            std::wstring(first, last) << std::endl;
+
           Iterator current = first;
           while (current != last && *current != '"' && *current != '`')
           {
@@ -302,20 +305,38 @@ namespace TransLucid
             type = L"ustring";
           }
 
-          ++current;
-
           if (*current == '"')
           {
+            ++current;
             //interpreted
-            auto r = build_escaped_characters(current, last);
-            if (!r.first)
+            while (*current != '"')
             {
-              //error = true;
+              //start of an escape sequence
+              if (*current == '\\')
+              {
+                auto r = build_escaped_characters(current, last);
+                if (!r.first)
+                {
+                  //error = true;
+                }
+                else
+                {
+                  std::cerr << "appending " << r.second << std::endl;
+                  value += r.second;
+                }
+              }
+              else
+              {
+                std::cerr << "appending " << *current << std::endl;
+                value += *current;
+                ++current;
+              }
             }
           }
           else
           {
             //raw
+            ++current;
             value.reserve(last - current);
             while (*current != '`')
             {

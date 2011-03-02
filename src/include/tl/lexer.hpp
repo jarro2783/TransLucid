@@ -70,7 +70,7 @@ namespace TransLucid
         this->self.add_pattern(L"ratNONDEC", L"{intNONDEC}_{ADIGIT}+");
         this->self.add_pattern(L"IDENT", L"[A-Za-z][_A-Za-z0-9]*");
         this->self.add_pattern(L"INTERPRETED_STRING", 
-          L"\\\"([^\\\"\\\\]|\\.)*\\\"");
+          L"\\\"([^\\\"\\\\]|\\\\.)*\\\"");
         this->self.add_pattern(L"RAW_STRING", L"`[^`]*`");
 
         identifier = L"{IDENT}";

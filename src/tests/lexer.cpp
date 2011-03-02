@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE ( constants )
     std::make_pair(L"ustring", 
         [](const std::u32string& s) -> wstring 
       {return wstring(s.begin(), s.end());}
-      (U"text\u00e4\xc2\xa2")
+      (U"text\u00e4\u00a2")
       )
   });
 
