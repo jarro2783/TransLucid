@@ -114,7 +114,7 @@ typedef lex::lexertl::token<
     Keyword, 
     Token,
     std::pair<std::wstring, std::wstring>,
-    value_wrapper<wchar_t>
+    char32_t
   > 
 > token_type;
 
@@ -137,7 +137,7 @@ typedef boost::variant
   wstring,
   Token,
   std::pair<std::wstring, std::wstring>,
-  value_wrapper<wchar_t>
+  char32_t
 > Values;
 
 //checks that the tokens are correct
@@ -253,12 +253,12 @@ class Checker
     ++m_current;
   }
 
-  void character(value_wrapper<wchar_t> c)
+  void character(char32_t c)
   {
     BOOST_TEST_MESSAGE("Testing character: " << c);
     BOOST_REQUIRE(m_current != m_tokens.end());
 
-    auto cp = boost::get<value_wrapper<wchar_t>>(&*m_current);
+    auto cp = boost::get<char32_t>(&*m_current);
 
     BOOST_REQUIRE(cp != nullptr);
     BOOST_CHECK(c == *cp);
@@ -417,10 +417,21 @@ BOOST_AUTO_TEST_CASE ( keywords )
 
 BOOST_AUTO_TEST_CASE ( constants )
 {
-  wstring input = L"`hello` 'a'";
+  wstring input = L"`hello` 'a' '\\U00000041' '\\u0041' '\\xA3\\xA4'";
+//                  L"\"text\\u00E4\\xA3\\xA4\"";
   Checker checker({
     std::make_pair(L"ustring", L"hello"),
-    value_wrapper<wchar_t>('a')
+    char32_t('a'),
+    U'\u0041',
+    U'\u0041',
+    U'\u00e4'
+#if 0
+    std::make_pair(L"ustring", 
+        [](const std::u32string& s) -> wstring 
+      {return wstring(s.begin(), s.end());}
+      (U"text\u00e4\xa3\xa4")
+      )
+#endif
   });
 
   check(input, checker);

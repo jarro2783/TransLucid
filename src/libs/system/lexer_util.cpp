@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/charset.hpp>
 #include <tl/lexer_util.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/range/iterator_range.hpp>
+
 #include <iostream>
 
 namespace TransLucid { namespace Parser { //namespace detail {
@@ -89,6 +89,122 @@ init_mpf(const Iterator& begin, const Iterator& end, int base)
   return mpf_class(s, prec, base);
 }
 
+//returns <valid, s>
+//reads whole sequences of escape characters at a time, this is so that
+//\x characters work
+template <typename Iterator>
+std::pair<bool, std::wstring>
+build_escaped_characters
+(
+  Iterator& current,
+  const Iterator& end
+)
+{
+  std::cerr << "got the following string to escape: " <<
+    u32string(current, end) 
+    << std::endl;
+  std::string building;
+  bool error = false;
+  int to_read = 0;
+
+  while (*current == '\\' && error == false)
+  {
+    ++current;
+    char32_t c = *current;
+    switch(c)
+    {
+      case 'U':
+      to_read = 8;
+      ++current;
+      break;
+
+      case 'u':
+      to_read = 4;
+      ++current;
+      break;
+
+      case 'x':
+      to_read = 2;
+      ++current;
+      break;
+
+      case 'a':
+      building += "\a";
+      ++current;
+      break;
+
+      default:
+      //invalid control character
+      error = true;
+      break;
+    }
+
+    //read the requested number of characters
+    std::string chars;
+    if (to_read > 0)
+    {
+      std::cerr << "reading " << to_read << " characters" << std::endl;
+      while (to_read > 0 && current != end && *current != '\'')
+      {
+        c = *current;  
+        if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'))
+        {
+          chars += c;
+        }
+        else
+        {
+          break;
+        }
+        --to_read;
+        ++current;
+      }
+    }
+
+    //if we didn't read everything then error
+    if (to_read != 0)
+    {
+      error = true;
+    }
+    else
+    {
+      uint32_t value = 0;
+      for (char c : chars)
+      {
+        if (c >= '0' && c <= '9')
+        {
+          value = value * 16 + (c - '0');
+        }
+        else
+        {
+          value = value * 16 + (c - 'A' + 10);
+        }
+        std::cerr << "value = " << value << std::endl;
+      }
+
+      //it was a byte if it was two characters, otherwise it was a whole
+      //character
+      if (chars.length() == 2)
+      {
+        std::cerr << "the byte is " << value << std::endl;
+        building += char(value & 0xFF);
+      }
+      else
+      {
+        building += utf32_to_utf8(u32string(1, value));
+      }
+    }
+  }
+
+  std::cerr << "error: " << error << std::endl;
+  std::cerr << "current ended on " << *current << std::endl;
+  std::cerr << "remaining string = \"" << u32string(current, end) << "\""
+    << std::endl;
+  u32string u32result = utf8_to_utf32(building);
+  std::cerr << "returning: \"" << u32result << "\"" << std::endl;
+  return std::make_pair(!error, 
+    std::wstring(u32result.begin(), u32result.end()));
+}
+
 template mpf_class init_mpf<std::wstring::const_iterator>
 (
   const std::wstring::const_iterator&,
@@ -120,5 +236,13 @@ template mpq_class init_mpq<std::wstring::iterator>
   int
 );
 #endif
+
+template 
+std::pair<bool, std::wstring>
+build_escaped_characters<std::wstring::const_iterator>
+(
+  std::wstring::const_iterator& begin,
+  const std::wstring::const_iterator& end
+);
  
 } }

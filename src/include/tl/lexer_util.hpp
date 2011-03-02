@@ -23,16 +23,6 @@ namespace TransLucid
 {
   namespace Parser
   {
-    #if 0
-    mpq_class
-    init_mpq
-    (
-      const std::wstring::const_iterator& begin, 
-      const std::wstring::const_iterator& end,
-      int base
-    );
-    #endif
-
     template <typename Iterator>
     mpq_class
     init_mpq
@@ -51,14 +41,13 @@ namespace TransLucid
       int base
     );
 
-    #if 0
-    mpf_class
-    init_mpf
+    //returns <valid, c>
+    template <typename Iterator>
+    std::pair<bool, std::wstring>
+    build_escaped_characters
     (
-      const std::wstring::const_iterator& begin,
-      const std::wstring::const_iterator& end,
-      int base
+      Iterator& begin,
+      const Iterator& end
     );
-    #endif
   }
 }
