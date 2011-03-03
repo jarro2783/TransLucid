@@ -93,7 +93,7 @@ init_mpf(const Iterator& begin, const Iterator& end, int base)
 //reads whole sequences of escape characters at a time, this is so that
 //\x characters work
 template <typename Iterator>
-std::pair<bool, std::wstring>
+std::pair<bool, u32string>
 build_escaped_characters
 (
   Iterator& current,
@@ -203,8 +203,7 @@ build_escaped_characters
     << std::endl;
   u32string u32result = utf8_to_utf32(building);
   std::cerr << "returning: \"" << u32result << "\"" << std::endl;
-  return std::make_pair(!error, 
-    std::wstring(u32result.begin(), u32result.end()));
+  return std::make_pair(!error, u32result);
 }
 
 template mpf_class init_mpf<std::wstring::const_iterator>
@@ -240,7 +239,7 @@ template mpq_class init_mpq<std::wstring::iterator>
 #endif
 
 template 
-std::pair<bool, std::wstring>
+std::pair<bool, u32string>
 build_escaped_characters<std::wstring::const_iterator>
 (
   std::wstring::const_iterator& begin,

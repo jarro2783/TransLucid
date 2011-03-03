@@ -1,5 +1,5 @@
 /* Lexer tests.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -57,7 +57,7 @@ ostream& operator<<(ostream& os, const wstring& s)
   return os;
 }
 
-ostream& operator<<(ostream& os, const pair<wstring, wstring>& p)
+ostream& operator<<(ostream& os, const pair<TL::u32string, TL::u32string>& p)
 {
   os << p.first << "<" << p.second << ">";
   return os;
@@ -99,7 +99,7 @@ enum Token
 };
 
 // iterator type used to expose the underlying input stream
-typedef std::basic_string<wchar_t> wstring;
+typedef std::basic_string<TL::Parser::lex_char_type> wstring;
 typedef wstring::const_iterator base_iterator_type;
 
 // This is the token type to return from the lexer iterator
@@ -110,10 +110,10 @@ typedef lex::lexertl::token<
     value_wrapper<mpz_class>, 
     value_wrapper<mpq_class>,
     value_wrapper<mpf_class>,
-    wstring, 
+    TL::u32string, 
     Keyword, 
     Token,
-    std::pair<std::wstring, std::wstring>,
+    std::pair<TL::u32string, TL::u32string>,
     char32_t
   > 
 > token_type;
@@ -134,9 +134,9 @@ typedef boost::variant
   value_wrapper<mpz_class>, 
   value_wrapper<mpq_class>,
   value_wrapper<mpf_class>,
-  wstring,
+  TL::u32string,
   Token,
-  std::pair<std::wstring, std::wstring>,
+  std::pair<TL::u32string, TL::u32string>,
   char32_t
 > Values;
 
@@ -156,12 +156,12 @@ class Checker
     BOOST_CHECK(m_current == m_tokens.end());
   }
 
-	void identifier(const wstring& ws)
+	void identifier(const TL::u32string& ws)
 	{
-    std::cerr << "got identifier: " << to_utf8(ws) << std::endl;
+    std::cerr << "got identifier: " << ws << std::endl;
     BOOST_REQUIRE(m_current != m_tokens.end());
 
-    const wstring* wsp = boost::get<wstring>(&*m_current);
+    const TL::u32string* wsp = boost::get<TL::u32string>(&*m_current);
 
     //if this fails the type of the token is wrong
     BOOST_REQUIRE(wsp != 0);
@@ -224,7 +224,7 @@ class Checker
     ++m_current;
   }
 
-  void float_val(const value_wrapper<mpf_class>& f)
+  void real(const value_wrapper<mpf_class>& f)
   {
     BOOST_TEST_MESSAGE("Testing float: " << f);
     BOOST_REQUIRE(m_current != m_tokens.end());
@@ -240,12 +240,12 @@ class Checker
     ++m_current;
   }
 
-  void constant(const std::pair<std::wstring, std::wstring>& c)
+  void constant(const std::pair<TL::u32string, TL::u32string>& c)
   {
     BOOST_TEST_MESSAGE("Testing constant: " << c);
     BOOST_REQUIRE(m_current != m_tokens.end());
 
-    auto cp = boost::get<std::pair<std::wstring, std::wstring>>(&*m_current);
+    auto cp = boost::get<std::pair<TL::u32string, TL::u32string>>(&*m_current);
 
     BOOST_REQUIRE(cp != nullptr);
     BOOST_CHECK(cp->first == c.first);
@@ -292,56 +292,58 @@ struct checker_grammar
 
       start = 
         *(
-          ident 
+          ident
         | integer
-        | keyword[ph::bind(&Checker::keyword, m_checker, _1)]
-        | symbol[ph::bind(&Checker::symbol, m_checker, _1)]
+        | keyword  [ph::bind(&Checker::keyword, m_checker, _1)]
+        | symbol   [ph::bind(&Checker::symbol, m_checker, _1)]
         | rational
-        | float_val
+        | real
         | constant
-        | tok.character[ph::bind(&Checker::character, m_checker, _1)]
+        | tok.character_[ph::bind(&Checker::character, m_checker, _1)]
         )
         >> qi::eoi
       ;
 
-      ident = tok.identifier[ph::bind(&Checker::identifier, m_checker, _1)];
-      integer = tok.integer[ph::bind(&Checker::integer, m_checker, _1)];
-      rational = tok.rational[ph::bind(&Checker::rational, m_checker, _1)];
-      float_val = tok.float_val[ph::bind(&Checker::float_val, m_checker, _1)];
-      constant = (tok.constant_raw | tok.constant_interpreted)
+      ident    = tok.identifier_[ph::bind(&Checker::identifier, m_checker, _1)];
+      integer  = tok.integer_   [ph::bind(&Checker::integer, m_checker, _1)];
+      rational = tok.rational_  [ph::bind(&Checker::rational, m_checker, _1)];
+      real     = tok.real_      [ph::bind(&Checker::real, m_checker, _1)];
+      constant = (tok.constantRAW_ | tok.constantINTERPRET_)
          [
            ph::bind(&Checker::constant, m_checker, _1)
          ]
       ;
+
       keyword = 
-        tok.if_[_val = KEYWORD_IF] 
-      | tok.fi_[_val = KEYWORD_FI]
+        tok.if_   [_val = KEYWORD_IF] 
+      | tok.fi_   [_val = KEYWORD_FI]
       | tok.where_[_val = KEYWORD_WHERE]
-      | tok.then_[_val = KEYWORD_THEN]
+      | tok.then_ [_val = KEYWORD_THEN]
       | tok.elsif_[_val = KEYWORD_ELSIF]
-      | tok.true_[_val = KEYWORD_TRUE]
+      | tok.true_ [_val = KEYWORD_TRUE]
       | tok.false_[_val = KEYWORD_FALSE]
       ;
 
       //using namespace TL::Parser;
 
       symbol = 
-        qi::lit(L':')[_val = TOKEN_COLON]
-      | qi::lit(L'[')[_val = TOKEN_OBRACKET]
-      | qi::lit(L']')[_val = TOKEN_CBRACKET]
-      | qi::lit(L'.')[_val = TOKEN_DOT]
-      | qi::lit(L'=')[_val = TOKEN_EQUALS]
-      | qi::lit(L'&')[_val = TOKEN_AMPERSAND]
-      | qi::lit(L'#')[_val = TOKEN_HASH]
-      | qi::lit(L'@')[_val = TOKEN_AT]
+        tok.dblslash_ [_val = TOKEN_DOUBLE_SLASH]
+      | tok.range_    [_val = TOKEN_RANGE]
+      | tok.arrow_    [_val = TOKEN_ARROW]
+      | tok.dblsemi_  [_val = TOKEN_DOUBLE_SEMI]
+
+      | qi::lit(L':') [_val = TOKEN_COLON]
+      | qi::lit(L'[') [_val = TOKEN_OBRACKET]
+      | qi::lit(L']') [_val = TOKEN_CBRACKET]
+      | qi::lit(L'.') [_val = TOKEN_DOT]
+      | qi::lit(L'=') [_val = TOKEN_EQUALS]
+      | qi::lit(L'&') [_val = TOKEN_AMPERSAND]
+      | qi::lit(L'#') [_val = TOKEN_HASH]
+      | qi::lit(L'@') [_val = TOKEN_AT]
       | qi::lit(L"\\")[_val = TOKEN_SLASH]
-      | tok.dblslash[_val = TOKEN_DOUBLE_SLASH]
-      | tok.range[_val = TOKEN_RANGE]
-      | qi::lit(L'(')[_val = TOKEN_OPAREN]
-      | qi::lit(L')')[_val = TOKEN_CPAREN]
-      | tok.arrow[_val = TOKEN_ARROW]
-      | qi::lit(L'|')[_val = TOKEN_BAR]
-      | tok.dblsemi[_val = TOKEN_DOUBLE_SEMI]
+      | qi::lit(L'(') [_val = TOKEN_OPAREN]
+      | qi::lit(L')') [_val = TOKEN_CPAREN]
+      | qi::lit(L'|') [_val = TOKEN_BAR]
       ;
     }
 
@@ -350,7 +352,7 @@ struct checker_grammar
     , ident
     , integer
     , rational
-    , float_val
+    , real
     , constant
 		;
 		qi::rule<Iterator, Keyword()>
@@ -384,15 +386,15 @@ BOOST_AUTO_TEST_CASE ( identifiers )
   wstring input = L"ifififif0a9fifi testing hello world a a_b a5 b abc34_";
   
   Checker checker({
-    L"ifififif0a9fifi", 
-    L"testing",
-    L"hello",
-    L"world",
-    L"a",
-    L"a_b",
-    L"a5",
-    L"b",
-    L"abc34_"
+    U"ifififif0a9fifi", 
+    U"testing",
+    U"hello",
+    U"world",
+    U"a",
+    U"a_b",
+    U"a5",
+    U"b",
+    U"abc34_"
     })
   ;
 
@@ -420,16 +422,12 @@ BOOST_AUTO_TEST_CASE ( constants )
   wstring input = L"`hello` 'a' '\\U00000041' '\\u0041' '\\xC2\\xA2'"
                   L"\"text\\u00E4\\xC2\\xA2\"";
   Checker checker({
-    std::make_pair(L"ustring", L"hello"),
+    std::make_pair(U"ustring", U"hello"),
     char32_t('a'),
     U'\u0041',
     U'\u0041',
     U'\u00a2',
-    std::make_pair(L"ustring", 
-        [](const std::u32string& s) -> wstring 
-      {return wstring(s.begin(), s.end());}
-      (U"text\u00e4\u00a2")
-      )
+    std::make_pair(U"ustring", U"text\u00e4\u00a2")
   });
 
   check(input, checker);
@@ -536,14 +534,14 @@ BOOST_AUTO_TEST_CASE ( mixed )
 {
   wstring input = L"intmp @ 10 (hello if) cats";
   Checker checker({
-    L"intmp",
+    U"intmp",
     TOKEN_AT,
     mpz_class(10),
     TOKEN_OPAREN,
-    L"hello",
+    U"hello",
     KEYWORD_IF,
     TOKEN_CPAREN,
-    L"cats"
+    U"cats"
   });
 
   check(input, checker);

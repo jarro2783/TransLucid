@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file translator.hpp
+ * Header file for the translator class.
+ */
+
 #ifndef TRANSLATOR_HPP_INCLUDED
 #define TRANSLATOR_HPP_INCLUDED
 

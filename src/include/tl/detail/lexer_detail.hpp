@@ -1,5 +1,5 @@
 /* TransLucid lexer detail.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -17,83 +17,31 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file lexer_detail.hpp
+ * Lexer implementation details.
+ * There are two sets of functions here: build_* and
+ * assign_to_attribute_from_iterators.
+ * The first construct the different type of tokens at lex time.
+ * The second are required to satisfy the compiler because the parser tries
+ * to construct semantic values of tokens at match time, but they aren't
+ * used because the values are constructed at lex time.
+ */
+
+#ifndef TL_LEXER_DETAIL_HPP_INCLUDED
+#define TL_LEXER_DETAIL_HPP_INCLUDED
+
 #include <iostream>
 #include <boost/spirit/include/lex_lexertl.hpp>
 #include <gmpxx.h>
 #include <tl/lexer_util.hpp>
+#include <tl/charset.hpp>
 
 namespace TransLucid
 {
   namespace Parser
   {
     namespace lex = boost::spirit::lex;
-
-    template <typename T>
-    struct value_wrapper;
-
-    template <typename T>
-    std::ostream&
-    operator<<(std::ostream&, const value_wrapper<T>& rhs);
-
-    template <typename T>
-    struct value_wrapper
-    {
-      public:
-      value_wrapper(const T& t)
-      : m_t(t)
-      {
-      }
-
-      value_wrapper()
-      {
-      }
-
-      operator T const&() const
-      {
-        return m_t;
-      }
-
-      bool operator==(const value_wrapper<T>& rhs) const
-      {
-        return m_t == rhs.m_t;
-      }
-
-      friend 
-      bool 
-      operator==(const T& lhs, const value_wrapper<T>& rhs)
-      {
-        return lhs == rhs.m_t;
-      }
-
-      friend
-      bool
-      operator==(const value_wrapper<T>& lhs, const T& rhs)
-      {
-        return lhs.m_t == rhs;
-      }
-
-      friend
-      std::ostream&
-      operator<< <T>(std::ostream&, const value_wrapper<T>& rhs);
-
-      private:
-      T m_t;
-    };
-
-    template <typename T>
-    bool
-    operator==(const T& lhs, const value_wrapper<T>& rhs)
-    {
-      return lhs == rhs.m_t;
-    }
-
-    template <typename T>
-    std::ostream&
-    operator<<(std::ostream& os, const value_wrapper<T>& rhs)
-    {
-      os << rhs.m_t;
-      return os;
-    }
 
     namespace detail
     {
@@ -161,7 +109,7 @@ namespace TransLucid
         }
       };
 
-      struct build_float
+      struct build_real
       {
         template <typename Iterator, typename Idtype, typename Context>
         void
@@ -307,10 +255,10 @@ namespace TransLucid
           Context& ctx
         ) const
         {
-          std::wstring type, value;
+          u32string type, value;
 
           std::cerr << "constructing constant with string " << 
-            std::wstring(first, last) << std::endl;
+            u32string(first, last) << std::endl;
 
           Iterator current = first;
           while (current != last && *current != '"' && *current != '`')
@@ -321,7 +269,7 @@ namespace TransLucid
 
           if (type.empty())
           {
-            type = L"ustring";
+            type = U"ustring";
           }
 
           if (*current == '"')
@@ -455,7 +403,7 @@ namespace boost { namespace spirit { namespace traits
   // normally convert a pair of iterators to the requested token value type.
   // However, this is being done in the semantic action of the lexer. So
   // these do nothing. The functors that do something are build_rational,
-  // build_float and build_integer.
+  // build_real and build_integer.
   //////////////////////////////////////////////////////////////////////////
   using TransLucid::Parser::value_wrapper;
   template <typename Iterator>
@@ -508,7 +456,7 @@ namespace boost { namespace spirit { namespace traits
 
   template <typename Iterator>
   struct assign_to_attribute_from_iterators<
-    std::pair<std::wstring, std::wstring>, Iterator
+    std::pair<TransLucid::u32string, TransLucid::u32string>, Iterator
   >
   {
     static void
@@ -516,7 +464,7 @@ namespace boost { namespace spirit { namespace traits
     (
       Iterator const& first,
       Iterator const& last,
-      std::pair<std::wstring, std::wstring>& attr
+      std::pair<TransLucid::u32string, TransLucid::u32string>& attr
     )
     {
       throw "construct constant pair incorrectly called";
@@ -539,4 +487,4 @@ namespace boost { namespace spirit { namespace traits
   };
 }}}
 
-
+#endif
