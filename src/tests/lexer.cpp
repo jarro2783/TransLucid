@@ -19,7 +19,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/lexer.hpp>
 #include <tl/charset.hpp>
-//#include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
@@ -38,9 +37,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/test/included/unit_test.hpp>
 
 namespace TL = TransLucid;
-namespace lex = TL::Parser::lex;
+namespace lex = TL::Lexer::lex;
 namespace qi = boost::spirit::qi;
-using TL::Parser::value_wrapper;
+using TL::Lexer::value_wrapper;
+using TL::Lexer::wstring;
 
 inline std::string
 to_utf8(const std::wstring& ws)
@@ -97,35 +97,6 @@ enum Token
   TOKEN_BAR,
   TOKEN_DOUBLE_SEMI
 };
-
-// iterator type used to expose the underlying input stream
-typedef std::basic_string<TL::Parser::lex_char_type> wstring;
-typedef wstring::const_iterator base_iterator_type;
-
-// This is the token type to return from the lexer iterator
-typedef lex::lexertl::token<
-	base_iterator_type, 
-	boost::mpl::vector
-  <
-    value_wrapper<mpz_class>, 
-    value_wrapper<mpq_class>,
-    value_wrapper<mpf_class>,
-    TL::u32string, 
-    Keyword, 
-    Token,
-    std::pair<TL::u32string, TL::u32string>,
-    char32_t
-  > 
-> token_type;
-
-// This is the lexer type to use to tokenize the input.
-// We use the lexertl based lexer engine.
-typedef lex::lexertl::actor_lexer<token_type> lexer_type;
-
-typedef TL::Parser::lex_tl_tokens<lexer_type> tl_lexer;
-
-// This is the iterator type exposed by the lexer 
-typedef tl_lexer::iterator_type iterator_type;
 
 //the types of values that we can have
 typedef boost::variant
@@ -324,8 +295,6 @@ struct checker_grammar
       | tok.false_[_val = KEYWORD_FALSE]
       ;
 
-      //using namespace TL::Parser;
-
       symbol = 
         tok.dblslash_ [_val = TOKEN_DOUBLE_SLASH]
       | tok.range_    [_val = TOKEN_RANGE]
@@ -368,11 +337,11 @@ struct checker_grammar
 };
 
 // This is the type of the grammar to parse
-typedef checker_grammar<iterator_type> cgrammar;
+typedef checker_grammar<TL::Lexer::iterator_type> cgrammar;
 
-bool check(const wstring& input, Checker& checker)
+bool check(const std::wstring& input, Checker& checker)
 {
-  tl_lexer lexer;
+  TL::Lexer::tl_lexer lexer;
   cgrammar checkg(lexer, checker);
 
   wstring::const_iterator first = input.begin();

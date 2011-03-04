@@ -22,7 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iostream>
 
-namespace TransLucid { namespace Parser { //namespace detail {
+namespace TransLucid { namespace Lexer {
 
 template <typename Iterator>
 mpq_class

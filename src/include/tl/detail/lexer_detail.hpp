@@ -39,7 +39,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  namespace Parser
+  namespace Lexer
   {
     namespace lex = boost::spirit::lex;
 
@@ -405,7 +405,7 @@ namespace boost { namespace spirit { namespace traits
   // these do nothing. The functors that do something are build_rational,
   // build_real and build_integer.
   //////////////////////////////////////////////////////////////////////////
-  using TransLucid::Parser::value_wrapper;
+  using TransLucid::Lexer::value_wrapper;
   template <typename Iterator>
   struct assign_to_attribute_from_iterators<value_wrapper<mpz_class>, Iterator>
   //struct assign_to_attribute_from_iterators<mpz_class, Iterator>

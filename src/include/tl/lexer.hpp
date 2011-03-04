@@ -40,10 +40,33 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  namespace Parser
+  namespace Lexer
   {
     namespace lex = boost::spirit::lex;
     typedef wchar_t lex_char_type;
+
+    // iterator type used to expose the underlying input stream
+    typedef std::basic_string<lex_char_type> wstring;
+    typedef wstring::const_iterator base_iterator_type;
+
+    // This is the token type to return from the lexer iterator
+    typedef lex::lexertl::token<
+      base_iterator_type, 
+      boost::mpl::vector
+      <
+        value_wrapper<mpz_class>, 
+        value_wrapper<mpq_class>,
+        value_wrapper<mpf_class>,
+        u32string, 
+        std::pair<u32string, u32string>,
+        char32_t
+      > 
+    > token_type;
+
+    // This is the lexer type to use to tokenize the input.
+    // We use the lexertl based lexer engine.
+    typedef lex::lexertl::actor_lexer<token_type> lexer_type;
+
     //for unnamed tokens
     typedef lex::token_def<lex::unused_type, lex_char_type> token_def_default;
 
@@ -182,6 +205,12 @@ namespace TransLucid
       std::wstring m_constant_type;
       std::wstring m_constant_value;
     };
+
+    //the lexer class
+    typedef lex_tl_tokens<lexer_type> tl_lexer;
+
+    // This is the iterator type exposed by the lexer 
+    typedef tl_lexer::iterator_type iterator_type;
   }
 }
 
