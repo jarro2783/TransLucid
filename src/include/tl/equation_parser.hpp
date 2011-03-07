@@ -39,7 +39,7 @@ namespace TransLucid
       <
         Iterator, 
         ParsedEquation(),
-        qi::locals<string_type>
+        qi::locals<u32string>
       >
     {
       public:
@@ -105,7 +105,7 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, ParsedEquation(), qi::locals<string_type>>
+      qi::rule<Iterator, ParsedEquation(), qi::locals<u32string>>
         equation
       ;
 

@@ -228,6 +228,12 @@ namespace TransLucid
         return m_iter->operator->();
       }
 
+      difference_type operator-(const U32Iterator& rhs) const
+      {
+        //TODO: implement me
+        return 0;
+      }
+
       private:
       Iterator* m_iter;
       Iterator* m_end;

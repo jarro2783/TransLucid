@@ -125,23 +125,22 @@ namespace TransLucid
 
         if_expr =
           (
-              //qi::lit("if")
               tok.if_
            >> if_expr
-           >> literal("then")
+           >> tok.then_
            >> if_expr
            >> *(
-                    literal("elsif")
+                    tok.elsif_
                  >> if_expr
-                 >> literal("then")
+                 >> tok.then_
                  >> if_expr
                )
-           >> literal("else")
+           >> tok.else_
            >> if_expr
-           >> literal("fi")
+           >> tok.fi_
           )
           [
-            qi::_val = construct<Tree::IfExpr>(_1, _2, _3, _4)
+            qi::_val = construct<Tree::IfExpr>(_2, _4, _5, _7)
           ]
         | range_expr
           [
@@ -261,7 +260,7 @@ namespace TransLucid
         ;
 
         ident_constant = 
-          tok.identifier_ [_a = _1]
+          tok.identifier_ [_val = construct<Tree::IdentExpr>(_1)]
         ;
         
         //we are deleting delimiters for now
@@ -312,7 +311,7 @@ namespace TransLucid
           ]
         ;
 
-        integer = tok.integer_;
+        integer = tok.integer_[construct<mpz_class>(_1)];
 
         end_delimiter = qi::unicode::char_(_r1);
 
@@ -413,7 +412,7 @@ namespace TransLucid
         //delimiters
       ;
 
-      qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>>
+      qi::rule<Iterator, Tree::Expr()>
         ident_constant
       ;
 

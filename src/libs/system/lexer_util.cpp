@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/charset.hpp>
 #include <tl/lexer_util.hpp>
+#include <tl/parser_iterator.hpp>
 
 #include <iostream>
 
@@ -206,10 +207,10 @@ build_escaped_characters
   return std::make_pair(!error, u32result);
 }
 
-template mpf_class init_mpf<std::wstring::const_iterator>
+template mpf_class init_mpf<Parser::U32Iterator>
 (
-  const std::wstring::const_iterator&,
-  const std::wstring::const_iterator&,
+  const Parser::U32Iterator&,
+  const Parser::U32Iterator&,
   int
 );
 
@@ -222,10 +223,10 @@ template mpf_class init_mpf<std::wstring::iterator>
 );
 #endif
 
-template mpq_class init_mpq<std::wstring::const_iterator>
+template mpq_class init_mpq<Parser::U32Iterator>
 (
-  const std::wstring::const_iterator&,
-  const std::wstring::const_iterator&,
+  const Parser::U32Iterator&,
+  const Parser::U32Iterator&,
   int
 );
 
@@ -240,10 +241,10 @@ template mpq_class init_mpq<std::wstring::iterator>
 
 template 
 std::pair<bool, u32string>
-build_escaped_characters<std::wstring::const_iterator>
+build_escaped_characters<Parser::U32Iterator>
 (
-  std::wstring::const_iterator& begin,
-  const std::wstring::const_iterator& end
+  Parser::U32Iterator& begin,
+  const Parser::U32Iterator& end
 );
  
 } }

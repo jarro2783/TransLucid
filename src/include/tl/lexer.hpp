@@ -49,11 +49,11 @@ namespace TransLucid
     // iterator type used to expose the underlying input stream
     typedef std::basic_string<lex_char_type> wstring;
     //typedef wstring::const_iterator base_iterator_type;
-    typedef Parser::U32Iterator base_iterator_type;
+    typedef Parser::U32Iterator base_iterator_t;
 
     // This is the token type to return from the lexer iterator
     typedef lex::lexertl::token<
-      base_iterator_type, 
+      base_iterator_t, 
       boost::mpl::vector
       <
         value_wrapper<mpz_class>, 
@@ -81,6 +81,7 @@ namespace TransLucid
       , where_(L"where")
       , then_(L"then")
       , elsif_(L"elsif")
+      , else_(L"else")
       , true_(L"true")
       , false_(L"false")
       , spaces(L"[ \\n\\t]")
@@ -136,6 +137,7 @@ namespace TransLucid
         | where_
         | then_
         | elsif_
+        | else_
         | true_
         | false_
         | identifier_
@@ -172,7 +174,7 @@ namespace TransLucid
 
       lex::token_def<lex::unused_type, lex_char_type> 
         //keywords
-        if_, fi_, where_, then_, elsif_, true_, false_
+        if_, fi_, where_, then_, elsif_, else_, true_, false_
         //symbols
       , arrow_, dblsemi_, dblslash_, range_
         //white space

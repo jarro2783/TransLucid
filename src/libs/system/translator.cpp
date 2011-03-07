@@ -132,7 +132,7 @@ Translator::~Translator()
 HD*
 Translator::translate_expr(const u32string& u32s)
 {
-  Parser::U32Iterator pos
+  Lexer::base_iterator_t pos
   (
     Parser::makeUTF32Iterator(u32s.begin()),
     Parser::makeUTF32Iterator(u32s.end())
@@ -141,7 +141,7 @@ Translator::translate_expr(const u32string& u32s)
   
   bool r = boost::spirit::lex::tokenize_and_parse(
     pos,
-    Parser::U32Iterator(),
+    Lexer::base_iterator_t(),
     *m_lexer,
     *m_expr,
     e);
@@ -154,7 +154,7 @@ Translator::translate_expr(const u32string& u32s)
     std::cerr << "failed to parse" << std::endl;
   }
 
-  if (pos != Parser::U32Iterator())
+  if (pos != Lexer::base_iterator_t())
   {
     std::cerr << "didn't read all input" << std::endl;
   }
@@ -174,7 +174,7 @@ Translator::translate_expr(const u32string& u32s)
 PTEquationVector
 Translator::translate_equation_set(const u32string& s)
 {
-  Parser::U32Iterator pos(Parser::U32Iterator(
+  Lexer::base_iterator_t pos(Lexer::base_iterator_t(
     Parser::makeUTF32Iterator(s.begin()),
     Parser::makeUTF32Iterator(s.end())));
 
@@ -183,7 +183,7 @@ Translator::translate_equation_set(const u32string& s)
 
   bool success = boost::spirit::lex::tokenize_and_parse(
     pos,
-    Parser::iterator_t(),
+    Lexer::base_iterator_t(),
     *m_lexer,
     equation_set,
     parsedEquations);
@@ -268,21 +268,22 @@ Translator::translate_and_add_equation_set(const u32string& s)
 bool
 Translator::parse_header(const u32string& s)
 {
-  Parser::iterator_t pos(Parser::U32Iterator(
+  Lexer::base_iterator_t pos(
     Parser::makeUTF32Iterator(s.begin()),
-    Parser::makeUTF32Iterator(s.end())));
+    Parser::makeUTF32Iterator(s.end()));
   std::vector<int> test;
 
-  bool r = boost::spirit::qi::phrase_parse(
+  bool r = boost::spirit::lex::tokenize_and_parse(
     pos,
-    Parser::iterator_t(),
+    Lexer::base_iterator_t(),
+    *m_lexer,
     (*m_header_grammar)(boost::phoenix::ref(*m_header))
     );
 
   //load any more libraries specified in the header
   loadLibraries();
 
-  return (r && pos == Parser::iterator_t());
+  return (r && pos == Lexer::base_iterator_t());
 }
 
 void
