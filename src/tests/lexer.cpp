@@ -337,7 +337,7 @@ struct checker_grammar
 };
 
 // This is the type of the grammar to parse
-typedef checker_grammar<TL::Lexer::iterator_type> cgrammar;
+typedef checker_grammar<TL::Lexer::iterator_t> cgrammar;
 
 bool check(const std::wstring& input, Checker& checker)
 {

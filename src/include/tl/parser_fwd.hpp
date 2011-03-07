@@ -28,16 +28,15 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tuple>
-//#include <boost/spirit/include/qi_core.hpp>
+#include <vector>
+
+#include <tl/ast.hpp>
+#include <tl/lexer.hpp>
+#include <tl/parser_iterator.hpp>
+#include <tl/types.hpp>
+
 #include <boost/spirit/include/qi_symbols.hpp>
 #include <boost/spirit/include/classic_multi_pass.hpp>
-#include <vector>
-#include <tl/types.hpp>
-//#include <tl/equation.hpp>
-//#include <boost/fusion/include/adapt_struct.hpp>
-#include <tl/ast.hpp>
-//#include <tl/utility.hpp>
-#include <tl/parser_iterator.hpp>
 
 inline std::ostream&
 operator<<(std::ostream& os, char32_t c)
@@ -126,7 +125,8 @@ namespace TransLucid
       return os;
     }
 
-    typedef boost::spirit::classic::multi_pass<U32Iterator> iterator_t;
+    //typedef boost::spirit::classic::multi_pass<U32Iterator> iterator_t;
+    typedef Lexer::iterator_t iterator_t;
 
     //name, | [], & bool, = HD
     typedef std::tuple<string_type, Tree::Expr, Tree::Expr, Tree::Expr>

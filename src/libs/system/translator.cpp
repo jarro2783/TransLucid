@@ -36,8 +36,7 @@ namespace
 
   template <typename Iterator>
   class EquationSetGrammar
-  : public qi::grammar<Iterator, std::vector<Parser::ParsedEquation>(),
-    Parser::SkipGrammar<Iterator>>
+  : public qi::grammar<Iterator, std::vector<Parser::ParsedEquation>()>
   {
     public:
     template <typename T>
@@ -70,15 +69,13 @@ namespace
     qi::rule
     <
       Iterator,
-      std::vector<Parser::ParsedEquation>(),
-      Parser::SkipGrammar<Iterator>
+      std::vector<Parser::ParsedEquation>()
     > equations;
 
     qi::rule
     <
       Iterator,
-      Parser::ParsedEquation(),
-      Parser::SkipGrammar<Iterator>
+      Parser::ParsedEquation()
     >
       one_equation,
       eqn
@@ -91,7 +88,6 @@ Translator::Translator()
   ,m_expr(0)
   ,m_equation(0)
   ,m_tuple(0)
-  ,m_skipper(0)
   ,m_header_grammar(0)
   ,m_compiler(&m_system)
   ,m_nextLib(0)
@@ -100,10 +96,10 @@ Translator::Translator()
   {
     m_header = new Parser::Header;
 
-    m_expr = new Parser::ExprGrammar<Parser::iterator_t>(*m_header);
-    m_equation = new Parser::EquationGrammar<Parser::iterator_t>;
+    m_lexer = new Lexer::tl_lexer;
+    m_expr = new Parser::ExprGrammar<Parser::iterator_t>(*m_header, *m_lexer);
+    m_equation = new Parser::EquationGrammar<Parser::iterator_t>(*m_lexer);
     m_tuple = new Parser::TupleGrammar<Parser::iterator_t>;
-    m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
     m_header_grammar = new Parser::HeaderGrammar<Parser::iterator_t>;
 
     m_expr->set_tuple(*m_tuple);
@@ -136,16 +132,18 @@ Translator::~Translator()
 HD*
 Translator::translate_expr(const u32string& u32s)
 {
-  Parser::iterator_t pos(Parser::U32Iterator(
+  Parser::U32Iterator pos
+  (
     Parser::makeUTF32Iterator(u32s.begin()),
-    Parser::makeUTF32Iterator(u32s.end())));
+    Parser::makeUTF32Iterator(u32s.end())
+  );
   Tree::Expr e;
   
-  bool r = boost::spirit::qi::phrase_parse(
+  bool r = boost::spirit::lex::tokenize_and_parse(
     pos,
-    Parser::iterator_t(),
+    Parser::U32Iterator(),
+    *m_lexer,
     *m_expr,
-    *m_skipper,
     e);
 
   //std::cerr << "pos at: ";
@@ -156,7 +154,7 @@ Translator::translate_expr(const u32string& u32s)
     std::cerr << "failed to parse" << std::endl;
   }
 
-  if (pos != Parser::iterator_t())
+  if (pos != Parser::U32Iterator())
   {
     std::cerr << "didn't read all input" << std::endl;
   }
@@ -176,18 +174,18 @@ Translator::translate_expr(const u32string& u32s)
 PTEquationVector
 Translator::translate_equation_set(const u32string& s)
 {
-  Parser::iterator_t pos(Parser::U32Iterator(
+  Parser::U32Iterator pos(Parser::U32Iterator(
     Parser::makeUTF32Iterator(s.begin()),
     Parser::makeUTF32Iterator(s.end())));
 
   EquationSetGrammar<Parser::iterator_t> equation_set(*m_equation);
   std::vector<Parser::ParsedEquation> parsedEquations;
 
-  bool success = boost::spirit::qi::phrase_parse(
+  bool success = boost::spirit::lex::tokenize_and_parse(
     pos,
     Parser::iterator_t(),
+    *m_lexer,
     equation_set,
-    *m_skipper,
     parsedEquations);
 
   if (!success)
@@ -278,8 +276,7 @@ Translator::parse_header(const u32string& s)
   bool r = boost::spirit::qi::phrase_parse(
     pos,
     Parser::iterator_t(),
-    (*m_header_grammar)(boost::phoenix::ref(*m_header)),
-    *m_skipper
+    (*m_header_grammar)(boost::phoenix::ref(*m_header))
     );
 
   //load any more libraries specified in the header
@@ -301,7 +298,6 @@ Translator::loadLibraries()
 void
 Translator::cleanup()
 {
-  delete m_skipper;
   delete m_tuple;
   delete m_equation;
   delete m_expr;

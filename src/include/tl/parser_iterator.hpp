@@ -34,7 +34,7 @@ namespace TransLucid
       public std::iterator
       <
         std::input_iterator_tag,
-        unsigned int,
+        wchar_t,
         int64_t
       >
     {

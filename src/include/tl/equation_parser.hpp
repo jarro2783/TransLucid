@@ -35,19 +35,24 @@ namespace TransLucid
 
     template <typename Iterator>
     class EquationGrammar
-    : public qi::grammar<Iterator, ParsedEquation(),qi::locals<string_type>,
-      SkipGrammar<Iterator>>
+    : public qi::grammar
+      <
+        Iterator, 
+        ParsedEquation(),
+        qi::locals<string_type>
+      >
     {
       public:
 
-      EquationGrammar()
+      template <typename TokenDef>
+      EquationGrammar(TokenDef& tok)
       : EquationGrammar::base_type(equation)
       {
         using namespace qi::labels;
 
         equation =
           (
-              ident[_a = _1]
+              tok.identifier_[_a = _1]
            >> guard
            >> boolean
            >> qi::lit('=')
@@ -100,19 +105,16 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, ParsedEquation(), qi::locals<string_type>,
-               SkipGrammar<Iterator>>
+      qi::rule<Iterator, ParsedEquation(), qi::locals<string_type>>
         equation
       ;
 
-      qi::rule<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
+      qi::rule<Iterator, Tree::Expr()>
         guard,
         boolean,
         context_perturb,
         expr
       ;
-
-      ident_parser<Iterator> ident;
     };
 
     extern template class EquationGrammar<iterator_t>;

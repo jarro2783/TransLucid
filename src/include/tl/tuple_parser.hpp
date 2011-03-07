@@ -40,7 +40,7 @@ namespace TransLucid
      */
     template <typename Iterator>
     class TupleGrammar
-    : public qi::grammar<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
+    : public qi::grammar<Iterator, Tree::Expr()>
     {
       public:
 
@@ -101,20 +101,19 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
+      qi::rule<Iterator, Tree::Expr()>
         expr,
         context_perturb
       ;
 
-      qi::rule<Iterator, vector_pair_expr(), SkipGrammar<Iterator>>
+      qi::rule<Iterator, vector_pair_expr()>
         tuple_inside
       ;
 
       qi::rule
       <
         Iterator,
-        boost::fusion::vector<Tree::Expr, Tree::Expr>(),
-        SkipGrammar<Iterator>
+        boost::fusion::vector<Tree::Expr, Tree::Expr>()
       >
         pair
       ;

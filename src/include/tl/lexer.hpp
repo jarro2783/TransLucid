@@ -37,6 +37,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/utility.hpp>
 #include <tl/lexer_util.hpp>
 #include <tl/detail/lexer_detail.hpp>
+#include <tl/parser_iterator.hpp>
 
 namespace TransLucid
 {
@@ -47,7 +48,8 @@ namespace TransLucid
 
     // iterator type used to expose the underlying input stream
     typedef std::basic_string<lex_char_type> wstring;
-    typedef wstring::const_iterator base_iterator_type;
+    //typedef wstring::const_iterator base_iterator_type;
+    typedef Parser::U32Iterator base_iterator_type;
 
     // This is the token type to return from the lexer iterator
     typedef lex::lexertl::token<
@@ -210,7 +212,7 @@ namespace TransLucid
     typedef lex_tl_tokens<lexer_type> tl_lexer;
 
     // This is the iterator type exposed by the lexer 
-    typedef tl_lexer::iterator_type iterator_type;
+    typedef tl_lexer::iterator_type iterator_t;
   }
 }
 

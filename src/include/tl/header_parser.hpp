@@ -38,7 +38,7 @@ namespace TransLucid
      */
     template <typename Iterator>
     class HeaderGrammar :
-      public qi::grammar<Iterator, SkipGrammar<Iterator>, void(Header&)>
+      public qi::grammar<Iterator, void(Header&)>
     {
       public:
 
@@ -273,11 +273,11 @@ namespace TransLucid
         }
       }
 
-      qi::rule<Iterator, SkipGrammar<Iterator>, void(Header&)>
+      qi::rule<Iterator, void(Header&)>
         headerp
       ;
 
-      qi::rule<Iterator, SkipGrammar<Iterator>, void(Header&)>
+      qi::rule<Iterator, void(Header&)>
         headerItem
       ;
 
@@ -285,11 +285,9 @@ namespace TransLucid
         integer
       ;
 
-      qi::rule<Iterator, SkipGrammar<Iterator>, Tree::Expr()>
+      qi::rule<Iterator, Tree::Expr()>
         expr
       ;
-
-      escaped_string_parser<Iterator> angle_string;
 
       qi::symbols<char_type, Tree::InfixAssoc> assoc_symbols;
       qi::symbols<char_type, Tree::UnaryType> unary_symbols;

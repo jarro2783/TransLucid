@@ -94,7 +94,7 @@ namespace TransLucid
 
     template <typename Iterator>
     class ExprGrammar
-    : public qi::grammar<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
+    : public qi::grammar<Iterator, Tree::Expr()>
     {
       public:
 
@@ -102,10 +102,10 @@ namespace TransLucid
        * Construct an expression grammar.
        * @param h The parser header to use.
        */
-      ExprGrammar(Header& h)
+      template <typename TokenDef>
+      ExprGrammar(Header& h, TokenDef& tok)
       : ExprGrammar::base_type(expr), header(h)
       {
-        //using qi::_val;
         using namespace qi::labels;
 
         for 
@@ -126,7 +126,7 @@ namespace TransLucid
         if_expr =
           (
               //qi::lit("if")
-              literal("if")
+              tok.if_
            >> if_expr
            >> literal("then")
            >> if_expr
@@ -249,7 +249,7 @@ namespace TransLucid
         | ident_constant
         | context_perturb
         | paren_expr 
-        | delimiters
+//        | delimiters
         | function_abstraction
         ;
 
@@ -261,23 +261,11 @@ namespace TransLucid
         ;
 
         ident_constant = 
-          ident [_a = _1]
-        >> ( qi::lexeme[angle_string]
-             [
-               _val = ph::bind
-               (
-                 &construct_typed_constant, 
-                 make_u32string(_a), 
-                 make_u32string(_1)
-               )
-             ]
-           | qi::eps
-             [
-              _val = construct<Tree::IdentExpr>(make_u32string(_a))
-             ]
-           )
+          tok.identifier_ [_a = _1]
         ;
         
+        //we are deleting delimiters for now
+        #if 0
         delimiters = 
           (   header.delimiter_start_symbols
               [
@@ -301,24 +289,7 @@ namespace TransLucid
                             make_u32string(_a))
           ]
         ;
-
-        dimensions = 
-          qi::lexeme
-          [
-            (
-              (
-                header.dimension_symbols
-              | header.system_dimension_symbols
-              | arg_dimensions
-              )
-              >> !qi::alpha
-            )
-            [
-              _val = construct<Tree::DimensionExpr>(make_u32string(_1))
-            ]
-          ]
-          
-        ;
+        #endif
 
         arg_dimensions = 
           qi::lexeme
@@ -341,20 +312,20 @@ namespace TransLucid
           ]
         ;
 
-        integer = integer_grammar[_val = _1];
+        integer = tok.integer_;
 
         end_delimiter = qi::unicode::char_(_r1);
 
         function_abstraction = 
             //phi abstraction
-            (literal("\\\\") > ident > literal("->") > expr)
+            (tok.dblslash_ > tok.identifier_ > tok.arrow_ > expr)
             [
               _val = construct<Tree::PhiExpr>()
             ]
             //lambda abstraction
-          | (literal("\\") > ident > literal("->") > expr)
+          | (literal("\\") > tok.identifier_ > tok.arrow_ > expr)
             [
-              _val = construct<Tree::LambdaExpr>(make_u32string(_1), _2)
+              _val = construct<Tree::LambdaExpr>(_1, _2)
             ]
         ;
 
@@ -403,7 +374,7 @@ namespace TransLucid
 
       char_type end;
 
-      qi::rule<Iterator, Tree::Expr(), SkipGrammar<Iterator>>
+      qi::rule<Iterator, Tree::Expr()>
         expr,
         if_expr,
         boolean,
@@ -417,13 +388,13 @@ namespace TransLucid
         function_abstraction
       ;
 
-      qi::rule<Iterator, Tree::Expr(), SkipGrammar<Iterator>,
+      qi::rule<Iterator, Tree::Expr(),
                qi::locals<Tree::Expr>>
         lambda_application,
         phi_application
       ;
 
-      qi::rule<Iterator, u32string()> //, SkipGrammar<Iterator>>
+      qi::rule<Iterator, u32string()>
         arg_dimensions
       ;
 
@@ -431,27 +402,20 @@ namespace TransLucid
         end_delimiter
       ;
 
-      qi::rule<Iterator, Tree::Expr(), qi::locals<Tree::Expr>,
-               SkipGrammar<Iterator>>
+      qi::rule<Iterator, Tree::Expr(), qi::locals<Tree::Expr>>
         postfix_expr,
         at_expr,
         binary_op
       ;
 
-      qi::rule<Iterator, Tree::Expr(), qi::locals<string_type, Delimiter>,
-               SkipGrammar<Iterator>>
-        primary_expr,
-        delimiters
+      qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>>
+        primary_expr
+        //delimiters
       ;
 
-      qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>,
-               SkipGrammar<Iterator>>
+      qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>>
         ident_constant
       ;
-
-      integer_parser<Iterator> integer_grammar;
-      escaped_string_parser<Iterator> angle_string;
-      ident_parser<Iterator> ident;
 
       Header &header;
 

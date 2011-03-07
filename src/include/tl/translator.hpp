@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/expr_compiler.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/lexer.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/system.hpp>
@@ -48,10 +49,13 @@ namespace TransLucid
     class TupleGrammar;
 
     template <typename Iterator>
-    class SkipGrammar;
-
-    template <typename Iterator>
     class HeaderGrammar;
+  }
+
+  namespace Lexer
+  {
+    template <typename Lexer>
+    class lex_tl_tokens;
   }
 
   typedef std::pair<Parser::ParsedEquation, TranslatedEquation> PTEquation;
@@ -206,10 +210,11 @@ namespace TransLucid
 
     Parser::Header* m_header;
 
+    Lexer::tl_lexer* m_lexer;
+
     Parser::ExprGrammar<Parser::iterator_t>* m_expr;
     Parser::EquationGrammar<Parser::iterator_t>* m_equation;
     Parser::TupleGrammar<Parser::iterator_t>* m_tuple;
-    Parser::SkipGrammar<Parser::iterator_t>* m_skipper;
     Parser::HeaderGrammar<Parser::iterator_t>* m_header_grammar;
 
     SystemHD m_system;
