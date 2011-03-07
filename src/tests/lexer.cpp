@@ -339,20 +339,24 @@ struct checker_grammar
 // This is the type of the grammar to parse
 typedef checker_grammar<TL::Lexer::iterator_t> cgrammar;
 
-bool check(const std::wstring& input, Checker& checker)
+bool check(const TL::u32string& input, Checker& checker)
 {
   TL::Lexer::tl_lexer lexer;
   cgrammar checkg(lexer, checker);
 
-  wstring::const_iterator first = input.begin();
-  wstring::const_iterator last = input.end();
+  TL::Parser::U32Iterator first(
+    TL::Parser::makeUTF32Iterator(input.begin()),
+    TL::Parser::makeUTF32Iterator(input.end())
+  );
+  TL::Parser::U32Iterator last;
 
 	return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last;
 }
 
 BOOST_AUTO_TEST_CASE ( identifiers )
 {
-  wstring input = L"ifififif0a9fifi testing hello world a a_b a5 b abc34_";
+  TL::u32string input 
+    = U"ifififif0a9fifi testing hello world a a_b a5 b abc34_";
   
   Checker checker({
     U"ifififif0a9fifi", 
@@ -372,7 +376,7 @@ BOOST_AUTO_TEST_CASE ( identifiers )
 
 BOOST_AUTO_TEST_CASE ( keywords )
 {
-  wstring input = L"if fi where then elsif true false";
+  TL::u32string input = U"if fi where then elsif true false";
   Checker checker({
     KEYWORD_IF,
     KEYWORD_FI,
@@ -388,8 +392,8 @@ BOOST_AUTO_TEST_CASE ( keywords )
 
 BOOST_AUTO_TEST_CASE ( constants )
 {
-  wstring input = L"`hello` 'a' '\\U00000041' '\\u0041' '\\xC2\\xA2'"
-                  L"\"text\\u00E4\\xC2\\xA2\"";
+  TL::u32string input = U"`hello` 'a' '\\U00000041' '\\u0041' '\\xC2\\xA2'"
+                        U"\"text\\u00E4\\xC2\\xA2\"";
   Checker checker({
     std::make_pair(U"ustring", U"hello"),
     char32_t('a'),
@@ -404,8 +408,8 @@ BOOST_AUTO_TEST_CASE ( constants )
 
 BOOST_AUTO_TEST_CASE ( integers )
 {
-  wstring input = L"0 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111"
-                  L" ~1 ~0Gab ~15 ~0111"
+  TL::u32string input = U"0 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111"
+                        U" ~1 ~0Gab ~15 ~0111"
   ;
   std::list<mpz_class> values
   ({
@@ -430,14 +434,14 @@ BOOST_AUTO_TEST_CASE ( integers )
 
   check(input, checker);
 
-  wstring invalid = L"0AFB";
+  TL::u32string invalid = U"0AFB";
   Checker check_invalid({});
   BOOST_CHECK(check(invalid, check_invalid) == false);
 }
 
 BOOST_AUTO_TEST_CASE ( rationals )
 {
-  wstring input = L"0_1 123_124 0GA_3 ~3_2";
+  TL::u32string input = U"0_1 123_124 0GA_3 ~3_2";
   std::list<mpq_class> values
   ({
     mpq_class(),
@@ -452,9 +456,9 @@ BOOST_AUTO_TEST_CASE ( rationals )
 
 BOOST_AUTO_TEST_CASE ( floats )
 {
-  wstring input = L"0.0 1.0 5.25 0GA.BC ~3.4 1.1^10 12.123456^20#500 "
-    L"0G1.123456789123456789123456789123456789123456789123456789123456789"
-    L"123456789#FFF";
+  TL::u32string input = U"0.0 1.0 5.25 0GA.BC ~3.4 1.1^10 12.123456^20#500 "
+    U"0G1.123456789123456789123456789123456789123456789123456789123456789"
+    U"123456789#FFF";
   std::list<mpf_class> values
   ({
     mpf_class(0),
@@ -474,7 +478,7 @@ BOOST_AUTO_TEST_CASE ( floats )
 
 BOOST_AUTO_TEST_CASE ( symbols )
 {
-  wstring input = L":[].=&#@\\ \\\\..()->|;;\\\\\\";
+  TL::u32string input = U":[].=&#@\\ \\\\..()->|;;\\\\\\";
   Checker checker({
     TOKEN_COLON,
     TOKEN_OBRACKET,
@@ -501,7 +505,7 @@ BOOST_AUTO_TEST_CASE ( symbols )
 
 BOOST_AUTO_TEST_CASE ( mixed )
 {
-  wstring input = L"intmp @ 10 (hello if) cats";
+  TL::u32string input = U"intmp @ 10 (hello if) cats";
   Checker checker({
     U"intmp",
     TOKEN_AT,

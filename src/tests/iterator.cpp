@@ -139,6 +139,8 @@ BOOST_AUTO_TEST_CASE ( copying )
   BOOST_CHECK(s == result);
 }
 
+//probably don't need to test multipass since we don't use it
+#if 0
 BOOST_AUTO_TEST_CASE( multi_pass )
 {
   TL::u32string s = U"ab";
@@ -150,8 +152,9 @@ BOOST_AUTO_TEST_CASE( multi_pass )
   ++pos;
   BOOST_CHECK(*pos == 'b');
   ++pos;
-  BOOST_CHECK(pos == TL::Parser::iterator_t());
+  BOOST_CHECK(pos == TL::Parser::U32Iterator());
 }
+#endif
 
 #if 0
 BOOST_AUTO_TEST_CASE( copy_iter)
