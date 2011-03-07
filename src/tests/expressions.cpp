@@ -227,6 +227,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
   BOOST_TEST_MESSAGE("Entering context change");
   TL::HD* h = 0;
 
+  BOOST_TEST_MESSAGE("translating \"1\"");
   h = translator.translate_expr(U"1");
   BOOST_REQUIRE(h != 0);
   BOOST_CHECK_EQUAL
@@ -243,6 +244,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
     )
   );
 
+  BOOST_TEST_MESSAGE("translating \"[1 : 5]\"");
   TL::HD* context1 = translator.translate_expr(U"[1 : 5]");
   BOOST_REQUIRE(context1 != 0);
   TL::TaggedConstant tuple1 = (*context1)(TL::Tuple());

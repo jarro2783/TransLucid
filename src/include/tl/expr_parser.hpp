@@ -348,6 +348,9 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(phi_application);
         BOOST_SPIRIT_DEBUG_NODE(lambda_application);
 
+        expr.name("expr");
+        integer.name("integer");
+
         qi::on_error<qi::fail>
         (
           expr,

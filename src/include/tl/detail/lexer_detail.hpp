@@ -214,7 +214,14 @@ namespace TransLucid
                 ++current;
                 if (base == 1)
                 {
-                  //attr = last - current;
+                  //count the number of 1's
+                  int num = 0;
+                  while (current != last)
+                  {
+                    ++current;
+                    ++num;
+                  }
+                  attr = num;
                 }
                 else
                 {

@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/tree_printer.hpp>
 #include <tl/translator.hpp>
 #include <tl/equation_parser.hpp>
 #include <tl/header_parser.hpp>

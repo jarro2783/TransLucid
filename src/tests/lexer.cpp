@@ -408,12 +408,13 @@ BOOST_AUTO_TEST_CASE ( constants )
 
 BOOST_AUTO_TEST_CASE ( integers )
 {
-  TL::u32string input = U"0 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111"
+  TL::u32string input = U"0 1 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111"
                         U" ~1 ~0Gab ~15 ~0111 ~1000"
   ;
   std::list<mpz_class> values
   ({
     0,
+    1,
     10,
     50,
     100,

@@ -216,7 +216,7 @@ namespace TransLucid
        */
       reference operator*() const
       {
-        std::cerr << u32string(1, **m_iter) << std::endl;
+        //std::cerr << u32string(1, **m_iter) << std::endl;
         return **m_iter;
       }
 
