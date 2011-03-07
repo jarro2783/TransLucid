@@ -208,6 +208,11 @@ namespace TransLucid
       : type(type), text(text)
       {}
 
+      ConstantExpr(const std::pair<u32string, u32string>& value)
+      : type(value.first), text(value.second)
+      {
+      }
+
       u32string type; /**< The typename.*/
       u32string text; /**< The text in the angle brackets.*/
     };

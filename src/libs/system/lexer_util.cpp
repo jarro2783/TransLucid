@@ -30,7 +30,6 @@ mpq_class
 init_mpq(const Iterator& begin, const Iterator& end, int base)
 {
   std::string s;
-  s.reserve(end - begin);
 
   Iterator current = begin;
   while (current != end)
@@ -59,7 +58,6 @@ init_mpf(const Iterator& begin, const Iterator& end, int base)
   std::cerr << "default precision is " << prec << std::endl;
   Iterator current = begin;
   std::string s;
-  s.reserve(end - begin);
 
   bool find_precision = false;
   while (current != end && !find_precision)

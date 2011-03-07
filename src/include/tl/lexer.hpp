@@ -169,6 +169,8 @@ namespace TransLucid
         | L'('
         | L')'
         | L'|'
+        | L','
+        | L"."
         ;
       }
 
@@ -203,7 +205,9 @@ namespace TransLucid
       , constantRAW_
       ;
 
-      lex::token_def<char32_t, lex_char_type> character_;
+      lex::token_def<char32_t, lex_char_type> 
+        character_
+      ;
 
       private:
       std::wstring m_constant_type;

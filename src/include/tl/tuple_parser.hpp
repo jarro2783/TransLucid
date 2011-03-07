@@ -52,12 +52,12 @@ namespace TransLucid
         namespace phoenix = boost::phoenix;
         //expr = self.parsers.expr_parser.top();
 
-        tuple_inside = pair[push_back(_val, _1)] % ',';
+        tuple_inside = pair[push_back(_val, _1)] % literal(',');
 
         pair %=
           (
              expr
-           >  ':'
+           >  literal(':')
            > expr
           )
           //[
@@ -68,9 +68,9 @@ namespace TransLucid
 
         context_perturb =
            (
-              '['
+              literal('[')
             > tuple_inside
-            > ']'
+            > literal(']')
            )
            [
              _val = construct<Tree::TupleExpr>(_1)

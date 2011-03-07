@@ -185,8 +185,10 @@ namespace TransLucid
         {
           try
           {
+            Iterator next = first;
+            ++next;
             mpz_class attr;
-            if (last - first == 1 && *first == L'0')
+            if (next == last && *first == L'0')
             {
               attr = 0;
             }
@@ -212,7 +214,7 @@ namespace TransLucid
                 ++current;
                 if (base == 1)
                 {
-                  attr = last - current;
+                  //attr = last - current;
                 }
                 else
                 {
@@ -304,7 +306,6 @@ namespace TransLucid
           {
             //raw
             ++current;
-            value.reserve(last - current);
             while (*current != '`')
             {
               value += *current;

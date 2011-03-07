@@ -243,8 +243,8 @@ namespace TransLucid
         primary_expr %=
           integer
         | boolean
-        | dimensions
-        | specials
+        //| dimensions
+        //| specials
         | ident_constant
         | context_perturb
         | paren_expr 
@@ -261,6 +261,12 @@ namespace TransLucid
 
         ident_constant = 
           tok.identifier_ [_val = construct<Tree::IdentExpr>(_1)]
+        | tok.constantINTERPRET_
+          [
+            _val = construct<Tree::ConstantExpr>(_1)
+          ]
+        | tok.constantRAW_
+        | tok.character_[_val = construct<char32_t>(_1)]
         ;
         
         //we are deleting delimiters for now
@@ -288,7 +294,6 @@ namespace TransLucid
                             make_u32string(_a))
           ]
         ;
-        #endif
 
         arg_dimensions = 
           qi::lexeme
@@ -299,21 +304,20 @@ namespace TransLucid
             ]
           ]
         ;
+        #endif
 
         boolean =
-          qi::unicode::string(literal("true"))
+          tok.true_
           [
             _val = true
           ]
-        | qi::unicode::string(literal("false"))
+        | tok.false_
           [
             _val = false
           ]
         ;
 
-        integer = tok.integer_[construct<mpz_class>(_1)];
-
-        end_delimiter = qi::unicode::char_(_r1);
+        integer = tok.integer_[_val = construct<mpz_class>(_1)];
 
         function_abstraction = 
             //phi abstraction
@@ -336,7 +340,7 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(prefix_expr);
         BOOST_SPIRIT_DEBUG_NODE(hash_expr);
         BOOST_SPIRIT_DEBUG_NODE(context_perturb);
-        BOOST_SPIRIT_DEBUG_NODE(end_delimiter);
+        //BOOST_SPIRIT_DEBUG_NODE(end_delimiter);
         BOOST_SPIRIT_DEBUG_NODE(postfix_expr);
         BOOST_SPIRIT_DEBUG_NODE(at_expr);
         BOOST_SPIRIT_DEBUG_NODE(binary_op);
@@ -382,7 +386,7 @@ namespace TransLucid
         prefix_expr,
         hash_expr,
         context_perturb,
-        dimensions,
+        //dimensions,
         paren_expr,
         function_abstraction
       ;
@@ -393,13 +397,13 @@ namespace TransLucid
         phi_application
       ;
 
-      qi::rule<Iterator, u32string()>
-        arg_dimensions
-      ;
+      //qi::rule<Iterator, u32string()>
+      //  arg_dimensions
+      //;
 
-      qi::rule<Iterator, void(char_type)>
-        end_delimiter
-      ;
+      //qi::rule<Iterator, void(char_type)>
+      //  end_delimiter
+      //;
 
       qi::rule<Iterator, Tree::Expr(), qi::locals<Tree::Expr>>
         postfix_expr,

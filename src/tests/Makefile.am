@@ -1,4 +1,4 @@
-#   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+#   Copyright (C) 2009-2011 Jarryd Beck and John Plaice
 #
 #   This file is part of TransLucid.
 #
@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt
 
-check_PROGRAMS = expressions equations printing lexer
+check_PROGRAMS = expressions equations printing lexer iterator_test
 
 AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -33,6 +33,8 @@ equations_SOURCES = equations.cpp
 printing_SOURCES = printing.cpp
 
 lexer_SOURCES = lexer.cpp
+
+iterator_test_SOURCES = iterator.cpp
 
 TESTS_ENVIRONMENT = LIBRARY_PATH=$(top_builddir)/src/libs/int \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh $(SHELL) -x

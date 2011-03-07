@@ -19,9 +19,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
-#include <tl/parser_fwd.hpp>
+//#include <tl/parser_fwd.hpp>
 
-#include <boost/spirit/include/classic_multi_pass.hpp>
+//#include <boost/spirit/include/classic_multi_pass.hpp>
 
 #define BOOST_TEST_MODULE equations
 #include <boost/test/included/unit_test.hpp>

@@ -22,7 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <algorithm>
 #include <tl/utility.hpp>
 #include <string>
-//#include <tl/tree_printer.hpp>
 #include <tl/parser_header_util.hpp>
 
 #define BOOST_TEST_MODULE expressions
@@ -113,6 +112,10 @@ test_integer(int n, TL::Translator& translator)
 
   TL::HD* h = 
     translator.translate_expr(TL::u32string(value.begin(), value.end()));
+  if (h == 0)
+  {
+    BOOST_MESSAGE("error testing integer: " << value);
+  }
   BOOST_REQUIRE(h != 0);
   TL::TaggedConstant v = (*h)(TL::Tuple());
   //std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;
@@ -146,7 +149,7 @@ BOOST_AUTO_TEST_CASE ( strings ) {
 
   TL::HD* h;
 
-  h = translator.translate_expr(U"« hello é world»");
+  h = translator.translate_expr(U"\" hello é world\"");
   BOOST_REQUIRE(h != 0);
 
   TL::TaggedConstant v = (*h)(TL::Tuple());
@@ -185,6 +188,7 @@ BOOST_AUTO_TEST_CASE ( chars ) {
 }
 
 BOOST_AUTO_TEST_CASE ( specials ) {
+  BOOST_TEST_MESSAGE("Entering specials");
 
   using TL::Special;
 
@@ -220,6 +224,7 @@ BOOST_AUTO_TEST_CASE ( unary_ops )
 
 BOOST_AUTO_TEST_CASE ( context_change )
 {
+  BOOST_TEST_MESSAGE("Entering context change");
   TL::HD* h = 0;
 
   h = translator.translate_expr(U"1");
@@ -274,6 +279,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
 
 BOOST_AUTO_TEST_CASE ( misc )
 {
+  BOOST_TEST_MESSAGE("Entering misc");
   TL::HD* h = 0;
 
   h = translator.translate_expr(U"0 @ [t:11, w:11, x:5, y:7, z:42]");
@@ -282,6 +288,7 @@ BOOST_AUTO_TEST_CASE ( misc )
 
 BOOST_AUTO_TEST_CASE ( header )
 {
+  BOOST_TEST_MESSAGE("Entering header");
   TL::Translator t2;
   BOOST_REQUIRE(t2.parse_header
   (

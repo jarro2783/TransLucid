@@ -116,4 +116,18 @@ namespace TransLucid
   }
 }
 
+#ifdef BOOST_SPIRIT_DEBUG
+namespace std
+{
+  inline
+  ostream&
+  operator<<(ostream& os, 
+    const pair<TransLucid::u32string, TransLucid::u32string>& p)
+  {
+    os << "pair: \"" << p.first << "\", \"" << p.second << "\"";
+    return os;
+  }
+}
+#endif
+
 #endif // PARSER_UTIL_HPP_INCLUDED
