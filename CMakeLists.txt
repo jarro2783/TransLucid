@@ -41,7 +41,7 @@ set(CMAKE_BUILD_TYPE build)
 set (Boost_USE_STATIC_LIBS OFF)
 #set (Boost_ADDITIONAL_VERSIONS 1.43 1.43.0)
 set (Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.42.0 REQUIRED COMPONENTS program_options)
+find_package(Boost 1.44.0 REQUIRED COMPONENTS program_options)
 
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
