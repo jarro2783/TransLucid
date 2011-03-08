@@ -26,17 +26,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 using namespace TransLucid;
 
-typedef std::back_insert_iterator<std::string> out_iter;
-
 namespace
 {
-
 Translator translator;
-
-Printer::ExprPrinter<out_iter> print_grammar;
 std::string generated;
-std::back_insert_iterator<std::string> outit(generated);
-
 }
 
 BOOST_AUTO_TEST_CASE ( integer )
@@ -44,7 +37,8 @@ BOOST_AUTO_TEST_CASE ( integer )
   Tree::Expr ast = mpz_class(42);
 
   generated.clear();
-  BOOST_CHECK(Printer::karma::generate(outit, print_grammar, ast));
+  generated = print_expr_tree(ast);
+  //BOOST_CHECK(Printer::karma::generate(outit, print_grammar, ast));
 
   BOOST_CHECK_EQUAL(generated, "42");
 
@@ -61,8 +55,9 @@ BOOST_AUTO_TEST_CASE ( integer )
    mpz_class(15)
   );
 
-  generated.clear();
-  BOOST_CHECK(Printer::karma::generate(outit, print_grammar, ast));
+  //generated.clear();
+  //BOOST_CHECK(Printer::karma::generate(outit, print_grammar, ast));
+  generated = print_expr_tree(ast);
   BOOST_CHECK_EQUAL(generated, "(10+15)");
 }
 
@@ -72,12 +67,7 @@ BOOST_AUTO_TEST_CASE ( tuple )
   translator.translate_expr(input);
 
   generated.clear();
-  BOOST_CHECK(Printer::karma::generate
-  (
-    outit,
-    print_grammar,
-    translator.lastExpression()
-  ));
+  generated = print_expr_tree(translator.lastExpression());
 
   BOOST_CHECK_EQUAL(generated, "[1:1]");
 }
@@ -88,12 +78,7 @@ BOOST_AUTO_TEST_CASE ( hash_expr )
   translator.translate_expr(input);
 
   generated.clear();
-  BOOST_CHECK(Printer::karma::generate
-  (
-    outit,
-    print_grammar,
-    translator.lastExpression()
-  ));
+  generated = print_expr_tree(translator.lastExpression());
 
   BOOST_CHECK_EQUAL(generated, "(#1)");
 }
@@ -104,12 +89,7 @@ BOOST_AUTO_TEST_CASE ( at )
   translator.translate_expr(input);
 
   generated.clear();
-  BOOST_CHECK(Printer::karma::generate
-  (
-    outit,
-    print_grammar,
-    translator.lastExpression()
-  ));
+  generated = print_expr_tree(translator.lastExpression());
 
   BOOST_CHECK_EQUAL(generated, "((#1)@[1:2])");
 }
