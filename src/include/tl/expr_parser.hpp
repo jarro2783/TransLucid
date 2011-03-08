@@ -429,6 +429,8 @@ namespace TransLucid
     };
 
     extern template class ExprGrammar<iterator_t>;
+    extern template ExprGrammar<iterator_t>::ExprGrammar<Lexer::tl_lexer>
+      (Header& h, Lexer::tl_lexer& tok);
   }
 }
 

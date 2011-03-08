@@ -189,6 +189,8 @@ BOOST_AUTO_TEST_CASE( copy_iter)
   ++iter2;
   BOOST_CHECK(*iter2 == 's');
 
+  TL::Parser::U32Iterator fakeEnd = iter;
+
   ++iter2;
   BOOST_CHECK(*iter2 == 't');
 
@@ -202,6 +204,7 @@ BOOST_AUTO_TEST_CASE( copy_iter)
   BOOST_CHECK(iter2 == end);
 
   BOOST_CHECK(TL::u32string(savePos, end) == U"test");
+  BOOST_CHECK_EQUAL(TL::u32string(savePos, fakeEnd), TL::u32string(U"te"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

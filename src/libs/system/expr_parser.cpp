@@ -24,5 +24,7 @@ namespace TransLucid
   namespace Parser
   {
     template class ExprGrammar<iterator_t>;
+    template ExprGrammar<iterator_t>::ExprGrammar<Lexer::tl_lexer>
+      (Header& h, Lexer::tl_lexer& tok);
   }
 }

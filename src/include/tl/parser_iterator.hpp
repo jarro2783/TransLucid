@@ -33,7 +33,7 @@ namespace TransLucid
     struct iterator_traits :
       public std::iterator
       <
-        std::input_iterator_tag,
+        std::forward_iterator_tag,
         wchar_t
       >
     {
@@ -174,7 +174,14 @@ namespace TransLucid
           rhs_end = true;
         }
 
-        return lhs_end == rhs_end;
+        if (!lhs_end && !rhs_end)
+        {
+          return *m_iter == *rhs.m_iter;
+        }
+        else
+        {
+          return lhs_end == rhs_end;
+        }
       }
 
       /**
