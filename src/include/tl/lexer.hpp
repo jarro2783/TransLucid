@@ -170,8 +170,9 @@ namespace TransLucid
         | L')'
         | L'|'
         | L','
-        | L"."
         ;
+
+        this->self.add(L".");
       }
 
       lex::token_def<lex::unused_type, lex_char_type> 
