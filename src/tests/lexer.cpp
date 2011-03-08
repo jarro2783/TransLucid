@@ -355,10 +355,14 @@ bool check(const TL::u32string& input, Checker& checker)
 
 BOOST_AUTO_TEST_CASE ( identifiers )
 {
-  TL::u32string input 
+  TL::u32string input1 = U"ident";
+  Checker checker1({U"ident"});
+  BOOST_CHECK(check(input1, checker1));
+
+  TL::u32string input2 
     = U"ifififif0a9fifi testing hello world a a_b a5 b abc34_";
   
-  Checker checker({
+  Checker checker2({
     U"ifififif0a9fifi", 
     U"testing",
     U"hello",
@@ -371,7 +375,7 @@ BOOST_AUTO_TEST_CASE ( identifiers )
     })
   ;
 
-  check(input, checker);
+  BOOST_CHECK(check(input2, checker2) == true);
 }
 
 BOOST_AUTO_TEST_CASE ( keywords )
@@ -456,6 +460,7 @@ BOOST_AUTO_TEST_CASE ( rationals )
   check(input, checker);
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE ( floats )
 {
   TL::u32string input = U"0.0 1.0 5.25 0GA.BC ~3.4 1.1^10 12.123456^20#500 "
@@ -477,6 +482,7 @@ BOOST_AUTO_TEST_CASE ( floats )
   check(input, checker);
 
 }
+#endif
 
 BOOST_AUTO_TEST_CASE ( symbols )
 {
@@ -507,7 +513,7 @@ BOOST_AUTO_TEST_CASE ( symbols )
 
 BOOST_AUTO_TEST_CASE ( mixed )
 {
-  TL::u32string input = U"intmp @ 10 (hello if) cats";
+  TL::u32string input = U"intmp @ 10 (hello if) cats [1 : 5]";
   Checker checker({
     U"intmp",
     TOKEN_AT,
@@ -516,7 +522,12 @@ BOOST_AUTO_TEST_CASE ( mixed )
     U"hello",
     KEYWORD_IF,
     TOKEN_CPAREN,
-    U"cats"
+    U"cats",
+    TOKEN_OBRACKET,
+    mpz_class(1),
+    TOKEN_COLON,
+    mpz_class(5),
+    TOKEN_CBRACKET
   });
 
   check(input, checker);

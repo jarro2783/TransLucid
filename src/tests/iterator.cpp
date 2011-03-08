@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 //#include <tl/parser_fwd.hpp>
 
-//#include <boost/spirit/include/classic_multi_pass.hpp>
+#include <boost/spirit/include/classic_multi_pass.hpp>
 
 #define BOOST_TEST_MODULE equations
 #include <boost/test/included/unit_test.hpp>
@@ -140,7 +140,6 @@ BOOST_AUTO_TEST_CASE ( copying )
 }
 
 //probably don't need to test multipass since we don't use it
-#if 0
 BOOST_AUTO_TEST_CASE( multi_pass )
 {
   TL::u32string s = U"ab";
@@ -149,19 +148,31 @@ BOOST_AUTO_TEST_CASE( multi_pass )
     TL::Parser::makeUTF32Iterator(s.end())));
 
   BOOST_CHECK(*pos == 'a');
+  auto pos2 = pos;
   ++pos;
   BOOST_CHECK(*pos == 'b');
   ++pos;
-  BOOST_CHECK(pos == TL::Parser::U32Iterator());
+  BOOST_CHECK(pos == 
+    boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
+  BOOST_CHECK(*pos2 == 'a');
+  ++pos2;
+  BOOST_CHECK(*pos2 == 'b');
+  ++pos2;
+  BOOST_CHECK(pos2 == 
+    boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
 }
-#endif
 
-#if 0
 BOOST_AUTO_TEST_CASE( copy_iter)
 { 
   TL::u32string s = U"test";
-  TL::Parser::U32Iterator iter(TL::Parser::makeUTF32Iterator(s.begin()));
-  TL::Parser::U32Iterator end(TL::Parser::makeUTF32Iterator(s.end()));
+  TL::Parser::U32Iterator iter
+  (
+    TL::Parser::makeUTF32Iterator(s.begin()),
+    TL::Parser::makeUTF32Iterator(s.end())
+  );
+  TL::Parser::U32Iterator end;
+
+  TL::Parser::U32Iterator savePos = iter;
 
   BOOST_CHECK(*iter == 't');
 
@@ -189,7 +200,8 @@ BOOST_AUTO_TEST_CASE( copy_iter)
   BOOST_CHECK(iter == iter2);
   BOOST_CHECK(iter == end);
   BOOST_CHECK(iter2 == end);
+
+  BOOST_CHECK(TL::u32string(savePos, end) == U"test");
 }
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()

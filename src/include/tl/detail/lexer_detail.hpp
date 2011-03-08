@@ -265,6 +265,7 @@ namespace TransLucid
         ) const
         {
           u32string type, value;
+          bool error = false;
 
           std::cerr << "constructing constant with string " << 
             u32string(first, last) << std::endl;
@@ -293,7 +294,7 @@ namespace TransLucid
                 auto r = build_escaped_characters(current, last);
                 if (!r.first)
                 {
-                  //error = true;
+                  error = true;
                 }
                 else
                 {
@@ -318,6 +319,11 @@ namespace TransLucid
               value += *current;
               ++current;
             }
+          }
+
+          if (error)
+          {
+            value = U"==error==";
           }
 
           std::cerr << "built constant of value " << type << "\"" << value <<
@@ -491,6 +497,29 @@ namespace boost { namespace spirit { namespace traits
     )
     {
       throw "construct character incorrectly called";
+    }
+  };
+  
+  template <typename Iterator>
+  struct assign_to_attribute_from_iterators<TransLucid::u32string, Iterator>
+  {
+    static void
+    call
+    (
+      Iterator const& first,
+      Iterator const& last,
+      TransLucid::u32string& attr
+    )
+    {
+      attr.clear();
+      std::cerr << "constructing u32string" << std::endl;
+      Iterator current = first;
+      while (current != last)
+      {
+        attr += *current;
+        std::cerr << attr << std::endl;
+        ++current;
+      }
     }
   };
 }}}

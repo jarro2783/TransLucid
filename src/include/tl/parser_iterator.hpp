@@ -34,8 +34,7 @@ namespace TransLucid
       public std::iterator
       <
         std::input_iterator_tag,
-        wchar_t,
-        int64_t
+        wchar_t
       >
     {
     };
@@ -228,20 +227,6 @@ namespace TransLucid
       {
         return m_iter->operator->();
       }
-
-      #if 0
-      difference_type operator-(const U32Iterator& rhs) const
-      {
-        //TODO: implement me
-        if (rhs.m_iter == 0 || *rhs.m_iter == *rhs.m_end)
-        {
-          //if rhs is the end iterator, then return the difference between
-          //this iterator's current and end
-          return (*m_end) - (*m_iter);
-        }
-        return 0;
-      }
-      #endif
 
       private:
       Iterator* m_iter;
