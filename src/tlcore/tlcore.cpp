@@ -364,8 +364,8 @@ TLCore::addExpression(const Tree::Expr& e)
 void
 TLCore::evaluateInstant()
 {
-  typedef std::back_insert_iterator<std::string> out_iter;
-  Printer::ExprPrinter<out_iter> printer;
+  //typedef std::back_insert_iterator<std::string> out_iter;
+  //Printer::ExprPrinter<out_iter> printer;
 
   //add the equations
   addNewEquations();
@@ -379,8 +379,7 @@ TLCore::evaluateInstant()
     if (m_verbose)
     {
       std::string output;
-      std::back_insert_iterator<std::string> outit(output);
-      Printer::karma::generate(outit, printer, iter->first);
+      output = print_expr_tree(iter->first);
       (*m_os) << "expr<" << output << ">" << " -> ";
       (*m_os) << std::flush;
     }

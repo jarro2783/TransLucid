@@ -29,7 +29,7 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp cache.cpp \
   equation_parser.cpp \
   expr_compiler.cpp expr_parser.cpp header.cpp lexer_util.cpp library.cpp \
   parser.cpp printer.cpp range.cpp set_types.cpp \
-  system.cpp translator.cpp tuple_parser.cpp types.cpp \
+  system.cpp translator.cpp tree_printer.cpp tuple_parser.cpp types.cpp \
   utility.cpp valuehd.cpp
 
 libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \

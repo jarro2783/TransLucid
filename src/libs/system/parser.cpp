@@ -49,32 +49,35 @@ operator<<(std::ostream& os, const Header& h)
 std::string
 printEquation(const ParsedEquation& e)
 {
-  typedef std::back_insert_iterator<std::string> out_iter;
-  Printer::ExprPrinter<out_iter> print_grammar;
+  //typedef std::back_insert_iterator<std::string> out_iter;
+  //Printer::ExprPrinter<out_iter> print_grammar;
   std::string generated;
-  std::back_insert_iterator<std::string> outit(generated);
+  //std::back_insert_iterator<std::string> outit(generated);
 
   std::string result = utf32_to_utf8(to_u32string(std::get<0>(e)));
 
   const Tree::Expr& guard = std::get<1>(e);
   if (boost::get<Tree::nil>(&guard) == 0)
   {
-    Printer::karma::generate(outit, print_grammar, guard);
+    //Printer::karma::generate(outit, print_grammar, guard);
+    generated = print_expr_tree(guard);
     result += " | " + generated;
   }
 
   const Tree::Expr& boolean = std::get<2>(e);
   if (boost::get<Tree::nil>(&boolean) == 0)
   {
-    generated.clear();
-    Printer::karma::generate(outit, print_grammar, boolean);
+    //generated.clear();
+    //Printer::karma::generate(outit, print_grammar, boolean);
+    generated = print_expr_tree(boolean);
     result += " & " + generated;
   }
 
   result += " = ";
 
-  generated.clear();
-  Printer::karma::generate(outit, print_grammar, std::get<3>(e));
+  //generated.clear();
+  //Printer::karma::generate(outit, print_grammar, std::get<3>(e));
+  generated = print_expr_tree(std::get<3>(e));
   result += generated;
 
   return result;
