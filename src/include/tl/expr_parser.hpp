@@ -273,6 +273,9 @@ namespace TransLucid
             _val = construct<Tree::ConstantExpr>(_1)
           ]
         | tok.constantRAW_
+          [
+            _val = construct<Tree::ConstantExpr>(_1)
+          ]
         | tok.character_[_val = construct<char32_t>(_1)]
         ;
         
