@@ -92,6 +92,13 @@ namespace TransLucid
       return construct_typed_constant(d.type, v);
     }
 
+    //determines if an identifier is a dimension, some named constant, or
+    //just an identifier
+    inline Tree::Expr
+    construct_identifier(const u32string& id)
+    {
+    }
+
     template <typename Iterator>
     class ExprGrammar
     : public qi::grammar<Iterator, Tree::Expr()>
@@ -260,7 +267,7 @@ namespace TransLucid
         ;
 
         ident_constant = 
-          tok.identifier_ [_val = construct<Tree::IdentExpr>(_1)]
+          tok.identifier_ [_val = ph::bind(construct_identifier, _1)]
         | tok.constantINTERPRET_
           [
             _val = construct<Tree::ConstantExpr>(_1)
