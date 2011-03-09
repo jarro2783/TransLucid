@@ -1,4 +1,4 @@
 #!/bin/sh
 
 echo $PWD
-${RUNBINARY} ${LIBRARY_PATH} PROGRAM_NAME --log_level=message
+${RUNBINARY} ${LIBRARY_PATH} PROGRAM_NAME ${TEST_FLAGS}

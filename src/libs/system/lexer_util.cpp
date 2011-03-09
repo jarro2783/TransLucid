@@ -55,7 +55,6 @@ mpf_class
 init_mpf(const Iterator& begin, const Iterator& end, int base)
 {
   unsigned int prec = mpf_get_default_prec();
-  std::cerr << "default precision is " << prec << std::endl;
   Iterator current = begin;
   std::string s;
 
@@ -83,8 +82,6 @@ init_mpf(const Iterator& begin, const Iterator& end, int base)
     prec = precision.get_si();
   }
 
-  std::cerr << "init_mpf: " << s << ", base: " << base 
-    << ", precision " << prec << std::endl;
   return mpf_class(s, prec, base);
 }
 
@@ -99,9 +96,6 @@ build_escaped_characters
   const Iterator& end
 )
 {
-  std::cerr << "got the following string to escape: " <<
-    u32string(current, end) 
-    << std::endl;
   std::string building;
   bool error = false;
   int to_read = 0;
@@ -142,7 +136,6 @@ build_escaped_characters
     std::string chars;
     if (to_read > 0)
     {
-      std::cerr << "reading " << to_read << " characters" << std::endl;
       while (to_read > 0 && current != end && *current != '\'')
       {
         c = *current;  
@@ -177,14 +170,12 @@ build_escaped_characters
         {
           value = value * 16 + (c - 'A' + 10);
         }
-        std::cerr << "value = " << value << std::endl;
       }
 
       //it was a byte if it was two characters, otherwise it was a whole
       //character
       if (chars.length() == 2)
       {
-        std::cerr << "the byte is " << value << std::endl;
         building += char(value & 0xFF);
       }
       else
@@ -194,14 +185,7 @@ build_escaped_characters
     }
   }
 
-  std::cerr << "building = " << building << std::endl;
-
-  std::cerr << "error: " << error << std::endl;
-  std::cerr << "current ended on " << *current << std::endl;
-  std::cerr << "remaining string = \"" << u32string(current, end) << "\""
-    << std::endl;
   u32string u32result = utf8_to_utf32(building);
-  std::cerr << "returning: \"" << u32result << "\"" << std::endl;
   return std::make_pair(!error, u32result);
 }
 

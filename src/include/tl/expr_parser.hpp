@@ -27,6 +27,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_util.hpp>
 #include <tl/utility.hpp>
 
+#include <unordered_map>
+
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/include/qi_nonterminal.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
@@ -95,7 +97,11 @@ namespace TransLucid
     //determines if an identifier is a dimension, some named constant, or
     //just an identifier
     inline Tree::Expr
-    construct_identifier(const u32string& id)
+    construct_identifier
+    (
+      const u32string& id,
+      const std::unordered_map<u32string, Tree::Expr>& ids
+    )
     {
     }
 
@@ -267,7 +273,14 @@ namespace TransLucid
         ;
 
         ident_constant = 
-          tok.identifier_ [_val = ph::bind(construct_identifier, _1)]
+          tok.identifier_ 
+          [
+            _val = ph::bind(
+              construct_identifier, 
+              _1, 
+              ph::ref(m_reserved_identifiers)
+            )
+          ]
         | tok.constantINTERPRET_
           [
             _val = construct<Tree::ConstantExpr>(_1)
@@ -278,44 +291,7 @@ namespace TransLucid
           ]
         | tok.character_[_val = construct<char32_t>(_1)]
         ;
-        
-        //we are deleting delimiters for now
-        #if 0
-        delimiters = 
-          (   header.delimiter_start_symbols
-              [
-                _b = _1,
-                _a = construct<string_type>()
-              ]
-           >> (
-               qi::no_skip
-               [
-                 *(qi::unicode::char_ -
-                   end_delimiter(ph::bind(&get_end_char, _b)))
-                  [
-                    _a += _1
-                  ]
-               ]
-              )
-            > end_delimiter(ph::bind(&get_end_char, _b))
-          )
-          [
-            _val = ph::bind(&construct_delimited_constant, _b,
-                            make_u32string(_a))
-          ]
-        ;
-
-        arg_dimensions = 
-          qi::lexeme
-          [
-            (literal("arg") >> qi::int_)
-            [
-              _val = ph::bind(&construct_arg_delim, _1)
-            ]
-          ]
-        ;
-        #endif
-
+       
         boolean =
           tok.true_
           [
@@ -388,8 +364,6 @@ namespace TransLucid
 
       private:
 
-      char_type end;
-
       qi::rule<Iterator, Tree::Expr()>
         expr,
         if_expr,
@@ -410,14 +384,6 @@ namespace TransLucid
         phi_application
       ;
 
-      //qi::rule<Iterator, u32string()>
-      //  arg_dimensions
-      //;
-
-      //qi::rule<Iterator, void(char_type)>
-      //  end_delimiter
-      //;
-
       qi::rule<Iterator, Tree::Expr(), qi::locals<Tree::Expr>>
         postfix_expr,
         at_expr,
@@ -426,7 +392,6 @@ namespace TransLucid
 
       qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>>
         primary_expr
-        //delimiters
       ;
 
       qi::rule<Iterator, Tree::Expr()>
@@ -434,6 +399,7 @@ namespace TransLucid
       ;
 
       Header &header;
+      std::unordered_map<u32string, Tree::Expr> m_reserved_identifiers;
 
       qi::symbols<char_type, Special::Value> specials;
     };

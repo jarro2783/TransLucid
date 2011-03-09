@@ -129,7 +129,7 @@ class Checker
 
 	void identifier(const TL::u32string& ws)
 	{
-    std::cerr << "got identifier: " << ws << std::endl;
+    BOOST_TEST_MESSAGE("Testing identifier: " << ws);
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const TL::u32string* wsp = boost::get<TL::u32string>(&*m_current);
@@ -143,7 +143,7 @@ class Checker
 
 	void integer(const value_wrapper<mpz_class>& i)
 	{
-    std::cerr << "got integer: " << i << std::endl;
+    BOOST_TEST_MESSAGE("Testing integer: " << i);
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const value_wrapper<mpz_class>* ip = 
@@ -157,7 +157,6 @@ class Checker
 
 	void keyword(Keyword t)
 	{
-    std::cerr << "got keyword: " << t << std::endl;
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const Keyword* tp = boost::get<Keyword>(&*m_current);
@@ -182,7 +181,6 @@ class Checker
 
   void rational(const value_wrapper<mpq_class>& q)
   {
-    std::cerr << "in rational" << std::endl;
     BOOST_TEST_MESSAGE("Testing rational: " << q);
     BOOST_REQUIRE(m_current != m_tokens.end());
 

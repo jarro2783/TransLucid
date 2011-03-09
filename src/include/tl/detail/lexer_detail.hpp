@@ -123,8 +123,6 @@ namespace TransLucid
         ) const
         {
           try {
-            std::cerr << "building float from " << std::string(start, end)
-              << std::endl;
             Iterator current = start;
             bool negative = false;
             mpf_class value;
@@ -267,9 +265,6 @@ namespace TransLucid
           u32string type, value;
           bool error = false;
 
-          std::cerr << "constructing constant with string " << 
-            u32string(first, last) << std::endl;
-
           Iterator current = first;
           while (current != last && *current != '"' && *current != '`')
           {
@@ -298,13 +293,11 @@ namespace TransLucid
                 }
                 else
                 {
-                  std::cerr << "appending " << r.second << std::endl;
                   value += r.second;
                 }
               }
               else
               {
-                std::cerr << "appending " << *current << std::endl;
                 value += *current;
                 ++current;
               }
@@ -323,11 +316,10 @@ namespace TransLucid
 
           if (error)
           {
+            //TODO: set an error flag here
             value = U"==error==";
           }
 
-          std::cerr << "built constant of value " << type << "\"" << value <<
-            "\"" << std::endl;
           ctx.set_value(std::make_pair(type, value));
         }
       };
@@ -358,11 +350,8 @@ namespace TransLucid
             {
               //handle escape characters
               auto r = build_escaped_characters(current, last);
-              std::cerr << "after build: valid = " << r.first <<
-                ", string == \"" << r.second << "\"" << std::endl;
               if (!r.first || r.second.length() != 1)
               {
-                std::cerr << "error after build" << std::endl;
                 error = true;
               }
               else
@@ -397,7 +386,6 @@ namespace TransLucid
 
           if (error)
           {
-            std::cerr << "error at build_character" << std::endl;
             matched = lex::pass_flags::pass_fail;
           }
           else
@@ -500,6 +488,7 @@ namespace boost { namespace spirit { namespace traits
     }
   };
   
+  #if 0
   template <typename Iterator>
   struct assign_to_attribute_from_iterators<TransLucid::u32string, Iterator>
   {
@@ -522,6 +511,7 @@ namespace boost { namespace spirit { namespace traits
       }
     }
   };
+  #endif
 }}}
 
 #endif
