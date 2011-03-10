@@ -27,7 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/expr_compiler.hpp>
 #include <tl/hyperdaton.hpp>
-#include <tl/lexer.hpp>
+//#include <tl/lexer.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/system.hpp>

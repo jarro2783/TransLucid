@@ -262,6 +262,8 @@ namespace TransLucid
           Context& ctx
         ) const
         {
+          std::cerr << "building string: " << u32string(first, last)
+            << std::endl;
           u32string type, value;
           bool error = false;
 
@@ -512,6 +514,17 @@ namespace boost { namespace spirit { namespace traits
     }
   };
   #endif
+
+  template <>
+  struct token_printer_debug<wchar_t>
+  {
+    template <typename Out>
+    static void print(Out& o, wchar_t const& c)
+    {
+      TransLucid::u32string s(1, c);
+      o << s;
+    }
+  };
 }}}
 
 #endif

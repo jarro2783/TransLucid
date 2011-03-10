@@ -422,4 +422,16 @@ operator<<(std::ostream& os, const TransLucid::Constant& v)
   return os;
 }
 
+namespace std
+{
+  template<>
+  struct hash<TransLucid::Constant>
+  {
+    size_t operator()(const TransLucid::Constant& c) const
+    {
+      return c.hash();
+    }
+  };
+}
+
 #endif

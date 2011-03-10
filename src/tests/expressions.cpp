@@ -163,7 +163,9 @@ BOOST_AUTO_TEST_CASE ( strings ) {
 
 BOOST_AUTO_TEST_CASE ( chars ) {
 
-  std::auto_ptr<TL::HD> h(translator.translate_expr(U"\'h\'"));
+  BOOST_TEST_MESSAGE("test suite: chars");
+
+  std::auto_ptr<TL::HD> h(translator.translate_expr(U"'h'"));
   BOOST_REQUIRE(h.get() != 0);
   TL::TaggedConstant v = (*h)(TL::Tuple());
 
@@ -175,7 +177,7 @@ BOOST_AUTO_TEST_CASE ( chars ) {
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_UCHAR);
   BOOST_CHECK(v.first.value<TL::Char>().value() == U'h');
 
-  h.reset(translator.translate_expr(U"\'è\'"));
+  h.reset(translator.translate_expr(U"'è'"));
   BOOST_REQUIRE(h.get() != 0);
   v = (*h)(TL::Tuple());
 
@@ -226,6 +228,7 @@ BOOST_AUTO_TEST_CASE ( unary_ops )
 BOOST_AUTO_TEST_CASE ( context_change )
 {
   BOOST_TEST_MESSAGE("Entering context change");
+  TL::u32string s;
   TL::HD* h = 0;
 
   BOOST_TEST_MESSAGE("translating \"1\"");
@@ -273,7 +276,9 @@ BOOST_AUTO_TEST_CASE ( context_change )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 42);
 
-  h = translator.translate_expr(U"(#1-2) @ [1 : 5]");
+  s = U"(#1-2) @ [1 : 5]";
+  BOOST_TEST_MESSAGE("translating: " << s);
+  h = translator.translate_expr(s);
   v = (*h)(TL::Tuple());
 
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);

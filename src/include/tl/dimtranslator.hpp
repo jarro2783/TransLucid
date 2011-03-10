@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define DIMTRANSLATOR_HPP_INCLUDED
 
 #include <tl/types.hpp>
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 namespace TransLucid
 {
@@ -64,8 +64,8 @@ namespace TransLucid
 
     size_t m_nextIndex;
 
-    typedef boost::unordered_map<u32string, size_t> ustring_size_map;
-    typedef boost::unordered_map<Constant, size_t> ustring_type_map;
+    typedef std::unordered_map<u32string, size_t> ustring_size_map;
+    typedef std::unordered_map<Constant, size_t> ustring_type_map;
 
     ustring_size_map m_namedDims;
     ustring_type_map m_typedDims;

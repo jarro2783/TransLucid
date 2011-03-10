@@ -394,6 +394,7 @@ BOOST_AUTO_TEST_CASE ( keywords )
 
 BOOST_AUTO_TEST_CASE ( constants )
 {
+  BOOST_TEST_MESSAGE("test case: constants");
   TL::u32string input = U"`hello` 'a' '\\U00000041' '\\u0041' '\\xC2\\xA2'"
                         U"\"text\\u00E4\\xC2\\xA2\"";
   Checker checker({
@@ -410,6 +411,7 @@ BOOST_AUTO_TEST_CASE ( constants )
 
 BOOST_AUTO_TEST_CASE ( integers )
 {
+  BOOST_TEST_MESSAGE("test case: integers");
   TL::u32string input = U"0 1 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111"
                         U" ~1 ~0Gab ~15 ~0111 ~1000"
   ;

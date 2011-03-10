@@ -176,6 +176,7 @@ build_escaped_characters
       //character
       if (chars.length() == 2)
       {
+        std::cerr << "adding byte " << std::hex << value << std::endl;
         building += char(value & 0xFF);
       }
       else

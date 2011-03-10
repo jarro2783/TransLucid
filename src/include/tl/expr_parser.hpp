@@ -352,7 +352,6 @@ namespace TransLucid
         prefix_expr,
         hash_expr,
         context_perturb,
-        //dimensions,
         paren_expr,
         function_abstraction
       ;
