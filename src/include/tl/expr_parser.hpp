@@ -94,17 +94,6 @@ namespace TransLucid
       return construct_typed_constant(d.type, v);
     }
 
-    //determines if an identifier is a dimension, some named constant, or
-    //just an identifier
-    inline Tree::Expr
-    construct_identifier
-    (
-      const u32string& id,
-      const std::unordered_map<u32string, Tree::Expr>& ids
-    )
-    {
-    }
-
     template <typename Iterator>
     class ExprGrammar
     : public qi::grammar<Iterator, Tree::Expr()>
@@ -121,17 +110,7 @@ namespace TransLucid
       {
         using namespace qi::labels;
 
-        for 
-        (
-          auto iter = Special::m_sv.parser_stov.begin(); 
-          iter != Special::m_sv.parser_stov.end();
-          ++iter
-        )
-        {
-          specials.add(
-            iter->first.c_str(),
-            iter->second);
-        }
+        m_reserved_identifiers = init_reserved_identifiers();
 
         expr %= if_expr
         ;
@@ -399,9 +378,10 @@ namespace TransLucid
       ;
 
       Header &header;
-      std::unordered_map<u32string, Tree::Expr> m_reserved_identifiers;
-
-      qi::symbols<char_type, Special::Value> specials;
+      //this contains a mapping of all the reserved identifiers to
+      //their expression tree
+      //the place that this is stored might change in the future
+      ReservedIdentifierMap m_reserved_identifiers;
     };
 
     extern template class ExprGrammar<iterator_t>;

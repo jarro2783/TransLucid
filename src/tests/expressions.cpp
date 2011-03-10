@@ -201,6 +201,7 @@ BOOST_AUTO_TEST_CASE ( specials ) {
     {U"spdim", Special::DIMENSION},
     {U"spundef", Special::UNDEF},
     {U"spconst", Special::CONST},
+    {U"spmultidef", Special::MULTIDEF},
     {U"sploop", Special::LOOP}
   };
 

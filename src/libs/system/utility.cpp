@@ -328,7 +328,7 @@ u32_to_ascii(const u32string& s)
 {
   std::string r;
 
-  BOOST_FOREACH(char32_t c, s)
+  for(char32_t c : s)
   {
     if (c > 0x7F)
     {

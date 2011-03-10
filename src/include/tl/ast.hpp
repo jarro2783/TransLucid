@@ -421,7 +421,7 @@ namespace TransLucid
       {
         using boost::fusion::at_c;
 
-        BOOST_FOREACH(auto& v, eif)
+        for(auto& v : eif)
         {
           else_ifs.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
         }

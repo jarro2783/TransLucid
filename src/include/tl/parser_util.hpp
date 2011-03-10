@@ -25,18 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
  * Parsing utility functions and definitions.
  */
 
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_bind.hpp>
-#include <boost/spirit/home/phoenix/function/function.hpp>
-#include <boost/spirit/include/qi_rule.hpp>
-#include <boost/spirit/include/qi_grammar.hpp>
-#include <boost/spirit/include/qi_char_.hpp>
-//#include <boost/spirit/include/qi_int.hpp>
-#include <boost/spirit/include/qi_action.hpp>
-#include <boost/spirit/include/qi_lexeme.hpp>
-#include <boost/spirit/include/qi_char_class.hpp>
-#include <boost/spirit/home/qi/auxiliary/eps.hpp>
-#include <boost/spirit/home/qi/nonterminal/debug_handler.hpp>
+#include <unordered_map>
 
 #include <gmpxx.h>
 #include <tl/types.hpp>
@@ -48,6 +37,21 @@ namespace TransLucid
 {
   namespace Parser
   {
+    typedef std::unordered_map<u32string, Tree::Expr> ReservedIdentifierMap;
+    //determines if an identifier is a dimension, some named constant, or
+    //just an identifier
+    Tree::Expr
+    construct_identifier
+    (
+      const u32string& id,
+      const ReservedIdentifierMap& ids
+    );
+
+    //initialises the reserved identifier map, this might need to change
+    //in the future too
+    ReservedIdentifierMap
+    init_reserved_identifiers();
+
     //TODO this may be useful for handling errors
     #if 0
     struct handle_expr_error

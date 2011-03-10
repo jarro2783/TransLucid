@@ -17,11 +17,16 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/builtin_types.hpp>
 #include <tl/charset.hpp>
 #include <tl/exception.hpp>
 #include <tl/parser_fwd.hpp>
 #include <tl/parser_header_util.hpp>
 #include <tl/tree_printer.hpp>
+#include <tl/parser_util.hpp>
+
+#include <algorithm>
+#include <iterator>
 
 namespace TransLucid
 {
@@ -81,6 +86,56 @@ printEquation(const ParsedEquation& e)
   result += generated;
 
   return result;
+}
+
+Tree::Expr
+construct_identifier
+(
+  const u32string& id,
+  const ReservedIdentifierMap& ids
+)
+{
+  auto iter = ids.find(id);
+  if (iter == ids.end())
+  {
+    return Tree::IdentExpr(id);
+  }
+  else
+  {
+    return iter->second;
+  }
+}
+
+struct IdMapper
+{
+  template <typename Value>
+  auto operator()(const Value& v) 
+    -> decltype(std::make_pair(v.first, Tree::Expr()))
+  {
+    return std::make_pair(v.first, Tree::Expr(v.second));
+  }
+};
+
+ReservedIdentifierMap
+init_reserved_identifiers()
+{
+  ReservedIdentifierMap m;
+
+  auto inserter = std::inserter(m, m.end());
+  std::transform(Special::m_sv.parser_stov.begin(), Special::m_sv.parser_stov.end(), 
+    inserter,
+    IdMapper()
+
+    #if 0
+    [](const Special::StringValueInitialiser::StringValueMap::value_type& 
+       iter) 
+    {
+      return std::make_pair(p.first, Tree::Expr(p.second));
+    } 
+    #endif
+  );
+
+  return m;
 }
 
 //I'll keep this for now because it could be of use

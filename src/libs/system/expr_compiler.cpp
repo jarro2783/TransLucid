@@ -148,7 +148,7 @@ ExprCompiler::operator()(const Tree::IfExpr& e)
 
   std::vector<std::pair<HD*, HD*>> else_ifs;
 
-  BOOST_FOREACH(auto& v, e.else_ifs)
+  for(auto& v : e.else_ifs)
   {
     else_ifs.push_back(std::make_pair
     (
@@ -171,7 +171,7 @@ HD*
 ExprCompiler::operator()(const Tree::TupleExpr& e)
 {
   std::list<std::pair<HD*, HD*>> elements;
-  BOOST_FOREACH(auto& v, e.pairs)
+  for(auto& v : e.pairs)
   {
     HD* lhs = boost::apply_visitor(*this, at_c<0>(v));
     HD* rhs = boost::apply_visitor(*this, at_c<1>(v));

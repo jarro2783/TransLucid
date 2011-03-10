@@ -19,11 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
-#include <boost/foreach.hpp>
-#include <boost/assign.hpp>
 #include <tl/utility.hpp>
-
-using boost::assign::map_list_of;
 
 namespace TransLucid
 {
@@ -43,14 +39,12 @@ Special::StringValueInitialiser::StringValueInitialiser()
   {Special::MULTIDEF, U"multidef"}
 }
 {
-  std::basic_string<unsigned int> prefix({'s', 'p'});
-  BOOST_FOREACH(ValueStringMap::value_type const& v, vtos)
+  u32string prefix({'s', 'p'});
+  for(ValueStringMap::value_type const& v : vtos)
   {
     stov.insert(std::make_pair(v.second, v.first));
-    std::basic_string<unsigned int> parser_string = prefix + 
-      std::basic_string<unsigned int>(v.second.begin(), v.second.end());
-    //std::cerr << "mapping " << utf32_to_utf8(to_u32string(parser_string))
-    //  << " to " << v.first << std::endl;
+    u32string parser_string = prefix + v.second;
+
     parser_stov.insert(std::make_pair(parser_string, v.first));
   }
 }
@@ -114,4 +108,28 @@ LambdaFunctionType::print(std::ostream& os) const
   os << "LambdaFunction";
 }
 
+}
+
+namespace std
+{
+  template <>
+  size_t
+  hash<basic_string<unsigned int>>::operator()
+  (const basic_string<unsigned int> s) const
+  {
+    size_t val = 0;
+    for(unsigned int c : s)
+    {
+      val = _Hash_impl::__hash_combine(c, val);
+    }
+    return val;
+  }
+
+  template <>
+  size_t
+  hash<TransLucid::Special::Value>::operator()
+  (TransLucid::Special::Value v) const
+  {
+    return v;
+  }
 }

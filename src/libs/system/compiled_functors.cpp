@@ -337,7 +337,7 @@ VariableOpHD::operator()(const Tuple& k)
 
   int i = 0;
   std::ostringstream os;
-  BOOST_FOREACH(HD* h, m_operands)
+  for(HD* h : m_operands)
   {
     os.str("arg");
     os << i;
@@ -389,7 +389,7 @@ TaggedConstant
 TupleHD::operator()(const Tuple& k)
 {
   tuple_t kp;
-  BOOST_FOREACH(auto& pair, m_elements)
+  for(auto& pair : m_elements)
   {
     //const Pair& p = v.first.value<Pair>();
     TaggedConstant left = (*pair.first)(k);
@@ -443,7 +443,7 @@ AtRelativeHD::operator()(const Tuple& k)
       return TaggedConstant(make_special(Special::ACCESS), k);
     }
 
-    BOOST_FOREACH(tuple_t::value_type v, delta)
+    for(tuple_t::value_type v : delta)
     {
       kNew[v.first] = v.second;
     }

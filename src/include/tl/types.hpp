@@ -20,10 +20,8 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_H_INCLUDED
 #define TYPES_H_INCLUDED
 
-#include <boost/foreach.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
@@ -57,7 +55,7 @@ namespace boost
     inline std::ostream&
     operator<<(std::ostream& os, const uuid& id)
     {
-      BOOST_FOREACH(int i, id)
+      for(int i : id)
       {
         os << std::hex << i;
       }

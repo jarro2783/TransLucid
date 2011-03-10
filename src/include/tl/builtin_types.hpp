@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 //#include <tl/equation.hpp>
 #include <set>
+#include <unordered_map>
 
 namespace TransLucid
 {
@@ -97,15 +98,13 @@ namespace TransLucid
 
     struct StringValueInitialiser
     {
-      typedef boost::unordered_map<u32string, Value> StringValueMap;
+      typedef std::unordered_map<u32string, Value> StringValueMap;
       StringValueMap stov;
 
-      typedef boost::unordered_map<Value, u32string> ValueStringMap;
+      typedef std::unordered_map<Value, u32string> ValueStringMap;
       ValueStringMap vtos;
 
-      typedef boost::unordered_map<std::basic_string<unsigned int>, Value> 
-      UnsignedStringValueMap;
-      UnsignedStringValueMap parser_stov;
+      StringValueMap parser_stov;
 
       StringValueInitialiser();
     };

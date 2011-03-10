@@ -160,7 +160,7 @@ SystemHD::buildConstantHD(size_t index)
 void
 SystemHD::init_types()
 {
-  BOOST_FOREACH(auto v, builtin_name_to_index)
+  for(auto v : builtin_name_to_index)
   {
     addToVariableActual(v.first, Tuple(),
                         new Hyperdatons::TypeConstHD(v.second));
@@ -257,7 +257,7 @@ SystemHD::tick()
 
   //run the applicable demands
 
-  BOOST_FOREACH(const DemandStore::value_type& d, m_demands)
+  for(const DemandStore::value_type& d : m_demands)
   {
     Tuple t = d.second.evaluate(Tuple());
     if (tupleApplicable(t, k))

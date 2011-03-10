@@ -126,7 +126,7 @@ GuardHD::evaluate(const Tuple& k) const
     //still need to remove this magic
     if (v.first.index() == TYPE_INDEX_TUPLE)
     {
-      BOOST_FOREACH(const Tuple::value_type& value, v.first.value<Tuple>())
+      for(const Tuple::value_type& value : v.first.value<Tuple>())
       {
         if (t.find(value.first) != t.end())
         {
