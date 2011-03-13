@@ -232,23 +232,19 @@ namespace TransLucid
           ]
         ;
 
-        primary_expr %=
-          integer
-        | boolean
+        primary_expr =
+          tok.integer_[_val = construct<mpz_class>(_1)]
+        | boolean [_val = _1]
         //| dimensions
         //| specials
-        | ident_constant
-        | context_perturb
-        | paren_expr 
-//        | delimiters
-        | function_abstraction
-        ;
-
-        paren_expr =
-          (literal('(') >> expr > literal(')')) 
+        | ident_constant [_val = _1]
+        | context_perturb [_val = _1]
+        | (literal('(') >> expr > literal(')')) 
           [
             _val = construct<Tree::ParenExpr>(_1)
           ]
+//        | delimiters
+        | function_abstraction [_val = _1]
         ;
 
         ident_constant = 
@@ -282,8 +278,6 @@ namespace TransLucid
           ]
         ;
 
-        integer = tok.integer_[_val = construct<mpz_class>(_1)];
-
         function_abstraction = 
             //phi abstraction
             (tok.dblslash_ > tok.identifier_ > tok.arrow_ > expr)
@@ -301,7 +295,6 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(expr);
         BOOST_SPIRIT_DEBUG_NODE(boolean);
         BOOST_SPIRIT_DEBUG_NODE(range_expr);
-        BOOST_SPIRIT_DEBUG_NODE(integer);
         BOOST_SPIRIT_DEBUG_NODE(prefix_expr);
         BOOST_SPIRIT_DEBUG_NODE(hash_expr);
         BOOST_SPIRIT_DEBUG_NODE(context_perturb);
@@ -314,7 +307,6 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(lambda_application);
 
         expr.name("expr");
-        integer.name("integer");
 
         qi::on_error<qi::fail>
         (
@@ -348,11 +340,9 @@ namespace TransLucid
         if_expr,
         boolean,
         range_expr,
-        integer,
         prefix_expr,
         hash_expr,
         context_perturb,
-        paren_expr,
         function_abstraction
       ;
 
