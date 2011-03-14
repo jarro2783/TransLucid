@@ -170,9 +170,10 @@ namespace TransLucid
         | L')'
         | L'|'
         | L','
+        | boost::spirit::standard_wide::char_(L".")[lex::_tokenid = *lex::_start]
         ;
 
-        this->self.add(L".");
+        //this->self.add(L".");
       }
 
       lex::token_def<lex::unused_type, lex_char_type> 
