@@ -17,12 +17,82 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/ast.hpp>
+#include <tl/builtin_types.hpp>
 #include <tl/expr_parser.hpp>
+#include <tl/parser_fwd.hpp>
+#include <tl/parser_header_util.hpp>
+#include <tl/parser_util.hpp>
+#include <tl/utility.hpp>
+
+#include <unordered_map>
+
+#include <boost/spirit/include/qi_auxiliary.hpp>
+#include <boost/spirit/include/qi_nonterminal.hpp>
+#include <boost/spirit/include/qi_sequence.hpp>
+#include <boost/spirit/include/qi_action.hpp>
+#include <boost/spirit/include/qi_core.hpp>
+
+#include <boost/spirit/home/phoenix/object/new.hpp>
+#include <boost/spirit/home/phoenix/object/construct.hpp>
+#include <boost/spirit/home/phoenix/container.hpp>
+#include <boost/spirit/home/phoenix/bind/bind_function.hpp>
+#include <boost/spirit/home/phoenix/statement/sequence.hpp>
+
 
 namespace TransLucid
 {
   namespace Parser
   {
+    namespace ph = boost::phoenix;
+    using namespace ph;
+
+    inline char_type
+    get_end_char(const Delimiter& d)
+    {
+      return d.end;
+    }
+
+    inline u32string
+    get_name(const Delimiter& d)
+    {
+      return d.type;
+    }
+
+    inline Tree::Expr
+    construct_typed_constant(const u32string& type, const u32string& value)
+    {
+      if (type == U"ustring") {
+        if (!validate_ustring(value)) {
+          throw ParseError(U"Invalid character in ustring");
+        }
+        return value;
+      } else if (type == U"uchar") {
+        char32_t v = value[0];
+        if (!validate_uchar(v)) {
+          throw ParseError(U"Invalid character");
+        }
+        return v;
+      } else {
+        return Tree::ConstantExpr(type, value);
+      }
+    }
+
+    inline u32string
+    construct_arg_delim(int a)
+    {
+      std::ostringstream os;
+      os << "arg" << a;
+      const std::string& s = os.str();
+      return std::u32string(s.begin(), s.end());
+    }
+
+    inline Tree::Expr
+    construct_delimited_constant(Delimiter& d, const u32string& v)
+    {
+      return construct_typed_constant(d.type, v);
+    }
+
     /**
      * Construct an expression grammar.
      * @param h The parser header to use.
@@ -156,23 +226,19 @@ namespace TransLucid
         ]
       ;
 
-      primary_expr %=
-        integer
-      | boolean
+      primary_expr =
+        tok.integer_[_val = construct<mpz_class>(_1)]
+      | boolean [_val = _1]
       //| dimensions
       //| specials
-      | ident_constant
-      | context_perturb
-      | paren_expr 
-//        | delimiters
-      | function_abstraction
-      ;
-
-      paren_expr =
-        (literal('(') >> expr > literal(')')) 
+      | ident_constant [_val = _1]
+      | context_perturb [_val = _1]
+      | (literal('(') >> expr > literal(')')) 
         [
           _val = construct<Tree::ParenExpr>(_1)
         ]
+//        | delimiters
+      | function_abstraction [_val = _1]
       ;
 
       ident_constant = 
@@ -206,8 +272,6 @@ namespace TransLucid
         ]
       ;
 
-      integer = tok.integer_[_val = construct<mpz_class>(_1)];
-
       function_abstraction = 
           //phi abstraction
           (tok.dblslash_ > tok.identifier_ > tok.arrow_ > expr)
@@ -225,7 +289,6 @@ namespace TransLucid
       BOOST_SPIRIT_DEBUG_NODE(expr);
       BOOST_SPIRIT_DEBUG_NODE(boolean);
       BOOST_SPIRIT_DEBUG_NODE(range_expr);
-      BOOST_SPIRIT_DEBUG_NODE(integer);
       BOOST_SPIRIT_DEBUG_NODE(prefix_expr);
       BOOST_SPIRIT_DEBUG_NODE(hash_expr);
       BOOST_SPIRIT_DEBUG_NODE(context_perturb);
@@ -238,7 +301,6 @@ namespace TransLucid
       BOOST_SPIRIT_DEBUG_NODE(lambda_application);
 
       expr.name("expr");
-      integer.name("integer");
 
       qi::on_error<qi::fail>
       (
@@ -251,18 +313,14 @@ namespace TransLucid
         << val("\"")
         << std::endl
       );
-    }
 
-    template <typename Iterator>
-    template <typename T>
-    void
-    ExprGrammar<Iterator>::set_tuple(const T& t)
+    }
+  
+    ExprGrammar<iterator_t>*
+    create_expr_grammar(Header& h, Lexer::tl_lexer& l)
     {
-      context_perturb = t;
+      return new ExprGrammar<iterator_t>(h, l);
     }
-
-    template class ExprGrammar<iterator_t>;
-    template ExprGrammar<iterator_t>::ExprGrammar<Lexer::tl_lexer>
-      (Header& h, Lexer::tl_lexer& tok);
   }
-}
+
+  }
