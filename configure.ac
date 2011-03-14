@@ -34,12 +34,15 @@ AC_PROG_LIBTOOL
 
 AC_LANG([C++])
 
+GCC_MIN_VERSION=`cat $srcdir/checks/gcc_min_version`
+[$srcdir/checks/generate_gcc_min_version_check]
+
 # check for the correct version of gcc
-AC_MSG_CHECKING([for gcc >= 4.5.0])
+AC_MSG_CHECKING([for gcc >= $GCC_MIN_VERSION])
 GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
 AC_COMPILE_IFELSE($GCC_CHECK_TEXT, 
 [AC_MSG_RESULT([yes])],
-[AC_MSG_ERROR([gcc version 4.5.0 or greater is required])]
+[AC_MSG_ERROR([gcc version $GCC_MIN_VERSION or greater is required])]
 )
 
 # Checks for libraries.

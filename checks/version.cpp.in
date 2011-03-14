@@ -1,0 +1,10 @@
+#if __GNUC__ < REQUIRED_MAJOR
+  #error
+#endif
+
+#if __GNUC_MINOR__ < REQUIRED_MINOR
+  #error
+#endif
+
+int main()
+{ return 0; }
