@@ -24,5 +24,55 @@ namespace TransLucid
   namespace Parser
   {
     template class TupleGrammar<iterator_t>;
+    
+    template <typename Iterator>
+    TupleGrammar<Iterator>::TupleGrammar()
+    : TupleGrammar::base_type(context_perturb)
+    {
+      using namespace qi::labels;
+      using namespace boost::phoenix;
+      namespace phoenix = boost::phoenix;
+      //expr = self.parsers.expr_parser.top();
+
+      tuple_inside = pair[push_back(_val, _1)] % literal(',');
+
+      pair %=
+        (
+           expr
+         >  literal(':')
+         > expr
+        )
+        //[
+        //  _val = construct<boost::fusion::vector<Tree::Expr, Tree::Expr>>
+        //         (_1, _2)
+        //]
+      ;
+
+      context_perturb =
+         (
+            literal('[')
+          > tuple_inside
+          > literal(']')
+         )
+         [
+           _val = construct<Tree::TupleExpr>(_1)
+         ]
+      ;
+
+      expr.name("expr");
+      pair.name("pair");
+      context_perturb.name("context_perturb");
+      tuple_inside.name("tuple_inside");
+
+      BOOST_SPIRIT_DEBUG_NODE(context_perturb);
+      BOOST_SPIRIT_DEBUG_NODE(pair);
+      BOOST_SPIRIT_DEBUG_NODE(tuple_inside);
+    }
+
+    TupleGrammar<iterator_t>*
+    create_tuple_grammar()
+    {
+      return new TupleGrammar<iterator_t>;
+    }
   }
 }

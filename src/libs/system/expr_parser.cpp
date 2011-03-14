@@ -322,5 +322,4 @@ namespace TransLucid
       return new ExprGrammar<iterator_t>(h, l);
     }
   }
-
-  }
+}
