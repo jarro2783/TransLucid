@@ -100,6 +100,13 @@ namespace TransLucid
     {
       public:
 
+      template <typename TokenDef>
+      ExprGrammar(Header& h, TokenDef& tok);
+
+      template <typename T>
+      void
+      set_tuple(const T& t);
+#if 0
       /**
        * Construct an expression grammar.
        * @param h The parser header to use.
@@ -330,6 +337,7 @@ namespace TransLucid
 
       }
 
+
       /**
        * Set the tuple parser for this expression parser.
        * @param t The tuple parser.
@@ -340,6 +348,7 @@ namespace TransLucid
       {
         context_perturb = t;
       }
+      #endif
 
       private:
 
