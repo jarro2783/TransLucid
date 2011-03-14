@@ -34,7 +34,7 @@ namespace TransLucid
   {
 
     typedef qi::symbols<char_type, Tree::UnaryOperator> unary_symbols;
-    typedef qi::symbols<char_type, Tree::BinaryOperator> binary_symbols;
+    typedef qi::symbols<wchar_t, Tree::BinaryOperator> binary_symbols;
     typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
 
     struct Header
@@ -110,7 +110,8 @@ namespace TransLucid
       const mpz_class& precedence
     )
     {
-      auto usymbol = to_unsigned_u32string(symbol);
+      //auto usymbol = to_unsigned_u32string(symbol);
+      std::wstring usymbol = std::wstring(symbol.begin(), symbol.end());
       if (h.binary_op_symbols.find(usymbol.c_str()) != 0) 
       {
         throw ParseError(U"Existing binary operator");

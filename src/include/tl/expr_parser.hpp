@@ -323,7 +323,9 @@ namespace TransLucid
           << val("Error! Expecting ")
           << _4
           << val(" here: \"")
-          << construct<std::string>(_3, _2)
+          //TODO work out how to print lex tokens
+          //<< construct<std::string>(_3, _2)
+          //<< _3
           << val("\"")
           << std::endl
         );

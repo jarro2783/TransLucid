@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE ( single )
 
 BOOST_AUTO_TEST_CASE ( simple_expressions )
 {
-  std::cerr << "Second test case" << std::endl;
+  BOOST_TEST_MESSAGE("entering simple_expressions");
   //TL::Parser::Header& header = translator.header();
 
   translator.translate_and_add_equation_set

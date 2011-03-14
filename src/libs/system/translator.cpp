@@ -38,8 +38,8 @@ namespace
   : public qi::grammar<Iterator, std::vector<Parser::ParsedEquation>()>
   {
     public:
-    template <typename T>
-    EquationSetGrammar(T& t)
+    template <typename T, typename TokenDef>
+    EquationSetGrammar(T& t, TokenDef& tok)
     : EquationSetGrammar::base_type(equations)
     {
       using boost::phoenix::push_back;
@@ -53,7 +53,7 @@ namespace
         ]
       ;
 
-      equations %= *(one_equation >> literal(";;")) >> qi::eoi
+      equations %= *(one_equation >> tok.dblsemi_) >> qi::eoi
         //[
         //  push_back(_val, _1)
         //]
@@ -177,7 +177,7 @@ Translator::translate_equation_set(const u32string& s)
     Parser::makeUTF32Iterator(s.begin()),
     Parser::makeUTF32Iterator(s.end())));
 
-  EquationSetGrammar<Parser::iterator_t> equation_set(*m_equation);
+  EquationSetGrammar<Parser::iterator_t> equation_set(*m_equation, *m_lexer);
   std::vector<Parser::ParsedEquation> parsedEquations;
 
   bool success = boost::spirit::lex::tokenize_and_parse(
