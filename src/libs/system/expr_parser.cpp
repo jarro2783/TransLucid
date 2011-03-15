@@ -169,7 +169,7 @@ namespace TransLucid
               _a = ph::bind(&Tree::insert_binary_operator, 
                      ph::bind(&find_binary_operator, 
                        ph::construct<u32string>(ph::begin(_1), ph::end(_1)), 
-                       header), 
+                       ph::ref(header)), 
                      _a, _2)
             ]
          )

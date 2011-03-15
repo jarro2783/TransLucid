@@ -111,16 +111,15 @@ namespace TransLucid
       const mpz_class& precedence
     )
     {
-      if (h.binary_op_symbols.find
-        (symbol.c_str()) != h.binary_op_symbols.end())
+      if (h.binary_op_symbols.find(symbol) != h.binary_op_symbols.end())
       {
         throw ParseError(U"Existing binary operator");
       }
-      std::cerr << "adding " << 
-        utf32_to_utf8(u32string(symbol.begin(), symbol.end())) << std::endl;
+      //std::cerr << "adding " << 
+      //  utf32_to_utf8(u32string(symbol.begin(), symbol.end())) << std::endl;
       h.binary_op_symbols.insert(std::make_pair
       (
-        symbol.c_str(),
+        symbol,
         Tree::BinaryOperator
         (
           assoc,
