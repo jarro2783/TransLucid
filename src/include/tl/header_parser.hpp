@@ -84,16 +84,6 @@ namespace TransLucid
              ph::bind(&addBinary, _r1, _1, _2, _3, _4)
            ]
          | (
-           //delimiters type open close
-               literal("delimiters")
-            >  expr
-            >  expr
-            >  expr
-           )
-           [
-             ph::bind(&addDelimiter, _r1, _1, _2, _3)
-           ]
-         | (
                literal("library")
             > expr
            )

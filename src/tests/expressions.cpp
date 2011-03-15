@@ -300,7 +300,6 @@ BOOST_AUTO_TEST_CASE ( header )
   TL::Translator t2;
   BOOST_REQUIRE(t2.parse_header
   (
-    U"delimiters ustring<ustring> uchar<\"> uchar<\">;;"
     U"prefix ustring<-> ustring<operator->;;"
     U"infixl ustring<%> ustring<operator%> 20;;"
   ) 
