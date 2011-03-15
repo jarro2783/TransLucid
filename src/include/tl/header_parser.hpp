@@ -76,7 +76,7 @@ namespace TransLucid
            )
          | (
             //infixl,r,n symbol name precedence
-               assoc_symbols
+               tok.infix_binary_
             >  expr
             >  expr
             >  expr
@@ -97,7 +97,7 @@ namespace TransLucid
              )
            ]
          | (
-              unary_symbols 
+              tok.unary_
            >  expr
            >  expr
            )
