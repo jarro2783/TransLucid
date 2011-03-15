@@ -56,6 +56,9 @@ namespace TransLucid
 
       std::vector<u32string> libraries; /**<Libraries not yet loaded.*/
       std::vector<u32string> loaded_libraries; /**<The loaded libraries.*/
+
+      //TODO: rename this
+      std::map<u32string, Tree::BinaryOperator> binary_op_symbols_new;
     };
 
     /**

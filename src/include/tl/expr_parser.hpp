@@ -58,7 +58,6 @@ namespace TransLucid
         expr,
         if_expr,
         boolean,
-        range_expr,
         prefix_expr,
         hash_expr,
         context_perturb,

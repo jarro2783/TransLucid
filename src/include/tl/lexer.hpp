@@ -129,6 +129,8 @@ namespace TransLucid
         real_     = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";
         rational_ = L"(0_1)|(~?)({ratDEC}|{ratNONDEC})";
 
+        any_ = L".*";
+
         this->self =
           spaces[lex::_pass = lex::pass_flags::pass_ignore]
         //multi character symbols
@@ -170,10 +172,10 @@ namespace TransLucid
         | L')'
         | L'|'
         | L','
-        | boost::spirit::standard_wide::char_(L".")[lex::_tokenid = *lex::_start]
-        ;
 
-        //this->self.add(L".");
+        //anything else not matched
+        | any_
+        ;
       }
 
       lex::token_def<lex::unused_type, lex_char_type> 
@@ -186,7 +188,7 @@ namespace TransLucid
       ;
 
       lex::token_def<u32string, lex_char_type>
-        identifier_
+        identifier_, any_
       ;
 
       lex::token_def<value_wrapper<mpz_class>, lex_char_type> 

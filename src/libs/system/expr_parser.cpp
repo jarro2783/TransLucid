@@ -94,6 +94,31 @@ namespace TransLucid
     }
 
     /**
+     * Finds a binary operator from a string.
+     *
+     * Tries to match the string @a s with an existing binary operator.
+     * If it doesn't exist, then it uses the default error operator and
+     * flags the parser that there was a problem.
+     * @param s The text of the operator.
+     * @param h The parser header.
+     * @return The binary operator instance.
+     * @todo Implement the error flagging.
+     */
+    inline Tree::BinaryOperator
+    find_binary_operator(const u32string& s, const Header& h)
+    {
+      auto iter = h.binary_op_symbols_new.find(s);
+      if (iter != h.binary_op_symbols_new.end())
+      {
+        return iter->second;
+      }
+      else
+      {
+        throw "invalid binary operator";
+      }
+    }
+
+    /**
      * Construct an expression grammar.
      * @param h The parser header to use.
      */
@@ -128,28 +153,22 @@ namespace TransLucid
         [
           qi::_val = construct<Tree::IfExpr>(_2, _4, _5, _7)
         ]
-      | range_expr
+      | binary_op
         [
           _val = _1
         ]
       ;
 
-      range_expr %= binary_op
-      ;
-       //>> -(".."
-       //>> if_expr)
-       //;
-
-      //the actions have to be put after the optional with | eps
-
       binary_op =
          prefix_expr [_a = _1]
       >> (
-           *(   header.binary_op_symbols
+           *(   tok.any_
              >> prefix_expr
             )
             [
-              _a = ph::bind(&Tree::insert_binary_operator, _1, _a, _2)
+              _a = ph::bind(&Tree::insert_binary_operator, 
+                            ph::bind(&find_binary_operator, _1, header), 
+                            _a, _2)
             ]
          )
          [
@@ -288,7 +307,6 @@ namespace TransLucid
       //BOOST_SPIRIT_DEBUG_NODE(if_expr);
       BOOST_SPIRIT_DEBUG_NODE(expr);
       BOOST_SPIRIT_DEBUG_NODE(boolean);
-      BOOST_SPIRIT_DEBUG_NODE(range_expr);
       BOOST_SPIRIT_DEBUG_NODE(prefix_expr);
       BOOST_SPIRIT_DEBUG_NODE(hash_expr);
       BOOST_SPIRIT_DEBUG_NODE(context_perturb);
