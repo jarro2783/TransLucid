@@ -110,13 +110,6 @@ Translator::Translator()
     m_equation->set_tuple(*m_tuple);
 
     m_header_grammar->set_expr(*m_expr);
-
-    m_header->delimiter_start_symbols.add(
-      to_unsigned_u32string(u32string(U"«")).c_str(),
-      Parser::Delimiter(U"ustring", U'«', U'»'));
-    m_header->delimiter_start_symbols.add(
-      to_unsigned_u32string(u32string(U"\'")).c_str(),
-      Parser::Delimiter(U"uchar", '\'', '\''));
   }
   catch (...)
   {

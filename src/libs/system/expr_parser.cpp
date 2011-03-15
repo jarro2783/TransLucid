@@ -47,18 +47,6 @@ namespace TransLucid
     namespace ph = boost::phoenix;
     using namespace ph;
 
-    inline char_type
-    get_end_char(const Delimiter& d)
-    {
-      return d.end;
-    }
-
-    inline u32string
-    get_name(const Delimiter& d)
-    {
-      return d.type;
-    }
-
     inline Tree::Expr
     construct_typed_constant(const u32string& type, const u32string& value)
     {
@@ -85,12 +73,6 @@ namespace TransLucid
       os << "arg" << a;
       const std::string& s = os.str();
       return std::u32string(s.begin(), s.end());
-    }
-
-    inline Tree::Expr
-    construct_delimited_constant(Delimiter& d, const u32string& v)
-    {
-      return construct_typed_constant(d.type, v);
     }
 
     /**

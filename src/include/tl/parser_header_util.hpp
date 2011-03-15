@@ -35,7 +35,6 @@ namespace TransLucid
 
     typedef qi::symbols<char_type, Tree::UnaryOperator> unary_symbols;
     typedef qi::symbols<wchar_t, Tree::BinaryOperator> binary_symbols;
-    typedef qi::symbols<char_type, Delimiter> delimiter_symbols;
 
     struct Header
     {
@@ -50,25 +49,12 @@ namespace TransLucid
       unary_symbols prefix_op_symbols;/**<Prefix operations.*/
       unary_symbols postfix_op_symbols;/**<Postfix operations.*/
 
-      delimiter_symbols delimiter_start_symbols; /**<The delimiters.*/
-
       std::vector<u32string> libraries; /**<Libraries not yet loaded.*/
       std::vector<u32string> loaded_libraries; /**<The loaded libraries.*/
 
       std::map<u32string, Tree::BinaryOperator> binary_op_symbols; 
       /**<Binary operators.*/
     };
-
-    /**
-     * Set the end delimiter for a delimiter.
-     * @param d The delimiter to change the end character of.
-     * @param end The end character.
-     */
-    inline void
-    setEndDelimiter(Delimiter& d, wchar_t& end)
-    {
-      end = d.end;
-    }
 
     /**
      * Adds a dimension symbol to the header.
@@ -128,34 +114,6 @@ namespace TransLucid
           precedence
         )
       ));
-    }
-
-    /**
-     * Add a delimiter symbol to a header.
-     * @param header The header to add to.
-     * @param type The typename.
-     * @param open The opening symbol.
-     * @param close The closing symbol.
-     */
-    inline void
-    addDelimiterSymbol
-    (
-      Header& header,
-      const u32string& type,
-      char32_t open,
-      char32_t close
-    )
-    {
-      string_type open_string(1, open);
-      if (header.delimiter_start_symbols.find(open_string) != 0) 
-      {
-        throw ParseError(U"Existing delimiter");
-      }
-      header.delimiter_start_symbols.add
-      (
-        open_string.c_str(),
-        Delimiter(type, (char_type)open, (char_type)close)
-      );
     }
 
     /**

@@ -213,37 +213,6 @@ namespace TransLucid
       }
 
       static void
-      addDelimiter
-      (
-        Header& header,
-        const Tree::Expr& type,
-        const Tree::Expr& open,
-        const Tree::Expr& close
-      )
-      {
-        try
-        {
-          const u32string& ctype =
-            boost::get<u32string>(type);
-          const char32_t& copen =
-            boost::get<const char32_t>(open);
-          const char32_t& cclose =
-            boost::get<const char32_t>(close);
-
-          addDelimiterSymbol(header, ctype, copen, cclose);
-        }
-        catch (const boost::bad_get& e)
-        {
-          std::cerr << "HeaderGrammar::addDelimeter: bad_get" << std::endl;
-        }
-        catch (const std::invalid_argument&)
-        {
-          std::cerr << "HeaderGrammar::addDelimeter: invalid_argument" 
-            << std::endl;
-        }
-      }
-
-      static void
       addLibraryInternal
       (
         Header& header,
