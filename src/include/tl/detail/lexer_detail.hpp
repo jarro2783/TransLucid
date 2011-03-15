@@ -486,7 +486,8 @@ namespace boost { namespace spirit { namespace traits
       char32_t& attr
     )
     {
-      throw "construct character incorrectly called";
+      //throw "construct character incorrectly called";
+      attr = *first;
     }
   };
   

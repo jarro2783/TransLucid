@@ -107,14 +107,14 @@ namespace TransLucid
     inline Tree::BinaryOperator
     find_binary_operator(const u32string& s, const Header& h)
     {
-      auto iter = h.binary_op_symbols_new.find(s);
-      if (iter != h.binary_op_symbols_new.end())
+      auto iter = h.binary_op_symbols.find(s);
+      if (iter != h.binary_op_symbols.end())
       {
         return iter->second;
       }
       else
       {
-        throw "invalid binary operator";
+        throw "invalid binary operator: " + utf32_to_utf8(s);
       }
     }
 
@@ -162,13 +162,15 @@ namespace TransLucid
       binary_op =
          prefix_expr [_a = _1]
       >> (
-           *(   tok.any_
+           *(   *tok.any_
              >> prefix_expr
             )
             [
               _a = ph::bind(&Tree::insert_binary_operator, 
-                            ph::bind(&find_binary_operator, _1, header), 
-                            _a, _2)
+                     ph::bind(&find_binary_operator, 
+                       ph::construct<u32string>(ph::begin(_1), ph::end(_1)), 
+                       header), 
+                     _a, _2)
             ]
          )
          [

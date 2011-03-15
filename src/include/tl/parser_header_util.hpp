@@ -47,8 +47,6 @@ namespace TransLucid
       symbols_t dimension_symbols;/**<Dimensions.*/
       symbols_t system_dimension_symbols;
 
-      binary_symbols binary_op_symbols;/**<Binary operations.*/
-
       unary_symbols prefix_op_symbols;/**<Prefix operations.*/
       unary_symbols postfix_op_symbols;/**<Postfix operations.*/
 
@@ -57,8 +55,8 @@ namespace TransLucid
       std::vector<u32string> libraries; /**<Libraries not yet loaded.*/
       std::vector<u32string> loaded_libraries; /**<The loaded libraries.*/
 
-      //TODO: rename this
-      std::map<u32string, Tree::BinaryOperator> binary_op_symbols_new;
+      std::map<u32string, Tree::BinaryOperator> binary_op_symbols; 
+      /**<Binary operators.*/
     };
 
     /**
@@ -113,17 +111,16 @@ namespace TransLucid
       const mpz_class& precedence
     )
     {
-      //auto usymbol = to_unsigned_u32string(symbol);
-      std::wstring usymbol = std::wstring(symbol.begin(), symbol.end());
-      if (h.binary_op_symbols.find(usymbol.c_str()) != 0) 
+      if (h.binary_op_symbols.find
+        (symbol.c_str()) != h.binary_op_symbols.end())
       {
         throw ParseError(U"Existing binary operator");
       }
       std::cerr << "adding " << 
         utf32_to_utf8(u32string(symbol.begin(), symbol.end())) << std::endl;
-      h.binary_op_symbols.add
+      h.binary_op_symbols.insert(std::make_pair
       (
-        usymbol.c_str(),
+        symbol.c_str(),
         Tree::BinaryOperator
         (
           assoc,
@@ -131,7 +128,7 @@ namespace TransLucid
           symbol,
           precedence
         )
-      );
+      ));
     }
 
     /**
