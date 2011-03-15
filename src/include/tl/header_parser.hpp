@@ -42,7 +42,8 @@ namespace TransLucid
     {
       public:
 
-      HeaderGrammar()
+      template <typename TokenDef>
+      HeaderGrammar(TokenDef& tok)
       : HeaderGrammar::base_type(headerp)
       {
          using namespace qi::labels;
@@ -67,7 +68,7 @@ namespace TransLucid
 
          headerItem =
            (
-             literal("dimension")
+             tok.dimension_
                > expr
                  [
                     ph::bind(&addDimension, _r1, _1)
@@ -84,7 +85,7 @@ namespace TransLucid
              ph::bind(&addBinary, _r1, _1, _2, _3, _4)
            ]
          | (
-               literal("library")
+               tok.library_
             > expr
            )
            [

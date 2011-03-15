@@ -129,6 +129,11 @@ namespace TransLucid
         real_     = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";
         rational_ = L"(0_1)|(~?)({ratDEC}|{ratNONDEC})";
 
+        library_ = L"library";
+        dimension_ = L"dimension";
+        infix_ = L"infix[lrnpm]";
+        unary_ = L"(prefix)|(postfix)";
+
         any_ = L".";
 
         this->self =
@@ -158,6 +163,12 @@ namespace TransLucid
         | real_    [detail::build_real()]
         | rational_[detail::build_rational()]
 
+        //header items
+        | library_
+        | dimension_
+        | infix_binary_
+        | unary_
+
         //single character symbols
         | L':'
         | L'['
@@ -181,7 +192,8 @@ namespace TransLucid
 
       lex::token_def<lex::unused_type, lex_char_type> 
         //keywords
-        if_, fi_, where_, then_, elsif_, else_, true_, false_
+        if_, fi_, where_, then_, elsif_, else_, true_, false_,
+        library_, dimension_, infix_, unary_
         //symbols
       , arrow_, dblsemi_, dblslash_, range_
         //white space

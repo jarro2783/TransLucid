@@ -101,7 +101,7 @@ Translator::Translator()
     m_equation = new Parser::EquationGrammar<Parser::iterator_t>(*m_lexer);
     //m_tuple = new Parser::TupleGrammar<Parser::iterator_t>;
     m_tuple = Parser::create_tuple_grammar();
-    m_header_grammar = new Parser::HeaderGrammar<Parser::iterator_t>;
+    m_header_grammar = new Parser::HeaderGrammar<Parser::iterator_t>(*m_lexer);
 
     m_expr->set_tuple(*m_tuple);
     m_tuple->set_expr(*m_expr);
