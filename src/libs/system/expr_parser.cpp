@@ -144,13 +144,14 @@ namespace TransLucid
       binary_op =
          prefix_expr [_a = _1]
       >> (
-           *(   *tok.any_
+           *(   tok.any_
              >> prefix_expr
             )
             [
               _a = ph::bind(&Tree::insert_binary_operator, 
                      ph::bind(&find_binary_operator, 
-                       ph::construct<u32string>(ph::begin(_1), ph::end(_1)), 
+                       //ph::construct<u32string>(ph::begin(_1), ph::end(_1)), 
+                       _1,
                        ph::ref(header)), 
                      _a, _2)
             ]

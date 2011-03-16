@@ -136,7 +136,7 @@ namespace TransLucid
         infix_binary_ = L"infix[lrnpm]";
         unary_ =        L"(prefix)|(postfix)";
 
-        any_ = L".";
+        any_ = L".*?";
 
         this->self =
           spaces[lex::_pass = lex::pass_flags::pass_ignore]
@@ -211,7 +211,7 @@ namespace TransLucid
       ;
 
       lex::token_def<u32string, lex_char_type>
-        identifier_
+        identifier_, any_
       ;
 
       lex::token_def<value_wrapper<mpz_class>, lex_char_type> 
@@ -233,7 +233,7 @@ namespace TransLucid
       ;
 
       lex::token_def<char32_t, lex_char_type> 
-        character_, any_
+        character_
       ;
 
       private:

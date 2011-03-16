@@ -266,8 +266,6 @@ namespace TransLucid
           Context& ctx
         ) const
         {
-          std::cerr << "building string: " << u32string(first, last)
-            << std::endl;
           u32string type, value;
           bool error = false;
 
@@ -299,11 +297,13 @@ namespace TransLucid
                 }
                 else
                 {
+                  std::cerr << "adding: " << r.second << std::endl;
                   value += r.second;
                 }
               }
               else
               {
+                std::cerr << "adding " << u32string(1, *current) << std::endl;
                 value += *current;
                 ++current;
               }
@@ -516,9 +516,21 @@ namespace boost { namespace spirit { namespace traits
 
       switch(c)
       {
-        //case 'l':
-        //attr = TransLucid::Tree::ASSOC_LEFT;
-        //break;
+        case 'l':
+        attr = TransLucid::Tree::ASSOC_LEFT;
+        break;
+
+        case 'r':
+        attr = TransLucid::Tree::ASSOC_RIGHT;
+        break;
+
+        case 'n':
+        attr = TransLucid::Tree::ASSOC_NON;
+        break;
+
+        case 'p':
+        attr = TransLucid::Tree::ASSOC_COMPARISON;
+        break;
 
         case 'm':
         attr = TransLucid::Tree::ASSOC_VARIABLE;

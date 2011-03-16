@@ -186,6 +186,13 @@ build_escaped_characters
     }
   }
 
+  std::cerr << "converting string:" << std::endl;
+  for (char c : building)
+  {
+    std::cerr << std::hex << uint8_t(c);
+  }
+  std::cerr << std::endl;
+
   u32string u32result = utf8_to_utf32(building);
   return std::make_pair(!error, u32result);
 }
