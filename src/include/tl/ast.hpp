@@ -208,6 +208,10 @@ namespace TransLucid
       : type(type), text(text)
       {}
 
+      /**
+       * Construct a ConstantExpr from a pair.
+       * @param value The pair representing the constant.
+       */
       ConstantExpr(const std::pair<u32string, u32string>& value)
       : type(value.first), text(value.second)
       {
@@ -299,16 +303,23 @@ namespace TransLucid
       boost::recursive_wrapper<ValueAppExpr>
     > Expr;
 
+    /**
+     * A parenthesised expression.
+     */
     struct ParenExpr
     {
       ParenExpr() = default;
 
+      /**
+       * Construct a parenthesised expression.
+       * @param e The inside expression.
+       */
       ParenExpr(const Expr& e)
       : e(e)
       {
       }
 
-      Expr e;
+      Expr e; /**<The expression.*/
     };
 
     /**
@@ -540,47 +551,74 @@ namespace TransLucid
       bool absolute;
     };
 
+    /**
+     * A lambda expression. An expression node representing a lambda 
+     * expression which creates an unnamed function.
+     */
     struct LambdaExpr
     {
       LambdaExpr() = default;
 
+      /**
+       * Construct a LambdaExpr.
+       * @param name The parameter to bind.
+       * @param rhs The right-hand-side expression.
+       */
       LambdaExpr(const u32string& name, const Expr& rhs)
       : name(name), rhs(rhs)
       {
       }
 
-      u32string name;
-      Expr rhs;
+      u32string name; /**<The bound parameter.*/
+      Expr rhs; /**<The right-hand-side expression.*/
     };
 
     struct PhiExpr
     {
     };
 
+    /**
+     * By value function application expression. An expression node
+     * representing by value function application.
+     */
     struct ValueAppExpr
     {
       ValueAppExpr() = default;
 
+      /**
+       * Construct a by value application expression.
+       * @param lhs The left-hand-side expression.
+       * @param rhs The right-hand-side expression.
+       */
       ValueAppExpr(const Expr& lhs, const Expr& rhs)
       : lhs(lhs), rhs(rhs)
       {
       }
 
-      Expr lhs;
-      Expr rhs;
+      Expr lhs; /**<The lhs.*/
+      Expr rhs; /**<The rhs.*/
     };
 
+    /**
+     * Named function application expression. An expression node representing
+     * named function application.
+     */
     struct NameAppExpr
     {
       NameAppExpr() = default;
 
+      /**
+       * Construct a named application expression.
+       * @param lhs The left-hand-side expression.
+       * @param rhs The right-hand-side expression.
+       */
       NameAppExpr(const Expr& lhs, const Expr& rhs)
       : lhs(lhs), rhs(rhs)
       {
       }
 
-      Expr lhs;
-      Expr rhs;
+      Expr lhs; /**<The lhs expression.*/
+      Expr rhs; /**<The rhs expression.*/
     };
 
     #define PRINT_NODE(n) \
