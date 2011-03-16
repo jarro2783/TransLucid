@@ -24,8 +24,8 @@ $(BOOST_LDFLAGS) $(TL_LDFLAGS)
 libtlsystem_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
 -lltdl
 
-libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp cache.cpp \
-  compiled_functors.cpp container.cpp dimtranslator.cpp equation.cpp \
+libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
+  compiled_functors.cpp dimtranslator.cpp equation.cpp \
   equation_parser.cpp \
   expr_parser.cpp \
   expr_compiler.cpp header.cpp lexer_util.cpp library.cpp \
