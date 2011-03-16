@@ -79,16 +79,14 @@ namespace TransLucid
     Tree::Expr
     operator()(const Tree::TupleExpr& e)
     {
-      using boost::fusion::at_c;
-
-      std::vector<boost::fusion::vector<Tree::Expr, Tree::Expr>> renamed;
+      std::vector<std::pair<Tree::Expr, Tree::Expr>> renamed;
 
       for (auto iter = e.pairs.begin(); iter != e.pairs.end(); ++iter)
       {
-        renamed.push_back(boost::fusion::vector<Tree::Expr, Tree::Expr>
+        renamed.push_back(std::make_pair
         (
-          boost::apply_visitor(*this, at_c<0>(*iter)),
-          boost::apply_visitor(*this, at_c<1>(*iter))
+          boost::apply_visitor(*this, iter->first),
+          boost::apply_visitor(*this, iter->second)
         ));
       }
 

@@ -31,8 +31,6 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-using boost::fusion::at_c;
-
 ExprCompiler::ExprCompiler(SystemHD* system)
 : m_system(system)
 {
@@ -173,8 +171,8 @@ ExprCompiler::operator()(const Tree::TupleExpr& e)
   std::list<std::pair<HD*, HD*>> elements;
   for(auto& v : e.pairs)
   {
-    HD* lhs = boost::apply_visitor(*this, at_c<0>(v));
-    HD* rhs = boost::apply_visitor(*this, at_c<1>(v));
+    HD* lhs = boost::apply_visitor(*this, v.second);
+    HD* rhs = boost::apply_visitor(*this, v.second);
     elements.push_back(std::make_pair(lhs, rhs));
   }
   return new Hyperdatons::TupleHD(m_system, elements);

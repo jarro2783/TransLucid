@@ -485,7 +485,7 @@ namespace TransLucid
        * The data structure which holds the pairs.
        */
       typedef
-      std::vector<boost::fusion::vector<Expr, Expr>>
+      std::vector<std::pair<Expr, Expr>>
       TuplePairs;
 
       /**
