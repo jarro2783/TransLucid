@@ -22,7 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <algorithm>
 #include <tl/utility.hpp>
 #include <string>
-#include <tl/parser_header_util.hpp>
+#include <tl/parser_header.hpp>
 
 #define BOOST_TEST_MODULE expressions
 #include <boost/test/included/unit_test.hpp>

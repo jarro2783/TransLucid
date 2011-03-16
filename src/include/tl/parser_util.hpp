@@ -29,9 +29,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <gmpxx.h>
 #include <tl/types.hpp>
-#include <tl/parser_fwd.hpp>
 #include <tl/utility.hpp>
 #include <tl/charset.hpp>
+#include <tl/ast.hpp>
+#include <tl/parser_defs.hpp>
 
 namespace TransLucid
 {

@@ -21,8 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_PARSER_INCLUDED
 
 #include <tl/parser_util.hpp>
-#include <tl/parser_fwd.hpp>
-#include <tl/parser_header_util.hpp>
+#include <tl/parser_header.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 

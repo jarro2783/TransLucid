@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef PARSER_HEADER_UTIL_INCLUDED
-#define PARSER_HEADER_UTIL_INCLUDED
+#ifndef PARSER_HEADER_INCLUDED
+#define PARSER_HEADER_INCLUDED
 
 /**
- * @file parser_header_util.hpp
+ * @file parser_header.hpp
  * Utility functions for the TransLucid header.
  */
 
-#include <tl/parser_fwd.hpp>
+#include <tl/ast.hpp>
 
 namespace TransLucid
 {
@@ -33,8 +33,9 @@ namespace TransLucid
   namespace Parser
   {
 
-    typedef qi::symbols<char_type, Tree::UnaryOperator> unary_symbols;
-    typedef qi::symbols<wchar_t, Tree::BinaryOperator> binary_symbols;
+    typedef std::map<u32string, Tree::UnaryOperator> unary_symbols;
+    typedef std::map<u32string, Tree::BinaryOperator> binary_symbols;
+    typedef std::set<u32string> dimension_set;
 
     struct Header
     {
@@ -43,8 +44,8 @@ namespace TransLucid
        */
       Header();
 
-      symbols_t dimension_symbols;/**<Dimensions.*/
-      symbols_t system_dimension_symbols;
+      dimension_set dimension_symbols;/**<Dimensions.*/
+      dimension_set system_dimension_symbols;
 
       unary_symbols prefix_op_symbols;/**<Prefix operations.*/
       unary_symbols postfix_op_symbols;/**<Postfix operations.*/
@@ -52,7 +53,7 @@ namespace TransLucid
       std::vector<u32string> libraries; /**<Libraries not yet loaded.*/
       std::vector<u32string> loaded_libraries; /**<The loaded libraries.*/
 
-      std::map<u32string, Tree::BinaryOperator> binary_op_symbols; 
+      binary_symbols binary_op_symbols; 
       /**<Binary operators.*/
     };
 
@@ -64,8 +65,7 @@ namespace TransLucid
     inline void
     addDimensionSymbol(Header& h, const u32string& name)
     {
-      string_type wsname(name.begin(), name.end());
-      h.dimension_symbols.add(wsname.c_str(), name);
+      h.dimension_symbols.insert(name);
     }
 
     /**
@@ -76,7 +76,7 @@ namespace TransLucid
     inline void
     removeDimensionSymbol(Header& h, const u32string& name)
     {
-      h.dimension_symbols.remove(name);
+      h.dimension_symbols.erase(name);
     }
 
      /**
@@ -139,32 +139,32 @@ namespace TransLucid
         type
       );
 
-      auto usymbol = to_unsigned_u32string(symbol);
-
       if (type == Tree::UNARY_PREFIX)
       {
-        if (header.prefix_op_symbols.find(symbol) != 0) 
+        if (header.prefix_op_symbols.find(symbol) 
+            != header.prefix_op_symbols.end()) 
         {
           throw ParseError(U"Existing prefix symbol");
         }
-        header.prefix_op_symbols.add
+        header.prefix_op_symbols.insert(std::make_pair
         (
-          usymbol.c_str(),
+          symbol,
           opinfo
-        );
+        ));
       }
       else
       {
-        if (header.postfix_op_symbols.find(symbol) != 0) 
+        if (header.postfix_op_symbols.find(symbol) 
+            != header.postfix_op_symbols.end()) 
         {
           throw ParseError(U"Existing postfix symbol");
         }
 
-        header.postfix_op_symbols.add
+        header.postfix_op_symbols.insert(std::make_pair
         (
-          usymbol.c_str(),
+          symbol,
           opinfo
-        );
+        ));
       }
     }
 

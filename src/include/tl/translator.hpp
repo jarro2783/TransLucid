@@ -29,29 +29,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/hyperdaton.hpp>
 //#include <tl/lexer.hpp>
 #include <tl/library.hpp>
-#include <tl/parser_fwd.hpp>
+#include <tl/parser_api.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
 
 namespace TransLucid
 {
-  namespace Parser
-  {
-    class Header;
-
-    template <typename Iterator>
-    class ExprGrammar;
-
-    template <typename Iterator>
-    class EquationGrammar;
-
-    template <typename Iterator>
-    class TupleGrammar;
-
-    template <typename Iterator>
-    class HeaderGrammar;
-  }
-
   namespace Lexer
   {
     template <typename Lexer>
@@ -60,6 +43,11 @@ namespace TransLucid
 
   typedef std::pair<Parser::ParsedEquation, TranslatedEquation> PTEquation;
   typedef std::vector<PTEquation> PTEquationVector;
+
+  namespace detail
+  {
+    class AllParsers;
+  }
 
   class Translator
   {
@@ -210,12 +198,7 @@ namespace TransLucid
 
     Parser::Header* m_header;
 
-    Lexer::tl_lexer* m_lexer;
-
-    Parser::ExprGrammar<Parser::iterator_t>* m_expr;
-    Parser::EquationGrammar<Parser::iterator_t>* m_equation;
-    Parser::TupleGrammar<Parser::iterator_t>* m_tuple;
-    Parser::HeaderGrammar<Parser::iterator_t>* m_header_grammar;
+    detail::AllParsers* m_parsers;
 
     SystemHD m_system;
 

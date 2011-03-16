@@ -25,8 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/exception.hpp>
 #include <gmpxx.h>
 #include <tl/builtin_types.hpp>
-#include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/container.hpp>
+//#include <boost/fusion/include/vector.hpp>
+//#include <boost/fusion/container.hpp>
 
 /**
  * @file ast.hpp
@@ -407,6 +407,7 @@ namespace TransLucid
        * @param eif A list of elsifs.
        * @param e The else expression.
        */
+      #if 0
       template <typename List>
       IfExpr
       (
@@ -426,6 +427,7 @@ namespace TransLucid
           else_ifs.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
         }
       }
+      #endif
 
       //when we already have a vector
       IfExpr

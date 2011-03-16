@@ -20,10 +20,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/charset.hpp>
 #include <tl/exception.hpp>
-#include <tl/parser_fwd.hpp>
-#include <tl/parser_header_util.hpp>
+#include <tl/parser_header.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/parser_util.hpp>
+#include <tl/parser_api.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -35,13 +35,14 @@ namespace Parser
 {
 
 Header::Header()
-{
+:
   //add predefined dimensions
-  system_dimension_symbols
-    .add(chars_to_unsigned_u32string("time"), U"time")
-    (chars_to_unsigned_u32string("id"), U"id")
-    (chars_to_unsigned_u32string("all"), U"all")
-  ;
+  system_dimension_symbols(
+    {U"time",
+    U"id",
+    U"all"}
+  )
+{ 
 }
 
 std::ostream& 

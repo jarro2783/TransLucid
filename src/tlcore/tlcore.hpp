@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/parser_fwd.hpp>
+#include <tl/parser_api.hpp>
+#include <tl/parser_defs.hpp>
 #include <tl/system.hpp>
 #include <iostream>
 #include <tl/ast.hpp>
@@ -192,7 +193,6 @@ namespace TransLucid
       bool m_demands;
       bool m_uuids;
       Grammar<Parser::iterator_t>* m_grammar;
-      Parser::SkipGrammar<Parser::iterator_t>* m_skipper;      
 
       std::istream* m_is;
       std::ostream* m_os;

@@ -80,14 +80,38 @@ namespace
       eqn
     ;
   };
+  
+  
+}
+
+namespace detail
+{
+  struct AllParsers
+  {
+    AllParsers(Parser::Header& h)
+    : m_expr(h, m_lexer)
+    , m_equation(m_lexer)
+    , m_header_grammar(m_lexer)
+    {
+      m_expr.set_tuple(m_tuple);
+      m_tuple.set_expr(m_expr);
+
+      m_equation.set_expr(m_expr);
+      m_equation.set_tuple(m_tuple);
+
+      m_header_grammar.set_expr(m_expr);
+    }
+
+    Lexer::tl_lexer m_lexer;
+    Parser::ExprGrammar<Parser::iterator_t> m_expr;
+    Parser::EquationGrammar<Parser::iterator_t> m_equation;
+    Parser::TupleGrammar<Parser::iterator_t> m_tuple;
+    Parser::HeaderGrammar<Parser::iterator_t> m_header_grammar;
+  };
 }
 
 Translator::Translator()
 :  m_header(0)
-  ,m_expr(0)
-  ,m_equation(0)
-  ,m_tuple(0)
-  ,m_header_grammar(0)
   ,m_compiler(&m_system)
   ,m_nextLib(0)
 {
@@ -95,6 +119,9 @@ Translator::Translator()
   {
     m_header = new Parser::Header;
 
+    m_parsers = new detail::AllParsers(*m_header);
+
+    #if 0
     m_lexer = new Lexer::tl_lexer;
     //m_expr = new Parser::ExprGrammar<Parser::iterator_t>(*m_header, *m_lexer);
     m_expr = create_expr_grammar(*m_header, *m_lexer);
@@ -110,6 +137,7 @@ Translator::Translator()
     m_equation->set_tuple(*m_tuple);
 
     m_header_grammar->set_expr(*m_expr);
+    #endif
   }
   catch (...)
   {
@@ -136,8 +164,8 @@ Translator::translate_expr(const u32string& u32s)
   bool r = boost::spirit::lex::tokenize_and_parse(
     pos,
     Lexer::base_iterator_t(),
-    *m_lexer,
-    *m_expr,
+    m_parsers->m_lexer,
+    m_parsers->m_expr,
     e);
 
   //std::cerr << "pos at: ";
@@ -172,13 +200,14 @@ Translator::translate_equation_set(const u32string& s)
     Parser::makeUTF32Iterator(s.begin()),
     Parser::makeUTF32Iterator(s.end())));
 
-  EquationSetGrammar<Parser::iterator_t> equation_set(*m_equation, *m_lexer);
+  EquationSetGrammar<Parser::iterator_t> equation_set
+    (m_parsers->m_equation, m_parsers->m_lexer);
   std::vector<Parser::ParsedEquation> parsedEquations;
 
   bool success = boost::spirit::lex::tokenize_and_parse(
     pos,
     Lexer::base_iterator_t(),
-    *m_lexer,
+    m_parsers->m_lexer,
     equation_set,
     parsedEquations);
 
@@ -270,8 +299,8 @@ Translator::parse_header(const u32string& s)
   bool r = boost::spirit::lex::tokenize_and_parse(
     pos,
     Lexer::base_iterator_t(),
-    *m_lexer,
-    (*m_header_grammar)(boost::phoenix::ref(*m_header))
+    m_parsers->m_lexer,
+    (m_parsers->m_header_grammar)(boost::phoenix::ref(*m_header))
     );
 
   //load any more libraries specified in the header
@@ -293,10 +322,6 @@ Translator::loadLibraries()
 void
 Translator::cleanup()
 {
-  delete m_tuple;
-  delete m_equation;
-  delete m_expr;
-  delete m_header_grammar;
   delete m_header;
 }
 

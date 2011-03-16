@@ -22,7 +22,7 @@ includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp cache.hpp \
   dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
   expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp footer.hpp \
   header.hpp header_parser.hpp hyperdaton.hpp lexer.hpp library.hpp \
-  parser_fwd.hpp parser_header_util.hpp parser_iterator.hpp \
+  parser_api.hpp parser_defs.hpp parser_header.hpp parser_iterator.hpp \
   parser_util.hpp printer.hpp range.hpp \
   set_types.hpp system.hpp translator.hpp tree_printer.hpp \
   tuple_parser.hpp types.hpp utility.hpp valuehd.hpp

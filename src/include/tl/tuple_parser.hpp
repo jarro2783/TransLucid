@@ -20,7 +20,6 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TUPLE_PARSER_HPP_INCLUDED
 #define TUPLE_PARSER_HPP_INCLUDED
 
-#include <tl/parser_fwd.hpp>
 #include <tl/parser_util.hpp>
 #include <boost/spirit/home/phoenix/object/new.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>

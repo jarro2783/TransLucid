@@ -20,8 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/expr_parser.hpp>
-#include <tl/parser_fwd.hpp>
-#include <tl/parser_header_util.hpp>
+#include <tl/parser_header.hpp>
 #include <tl/parser_util.hpp>
 #include <tl/utility.hpp>
 
@@ -32,6 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_sequence.hpp>
 #include <boost/spirit/include/qi_action.hpp>
 #include <boost/spirit/include/qi_core.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 #include <boost/spirit/home/phoenix/object/new.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
@@ -65,6 +65,32 @@ namespace TransLucid
         return Tree::ConstantExpr(type, value);
       }
     }
+
+    struct make_elsifs_imp
+    {
+      template <typename Arg>
+      struct result
+      {
+        typedef std::vector<std::pair<Tree::Expr, Tree::Expr>> type;
+      };
+
+      template <typename Arg>
+      std::vector<std::pair<Tree::Expr, Tree::Expr>>
+      operator()(const Arg& eif) const
+      {
+        using boost::fusion::at_c;
+
+        std::vector<std::pair<Tree::Expr, Tree::Expr>> result;
+        for (auto& v : eif)
+        {
+          result.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
+        }
+
+        return result;
+      }
+    };
+
+    ph::function<make_elsifs_imp> make_elsifs;
 
     inline u32string
     construct_arg_delim(int a)
@@ -133,7 +159,8 @@ namespace TransLucid
          >> tok.fi_
         )
         [
-          qi::_val = construct<Tree::IfExpr>(_2, _4, _5, _7)
+          qi::_val = construct<Tree::IfExpr>(
+            _2, _4, make_elsifs(_5), _7)
         ]
       | binary_op
         [
@@ -162,17 +189,21 @@ namespace TransLucid
       ;
 
       prefix_expr =
+      #if 0
         ( header.prefix_op_symbols >> postfix_expr)
         [
           _val = construct<Tree::UnaryOpExpr>(_1, _2)
         ]
-      | postfix_expr [_val = _1]
+      | 
+      #endif 
+      postfix_expr [_val = _1]
       ;
 
       postfix_expr =
          at_expr [_a = _1]
+      #if 0
       >> (
-           ( header.postfix_op_symbols
+           ( tok.any_
              [
                _val = construct<Tree::UnaryOpExpr>(_1, _a)
              ]
@@ -182,6 +213,7 @@ namespace TransLucid
             _val = _a
            ]
          )
+      #endif
       ;
 
       at_expr =

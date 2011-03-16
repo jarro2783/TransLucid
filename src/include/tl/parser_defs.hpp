@@ -35,15 +35,14 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
 
-#include <boost/spirit/include/qi_symbols.hpp>
-#include <boost/spirit/include/classic_multi_pass.hpp>
-
+#if 0
 inline std::ostream&
 operator<<(std::ostream& os, char32_t c)
 {
   os << TransLucid::utf32_to_utf8(TransLucid::u32string(1, c));
   return os;
 }
+#endif
 
 namespace TransLucid
 {
@@ -73,20 +72,7 @@ namespace TransLucid
     typedef std::basic_string<unsigned int> string_type;
     typedef unsigned int char_type;
 
-    /**
-     * The symbol table type, maps the symbol name to itself.
-     */
-    typedef qi::symbols<char_type, u32string> symbols_t;
-
-    //typedef boost::spirit::classic::multi_pass<U32Iterator> iterator_t;
     typedef Lexer::iterator_t iterator_t;
-
-    //name, | [], & bool, = HD
-    typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
-    ParsedEquation;
-
-    std::string
-    printEquation(const ParsedEquation& e);
   }
 }
 
