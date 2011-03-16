@@ -36,6 +36,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <gmpxx.h>
 #include <tl/lexer_util.hpp>
 #include <tl/charset.hpp>
+#include <tl/ast.hpp>
+
+#define XSTRING(x) STRING(x)
+#define STRING(x) #x
 
 namespace TransLucid
 {
@@ -488,6 +492,68 @@ namespace boost { namespace spirit { namespace traits
     {
       //throw "construct character incorrectly called";
       attr = *first;
+    }
+  };
+
+  template <typename Iterator>
+  struct assign_to_attribute_from_iterators
+  <
+    TransLucid::Tree::InfixAssoc, 
+    Iterator
+  >
+  {
+    static void
+    call
+    (
+      Iterator const& first,
+      Iterator const& last,
+      TransLucid::Tree::InfixAssoc& attr
+    )
+    {
+      //strings will be of the form infix{l,m,n,p,r}
+      TransLucid::u32string s(first, last);
+      char32_t c = s.at(s.length()-1);
+
+      switch(c)
+      {
+        //case 'l':
+        //attr = TransLucid::Tree::ASSOC_LEFT;
+        //break;
+
+        case 'm':
+        attr = TransLucid::Tree::ASSOC_VARIABLE;
+        break;
+
+        default:
+        throw "error at: " XSTRING(__LINE__) " in " __FILE__;
+      }
+    }
+  };
+
+  template <typename Iterator>
+  struct assign_to_attribute_from_iterators
+  <
+    TransLucid::Tree::UnaryType, 
+    Iterator
+  >
+  {
+    static void
+    call
+    (
+      Iterator const& first,
+      Iterator const& last,
+      TransLucid::Tree::UnaryType& attr
+    )
+    {
+      TransLucid::u32string s(first, last);
+      if (s == U"prefix")
+      {
+        attr = TransLucid::Tree::UNARY_PREFIX;
+      }
+      else
+      {
+        attr = TransLucid::Tree::UNARY_POSTFIX;
+      }
     }
   };
   

@@ -48,6 +48,7 @@ namespace TransLucid
       {
          using namespace qi::labels;
 
+         #if 0
          assoc_symbols.add
            (chars_to_unsigned_u32string(U"infixl"), Tree::ASSOC_LEFT)
            (chars_to_unsigned_u32string(U"infixr"), Tree::ASSOC_RIGHT)
@@ -60,10 +61,11 @@ namespace TransLucid
            (chars_to_unsigned_u32string(U"prefix"), Tree::UNARY_PREFIX)
            (chars_to_unsigned_u32string(U"postfix"), Tree::UNARY_POSTFIX)
          ;
+         #endif
            
 
          headerp =
-           *( headerItem(_r1) > literal(";;") )
+           *( headerItem(_r1) > tok.dblsemi_ )
          ;
 
          headerItem =
@@ -248,9 +250,6 @@ namespace TransLucid
       qi::rule<Iterator, Tree::Expr()>
         expr
       ;
-
-      qi::symbols<char_type, Tree::InfixAssoc> assoc_symbols;
-      qi::symbols<char_type, Tree::UnaryType> unary_symbols;
     };
   }
 }

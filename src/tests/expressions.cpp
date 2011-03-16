@@ -300,26 +300,13 @@ BOOST_AUTO_TEST_CASE ( header )
   TL::Translator t2;
   BOOST_REQUIRE(t2.parse_header
   (
-    U"prefix ustring<-> ustring<operator->;;"
-    U"infixl ustring<%> ustring<operator%> 20;;"
+    U"prefix ustring\"-\" ustring\"operator-\";;"
+    U"infixl ustring\"%\" ustring\"operator%\" 20;;"
   ) 
   != false);
 
   TL::HD *h = t2.translate_expr(U"4 % -5");
   BOOST_REQUIRE(h != 0);
-
-  #if 0
-  std::string generated;
-  print_iter outit(generated);
-  TL::Printer::karma::generate(outit, print_grammar,
-                               t2.lastExpression());
-
-  BOOST_CHECK_EQUAL("(4%(-5))", generated);
-  #endif
-
-  BOOST_REQUIRE_THROW(
-    t2.parse_header(U"delimiters ustring<ustring> uchar<\"> uchar<\">;;"),
-    TL::ParseError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

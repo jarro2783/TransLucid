@@ -61,7 +61,9 @@ namespace TransLucid
         value_wrapper<mpf_class>,
         u32string, 
         std::pair<u32string, u32string>,
-        char32_t
+        char32_t,
+        Tree::UnaryType,
+        Tree::InfixAssoc
       > 
     > token_type;
 
@@ -192,12 +194,20 @@ namespace TransLucid
 
       lex::token_def<lex::unused_type, lex_char_type> 
         //keywords
-        if_, fi_, where_, then_, elsif_, else_, true_, false_,
-        library_, dimension_, infix_binary_, unary_
+        if_, fi_, where_, then_, elsif_, else_, true_, false_
+      , library_, dimension_
         //symbols
       , arrow_, dblsemi_, dblslash_, range_
         //white space
       , spaces
+      ;
+
+      lex::token_def<Tree::InfixAssoc, lex_char_type>
+        infix_binary_
+      ;
+
+      lex::token_def<Tree::UnaryType, lex_char_type>
+        unary_
       ;
 
       lex::token_def<u32string, lex_char_type>
