@@ -31,13 +31,16 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/operator/self.hpp>
 #include <boost/spirit/home/phoenix/statement/sequence.hpp>
 #include <boost/spirit/home/phoenix/statement/if.hpp>
-#include <boost/spirit/include/karma.hpp>
+
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+
+#include <boost/spirit/include/karma.hpp>
 
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/std_pair.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT
 (
@@ -114,7 +117,6 @@ BOOST_FUSION_ADAPT_STRUCT
   (TransLucid::Tree::Expr, rhs)
 )
 
-
 namespace TransLucid
 {
   namespace Printer
@@ -173,7 +175,9 @@ namespace TransLucid
         paren_expr = literal('(') << expr << ')';
 
         hash_expr = ("(#") << expr[_1 = at_c<0>(_val)] << (')');
-        pairs %= (expr << ":" << expr) % ", ";
+        pairs %= one_pair % ", ";
+
+        one_pair %= expr << ':' << expr;
         tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
         at_expr = literal('(') << expr << literal('@') << expr << literal(')');
 
@@ -238,6 +242,13 @@ namespace TransLucid
         Iterator,
         Tree::TupleExpr::TuplePairs()
       > pairs;
+
+      karma::rule
+      <
+        Iterator,
+        std::pair<Tree::Expr, Tree::Expr>()
+      > one_pair;
+
       std::map<Special::Value, std::string> special_map;
     };
   }

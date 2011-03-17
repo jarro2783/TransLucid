@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file expr_parser.cpp
+ * The expression parser implementation.
+ */
+
 #include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/expr_parser.hpp>
@@ -66,14 +70,28 @@ namespace TransLucid
       }
     }
 
+    /**
+     * Create the elsif list. Creates a vector of pairs as an elsif list from
+     * a fusion vector which spirit gives us.
+     */
     struct make_elsifs_imp
     {
+      /**
+       * Metafunction for the return type of make_elsifs_imp.
+       */
       template <typename Arg>
       struct result
       {
+        /**
+         * The actual return type.
+         */
         typedef std::vector<std::pair<Tree::Expr, Tree::Expr>> type;
       };
 
+      /**
+       * The actual function which does the conversion.
+       * @param eif The elsif list.
+       */
       template <typename Arg>
       std::vector<std::pair<Tree::Expr, Tree::Expr>>
       operator()(const Arg& eif) const
@@ -90,6 +108,7 @@ namespace TransLucid
       }
     };
 
+    /** The phoenix function for creating an elsif list. */
     ph::function<make_elsifs_imp> make_elsifs;
 
     inline u32string

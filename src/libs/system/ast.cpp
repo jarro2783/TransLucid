@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file ast.cpp
+ * The AST implementation.
+ */
+
 #include <tl/ast.hpp>
 
 namespace TransLucid

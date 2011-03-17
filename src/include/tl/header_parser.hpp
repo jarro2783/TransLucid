@@ -41,27 +41,16 @@ namespace TransLucid
     {
       public:
 
+      /**
+       * Construct a HeaderGrammar.
+       * The constructor sets up the grammar so that it is ready to parse.
+       * @param tok The lexer from which to match tokens.
+       */
       template <typename TokenDef>
       HeaderGrammar(TokenDef& tok)
       : HeaderGrammar::base_type(headerp)
       {
          using namespace qi::labels;
-
-         #if 0
-         assoc_symbols.add
-           (chars_to_unsigned_u32string(U"infixl"), Tree::ASSOC_LEFT)
-           (chars_to_unsigned_u32string(U"infixr"), Tree::ASSOC_RIGHT)
-           (chars_to_unsigned_u32string(U"infixn"), Tree::ASSOC_NON)
-           (chars_to_unsigned_u32string(U"infixp"), Tree::ASSOC_COMPARISON)
-           (chars_to_unsigned_u32string(U"infixm"), Tree::ASSOC_VARIABLE)
-         ;
-
-         unary_symbols.add
-           (chars_to_unsigned_u32string(U"prefix"), Tree::UNARY_PREFIX)
-           (chars_to_unsigned_u32string(U"postfix"), Tree::UNARY_POSTFIX)
-         ;
-         #endif
-           
 
          headerp =
            *( headerItem(_r1) > tok.dblsemi_ )

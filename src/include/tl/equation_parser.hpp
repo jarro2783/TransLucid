@@ -44,6 +44,10 @@ namespace TransLucid
     {
       public:
 
+      /**
+       * Construct an Equation Grammar.
+       * @param tok The lexer from which to match tokens.
+       */
       template <typename TokenDef>
       EquationGrammar(TokenDef& tok)
       : EquationGrammar::base_type(equation)

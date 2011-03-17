@@ -36,6 +36,7 @@ namespace TransLucid
       /**
        * Construct an expression grammar.
        * @param h The parser header to use.
+       * @param tok The lexer from which to match tokens.
        */
       template <typename TokenDef>
       ExprGrammar(Header& h, TokenDef& tok);

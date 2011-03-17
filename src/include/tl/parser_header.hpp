@@ -45,7 +45,7 @@ namespace TransLucid
       Header();
 
       dimension_set dimension_symbols;/**<Dimensions.*/
-      dimension_set system_dimension_symbols;
+      dimension_set system_dimension_symbols; /**<System dimensions.*/
 
       unary_symbols prefix_op_symbols;/**<Prefix operations.*/
       unary_symbols postfix_op_symbols;/**<Postfix operations.*/
