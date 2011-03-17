@@ -49,6 +49,9 @@ namespace TransLucid
     class AllParsers;
   }
 
+  /**
+   * Translator class. Drives the parser.
+   */
   class Translator
   {
     private:
@@ -56,19 +59,36 @@ namespace TransLucid
 
     public:
 
+    /**
+     * An iterator into a list of equations. EquationIterator is a façade
+     * to UUIDToParsedEquation.
+     */
     class EquationIterator
     {
       public:
+      /**
+       * Construct an EquationIterator.
+       * @param iter The underlying iterator.
+       */
       EquationIterator(const UUIDToParsedEquation::const_iterator& iter)
       : m_iter(iter)
       {
       }
 
+      /**
+       * Copies an EquationIterator.
+       * @param other The iterator to copy.
+       */
       EquationIterator(const EquationIterator& other)
       : m_iter(other.m_iter)
       {
       }
 
+      /**
+       * Assigns an EquationIterator.
+       * @param rhs The iterator to assign to.
+       * @return *this.
+       */
       EquationIterator& operator=(const EquationIterator& rhs)
       {
         if (&rhs != this)
@@ -78,22 +98,40 @@ namespace TransLucid
         return *this;
       }
 
+      /**
+       * Tests equality to another iterator.
+       * @param rhs The other iterator.
+       * @return True if equal, false if not.
+       */
       bool operator==(const EquationIterator& rhs) const
       {
         return m_iter == rhs.m_iter;
       }
 
+      /**
+       * Tests inequality.
+       * @param rhs The other iterator.
+       * @return True if not equal, false if equal.
+       */
       bool operator!=(const EquationIterator& rhs) const
       {
         return m_iter != rhs.m_iter;
       }
 
+      /**
+       * Preincrement the iterator.
+       * @return *this.
+       */
       EquationIterator& operator++() 
       {
         ++m_iter;
         return *this;
       }
 
+      /**
+       * Postincrement operator.
+       * return A copy of the iterator before incrementing.
+       */
       EquationIterator operator++(int)
       {
         EquationIterator i(m_iter);
@@ -102,11 +140,19 @@ namespace TransLucid
         return i;
       }
 
+      /**
+       * Get the current uuid.
+       * @return The uuid of the equation currently being referred to.
+       */
       uuid id() const
       {
         return m_iter->first;
       }
 
+      /**
+       * Print the current equation.
+       * @return A string representation of the current equation.
+       */
       std::string print() const;
 
       private:
@@ -116,12 +162,28 @@ namespace TransLucid
     Translator();
     ~Translator();
 
+    /**
+     * Translate an expression into a hyperdaton.
+     * Parses and compiles an expression string.
+     * @param s The string representing the expression.
+     */
     HD*
     translate_expr(const u32string& s);
 
+    /**
+     * Translate an equation set and add it to the system.
+     * Parses a set of equations, compiles them, and adds them to the system
+     * that the Translator has.
+     * @param s The string representing the equation set.
+     */
     void
     translate_and_add_equation_set(const u32string& s);
 
+    /**
+     * Translates an equation set.
+     * Parses a set of equations and compiles them.
+     * @param s The string representing the equation set.
+     */
     PTEquationVector
     translate_equation_set(const u32string& s);
 
@@ -134,24 +196,43 @@ namespace TransLucid
     bool
     parse_header(const u32string& s);
 
+    /**
+     * The Translator's system.
+     * @return The SystemHD belonging to the Translator.
+     */
     SystemHD&
     system()
     {
       return m_system;
     }
 
+    /**
+     * The Translator's header.
+     * The parser header belonging to the Translator.
+     */
     Parser::Header&
     header()
     {
       return *m_header;
     }
 
+    /**
+     * Load a library. Loads the library given by the string @a s.
+     * @param s The name of the library to load.
+     */
     void
     loadLibrary(const u32string& s)
     {
       m_lt.loadLibrary(s, &m_system);
     }
 
+    /**
+     * The AST of the last expression parsed. When translate_expr is called,
+     * the expression tree will be stored and can be retrieved by this
+     * function.
+     * @return The expression tree of the last expression parsed by
+     * translate_expr.
+     */
     const Tree::Expr&
     lastExpression() const
     {
