@@ -149,7 +149,6 @@ namespace TransLucid
         | else_
         | true_
         | false_
-        | identifier_
         | range_
         | dblslash_
         | arrow_
@@ -169,7 +168,7 @@ namespace TransLucid
         | library_
         | dimension_
         | infix_binary_
-        | unary_
+        | unary_ [ph::ref(std::cout) << "matched unary" << std::endl]
 
         //single character symbols
         | L':'
@@ -185,6 +184,8 @@ namespace TransLucid
         | L')'
         | L'|'
         | L','
+
+        | identifier_
         ;
 
         //anything else not matched

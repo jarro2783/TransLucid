@@ -219,8 +219,8 @@ namespace TransLucid
       ;
 
       postfix_expr =
-         at_expr [_a = _1]
       #if 0
+         at_expr [_a = _1]
       >> (
            ( tok.any_
              [
@@ -233,6 +233,7 @@ namespace TransLucid
            ]
          )
       #endif
+        at_expr[_val = _1]
       ;
 
       at_expr =

@@ -23,6 +23,34 @@ namespace TransLucid
 {
   namespace Parser
   {
+    namespace ph = boost::phoenix;
+
+    struct make_tuple_imp
+    {
+      template <typename Arg>
+      struct result
+      {
+        typedef std::vector<std::pair<Tree::Expr, Tree::Expr>> type;
+      };
+
+      template <typename Arg>
+      typename result<Arg>::type
+      operator()(const Arg& a) const
+      {
+        using boost::fusion::at_c;
+
+        typename result<Arg>::type t;
+        for (auto& v : a)
+        {
+          t.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
+        }
+
+        return t;
+      }
+    };
+
+    ph::function<make_tuple_imp> make_tuple;
+
     template class TupleGrammar<iterator_t>;
     
     template <typename Iterator>
@@ -32,7 +60,6 @@ namespace TransLucid
       using namespace qi::labels;
       using namespace boost::phoenix;
       namespace phoenix = boost::phoenix;
-      //expr = self.parsers.expr_parser.top();
 
       tuple_inside = pair[push_back(_val, _1)] % literal(',');
 
@@ -55,7 +82,7 @@ namespace TransLucid
           > literal(']')
          )
          [
-           _val = construct<Tree::TupleExpr>(_1)
+           _val = construct<Tree::TupleExpr>(make_tuple(_1))
          ]
       ;
 
