@@ -269,6 +269,7 @@ struct checker_grammar
         | real
         | constant
         | tok.character_[ph::bind(&Checker::character, m_checker, _1)]
+        | tok.any_[ph::bind(&Checker::identifier, m_checker, _1)]
         )
         >> qi::eoi
       ;
@@ -528,6 +529,20 @@ BOOST_AUTO_TEST_CASE ( mixed )
     TOKEN_COLON,
     mpz_class(5),
     TOKEN_CBRACKET
+  });
+
+  check(input, checker);
+}
+
+BOOST_AUTO_TEST_CASE ( any )
+{
+  BOOST_TEST_MESSAGE("testing the any symbol");
+  TL::u32string input = U"4 % -5";
+  Checker checker({
+    mpz_class(4),
+    U"%",
+    U"-",
+    mpz_class(5)
   });
 
   check(input, checker);
