@@ -354,6 +354,7 @@ lookup_context(HD* system, const Constant& v, const Tuple& k)
   {
     index = get_dimension_index(system, v);
   }
+  std::cerr << "looking up index " << index << std::endl;
 
   Tuple::const_iterator iter = k.find(index);
   if (iter != k.end())

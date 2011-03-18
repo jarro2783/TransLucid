@@ -67,12 +67,16 @@ DimensionTranslator::lookup(const u32string& name)
 size_t
 DimensionTranslator::lookup(const Constant& value)
 {
+  std::cerr << "looking up: " << value << std::endl;
+
   std::pair<ustring_type_map::iterator,bool> result =
     m_typedDims.insert(std::make_pair(value, m_nextIndex));
   if (result.second)
   {
     ++m_nextIndex;
   }
+
+  std::cerr << "has index: " << result.first->second << std::endl;
   return result.first->second;
   #if 0
   ustring_type_map::iterator iter = m_typedDims.find(value);

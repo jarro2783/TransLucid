@@ -52,8 +52,11 @@ namespace TransLucid
     using namespace ph;
 
     inline Tree::Expr
-    construct_typed_constant(const u32string& type, const u32string& value)
+    //construct_typed_constant(const u32string& type, const u32string& value)
+    construct_typed_constant(const std::pair<u32string, u32string>& c)
     {
+      const std::u32string& type = c.first;
+      const std::u32string& value = c.second;
       if (type == U"ustring") {
         if (!validate_ustring(value)) {
           throw ParseError(U"Invalid character in ustring");
@@ -308,11 +311,11 @@ namespace TransLucid
         ]
       | tok.constantINTERPRET_
         [
-          _val = construct<Tree::ConstantExpr>(_1)
+          _val = ph::bind(construct_typed_constant, _1)
         ]
       | tok.constantRAW_
         [
-          _val = construct<Tree::ConstantExpr>(_1)
+          _val = ph::bind(construct_typed_constant, _1)
         ]
       | tok.character_[_val = construct<char32_t>(_1)]
       ;

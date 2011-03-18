@@ -254,6 +254,10 @@ BOOST_AUTO_TEST_CASE ( context_change )
   TL::TaggedConstant tuple1 = (*context1)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple1.first.index(), TL::TYPE_INDEX_TUPLE);
 
+  std::cerr << "built tuple ";
+  tuple1.first.value<TL::Tuple>().print(std::cerr);
+  std::cerr << std::endl;
+
   h = translator.translate_expr(U"#1");
   BOOST_REQUIRE(h != 0);
   TL::TaggedConstant v = (*h)(tuple1.first.value<TL::Tuple>());
@@ -304,6 +308,8 @@ BOOST_AUTO_TEST_CASE ( header )
     U"infixl ustring\"%\" ustring\"operator%\" 20;;"
   ) 
   != false);
+
+  BOOST_TEST_MESSAGE("Parsed header");
 
   TL::HD *h = t2.translate_expr(U"4 % -5");
   BOOST_REQUIRE(h != 0);
