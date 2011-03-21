@@ -236,18 +236,21 @@ TLCore::run()
   m_grammar = 
     new Grammar<Parser::iterator_t>
       (m_system, m_exprs, m_reactive, m_demands, *this);
+
+  Lexer::tl_lexer lexer;
   
   *m_is >> std::noskipws;
 
-  Parser::iterator_t pos(Parser::U32Iterator(
+  Lexer::base_iterator_t pos(
     Parser::makeUTF8Iterator(
       std::istream_iterator<char>(*m_is)),
     Parser::makeUTF8Iterator(std::istream_iterator<char>())
-  ));
+  );
 
-  bool r = boost::spirit::qi::phrase_parse(
+  bool r = boost::spirit::lex::tokenize_and_parse(
     pos,
-    Parser::iterator_t(),
+    Lexer::base_iterator_t(),
+    lexer,
     *m_grammar
   );
 
