@@ -85,10 +85,6 @@ namespace TransLucid
       ;
 
       Header &header;
-      //this contains a mapping of all the reserved identifiers to
-      //their expression tree
-      //the place that this is stored might change in the future
-      ReservedIdentifierMap m_reserved_identifiers;
     };
  
     ExprGrammar<iterator_t>*

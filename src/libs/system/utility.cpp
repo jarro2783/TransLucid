@@ -229,6 +229,12 @@ booleanTrue(const GuardHD& g, const Tuple& k)
 std::string
 utf32_to_utf8(const std::u32string& s) {
   #ifdef ICONV_CONVERT
+  std::cerr << "utf32_to_utf8" << std::endl;
+  for (char32_t c : s)
+  {
+    std::cerr << std::hex << c << " ";
+  }
+  std::cerr << std::endl;
   const size_t buffer_size = 8000;
   if (s.size()+1 > buffer_size/sizeof(char32_t))
   {
@@ -242,6 +248,7 @@ utf32_to_utf8(const std::u32string& s) {
 
   size_t inSize = (s.size())* sizeof(char32_t);
   size_t outSize = buffer_size * sizeof(char32_t);
+  std::cerr << "input size = " << inSize << std::endl;
   char out[buffer_size];
   char32_t in[buffer_size];
   memcpy(in, s.c_str(), s.size()*sizeof(char32_t));
@@ -290,6 +297,7 @@ utf32_to_utf8(const std::u32string& s) {
 std::u32string
 utf8_to_utf32(const std::string& s)
 {
+  std::cerr << "utf8_to_utf32: size = " << s.size() << std::endl;
   const size_t buffer_size = 8000;
   if (s.size()+1 > buffer_size/sizeof(char32_t))
   {
@@ -319,7 +327,14 @@ utf8_to_utf32(const std::string& s)
     }
   }
 
-  *outp = '\0';
+  //std::cerr << "utf8_to_utf32: outp length = " << outp - reinterpret_cast<char*>(&out) << std::endl;
+  std::cerr << "the bytes in the converted string" << std::endl;
+  for (char* p = reinterpret_cast<char*>(out); p != outp; ++p)
+  {
+    std::cerr << (int(*p) & 0xFF) << std::endl;
+  }
+
+  *reinterpret_cast<char32_t*>(outp) = U'\0';
   return std::u32string(out);
 }
 
@@ -354,7 +369,6 @@ lookup_context(HD* system, const Constant& v, const Tuple& k)
   {
     index = get_dimension_index(system, v);
   }
-  std::cerr << "looking up index " << index << std::endl;
 
   Tuple::const_iterator iter = k.find(index);
   if (iter != k.end())

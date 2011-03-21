@@ -266,6 +266,9 @@ namespace TransLucid
           Context& ctx
         ) const
         {
+          //std::cerr << "building string with text " << 
+          //  u32string(first, last)
+          //  << std::endl;
           u32string type, value;
           bool error = false;
 
@@ -297,13 +300,13 @@ namespace TransLucid
                 }
                 else
                 {
-                  std::cerr << "adding: " << r.second << std::endl;
+                  std::cerr << "appending : " << r.second << std::endl;
                   value += r.second;
                 }
               }
               else
               {
-                std::cerr << "adding " << u32string(1, *current) << std::endl;
+                std::cerr << "appending " << *current << std::endl;
                 value += *current;
                 ++current;
               }
@@ -326,6 +329,7 @@ namespace TransLucid
             value = U"==error==";
           }
 
+          std::cerr << "built constant with text = " << value << std::endl;
           ctx.set_value(std::make_pair(type, value));
         }
       };

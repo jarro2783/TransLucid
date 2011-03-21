@@ -36,6 +36,7 @@ namespace TransLucid
     typedef std::map<u32string, Tree::UnaryOperator> unary_symbols;
     typedef std::map<u32string, Tree::BinaryOperator> binary_symbols;
     typedef std::set<u32string> dimension_set;
+    typedef std::unordered_map<u32string, Tree::Expr> ReservedIdentifierMap;
 
     struct Header
     {
@@ -55,6 +56,8 @@ namespace TransLucid
 
       binary_symbols binary_op_symbols; 
       /**<Binary operators.*/
+
+      ReservedIdentifierMap reserved_ids;
     };
 
     /**
@@ -65,7 +68,18 @@ namespace TransLucid
     inline void
     addDimensionSymbol(Header& h, const u32string& name)
     {
+      //add to list of dimensions
       h.dimension_symbols.insert(name);
+
+      //and the global list of symbols
+      h.reserved_ids.insert
+      (
+        std::make_pair
+        (
+          name,
+          Tree::DimensionExpr(name)
+        )
+      );
     }
 
     /**

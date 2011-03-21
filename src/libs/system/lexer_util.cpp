@@ -176,7 +176,6 @@ build_escaped_characters
       //character
       if (chars.length() == 2)
       {
-        std::cerr << "adding byte " << std::hex << value << std::endl;
         building += char(value & 0xFF);
       }
       else
@@ -189,11 +188,14 @@ build_escaped_characters
   std::cerr << "converting string:" << std::endl;
   for (char c : building)
   {
-    std::cerr << std::hex << uint8_t(c);
+    std::cerr << std::hex << (int(c) & 0xFF);
   }
   std::cerr << std::endl;
 
+  std::cerr << "building string: " << building << std::endl;
+
   u32string u32result = utf8_to_utf32(building);
+  std::cerr << "converted to " << u32result << std::endl;
   return std::make_pair(!error, u32result);
 }
 

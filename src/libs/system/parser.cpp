@@ -34,6 +34,19 @@ namespace TransLucid
 namespace Parser
 {
 
+namespace
+{
+  struct IdMapper
+  {
+    template <typename Value>
+    auto operator()(const Value& v) 
+      -> decltype(std::make_pair(v.first, Tree::Expr()))
+    {
+      return std::make_pair(v.first, Tree::Expr(v.second));
+    }
+  };
+}
+
 Header::Header()
 :
   //add predefined dimensions
@@ -43,6 +56,23 @@ Header::Header()
     U"all"}
   )
 { 
+  ReservedIdentifierMap& m = reserved_ids;;
+
+  auto inserter = std::inserter(m, m.end());
+  std::transform(
+    Special::m_sv.parser_stov.begin(), 
+    Special::m_sv.parser_stov.end(), 
+    inserter,
+    IdMapper()
+
+    #if 0
+    [](const Special::StringValueInitialiser::StringValueMap::value_type& 
+       iter) 
+    {
+      return std::make_pair(p.first, Tree::Expr(p.second));
+    } 
+    #endif
+  );
 }
 
 std::ostream& 
@@ -105,38 +135,6 @@ construct_identifier
   {
     return iter->second;
   }
-}
-
-struct IdMapper
-{
-  template <typename Value>
-  auto operator()(const Value& v) 
-    -> decltype(std::make_pair(v.first, Tree::Expr()))
-  {
-    return std::make_pair(v.first, Tree::Expr(v.second));
-  }
-};
-
-ReservedIdentifierMap
-init_reserved_identifiers()
-{
-  ReservedIdentifierMap m;
-
-  auto inserter = std::inserter(m, m.end());
-  std::transform(Special::m_sv.parser_stov.begin(), Special::m_sv.parser_stov.end(), 
-    inserter,
-    IdMapper()
-
-    #if 0
-    [](const Special::StringValueInitialiser::StringValueMap::value_type& 
-       iter) 
-    {
-      return std::make_pair(p.first, Tree::Expr(p.second));
-    } 
-    #endif
-  );
-
-  return m;
 }
 
 //I'll keep this for now because it could be of use

@@ -17,11 +17,16 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file iterator.cpp
+ * Iterator tests.
+ */
+
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
 //#include <tl/parser_fwd.hpp>
 
-#include <boost/spirit/include/classic_multi_pass.hpp>
+//#include <boost/spirit/include/classic_multi_pass.hpp>
 
 #define BOOST_TEST_MODULE equations
 #include <boost/test/included/unit_test.hpp>
@@ -139,6 +144,7 @@ BOOST_AUTO_TEST_CASE ( copying )
   BOOST_CHECK(s == result);
 }
 
+#if 0
 //probably don't need to test multipass since we don't use it
 BOOST_AUTO_TEST_CASE( multi_pass )
 {
@@ -161,6 +167,7 @@ BOOST_AUTO_TEST_CASE( multi_pass )
   BOOST_CHECK(pos2 == 
     boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
 }
+#endif
 
 BOOST_AUTO_TEST_CASE( copy_iter)
 { 

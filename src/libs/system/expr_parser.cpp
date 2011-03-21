@@ -159,8 +159,6 @@ namespace TransLucid
     {
       using namespace qi::labels;
 
-      m_reserved_identifiers = init_reserved_identifiers();
-
       expr %= if_expr
       ;
 
@@ -306,7 +304,7 @@ namespace TransLucid
           _val = ph::bind(
             construct_identifier, 
             _1, 
-            ph::ref(m_reserved_identifiers)
+            ph::ref(header.reserved_ids)
           )
         ]
       | tok.constantINTERPRET_

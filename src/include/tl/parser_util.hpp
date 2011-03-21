@@ -33,12 +33,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/charset.hpp>
 #include <tl/ast.hpp>
 #include <tl/parser_defs.hpp>
+#include <tl/parser_header.hpp>
 
 namespace TransLucid
 {
   namespace Parser
   {
-    typedef std::unordered_map<u32string, Tree::Expr> ReservedIdentifierMap;
     //determines if an identifier is a dimension, some named constant, or
     //just an identifier
     Tree::Expr
@@ -47,11 +47,6 @@ namespace TransLucid
       const u32string& id,
       const ReservedIdentifierMap& ids
     );
-
-    //initialises the reserved identifier map, this might need to change
-    //in the future too
-    ReservedIdentifierMap
-    init_reserved_identifiers();
 
     //TODO this may be useful for handling errors
     #if 0
