@@ -36,9 +36,6 @@ namespace TransLucid
 {
   namespace Parser
   {
-    template <typename Iterator>
-    class SkipGrammar;
-
     //class ParsedEquation; 
     class Header;
   }

@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#if 0
 
 #include "tlcore.hpp"
 #include <tl/expr_parser.hpp>
@@ -48,7 +47,7 @@ namespace TLCore
 
 template <typename Iterator>
 class Grammar : 
-  public Parser::qi::grammar<Iterator, Parser::SkipGrammar<Iterator>>
+  public Parser::qi::grammar<Iterator>
 {
   public:
   /**
@@ -77,13 +76,6 @@ class Grammar :
     m_eqn.set_expr(m_expr);
     m_eqn.set_tuple(m_tuple);
     m_header_parser.set_expr(m_expr);
-
-    m_header.delimiter_start_symbols.add(
-      to_unsigned_u32string(u32string(U"\"")).c_str(),
-      Parser::Delimiter(U"ustring", U'\"', U'\"'));
-    m_header.delimiter_start_symbols.add(
-      to_unsigned_u32string(u32string(U"\'")).c_str(),
-      Parser::Delimiter(U"uchar", '\'', '\''));
 
     if (reactive)
     {
@@ -181,7 +173,7 @@ class Grammar :
   Parser::EquationGrammar<Iterator> m_eqn;
   Parser::TupleGrammar<Iterator> m_tuple;
 
-  Parser::qi::rule<Iterator, Parser::SkipGrammar<Iterator>> 
+  Parser::qi::rule<Iterator>
     r_program,
     r_exprs,
     r_eqns,
@@ -234,7 +226,6 @@ TLCore::TLCore()
  ,m_time(0)
  ,m_lastLibLoaded(0)
 {
-  m_skipper = new Parser::SkipGrammar<Parser::iterator_t>;
   m_libtool.addSearchPath(to_u32string(std::string(PREFIX "/share/tl")));
 }
 
@@ -257,8 +248,7 @@ TLCore::run()
   bool r = boost::spirit::qi::phrase_parse(
     pos,
     Parser::iterator_t(),
-    *m_grammar,
-    *m_skipper
+    *m_grammar
   );
 
   if (!r && pos != Parser::iterator_t())
@@ -437,4 +427,3 @@ void TLCore::addNewEquations()
 
 } //namespace TransLucid
 
-#endif
