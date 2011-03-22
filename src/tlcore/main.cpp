@@ -66,7 +66,6 @@ std::unique_ptr<std::ofstream> openOutput(const std::string& output)
  */
 int main(int argc, char *argv[])
 {
-  #if 0
   setlocale(LC_ALL, "");
 
   po::variables_map vm;
@@ -159,6 +158,5 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  #endif
   return 0;
 }

@@ -59,11 +59,14 @@ class Grammar :
    * @param evaluate The evaluator to inform of events.
    * @todo Remove exprs because we don't use it anymore.
    */
+  template <typename TokenDef>
   Grammar(SystemHD& system, ExprList& exprs, bool reactive, bool demands,
-    Evaluator& evaluate
+    Evaluator& evaluate, TokenDef& tok
   )
   : Grammar::base_type(r_program)
-   ,m_expr(m_header)
+   ,m_header_parser(tok)
+   ,m_expr(m_header, tok)
+   ,m_eqn(tok)
    ,m_system(system)
    ,m_exprs(exprs)
    ,m_evaluator(evaluate)
@@ -85,10 +88,10 @@ class Grammar :
           [
             ph::bind(&evaluateInstant, ph::ref(m_evaluator))
           ]
-          % Parser::qi::lit(literal("$$"))
+          % tok.dbldollar_
         )
         
-      >> -Parser::qi::lit(literal("$$"))
+      >> -tok.dbldollar_
       > Parser::qi::eoi;
     }
     else
@@ -102,16 +105,16 @@ class Grammar :
     r_onetime =
       -m_header_parser(ph::ref(m_header))
         [ph::bind(&postHeader, ph::ref(m_evaluator), ph::ref(m_header))]
-    >> literal("%%")
+    >> tok.dblpercent_
     > r_eqns
     > r_demands_conditional
-    > literal("%%")
+    > tok.dblpercent_
     > r_exprs
     ;
 
     r_eqns = 
       *(
-         (m_eqn > literal(";;"))
+         (m_eqn > tok.dblsemi_)
          [
            ph::bind(&addEquation, ph::ref(m_system), _1, ph::ref(m_evaluator))
          ]
@@ -120,7 +123,7 @@ class Grammar :
 
     r_exprs = 
       *(
-         (m_expr > literal(";;"))
+         (m_expr > tok.dblsemi_)
          [
            ph::bind(&addExpression, _1, ph::ref(m_evaluator))
          ]
@@ -135,7 +138,7 @@ class Grammar :
     
     if (demands)
     {
-      r_demands_conditional = r_demands > literal("%%");
+      r_demands_conditional = r_demands > tok.dblpercent_;
     }
     else
     {
@@ -232,13 +235,13 @@ TLCore::TLCore()
 void 
 TLCore::run()
 {
+  Lexer::tl_lexer lexer;
+  
   delete m_grammar;
   m_grammar = 
     new Grammar<Parser::iterator_t>
-      (m_system, m_exprs, m_reactive, m_demands, *this);
+      (m_system, m_exprs, m_reactive, m_demands, *this, lexer);
 
-  Lexer::tl_lexer lexer;
-  
   *m_is >> std::noskipws;
 
   Lexer::base_iterator_t pos(
@@ -254,7 +257,7 @@ TLCore::run()
     *m_grammar
   );
 
-  if (!r && pos != Parser::iterator_t())
+  if (!r && pos != Lexer::base_iterator_t())
   {
     throw "Failed parsing";
   }

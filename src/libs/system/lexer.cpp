@@ -73,10 +73,12 @@ lex_tl_tokens<Lexer>::lex_tl_tokens()
   integer_           = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
   character_         = L"'([^'\\\\]|\\\\.)+'";
 
-  dblslash_ = L"\\\\\\\\";
-  range_    = L"\\.\\.";
-  arrow_    = L"->";
-  dblsemi_  = L";;";
+  dblslash_   = L"\\\\\\\\";
+  range_      = L"\\.\\.";
+  arrow_      = L"->";
+  dblsemi_    = L";;";
+  dbldollar_  = L"$$";
+  dblpercent_ = L"%%";
 
   real_     = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";
   rational_ = L"(0_1)|(~?)({ratDEC}|{ratNONDEC})";
@@ -103,6 +105,8 @@ lex_tl_tokens<Lexer>::lex_tl_tokens()
   | dblslash_
   | arrow_
   | dblsemi_
+  | dbldollar_
+  | dblpercent_
 
   //constants
   | constantRAW_       [detail::build_constant()]

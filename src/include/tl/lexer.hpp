@@ -84,7 +84,7 @@ namespace TransLucid
         if_, fi_, where_, then_, elsif_, else_, true_, false_
       , library_, dimension_
         //symbols
-      , arrow_, dblsemi_, dblslash_, range_
+      , arrow_, dblsemi_, dblslash_, range_, dbldollar_, dblpercent_
         //white space
       , spaces
       ;
