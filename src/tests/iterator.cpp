@@ -113,15 +113,45 @@ BOOST_AUTO_TEST_CASE ( stream )
 
   TL::Parser::U32Iterator end;
 
-  std::wstring s;
+  TL::u32string s;
   while (pos != end)
   {
     s += *pos;
     ++pos;
   }
 
-  BOOST_CHECK_EQUAL(TL::u32string(s.begin(), s.end()), 
-    TL::u32string(U"%%\n%%\n5;;"));
+  BOOST_CHECK_EQUAL(s, TL::u32string(U"%%\n%%\n5;;"));
+}
+
+BOOST_AUTO_TEST_CASE( stream_increment )
+{
+  std::istringstream is("%%\n%%\n5;;");
+  is >> std::noskipws;
+
+  TL::Parser::U32Iterator pos
+  (
+    TL::Parser::makeUTF8Iterator
+    (
+      std::istream_iterator<char>(is)
+    ),
+    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
+  );
+
+  TL::Parser::U32Iterator pos2 = pos;
+  TL::Parser::U32Iterator end;
+
+  BOOST_CHECK_EQUAL(*pos, '%');
+
+  ++pos2;
+
+  BOOST_CHECK_EQUAL(*pos2, '%');
+  BOOST_CHECK_EQUAL(*pos, '%');
+
+  ++pos;
+
+  BOOST_CHECK_EQUAL(*pos, '\n');
+  BOOST_CHECK_EQUAL(*pos2, '\n');
+
 }
 
 BOOST_AUTO_TEST_CASE( multi_pass )
