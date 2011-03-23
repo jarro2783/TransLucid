@@ -33,7 +33,7 @@ namespace TransLucid
     struct iterator_traits :
       public std::iterator
       <
-        std::forward_iterator_tag,
+        std::input_iterator_tag,
         wchar_t
       >
     {
@@ -113,6 +113,7 @@ namespace TransLucid
       : m_iter(other.m_iter != 0 ? other.m_iter->clone() : 0)
       , m_end(other.m_end != 0 ? other.m_end->clone() : 0)
       {
+        std::cerr << "U32Iterator(const U32Iterator&)" << std::endl;
       }
 
       /**
@@ -124,6 +125,7 @@ namespace TransLucid
        */
       U32Iterator& operator=(const U32Iterator& rhs)
       {
+        std::cerr << "i: =" << std::endl;
         if (this != &rhs)
         {
           Iterator* iter_copy = 0;
@@ -161,6 +163,7 @@ namespace TransLucid
        */
       bool operator==(const U32Iterator& rhs) const
       {
+        std::cerr << "i: ==" << std::endl;
         bool lhs_end = false;
         bool rhs_end = false;
 
@@ -192,6 +195,7 @@ namespace TransLucid
        */
       bool operator!=(const U32Iterator& rhs) const
       {
+        std::cerr << "i: !=" << std::endl;
         return !this->operator==(rhs);
       }
 
@@ -201,7 +205,9 @@ namespace TransLucid
        */
       U32Iterator& operator++()
       {
+        std::cerr << "i: ++" << std::endl;
         ++*m_iter;
+        //std::cerr << "++ " << u32string(1, operator*()) << std::endl;
         return *this;
       }
 
@@ -211,6 +217,7 @@ namespace TransLucid
        */
       const U32Iterator operator++(int)
       {
+        std::cerr << "i: i++" << std::endl;
         U32Iterator old(*this);
         ++*this;
         return old;
@@ -222,7 +229,8 @@ namespace TransLucid
        */
       reference operator*() const
       {
-        //std::cerr << u32string(1, **m_iter) << std::endl;
+        std::cerr << "i: *" << std::endl;
+        std::cerr << u32string(U"> ") + u32string(1, **m_iter) << std::endl;
         return **m_iter;
       }
 
@@ -232,6 +240,7 @@ namespace TransLucid
        */
       pointer operator->() const
       {
+        std::cerr << "i: ->" << std::endl;
         return m_iter->operator->();
       }
 

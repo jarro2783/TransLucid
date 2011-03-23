@@ -95,7 +95,8 @@ enum Token
   TOKEN_CPAREN,
   TOKEN_ARROW,
   TOKEN_BAR,
-  TOKEN_DOUBLE_SEMI
+  TOKEN_DOUBLE_SEMI,
+  TOKEN_DBL_PERCENT
 };
 
 //the types of values that we can have
@@ -299,6 +300,7 @@ struct checker_grammar
       | tok.range_    [_val = TOKEN_RANGE]
       | tok.arrow_    [_val = TOKEN_ARROW]
       | tok.dblsemi_  [_val = TOKEN_DOUBLE_SEMI]
+      | tok.dblpercent_ [_val = TOKEN_DBL_PERCENT]
 
       | qi::lit(L':') [_val = TOKEN_COLON]
       | qi::lit(L'[') [_val = TOKEN_OBRACKET]
@@ -350,6 +352,23 @@ bool check(const TL::u32string& input, Checker& checker)
   TL::Parser::U32Iterator last;
 
 	return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last;
+}
+
+bool check_utf8(const std::string& input, Checker& checker)
+{
+  std::istringstream is(input);
+  TL::Parser::U32Iterator first
+  (
+    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>(is)),
+    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
+  )
+  ;
+  TL::Parser::U32Iterator last;
+
+  TL::Lexer::tl_lexer lexer;
+  cgrammar checkg(lexer, checker);
+
+  return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last;
 }
 
 BOOST_AUTO_TEST_CASE ( identifiers )
@@ -487,7 +506,7 @@ BOOST_AUTO_TEST_CASE ( floats )
 
 BOOST_AUTO_TEST_CASE ( symbols )
 {
-  TL::u32string input = U":[].=&#@\\ \\\\..()->|;;\\\\\\";
+  TL::u32string input = U":[].=&#@\\ \\\\..()->|;;\\\\\\ %%";
   Checker checker({
     TOKEN_COLON,
     TOKEN_OBRACKET,
@@ -506,7 +525,8 @@ BOOST_AUTO_TEST_CASE ( symbols )
     TOKEN_BAR,
     TOKEN_DOUBLE_SEMI,
     TOKEN_DOUBLE_SLASH,
-    TOKEN_SLASH
+    TOKEN_SLASH,
+    TOKEN_DBL_PERCENT
   });
 
   check(input, checker);
@@ -546,6 +566,18 @@ BOOST_AUTO_TEST_CASE ( any )
   });
 
   check(input, checker);
+}
+
+BOOST_AUTO_TEST_CASE ( utf8 )
+{
+  BOOST_TEST_MESSAGE("testing utf8 input stream");
+  std::string input = "45 4 600";
+  Checker checker({
+    mpz_class(45),
+    mpz_class(4),
+    mpz_class(600)
+  });
+  BOOST_CHECK(check_utf8(input, checker));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

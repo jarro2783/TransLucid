@@ -77,7 +77,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens()
   range_      = L"\\.\\.";
   arrow_      = L"->";
   dblsemi_    = L";;";
-  dbldollar_  = L"$$";
+  dbldollar_  = L"\\$\\$";
   dblpercent_ = L"%%";
 
   real_     = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";

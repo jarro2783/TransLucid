@@ -300,13 +300,11 @@ namespace TransLucid
                 }
                 else
                 {
-                  std::cerr << "appending : " << r.second << std::endl;
                   value += r.second;
                 }
               }
               else
               {
-                std::cerr << "appending " << *current << std::endl;
                 value += *current;
                 ++current;
               }
@@ -329,7 +327,6 @@ namespace TransLucid
             value = U"==error==";
           }
 
-          std::cerr << "built constant with text = " << value << std::endl;
           ctx.set_value(std::make_pair(type, value));
         }
       };

@@ -107,7 +107,7 @@ class Grammar :
         [ph::bind(&postHeader, ph::ref(m_evaluator), ph::ref(m_header))]
     >> tok.dblpercent_
     > r_eqns
-    > r_demands_conditional
+    //> r_demands_conditional
     > tok.dblpercent_
     > r_exprs
     ;
