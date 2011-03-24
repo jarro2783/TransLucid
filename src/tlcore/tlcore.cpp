@@ -281,26 +281,6 @@ TLCore::run()
   #endif
 }
 
-std::u32string 
-TLCore::read_input()
-{
-  std::u32string input;
-  std::string buffer;
-
-  while (!m_is->eof())
-  {
-    int c = m_is->get();
-    if (c != EOF)
-    {
-      buffer += static_cast<char>(c);
-    }
-  }
-  
-  input = utf8_to_utf32(buffer);
-
-  return input;
-}
-
 void 
 TLCore::addEquation(const Parser::ParsedEquation& eqn)
 {

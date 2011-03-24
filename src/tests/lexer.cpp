@@ -357,6 +357,7 @@ bool check(const TL::u32string& input, Checker& checker)
 bool check_utf8(const std::string& input, Checker& checker)
 {
   std::istringstream is(input);
+  is >> std::noskipws;
   TL::Parser::U32Iterator first
   (
     TL::Parser::makeUTF8Iterator(std::istream_iterator<char>(is)),
@@ -571,8 +572,9 @@ BOOST_AUTO_TEST_CASE ( any )
 BOOST_AUTO_TEST_CASE ( utf8 )
 {
   BOOST_TEST_MESSAGE("testing utf8 input stream");
-  std::string input = "45 4 600";
+  std::string input = "%% 45 4 600";
   Checker checker({
+    TOKEN_DBL_PERCENT,
     mpz_class(45),
     mpz_class(4),
     mpz_class(600)

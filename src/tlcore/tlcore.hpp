@@ -208,9 +208,6 @@ namespace TransLucid
       typedef std::tuple<u32string, HD*, HD*, HD*> CompiledEquation;
       std::list<CompiledEquation> m_addEquations;
 
-      std::u32string 
-      read_input();
-
       //does the actual adding to the system
       void
       addNewEquations();

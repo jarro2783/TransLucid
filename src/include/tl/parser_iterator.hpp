@@ -92,7 +92,9 @@ namespace TransLucid
       : m_iter(0)
       , m_end(0)
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << ": U32Iterator()" << std::endl;
+        #endif
       }
 
       /**
@@ -104,7 +106,9 @@ namespace TransLucid
       : m_iter(i.clone())
       , m_end(end.clone())
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << ": U32Iterator(i, end)" << std::endl;
+        #endif
       }
 
       /**
@@ -115,7 +119,9 @@ namespace TransLucid
       : m_iter(other.m_iter != 0 ? other.m_iter->clone() : 0)
       , m_end(other.m_end != 0 ? other.m_end->clone() : 0)
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << " U32Iterator(*" << &other << ")" << std::endl;
+        #endif
       }
 
       /**
@@ -127,7 +133,9 @@ namespace TransLucid
        */
       U32Iterator& operator=(const U32Iterator& rhs)
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << " = " << &rhs << std::endl;
+        #endif
         if (this != &rhs)
         {
           Iterator* iter_copy = 0;
@@ -165,7 +173,9 @@ namespace TransLucid
        */
       bool operator==(const U32Iterator& rhs) const
       {
-        std::cerr << this << " == " << &rhs << std::endl;
+        #ifdef ITERATOR_DEBUG
+        std::cerr << this << " == " << &rhs;
+        #endif
         bool lhs_end = false;
         bool rhs_end = false;
 
@@ -181,10 +191,16 @@ namespace TransLucid
 
         if (!lhs_end && !rhs_end)
         {
+          #ifdef ITERATOR_DEBUG
+          std::cerr << " " << (*m_iter == *rhs.m_iter) << std::endl;
+          #endif
           return *m_iter == *rhs.m_iter;
         }
         else
         {
+          #ifdef ITERATOR_DEBUG
+          std::cerr << " " << (lhs_end == rhs_end) << std::endl;
+          #endif
           return lhs_end == rhs_end;
         }
       }
@@ -197,7 +213,9 @@ namespace TransLucid
        */
       bool operator!=(const U32Iterator& rhs) const
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << ": !=" << &rhs << std::endl;
+        #endif
         return !this->operator==(rhs);
       }
 
@@ -207,7 +225,9 @@ namespace TransLucid
        */
       U32Iterator& operator++()
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << ": ++" << std::endl;
+        #endif
         ++*m_iter;
         //std::cerr << "++ " << u32string(1, operator*()) << std::endl;
         return *this;
@@ -219,7 +239,9 @@ namespace TransLucid
        */
       const U32Iterator operator++(int)
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << ": i++" << std::endl;
+        #endif
         U32Iterator old(*this);
         ++*this;
         return old;
@@ -231,8 +253,11 @@ namespace TransLucid
        */
       reference operator*() const
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << ": *" << std::endl;
-        std::cerr << u32string(U"> ") + u32string(1, **m_iter) << std::endl;
+        wchar_t value = **m_iter;
+        std::cerr << u32string(U"> ") + u32string(1, value) << std::endl;
+        #endif
         return **m_iter;
       }
 
@@ -242,7 +267,9 @@ namespace TransLucid
        */
       pointer operator->() const
       {
+        #ifdef ITERATOR_DEBUG
         std::cerr << this << ": ->" << std::endl;
+        #endif
         return m_iter->operator->();
       }
 
@@ -264,8 +291,9 @@ namespace TransLucid
        * @param iter The underlying iterator.
        */
       UTF8Iterator(const T& iter)
-      : m_iter(iter), m_haveReadCurrent(false)
+      : m_iter(iter)
       {
+        readNext();
       }
 
       /**
@@ -275,7 +303,6 @@ namespace TransLucid
       UTF8Iterator(const UTF8Iterator& other)
       : m_iter(other.m_iter)
       , m_value(other.m_value)
-      , m_haveReadCurrent(other.m_haveReadCurrent)
       {
       }
 
@@ -299,32 +326,19 @@ namespace TransLucid
 
       Iterator& operator++() 
       {
-        if (!m_haveReadCurrent)
-        {
-          readNext();
-        }
-
-        m_haveReadCurrent = false;
+        ++m_iter;
+        readNext();
 
         return *this;
       }
 
       reference operator*() const
       {
-        if (!m_haveReadCurrent)
-        {
-          readNext();
-        }
-        //std::cerr << utf32_to_utf8(u32string({m_value})) << std::endl;;
         return m_value;
       }
 
       pointer operator->() const
       {
-        if (!m_haveReadCurrent)
-        {
-          readNext();
-        }
         return &m_value;
       }
 
@@ -370,10 +384,9 @@ namespace TransLucid
           std::cerr << "warning: invalid initial unicode byte" << std::endl;
         }
 
-        ++m_iter;
-
         for (int i = 0; i != toRead; ++i)
         {
+          ++m_iter;
           c = *m_iter;
           //std::cerr << (int)c << " ";
           if ((c & 0xC0) != 0x80)
@@ -383,19 +396,11 @@ namespace TransLucid
           }
           m_value |= ((0x3F & c) << nextShift);
           nextShift -= 6;
-          ++m_iter;
         }
-
-        //std::cerr << std::endl;
-
-        //std::cerr << "readNext() = " << m_value << std::endl;
-
-        m_haveReadCurrent = true;
       }
 
       mutable T m_iter;
       mutable value_type m_value;
-      mutable bool m_haveReadCurrent;
     };
 
     /**

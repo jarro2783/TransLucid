@@ -28,7 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <boost/spirit/include/classic_multi_pass.hpp>
 
-#define BOOST_TEST_MODULE equations
+#define BOOST_TEST_MODULE U32Iterator
 #include <boost/test/included/unit_test.hpp>
 
 namespace TL = TransLucid;
@@ -125,33 +125,76 @@ BOOST_AUTO_TEST_CASE ( stream )
 
 BOOST_AUTO_TEST_CASE( stream_increment )
 {
-  std::istringstream is("%%\n%%\n5;;");
+  std::istringstream is("1234567890");
   is >> std::noskipws;
+
+  std::istream_iterator<char> iter(is);
+
+  TL::Parser::U32Iterator pos_original
+  (
+    TL::Parser::makeUTF8Iterator
+    (
+      iter
+    ),
+    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
+  );
+
+  TL::Parser::U32Iterator pos1 = pos_original;
+  TL::Parser::U32Iterator pos = pos1;
+  TL::Parser::U32Iterator pos2 = pos1;
+  TL::Parser::U32Iterator end;
+
+  BOOST_CHECK(pos != end);
+
+  BOOST_CHECK_EQUAL(*pos++, '1');
+  pos2 = pos;
+  BOOST_CHECK(pos != end);
+
+  BOOST_CHECK_EQUAL(*pos++, '2');
+  pos2 = pos;
+  BOOST_CHECK(pos != end);
+
+  BOOST_CHECK_EQUAL(*pos++, '3');
+  pos2 = pos;
+  BOOST_CHECK(pos != end);
+
+  BOOST_CHECK_EQUAL(*pos++, '4');
+  pos2 = pos;
+  BOOST_CHECK(pos != end);
+
+  BOOST_CHECK_EQUAL(*pos++, '5');
+  pos2 = pos;
+  BOOST_CHECK(pos != end);
+
+  BOOST_CHECK_EQUAL(*pos++, '6');
+  pos2 = pos;
+  BOOST_CHECK(pos != end);
+}
+
+BOOST_AUTO_TEST_CASE( stream_weird )
+{
+  std::istringstream is("%%%%5;;");
+  is >> std::noskipws;
+
+  std::istream_iterator<char> iter(is);
 
   TL::Parser::U32Iterator pos
   (
     TL::Parser::makeUTF8Iterator
     (
-      std::istream_iterator<char>(is)
+      iter
     ),
     TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
   );
 
-  TL::Parser::U32Iterator pos2 = pos;
-  TL::Parser::U32Iterator end;
-
-  BOOST_CHECK_EQUAL(*pos, '%');
-
-  ++pos2;
-
-  BOOST_CHECK_EQUAL(*pos2, '%');
-  BOOST_CHECK_EQUAL(*pos, '%');
-
-  ++pos;
-
-  BOOST_CHECK_EQUAL(*pos, '\n');
-  BOOST_CHECK_EQUAL(*pos2, '\n');
-
+  BOOST_CHECK_EQUAL(*pos++, '%');
+  BOOST_CHECK_EQUAL(*pos++, '%');
+  BOOST_CHECK_EQUAL(*pos++, '%');
+  BOOST_CHECK_EQUAL(*pos++, '%');
+  BOOST_CHECK_EQUAL(*pos++, '5');
+  BOOST_CHECK_EQUAL(*pos++, ';');
+  BOOST_CHECK_EQUAL(*pos++, ';');
+  BOOST_CHECK(pos == TL::Parser::U32Iterator());
 }
 
 BOOST_AUTO_TEST_CASE( multi_pass )
@@ -167,6 +210,7 @@ BOOST_AUTO_TEST_CASE( multi_pass )
   );
 
   auto pos2 = pos;
+  auto segment_begin = pos;
   BOOST_CHECK(*pos == 'a');
 
   for (int i = 0; i != 7; ++i)
@@ -175,6 +219,7 @@ BOOST_AUTO_TEST_CASE( multi_pass )
   }
 
   BOOST_CHECK(*pos == 'h');
+  auto segment_end = pos;
 
   TL::u32string result;
   for (int i = 0; i != 16; ++i)
@@ -204,6 +249,9 @@ BOOST_AUTO_TEST_CASE( multi_pass )
   ++pos;
   BOOST_CHECK(pos == 
     boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
+
+  BOOST_CHECK_EQUAL(TL::u32string(segment_begin, segment_end), 
+    TL::u32string(U"abcdefg"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
