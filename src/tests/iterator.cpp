@@ -106,9 +106,9 @@ BOOST_AUTO_TEST_CASE ( stream )
   (
     TL::Parser::makeUTF8Iterator
     (
-      std::istream_iterator<char>(is)
+      boost::spirit::istream_iterator<char>(is)
     ),
-    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
   );
 
   TL::Parser::U32Iterator end;
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE( stream_increment )
   std::istringstream is("1234567890");
   is >> std::noskipws;
 
-  std::istream_iterator<char> iter(is);
+  boost::spirit::istream_iterator<char> iter(is);
 
   TL::Parser::U32Iterator pos_original
   (
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE( stream_increment )
     (
       iter
     ),
-    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
   );
 
   TL::Parser::U32Iterator pos1 = pos_original;
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE( stream_weird )
   std::istringstream is("%%%%5;;");
   is >> std::noskipws;
 
-  std::istream_iterator<char> iter(is);
+  boost::spirit::istream_iterator<char> iter(is);
 
   TL::Parser::U32Iterator pos
   (
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE( stream_weird )
     (
       iter
     ),
-    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
   );
 
   BOOST_CHECK_EQUAL(*pos++, '%');
@@ -204,8 +204,8 @@ BOOST_AUTO_TEST_CASE( multi_pass )
   (
     TL::Parser::U32Iterator
     (
-      TL::Parser::makeUTF8Iterator(std::istream_iterator<char>(is)),
-      TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
+      TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>(is)),
+      TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
     )
   );
 

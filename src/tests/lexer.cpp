@@ -360,8 +360,8 @@ bool check_utf8(const std::string& input, Checker& checker)
   is >> std::noskipws;
   TL::Parser::U32Iterator first
   (
-    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>(is)),
-    TL::Parser::makeUTF8Iterator(std::istream_iterator<char>())
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>(is)),
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
   )
   ;
   TL::Parser::U32Iterator last;

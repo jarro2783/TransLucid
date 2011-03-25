@@ -29,6 +29,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iterator>
 #include <iostream>
 
+#include <boost/spirit/include/support_istream_iterator.hpp>
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -246,8 +248,8 @@ TLCore::run()
 
   Lexer::base_iterator_t pos(
     Parser::makeUTF8Iterator(
-      std::istream_iterator<char>(*m_is)),
-    Parser::makeUTF8Iterator(std::istream_iterator<char>())
+      boost::spirit::istream_iterator(*m_is)),
+    Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
   );
 
   bool r = boost::spirit::lex::tokenize_and_parse(
