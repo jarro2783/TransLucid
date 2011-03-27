@@ -26,6 +26,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/charset.hpp>
 
+//define this to get lots of debugging
+#define ITERATOR_DEBUG
+
 namespace TransLucid
 {
   namespace Parser
@@ -293,7 +296,9 @@ namespace TransLucid
       UTF8Iterator(const T& iter)
       : m_iter(iter)
       {
-        readNext();
+        if (!(iter == T())) {
+          readNext();
+        }
       }
 
       /**
