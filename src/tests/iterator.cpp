@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 //#include <tl/parser_fwd.hpp>
 
 #include <boost/spirit/include/classic_multi_pass.hpp>
+#include <boost/spirit/include/support_istream_iterator.hpp>
 
 #define BOOST_TEST_MODULE U32Iterator
 #include <boost/test/included/unit_test.hpp>
@@ -106,9 +107,9 @@ BOOST_AUTO_TEST_CASE ( stream )
   (
     TL::Parser::makeUTF8Iterator
     (
-      boost::spirit::istream_iterator<char>(is)
+      boost::spirit::istream_iterator(is)
     ),
-    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
   );
 
   TL::Parser::U32Iterator end;
@@ -128,7 +129,7 @@ BOOST_AUTO_TEST_CASE( stream_increment )
   std::istringstream is("1234567890");
   is >> std::noskipws;
 
-  boost::spirit::istream_iterator<char> iter(is);
+  boost::spirit::istream_iterator iter(is);
 
   TL::Parser::U32Iterator pos_original
   (
@@ -136,7 +137,7 @@ BOOST_AUTO_TEST_CASE( stream_increment )
     (
       iter
     ),
-    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
   );
 
   TL::Parser::U32Iterator pos1 = pos_original;
@@ -176,7 +177,7 @@ BOOST_AUTO_TEST_CASE( stream_weird )
   std::istringstream is("%%%%5;;");
   is >> std::noskipws;
 
-  boost::spirit::istream_iterator<char> iter(is);
+  boost::spirit::istream_iterator iter(is);
 
   TL::Parser::U32Iterator pos
   (
@@ -184,7 +185,7 @@ BOOST_AUTO_TEST_CASE( stream_weird )
     (
       iter
     ),
-    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
   );
 
   BOOST_CHECK_EQUAL(*pos++, '%');
@@ -204,8 +205,8 @@ BOOST_AUTO_TEST_CASE( multi_pass )
   (
     TL::Parser::U32Iterator
     (
-      TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>(is)),
-      TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
+      TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator(is)),
+      TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
     )
   );
 

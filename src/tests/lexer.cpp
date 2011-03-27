@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_eoi.hpp>
 #include <boost/spirit/include/qi_kleene.hpp>
 #include <boost/spirit/include/qi_core.hpp>
+#include <boost/spirit/include/support_istream_iterator.hpp>
 
 #include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
 #include <boost/spirit/home/phoenix/operator.hpp>
@@ -360,8 +361,8 @@ bool check_utf8(const std::string& input, Checker& checker)
   is >> std::noskipws;
   TL::Parser::U32Iterator first
   (
-    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>(is)),
-    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator<char>())
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator(is)),
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
   )
   ;
   TL::Parser::U32Iterator last;
