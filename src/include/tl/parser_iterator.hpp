@@ -27,7 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/charset.hpp>
 
 //define this to get lots of debugging
-#define ITERATOR_DEBUG
+//#define ITERATOR_DEBUG
 
 namespace TransLucid
 {
@@ -36,7 +36,7 @@ namespace TransLucid
     struct iterator_traits :
       public std::iterator
       <
-        std::input_iterator_tag,
+        std::forward_iterator_tag,
         wchar_t
       >
     {
@@ -289,6 +289,14 @@ namespace TransLucid
     class UTF8Iterator : public Iterator
     {
       public:
+
+      //T must be a forward iterator
+      //static_assert(is_forward_iterator<T>::value == 1, 
+      //  "The UTF8 underlying iterator must be a forward iterator.");
+
+      __glibcxx_class_requires(_ForwardIteratorConcept<T>, 
+        "Need forward iterator")
+
       /**
        * Construct a UTF8Iterator.
        * @param iter The underlying iterator.

@@ -152,6 +152,10 @@ int main(int argc, char *argv[])
     std::cerr << "terminated with exception: " << c << std::endl;
     return 1;
   }
+  catch (std::exception& e)
+  {
+    std::cerr << "std::exception running system: " << e.what() << std::endl;
+  }
   catch (...)
   {
     std::cerr << "error running system" << std::endl;
