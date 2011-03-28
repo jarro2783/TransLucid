@@ -83,7 +83,7 @@ namespace TransLucid
              (
                &HeaderGrammar::addLibraryInternal,
                _r1,
-               _1
+               _2
              )
            ]
          | (
@@ -213,7 +213,7 @@ namespace TransLucid
         try
         {
           const u32string& slibrary =
-            boost::get<u32string>(library);
+            boost::get<const u32string>(library);
 
           addLibrary(header, slibrary);
         }

@@ -644,7 +644,6 @@ namespace TransLucid
     PRINT_NODE(LambdaExpr)
     PRINT_NODE(NameAppExpr)
     PRINT_NODE(ValueAppExpr)
-
   }
 }
 
