@@ -36,7 +36,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens()
 , else_(L"else")
 , true_(L"true")
 , false_(L"false")
-, spaces(L"[ \\n\\t]")
+, spaces(L"[ \\n\\t]|(\\/\\/.*\\n)")
 {
   using boost::phoenix::ref;
   using lex::_val;
