@@ -27,7 +27,6 @@ namespace TransLucid
     {
       if (m_from == e.text)
       {
-        std::cerr << "renaming " << m_from << " to " << m_to << std::endl;
         return Tree::IdentExpr(m_to);
       }
       else
