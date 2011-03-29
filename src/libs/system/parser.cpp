@@ -126,7 +126,6 @@ construct_identifier
   const ReservedIdentifierMap& ids
 )
 {
-  std::cerr << "constructing identifier: " << id << std::endl;
   auto iter = ids.find(id);
   if (iter == ids.end())
   {
@@ -134,7 +133,6 @@ construct_identifier
   }
   else
   {
-    std::cerr << "reserved to " << iter->second << std::endl;
     return iter->second;
   }
 }
