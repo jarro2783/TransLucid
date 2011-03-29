@@ -218,6 +218,7 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
   m_system->addExpr(Tuple(addContext), hashUnique);
 
   //make a LambdaAbstractionHD
+  std::cerr << "renamed: " << renamed << std::endl;
   HD* rhs = boost::apply_visitor(*this, renamed);
   return new Hyperdatons::LambdaAbstractionHD(m_system, e.name, index, rhs);
 }

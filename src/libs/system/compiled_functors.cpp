@@ -473,6 +473,7 @@ LambdaApplicationHD::operator()(const Tuple& k)
   }
 
   Constant rhs = (*m_rhs)(k).first;
+  std::cerr << "rhs: " << rhs << std::endl;
   const FunctionType& f = lhs.value<FunctionType>();
 
   return f.applyLambda(k, rhs);

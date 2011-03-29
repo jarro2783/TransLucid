@@ -187,8 +187,6 @@ namespace TransLucid
         {
           try
           {
-            std::cerr << "building integer from " << u32string(first, last)
-              << std::endl;
             Iterator next = first;
             ++next;
             mpz_class attr;

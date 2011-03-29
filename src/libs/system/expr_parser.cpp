@@ -272,7 +272,7 @@ namespace TransLucid
         (
          primary_expr[_a = _1] 
       >> *(
-            literal(".") > primary_expr
+            literal('.') > primary_expr
             [
               _a = construct<Tree::ValueAppExpr>(_a, _1)
             ]
@@ -336,9 +336,9 @@ namespace TransLucid
             _val = construct<Tree::PhiExpr>()
           ]
           //lambda abstraction
-        | (literal("\\") > tok.identifier_ > tok.arrow_ > expr)
+        | (literal('\\') > tok.identifier_ > tok.arrow_ > expr)
           [
-            _val = construct<Tree::LambdaExpr>(_1, _2)
+            _val = construct<Tree::LambdaExpr>(_1, _3)
           ]
       ;
 
