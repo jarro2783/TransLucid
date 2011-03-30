@@ -362,11 +362,11 @@ namespace TransLucid
       (
         expr,
         std::cerr
-        << val("Error! Expecting ")
+        << val("Error! Expecting '")
         << _4
-        << val(" here: \"")
-        << construct<std::string>(_3, _2)
-        << val("\"")
+        //<< val(" here: \"")
+        //<< construct<std::string>(_3, _2)
+        << val("'")
         << std::endl
       );
 
