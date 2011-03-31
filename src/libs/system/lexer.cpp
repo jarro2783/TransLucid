@@ -27,7 +27,7 @@ namespace Lexer
 {
 
 template <typename Lexer>
-lex_tl_tokens<Lexer>::lex_tl_tokens()
+lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
 : if_(L"if")
 , fi_(L"fi")
 , where_(L"where")
@@ -37,6 +37,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens()
 , true_(L"true")
 , false_(L"false")
 , spaces(L"([ \\n\\t])|(\\/\\/[^\\n]*)")
+, m_errors(errors)
 {
   using boost::phoenix::ref;
   using lex::_val;
@@ -147,7 +148,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens()
   ;
 }
 
-template lex_tl_tokens<lexer_type>::lex_tl_tokens();
+template lex_tl_tokens<lexer_type>::lex_tl_tokens(Parser::Errors&);
 
 } //namespace Lexer
 

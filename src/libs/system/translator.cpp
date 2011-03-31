@@ -89,7 +89,8 @@ namespace detail
   struct AllParsers
   {
     AllParsers(Parser::Header& h)
-    : m_expr(h, m_lexer)
+    : m_lexer(m_errors)
+    , m_expr(h, m_lexer)
     , m_equation(m_lexer)
     , m_header_grammar(m_lexer)
     {
@@ -102,6 +103,7 @@ namespace detail
       m_header_grammar.set_expr(m_expr);
     }
 
+    Parser::Errors m_errors;
     Lexer::tl_lexer m_lexer;
     Parser::ExprGrammar<Parser::iterator_t> m_expr;
     Parser::EquationGrammar<Parser::iterator_t> m_equation;

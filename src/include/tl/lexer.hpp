@@ -34,10 +34,11 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/object/construct.hpp>
 
 #include <tl/charset.hpp>
-#include <tl/utility.hpp>
-#include <tl/lexer_util.hpp>
 #include <tl/detail/lexer_detail.hpp>
+#include <tl/lexer_util.hpp>
+#include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid
 {
@@ -77,7 +78,7 @@ namespace TransLucid
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
     {
-      lex_tl_tokens();
+      lex_tl_tokens(Parser::Errors& errors);
 
       lex::token_def<lex::unused_type, lex_char_type> 
         //keywords
@@ -124,8 +125,9 @@ namespace TransLucid
       ;
 
       private:
-      std::wstring m_constant_type;
-      std::wstring m_constant_value;
+      //std::wstring m_constant_type;
+      //std::wstring m_constant_value;
+      Parser::Errors& m_errors;
     };
 
     //the lexer class

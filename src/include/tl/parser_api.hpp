@@ -48,7 +48,67 @@ namespace TransLucid
     template <typename Iterator>
     class HeaderGrammar;
 
-    struct AllParsers;
+    class Errors
+    {
+      public:
+      Errors()
+      : m_count(0)
+      {
+      }
+
+      struct ErrorReporter
+      {
+        ErrorReporter()
+        : m_end(true)
+        {
+        }
+
+        ~ErrorReporter()
+        {
+          if (m_end)
+          {
+            std::cerr << std::endl;
+          }
+        }
+
+        template <typename T>
+        ErrorReporter
+        operator<<(const T& t)
+        {
+          m_end = false;
+          std::cerr << t;
+          return ErrorReporter();
+        }
+
+        private:
+
+        template <typename T>
+        void
+        report(const T& t)
+        {
+          std::cerr << t;
+        }
+
+        bool m_end;
+      };
+
+      template <typename T>
+      ErrorReporter 
+      error(const T& t)
+      {
+        ++m_count;
+        return ErrorReporter() << t;
+      }
+
+      int 
+      count()
+      {
+        return m_count;
+      }
+
+      private:
+      int m_count;
+    };
   }
 
 }

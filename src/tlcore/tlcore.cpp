@@ -237,7 +237,8 @@ TLCore::TLCore()
 void 
 TLCore::run()
 {
-  Lexer::tl_lexer lexer;
+  Parser::Errors errors;
+  Lexer::tl_lexer lexer(errors);
   
   delete m_grammar;
   m_grammar = 

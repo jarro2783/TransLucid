@@ -343,7 +343,8 @@ typedef checker_grammar<TL::Lexer::iterator_t> cgrammar;
 
 bool check(const TL::u32string& input, Checker& checker)
 {
-  TL::Lexer::tl_lexer lexer;
+  TL::Parser::Errors errors;
+  TL::Lexer::tl_lexer lexer(errors);
   cgrammar checkg(lexer, checker);
 
   TL::Parser::U32Iterator first(
@@ -352,7 +353,8 @@ bool check(const TL::u32string& input, Checker& checker)
   );
   TL::Parser::U32Iterator last;
 
-	return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last;
+	return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last
+    && errors.count() == 0;
 }
 
 bool check_utf8(const std::string& input, Checker& checker)
@@ -367,10 +369,12 @@ bool check_utf8(const std::string& input, Checker& checker)
   ;
   TL::Parser::U32Iterator last;
 
-  TL::Lexer::tl_lexer lexer;
+  TL::Parser::Errors errors;
+  TL::Lexer::tl_lexer lexer(errors);
   cgrammar checkg(lexer, checker);
 
-  return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last;
+  return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last
+    && errors.count() == 0;
 }
 
 BOOST_AUTO_TEST_CASE ( identifiers )
