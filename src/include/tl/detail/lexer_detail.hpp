@@ -259,7 +259,7 @@ namespace TransLucid
           {
             //an invalid number was input
             //matched = lex::pass_flags::pass_fail;
-            ctx.set_value(value_wrapper<mpz_class>(0));
+            ctx.set_value(value_wrapper<mpz_class>(mpz_class()));
             m_errors.error("invalid integer literal ") << 
               u32string(first, last);
           }
