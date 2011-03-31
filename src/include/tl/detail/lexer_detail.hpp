@@ -37,6 +37,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/lexer_util.hpp>
 #include <tl/charset.hpp>
 #include <tl/ast.hpp>
+#include <tl/parser_api.hpp>
 
 #define XSTRING(x) STRING(x)
 #define STRING(x) #x
@@ -174,6 +175,15 @@ namespace TransLucid
 
       struct build_integer
       {
+        private:
+        Parser::Errors& m_errors;
+
+        public:
+        build_integer(Parser::Errors& errors)
+        : m_errors(errors)
+        {
+        }
+
         template <typename Iterator, typename Idtype, typename Context>
         void
         operator()
@@ -248,7 +258,10 @@ namespace TransLucid
           catch(std::invalid_argument& e)
           {
             //an invalid number was input
-            matched = lex::pass_flags::pass_fail;
+            //matched = lex::pass_flags::pass_fail;
+            ctx.set_value(value_wrapper<mpz_class>(0));
+            m_errors.error("invalid integer literal ") << 
+              u32string(first, last);
           }
         }
       };

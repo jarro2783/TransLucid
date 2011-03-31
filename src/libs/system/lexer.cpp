@@ -115,7 +115,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   | character_         [detail::build_character()]
 
   //numbers
-  | integer_ [detail::build_integer()]
+  | integer_ [detail::build_integer(m_errors)]
   | real_    [detail::build_real()]
   | rational_[detail::build_rational()]
 
