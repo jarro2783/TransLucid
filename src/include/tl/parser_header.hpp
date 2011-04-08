@@ -35,7 +35,16 @@ namespace TransLucid
 
     typedef std::map<u32string, Tree::UnaryOperator> unary_symbols;
     typedef std::map<u32string, Tree::BinaryOperator> binary_symbols;
+
+    /**
+     * A set of dimensions.
+     */
     typedef std::set<u32string> dimension_set;
+
+    /**
+     * Reserved identifiers.
+     * Maps identifier names to their appropriate expression tree.
+     */
     typedef std::unordered_map<u32string, Tree::Expr> ReservedIdentifierMap;
 
     struct Header
