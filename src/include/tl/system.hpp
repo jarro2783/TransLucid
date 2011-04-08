@@ -51,12 +51,20 @@ namespace TransLucid
     void
     addDemand(const u32string& id, const GuardHD& guard);
 
+    /**
+     * Get the time.
+     * @return The current time of the system.
+     */
     size_t 
     theTime()
     {
       return m_time;
     }
 
+    /**
+     * Commit the current changes. This has the effect of incrementing to the
+     * next time.
+     */
     void
     commit()
     {

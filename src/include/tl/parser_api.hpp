@@ -31,6 +31,12 @@ namespace TransLucid
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     ParsedEquation;
 
+    /**
+     * Prints an equation.
+     * Prints to a string.
+     * @param e The parsed equation.
+     * @return A string representing the equation.
+     */
     std::string
     printEquation(const ParsedEquation& e);
 
@@ -48,6 +54,11 @@ namespace TransLucid
     template <typename Iterator>
     class HeaderGrammar;
 
+    /**
+     * Errors during parsing.
+     * Facilitates printing error messages and stores the number of errors
+     * that occurred.
+     */
     class Errors
     {
       public:
@@ -56,8 +67,18 @@ namespace TransLucid
       {
       }
 
+      /**
+       * Aids error reporting. 
+       * Allows the user to do 
+       * errors.error("The number: ")(foo)(" is invalid"). It adds the
+       * ability to concatenate any type that has an operator<< in the error
+       * report.
+       */
       struct ErrorReporter
       {
+        /**
+         * Create the end error reporter in a list.
+         */
         ErrorReporter()
         : m_end(true)
         {
@@ -71,6 +92,11 @@ namespace TransLucid
           }
         }
 
+        /**
+         * Add more information to the output stream.
+         * Executes std::operator<<(std::cerr, t).
+         * @param t The object to print to cerr.
+         */
         template <typename T>
         ErrorReporter
         operator<<(const T& t)
@@ -92,6 +118,11 @@ namespace TransLucid
         bool m_end;
       };
 
+      /**
+       * Signify that an error occurred.
+       * @param t An object that describes the error, it must have
+       * operator<< defined.
+       */
       template <typename T>
       ErrorReporter 
       error(const T& t)
@@ -100,6 +131,10 @@ namespace TransLucid
         return ErrorReporter() << t;
       }
 
+      /**
+       * The number of errors that we saw during parsing.
+       * @return The number of errors.
+       */
       int 
       count()
       {

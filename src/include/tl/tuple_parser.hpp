@@ -77,6 +77,11 @@ namespace TransLucid
       ;
     };
 
+    /**
+     * Creates a new TupleGrammar.
+     * This should be freed with delete.
+     * @return A TupleGrammar allocated with new.
+     */
     TupleGrammar<iterator_t>*
     create_tuple_grammar();
   }

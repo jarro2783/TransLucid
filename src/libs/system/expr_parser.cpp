@@ -53,6 +53,12 @@ namespace TransLucid
 
     inline Tree::Expr
     //construct_typed_constant(const u32string& type, const u32string& value)
+
+    /**
+     * Construct a constant with a type.
+     * When the type is ustring or uchar, it constructs the actual ustring
+     * or uchar. Otherwise it constructs a Tree::ConstantExpr.
+     */
     construct_typed_constant(const std::pair<u32string, u32string>& c)
     {
       const std::u32string& type = c.first;
@@ -114,6 +120,11 @@ namespace TransLucid
     /** The phoenix function for creating an elsif list. */
     ph::function<make_elsifs_imp> make_elsifs;
 
+    /**
+     * Create an arg dimension name.
+     * @param a The number to append to arg.
+     * @return "arg"a.
+     */
     inline u32string
     construct_arg_delim(int a)
     {

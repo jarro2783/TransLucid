@@ -59,6 +59,7 @@ class Grammar :
    * @param reactive If it is a reactive system.
    * @param demands If we are using demands.
    * @param evaluate The evaluator to inform of events.
+   * @param tok The lexer.
    * @todo Remove exprs because we don't use it anymore.
    */
   template <typename TokenDef>

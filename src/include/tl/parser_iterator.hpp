@@ -294,8 +294,10 @@ namespace TransLucid
       //static_assert(is_forward_iterator<T>::value == 1, 
       //  "The UTF8 underlying iterator must be a forward iterator.");
 
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       __glibcxx_class_requires(_ForwardIteratorConcept<T>, 
         "Need forward iterator")
+      #endif
 
       /**
        * Construct a UTF8Iterator.

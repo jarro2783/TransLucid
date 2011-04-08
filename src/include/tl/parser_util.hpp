@@ -39,8 +39,14 @@ namespace TransLucid
 {
   namespace Parser
   {
-    //determines if an identifier is a dimension, some named constant, or
-    //just an identifier
+    /**
+     * Constructs an identifier.
+     * determines if an identifier is a dimension, some named constant, or
+     * just an identifier.
+     * @param id The identifier name.
+     * @param ids The reserved identifiers.
+     * @return An expression node which represents the identifier.
+     */
     Tree::Expr
     construct_identifier
     (

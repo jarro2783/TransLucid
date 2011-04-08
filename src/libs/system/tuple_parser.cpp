@@ -27,12 +27,22 @@ namespace TransLucid
 
     struct make_tuple_imp
     {
+      /**
+       * The return type of make_tuple_imp.
+       */
       template <typename Arg>
       struct result
       {
+        /**
+         * The actual type of the return type.
+         */
         typedef std::vector<std::pair<Tree::Expr, Tree::Expr>> type;
       };
 
+      /**
+       * Make a tuple. Creates a tuple from the fusion vector that spirit
+       * qi gives us of the parsed tuple.
+       */
       template <typename Arg>
       typename result<Arg>::type
       operator()(const Arg& a) const
@@ -49,6 +59,10 @@ namespace TransLucid
       }
     };
 
+    /**
+     * Make a tuple.
+     * The phoenix function to make a tuple.
+     */
     ph::function<make_tuple_imp> make_tuple;
 
     template class TupleGrammar<iterator_t>;

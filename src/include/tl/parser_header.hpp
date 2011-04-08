@@ -33,7 +33,14 @@ namespace TransLucid
   namespace Parser
   {
 
+    /**
+     * Maps unary operator symbols to their operator info.
+     */
     typedef std::map<u32string, Tree::UnaryOperator> unary_symbols;
+
+    /**
+     * Maps binary operator symbols to their operator info.
+     */
     typedef std::map<u32string, Tree::BinaryOperator> binary_symbols;
 
     /**
@@ -47,6 +54,12 @@ namespace TransLucid
      */
     typedef std::unordered_map<u32string, Tree::Expr> ReservedIdentifierMap;
 
+    /**
+     * The parser header.
+     * The header is extra information that the parser requires to be able to
+     * function. It adds static information about dimension, operators and
+     * libraries.
+     */
     struct Header
     {
       /**
@@ -66,7 +79,7 @@ namespace TransLucid
       binary_symbols binary_op_symbols; 
       /**<Binary operators.*/
 
-      ReservedIdentifierMap reserved_ids;
+      ReservedIdentifierMap reserved_ids; /**<Reserved identifiers.*/
     };
 
     /**
