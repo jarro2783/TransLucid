@@ -467,7 +467,7 @@ BOOST_AUTO_TEST_CASE ( integers )
   check(input, checker);
 
   TL::u32string invalid = U"0AFB";
-  Checker check_invalid({});
+  Checker check_invalid({mpz_class(0)});
   BOOST_CHECK(check(invalid, check_invalid) == false);
 }
 
