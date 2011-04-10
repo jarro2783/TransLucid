@@ -20,6 +20,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef EXPR_PARSER_HPP_INCLUDED
 #define EXPR_PARSER_HPP_INCLUDED
 
+/**
+ * @file expr_parser.hpp
+ * The expression parser header.
+ */
+
 #include <tl/parser_header.hpp>
 #include <tl/parser_util.hpp>
 
@@ -87,6 +92,13 @@ namespace TransLucid
       Header &header;
     };
  
+    /**
+     * Creates an ExprGrammar.
+     * Allocates an ExprGrammar with new. It should be freed with delete.
+     * @param h The header that the parser should use.
+     * @param l The lexer that the parser should get symbols from.
+     * @return A new ExprGrammar.
+     */
     ExprGrammar<iterator_t>*
     create_expr_grammar(Header&, Lexer::tl_lexer&);
   }

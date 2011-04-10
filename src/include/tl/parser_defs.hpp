@@ -51,6 +51,7 @@ namespace TransLucid
    */
   namespace Parser
   {
+    #if 0
     enum ParseErrorType
     {
       error_expected_fi,
@@ -64,14 +65,25 @@ namespace TransLucid
       //an error that hasn't been specifically dealt with
       error_unknown
     };
+    #endif
 
     namespace qi = boost::spirit::qi;
     namespace fusion = boost::fusion;
 
     //typedef std::basic_string<wchar_t> string_type;
+    /**
+     * The string type of the parser.
+     */
     typedef std::basic_string<unsigned int> string_type;
+
+    /**
+     * The character type of the parser.
+     */
     typedef unsigned int char_type;
 
+    /**
+     * The parser's iterator.
+     */
     typedef Lexer::iterator_t iterator_t;
   }
 }

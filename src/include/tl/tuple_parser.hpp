@@ -31,6 +31,10 @@ namespace TransLucid
 {
   namespace Parser
   {
+    /**
+     * A parsed pair.
+     * The data structure that stores the parsed expression of a pair.
+     */
     typedef std::vector<boost::fusion::vector<Tree::Expr, Tree::Expr>>
       vector_pair_expr;
 

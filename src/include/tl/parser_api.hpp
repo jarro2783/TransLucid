@@ -27,7 +27,10 @@ namespace TransLucid
 {
   namespace Parser
   {
-    //name, | [], & bool, = HD
+    /**
+     * A parsed equation.
+     * The tuple is defined as: name, | [], & bool, = HD
+     */
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     ParsedEquation;
 
