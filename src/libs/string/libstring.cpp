@@ -20,9 +20,15 @@ namespace TransLucid
 namespace LibString
 {
 
+/**
+ * The string argument type.
+ */
 template <int index>
 struct StringArgType
 {
+  /**
+   * The type of the string arg is always String.
+   */
   typedef String type;
 };
 
