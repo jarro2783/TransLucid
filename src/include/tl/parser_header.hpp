@@ -74,7 +74,7 @@ namespace TransLucid
       unary_symbols postfix_op_symbols;/**<Postfix operations.*/
 
       std::vector<u32string> libraries; /**<Libraries not yet loaded.*/
-      std::vector<u32string> loaded_libraries; /**<The loaded libraries.*/
+      //std::vector<u32string> loaded_libraries; /**<The loaded libraries.*/
 
       binary_symbols binary_op_symbols; 
       /**<Binary operators.*/

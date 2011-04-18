@@ -22,15 +22,28 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 
+/**
+ * @file bestfit.hpp
+ * The optimisation of best fitting.
+ */
+
 namespace TransLucid 
 {
   class VariableHD;
   class EquationHD;
 
+  /**
+   * Computes the best fit for an equation.
+   * A best fitting interface which any best fitter will inherit from.
+   */
   class BestFit
   {
     public:
     virtual ~BestFit() {}
+
+    /**
+     * Find the best fit and evaluate.
+     */
     virtual TaggedConstant operator()(const Tuple& k) = 0;
   };
 
@@ -59,6 +72,12 @@ namespace TransLucid
     BestFit* m_bestFit;
   };
 
+  /**
+   * Compiles a new best fit. This is the just in time compilation
+   * of a best fit. Before the first best fit, the best fit will be of
+   * this type. So first it compiles the best fit and then runs the
+   * appropriate best fit.
+   */
   class CompileBestFit : public BestFit
   {
     public:
@@ -72,6 +91,10 @@ namespace TransLucid
     BestFittable* m_bestFittable;
   };
 
+  /**
+   * The dumb best fit. Tries to find all definitions and determines
+   * which is applicable.
+   */
   class BruteForceBestFit : public BestFit
   {
     public:
