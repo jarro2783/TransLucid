@@ -24,6 +24,11 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/dimtranslator.hpp>
 #include <tl/equation.hpp>
 
+/**
+ * @file system.hpp
+ * The System Hyperdaton header file.
+ */
+
 namespace TransLucid
 {
   /**
