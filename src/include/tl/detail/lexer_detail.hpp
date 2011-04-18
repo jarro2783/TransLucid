@@ -50,8 +50,21 @@ namespace TransLucid
 
     namespace detail
     {
+      /**
+       * Builds a rational value.
+       * The lex function class which builds an mpq_class from a string.
+       */
       struct build_rational
       {
+        /**
+         * Builds the rational. The input must be of the form
+         * number _ number.
+         * @param start The begin iterator.
+         * @param end The end iterator.
+         * matched The pass flags.
+         * id Something.
+         * ctx The lexer context.
+         */
         template <typename Iterator, typename Idtype, typename Context>
         void
         operator()
@@ -114,8 +127,20 @@ namespace TransLucid
         }
       };
 
+      /**
+       * Construct a real value. The lex function class which builds an
+       * mpf_class from a string.
+       */
       struct build_real
       {
+        /**
+         * Build the float value.
+         * @param start The start iterator.
+         * @param end The end iterator.
+         * @param matched The match flag.
+         * @param id Something.
+         * @param ctx The lex context.
+         */
         template <typename Iterator, typename Idtype, typename Context>
         void
         operator()
@@ -173,12 +198,19 @@ namespace TransLucid
         }
       };
 
+      /**
+       * Build an integer.
+       * The lex function class which builds an mpz_class object.
+       */
       struct build_integer
       {
         private:
         Parser::Errors& m_errors;
 
         public:
+        /**
+         * Construct the integer builder with a parse error tracker.
+         */
         build_integer(Parser::Errors& errors)
         : m_errors(errors)
         {
