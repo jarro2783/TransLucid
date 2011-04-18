@@ -20,10 +20,20 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/hyperdaton.hpp>
 #include <sstream>
 
+/**
+ * @file ophd.hpp
+ * Operation hyperdaton classes.
+ */
+
 namespace TransLucid
 {
   namespace OpHDImp
   {
+    /**
+     * Transforms a list of something into a list of something else
+     * defined by Mod. Its type is a type of List of Args transformed to
+     * the type decided by Mod.
+     */
     template 
     <
       template <typename...> class List,
@@ -32,19 +42,30 @@ namespace TransLucid
     >
     struct modify_type_index_list
     {
+      /**
+       * The type of the list.
+       */
       typedef List<typename Mod<Args>::type...> type;
     };
 
     template <type_index T>
     struct make_size_t
     {
+      /**
+       * The type of make_size_t, just size_t.
+       */
       typedef size_t type;
     };
 
-    //creates a tuple with length of Args integers as parameters
+    /**
+     * Creates a tuple with length of Args integers as parameters.
+     */
     template <type_index ...Args>
     struct generate_args_tuple_type
     {
+      /**
+       * The type of the list generated.
+       */
       typedef typename modify_type_index_list
         <std::tuple, make_size_t, Args...>::type type;
     };
@@ -58,6 +79,10 @@ namespace TransLucid
     >
     struct lookup_index;
 
+    /**
+     * The end case of dimension index lookup.
+     * Just returns a list of the arguments.
+     */
     template
     <
       int N,
@@ -66,6 +91,9 @@ namespace TransLucid
     >
     struct lookup_index<N, Ret, List>
     {
+      /**
+       * Transforms the template pack of indices into a list.
+       */
       template <typename ...DimIndexes>
       Ret
       operator()(SystemHD& i, DimIndexes... dims) const
@@ -74,7 +102,9 @@ namespace TransLucid
       }
     };
  
-    //TODO this needs to lookup the argN indices and build the List
+    /**
+     * Looks up the dimension index of "argN".
+     */
     template 
     <
       int N, 
@@ -85,6 +115,11 @@ namespace TransLucid
     >
     struct lookup_index<N, Ret, List, First, Args...>
     {
+      /**
+       * Does the actual index lookup.
+       * @param i The system.
+       * @param dims The indices looked up so far.
+       */
       template
       <
         typename ...DimIndexes
@@ -99,7 +134,12 @@ namespace TransLucid
       }
     };
 
-    //TODO finish this
+    /*
+     * Gets a value out of the context. Given the dimension index and a
+     * metafunction which can give us the type of the value given the
+     * TransLucid type index, it pulls the value of that type out of the
+     * context at that dimension.
+     */
     template
     <
       template <int> class ArgType,
@@ -107,8 +147,18 @@ namespace TransLucid
     >
     struct make_constant
     {
+      /**
+       * The return type of the function.
+       */
       typedef typename ArgType<type>::type ret;
 
+      /**
+       * Does the actual operation.
+       * @param c The context.
+       * @param index The TransLucid type index of the value.
+       * @throw DimensionNotFound if the dimension is not found or if it is
+       * of the wrong type.
+       */
       ret 
       operator()(const Tuple& c, size_t index)
       {
@@ -132,6 +182,10 @@ namespace TransLucid
     >
     struct build_arguments_imp;
 
+    /**
+     * Call the actual operation.
+     * The specialisation for when we have run out of arguments to process.
+     */
     template
     <
       int N,
@@ -139,6 +193,13 @@ namespace TransLucid
     >
     struct build_arguments_imp<N, ArgType>
     {
+      /**
+       * Calls the actual operation.
+       * @param f The function.
+       * @param args The dimension indices.
+       * @param c The context.
+       * @param constants The arguments.
+       */
       template
       <
         typename F,
@@ -155,6 +216,16 @@ namespace TransLucid
       }
     };
 
+    /**
+     * The implementation of build arguments.
+     * Checks that the Nth argument is the right type and passes execution
+     * on to getting the N+1th argument. Pulls that argument out of the
+     * context.
+     * @param N The Nth argument to retrieve.
+     * @param The type of the Nth value.
+     * @param First The type of the current value.
+     * @param Args The remaining arguments.
+     */
     template
     <
       int N, 
@@ -164,6 +235,13 @@ namespace TransLucid
     >
     struct build_arguments_imp<N, ArgType, First, Args...>
     {
+      /**
+       * Build the actual arguments.
+       * @param f The functor.
+       * @param args The dimension indices of the arguments.
+       * @param c The context.
+       * @param constants The parameters seen so far.
+       */
       template 
       <
         typename F, 
@@ -185,6 +263,12 @@ namespace TransLucid
       }
     };
  
+    /**
+     * Builds the arguments to an operation HD.
+     * @param ArgType A template metafunction which returns the type of the
+     * nth argument.
+     * @param Args The TransLucid type indices of the arguments.
+     */
     template
     <
       template <int> class ArgType,
@@ -192,6 +276,12 @@ namespace TransLucid
     >
     struct build_arguments
     {
+      /**
+       * Builds the actual arguments and calls the operation.
+       * @param f The functor of the operation.
+       * @param args A list of the arguments.
+       * @param c The context.
+       */
       template 
       <
         typename F, 
@@ -210,10 +300,11 @@ namespace TransLucid
     };
   }
 
-  //T is the actual functor
-  //ArgType is a template which ::type will return the type of an argument
-  //by its index, Args are the indices
-  //this is the index-known-at-compile-time version
+  /**
+   * An operation hyperdaton. The indices must be known at compile time.
+   * @param T A functor which carries out the operation.
+   * @param Args The variadic template pack of the TransLucid argument indices.
+   */
   template <typename T, 
     template <int> class ArgType, type_index ...Args>
   class OpHD : public HD
