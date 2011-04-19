@@ -23,11 +23,28 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <iconv.h>
 
+/**
+ * @file charset.hpp
+ * Character set utility functions. Contains functions for converting
+ * between character sets.
+ */
+
 namespace TransLucid
 {
+  /**
+   * An iconv wrapper class. Provides a C++ interface to the iconv
+   * library.
+   */
   class Iconv
   {
     public:
+    /**
+     * Construct an Iconv object, the to and from character sets must be
+     * provided.
+     * @param to The character set to convert to.
+     * @param from The character set to convert from.
+     * @todo What is the best way to handle errors here?
+     */
     Iconv(const char* to, const char* from)
     {
       m_iconv = iconv_open(to, from);
@@ -42,6 +59,14 @@ namespace TransLucid
       iconv_close(m_iconv);
     }
 
+    /**
+     * Do the conversion directly calling ::iconv.
+     * @param inbuf The input array.
+     * @param inbytesleft The number of bytes left to read in the input.
+     * @param outbuf The output array.
+     * @param outbytesleft The amount of space left in the output buffer.
+     * @return The number of characters converted nonreversibly.
+     */
     size_t
     iconv(char** inbuf, size_t* inbytesleft,
           char** outbuf, size_t* outbytesleft)
@@ -53,12 +78,29 @@ namespace TransLucid
     iconv_t m_iconv;
   };
 
+  /**
+   * Converts a UTF-32 string to a UTF-8 string.
+   * @param s The UTF-32 string.
+   * @return The equivalent UTF-8 string.
+   */
   std::string
   utf32_to_utf8(const u32string& s);
 
+  /**
+   * Converts a UTF-8 string to a UTF-32 string.
+   * @param s The UTF-8 string.
+   * @return The equivalent UTF-32 string.
+   */
   std::u32string
   utf8_to_utf32(const std::string& s);
 
+  /**
+   * Converts a UTF-32 string to ASCII. All the characters must be 
+   * representable in ASCII. If any are not, an exception is thrown.
+   * @param s The UTF-32 string.
+   * @return The string in ASCII.
+   * @throws char* "character not ascii"
+   */
   std::string
   u32_to_ascii(const u32string& s);
 

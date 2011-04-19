@@ -216,6 +216,17 @@ namespace TransLucid
         {
         }
 
+        /**
+         * Construct the actual integer. Builds an integer from a string
+         * which has been accepted by the lexer as a valid integer. It checks
+         * that the number is valid in the base specified. If it is not, an
+         * error is recorded.
+         * @param first The start iterator.
+         * @param last The end iterator.
+         * @param matched The match flags.
+         * @param id Something.
+         * @param ctx The lexer context.
+         */
         template <typename Iterator, typename Idtype, typename Context>
         void
         operator()
@@ -300,6 +311,15 @@ namespace TransLucid
       
       struct build_constant
       {
+        /**
+         * Create the constant. Reads a constant that is either built with
+         * ", `, and/or no type specified.
+         * @param first The begin iterator.
+         * @param last The end iterator.
+         * @param matched The match flags.
+         * @param id Something.
+         * @param ctx The lexer context.
+         */
         template <typename Iterator, typename Idtype, typename Context>
         void
         operator()
