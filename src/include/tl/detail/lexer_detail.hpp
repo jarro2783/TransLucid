@@ -61,9 +61,9 @@ namespace TransLucid
          * number _ number.
          * @param start The begin iterator.
          * @param end The end iterator.
-         * matched The pass flags.
-         * id Something.
-         * ctx The lexer context.
+         * @param matched The pass flags.
+         * @param id Something.
+         * @param ctx The lexer context.
          */
         template <typename Iterator, typename Idtype, typename Context>
         void
@@ -398,6 +398,14 @@ namespace TransLucid
 
       struct build_character
       {
+        /**
+         * Builds a single character.
+         * @param first The start iterator.
+         * @param last The end iterator.
+         * @param matched The match flags.
+         * @param id something.
+         * @param ctx The lexer context.
+         */
         template <typename Iterator, typename Idtype, typename Context>
         void
         operator()
