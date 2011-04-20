@@ -104,6 +104,12 @@ namespace TransLucid
   std::string
   u32_to_ascii(const u32string& s);
 
+  /**
+   * Converts an object to a UTF-32 string. Converts a container that is
+   * iterable and whose elements are convertible to char32_t to a u32string.
+   * @param s The container to convert.
+   * @return The u32string after the conversion.
+   */
   template <typename T>
   u32string
   to_u32string(const T& s)
@@ -111,6 +117,12 @@ namespace TransLucid
     return u32string(s.begin(), s.end());
   }
 
+  /**
+   * Converts an object to a u32string whose elements are unsigned 32 bit
+   * integers.
+   * @param s The container to convert.
+   * @return The converted container.
+   */
   template <typename T>
   std::basic_string<uint32_t>
   to_unsigned_u32string(const T& s)
@@ -118,6 +130,12 @@ namespace TransLucid
     return std::basic_string<uint32_t>(s.begin(), s.end());
   }
 
+  /**
+   * Converts an array of char to a string of uint32_t. Does no character
+   * conversion, just copies the bytes directly.
+   * @param s The character array.
+   * @return The string object.
+   */
   template <typename T>
   std::basic_string<uint32_t>
   chars_to_unsigned_u32string(T* s)
@@ -130,6 +148,11 @@ namespace TransLucid
     return ustring;
   }
 
+  /**
+   * Checks that a character is a valid unicode character.
+   * @param c The integer representing the character to validate.
+   * @return true if it is a valid character.
+   */
   inline bool 
   validate_uchar(char32_t c)
   {
