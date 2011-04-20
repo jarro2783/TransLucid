@@ -79,7 +79,12 @@ namespace TransLucid
       binary_symbols binary_op_symbols; 
       /**<Binary operators.*/
 
-      ReservedIdentifierMap reserved_ids; /**<Reserved identifiers.*/
+      /**
+       * This is a global list of identifiers that have been registered
+       * with the parser. For all identifier types, they map their identifier
+       * name to the Tree::Expr that represents what they are.
+       */
+      ReservedIdentifierMap reserved_ids;
     };
 
     /**
