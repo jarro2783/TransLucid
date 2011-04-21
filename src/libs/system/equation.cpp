@@ -191,6 +191,7 @@ VariableHD::operator()(const Tuple& k)
 
   //find all the applicable ones
 
+  #if 0
   Tuple::const_iterator iditer = k.find(DIM_ID);
 
   if (iditer != k.end())
@@ -237,6 +238,7 @@ VariableHD::operator()(const Tuple& k)
                             TYPE_INDEX_SPECIAL), k);
     }
   }
+  #endif
 
   for (UUIDEquationMap::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
@@ -386,8 +388,7 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
 std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
 VariableHD::addExprInternal(const Tuple& k, HD* e)
 {
-  size_t dim_id = DIM_ID;
-  Tuple::const_iterator iter = k.find(dim_id);
+  Tuple::const_iterator iter = k.find(DIM_ID);
   if (iter == k.end())
   {
     return addExprActual(k, e);
@@ -409,11 +410,11 @@ VariableHD::addExprInternal(const Tuple& k, HD* e)
     tuple_t kp = k.tuple();
     if (end.size() != 0)
     {
-      kp[dim_id] = Constant(String(end), TYPE_INDEX_USTRING);
+      kp[DIM_ID] = Constant(String(end), TYPE_INDEX_USTRING);
     }
     else
     {
-      kp.erase(dim_id);
+      kp.erase(DIM_ID);
     }
 
     return addToVariableActual(begin, Tuple(kp), e);

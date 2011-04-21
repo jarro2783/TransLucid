@@ -221,6 +221,7 @@ SystemHD::SystemHD()
   addToVariableActual(U"DEFAULTINT", Tuple(), intmpHD);
 }
 
+#if 0
 void
 SystemHD::addOutput(const IOList& output)
 {
@@ -237,6 +238,7 @@ SystemHD::addInput(const IOList& input)
   #warning clash and there is only one equation per name, otherwise trouble
   m_variables.insert(input.begin(), input.end());
 }
+#endif
 
 void
 SystemHD::addDemand(const u32string& id, const GuardHD& guard)
@@ -247,7 +249,7 @@ SystemHD::addDemand(const u32string& id, const GuardHD& guard)
 void
 SystemHD::tick()
 {
-
+  #if 0
   tuple_t current;
   current[DIM_TIME] = Constant(Intmp(m_time), TYPE_INDEX_INTMP);
 
@@ -279,6 +281,38 @@ SystemHD::tick()
   }
 
   ++m_time;
+  #endif
+}
+
+TaggedConstant
+SystemHD::operator()(const Tuple& k)
+{
+  Tuple::const_iterator iditer = k.find(DIM_ID);
+
+  //the system only varies in the id dimension
+  if (iditer == k.end())
+  {
+    return TaggedConstant(Constant(Special(Special::DIMENSION),
+                          TYPE_INDEX_SPECIAL), k);
+  }
+  else
+  {
+    const u32string& id = iditer->second.value<String>().value();
+    VariableMap::const_iterator viter =
+      VariableHD::m_variables.find(id);
+
+    if (viter == m_variables.end())
+    {
+      return TaggedConstant(Constant(Special(Special::UNDEF),
+                            TYPE_INDEX_SPECIAL), k);
+    }
+    else
+    {
+      tuple_t kp = k.tuple();
+      kp.erase(DIM_ID);
+      return (*viter->second)(Tuple(kp));
+    }
+  }
 }
 
 } //namespace TransLucid

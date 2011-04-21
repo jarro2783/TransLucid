@@ -56,6 +56,9 @@ namespace TransLucid
     void
     addDemand(const u32string& id, const GuardHD& guard);
 
+    TaggedConstant
+    operator()(const Tuple& k);
+
     /**
      * Get the time.
      * @return The current time of the system.
@@ -91,7 +94,7 @@ namespace TransLucid
     void
     init_types();
 
-    IOList m_variables;
+    //IOList m_variables;
 
     template <typename T>
     HD*

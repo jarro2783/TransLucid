@@ -235,17 +235,20 @@ namespace TransLucid
     
     ~VariableHD();
 
-    TaggedConstant operator()(const Tuple& k);
+    virtual TaggedConstant 
+    operator()(const Tuple& k);
 
-    uuid
+    virtual uuid
     addExpr(const Tuple& k, HD* h)
     {
       return addExprInternal(k, h).first;
     }
 
-    bool delexpr(uuid id, size_t time);
+    virtual bool 
+    delexpr(uuid id, size_t time);
 
-    bool replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr);
+    virtual bool 
+    replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr);
 
     /**
      * The equations belonging directly to this variable. Returns the map of
@@ -261,6 +264,7 @@ namespace TransLucid
 
     std::pair<uuid, UUIDEquationMap::iterator>
     addToVariableActual(const u32string& id, const Tuple& k, HD* h);
+    VariableMap m_variables;
 
     private:
 
@@ -278,7 +282,6 @@ namespace TransLucid
 
     UUIDVarMap m_uuidVars;
     UUIDEquationMap m_equations;
-    VariableMap m_variables;
 
     u32string m_name;
     HD* m_system;
