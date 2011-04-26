@@ -118,6 +118,7 @@ namespace TransLucid
     removeDimensionSymbol(Header& h, const u32string& name)
     {
       h.dimension_symbols.erase(name);
+      h.reserved_ids.erase(name);
     }
 
      /**
