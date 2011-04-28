@@ -107,6 +107,8 @@ namespace TransLucid
     tick();
 
     std::map<u32string, size_t> builtin_name_to_index;
+
+    std::map<u32string, VariableHD*> m_equations;
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);
