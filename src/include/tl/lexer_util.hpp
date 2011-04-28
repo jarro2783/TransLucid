@@ -69,29 +69,55 @@ namespace TransLucid
     std::ostream&
     operator<<(std::ostream&, const value_wrapper<T>& rhs);
 
+    /**
+     * Wraps a value for use in a boost variant so that the constructors are
+     * not ambiguous.
+     */
     template <typename T>
     struct value_wrapper
     {
       public:
+      /**
+       * Constructs a value_wrapper with a value.
+       * @param t The value to hold.
+       */
       value_wrapper(const T& t)
       : m_t(t)
       {
       }
 
+      /**
+       * Constructs a value_wrapper with the default value of the stored type.
+       */
       value_wrapper()
       {
       }
 
+      /**
+       * Convert to the stored type.
+       * @return A reference to the stored type.
+       */
       operator T const&() const
       {
         return m_t;
       }
 
+      /**
+       * Test equality with another wrapper of the same type.
+       * @param rhs The value to test equality with.
+       * @return True if the stored value == the rhs stored value.
+       */
       bool operator==(const value_wrapper<T>& rhs) const
       {
         return m_t == rhs.m_t;
       }
 
+      /**
+       * Check equality with a non wrapped value.
+       * @param lhs The non wrapped value.
+       * @param rhs The wrapped value.
+       * @return True if lhs == the stored value of rhs.
+       */
       friend 
       bool 
       operator==(const T& lhs, const value_wrapper<T>& rhs)
@@ -99,16 +125,31 @@ namespace TransLucid
         return lhs == rhs.m_t;
       }
 
+      /**
+       * Check equality with a non wrapped value.
+       * @param lhs The wrapped value.
+       * @param rhs The non wrapped value.
+       * @return True if the stored value of lhs == rhs.
+       */
+      template <typename S>
       friend
       bool
-      operator==(const value_wrapper<T>& lhs, const T& rhs)
+      operator==(const value_wrapper<S>& lhs, const S& rhs);
+      #if 0
       {
         return lhs.m_t == rhs;
       }
+      #endif
 
+      /**
+       * Print a value.
+       * @param os The ostream to print to.
+       * @param rhs The object to print.
+       * @return The passed ostream.
+       */
       friend
       std::ostream&
-      operator<< <T>(std::ostream&, const value_wrapper<T>& rhs);
+      operator<< <T>(std::ostream& os, const value_wrapper<T>& rhs);
 
       private:
       T m_t;
