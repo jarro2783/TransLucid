@@ -45,17 +45,6 @@ namespace TransLucid
     //don't want to copy
     SystemHD(const SystemHD&) = delete;
 
-    typedef std::map<u32string, HD*> IOList;
-
-    void
-    addOutput(const IOList& output);
-
-    void
-    addInput(const IOList& input);
-
-    void
-    addDemand(const u32string& id, const GuardHD& guard);
-
     TaggedConstant
     operator()(const Tuple& k);
 
@@ -79,16 +68,13 @@ namespace TransLucid
       ++m_time;
     }
 
+    uuid
+    addEquation(const EquationHD* equation);
+
     private:
     DimensionTranslator m_dimTranslator;
 
     size_t m_time;
-
-    IOList m_outputs;
-    IOList m_inputs;
-
-    typedef std::map<u32string, GuardHD> DemandStore;
-    DemandStore m_demands;
 
     //initialises the type indexes
     void

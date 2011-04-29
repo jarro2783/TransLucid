@@ -221,31 +221,6 @@ SystemHD::SystemHD()
   addToVariableActual(U"DEFAULTINT", Tuple(), intmpHD);
 }
 
-#if 0
-void
-SystemHD::addOutput(const IOList& output)
-{
-  m_outputs.insert(output.begin(), output.end());
-}
-
-void
-SystemHD::addInput(const IOList& input)
-{
-  m_inputs.insert(input.begin(), input.end());
-
-  //add all the inputs as equations
-  #warning clear up semantics here, this only works if the names do not
-  #warning clash and there is only one equation per name, otherwise trouble
-  m_variables.insert(input.begin(), input.end());
-}
-#endif
-
-void
-SystemHD::addDemand(const u32string& id, const GuardHD& guard)
-{
-  m_demands.insert(std::make_pair(id, guard));
-}
-
 void
 SystemHD::tick()
 {
