@@ -20,7 +20,13 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef SET_EVALUATOR_HPP_INCLUDED
 #define SET_EVALUATOR_HPP_INCLUDED
 
-#include <tl/ast.hpp>
+/**
+ * @file compiled_functors.hpp
+ * The header file for the compiled hyperdatons which run to evaluate
+ * expressions.
+ */
+
+//#include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/hyperdaton.hpp>
 
@@ -115,10 +121,10 @@ namespace TransLucid
       UnaryOpHD
       (
         HD* system,
-        Tree::UnaryOperator op, 
+        u32string name,
         HD* e
       )
-      : m_system(system), m_op(op), m_e(e)
+      : m_system(system), m_name(name), m_e(e)
       {}
 
       TaggedConstant
@@ -126,7 +132,7 @@ namespace TransLucid
 
       private:
       HD* m_system;
-      Tree::UnaryOperator m_op;
+      u32string m_name;
       HD* m_e;
     };
 

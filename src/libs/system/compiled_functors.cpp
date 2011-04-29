@@ -32,8 +32,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <sstream>
 
-#include <boost/assign/list_of.hpp>
-
 namespace TransLucid
 {
 
