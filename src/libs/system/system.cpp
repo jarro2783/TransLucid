@@ -290,4 +290,20 @@ SystemHD::operator()(const Tuple& k)
   }
 }
 
+uuid
+SystemHD::addEquation(const EquationHD* equation)
+{
+  auto i = m_equations.find(equation->name());
+  VariableHD* var = nullptr;
+
+  if (i == m_equations.end())
+  {
+    var = new VariableHD;
+    m_equations.insert(std::make_pair(equation->name(), var));
+  }
+  else
+  {
+  }
+}
+
 } //namespace TransLucid
