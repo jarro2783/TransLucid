@@ -250,12 +250,6 @@ namespace TransLucid
       size_t time
     );
 
-    virtual uuid
-    addExpr(const Tuple& k, HD* h)
-    {
-      return addExprInternal(k, h).first;
-    }
-
     virtual bool 
     delexpr(uuid id, size_t time);
 
@@ -292,7 +286,6 @@ namespace TransLucid
 
     bool equationValid(const EquationHD& e, const Tuple& k);
 
-    UUIDVarMap m_uuidVars;
     UUIDEquationMap m_equations;
 
     u32string m_name;
