@@ -10,7 +10,7 @@ tlcore_CPPFLAGS = -I$(top_srcdir)/src/include \
 
 tlcore_SOURCES = main.cpp tlcore.cpp tlcore.hpp
 
-TESTS_ENVIRONMENT = TLCORE=$(top_builddir)/src/tlcore/tlcore \ 
+TESTS_ENVIRONMENT = TLCORE=$(top_builddir)/src/tlcore/tlcore \
   TESTDIR=$(top_srcdir)/src/tlcore/tests \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh \
   RUNTESTS=$(top_srcdir)/src/tlcore/runtests.sh \
