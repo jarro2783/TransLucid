@@ -238,6 +238,18 @@ namespace TransLucid
     virtual TaggedConstant 
     operator()(const Tuple& k);
 
+    uuid
+    addEquation(EquationHD* e, size_t time);
+
+    uuid
+    addEquation
+    (
+      const u32string& name, 
+      GuardHD guard, 
+      HD* e, 
+      size_t time
+    );
+
     virtual uuid
     addExpr(const Tuple& k, HD* h)
     {

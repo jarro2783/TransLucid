@@ -385,6 +385,28 @@ VariableHD::addExprActual(const Tuple& k, HD* h)
   //}
 }
 
+uuid
+VariableHD::addEquation(EquationHD* e, size_t time)
+{
+  return m_equations.insert(std::make_pair(e->id(), *e)).first->first;
+}
+
+uuid
+VariableHD::addEquation
+(
+  const u32string& name, 
+  GuardHD guard, 
+  HD* e, 
+  size_t time
+)
+{
+  guard.setTimeStart(time);
+
+  EquationHD eq(name, guard, e);
+
+  return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
+}
+
 std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
 VariableHD::addExprInternal(const Tuple& k, HD* e)
 {
