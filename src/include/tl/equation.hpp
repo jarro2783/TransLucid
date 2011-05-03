@@ -238,11 +238,13 @@ namespace TransLucid
     virtual TaggedConstant 
     operator()(const Tuple& k);
 
+    #if 0
     virtual uuid
     addExpr(const Tuple& k, HD* h)
     {
       return addExprInternal(k, h).first;
     }
+    #endif
 
     virtual bool 
     delexpr(uuid id, size_t time);
