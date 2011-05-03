@@ -359,6 +359,7 @@ VariableHD::addEquation
   return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
 }
 
+#if 0
 std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
 VariableHD::addExprInternal(const Tuple& k, HD* e)
 {
@@ -394,6 +395,7 @@ VariableHD::addExprInternal(const Tuple& k, HD* e)
     return addToVariableActual(begin, Tuple(kp), e);
   }
 }
+#endif
 
 bool
 VariableHD::delexpr(uuid id, size_t time)

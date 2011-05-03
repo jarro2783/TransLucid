@@ -271,6 +271,10 @@ Translator::translate_and_add_equation_set(const u32string& s)
   BOOST_FOREACH(auto& ptv, equations)
   {
     auto v = ptv.second;
+    uuid id = m_system.addEquation(std::get<0>(v), 
+      GuardHD(std::get<1>(v), std::get<2>(v)), std::get<3>(v));
+
+#if 0
     uuid id = m_system.addExpr
     (
       Tuple
@@ -285,6 +289,7 @@ Translator::translate_and_add_equation_set(const u32string& s)
       ),
       std::get<3>(v)
     );
+#endif
 
     m_uuidParsedEqns.insert(std::make_pair(id, ptv.first));
   }

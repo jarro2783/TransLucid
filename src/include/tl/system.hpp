@@ -71,6 +71,12 @@ namespace TransLucid
     uuid
     addEquation(const u32string& name, const GuardHD& guard, HD* e);
 
+    uuid
+    addEquation(const u32string& name, HD* e)
+    {
+      return addEquation(name, GuardHD(), e);
+    }
+
     private:
     DimensionTranslator m_dimTranslator;
 

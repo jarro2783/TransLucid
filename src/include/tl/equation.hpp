@@ -276,8 +276,6 @@ namespace TransLucid
 
     protected:
 
-    std::pair<uuid, UUIDEquationMap::iterator>
-    addToVariableActual(const u32string& id, const Tuple& k, HD* h);
     VariableMap m_variables;
 
     private:

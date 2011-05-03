@@ -215,7 +215,8 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
   //add alpha = #_uniquedim to the system
   HD* hashUnique = new HashIndexHD(index);
   tuple_t addContext = {{DIM_ID, generate_string(uniqueName)}};
-  m_system->addExpr(Tuple(addContext), hashUnique);
+  //m_system->addExpr(Tuple(addContext), hashUnique);
+  m_system->addEquation(uniqueName, hashUnique);
 
   //make a LambdaAbstractionHD
   HD* rhs = boost::apply_visitor(*this, renamed);

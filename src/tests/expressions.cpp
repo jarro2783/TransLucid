@@ -304,8 +304,8 @@ BOOST_AUTO_TEST_CASE ( header )
   TL::Translator t2;
   BOOST_REQUIRE(t2.parse_header
   (
-    U"prefix ustring\"-\" ustring\"operator-\";;"
-    U"infixl ustring\"%\" ustring\"operator%\" 20;;"
+    U"prefix \"-\" \"operator-\";;"
+    U"infixl \"%\" \"operator%\" 20;;"
   ) 
   != false);
 
