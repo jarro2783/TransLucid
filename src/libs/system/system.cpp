@@ -290,4 +290,23 @@ SystemHD::operator()(const Tuple& k)
   }
 }
 
+uuid
+SystemHD::addEquation(const u32string& name, const GuardHD& guard, HD* e)
+{
+  auto i = m_equations.find(name);
+  VariableHD* var = nullptr;
+
+  if (i == m_equations.end())
+  {
+    var = new VariableHD(name, this);
+    m_equations.insert(std::make_pair(name, var));
+  }
+  else
+  {
+    var = i->second;
+  }
+
+  return var->addEquation(name, guard, e, m_time);
+}
+
 } //namespace TransLucid

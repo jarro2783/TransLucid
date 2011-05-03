@@ -246,6 +246,18 @@ namespace TransLucid
     }
     #endif
 
+    uuid
+    addEquation(EquationHD* e, size_t time);
+
+    uuid
+    addEquation
+    (
+      const u32string& name, 
+      GuardHD guard, 
+      HD* e, 
+      size_t time
+    );
+
     virtual bool 
     delexpr(uuid id, size_t time);
 
@@ -282,7 +294,6 @@ namespace TransLucid
 
     bool equationValid(const EquationHD& e, const Tuple& k);
 
-    UUIDVarMap m_uuidVars;
     UUIDEquationMap m_equations;
 
     u32string m_name;
