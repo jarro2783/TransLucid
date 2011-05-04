@@ -36,7 +36,7 @@ namespace TransLucid
    *
    * Holds all the data necessary for an system.
    **/
-  class SystemHD : public VariableHD
+  class SystemHD : public HD
   {
     public:
 
@@ -85,8 +85,6 @@ namespace TransLucid
     //initialises the type indexes
     void
     init_types();
-
-    //IOList m_variables;
 
     template <typename T>
     HD*

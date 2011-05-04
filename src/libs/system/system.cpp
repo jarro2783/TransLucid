@@ -160,8 +160,7 @@ SystemHD::init_types()
 }
 
 SystemHD::SystemHD()
-: VariableHD(U"", this),
-  m_time(0),
+: m_time(0),
   builtin_name_to_index
   {
    {U"ustring", TYPE_INDEX_USTRING},
@@ -265,10 +264,9 @@ SystemHD::operator()(const Tuple& k)
   else
   {
     const u32string& id = iditer->second.value<String>().value();
-    VariableMap::const_iterator viter =
-      VariableHD::m_variables.find(id);
+    auto viter = m_equations.find(id);
 
-    if (viter == m_variables.end())
+    if (viter == m_equations.end())
     {
       return TaggedConstant(Constant(Special(Special::UNDEF),
                             TYPE_INDEX_SPECIAL), k);
