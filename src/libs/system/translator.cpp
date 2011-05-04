@@ -263,10 +263,11 @@ Translator::translate_equation_set(const u32string& s)
   return equations;
 }
 
-void
+std::list<std::pair<uuid, Parser::ParsedEquation>>
 Translator::translate_and_add_equation_set(const u32string& s)
 {
   PTEquationVector equations = translate_equation_set(s);
+  std::list<std::pair<uuid, Parser::ParsedEquation>> added;
 
   BOOST_FOREACH(auto& ptv, equations)
   {
@@ -274,25 +275,11 @@ Translator::translate_and_add_equation_set(const u32string& s)
     uuid id = m_system.addEquation(std::get<0>(v), 
       GuardHD(std::get<1>(v), std::get<2>(v)), std::get<3>(v));
 
-#if 0
-    uuid id = m_system.addExpr
-    (
-      Tuple
-      (
-        create_add_eqn_context
-        (
-          to_u32string(std::get<0>(v)),
-          std::get<1>(v),
-          std::get<2>(v),
-          0
-        )
-      ),
-      std::get<3>(v)
-    );
-#endif
-
     m_uuidParsedEqns.insert(std::make_pair(id, ptv.first));
+    added.push_back(std::make_pair(id, ptv.first));
   }
+
+  return added;
 }
 
 bool

@@ -176,7 +176,7 @@ namespace TransLucid
      * that the Translator has.
      * @param s The string representing the equation set.
      */
-    void
+    std::list<std::pair<uuid, Parser::ParsedEquation>>
     translate_and_add_equation_set(const u32string& s);
 
     /**
