@@ -36,7 +36,7 @@ namespace TransLucid
    *
    * Holds all the data necessary for an system.
    **/
-  class SystemHD : public VariableHD
+  class SystemHD : public HD
   {
     public:
 
@@ -45,16 +45,8 @@ namespace TransLucid
     //don't want to copy
     SystemHD(const SystemHD&) = delete;
 
-    typedef std::map<u32string, HD*> IOList;
-
-    void
-    addOutput(const IOList& output);
-
-    void
-    addInput(const IOList& input);
-
-    void
-    addDemand(const u32string& id, const GuardHD& guard);
+    TaggedConstant
+    operator()(const Tuple& k);
 
     /**
      * Get the time.
@@ -76,22 +68,23 @@ namespace TransLucid
       ++m_time;
     }
 
+    uuid
+    addEquation(const u32string& name, const GuardHD& guard, HD* e);
+
+    uuid
+    addEquation(const u32string& name, HD* e)
+    {
+      return addEquation(name, GuardHD(), e);
+    }
+
     private:
     DimensionTranslator m_dimTranslator;
 
     size_t m_time;
 
-    IOList m_outputs;
-    IOList m_inputs;
-
-    typedef std::map<u32string, GuardHD> DemandStore;
-    DemandStore m_demands;
-
     //initialises the type indexes
     void
     init_types();
-
-    IOList m_variables;
 
     template <typename T>
     HD*
@@ -104,6 +97,8 @@ namespace TransLucid
     tick();
 
     std::map<u32string, size_t> builtin_name_to_index;
+
+    std::map<u32string, VariableHD*> m_equations;
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);

@@ -93,20 +93,7 @@ register_one_op(HD* hd, SystemHD& i)
     }
   };
 
-  tuple_t context =
-  {
-    {
-      DIM_VALID_GUARD,
-      Constant(Guard(GuardHD(Tuple(guard))),
-                     TYPE_INDEX_GUARD)
-    },
-    {
-      DIM_ID,
-      generate_string(U"OP")
-    }
-  };
-
-  i.addExpr(Tuple(context), hd);
+  i.addEquation(U"OP", GuardHD(Tuple(guard)), hd);
 }
 
 /**

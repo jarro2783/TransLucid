@@ -134,24 +134,16 @@ SystemHD::buildConstantHD(size_t index)
     }
   };
 
-  tuple_t k =
-  {
-    {
-      DIM_VALID_GUARD,
-      Constant(Guard(GuardHD(Tuple(guard))), TYPE_INDEX_GUARD)
-    }
-  };
-
   //sets the following
 
   //CONST | [type : ustring<name>]
-  addToVariableActual(U"CONST", Tuple(k), h);
+  addEquation(U"CONST", GuardHD(Tuple(guard)), h);
 
   //TYPE_INDEX | [type : ustring<name>] = index;;
-  addToVariableActual
+  addEquation
   (
     U"TYPE_INDEX", 
-    Tuple(k), 
+    GuardHD(Tuple(guard)), 
     new Hyperdatons::IntmpConstHD(index)
   );
   return h;
@@ -162,14 +154,13 @@ SystemHD::init_types()
 {
   for(auto v : builtin_name_to_index)
   {
-    addToVariableActual(v.first, Tuple(),
+    addEquation(v.first, GuardHD(),
                         new Hyperdatons::TypeConstHD(v.second));
   }
 }
 
 SystemHD::SystemHD()
-: VariableHD(U"", this),
-  m_time(0),
+: m_time(0),
   builtin_name_to_index
   {
    {U"ustring", TYPE_INDEX_USTRING},
@@ -184,13 +175,13 @@ SystemHD::SystemHD()
   //create the obj, const and fun ids
 
   //we need dimensions and unique to do anything
-  addToVariableActual(U"DIMENSION_NAMED_INDEX", Tuple(),
+  addEquation(U"DIMENSION_NAMED_INDEX", GuardHD(),
                       new DimensionsStringHD(m_dimTranslator));
-  addToVariableActual(U"DIMENSION_VALUE_INDEX", Tuple(),
+  addEquation(U"DIMENSION_VALUE_INDEX", GuardHD(),
                       new DimensionsTypedHD(m_dimTranslator));
-  addToVariableActual
+  addEquation
   (
-    U"_unique", Tuple(),
+    U"_unique", GuardHD(),
     new UniqueHD(std::max
     (
       static_cast<int>(TYPE_INDEX_LAST),
@@ -198,14 +189,14 @@ SystemHD::SystemHD()
     ))
   );
 
-  addToVariableActual
+  addEquation
   (
-    U"_uniquedim", Tuple(),
+    U"_uniquedim", GuardHD(),
     new UniqueDimensionHD(m_dimTranslator)
   );
 
   //add this
-  addToVariableActual(U"this", Tuple(), this);
+  addEquation(U"this", GuardHD(), this);
 
   //add variables for all the types
   //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
@@ -218,36 +209,13 @@ SystemHD::SystemHD()
   buildConstantHD<Hyperdatons::UStringHD>(TYPE_INDEX_USTRING);
 
   //set this as the default int too
-  addToVariableActual(U"DEFAULTINT", Tuple(), intmpHD);
-}
-
-void
-SystemHD::addOutput(const IOList& output)
-{
-  m_outputs.insert(output.begin(), output.end());
-}
-
-void
-SystemHD::addInput(const IOList& input)
-{
-  m_inputs.insert(input.begin(), input.end());
-
-  //add all the inputs as equations
-  #warning clear up semantics here, this only works if the names do not
-  #warning clash and there is only one equation per name, otherwise trouble
-  m_variables.insert(input.begin(), input.end());
-}
-
-void
-SystemHD::addDemand(const u32string& id, const GuardHD& guard)
-{
-  m_demands.insert(std::make_pair(id, guard));
+  addEquation(U"DEFAULTINT", GuardHD(), intmpHD);
 }
 
 void
 SystemHD::tick()
 {
-
+  #if 0
   tuple_t current;
   current[DIM_TIME] = Constant(Intmp(m_time), TYPE_INDEX_INTMP);
 
@@ -279,6 +247,56 @@ SystemHD::tick()
   }
 
   ++m_time;
+  #endif
+}
+
+TaggedConstant
+SystemHD::operator()(const Tuple& k)
+{
+  Tuple::const_iterator iditer = k.find(DIM_ID);
+
+  //the system only varies in the id dimension
+  if (iditer == k.end())
+  {
+    return TaggedConstant(Constant(Special(Special::DIMENSION),
+                          TYPE_INDEX_SPECIAL), k);
+  }
+  else
+  {
+    const u32string& id = iditer->second.value<String>().value();
+    auto viter = m_equations.find(id);
+
+    if (viter == m_equations.end())
+    {
+      return TaggedConstant(Constant(Special(Special::UNDEF),
+                            TYPE_INDEX_SPECIAL), k);
+    }
+    else
+    {
+      tuple_t kp = k.tuple();
+      kp.erase(DIM_ID);
+      return (*viter->second)(Tuple(kp));
+    }
+  }
+}
+
+uuid
+SystemHD::addEquation(const u32string& name, const GuardHD& guard, HD* e)
+{
+  auto i = m_equations.find(name);
+  VariableHD* var = nullptr;
+
+  if (i == m_equations.end())
+  {
+    var = new VariableHD(name, this);
+    m_equations.insert(std::make_pair(name, var));
+  }
+  else
+  {
+    var = i->second;
+  }
+
+  return var->addEquation(name, guard, e, m_time);
 }
 
 } //namespace TransLucid

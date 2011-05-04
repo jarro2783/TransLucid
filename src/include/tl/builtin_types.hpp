@@ -20,6 +20,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef BUILTIN_TYPES_HPP_INCLUDED
 #define BUILTIN_TYPES_HPP_INCLUDED
 
+/**
+ * @file builtin_types.hpp
+ * The header for the types that are built directly into the system.
+ */
+
 #include <tl/types.hpp>
 //#include <tl/equation.hpp>
 #include <set>

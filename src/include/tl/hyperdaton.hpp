@@ -32,12 +32,6 @@ namespace TransLucid
 
     virtual TaggedConstant
     operator()(const Tuple& k) = 0;
-
-    virtual uuid
-    addExpr(const Tuple& k, HD* h)
-    {
-      return nil_uuid();
-    }
   };
 } //namespace TransLucid
 

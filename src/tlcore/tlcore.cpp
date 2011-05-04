@@ -391,17 +391,13 @@ void TLCore::addNewEquations()
     ++iter
   )
   {
-    auto uuid = m_system.addExpr
+    auto& eq = *iter;
+    auto uuid = m_system.addEquation
     (
-      Tuple
-      (
-        create_add_eqn_context
-        (
-          std::get<0>(*iter),
-          std::get<1>(*iter),
-          std::get<2>(*iter),
-          m_time
-        )
+      std::get<0>(eq),
+      GuardHD(
+        std::get<1>(*iter),
+        std::get<2>(*iter)
       ),
       std::get<3>(*iter)
     );

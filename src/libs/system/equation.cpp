@@ -191,6 +191,7 @@ VariableHD::operator()(const Tuple& k)
 
   //find all the applicable ones
 
+  #if 0
   Tuple::const_iterator iditer = k.find(DIM_ID);
 
   if (iditer != k.end())
@@ -237,6 +238,7 @@ VariableHD::operator()(const Tuple& k)
                             TYPE_INDEX_SPECIAL), k);
     }
   }
+  #endif
 
   for (UUIDEquationMap::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
@@ -335,59 +337,33 @@ VariableHD::operator()(const Tuple& k)
   }
 }
 
-inline std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
-VariableHD::addExprActual(const Tuple& k, HD* h)
+uuid
+VariableHD::addEquation(EquationHD* e, size_t time)
 {
-  GuardHD g;
-  Tuple::const_iterator giter = k.find(DIM_VALID_GUARD);
-  if (giter != k.end())
-  {
-    g = giter->second.value<Guard>().value();
-  }
-
-  Tuple::const_iterator titer = k.find(DIM_TIME);
-  if (titer != k.end())
-  {
-    g.setTimeStart(titer->second.value<Intmp>().value());
-    #if 0
-    g.addDimension(DIM_TIME, 
-      Constant(Range(&titer->second.value<Intmp>().value(), 0), 
-               TYPE_INDEX_RANGE));
-    #endif
-  }
-
-  //set the time
-
-  auto adder =
-    [this] (const EquationHD& e) -> std::pair<uuid, UUIDEquationMap::iterator>
-  {
-    auto& id = e.id();
-    auto added = std::make_pair(
-      id,
-      this->m_equations.insert(std::make_pair(id, e)).first
-    );
-
-    this->m_uuidVars.insert(std::make_pair(id, this));
-
-    return added;
-  };
-
-  //if (g)
-  //{
-    return adder(EquationHD(m_name, g, h));
-  //}
-  //else
-  //{
-  //  return adder(EquationHD(m_name, 
-  //    makeGuardWithTime(titer->second.value<Intmp>.value()), h));
-  //}
+  return m_equations.insert(std::make_pair(e->id(), *e)).first->first;
 }
 
+uuid
+VariableHD::addEquation
+(
+  const u32string& name, 
+  GuardHD guard, 
+  HD* e, 
+  size_t time
+)
+{
+  guard.setTimeStart(time);
+
+  EquationHD eq(name, guard, e);
+
+  return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
+}
+
+#if 0
 std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
 VariableHD::addExprInternal(const Tuple& k, HD* e)
 {
-  size_t dim_id = DIM_ID;
-  Tuple::const_iterator iter = k.find(dim_id);
+  Tuple::const_iterator iter = k.find(DIM_ID);
   if (iter == k.end())
   {
     return addExprActual(k, e);
@@ -409,36 +385,17 @@ VariableHD::addExprInternal(const Tuple& k, HD* e)
     tuple_t kp = k.tuple();
     if (end.size() != 0)
     {
-      kp[dim_id] = Constant(String(end), TYPE_INDEX_USTRING);
+      kp[DIM_ID] = Constant(String(end), TYPE_INDEX_USTRING);
     }
     else
     {
-      kp.erase(dim_id);
+      kp.erase(DIM_ID);
     }
 
     return addToVariableActual(begin, Tuple(kp), e);
   }
 }
-
-std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
-VariableHD::addToVariableActual(const u32string& id, const Tuple& k, HD* h)
-{
-  //find the variable
-  VariableMap::const_iterator iter = m_variables.find(id);
-  if (iter == m_variables.end())
-  {
-    iter = m_variables.insert
-    (
-      std::make_pair(id, new VariableHD(id, m_system))
-    ).first;
-  }
-  //add it
-  //and add the resulting uuid mapping to the variable that we added to
-  auto result = iter->second->addExprInternal(k, h);
-  m_uuidVars.insert(std::make_pair(result.first, iter->second));
-  return result;
-}
-
+#endif
 
 bool
 VariableHD::delexpr(uuid id, size_t time)

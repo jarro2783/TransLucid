@@ -455,7 +455,7 @@ template <typename T, template <typename> class Op>
 void
 register_one_op
 (
-  TL::HD& system,
+  TL::SystemHD& system,
   const TL::u32string& name,
   size_t index
 )
@@ -482,20 +482,7 @@ register_one_op
     }
   };
 
-  TL::tuple_t context =
-  {
-    {
-      TL::DIM_VALID_GUARD,
-      TL::Constant(TL::Guard(TL::GuardHD(TL::Tuple(guard))),
-                     TL::TYPE_INDEX_GUARD)
-    },
-    {
-      TL::DIM_ID,
-      TL::Constant(TL::String(U"OP"), TL::TYPE_INDEX_USTRING)
-    }
-  };
-
-  system.addExpr(TL::Tuple(context), op);
+  system.addEquation(U"OP", TL::GuardHD(TL::Tuple(guard)), op);
 }
 
 template<class T>
@@ -574,15 +561,14 @@ registerType(const TL::u32string& name, TL::SystemHD& i)
 
   TL::tuple_t k;
   k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
-  k.insert(std::make_pair(TL::DIM_ID, TL::generate_string(U"CONST")));
-  i.addExpr(TransLucid::Tuple(k), h);
+  i.addEquation(U"CONST", TL::GuardHD(TL::Tuple(k)), h);
 
   k.clear();
   k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
-  k.insert(std::make_pair(TL::DIM_ID, TL::generate_string(U"TYPE_INDEX")));
-  i.addExpr
+  i.addEquation
   (
-    TransLucid::Tuple(k), 
+    U"TYPE_INDEX",
+    TL::GuardHD(TL::Tuple(k)), 
     new TL::Hyperdatons::IntmpConstHD(unique)
   );
 
