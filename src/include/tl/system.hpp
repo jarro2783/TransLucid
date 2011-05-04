@@ -1,5 +1,5 @@
 /* System hyperdaton.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009-2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -76,6 +76,14 @@ namespace TransLucid
     {
       return addEquation(name, GuardHD(), e);
     }
+
+    //what is the input?
+    uuid
+    addExpr();
+
+    //output hyperdatons, set of context
+    void
+    eval(const std::list<uuid>& exprs);
 
     private:
     DimensionTranslator m_dimTranslator;
