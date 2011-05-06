@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/dimtranslator.hpp>
 #include <tl/equation.hpp>
+#include <tl/physicalhds.hpp>
 
 /**
  * @file system.hpp
@@ -68,6 +69,7 @@ namespace TransLucid
       ++m_time;
     }
 
+    //string input?
     uuid
     addEquation(const u32string& name, const GuardHD& guard, HD* e);
 
@@ -83,7 +85,7 @@ namespace TransLucid
 
     //output hyperdatons, set of context
     void
-    eval(const std::list<uuid>& exprs);
+    eval(const std::list<uuid>& exprs, PhysicalHD* out);
 
     private:
     DimensionTranslator m_dimTranslator;
