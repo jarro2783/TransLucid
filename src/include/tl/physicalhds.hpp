@@ -17,11 +17,50 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifndef PHYSICAL_HDS_HPP_INCLUDED
+#define PHYSICAL_HDS_HPP_INCLUDED
+
 #include <tl/hyperdaton.hpp>
 
 namespace TransLucid
 {
   class PhysicalHD : public HD
   {
+    public:
+
+    virtual void
+    setValue(const Constant& c, const Tuple& k) = 0;
+  };
+
+  //stores a single value no matter the context
+  class SingleValuePhysicalHD : public PhysicalHD
+  {
+    public:
+    void
+    setValue(const Constant& c, const Tuple& k)
+    {
+      m_value = c;
+    }
+
+    const Constant&
+    get() const
+    {
+      return m_value;
+    }
+
+    Constant&
+    get()
+    {
+      return m_value;
+    }
+
+    private:
+    Constant m_value;
+  };
+
+  class ArrayPhysicalHD : public PhysicalHD
+  {
   };
 }
+
+#endif
