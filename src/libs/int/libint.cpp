@@ -19,21 +19,21 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "libint.hpp"
 
-#include <boost/lexical_cast.hpp>
-#include <boost/assign.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/parameter.hpp>
 #include <boost/optional.hpp>
+
 #include <limits>
 #include <gmpxx.h>
-#include <boost/ref.hpp>
+
 #include <tl/builtin_types.hpp>
 #include <tl/system.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/utility.hpp>
 #include <tl/valuehd.hpp>
-#include <boost/function.hpp>
 #include <tl/utility.hpp>
 #include <tl/consthd.hpp>
 
@@ -55,7 +55,6 @@ namespace std
 namespace IntLib
 {
 
-using boost::assign::list_of;
 namespace TL = TransLucid;
 
 namespace
