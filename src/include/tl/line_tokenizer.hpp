@@ -20,18 +20,26 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef LINE_TOKENIZER_HPP_INCLUDED
 #define LINE_TOKENIZER_HPP_INCLUDED
 
+#include <deque>
+
+#include <tl/parser_iterator.hpp>
+
 namespace TransLucid
 {
   class LineTokenizer
   {
     public:
     //construct with an iterator
-    LineTokenizer();
+    LineTokenizer(TransLucid::Parser::U32Iterator& begin)
+    : m_current(begin)
+    {
+    }
 
     std::string next();
 
     private:
-    //current iterator
+    std::deque<char> m_lookahead;
+    TransLucid::Parser::U32Iterator& m_current;
   };
 }
 

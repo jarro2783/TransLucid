@@ -19,6 +19,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 
 #include "tlcore.hpp"
+
+#include <tl/line_tokenizer.hpp>
+
+#if 0
 #include <tl/expr_parser.hpp>
 #include <tl/equation_parser.hpp>
 #include <tl/tuple_parser.hpp>
@@ -412,4 +416,6 @@ void TLCore::addNewEquations()
 } //namespace TLCore
 
 } //namespace TransLucid
+
+#endif
 

@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#if 0
+
 #include <tl/parser_api.hpp>
 #include <tl/parser_defs.hpp>
 #include <tl/system.hpp>
@@ -214,3 +216,5 @@ namespace TransLucid
     };
   }
 }
+
+#endif 
