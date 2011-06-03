@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/translator.hpp>
+#include <tl/system.hpp>
 
 using namespace TransLucid;
 
@@ -25,9 +25,9 @@ int main(int argc, char* argv[])
 {
   HD* e = 0;
   try {
-    Translator t;
+    SystemHD s;
 
-    t.parse_header
+    s.parse_header
     (
       U"dimension ustring<n>;;"
       U"infixl ustring<-> ustring<operator-> 5;;"
@@ -35,13 +35,13 @@ int main(int argc, char* argv[])
       U"library ustring<int>;;"
     );
 
-    t.translate_and_add_equation_set
+    s.translate_and_add_equation_set
     (
       U"fact | [n:0] = 1;;"
       U"fact = #n * (fact @ [n:#n-1]);;"
     );
 
-    e = t.translate_expr(U"fact @ [n:20]");
+    e = s.translate_expr(U"fact @ [n:20]");
 
     TaggedConstant result = (*e)(Tuple());
 

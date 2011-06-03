@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/translator.hpp>
+#include <tl/system.hpp>
 #include <tl/builtin_types.hpp>
 #include <algorithm>
 #include <tl/utility.hpp>
@@ -40,13 +40,13 @@ namespace TL = TransLucid;
 
 namespace
 {
-  TL::Translator translator;
+  TL::SystemHD tlsystem;
 }
 
 struct translator_class {
   translator_class()
   {
-    TL::Parser::Header& header = translator.header();
+    TL::Parser::Header& header = tlsystem.header();
     TL::Parser::addBinaryOpSymbol
     (
       header, U"+", U"operator+", TL::Tree::ASSOC_LEFT, 5
@@ -69,14 +69,14 @@ struct translator_class {
       header, TL::Tree::UNARY_POSTFIX, L"-", L"operator-"
     );
     #endif
-    translator.loadLibrary(U"int");
+    tlsystem.loadLibrary(U"int");
   }
 };
 
 BOOST_GLOBAL_FIXTURE ( translator_class );
 
 void
-test_base(size_t base, uint32_t number, TL::Translator& t)
+test_base(size_t base, uint32_t number, TL::SystemHD& s)
 {
   std::string value = "0";
   mpz_class baseVal(base);
@@ -88,7 +88,7 @@ test_base(size_t base, uint32_t number, TL::Translator& t)
     value += num.get_str(base);
   }
 
-  TL::HD* h = t.translate_expr(TL::u32string(value.begin(), value.end()));
+  TL::HD* h = s.translate_expr(TL::u32string(value.begin(), value.end()));
   TL::TaggedConstant v = (*h)(TL::Tuple());
 
   uint32_t result = v.first.value<TL::Intmp>().value().get_ui();
@@ -98,7 +98,7 @@ test_base(size_t base, uint32_t number, TL::Translator& t)
 }
 
 void
-test_integer(int n, TL::Translator& translator)
+test_integer(int n, TL::SystemHD& tlsystem)
 {
   std::string value;
   if (n < 0)
@@ -111,7 +111,7 @@ test_integer(int n, TL::Translator& translator)
   }
 
   TL::HD* h = 
-    translator.translate_expr(TL::u32string(value.begin(), value.end()));
+    tlsystem.translate_expr(TL::u32string(value.begin(), value.end()));
   if (h == 0)
   {
     BOOST_MESSAGE("error testing integer: " << value);
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE( integers )
 {
   for (int i = -1000; i < 1000; i += 77)
   {
-    test_integer(i, translator);
+    test_integer(i, tlsystem);
   }
 
 #if 0
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE ( strings ) {
 
   TL::HD* h;
 
-  h = translator.translate_expr(U"\" hello é world\"");
+  h = tlsystem.translate_expr(U"\" hello é world\"");
   BOOST_REQUIRE(h != 0);
 
   TL::TaggedConstant v = (*h)(TL::Tuple());
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE ( chars ) {
 
   BOOST_TEST_MESSAGE("test suite: chars");
 
-  std::auto_ptr<TL::HD> h(translator.translate_expr(U"'h'"));
+  std::auto_ptr<TL::HD> h(tlsystem.translate_expr(U"'h'"));
   BOOST_REQUIRE(h.get() != 0);
   TL::TaggedConstant v = (*h)(TL::Tuple());
 
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE ( chars ) {
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_UCHAR);
   BOOST_CHECK(v.first.value<TL::Char>().value() == U'h');
 
-  h.reset(translator.translate_expr(U"'è'"));
+  h.reset(tlsystem.translate_expr(U"'è'"));
   BOOST_REQUIRE(h.get() != 0);
   v = (*h)(TL::Tuple());
 
@@ -208,9 +208,9 @@ BOOST_AUTO_TEST_CASE ( specials ) {
   };
 
   std::for_each(specials.begin(), specials.end(),
-    [&translator] (SpecialList::value_type& s)
+    [&tlsystem] (SpecialList::value_type& s)
       {
-        TL::HD* h = translator.translate_expr(s.first);
+        TL::HD* h = tlsystem.translate_expr(s.first);
         BOOST_REQUIRE(h != 0);
         TL::TaggedConstant v = (*h)(TL::Tuple());
         BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_SPECIAL);
@@ -232,24 +232,24 @@ BOOST_AUTO_TEST_CASE ( context_change )
   TL::HD* h = 0;
 
   BOOST_TEST_MESSAGE("translating \"1\"");
-  h = translator.translate_expr(U"1");
+  h = tlsystem.translate_expr(U"1");
   BOOST_REQUIRE(h != 0);
   BOOST_CHECK_EQUAL
   (
     TL::get_dimension_index
     (
-      &translator.system(),
+      &tlsystem,
       (*h)(TL::Tuple()).first
     ),
     TL::get_dimension_index
     (
-      &translator.system(),
+      &tlsystem,
       (*h)(TL::Tuple()).first
     )
   );
 
   BOOST_TEST_MESSAGE("translating \"[1 : 5]\"");
-  TL::HD* context1 = translator.translate_expr(U"[1 : 5]");
+  TL::HD* context1 = tlsystem.translate_expr(U"[1 : 5]");
   BOOST_REQUIRE(context1 != 0);
   TL::TaggedConstant tuple1 = (*context1)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple1.first.index(), TL::TYPE_INDEX_TUPLE);
@@ -258,13 +258,13 @@ BOOST_AUTO_TEST_CASE ( context_change )
   tuple1.first.value<TL::Tuple>().print(std::cerr);
   std::cerr << std::endl;
 
-  h = translator.translate_expr(U"#1");
+  h = tlsystem.translate_expr(U"#1");
   BOOST_REQUIRE(h != 0);
   TL::TaggedConstant v = (*h)(tuple1.first.value<TL::Tuple>());
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 5);
 
-  TL::HD* context2 = translator.translate_expr(U"[1 : 42]");
+  TL::HD* context2 = tlsystem.translate_expr(U"[1 : 42]");
   TL::TaggedConstant tuple2 = (*context2)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple2.first.index(), TL::TYPE_INDEX_TUPLE);
 
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 42);
 
-  TL::HD* context3 = translator.translate_expr(U"[1 : 42, 2 : 16, 3 : 47]");
+  TL::HD* context3 = tlsystem.translate_expr(U"[1 : 42, 2 : 16, 3 : 47]");
   TL::TaggedConstant tuple3 = (*context3)(TL::Tuple());
   BOOST_REQUIRE_EQUAL(tuple3.first.index(), TL::TYPE_INDEX_TUPLE);
 
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE ( context_change )
 
   s = U"(#1-2) @ [1 : 5]";
   BOOST_TEST_MESSAGE("translating: " << s);
-  h = translator.translate_expr(s);
+  h = tlsystem.translate_expr(s);
   v = (*h)(TL::Tuple());
 
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
@@ -294,15 +294,15 @@ BOOST_AUTO_TEST_CASE ( misc )
   BOOST_TEST_MESSAGE("Entering misc");
   TL::HD* h = 0;
 
-  h = translator.translate_expr(U"0 @ [t:11, w:11, x:5, y:7, z:42]");
+  h = tlsystem.translate_expr(U"0 @ [t:11, w:11, x:5, y:7, z:42]");
   BOOST_REQUIRE(h != 0);
 }
 
 BOOST_AUTO_TEST_CASE ( header )
 {
   BOOST_TEST_MESSAGE("Entering header");
-  TL::Translator t2;
-  BOOST_REQUIRE(t2.parse_header
+  TL::SystemHD s2;
+  BOOST_REQUIRE(s2.parse_header
   (
     U"prefix \"-\" \"operator-\";;"
     U"infixl \"%\" \"operator%\" 20;;"
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE ( header )
 
   BOOST_TEST_MESSAGE("Parsed header");
 
-  TL::HD *h = t2.translate_expr(U"4 % -5");
+  TL::HD *h = s2.translate_expr(U"4 % -5");
   BOOST_REQUIRE(h != 0);
 }
 

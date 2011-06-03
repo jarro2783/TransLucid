@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 //#include <tl/compiled_functors.hpp>
 #include <algorithm>
 #include <tl/consthd.hpp>
+#include <tl/translator.hpp>
 
 namespace TransLucid
 {
@@ -210,6 +211,13 @@ SystemHD::SystemHD()
 
   //set this as the default int too
   addEquation(U"DEFAULTINT", GuardHD(), intmpHD);
+
+  m_translator = new Translator(*this);
+}
+
+SystemHD::~SystemHD()
+{
+  delete m_translator;
 }
 
 void
@@ -297,6 +305,48 @@ SystemHD::addEquation(const u32string& name, const GuardHD& guard, HD* e)
   }
 
   return var->addEquation(name, guard, e, m_time);
+}
+
+HD*
+SystemHD::translate_expr(const u32string& s)
+{
+  return m_translator->translate_expr(s);
+}
+
+std::list<std::pair<uuid, Parser::ParsedEquation>>
+SystemHD::translate_and_add_equation_set(const u32string& s)
+{
+  return m_translator->translate_and_add_equation_set(s);
+}
+
+PTEquationVector
+SystemHD::translate_equation_set(const u32string& s)
+{
+  return m_translator->translate_equation_set(s);
+}
+
+bool
+SystemHD::parse_header(const u32string& s)
+{
+  return m_translator->parse_header(s);
+}
+
+void
+SystemHD::loadLibrary(const u32string& s)
+{
+  m_translator->loadLibrary(s);
+}
+
+Parser::Header&
+SystemHD::header()
+{
+  return m_translator->header();
+}
+
+const Tree::Expr&
+SystemHD::lastExpression() const
+{
+  return m_translator->lastExpression();
 }
 
 } //namespace TransLucid

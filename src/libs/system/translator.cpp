@@ -112,9 +112,10 @@ namespace detail
   };
 }
 
-Translator::Translator()
+Translator::Translator(SystemHD& system)
 :  m_header(0)
-  ,m_compiler(&m_system)
+  ,m_system(system)
+  ,m_compiler(&system)
   ,m_nextLib(0)
 {
   try
@@ -322,6 +323,12 @@ Translator::cleanup()
 std::string Translator::EquationIterator::print() const
 {
   return Parser::printEquation(m_iter->second);
+}
+
+void
+Translator::loadLibrary(const u32string& s)
+{
+  m_lt.loadLibrary(s, &m_system);
 }
 
 }

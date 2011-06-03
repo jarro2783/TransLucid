@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/dimtranslator.hpp>
 #include <tl/equation.hpp>
 #include <tl/physicalhds.hpp>
+#include <tl/parser_api.hpp>
 
 /**
  * @file system.hpp
@@ -37,6 +38,8 @@ namespace TransLucid
   class uuidmap : public std::map<uuid, T> {
   };
 
+  class Translator;
+
   /**
    * @brief SystemHD base class.
    *
@@ -47,6 +50,7 @@ namespace TransLucid
     public:
 
     SystemHD();
+    ~SystemHD();
 
     //don't want to copy
     SystemHD(const SystemHD&) = delete;
@@ -92,6 +96,27 @@ namespace TransLucid
     void
     eval(const std::list<uuid>& exprs, PhysicalHD* out);
 
+    HD*
+    translate_expr(const u32string& s);
+
+    std::list<std::pair<uuid, Parser::ParsedEquation>>
+    translate_and_add_equation_set(const u32string& s);
+
+    PTEquationVector
+    translate_equation_set(const u32string& s);
+
+    bool
+    parse_header(const u32string& s);
+
+    void
+    loadLibrary(const u32string& s);
+
+    Parser::Header&
+    header();
+
+    const Tree::Expr&
+    lastExpression() const;
+
     private:
     DimensionTranslator m_dimTranslator;
 
@@ -118,6 +143,8 @@ namespace TransLucid
     //the uuid generator
     boost::uuids::basic_random_generator<boost::mt19937>
     m_uuid_generator;
+
+    Translator *m_translator;
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);

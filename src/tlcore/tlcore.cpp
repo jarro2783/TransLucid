@@ -17,12 +17,6 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-
-#include "tlcore.hpp"
-
-#include <tl/line_tokenizer.hpp>
-
-#if 0
 #include <tl/expr_parser.hpp>
 #include <tl/equation_parser.hpp>
 #include <tl/tuple_parser.hpp>
@@ -34,6 +28,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 
 #include <boost/spirit/include/support_istream_iterator.hpp>
+
+#include "tlcore.hpp"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -416,6 +412,3 @@ void TLCore::addNewEquations()
 } //namespace TLCore
 
 } //namespace TransLucid
-
-#endif
-

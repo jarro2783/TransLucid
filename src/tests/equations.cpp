@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/translator.hpp>
 #include <tl/utility.hpp>
 //#include <tl/parser_util.hpp>
 #include <tl/parser_header.hpp>
+#include <tl/system.hpp>
 
 #define BOOST_TEST_MODULE equations
 #include <boost/test/included/unit_test.hpp>
@@ -29,14 +29,14 @@ namespace TL = TransLucid;
 
 namespace
 {
-  TL::Translator translator;
+  TL::SystemHD tlsystem;
 }
 
 struct translator_class {
   translator_class()
   {
-    translator.loadLibrary(U"int");
-    TL::Parser::Header& header = translator.header();
+    tlsystem.loadLibrary(U"int");
+    TL::Parser::Header& header = tlsystem.header();
     TL::Parser::addBinaryOpSymbol
     (
       header, U"+", U"operator+", TL::Tree::ASSOC_LEFT, 5
@@ -63,11 +63,9 @@ BOOST_AUTO_TEST_SUITE( expressions_tests )
 BOOST_AUTO_TEST_CASE ( single )
 {
   std::cerr << "First test case" << std::endl;
-  translator.translate_and_add_equation_set(U" x = 5;; y = 6;;");
+  tlsystem.translate_and_add_equation_set(U" x = 5;; y = 6;;");
 
-  TL::HD& system = translator.system();
-
-  TL::TaggedConstant v = system
+  TL::TaggedConstant v = tlsystem
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"x")},
@@ -78,7 +76,7 @@ BOOST_AUTO_TEST_CASE ( single )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 5);
 
-  v = system
+  v = tlsystem
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"y")},
@@ -89,7 +87,7 @@ BOOST_AUTO_TEST_CASE ( single )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 6);
 
-  v = system
+  v = tlsystem
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"z")}
@@ -110,16 +108,14 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   BOOST_TEST_MESSAGE("entering simple_expressions");
   //TL::Parser::Header& header = translator.header();
 
-  translator.translate_and_add_equation_set
+  tlsystem.translate_and_add_equation_set
   (
     U"a = 1 + 2;;"
     U"b = 5 * 6;;"
     U"c = 4 - 3;;"
   );
 
-  TL::HD& system = translator.system();
-
-  TL::TaggedConstant v = system
+  TL::TaggedConstant v = tlsystem
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"a")},
@@ -130,7 +126,7 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 3);
 
-  v = system
+  v = tlsystem
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"b")},
@@ -141,7 +137,7 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 30);
 
-  v = system
+  v = tlsystem
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"c")},
@@ -152,11 +148,11 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
 
-  translator.translate_and_add_equation_set
+  tlsystem.translate_and_add_equation_set
   (
     U"d = 1 + 2 * 3;;"
   );
-  v = system
+  v = tlsystem
   (TL::Tuple(TL::tuple_t(
     {
       {TL::DIM_ID, TL::generate_string(U"d")},
@@ -175,33 +171,33 @@ BOOST_AUTO_TEST_CASE ( functions )
   TL::TaggedConstant v;
   TL::Tuple k(TL::tuple_t({{TL::DIM_TIME, TL::makeTime(0)}}));
 
-  translator.translate_and_add_equation_set
+  tlsystem.translate_and_add_equation_set
   (
     U"fib = (fib @ [1 : #1-1]) + (fib @ [1 : #1-2]);;"
     U"fib | [1 : 0] = 0;;"
     U"fib | [1 : 1] = 1;;"
   );
 
-  h = translator.translate_expr(U"fib @ [1 : 0]");
+  h = tlsystem.translate_expr(U"fib @ [1 : 0]");
   BOOST_REQUIRE(h != 0);
   v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 0);
 
-  h = translator.translate_expr(U"fib @ [1 : 1]");
+  h = tlsystem.translate_expr(U"fib @ [1 : 1]");
   BOOST_REQUIRE(h != 0);
   v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
 
-  h = translator.translate_expr(U"fib @ [1 : 2]");
+  h = tlsystem.translate_expr(U"fib @ [1 : 2]");
   v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 1);
 
   #if 0
   BOOST_REQUIRE(
-  translator.parse_header
+  tlsystem.parse_header
   (
     U"dimension \"n\";;"
     U"dimension \"h\";;"
@@ -210,19 +206,19 @@ BOOST_AUTO_TEST_CASE ( functions )
   != false);
   #endif
 
-  translator.translate_and_add_equation_set
+  tlsystem.translate_and_add_equation_set
   (
     U"fact = #n * (fact @ [n:#n-1]);;"
     U"fact | [n:0] = 1;;"
   );
 
-  h = translator.translate_expr(U"(fact + #i) @ [time:0, n:3, i:25, h:50]");
+  h = tlsystem.translate_expr(U"(fact + #i) @ [time:0, n:3, i:25, h:50]");
   BOOST_REQUIRE(h != 0);
   v = (*h)(k);
   BOOST_REQUIRE_EQUAL(v.first.index(), TL::TYPE_INDEX_INTMP);
   BOOST_CHECK_EQUAL(v.first.value<TL::Intmp>().value(), 31);
 
-  h = translator.translate_expr(
+  h = tlsystem.translate_expr(
     U"(fact + #i) @ [time:0, n:3, i:25, h:50, j:60]");
   BOOST_REQUIRE(h != 0);
   v = (*h)(k);

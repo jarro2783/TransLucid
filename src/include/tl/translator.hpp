@@ -30,7 +30,6 @@ along with TransLucid; see the file COPYING.  If not see
 //#include <tl/lexer.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_api.hpp>
-#include <tl/system.hpp>
 #include <tl/types.hpp>
 
 namespace TransLucid
@@ -41,13 +40,12 @@ namespace TransLucid
     class lex_tl_tokens;
   }
 
-  typedef std::pair<Parser::ParsedEquation, TranslatedEquation> PTEquation;
-  typedef std::vector<PTEquation> PTEquationVector;
-
   namespace detail
   {
     class AllParsers;
   }
+
+  class SystemHD;
 
   /**
    * Translator class. Drives the parser.
@@ -159,7 +157,7 @@ namespace TransLucid
       UUIDToParsedEquation::const_iterator m_iter;
     };
 
-    Translator();
+    Translator(SystemHD& system);
     ~Translator();
 
     /**
@@ -221,10 +219,7 @@ namespace TransLucid
      * @param s The name of the library to load.
      */
     void
-    loadLibrary(const u32string& s)
-    {
-      m_lt.loadLibrary(s, &m_system);
-    }
+    loadLibrary(const u32string& s);
 
     /**
      * The AST of the last expression parsed. When translate_expr is called,
@@ -281,7 +276,7 @@ namespace TransLucid
 
     detail::AllParsers* m_parsers;
 
-    SystemHD m_system;
+    SystemHD& m_system;
 
     ExprCompiler m_compiler;
 

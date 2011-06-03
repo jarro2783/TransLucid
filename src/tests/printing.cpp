@@ -21,14 +21,14 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/test/included/unit_test.hpp>
 
 #include <tl/tree_printer.hpp>
-#include <tl/translator.hpp>
+#include <tl/system.hpp>
 #include <tl/ast.hpp>
 
 using namespace TransLucid;
 
 namespace
 {
-Translator translator;
+SystemHD tlsystem;
 std::string generated;
 }
 
@@ -64,10 +64,10 @@ BOOST_AUTO_TEST_CASE ( integer )
 BOOST_AUTO_TEST_CASE ( tuple )
 {
   u32string input = U"[1:1]";
-  translator.translate_expr(input);
+  tlsystem.translate_expr(input);
 
   generated.clear();
-  generated = print_expr_tree(translator.lastExpression());
+  generated = print_expr_tree(tlsystem.lastExpression());
 
   BOOST_CHECK_EQUAL(generated, "[1:1]");
 }
@@ -75,10 +75,10 @@ BOOST_AUTO_TEST_CASE ( tuple )
 BOOST_AUTO_TEST_CASE ( hash_expr )
 {
   u32string input(U"#1");
-  translator.translate_expr(input);
+  tlsystem.translate_expr(input);
 
   generated.clear();
-  generated = print_expr_tree(translator.lastExpression());
+  generated = print_expr_tree(tlsystem.lastExpression());
 
   BOOST_CHECK_EQUAL(generated, "(#1)");
 }
@@ -86,10 +86,10 @@ BOOST_AUTO_TEST_CASE ( hash_expr )
 BOOST_AUTO_TEST_CASE ( at )
 {
   u32string input(U"#1 @ [1:2]");
-  translator.translate_expr(input);
+  tlsystem.translate_expr(input);
 
   generated.clear();
-  generated = print_expr_tree(translator.lastExpression());
+  generated = print_expr_tree(tlsystem.lastExpression());
 
   BOOST_CHECK_EQUAL(generated, "((#1)@[1:2])");
 }

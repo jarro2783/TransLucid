@@ -149,6 +149,8 @@ namespace TransLucid
     };
   }
 
+  typedef std::pair<Parser::ParsedEquation, TranslatedEquation> PTEquation;
+  typedef std::vector<PTEquation> PTEquationVector;
 }
 
 #endif

@@ -22,8 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
  * The main tlcore driver file.
  */
 
-#if 0
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -164,12 +162,5 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  return 0;
-}
-
-#endif
-
-int main()
-{
   return 0;
 }
