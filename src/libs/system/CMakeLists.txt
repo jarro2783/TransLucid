@@ -10,7 +10,7 @@ ast.cpp bestfit.cpp builtin_types.cpp
 compiled_functors.cpp dimtranslator.cpp 
 equation.cpp equation_parser.cpp expr_compiler.cpp 
 expr_parser.cpp header.cpp lexer.cpp lexer_util.cpp library.cpp 
-parser.cpp printer.cpp
+line_tokenizer.cpp parser.cpp printer.cpp
 range.cpp set_types.cpp system.cpp translator.cpp tree_printer.cpp
 tuple_parser.cpp types.cpp utility.cpp valuehd.cpp
 )
