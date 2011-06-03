@@ -34,6 +34,8 @@ namespace TransLucid
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     Equation;
 
+    typedef std::tuple<u32string, u32string, mpz_class> BinopHeader;
+
     /**
      * Prints an equation.
      * Prints to a string.
@@ -151,6 +153,7 @@ namespace TransLucid
 
   typedef std::pair<Parser::Equation, TranslatedEquation> PTEquation;
   typedef std::vector<PTEquation> PTEquationVector;
+
 }
 
 #endif

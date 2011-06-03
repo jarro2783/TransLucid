@@ -389,44 +389,84 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
   }
 
   auto iter = lineTypes.find(firstWord);
-  LineType type;
   if (iter != lineTypes.end())
   {
+    LineType type;
     type = iter->second;
-  }
 
-  switch (type)
-  {
-    case LINE_EQN:
+    switch (type)
     {
-      auto result = m_translator->parseEquation(current, end);
+      case LINE_EQN:
+      {
+        auto result = m_translator->parseEquation(current, end);
+        if (result.first)
+        {
+          return addEquation(result.second);
+        }
+        else
+        {
+        }
+      }
+      break;
+
+      case LINE_ASSIGN:
+      //parse an assignment
+      break;
+
+      case LINE_DIM:
+      //parse dim
+      {
+        auto result = m_translator->parseHeaderString(current, end);
+        if (result.first)
+        {
+          addDimension(result.second);
+        }
+      }
+      break;
+
+      case LINE_INFIXL:
+      case LINE_INFIXR:
+      case LINE_INFIXN:
+      //parse binary
+      {
+        auto result = m_translator->parseHeaderBinary(current, end); 
+      }
+      break;
+
+      case LINE_LIBRARY:
+      //parse library
+      {
+        auto result = m_translator->parseHeaderString(current, end);
+        if (result.first)
+        {
+          loadLibrary(result.second);
+        }
+      }
+      break;
+
+      case LINE_PREFIX:
+      case LINE_POSTFIX:
+      //parse unary
+      break;
     }
-    break;
-
-    case LINE_ASSIGN:
-    //parse an assignment
-    break;
-
-    case LINE_DIM:
-    //parse dim
-    case LINE_INFIXL:
-    case LINE_INFIXR:
-    case LINE_INFIXN:
-    //parse binary
-    break;
-
-    case LINE_LIBRARY:
-    //parse library
-    break;
-
-    case LINE_PREFIX:
-    case LINE_POSTFIX:
-    //parse unary
-    break;
+  }
+  else
+  {
+    //invalid keyword
   }
 
   //return std::make_tuple(
   
+}
+
+Constant
+System::addEquation(const Parser::Equation& eqn)
+{
+}
+
+Constant 
+System::addDimension(const u32string& dimension)
+{
 }
 
 } //namespace TransLucid

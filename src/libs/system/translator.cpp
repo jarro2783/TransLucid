@@ -80,8 +80,6 @@ namespace
       eqn
     ;
   };
-  
-  
 }
 
 namespace detail
@@ -93,6 +91,8 @@ namespace detail
     , m_expr(h, m_lexer)
     , m_equation(m_lexer)
     , m_header_grammar(m_lexer)
+    , m_header_binary(m_lexer)
+    , m_header_string(m_lexer)
     {
       m_expr.set_tuple(m_tuple);
       m_tuple.set_expr(m_expr);
@@ -109,6 +109,8 @@ namespace detail
     Parser::EquationGrammar<Parser::iterator_t> m_equation;
     Parser::TupleGrammar<Parser::iterator_t> m_tuple;
     Parser::HeaderGrammar<Parser::iterator_t> m_header_grammar;
+    Parser::HeaderBinopGrammar<Parser::iterator_t> m_header_binary;
+    Parser::HeaderStringGrammar<Parser::iterator_t> m_header_string;
   };
 }
 
@@ -164,7 +166,7 @@ Translator::translate_expr(const u32string& u32s)
   );
   Tree::Expr e;
   
-  bool r = boost::spirit::lex::tokenize_and_parse(
+  bool success = boost::spirit::lex::tokenize_and_parse(
     pos,
     Lexer::base_iterator_t(),
     m_parsers->m_lexer,
@@ -174,7 +176,7 @@ Translator::translate_expr(const u32string& u32s)
   //std::cerr << "pos at: ";
   //std::cerr << *pos << std::endl;
 
-  if (r == false)
+  if (success == false)
   {
     std::cerr << "failed to parse" << std::endl;
   }
@@ -214,7 +216,6 @@ Translator::parseEquation
 
   return std::make_pair(success, eqn);
 }
-
 
 PTEquationVector
 Translator::translate_equation_set(const u32string& s)
@@ -311,7 +312,7 @@ Translator::parse_header(const u32string& s)
     Parser::makeUTF32Iterator(s.end()));
   std::vector<int> test;
 
-  bool r = boost::spirit::lex::tokenize_and_parse(
+  bool success = boost::spirit::lex::tokenize_and_parse(
     pos,
     Lexer::base_iterator_t(),
     m_parsers->m_lexer,
@@ -321,7 +322,45 @@ Translator::parse_header(const u32string& s)
   //load any more libraries specified in the header
   loadLibraries();
 
-  return (r && pos == Lexer::base_iterator_t());
+  return (success && pos == Lexer::base_iterator_t());
+}
+
+std::pair<bool, Parser::BinopHeader>
+Translator::parseHeaderBinary
+(
+  Parser::U32Iterator& begin, 
+  const Parser::U32Iterator& end
+)
+{
+  Parser::BinopHeader op;
+  bool success = boost::spirit::lex::tokenize_and_parse(
+    begin,
+    end,
+    m_parsers->m_lexer,
+    m_parsers->m_header_binary,
+    op
+  );
+
+  return std::make_pair(success, op);
+}
+
+std::pair<bool, u32string>
+Translator::parseHeaderString
+(
+  Parser::U32Iterator& begin, 
+  const Parser::U32Iterator& end
+)
+{
+  u32string arg;
+  bool success = boost::spirit::lex::tokenize_and_parse(
+    begin,
+    end,
+    m_parsers->m_lexer,
+    m_parsers->m_header_string,
+    arg
+  );
+
+  return std::make_pair(success, arg);
 }
 
 void

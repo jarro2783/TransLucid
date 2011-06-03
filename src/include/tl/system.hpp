@@ -90,6 +90,12 @@ namespace TransLucid
     }
 
     Constant
+    addEquation(const Parser::Equation& eqn);
+
+    Constant 
+    addDimension(const u32string& dimension);
+
+    Constant
     parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end);
 
     //what is the input?

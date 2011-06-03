@@ -32,6 +32,80 @@ namespace TransLucid
     namespace ph = boost::phoenix;
     using namespace ph;
 
+    template <typename Iterator>
+    class HeaderBinopGrammar : public qi::grammar<Iterator, BinopHeader()>
+    {
+      public:
+
+      template <typename TokenDef>
+      HeaderBinopGrammar(TokenDef& tok)
+      : HeaderBinopGrammar::base_type(r_binop)
+      {
+        using namespace qi::labels;
+        r_constant %= tok.constantINTERPRET_ | tok.constantRAW_;
+
+        r_binop = (r_constant > r_constant > tok.integer_
+          > tok.dblsemi_)
+          [
+            _val = ph::bind(&buildBinop, _1, _2, _3)
+          ]
+        ;
+
+      }
+      
+      static BinopHeader
+      buildBinop
+      (
+        const std::pair<u32string, u32string>& symbol,
+        const std::pair<u32string, u32string>& name,
+        const mpz_class& precedence
+      )
+      {
+        if (symbol.first != U"ustring" || name.first != U"ustring")
+        {
+        }
+
+        return BinopHeader(symbol.second, name.second, precedence);
+      }
+
+      qi::rule<Iterator, BinopHeader()> r_binop;
+      qi::rule<Iterator, std::pair<u32string, u32string>()> r_constant;
+    };
+
+    //a grammar which parses just one constant and accepts just a string
+    template <typename Iterator>
+    class HeaderStringGrammar :
+      public qi::grammar<Iterator, u32string()>
+    {
+      public:
+
+      template <typename TokenDef>
+      HeaderStringGrammar(TokenDef& tok)
+      : HeaderStringGrammar::base_type(r_constant)
+      {
+        using namespace qi::labels;
+        r_constant = 
+          (tok.constantINTERPRET_ | tok.constantRAW_)
+          [
+            _val = ph::bind(&buildString, _1)
+          ]
+        ;
+      }
+
+      static u32string
+      buildString(const std::pair<u32string, u32string>& literal)
+      {
+        if (literal.first != U"ustring")
+        {
+        }
+
+        return literal.second;
+      }
+
+      qi::rule<Iterator, u32string()> r_constant;
+
+    };
+
     /**
      * The header grammar. The grammar required to parse a TransLucid header.
      */

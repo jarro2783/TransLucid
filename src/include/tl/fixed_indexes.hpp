@@ -18,6 +18,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file fixed_indexes.hpp
+ * Defines all the builtin index values.
+ */
+
 #ifndef FIXED_INDEXES_HPP_INCLUDED
 #define FIXED_INDEXES_HPP_INCLUDED
 

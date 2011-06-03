@@ -201,6 +201,20 @@ namespace TransLucid
       const Parser::U32Iterator& end
     );
 
+    std::pair<bool, Parser::BinopHeader>
+    parseHeaderBinary
+    (
+      Parser::U32Iterator& begin, 
+      const Parser::U32Iterator& end
+    );
+
+    std::pair<bool, u32string>
+    parseHeaderString
+    (
+      Parser::U32Iterator& begin, 
+      const Parser::U32Iterator& end
+    );
+
     /**
      * The Translator's system.
      * @return The System belonging to the Translator.
