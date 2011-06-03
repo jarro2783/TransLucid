@@ -195,24 +195,24 @@ namespace TransLucid
      * A constant expression node. The representation of type<value> 
      * after being parsed.
      */
-    struct ConstantExpr
+    struct LiteralExpr
     {
-      ConstantExpr() = default;
+      LiteralExpr() = default;
 
       /**
-       * ConstantExpr constructor.
+       * LiteralExpr constructor.
        * @param type type name.
        * @param text the text in the <>.
        */
-      ConstantExpr(const u32string& type, const u32string& text)
+      LiteralExpr(const u32string& type, const u32string& text)
       : type(type), text(text)
       {}
 
       /**
-       * Construct a ConstantExpr from a pair.
+       * Construct a LiteralExpr from a pair.
        * @param value The pair representing the constant.
        */
-      ConstantExpr(const std::pair<u32string, u32string>& value)
+      LiteralExpr(const std::pair<u32string, u32string>& value)
       : type(value.first), text(value.second)
       {
       }
@@ -273,11 +273,10 @@ namespace TransLucid
     // Not defined in ast.hpp
     class OpExpr;
     class RangeExpr;
-    //TODO: rename ConstantExpr to TypedValueExpr
+
     /**
      * Abstract syntax tree node. A single expression node in the 
      * abstract syntax tree which is created by the parser.
-     * @todo rename ConstantExpr to TypedValueExpr
      */
     typedef boost::variant
     <
@@ -287,7 +286,7 @@ namespace TransLucid
       mpz_class,          //replaces IntegerExpr
       char32_t,           //replaces UcharExpr
       u32string,          //replaces StringExpr
-      ConstantExpr,
+      LiteralExpr,
       DimensionExpr,
       IdentExpr,
       boost::recursive_wrapper<ParenExpr>,
@@ -630,7 +629,7 @@ namespace TransLucid
     } \
 
     PRINT_NODE(nil)
-    PRINT_NODE(ConstantExpr)
+    PRINT_NODE(LiteralExpr)
     PRINT_NODE(DimensionExpr)
     PRINT_NODE(IdentExpr)
     PRINT_NODE(ParenExpr)

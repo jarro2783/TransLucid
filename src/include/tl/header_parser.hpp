@@ -79,12 +79,7 @@ namespace TransLucid
             > expr
            )
            [
-             ph::bind
-             (
-               &HeaderGrammar::addLibraryInternal,
-               _r1,
-               _2
-             )
+             ph::bind(&addLibraryInternal, _r1, _2)
            ]
          | (
               tok.unary_
@@ -92,11 +87,7 @@ namespace TransLucid
            >  expr
            )
            [
-             ph::bind
-             (
-               &HeaderGrammar<Iterator>::addUnary, 
-               _r1, _1, _2, _3
-              )
+             ph::bind(&addUnary, _r1, _1, _2, _3)
            ]
          ;
 

@@ -44,7 +44,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 BOOST_FUSION_ADAPT_STRUCT
 (
-  TransLucid::Tree::ConstantExpr,
+  TransLucid::Tree::LiteralExpr,
   (std::u32string, type)
   (std::u32string, text)
 )
@@ -225,7 +225,7 @@ namespace TransLucid
       karma::rule<Iterator, mpz_class()> integer;
       karma::rule<Iterator, u32string()> ustring;
       karma::rule<Iterator, char32_t()> uchar;
-      karma::rule<Iterator, Tree::ConstantExpr()> constant;
+      karma::rule<Iterator, Tree::LiteralExpr()> constant;
       karma::rule<Iterator, Tree::DimensionExpr()> dimension;
       karma::rule<Iterator, Tree::IdentExpr()> ident;
       karma::rule<Iterator, Tree::ParenExpr()> paren_expr;

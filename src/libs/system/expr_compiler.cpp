@@ -98,7 +98,7 @@ ExprCompiler::operator()(const u32string& s)
 }
 
 HD*
-ExprCompiler::operator()(const Tree::ConstantExpr& e)
+ExprCompiler::operator()(const Tree::LiteralExpr& e)
 {
   return new Hyperdatons::TypedValueHD(m_system, e.type, e.text);
 }

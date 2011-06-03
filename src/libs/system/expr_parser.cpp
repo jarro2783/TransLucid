@@ -57,7 +57,7 @@ namespace TransLucid
     /**
      * Construct a constant with a type.
      * When the type is ustring or uchar, it constructs the actual ustring
-     * or uchar. Otherwise it constructs a Tree::ConstantExpr.
+     * or uchar. Otherwise it constructs a Tree::LiteralExpr.
      */
     construct_typed_constant(const std::pair<u32string, u32string>& c)
     {
@@ -75,7 +75,7 @@ namespace TransLucid
         }
         return v;
       } else {
-        return Tree::ConstantExpr(type, value);
+        return Tree::LiteralExpr(type, value);
       }
     }
 

@@ -44,7 +44,7 @@ namespace TransLucid
     HD* operator()(const mpz_class& i);
     HD* operator()(char32_t c);
     HD* operator()(const u32string& s);
-    HD* operator()(const Tree::ConstantExpr& e);
+    HD* operator()(const Tree::LiteralExpr& e);
     HD* operator()(const Tree::DimensionExpr& e);
     HD* operator()(const Tree::IdentExpr& e);
     HD* operator()(const Tree::ParenExpr& e);
