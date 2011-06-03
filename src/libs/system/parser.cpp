@@ -83,7 +83,7 @@ operator<<(std::ostream& os, const Header& h)
 }
 
 std::string
-printEquation(const ParsedEquation& e)
+printEquation(const Equation& e)
 {
   //typedef std::back_insert_iterator<std::string> out_iter;
   //Printer::ExprPrinter<out_iter> print_grammar;

@@ -27,10 +27,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/expr_compiler.hpp>
 #include <tl/workshop.hpp>
-//#include <tl/lexer.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/types.hpp>
+#include <tl/parser_iterator.hpp>
 
 namespace TransLucid
 {
@@ -53,13 +53,13 @@ namespace TransLucid
   class Translator
   {
     private:
-    typedef std::map<uuid, Parser::ParsedEquation> UUIDToParsedEquation;
+    typedef std::map<uuid, Parser::Equation> UUIDToEquation;
 
     public:
 
     /**
      * An iterator into a list of equations. EquationIterator is a façade
-     * to UUIDToParsedEquation.
+     * to UUIDToEquation.
      */
     class EquationIterator
     {
@@ -68,7 +68,7 @@ namespace TransLucid
        * Construct an EquationIterator.
        * @param iter The underlying iterator.
        */
-      EquationIterator(const UUIDToParsedEquation::const_iterator& iter)
+      EquationIterator(const UUIDToEquation::const_iterator& iter)
       : m_iter(iter)
       {
       }
@@ -154,7 +154,7 @@ namespace TransLucid
       std::string print() const;
 
       private:
-      UUIDToParsedEquation::const_iterator m_iter;
+      UUIDToEquation::const_iterator m_iter;
     };
 
     Translator(System& system);
@@ -174,7 +174,7 @@ namespace TransLucid
      * that the Translator has.
      * @param s The string representing the equation set.
      */
-    std::list<std::pair<uuid, Parser::ParsedEquation>>
+    std::list<std::pair<uuid, Parser::Equation>>
     translate_and_add_equation_set(const u32string& s);
 
     /**
@@ -193,6 +193,13 @@ namespace TransLucid
      */
     bool
     parse_header(const u32string& s);
+
+    std::pair<bool, Parser::Equation>
+    parseEquation
+    (
+      Parser::U32Iterator& begin, 
+      const Parser::U32Iterator& end
+    );
 
     /**
      * The Translator's system.
@@ -283,7 +290,7 @@ namespace TransLucid
     Libtool m_lt;
 
     Tree::Expr m_lastExpr;
-    UUIDToParsedEquation m_uuidParsedEqns;
+    UUIDToEquation m_uuidParsedEqns;
 
     unsigned int m_nextLib;
   };

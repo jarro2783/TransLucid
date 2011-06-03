@@ -35,7 +35,7 @@ namespace
 
   template <typename Iterator>
   class EquationSetGrammar
-  : public qi::grammar<Iterator, std::vector<Parser::ParsedEquation>()>
+  : public qi::grammar<Iterator, std::vector<Parser::Equation>()>
   {
     public:
     template <typename T, typename TokenDef>
@@ -68,13 +68,13 @@ namespace
     qi::rule
     <
       Iterator,
-      std::vector<Parser::ParsedEquation>()
+      std::vector<Parser::Equation>()
     > equations;
 
     qi::rule
     <
       Iterator,
-      Parser::ParsedEquation()
+      Parser::Equation()
     >
       one_equation,
       eqn
@@ -196,6 +196,26 @@ Translator::translate_expr(const u32string& u32s)
   return m_compiler.compile_top_level(e);
 }
 
+std::pair<bool, Parser::Equation>
+Translator::parseEquation
+(
+  Parser::U32Iterator& begin, 
+  const Parser::U32Iterator& end
+)
+{
+  Parser::Equation eqn;
+  bool success = boost::spirit::lex::tokenize_and_parse(
+    begin,
+    end,
+    m_parsers->m_lexer,
+    m_parsers->m_equation,
+    eqn
+  );
+
+  return std::make_pair(success, eqn);
+}
+
+
 PTEquationVector
 Translator::translate_equation_set(const u32string& s)
 {
@@ -205,7 +225,7 @@ Translator::translate_equation_set(const u32string& s)
 
   EquationSetGrammar<Parser::iterator_t> equation_set
     (m_parsers->m_equation, m_parsers->m_lexer);
-  std::vector<Parser::ParsedEquation> parsedEquations;
+  std::vector<Parser::Equation> parsedEquations;
 
   bool success = boost::spirit::lex::tokenize_and_parse(
     pos,
@@ -264,11 +284,11 @@ Translator::translate_equation_set(const u32string& s)
   return equations;
 }
 
-std::list<std::pair<uuid, Parser::ParsedEquation>>
+std::list<std::pair<uuid, Parser::Equation>>
 Translator::translate_and_add_equation_set(const u32string& s)
 {
   PTEquationVector equations = translate_equation_set(s);
-  std::list<std::pair<uuid, Parser::ParsedEquation>> added;
+  std::list<std::pair<uuid, Parser::Equation>> added;
 
   BOOST_FOREACH(auto& ptv, equations)
   {

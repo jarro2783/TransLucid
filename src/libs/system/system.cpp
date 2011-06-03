@@ -43,7 +43,8 @@ namespace
     LINE_INFIXR,
     LINE_INFIXN,
     LINE_LIBRARY,
-    LINE_EXPR
+    LINE_POSTFIX,
+    LINE_PREFIX
   };
 
   class UniqueWS : public WS
@@ -327,7 +328,7 @@ System::translate_expr(const u32string& s)
   return m_translator->translate_expr(s);
 }
 
-std::list<std::pair<uuid, Parser::ParsedEquation>>
+std::list<std::pair<uuid, Parser::Equation>>
 System::translate_and_add_equation_set(const u32string& s)
 {
   return m_translator->translate_and_add_equation_set(s);
@@ -364,7 +365,7 @@ System::lastExpression() const
 }
 
 Constant
-System::parseLine(const std::string& line)
+System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
 {
   std::unordered_map<u32string, LineType> lineTypes = 
   {
@@ -375,17 +376,12 @@ System::parseLine(const std::string& line)
     {U"infixr", LINE_INFIXR},
     {U"infixn", LINE_INFIXN},
     {U"library", LINE_LIBRARY},
-    {U"expr", LINE_EXPR}
+    {U"prefix", LINE_PREFIX},
+    {U"postfix", LINE_POSTFIX}
   };
 
-  Parser::U32Iterator current
-  (
-    Parser::makeUTF8Iterator(line.begin()),
-    Parser::makeUTF8Iterator(line.end())
-  );
-  Parser::U32Iterator end;
-
   u32string firstWord;
+  Parser::U32Iterator& current = begin;
   while (current != end && *current != ' ')
   {
     firstWord += *current;
@@ -402,7 +398,9 @@ System::parseLine(const std::string& line)
   switch (type)
   {
     case LINE_EQN:
-    m_translator->translate_and_add_equation_set(u32string(current, end));
+    {
+      auto result = m_translator->parseEquation(current, end);
+    }
     break;
 
     case LINE_ASSIGN:
@@ -410,17 +408,24 @@ System::parseLine(const std::string& line)
     break;
 
     case LINE_DIM:
+    //parse dim
     case LINE_INFIXL:
     case LINE_INFIXR:
     case LINE_INFIXN:
-    case LINE_LIBRARY:
-    m_translator->parse_header(utf8_to_utf32(line));
+    //parse binary
     break;
 
-    case LINE_EXPR:
-    //work out something sensible to do here
+    case LINE_LIBRARY:
+    //parse library
+    break;
+
+    case LINE_PREFIX:
+    case LINE_POSTFIX:
+    //parse unary
     break;
   }
+
+  //return std::make_tuple(
   
 }
 

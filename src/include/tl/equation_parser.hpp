@@ -38,7 +38,7 @@ namespace TransLucid
     : public qi::grammar
       <
         Iterator, 
-        ParsedEquation(),
+        Equation(),
         qi::locals<u32string>
       >
     {
@@ -63,7 +63,7 @@ namespace TransLucid
            >> expr
           )
           [
-            _val = construct<ParsedEquation>(_a, _2, _3, _4)
+            _val = construct<Equation>(_a, _2, _3, _4)
           ]
         ;
 
@@ -109,7 +109,7 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, ParsedEquation(), qi::locals<u32string>>
+      qi::rule<Iterator, Equation(), qi::locals<u32string>>
         equation
       ;
 
@@ -128,7 +128,7 @@ namespace TransLucid
 namespace std
 {
   inline ostream&
-  operator<<(ostream& os, const TransLucid::Parser::ParsedEquation& e)
+  operator<<(ostream& os, const TransLucid::Parser::Equation& e)
   {
     os << "parsed equation";
     return os;

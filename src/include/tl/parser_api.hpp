@@ -32,7 +32,7 @@ namespace TransLucid
      * The tuple is defined as: name, | [], & bool, = WS
      */
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
-    ParsedEquation;
+    Equation;
 
     /**
      * Prints an equation.
@@ -41,7 +41,7 @@ namespace TransLucid
      * @return A string representing the equation.
      */
     std::string
-    printEquation(const ParsedEquation& e);
+    printEquation(const Equation& e);
 
     class Header;
 
@@ -149,7 +149,7 @@ namespace TransLucid
     };
   }
 
-  typedef std::pair<Parser::ParsedEquation, TranslatedEquation> PTEquation;
+  typedef std::pair<Parser::Equation, TranslatedEquation> PTEquation;
   typedef std::vector<PTEquation> PTEquationVector;
 }
 

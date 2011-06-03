@@ -19,4 +19,4 @@
 add_subdirectory(libs)
 add_subdirectory(basic)
 add_subdirectory(tests)
-add_subdirectory(tlcore)
+add_subdirectory(tltext)

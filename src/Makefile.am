@@ -17,4 +17,4 @@
 #   <http://www.gnu.org/licenses/>.
 #   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
-SUBDIRS = include libs tests tlcore
+SUBDIRS = include libs tests tltext

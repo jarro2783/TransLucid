@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/equation.hpp>
 #include <tl/physicalhds.hpp>
 #include <tl/parser_api.hpp>
+#include <tl/parser_iterator.hpp>
 
 /**
  * @file system.hpp
@@ -89,7 +90,7 @@ namespace TransLucid
     }
 
     Constant
-    parseLine(const std::string& line);
+    parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end);
 
     //what is the input?
     uuid
@@ -102,7 +103,7 @@ namespace TransLucid
     WS*
     translate_expr(const u32string& s);
 
-    std::list<std::pair<uuid, Parser::ParsedEquation>>
+    std::list<std::pair<uuid, Parser::Equation>>
     translate_and_add_equation_set(const u32string& s);
 
     PTEquationVector
