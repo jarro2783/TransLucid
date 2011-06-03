@@ -27,6 +27,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 
+#include <unordered_set>
+
 /**
  * @file system.hpp
  * The System Hyperdaton header file.
@@ -141,9 +143,6 @@ namespace TransLucid
     buildConstantWS(size_t index);
 
     void
-    addDimensionSymbol(const u32string& s);
-
-    void
     tick();
 
     std::map<u32string, size_t> builtin_name_to_index;
@@ -155,6 +154,9 @@ namespace TransLucid
     m_uuid_generator;
 
     Translator *m_translator;
+
+    //the sets of all the uuids of objects
+    std::unordered_set<uuid> m_dimension_uuids;
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);

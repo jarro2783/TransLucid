@@ -462,11 +462,28 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
 Constant
 System::addEquation(const Parser::Equation& eqn)
 {
+  //simplify, turn into workshops
 }
 
 Constant 
 System::addDimension(const u32string& dimension)
 {
+  //add equation DIM | [name : "dimension"] = true
+  Constant c = addEquation(Parser::Equation(
+    U"DIM", 
+    Tree::TupleExpr({{Tree::DimensionExpr(U"name"), dimension}}), 
+    Tree::Expr(), 
+    true
+  ));
+
+  //add to the set of dimensions
+  if (c.index() != TYPE_INDEX_SPECIAL)
+  {
+    //TODO make the uuid type and then this is where we extract it
+    //m_dimension_uuids.insert(c)
+  }
+
+  return c;
 }
 
 } //namespace TransLucid
