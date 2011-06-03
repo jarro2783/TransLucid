@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef VALUEHD_HPP_INCLUDED
-#define VALUEHD_HPP_INCLUDED
+#ifndef VALUEWS_HPP_INCLUDED
+#define VALUEWS_HPP_INCLUDED
 
 #include <tl/hyperdaton.hpp>
 #include <tl/system.hpp>
@@ -31,64 +31,64 @@ namespace TransLucid
   {
     //TODO: as soon as inheriting constructors is done,
     //      these classes can do
-    //using ValueHD::ValueHD;
-    class ValueHD : public HD
+    //using ValueWS::ValueWS;
+    class ValueWS : public WS
     {
       public:
-      ValueHD(HD* system)
+      ValueWS(WS* system)
       : m_system(system)
       {}
 
       protected:
-      HD* m_system;
+      WS* m_system;
     };
 
-    class BoolHD : public ValueHD
+    class BoolWS : public ValueWS
     {
       public:
       static const char32_t* name;
 
-      BoolHD(HD* system)
-      : ValueHD(system)
+      BoolWS(WS* system)
+      : ValueWS(system)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
     };
 
-    class IntmpHD : public ValueHD
+    class IntmpWS : public ValueWS
     {
       public:
       static const char32_t* name;
 
-      IntmpHD(HD* system)
-      : ValueHD(system)
+      IntmpWS(WS* system)
+      : ValueWS(system)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
     };
 
-    class UCharHD : public ValueHD
+    class UCharWS : public ValueWS
     {
       public:
       static const char32_t* name;
 
-      UCharHD(HD* system)
-      : ValueHD(system)
+      UCharWS(WS* system)
+      : ValueWS(system)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
     };
 
-    class UStringHD : public ValueHD
+    class UStringWS : public ValueWS
     {
       public:
       static const char32_t* name;
 
-      UStringHD(HD* system)
-      : ValueHD(system)
+      UStringWS(WS* system)
+      : ValueWS(system)
       {}
 
       TaggedConstant
@@ -98,4 +98,4 @@ namespace TransLucid
   } //namespace Hyperdatons
 } //namespace TransLucid
 
-#endif // VALUEHD_HPP_INCLUDED
+#endif // VALUEWS_HPP_INCLUDED

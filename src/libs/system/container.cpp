@@ -25,17 +25,17 @@ namespace TransLucid
 {
 
 uuid
-ContainerHD::addExpr(const Tuple& k, HD* e)
+ContainerWS::addExpr(const Tuple& k, WS* e)
 {
 }
 
 TaggedConstant
-ContainerHD::operator()(const Tuple& k)
+ContainerWS::operator()(const Tuple& k)
 {
 }
 
 void
-ContainerHD::push_back(HD* v, int time)
+ContainerWS::push_back(WS* v, int time)
 {
   mpq_class next = m_storage.size() == 0
                  ? mpq_class(0)
@@ -48,7 +48,7 @@ ContainerHD::push_back(HD* v, int time)
 }
 
 void
-ContainerHD::push_front(HD* v, int time)
+ContainerWS::push_front(WS* v, int time)
 {
   mpq_class previous = m_storage.size() == 0
                      ? mpq_class(0)
@@ -61,7 +61,7 @@ ContainerHD::push_front(HD* v, int time)
 }
 
 void
-ContainerHD::replace_at(HD* v, const mpq_class& pos, int time)
+ContainerWS::replace_at(WS* v, const mpq_class& pos, int time)
 {
   Storage::iterator iter = m_storage.lower_bound(pos);
 
@@ -80,7 +80,7 @@ ContainerHD::replace_at(HD* v, const mpq_class& pos, int time)
 }
 
 void
-ContainerHD::insert_before(HD* v, const mpq_class& pos, int time)
+ContainerWS::insert_before(WS* v, const mpq_class& pos, int time)
 {
 
   #if 0
@@ -124,7 +124,7 @@ ContainerHD::insert_before(HD* v, const mpq_class& pos, int time)
 }
 
 void
-ContainerHD::insert_after(HD* v, const mpq_class& pos, int time)
+ContainerWS::insert_after(WS* v, const mpq_class& pos, int time)
 {
   Storage::iterator iter = m_storage.upper_bound(pos);
 
@@ -142,7 +142,7 @@ ContainerHD::insert_after(HD* v, const mpq_class& pos, int time)
 }
 
 void
-ContainerHD::remove
+ContainerWS::remove
 (
   const mpq_class& start,
   const mpq_class& end,

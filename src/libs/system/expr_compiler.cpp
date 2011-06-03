@@ -31,7 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-ExprCompiler::ExprCompiler(SystemHD* system)
+ExprCompiler::ExprCompiler(System* system)
 : m_system(system)
 {
 }
@@ -40,16 +40,16 @@ ExprCompiler::~ExprCompiler()
 {
 }
 
-HD*
+WS*
 ExprCompiler::compile_for_equation(const Tree::Expr& e)
 {
   return boost::apply_visitor(*this, e);
 }
 
-HD*
+WS*
 ExprCompiler::compile_top_level(const Tree::Expr& e)
 {
-  HD* h = boost::apply_visitor(*this, e);
+  WS* h = boost::apply_visitor(*this, e);
 
   if (h == 0)
   {
@@ -57,94 +57,94 @@ ExprCompiler::compile_top_level(const Tree::Expr& e)
   }
   else
   {
-    return new Hyperdatons::SystemEvaluationHD(m_system, h);
+    return new Hyperdatons::SystemEvaluationWS(m_system, h);
   }
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::nil& n)
 {
   return 0;
 }
 
-HD*
+WS*
 ExprCompiler::operator()(bool b)
 {
-  return new Hyperdatons::BoolConstHD(b);
+  return new Hyperdatons::BoolConstWS(b);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(Special::Value s)
 {
-  return new Hyperdatons::SpecialConstHD(s);
+  return new Hyperdatons::SpecialConstWS(s);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const mpz_class& i)
 {
-  return new Hyperdatons::IntmpConstHD(i);
+  return new Hyperdatons::IntmpConstWS(i);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(char32_t c)
 {
-  return new Hyperdatons::UCharConstHD(c);
+  return new Hyperdatons::UCharConstWS(c);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const u32string& s)
 {
-  return new Hyperdatons::UStringConstHD(s);
+  return new Hyperdatons::UStringConstWS(s);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::LiteralExpr& e)
 {
-  return new Hyperdatons::TypedValueHD(m_system, e.type, e.text);
+  return new Hyperdatons::TypedValueWS(m_system, e.type, e.text);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::DimensionExpr& e)
 {
-  return new Hyperdatons::DimensionHD(m_system, e.text);
+  return new Hyperdatons::DimensionWS(m_system, e.text);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::IdentExpr& e)
 {
-  return new Hyperdatons::IdentHD(m_system, e.text);
+  return new Hyperdatons::IdentWS(m_system, e.text);
 }
 
-HD* 
+WS* 
 ExprCompiler::operator()(const Tree::ParenExpr& e)
 {
   return boost::apply_visitor(*this, e.e);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {
-  HD* operand = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::UnaryOpHD(m_system, e.op.op, operand);
+  WS* operand = boost::apply_visitor(*this, e.e);
+  return new Hyperdatons::UnaryOpWS(m_system, e.op.op, operand);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
 {
-  HD* lhs = boost::apply_visitor(*this, e.lhs);
-  HD* rhs = boost::apply_visitor(*this, e.rhs);
+  WS* lhs = boost::apply_visitor(*this, e.lhs);
+  WS* rhs = boost::apply_visitor(*this, e.rhs);
 
-  return new Hyperdatons::BinaryOpHD(m_system, {lhs, rhs}, e.op.op);
+  return new Hyperdatons::BinaryOpWS(m_system, {lhs, rhs}, e.op.op);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::IfExpr& e)
 {
-  HD* condition = boost::apply_visitor(*this, e.condition);
-  HD* then = boost::apply_visitor(*this, e.then);
-  HD* else_ = boost::apply_visitor(*this, e.else_);
+  WS* condition = boost::apply_visitor(*this, e.condition);
+  WS* then = boost::apply_visitor(*this, e.then);
+  WS* else_ = boost::apply_visitor(*this, e.else_);
 
-  std::vector<std::pair<HD*, HD*>> else_ifs;
+  std::vector<std::pair<WS*, WS*>> else_ifs;
 
   for(auto& v : e.else_ifs)
   {
@@ -155,46 +155,46 @@ ExprCompiler::operator()(const Tree::IfExpr& e)
     ));
   }
 
-  return new Hyperdatons::IfHD(condition, then, else_ifs, else_);
+  return new Hyperdatons::IfWS(condition, then, else_ifs, else_);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::HashExpr& e)
 {
-  HD* expr = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::HashHD(m_system, expr);
+  WS* expr = boost::apply_visitor(*this, e.e);
+  return new Hyperdatons::HashWS(m_system, expr);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::TupleExpr& e)
 {
-  std::list<std::pair<HD*, HD*>> elements;
+  std::list<std::pair<WS*, WS*>> elements;
   for(auto& v : e.pairs)
   {
-    HD* lhs = boost::apply_visitor(*this, v.first);
-    HD* rhs = boost::apply_visitor(*this, v.second);
+    WS* lhs = boost::apply_visitor(*this, v.first);
+    WS* rhs = boost::apply_visitor(*this, v.second);
     elements.push_back(std::make_pair(lhs, rhs));
   }
-  return new Hyperdatons::TupleHD(m_system, elements);
+  return new Hyperdatons::TupleWS(m_system, elements);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::AtExpr& e)
 {
-  HD* lhs = boost::apply_visitor(*this, e.lhs);
-  HD* rhs = boost::apply_visitor(*this, e.rhs);
+  WS* lhs = boost::apply_visitor(*this, e.lhs);
+  WS* rhs = boost::apply_visitor(*this, e.rhs);
 
   if (e.absolute)
   {
-    return new Hyperdatons::AtAbsoluteHD(lhs, rhs);
+    return new Hyperdatons::AtAbsoluteWS(lhs, rhs);
   }
   else
   {
-    return new Hyperdatons::AtRelativeHD(lhs, rhs);
+    return new Hyperdatons::AtRelativeWS(lhs, rhs);
   }
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::LambdaExpr& e)
 {
   //generate a new dimension
@@ -213,17 +213,17 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
   Tree::Expr renamed = RenameIdentifier(e.name, uniqueName).rename(e.rhs);
 
   //add alpha = #_uniquedim to the system
-  HD* hashUnique = new HashIndexHD(index);
+  WS* hashUnique = new HashIndexWS(index);
   tuple_t addContext = {{DIM_ID, generate_string(uniqueName)}};
   //m_system->addExpr(Tuple(addContext), hashUnique);
   m_system->addEquation(uniqueName, hashUnique);
 
-  //make a LambdaAbstractionHD
-  HD* rhs = boost::apply_visitor(*this, renamed);
-  return new Hyperdatons::LambdaAbstractionHD(m_system, e.name, index, rhs);
+  //make a LambdaAbstractionWS
+  WS* rhs = boost::apply_visitor(*this, renamed);
+  return new Hyperdatons::LambdaAbstractionWS(m_system, e.name, index, rhs);
 }
 
-HD*
+WS*
 ExprCompiler::operator()(const Tree::PhiExpr& e)
 {
   //generate a new dimension gamma
@@ -234,20 +234,20 @@ ExprCompiler::operator()(const Tree::PhiExpr& e)
 
   //add alpha | hd(#gamma) == j = e.rhs @ [gamma : tl(#gamma)]
 
-  //create a PhiAbstractionHD
+  //create a PhiAbstractionWS
   return 0;
 }
 
-HD* 
+WS* 
 ExprCompiler::operator()(const Tree::ValueAppExpr& e)
 {
-  //create a LambdaApplicationHD with the compiled sub expression
-  HD* lhs = boost::apply_visitor(*this, e.lhs);
-  HD* rhs = boost::apply_visitor(*this, e.rhs);
-  return new Hyperdatons::LambdaApplicationHD(m_system, lhs, rhs);
+  //create a LambdaApplicationWS with the compiled sub expression
+  WS* lhs = boost::apply_visitor(*this, e.lhs);
+  WS* rhs = boost::apply_visitor(*this, e.rhs);
+  return new Hyperdatons::LambdaApplicationWS(m_system, lhs, rhs);
 }
 
-HD* 
+WS* 
 ExprCompiler::operator()(const Tree::NameAppExpr& e)
 {
   return 0;

@@ -34,7 +34,7 @@ struct StringArgType
 
 /**
  * Concatenates strings.
- * A functor which is used with TransLucid::OpHD to concatenate strings.
+ * A functor which is used with TransLucid::OpWS to concatenate strings.
  */
 struct StringAdder
 {
@@ -60,10 +60,10 @@ struct StringAdder
  * @return A hyperdaton which takes two strings in dimensions arg0 and arg1
  * and concatenates them.
  */
-HD*
-create_plus(SystemHD& i)
+WS*
+create_plus(System& i)
 {
-  return new OpHD<StringAdder, 
+  return new OpWS<StringAdder, 
     StringArgType, TYPE_INDEX_USTRING, TYPE_INDEX_USTRING>(i);
 }
 
@@ -75,7 +75,7 @@ create_plus(SystemHD& i)
  * @param i The system hyperdaton.
  */
 void
-register_one_op(HD* hd, SystemHD& i)
+register_one_op(WS* hd, System& i)
 {
   tuple_t guard =
   {
@@ -93,7 +93,7 @@ register_one_op(HD* hd, SystemHD& i)
     }
   };
 
-  i.addEquation(U"OP", GuardHD(Tuple(guard)), hd);
+  i.addEquation(U"OP", GuardWS(Tuple(guard)), hd);
 }
 
 /**
@@ -101,7 +101,7 @@ register_one_op(HD* hd, SystemHD& i)
  * @param i The current system hyperdaton.
  */
 void
-register_string_ops(SystemHD& i)
+register_string_ops(System& i)
 {
   register_one_op(create_plus(i), i);
 }
@@ -118,7 +118,7 @@ extern "C"
  * @param i The current system hyperdaton.
  */
 void
-lib_string_init(TransLucid::SystemHD& i)
+lib_string_init(TransLucid::System& i)
 {
   TransLucid::LibString::register_string_ops(i);
 }

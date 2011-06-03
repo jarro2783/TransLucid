@@ -31,11 +31,11 @@ using namespace TL;
 int
 main(int argc, char *argv[])
 {
-  TL::SystemHD i;
-  HD& h = i;
+  TL::System i;
+  WS& h = i;
 
-  TL::VariableHD x(U"x", &i);
-  TL::Hyperdatons::IntmpConstHD i1(5);
+  TL::VariableWS x(U"x", &i);
+  TL::Hyperdatons::IntmpConstWS i1(5);
   TL::Tuple k;
   x.addExpr(k, &i1);
 
@@ -45,13 +45,13 @@ main(int argc, char *argv[])
 
   //set up the equation guard
   TL::tuple_t guard;
-  TL::Hyperdatons::IntmpConstHD i2(10);
+  TL::Hyperdatons::IntmpConstWS i2(10);
   guard[DIM_VALUE] = Constant(TL::Intmp(10), TL::TYPE_INDEX_INTMP);
 
   //set up the context for addExpr
   tuple_t k2;
   k2[get_dimension_index(&h, U"_validguard")] =
-     Constant(Guard(GuardHD(Tuple(guard))),
+     Constant(Guard(GuardWS(Tuple(guard))),
                 TYPE_INDEX_GUARD);
 
   //x @ [value : 10] = 10;;

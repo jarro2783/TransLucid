@@ -27,12 +27,12 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class ContainerHD : public HD
+  class ContainerWS : public WS
   {
     public:
 
     uuid
-    addExpr(const Tuple& k, HD* e);
+    addExpr(const Tuple& k, WS* e);
 
     TaggedConstant
     operator()(const Tuple& k);
@@ -40,24 +40,24 @@ namespace TransLucid
     private:
 
     void
-    push_back(HD* v, int time);
+    push_back(WS* v, int time);
 
     void
-    push_front(HD* v, int time);
+    push_front(WS* v, int time);
 
     void
-    replace_at(HD* v, const mpq_class& pos, int time);
+    replace_at(WS* v, const mpq_class& pos, int time);
 
     void
-    insert_before(HD* v, const mpq_class& pos, int time);
+    insert_before(WS* v, const mpq_class& pos, int time);
 
     void
-    insert_after(HD* v, const mpq_class& pos, int time);
+    insert_after(WS* v, const mpq_class& pos, int time);
 
     void
     remove(const mpq_class& start, const mpq_class& end, int time);
 
-    typedef boost::tuple<int, int, HD*> SingleValue;
+    typedef boost::tuple<int, int, WS*> SingleValue;
     typedef std::vector<SingleValue> TimedValues;
     typedef std::map<mpq_class, TimedValues> Storage;
 

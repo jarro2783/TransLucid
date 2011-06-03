@@ -29,8 +29,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid 
 {
-  class VariableHD;
-  class EquationHD;
+  class VariableWS;
+  class EquationWS;
 
   /**
    * Computes the best fit for an equation.
@@ -81,7 +81,7 @@ namespace TransLucid
   class CompileBestFit : public BestFit
   {
     public:
-    //CompileBestFit(EquationHD& e, VariableHD& v);
+    //CompileBestFit(EquationWS& e, VariableWS& v);
 
     TaggedConstant operator()(const Tuple& k);
 

@@ -27,13 +27,13 @@ namespace TransLucid
 namespace Hyperdatons
 {
 
-const char32_t* BoolHD::name =      U"bool";
-const char32_t* IntmpHD::name =     U"intmp";
-const char32_t* UCharHD::name =     U"uchar";
-const char32_t* UStringHD::name =   U"ustring";
+const char32_t* BoolWS::name =      U"bool";
+const char32_t* IntmpWS::name =     U"intmp";
+const char32_t* UCharWS::name =     U"uchar";
+const char32_t* UStringWS::name =   U"ustring";
 
 TaggedConstant
-BoolHD::operator()(const Tuple& k)
+BoolWS::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 
@@ -55,7 +55,7 @@ BoolHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-IntmpHD::operator()(const Tuple& k)
+IntmpWS::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 
@@ -79,7 +79,7 @@ IntmpHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-UCharHD::operator()(const Tuple& k)
+UCharWS::operator()(const Tuple& k)
 {
   size_t valueindex = get_dimension_index(m_system, U"text");
   Tuple::const_iterator value = k.find(valueindex);
@@ -102,7 +102,7 @@ UCharHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-UStringHD::operator()(const Tuple& k)
+UStringWS::operator()(const Tuple& k)
 {
   Tuple::const_iterator value = k.find(DIM_TEXT);
 

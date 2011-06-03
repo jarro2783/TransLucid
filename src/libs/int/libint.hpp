@@ -65,7 +65,7 @@ namespace IntLib
     //(
     //  const TransLucid::u32string& text,
     //  const TransLucid::Tuple& k,
-    //  const TransLucid::SystemHD& i
+    //  const TransLucid::System& i
     //)
     //{
     //  return Int<T>(boost::lexical_cast<T>(text));

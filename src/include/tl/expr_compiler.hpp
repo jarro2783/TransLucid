@@ -30,38 +30,38 @@ namespace TransLucid
   {
     public:
     //boost::apply_visitor requires this
-    typedef HD* result_type;
+    typedef WS* result_type;
 
-    ExprCompiler(SystemHD* system);
+    ExprCompiler(System* system);
     ~ExprCompiler();
 
-    HD* compile_for_equation(const Tree::Expr&);
-    HD* compile_top_level(const Tree::Expr&);
+    WS* compile_for_equation(const Tree::Expr&);
+    WS* compile_top_level(const Tree::Expr&);
 
-    HD* operator()(const Tree::nil& n);
-    HD* operator()(bool b);
-    HD* operator()(Special::Value s);
-    HD* operator()(const mpz_class& i);
-    HD* operator()(char32_t c);
-    HD* operator()(const u32string& s);
-    HD* operator()(const Tree::LiteralExpr& e);
-    HD* operator()(const Tree::DimensionExpr& e);
-    HD* operator()(const Tree::IdentExpr& e);
-    HD* operator()(const Tree::ParenExpr& e);
-    HD* operator()(const Tree::UnaryOpExpr& e);
-    HD* operator()(const Tree::BinaryOpExpr& e);
-    HD* operator()(const Tree::IfExpr& e);
-    HD* operator()(const Tree::HashExpr& e);
-    HD* operator()(const Tree::TupleExpr& e);
-    HD* operator()(const Tree::AtExpr& e);
-    HD* operator()(const Tree::PhiExpr& e);
-    HD* operator()(const Tree::LambdaExpr& e);
-    HD* operator()(const Tree::NameAppExpr& e);
-    HD* operator()(const Tree::ValueAppExpr& e);
+    WS* operator()(const Tree::nil& n);
+    WS* operator()(bool b);
+    WS* operator()(Special::Value s);
+    WS* operator()(const mpz_class& i);
+    WS* operator()(char32_t c);
+    WS* operator()(const u32string& s);
+    WS* operator()(const Tree::LiteralExpr& e);
+    WS* operator()(const Tree::DimensionExpr& e);
+    WS* operator()(const Tree::IdentExpr& e);
+    WS* operator()(const Tree::ParenExpr& e);
+    WS* operator()(const Tree::UnaryOpExpr& e);
+    WS* operator()(const Tree::BinaryOpExpr& e);
+    WS* operator()(const Tree::IfExpr& e);
+    WS* operator()(const Tree::HashExpr& e);
+    WS* operator()(const Tree::TupleExpr& e);
+    WS* operator()(const Tree::AtExpr& e);
+    WS* operator()(const Tree::PhiExpr& e);
+    WS* operator()(const Tree::LambdaExpr& e);
+    WS* operator()(const Tree::NameAppExpr& e);
+    WS* operator()(const Tree::ValueAppExpr& e);
 
     private:
     //the system to compile with
-    SystemHD* m_system;
+    System* m_system;
   };
 
 } //namespace TransLucid

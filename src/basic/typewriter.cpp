@@ -27,7 +27,7 @@ namespace TL = TransLucid;
 int main(int argc, char *argv[])
 {
   TL::Translator translator;
-  TL::HD* h = translator.translate_expr(U"42");
+  TL::WS* h = translator.translate_expr(U"42");
 
   TL::TaggedConstant v = (*h)(TL::Tuple());
   std::cout << v.first.value<TL::Intmp>().value().get_ui() << std::endl;

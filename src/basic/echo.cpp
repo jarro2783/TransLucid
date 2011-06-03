@@ -28,23 +28,23 @@ along with TransLucid; see the file COPYING.  If not see
 using namespace TransLucid;
 using boost::assign::map_list_of;
 
-class Receiver : public HD
+class Receiver : public WS
 {
   public:
   TaggedConstant operator()(const Tuple& k);
 
-  uuid addExpr(const Tuple& k, HD *h);
+  uuid addExpr(const Tuple& k, WS *h);
 
   private:
   TaggedConstant m_value;
 };
 
-class Sender : public HD
+class Sender : public WS
 {
   public:
   TaggedConstant operator()(const Tuple& k);
 
-  uuid addExpr(const Tuple& k, HD* h);
+  uuid addExpr(const Tuple& k, WS* h);
 
   private:
   static const int BUF_SIZE = 1000;
@@ -58,7 +58,7 @@ Receiver::operator()(const Tuple& k)
 }
 
 uuid
-Receiver::addExpr(const Tuple& k, HD* h)
+Receiver::addExpr(const Tuple& k, WS* h)
 {
   Tuple::const_iterator iter = k.find(DIM_VALUE);
   m_value = TaggedConstant(iter->second, k);
@@ -73,7 +73,7 @@ Sender::operator()(const Tuple& k)
 }
 
 uuid
-Sender::addExpr(const Tuple& k, HD* h)
+Sender::addExpr(const Tuple& k, WS* h)
 {
   return boost::uuids::random_generator()();
 }
@@ -81,7 +81,7 @@ Sender::addExpr(const Tuple& k, HD* h)
 int
 main(int argc, char* argv[])
 {
-  SystemHD i;
+  System i;
 
   Receiver r;
   Sender s;
@@ -89,14 +89,14 @@ main(int argc, char* argv[])
   i.addOutput(map_list_of(U"out", &r));
   i.addInput(map_list_of(U"keyboard", &s));
 
-  i.addDemand(U"out", GuardHD());
+  i.addDemand(U"out", GuardWS());
 
   //set out = keyboard
-  Hyperdatons::IdentHD ident(&i, U"keyboard");
+  Hyperdatons::IdentWS ident(&i, U"keyboard");
   tuple_t context =
     map_list_of(size_t(DIM_ID), generate_string(U"out"))
                (get_dimension_index(&i, U"_validguard"),
-                Constant(Guard(GuardHD()),
+                Constant(Guard(GuardWS()),
                 TYPE_INDEX_GUARD));
   i.addExpr(Tuple(context), &ident);
 

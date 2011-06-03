@@ -19,7 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 /**
  * @file compiled_functors.cpp
- * The HDs that implement the evaluation of expressions.
+ * The WSs that implement the evaluation of expressions.
  */
 
 #include <tl/builtin_types.hpp>
@@ -46,7 +46,7 @@ inline void
 contextInsert
 (
   tuple_t& k,
-  HD* h,
+  WS* h,
   const u32string& dim,
   const V& value,
   size_t index
@@ -59,7 +59,7 @@ inline void
 contextInsert
 (
   tuple_t& k,
-  HD* i,
+  WS* i,
   const u32string& dim,
   const Constant& v
 )
@@ -71,7 +71,7 @@ template <typename T>
 class TupleInserter
 {
   public:
-  TupleInserter(tuple_t& k, HD* h, size_t index)
+  TupleInserter(tuple_t& k, WS* h, size_t index)
   : m_k(k), m_h(h), m_index(index)
   {
   }
@@ -86,13 +86,13 @@ class TupleInserter
 
   private:
   tuple_t& m_k;
-  HD* m_h;
+  WS* m_h;
   size_t m_index;
 };
 
 template <typename T>
 TupleInserter<T>
-insert_tuple(tuple_t& k, HD* h, size_t index)
+insert_tuple(tuple_t& k, WS* h, size_t index)
 {
   return TupleInserter<T>(k, h, index);
 }
@@ -100,7 +100,7 @@ insert_tuple(tuple_t& k, HD* h, size_t index)
 }
 
 TaggedConstant
-SystemEvaluationHD::operator()(const Tuple& k)
+SystemEvaluationWS::operator()(const Tuple& k)
 {
   tuple_t newK = k.tuple();
   newK[DIM_TIME] = Constant(Intmp(m_system->theTime()), TYPE_INDEX_INTMP);
@@ -108,7 +108,7 @@ SystemEvaluationHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-BinaryOpHD::operator()(const Tuple& k)
+BinaryOpWS::operator()(const Tuple& k)
 {
   //Constant v1 = (*m_operands.at(0))(k).first;
   //Constant v2 = (*m_operands.at(1))(k).first;
@@ -134,20 +134,20 @@ BinaryOpHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-BoolConstHD::operator()(const Tuple& k)
+BoolConstWS::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
 }
 
 TaggedConstant
-TypeConstHD::operator()(const Tuple& k)
+TypeConstWS::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Type(m_value), TYPE_INDEX_TYPE), k);
 }
 
 
 TaggedConstant
-TypedValueHD::operator()(const Tuple& k)
+TypedValueWS::operator()(const Tuple& k)
 {
   //evaluate CONST
   tuple_t kp = k.tuple();
@@ -169,14 +169,14 @@ TypedValueHD::operator()(const Tuple& k)
 //TODO work out type conversion
 #if 0
 TaggedConstant
-ConvertHD::operator()(const Tuple& k)
+ConvertWS::operator()(const Tuple& k)
 {
   return TaggedConstant();
 }
 #endif
 
 TaggedConstant
-DimensionHD::operator()(const Tuple& k)
+DimensionWS::operator()(const Tuple& k)
 {
   size_t id = get_dimension_index(m_system, m_name);
   return TaggedConstant (Constant(TransLucid::Dimension(id),
@@ -184,7 +184,7 @@ DimensionHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-IdentHD::operator()(const Tuple& k)
+IdentWS::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
 
@@ -207,7 +207,7 @@ IdentHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-IfHD::operator()(const Tuple& k)
+IfWS::operator()(const Tuple& k)
 {
   TaggedConstant cond = (*m_condition)(k);
   Constant& condv = cond.first;
@@ -228,7 +228,7 @@ IfHD::operator()(const Tuple& k)
     else
     {
       //run the elsifs and else
-      std::list<HD*>::const_iterator iter = m_elsifs.begin();
+      std::list<WS*>::const_iterator iter = m_elsifs.begin();
       while (iter != m_elsifs.end())
       {
         //std::auto_ptr<ValueV> cond(makeValue((*iter)->visit(this, d)));
@@ -269,7 +269,7 @@ IfHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-HashHD::operator()(const Tuple& k)
+HashWS::operator()(const Tuple& k)
 {
   TaggedConstant r = (*m_e)(k);
   return lookup_context(m_system, r.first, k);
@@ -309,27 +309,27 @@ HashHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-IntmpConstHD::operator()(const Tuple& k)
+IntmpConstWS::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Intmp(m_value), TYPE_INDEX_INTMP), k);
 }
 
 TaggedConstant
-IsSpecialHD::operator()(const Tuple& k)
+IsSpecialWS::operator()(const Tuple& k)
 {
   //this is going away, but to stop warnings
   return TaggedConstant();
 }
 
 TaggedConstant
-IsTypeHD::operator()(const Tuple& k)
+IsTypeWS::operator()(const Tuple& k)
 {
   //this is going away, but to stop warnings
   return TaggedConstant();
 }
 
 TaggedConstant
-VariableOpHD::operator()(const Tuple& k)
+VariableOpWS::operator()(const Tuple& k)
 {
   tuple_t kp = k.tuple();
 
@@ -338,7 +338,7 @@ VariableOpHD::operator()(const Tuple& k)
 
   int i = 0;
   std::ostringstream os;
-  for(HD* h : m_operands)
+  for(WS* h : m_operands)
   {
     os.str("arg");
     os << i;
@@ -351,7 +351,7 @@ VariableOpHD::operator()(const Tuple& k)
 
 #if 0
 TaggedConstant
-PairHD::operator()(const Tuple& k)
+PairWS::operator()(const Tuple& k)
 {
   TaggedConstant l = (*m_lhs)(k);
   TaggedConstant r = (*m_rhs)(k);
@@ -362,32 +362,32 @@ PairHD::operator()(const Tuple& k)
 #endif
 
 TaggedConstant
-SpecialConstHD::operator()(const Tuple& k)
+SpecialConstWS::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
 }
 
 TaggedConstant
-UStringConstHD::operator()(const Tuple& k)
+UStringConstWS::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(String(m_value), TYPE_INDEX_USTRING), k);
 }
 
 TaggedConstant
-UCharConstHD::operator()(const Tuple& k)
+UCharConstWS::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
 }
 
 TaggedConstant
-UnaryOpHD::operator()(const Tuple& k)
+UnaryOpWS::operator()(const Tuple& k)
 {
   //TODO: resolve what to do with operators
   return TaggedConstant();
 }
 
 TaggedConstant
-TupleHD::operator()(const Tuple& k)
+TupleWS::operator()(const Tuple& k)
 {
   tuple_t kp;
   for(auto& pair : m_elements)
@@ -409,7 +409,7 @@ TupleHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-AtAbsoluteHD::operator()(const Tuple& k)
+AtAbsoluteWS::operator()(const Tuple& k)
 {
   TaggedConstant kp = (*e1)(k);
   if (kp.first.index() != TYPE_INDEX_TUPLE)
@@ -424,7 +424,7 @@ AtAbsoluteHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-AtRelativeHD::operator()(const Tuple& k)
+AtRelativeWS::operator()(const Tuple& k)
 {
   tuple_t kNew = k.tuple();
   TaggedConstant kp = (*e1)(k);
@@ -453,7 +453,7 @@ AtRelativeHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-LambdaAbstractionHD::operator()(const Tuple& k)
+LambdaAbstractionWS::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(LambdaFunctionType(m_name, m_dim, m_rhs),
                                  TYPE_INDEX_FUNCTION), 
@@ -461,7 +461,7 @@ LambdaAbstractionHD::operator()(const Tuple& k)
 }
 
 TaggedConstant
-LambdaApplicationHD::operator()(const Tuple& k)
+LambdaApplicationWS::operator()(const Tuple& k)
 {
   //evaluate the lhs, evaluate the rhs
   //and pass the value to the function to evaluate

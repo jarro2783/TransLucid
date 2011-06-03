@@ -28,7 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-  typedef void (*library_loader)(HD*);
+  typedef void (*library_loader)(WS*);
 
   class Libtool
   {
@@ -38,7 +38,7 @@ namespace TransLucid
     ~Libtool();
 
     void
-    loadLibrary(const u32string& name, HD* system);
+    loadLibrary(const u32string& name, WS* system);
 
     void
     addSearchPath(const u32string& path);

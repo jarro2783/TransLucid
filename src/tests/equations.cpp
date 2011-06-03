@@ -29,7 +29,7 @@ namespace TL = TransLucid;
 
 namespace
 {
-  TL::SystemHD tlsystem;
+  TL::System tlsystem;
 }
 
 struct translator_class {
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE ( simple_expressions )
 BOOST_AUTO_TEST_CASE ( functions )
 {
   std::cerr << "Third test case" << std::endl;
-  TL::HD* h = 0;
+  TL::WS* h = 0;
   TL::TaggedConstant v;
   TL::Tuple k(TL::tuple_t({{TL::DIM_TIME, TL::makeTime(0)}}));
 

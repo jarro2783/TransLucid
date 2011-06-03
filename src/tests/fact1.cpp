@@ -6,7 +6,7 @@ using namespace TransLucid;
 
 int main(int argc, char* argv[])
 {
-  HD* e = 0;
+  WS* e = 0;
   try {
     Translator t;
 

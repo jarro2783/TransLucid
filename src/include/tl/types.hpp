@@ -70,16 +70,16 @@ namespace boost
 namespace TransLucid
 {
 
-  class SystemHD;
+  class System;
 
-  class HD;
+  class WS;
 
-  //class GuardHD;
+  //class GuardWS;
 
   typedef uint16_t type_index;
   typedef std::u32string u32string;
 
-  typedef std::tuple<u32string, HD*, HD*, HD*> TranslatedEquation;
+  typedef std::tuple<u32string, WS*, WS*, WS*> TranslatedEquation;
   typedef std::vector<TranslatedEquation> equation_v;
 
   typedef boost::uuids::uuid uuid;
@@ -368,7 +368,7 @@ namespace TransLucid
     }
 
     //void
-    //print(const SystemHD& i, std::ostream& os, const Tuple& c) const;
+    //print(const System& i, std::ostream& os, const Tuple& c) const;
 
     void print(std::ostream& os) const;
 

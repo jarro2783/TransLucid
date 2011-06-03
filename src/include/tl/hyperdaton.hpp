@@ -25,10 +25,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class HD
+  class WS
   {
     public:
-    virtual ~HD() {}
+    virtual ~WS() {}
 
     virtual TaggedConstant
     operator()(const Tuple& k) = 0;

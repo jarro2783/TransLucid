@@ -35,7 +35,7 @@ namespace
   (
     const u32string& file,
     const u32string& name,
-    HD* system
+    WS* system
   )
   {
     #warning fix library loading
@@ -101,7 +101,7 @@ Libtool::~Libtool()
 }
 
 void
-Libtool::loadLibrary(const u32string& name, HD* system)
+Libtool::loadLibrary(const u32string& name, WS* system)
 {
 
   #if 0

@@ -32,11 +32,11 @@ namespace TransLucid
 namespace
 {
 
-  class UniqueHD : public HD
+  class UniqueWS : public WS
   {
     public:
 
-    UniqueHD(int start)
+    UniqueWS(int start)
     : m_index(start)
     {
     }
@@ -51,11 +51,11 @@ namespace
     mpz_class m_index;
   };
 
-  class DimensionsStringHD : public HD
+  class DimensionsStringWS : public WS
   {
     public:
 
-    DimensionsStringHD(DimensionTranslator& d)
+    DimensionsStringWS(DimensionTranslator& d)
     : m_d(d)
     {}
 
@@ -76,11 +76,11 @@ namespace
     DimensionTranslator& m_d;
   };
 
-  class DimensionsTypedHD : public HD
+  class DimensionsTypedWS : public WS
   {
     public:
 
-    DimensionsTypedHD(DimensionTranslator& d)
+    DimensionsTypedWS(DimensionTranslator& d)
     : m_d(d)
     {}
 
@@ -100,11 +100,11 @@ namespace
     DimensionTranslator& m_d;
   };
 
-  class UniqueDimensionHD : public HD
+  class UniqueDimensionWS : public WS
   {
     public:
 
-    UniqueDimensionHD(DimensionTranslator& d)
+    UniqueDimensionWS(DimensionTranslator& d)
     : m_d(d)
     {
     }
@@ -122,10 +122,10 @@ namespace
 }
 
 template <typename T>
-HD*
-SystemHD::buildConstantHD(size_t index)
+WS*
+System::buildConstantWS(size_t index)
 {
-  HD* h = new T(this);
+  WS* h = new T(this);
 
   tuple_t guard =
   {
@@ -138,29 +138,29 @@ SystemHD::buildConstantHD(size_t index)
   //sets the following
 
   //CONST | [type : ustring<name>]
-  addEquation(U"CONST", GuardHD(Tuple(guard)), h);
+  addEquation(U"CONST", GuardWS(Tuple(guard)), h);
 
   //TYPE_INDEX | [type : ustring<name>] = index;;
   addEquation
   (
     U"TYPE_INDEX", 
-    GuardHD(Tuple(guard)), 
-    new Hyperdatons::IntmpConstHD(index)
+    GuardWS(Tuple(guard)), 
+    new Hyperdatons::IntmpConstWS(index)
   );
   return h;
 }
 
 void
-SystemHD::init_types()
+System::init_types()
 {
   for(auto v : builtin_name_to_index)
   {
-    addEquation(v.first, GuardHD(),
-                        new Hyperdatons::TypeConstHD(v.second));
+    addEquation(v.first, GuardWS(),
+                        new Hyperdatons::TypeConstWS(v.second));
   }
 }
 
-SystemHD::SystemHD()
+System::System()
 : m_time(0),
   builtin_name_to_index
   {
@@ -176,14 +176,14 @@ SystemHD::SystemHD()
   //create the obj, const and fun ids
 
   //we need dimensions and unique to do anything
-  addEquation(U"DIMENSION_NAMED_INDEX", GuardHD(),
-                      new DimensionsStringHD(m_dimTranslator));
-  addEquation(U"DIMENSION_VALUE_INDEX", GuardHD(),
-                      new DimensionsTypedHD(m_dimTranslator));
+  addEquation(U"DIMENSION_NAMED_INDEX", GuardWS(),
+                      new DimensionsStringWS(m_dimTranslator));
+  addEquation(U"DIMENSION_VALUE_INDEX", GuardWS(),
+                      new DimensionsTypedWS(m_dimTranslator));
   addEquation
   (
-    U"_unique", GuardHD(),
-    new UniqueHD(std::max
+    U"_unique", GuardWS(),
+    new UniqueWS(std::max
     (
       static_cast<int>(TYPE_INDEX_LAST),
       static_cast<int>(DIM_INDEX_LAST)
@@ -192,36 +192,36 @@ SystemHD::SystemHD()
 
   addEquation
   (
-    U"_uniquedim", GuardHD(),
-    new UniqueDimensionHD(m_dimTranslator)
+    U"_uniquedim", GuardWS(),
+    new UniqueDimensionWS(m_dimTranslator)
   );
 
   //add this
-  addEquation(U"this", GuardHD(), this);
+  addEquation(U"this", GuardWS(), this);
 
   //add variables for all the types
   //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
   init_types();
 
   //build the constant creators
-  buildConstantHD<Hyperdatons::BoolHD>(TYPE_INDEX_BOOL);
-  buildConstantHD<Hyperdatons::UCharHD>(TYPE_INDEX_UCHAR);
-  HD* intmpHD = buildConstantHD<Hyperdatons::IntmpHD>(TYPE_INDEX_INTMP);
-  buildConstantHD<Hyperdatons::UStringHD>(TYPE_INDEX_USTRING);
+  buildConstantWS<Hyperdatons::BoolWS>(TYPE_INDEX_BOOL);
+  buildConstantWS<Hyperdatons::UCharWS>(TYPE_INDEX_UCHAR);
+  WS* intmpWS = buildConstantWS<Hyperdatons::IntmpWS>(TYPE_INDEX_INTMP);
+  buildConstantWS<Hyperdatons::UStringWS>(TYPE_INDEX_USTRING);
 
   //set this as the default int too
-  addEquation(U"DEFAULTINT", GuardHD(), intmpHD);
+  addEquation(U"DEFAULTINT", GuardWS(), intmpWS);
 
   m_translator = new Translator(*this);
 }
 
-SystemHD::~SystemHD()
+System::~System()
 {
   delete m_translator;
 }
 
 void
-SystemHD::tick()
+System::tick()
 {
   #if 0
   tuple_t current;
@@ -259,7 +259,7 @@ SystemHD::tick()
 }
 
 TaggedConstant
-SystemHD::operator()(const Tuple& k)
+System::operator()(const Tuple& k)
 {
   Tuple::const_iterator iditer = k.find(DIM_ID);
 
@@ -289,14 +289,14 @@ SystemHD::operator()(const Tuple& k)
 }
 
 uuid
-SystemHD::addEquation(const u32string& name, const GuardHD& guard, HD* e)
+System::addEquation(const u32string& name, const GuardWS& guard, WS* e)
 {
   auto i = m_equations.find(name);
-  VariableHD* var = nullptr;
+  VariableWS* var = nullptr;
 
   if (i == m_equations.end())
   {
-    var = new VariableHD(name, this);
+    var = new VariableWS(name, this);
     m_equations.insert(std::make_pair(name, var));
   }
   else
@@ -307,44 +307,44 @@ SystemHD::addEquation(const u32string& name, const GuardHD& guard, HD* e)
   return var->addEquation(name, guard, e, m_time);
 }
 
-HD*
-SystemHD::translate_expr(const u32string& s)
+WS*
+System::translate_expr(const u32string& s)
 {
   return m_translator->translate_expr(s);
 }
 
 std::list<std::pair<uuid, Parser::ParsedEquation>>
-SystemHD::translate_and_add_equation_set(const u32string& s)
+System::translate_and_add_equation_set(const u32string& s)
 {
   return m_translator->translate_and_add_equation_set(s);
 }
 
 PTEquationVector
-SystemHD::translate_equation_set(const u32string& s)
+System::translate_equation_set(const u32string& s)
 {
   return m_translator->translate_equation_set(s);
 }
 
 bool
-SystemHD::parse_header(const u32string& s)
+System::parse_header(const u32string& s)
 {
   return m_translator->parse_header(s);
 }
 
 void
-SystemHD::loadLibrary(const u32string& s)
+System::loadLibrary(const u32string& s)
 {
   m_translator->loadLibrary(s);
 }
 
 Parser::Header&
-SystemHD::header()
+System::header()
 {
   return m_translator->header();
 }
 
 const Tree::Expr&
-SystemHD::lastExpression() const
+System::lastExpression() const
 {
   return m_translator->lastExpression();
 }

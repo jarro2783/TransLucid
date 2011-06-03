@@ -63,7 +63,7 @@ class Grammar :
    * @todo Remove exprs because we don't use it anymore.
    */
   template <typename TokenDef>
-  Grammar(SystemHD& system, ExprList& exprs, bool reactive, bool demands,
+  Grammar(System& system, ExprList& exprs, bool reactive, bool demands,
     Evaluator& evaluate, TokenDef& tok
   )
   : Grammar::base_type(r_program)
@@ -188,12 +188,12 @@ class Grammar :
     r_onetime
   ;
 
-  SystemHD& m_system;
+  System& m_system;
   ExprList& m_exprs;
   Evaluator& m_evaluator;
 
   static void
-  addEquation(SystemHD& system, const Parser::ParsedEquation& eqn,
+  addEquation(System& system, const Parser::ParsedEquation& eqn,
     Evaluator& evaluate
   )
   {
@@ -294,9 +294,9 @@ TLCore::addEquation(const Parser::ParsedEquation& eqn)
     (*m_os) << "eqn<" << Parser::printEquation(eqn) << ">" << std::endl;
   }
 
-  HD* guard = 0;
-  HD* boolean = 0;
-  HD* expr = 0;
+  WS* guard = 0;
+  WS* boolean = 0;
+  WS* expr = 0;
 
   try 
   {
@@ -325,7 +325,7 @@ TLCore::addEquation(const Parser::ParsedEquation& eqn)
 void
 TLCore::addExpression(const Tree::Expr& e)
 {
-  HD* ce = 0;
+  WS* ce = 0;
   
   try {
     ce = m_compiler.compile_top_level(e);
@@ -395,7 +395,7 @@ void TLCore::addNewEquations()
     auto uuid = m_system.addEquation
     (
       std::get<0>(eq),
-      GuardHD(
+      GuardWS(
         std::get<1>(*iter),
         std::get<2>(*iter)
       ),

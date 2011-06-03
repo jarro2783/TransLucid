@@ -208,9 +208,9 @@ tupleRefines(const Tuple& a, const Tuple& b)
 }
 
 bool
-booleanTrue(const GuardHD& g, const Tuple& k)
+booleanTrue(const GuardWS& g, const Tuple& k)
 {
-  HD* b = g.boolean();
+  WS* b = g.boolean();
 
   if (b)
   {
@@ -342,7 +342,7 @@ u32_to_ascii(const u32string& s)
 }
 
 TaggedConstant
-lookup_context(HD* system, const Constant& v, const Tuple& k)
+lookup_context(WS* system, const Constant& v, const Tuple& k)
 {
   size_t index;
   if (v.index() == TYPE_INDEX_DIMENSION)
@@ -379,8 +379,8 @@ tuple_t
 create_add_eqn_context
 (
   const u32string& name,
-  HD* guard,
-  HD* boolean,
+  WS* guard,
+  WS* boolean,
   const mpz_class& time
 )
 {
@@ -389,7 +389,7 @@ create_add_eqn_context
     {DIM_ID, generate_string(name)},
     {
       DIM_VALID_GUARD,
-      Constant(Guard(GuardHD(guard, boolean)),
+      Constant(Guard(GuardWS(guard, boolean)),
                  TYPE_INDEX_GUARD)
     },
     {DIM_TIME, makeTime(time)}

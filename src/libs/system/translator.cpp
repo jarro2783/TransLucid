@@ -112,7 +112,7 @@ namespace detail
   };
 }
 
-Translator::Translator(SystemHD& system)
+Translator::Translator(System& system)
 :  m_header(0)
   ,m_system(system)
   ,m_compiler(&system)
@@ -154,7 +154,7 @@ Translator::~Translator()
   cleanup();
 }
 
-HD*
+WS*
 Translator::translate_expr(const u32string& u32s)
 {
   Lexer::base_iterator_t pos
@@ -223,9 +223,9 @@ Translator::translate_equation_set(const u32string& s)
 
   BOOST_FOREACH(auto& v, parsedEquations)
   {
-    HD* context = m_compiler.compile_for_equation(std::get<1>(v));
-    HD* boolean = m_compiler.compile_for_equation(std::get<2>(v));
-    HD* e = m_compiler.compile_for_equation(std::get<3>(v));
+    WS* context = m_compiler.compile_for_equation(std::get<1>(v));
+    WS* boolean = m_compiler.compile_for_equation(std::get<2>(v));
+    WS* e = m_compiler.compile_for_equation(std::get<3>(v));
     equations.push_back(
       std::make_pair(
       v,
@@ -274,7 +274,7 @@ Translator::translate_and_add_equation_set(const u32string& s)
   {
     auto v = ptv.second;
     uuid id = m_system.addEquation(std::get<0>(v), 
-      GuardHD(std::get<1>(v), std::get<2>(v)), std::get<3>(v));
+      GuardWS(std::get<1>(v), std::get<2>(v)), std::get<3>(v));
 
     m_uuidParsedEqns.insert(std::make_pair(id, ptv.first));
     added.push_back(std::make_pair(id, ptv.first));

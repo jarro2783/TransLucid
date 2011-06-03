@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef PHYSICAL_HDS_HPP_INCLUDED
-#define PHYSICAL_HDS_HPP_INCLUDED
+#ifndef PHYSICAL_WSS_HPP_INCLUDED
+#define PHYSICAL_WSS_HPP_INCLUDED
 
 #include <tl/hyperdaton.hpp>
 
 namespace TransLucid
 {
-  class PhysicalHD : public HD
+  class PhysicalWS : public WS
   {
     public:
 
@@ -33,7 +33,7 @@ namespace TransLucid
   };
 
   //stores a single value no matter the context
-  class SingleValuePhysicalHD : public PhysicalHD
+  class SingleValuePhysicalWS : public PhysicalWS
   {
     public:
     void
@@ -58,7 +58,7 @@ namespace TransLucid
     Constant m_value;
   };
 
-  class ArrayPhysicalHD : public PhysicalHD
+  class ArrayPhysicalWS : public PhysicalWS
   {
   };
 }

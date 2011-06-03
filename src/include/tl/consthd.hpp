@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef CONSTHD_HPP_INCLUDED
-#define CONSTHD_HPP_INCLUDED
+#ifndef CONSTWS_HPP_INCLUDED
+#define CONSTWS_HPP_INCLUDED
 
 #include <tl/hyperdaton.hpp>
 
@@ -32,11 +32,11 @@ namespace TransLucid
    */
   namespace Hyperdatons
   {
-    class TypeConstHD : public HD
+    class TypeConstWS : public WS
     {
       public:
 
-      TypeConstHD(size_t value)
+      TypeConstWS(size_t value)
       : m_value(value)
       {}
 
@@ -52,11 +52,11 @@ namespace TransLucid
      *
      * Returns the same boolean no matter what the context.
      */
-    class BoolConstHD : public HD
+    class BoolConstWS : public WS
     {
       public:
 
-      BoolConstHD(bool value)
+      BoolConstWS(bool value)
       : m_value(value)
       {}
 
@@ -67,10 +67,10 @@ namespace TransLucid
       bool m_value;
     };
 
-    class SpecialConstHD : public HD
+    class SpecialConstWS : public WS
     {
       public:
-      SpecialConstHD(Special::Value v)
+      SpecialConstWS(Special::Value v)
       : m_value(v)
       {}
 
@@ -81,10 +81,10 @@ namespace TransLucid
       Special::Value m_value;
     };
 
-    class IntmpConstHD : public HD
+    class IntmpConstWS : public WS
     {
       public:
-      IntmpConstHD(const mpz_class& value)
+      IntmpConstWS(const mpz_class& value)
       : m_value(value)
       {}
 
@@ -95,10 +95,10 @@ namespace TransLucid
       mpz_class m_value;
     };
 
-    class UCharConstHD : public HD
+    class UCharConstWS : public WS
     {
       public:
-      UCharConstHD(char32_t c)
+      UCharConstWS(char32_t c)
       : m_value(c)
       {}
 
@@ -109,10 +109,10 @@ namespace TransLucid
       char32_t m_value;
     };
 
-    class UStringConstHD : public HD
+    class UStringConstWS : public WS
     {
       public:
-      UStringConstHD(const u32string& s)
+      UStringConstWS(const u32string& s)
       : m_value(s)
       {}
 

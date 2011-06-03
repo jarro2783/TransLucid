@@ -67,13 +67,13 @@ void Char::print(std::ostream& os) const
   os << "uchar<" << utf32_to_utf8(s) << ">";
 }
 
-Guard::Guard(const GuardHD& g)
-: m_g(new GuardHD(g))
+Guard::Guard(const GuardWS& g)
+: m_g(new GuardWS(g))
 {
 }
 
 Guard::Guard(const Guard& rhs)
-: m_g(new GuardHD(*rhs.m_g))
+: m_g(new GuardWS(*rhs.m_g))
 {
 }
 
@@ -85,7 +85,7 @@ FunctionType::applyLambda(const Tuple& k, const Constant& value) const
 }
 
 TaggedConstant
-FunctionType::applyPhi(const Tuple& k, HD* expr) const
+FunctionType::applyPhi(const Tuple& k, WS* expr) const
 {
 }
 

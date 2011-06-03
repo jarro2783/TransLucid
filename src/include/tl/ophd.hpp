@@ -1,4 +1,4 @@
-/* OpHD class.
+/* OpWS class.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -27,7 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  namespace OpHDImp
+  namespace OpWSImp
   {
     /**
      * Transforms a list of something into a list of something else
@@ -96,7 +96,7 @@ namespace TransLucid
        */
       template <typename ...DimIndexes>
       Ret
-      operator()(SystemHD& i, DimIndexes... dims) const
+      operator()(System& i, DimIndexes... dims) const
       {
         return Ret(dims...);
       }
@@ -125,7 +125,7 @@ namespace TransLucid
         typename ...DimIndexes
       >
       Ret 
-      operator()(SystemHD& i, DimIndexes... dims) const
+      operator()(System& i, DimIndexes... dims) const
       {
         std::ostringstream os;
         os << "arg" << N;
@@ -264,7 +264,7 @@ namespace TransLucid
     };
  
     /**
-     * Builds the arguments to an operation HD.
+     * Builds the arguments to an operation WS.
      * @param ArgType A template metafunction which returns the type of the
      * nth argument.
      * @param Args The TransLucid type indices of the arguments.
@@ -307,19 +307,19 @@ namespace TransLucid
    */
   template <typename T, 
     template <int> class ArgType, type_index ...Args>
-  class OpHD : public HD
+  class OpWS : public WS
   {
     private:
     //a tuple of all the argN indexes
-    typedef typename OpHDImp::generate_args_tuple_type<Args...>::type DimsType;
+    typedef typename OpWSImp::generate_args_tuple_type<Args...>::type DimsType;
     DimsType m_args;
 
     //generates all of the args, then extracts them and checks that they
     //are the right type and passes them all to the functor
     public:
-    OpHD(SystemHD& i)
+    OpWS(System& i)
     {
-      m_args = OpHDImp::lookup_index<0, DimsType, std::tuple, Args...>()(i);
+      m_args = OpWSImp::lookup_index<0, DimsType, std::tuple, Args...>()(i);
     }
 
     TaggedConstant operator()(const Tuple& c)
@@ -328,7 +328,7 @@ namespace TransLucid
       //T::operator()(args...)
       //it extracts the arguments out of the context and checks that they are
       //of the right type
-      return OpHDImp::build_arguments<ArgType, Args...>()(m_t, m_args, c);
+      return OpWSImp::build_arguments<ArgType, Args...>()(m_t, m_args, c);
     }
 
     private:

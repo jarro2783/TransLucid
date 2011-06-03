@@ -49,7 +49,7 @@ namespace TransLucid
      * A list of expressions. Stores both the expression tree and the
      * hyperdaton that was generated from it.
      */
-    typedef std::vector<std::pair<Tree::Expr, HD*>> ExprList;
+    typedef std::vector<std::pair<Tree::Expr, WS*>> ExprList;
 
     template <typename Iterator>
     class Grammar;
@@ -194,7 +194,7 @@ namespace TransLucid
       std::istream* m_is;
       std::ostream* m_os;
 
-      SystemHD m_system;
+      System m_system;
       ExprList m_exprs;
       ExprCompiler m_compiler;
 
@@ -205,7 +205,7 @@ namespace TransLucid
       Libtool m_libtool;
 
       //name, guard, boolean, expr
-      typedef std::tuple<u32string, HD*, HD*, HD*> CompiledEquation;
+      typedef std::tuple<u32string, WS*, WS*, WS*> CompiledEquation;
       std::list<CompiledEquation> m_addEquations;
 
       //does the actual adding to the system

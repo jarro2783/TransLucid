@@ -25,9 +25,9 @@ namespace TransLucid
 {
 
 boost::uuids::basic_random_generator<boost::mt19937>
-EquationHD::m_generator;
+EquationWS::m_generator;
 
-VariableHD::VariableHD(const u32string& name, HD* system)
+VariableWS::VariableWS(const u32string& name, WS* system)
 : m_name(name)
  ,m_system(system)
 #if 0
@@ -43,12 +43,12 @@ VariableHD::VariableHD(const u32string& name, HD* system)
 {
 }
 
-VariableHD::~VariableHD()
+VariableWS::~VariableWS()
 {
   //cleanup best fit variables
 }
 
-GuardHD::GuardHD(const GuardHD& other)
+GuardWS::GuardWS(const GuardWS& other)
 : m_guard(other.m_guard)
 , m_boolean(other.m_boolean)
 , m_dimensions(other.m_dimensions)
@@ -75,8 +75,8 @@ GuardHD::GuardHD(const GuardHD& other)
   }
 }
 
-GuardHD& 
-GuardHD::operator=(const GuardHD& rhs)
+GuardWS& 
+GuardWS::operator=(const GuardWS& rhs)
 {
   if (this != &rhs)
   {
@@ -115,7 +115,7 @@ GuardHD::operator=(const GuardHD& rhs)
 }
 
 Tuple
-GuardHD::evaluate(const Tuple& k) const
+GuardWS::evaluate(const Tuple& k) const
 {
   tuple_t t = m_dimensions;
 
@@ -162,20 +162,20 @@ GuardHD::evaluate(const Tuple& k) const
   //TaggedConstant v = (*m_guard)(k);
 }
 
-GuardHD makeGuardWithTime(const mpz_class& start)
+GuardWS makeGuardWithTime(const mpz_class& start)
 {
-  GuardHD g;
+  GuardWS g;
   g.addDimension(DIM_TIME,
     Constant(Range(&start, 0), TYPE_INDEX_RANGE));
   return g;
 }
 
-bool VariableHD::equationValid(const EquationHD& e, const Tuple& k)
+bool VariableWS::equationValid(const EquationWS& e, const Tuple& k)
 {
 }
 
 TaggedConstant
-VariableHD::operator()(const Tuple& k)
+VariableWS::operator()(const Tuple& k)
 {
 
   #if 0
@@ -247,7 +247,7 @@ VariableHD::operator()(const Tuple& k)
     {
       try
       {
-        const GuardHD& guard = eqn_i->second.validContext();
+        const GuardWS& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
         if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
         {
@@ -338,30 +338,30 @@ VariableHD::operator()(const Tuple& k)
 }
 
 uuid
-VariableHD::addEquation(EquationHD* e, size_t time)
+VariableWS::addEquation(EquationWS* e, size_t time)
 {
   return m_equations.insert(std::make_pair(e->id(), *e)).first->first;
 }
 
 uuid
-VariableHD::addEquation
+VariableWS::addEquation
 (
   const u32string& name, 
-  GuardHD guard, 
-  HD* e, 
+  GuardWS guard, 
+  WS* e, 
   size_t time
 )
 {
   guard.setTimeStart(time);
 
-  EquationHD eq(name, guard, e);
+  EquationWS eq(name, guard, e);
 
   return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
 }
 
 #if 0
-std::pair<uuid, VariableHD::UUIDEquationMap::iterator>
-VariableHD::addExprInternal(const Tuple& k, HD* e)
+std::pair<uuid, VariableWS::UUIDEquationMap::iterator>
+VariableWS::addExprInternal(const Tuple& k, WS* e)
 {
   Tuple::const_iterator iter = k.find(DIM_ID);
   if (iter == k.end())
@@ -398,7 +398,7 @@ VariableHD::addExprInternal(const Tuple& k, HD* e)
 #endif
 
 bool
-VariableHD::delexpr(uuid id, size_t time)
+VariableWS::delexpr(uuid id, size_t time)
 {
   UUIDEquationMap::iterator iter = m_equations.find(id);
 
@@ -410,12 +410,12 @@ VariableHD::delexpr(uuid id, size_t time)
 }
 
 bool
-VariableHD::replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr)
+VariableWS::replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr)
 {
 }
 
 void
-EquationHD::del(size_t time)
+EquationWS::del(size_t time)
 {
   m_validContext.setTimeEnd(time);
 }

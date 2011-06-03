@@ -440,12 +440,12 @@ namespace TransLucid
     char32_t m_c;
   };
 
-  class GuardHD;
+  class GuardWS;
 
   class Guard : public TypedValue
   {
     public:
-    Guard(const GuardHD& g);
+    Guard(const GuardWS& g);
 
     Guard(const Guard& rhs);
 
@@ -455,7 +455,7 @@ namespace TransLucid
       return new Guard(*this);
     }
 
-    const GuardHD&
+    const GuardWS&
     value() const
     {
       return *m_g;
@@ -486,7 +486,7 @@ namespace TransLucid
     }
 
     private:
-    GuardHD* m_g;
+    GuardWS* m_g;
   };
 
   class Pair : public TypedValue
@@ -667,13 +667,13 @@ namespace TransLucid
     applyLambda(const Tuple& k, const Constant& value) const;
 
     virtual TaggedConstant
-    applyPhi(const Tuple& k, HD* expr) const;
+    applyPhi(const Tuple& k, WS* expr) const;
   };
 
   class LambdaFunctionType : public FunctionType
   {
     public:
-    LambdaFunctionType(const u32string& name, dimension_index dim, HD* expr)
+    LambdaFunctionType(const u32string& name, dimension_index dim, WS* expr)
     : m_name(name), m_dim(dim), m_expr(expr)
     {
     }
@@ -699,13 +699,13 @@ namespace TransLucid
     private:
     u32string m_name;
     dimension_index m_dim;
-    HD* m_expr;
+    WS* m_expr;
   };
 
   class PhiFunctionType : public FunctionType
   {
     private:
-    HD* m_expr;
+    WS* m_expr;
   };
 }
 

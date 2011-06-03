@@ -34,17 +34,17 @@ along with TransLucid; see the file COPYING.  If not see
 
 //Some of these functors are constructed with the system, some are not.
 //The ones that are make a demand of the system.
-//For example, BoolConstHD is returning a constant boolean. If one types in
+//For example, BoolConstWS is returning a constant boolean. If one types in
 //true, the value true is created with index TYPE_INDEX_BOOL, the system is
 //not required for this.
-//On the other hand, IdentHD is used whenever an arbitrary identifier is 
+//On the other hand, IdentWS is used whenever an arbitrary identifier is 
 //referred to.
 //For an identifier x:
-//IdentHD makes the demand system([id : "x"]) & k
+//IdentWS makes the demand system([id : "x"]) & k
 
 namespace TransLucid
 {
-  class SystemHD;
+  class System;
 
   namespace Hyperdatons
   {
@@ -52,10 +52,10 @@ namespace TransLucid
      * @brief The outermost hyperdaton which starts an evaluation.
      * Sets up the right context so that evaluation works.
      */
-    class SystemEvaluationHD : public HD
+    class SystemEvaluationWS : public WS
     {
       public:
-      SystemEvaluationHD(SystemHD* system, HD* e)
+      SystemEvaluationWS(System* system, WS* e)
       : m_system(system), m_e(e)
       {
       }
@@ -64,15 +64,15 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      SystemHD* m_system;
-      HD* m_e;
+      System* m_system;
+      WS* m_e;
     };
 
-    class TypedValueHD : public HD
+    class TypedValueWS : public WS
     {
       public:
 
-      TypedValueHD(HD* system, const u32string& type, const u32string& text)
+      TypedValueWS(WS* system, const u32string& type, const u32string& text)
       : m_system(system), m_type(type), m_text(text)
       {}
 
@@ -80,15 +80,15 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
+      WS* m_system;
       std::u32string m_type;
       std::u32string m_text;
     };
 
-    class DimensionHD : public HD
+    class DimensionWS : public WS
     {
       public:
-      DimensionHD(HD* system, const std::u32string& name)
+      DimensionWS(WS* system, const std::u32string& name)
       : m_system(system), m_name(name)
       {}
 
@@ -96,14 +96,14 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
+      WS* m_system;
       std::u32string m_name;
     };
 
-    class IdentHD : public HD
+    class IdentWS : public WS
     {
       public:
-      IdentHD(HD* system, const u32string& name)
+      IdentWS(WS* system, const u32string& name)
       : m_system(system), m_name(name)
       {}
 
@@ -111,18 +111,18 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
+      WS* m_system;
       u32string m_name;
     };
 
-    class UnaryOpHD : public HD
+    class UnaryOpWS : public WS
     {
       public:
-      UnaryOpHD
+      UnaryOpWS
       (
-        HD* system,
+        WS* system,
         u32string name,
-        HD* e
+        WS* e
       )
       : m_system(system), m_name(name), m_e(e)
       {}
@@ -131,19 +131,19 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
+      WS* m_system;
       u32string m_name;
-      HD* m_e;
+      WS* m_e;
     };
 
-    class BinaryOpHD : public HD
+    class BinaryOpWS : public WS
     {
       public:
 
-      BinaryOpHD
+      BinaryOpWS
       (
-        HD* system,
-        const std::vector<HD*>& operands,
+        WS* system,
+        const std::vector<WS*>& operands,
         const u32string& name
       )
       : m_system(system), m_operands(operands), m_name(name)
@@ -153,16 +153,16 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
-      std::vector<HD*> m_operands;
+      WS* m_system;
+      std::vector<WS*> m_operands;
       u32string m_name;
     };
 
-    class VariableOpHD : public HD
+    class VariableOpWS : public WS
     {
       public:
-      VariableOpHD(HD* system,
-                const std::vector<HD*>& operands,
+      VariableOpWS(WS* system,
+                const std::vector<WS*>& operands,
                 const u32string& symbol)
       : m_system(system), m_operands(operands), m_symbol(symbol)
       {
@@ -172,15 +172,15 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
-      const std::vector<HD*>& m_operands;
+      WS* m_system;
+      const std::vector<WS*>& m_operands;
       u32string m_symbol;
     };
 
-    class IsSpecialHD : public HD
+    class IsSpecialWS : public WS
     {
       public:
-      IsSpecialHD(HD* system, const u32string& special, HD* e)
+      IsSpecialWS(WS* system, const u32string& special, WS* e)
       : m_special(special),
       m_e(e)
       {}
@@ -189,15 +189,15 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
+      WS* m_system;
       u32string m_special;
-      HD* m_e;
+      WS* m_e;
     };
 
-    class IsTypeHD : public HD
+    class IsTypeWS : public WS
     {
       public:
-      IsTypeHD(HD* system, const u32string& type, HD* e)
+      IsTypeWS(WS* system, const u32string& type, WS* e)
       : m_system(system), m_type(type), m_e(e)
       {}
 
@@ -205,17 +205,17 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
+      WS* m_system;
       u32string m_type;
-      HD* m_e;
+      WS* m_e;
     };
 
     //TODO work out what converting is
     #if 0
-    class ConvertHD : public HD
+    class ConvertWS : public WS
     {
       public:
-      ConvertHD(const u32string& to, HD* e)
+      ConvertWS(const u32string& to, WS* e)
       : m_to(to), m_e(e)
       {}
 
@@ -224,17 +224,17 @@ namespace TransLucid
 
       private:
       u32string m_to;
-      HD* m_e;
+      WS* m_e;
     };
     #endif
 
-    class IfHD : public HD
+    class IfWS : public WS
     {
       public:
 
-      IfHD(HD* condition, HD* then,
-        const std::vector<std::pair<HD*, HD*>>& elsifs,
-        HD* else_)
+      IfWS(WS* condition, WS* then,
+        const std::vector<std::pair<WS*, WS*>>& elsifs,
+        WS* else_)
       : m_condition(condition),
         m_then(then),
         m_elsifs_2(elsifs),
@@ -245,18 +245,18 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      //HD* m_system;
-      HD* m_condition;
-      HD* m_then;
-      std::list<HD*> m_elsifs;
-      std::vector<std::pair<HD*, HD*>> m_elsifs_2;
-      HD* m_else;
+      //WS* m_system;
+      WS* m_condition;
+      WS* m_then;
+      std::list<WS*> m_elsifs;
+      std::vector<std::pair<WS*, WS*>> m_elsifs_2;
+      WS* m_else;
     };
 
-    class HashHD : public HD
+    class HashWS : public WS
     {
       public:
-      HashHD(HD* system, HD* e)
+      HashWS(WS* system, WS* e)
       : m_system(system), m_e(e)
       {}
 
@@ -264,16 +264,16 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
-      HD* m_e;
+      WS* m_system;
+      WS* m_e;
     };
 
 #if 0
     //TODO: What is this?
-    class PairHD : public HD
+    class PairWS : public WS
     {
       public:
-      PairHD(HD* lhs, HD* rhs)
+      PairWS(WS* lhs, WS* rhs)
       : m_lhs(lhs), m_rhs(rhs)
       {}
 
@@ -281,17 +281,17 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_lhs;
-      HD* m_rhs;
+      WS* m_lhs;
+      WS* m_rhs;
     };
 #endif
 
-    class TupleHD : public HD
+    class TupleWS : public WS
     {
       public:
 
-      TupleHD(HD* system,
-                 const std::list<std::pair<HD*, HD*>>& elements)
+      TupleWS(WS* system,
+                 const std::list<std::pair<WS*, WS*>>& elements)
       : m_system(system), m_elements(elements)
       {}
 
@@ -299,16 +299,16 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
-      std::list<std::pair<HD*, HD*>> m_elements;
+      WS* m_system;
+      std::list<std::pair<WS*, WS*>> m_elements;
     };
 
     //e2 @ e1
-    class AtAbsoluteHD : public HD
+    class AtAbsoluteWS : public WS
     {
       public:
 
-      AtAbsoluteHD(HD* e2, HD* e1)
+      AtAbsoluteWS(WS* e2, WS* e1)
       : e2(e2), e1(e1)
       {}
 
@@ -316,15 +316,15 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* e2;
-      HD* e1;
+      WS* e2;
+      WS* e1;
     };
 
-    class AtRelativeHD : public HD
+    class AtRelativeWS : public WS
     {
       public:
 
-      AtRelativeHD(HD* e2, HD* e1)
+      AtRelativeWS(WS* e2, WS* e1)
       : e2(e2), e1(e1)
       {}
 
@@ -332,19 +332,19 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* e2;
-      HD* e1;
+      WS* e2;
+      WS* e1;
     };
 
-    class LambdaAbstractionHD : public HD
+    class LambdaAbstractionWS : public WS
     {
       public:
-      LambdaAbstractionHD
+      LambdaAbstractionWS
       (
-        HD* system, 
+        WS* system, 
         const u32string& name, 
         dimension_index dim, 
-        HD* rhs
+        WS* rhs
       )
       : m_system(system)
       , m_name(name)
@@ -357,16 +357,16 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
+      WS* m_system;
       u32string m_name;
       dimension_index m_dim;
-      HD* m_rhs;
+      WS* m_rhs;
     };
 
-    class LambdaApplicationHD : public HD
+    class LambdaApplicationWS : public WS
     {
       public:
-      LambdaApplicationHD(HD* system, HD* lhs, HD* rhs)
+      LambdaApplicationWS(WS* system, WS* lhs, WS* rhs)
       : m_system(system)
       , m_lhs(lhs)
       , m_rhs(rhs)
@@ -377,9 +377,9 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      HD* m_system;
-      HD* m_lhs;
-      HD* m_rhs;
+      WS* m_system;
+      WS* m_lhs;
+      WS* m_rhs;
     };
 
   }

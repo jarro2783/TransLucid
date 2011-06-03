@@ -41,19 +41,19 @@ namespace TransLucid
   class Translator;
 
   /**
-   * @brief SystemHD base class.
+   * @brief System base class.
    *
    * Holds all the data necessary for an system.
    **/
-  class SystemHD : public HD
+  class System : public WS
   {
     public:
 
-    SystemHD();
-    ~SystemHD();
+    System();
+    ~System();
 
     //don't want to copy
-    SystemHD(const SystemHD&) = delete;
+    System(const System&) = delete;
 
     TaggedConstant
     operator()(const Tuple& k);
@@ -80,12 +80,12 @@ namespace TransLucid
 
     //string input?
     uuid
-    addEquation(const u32string& name, const GuardHD& guard, HD* e);
+    addEquation(const u32string& name, const GuardWS& guard, WS* e);
 
     uuid
-    addEquation(const u32string& name, HD* e)
+    addEquation(const u32string& name, WS* e)
     {
-      return addEquation(name, GuardHD(), e);
+      return addEquation(name, GuardWS(), e);
     }
 
     //what is the input?
@@ -94,9 +94,9 @@ namespace TransLucid
 
     //output hyperdatons, set of context
     void
-    eval(const std::list<uuid>& exprs, PhysicalHD* out);
+    eval(const std::list<uuid>& exprs, PhysicalWS* out);
 
-    HD*
+    WS*
     translate_expr(const u32string& s);
 
     std::list<std::pair<uuid, Parser::ParsedEquation>>
@@ -127,8 +127,8 @@ namespace TransLucid
     init_types();
 
     template <typename T>
-    HD*
-    buildConstantHD(size_t index);
+    WS*
+    buildConstantWS(size_t index);
 
     void
     addDimensionSymbol(const u32string& s);
@@ -138,7 +138,7 @@ namespace TransLucid
 
     std::map<u32string, size_t> builtin_name_to_index;
 
-    std::map<u32string, VariableHD*> m_equations;
+    std::map<u32string, VariableWS*> m_equations;
 
     //the uuid generator
     boost::uuids::basic_random_generator<boost::mt19937>

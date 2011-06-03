@@ -28,7 +28,7 @@ using namespace TransLucid;
 
 namespace
 {
-SystemHD tlsystem;
+System tlsystem;
 std::string generated;
 }
 

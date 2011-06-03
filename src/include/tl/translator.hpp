@@ -45,7 +45,7 @@ namespace TransLucid
     class AllParsers;
   }
 
-  class SystemHD;
+  class System;
 
   /**
    * Translator class. Drives the parser.
@@ -157,7 +157,7 @@ namespace TransLucid
       UUIDToParsedEquation::const_iterator m_iter;
     };
 
-    Translator(SystemHD& system);
+    Translator(System& system);
     ~Translator();
 
     /**
@@ -165,7 +165,7 @@ namespace TransLucid
      * Parses and compiles an expression string.
      * @param s The string representing the expression.
      */
-    HD*
+    WS*
     translate_expr(const u32string& s);
 
     /**
@@ -196,9 +196,9 @@ namespace TransLucid
 
     /**
      * The Translator's system.
-     * @return The SystemHD belonging to the Translator.
+     * @return The System belonging to the Translator.
      */
-    SystemHD&
+    System&
     system()
     {
       return m_system;
@@ -276,7 +276,7 @@ namespace TransLucid
 
     detail::AllParsers* m_parsers;
 
-    SystemHD& m_system;
+    System& m_system;
 
     ExprCompiler m_compiler;
 

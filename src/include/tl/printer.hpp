@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class ValuePrinterHD : public HD
+  class ValuePrinterWS : public WS
   {
     public:
 

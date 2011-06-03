@@ -88,7 +88,7 @@ namespace TransLucid
   }
 
   inline mpz_class
-  get_type_index(HD* h, const u32string& name)
+  get_type_index(WS* h, const u32string& name)
   {
     tuple_t k;
     k[DIM_ID] = generate_string(U"TYPE_INDEX");
@@ -119,7 +119,7 @@ namespace TransLucid
   }
 
   inline mpz_class
-  get_unique(HD* h)
+  get_unique(WS* h)
   {
     tuple_t k;
     k[DIM_ID] = Constant(String(U"_unique"), TYPE_INDEX_USTRING);
@@ -127,7 +127,7 @@ namespace TransLucid
   }
 
   inline size_t
-  get_dimension_index(HD* h, const u32string& name)
+  get_dimension_index(WS* h, const u32string& name)
   {
     tuple_t k;
     k[DIM_ID] = generate_string(U"DIMENSION_NAMED_INDEX");
@@ -136,7 +136,7 @@ namespace TransLucid
   }
 
   inline size_t
-  get_dimension_index(HD* h, const Constant& v)
+  get_dimension_index(WS* h, const Constant& v)
   {
     tuple_t k;
     k[DIM_ID] = generate_string(U"DIMENSION_VALUE_INDEX");
@@ -156,10 +156,10 @@ namespace TransLucid
   }
 
   template <typename T>
-  class FunctorHD : public HD
+  class FunctorWS : public WS
   {
     public:
-    FunctorHD(const T& f)
+    FunctorWS(const T& f)
     : m_f(f)
     {}
 
@@ -170,7 +170,7 @@ namespace TransLucid
     }
 
     void
-    addExpr(const Tuple& k, HD* h)
+    addExpr(const Tuple& k, WS* h)
     {
     }
 
@@ -179,9 +179,9 @@ namespace TransLucid
   };
 
   template <typename T>
-  FunctorHD<T>* generate_functor_hd(const T& f)
+  FunctorWS<T>* generate_functor_hd(const T& f)
   {
-    return new FunctorHD<T>(f);
+    return new FunctorWS<T>(f);
   }
 
   bool
@@ -194,21 +194,21 @@ namespace TransLucid
   valueRefines(const Constant& a, const Constant& b);
 
   bool
-  booleanTrue(const GuardHD& g, const Tuple& c);
+  booleanTrue(const GuardWS& g, const Tuple& c);
 
   tuple_t
   create_add_eqn_context
   (
     const u32string& name,
-    HD* guard,
-    HD* boolean,
+    WS* guard,
+    WS* boolean,
     const mpz_class& time
   );
 
   //looks up a value in the current context and returns the value of the
   //all dimension if it exists, otherwise special<dim> if not found
   TaggedConstant
-  lookup_context(HD* system, const Constant& v, const Tuple& k);
+  lookup_context(WS* system, const Constant& v, const Tuple& k);
 
   inline Constant
   make_special(Special::Value s)
@@ -217,10 +217,10 @@ namespace TransLucid
   }
 
   //returns the hash of a dimension when we only have the index
-  class HashIndexHD : public HD
+  class HashIndexWS : public WS
   {
     public:
-    HashIndexHD(dimension_index index)
+    HashIndexWS(dimension_index index)
     : m_index(index)
     {
     }

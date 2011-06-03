@@ -355,14 +355,14 @@ int_bin_op
 
 template <class T, template <typename> class Op>
 OpFunction
-bindBinOp(TL::HD& i, size_t index)
+bindBinOp(TL::WS& i, size_t index)
 {
   return boost::bind(int_bin_op<T, Op>, index, _1, _2, _3);
 }
 
 template <class T, template <typename> class Op, class Arg1>
 OpFunction
-bindBinOp(TL::HD& i, size_t index)
+bindBinOp(TL::WS& i, size_t index)
 {
   //when adding context make the third _2
   return boost::bind(int_bin_op<T, Op, Arg1>, index, _1, _2, _3);
@@ -370,7 +370,7 @@ bindBinOp(TL::HD& i, size_t index)
 
 template <class T, template <typename> class Op, class Arg1, class Arg2>
 OpFunction
-bindBinOp(TL::HD& i, size_t index)
+bindBinOp(TL::WS& i, size_t index)
 {
   //when adding context make the third _2
   return boost::bind(int_bin_op<T, Op, Arg1, Arg2>, index, _1, _2, _3);
@@ -404,11 +404,11 @@ bindCompOp(const TL::TypeManager& m)
 #endif
 
 template <typename T>
-class OpHD : public TL::HD
+class OpWS : public TL::WS
 {
   public:
 
-  OpHD(TL::HD& system, const T& op)
+  OpWS(TL::WS& system, const T& op)
   : m_op(op), m_system(system)
   {}
 
@@ -440,26 +440,26 @@ class OpHD : public TL::HD
 
   private:
   T m_op;
-  TL::HD& m_system;
+  TL::WS& m_system;
 };
 
 template <typename Operator>
-TL::HD*
-build_op_hd(TL::HD& i, const Operator& op)
+TL::WS*
+build_op_hd(TL::WS& i, const Operator& op)
 {
-  return new OpHD<Operator>(i, op);
+  return new OpWS<Operator>(i, op);
 }
 
 template <typename T, template <typename> class Op>
 void
 register_one_op
 (
-  TL::SystemHD& system,
+  TL::System& system,
   const TL::u32string& name,
   size_t index
 )
 {
-  TL::HD* op = build_op_hd(system, bindBinOp<T, Op>(system, index));
+  TL::WS* op = build_op_hd(system, bindBinOp<T, Op>(system, index));
   //build a guard with arg0:T, arg1:T
 
   //std::cerr << "adding OP @ [name : " << TL::utf32_to_utf8(name) << "..."
@@ -481,12 +481,12 @@ register_one_op
     }
   };
 
-  system.addEquation(U"OP", TL::GuardHD(TL::Tuple(guard)), op);
+  system.addEquation(U"OP", TL::GuardWS(TL::Tuple(guard)), op);
 }
 
 template<class T>
 void
-register_int_ops(TL::SystemHD& i, size_t index)
+register_int_ops(TL::System& i, size_t index)
 {
   register_one_op<T, std::plus>(i, U"operator+", index);
   register_one_op<T, std::minus>(i, U"operator-", index);
@@ -508,10 +508,10 @@ register_int_ops(TL::SystemHD& i, size_t index)
 }
 
 template <typename T>
-class IntHD : public TL::HD
+class IntWS : public TL::WS
 {
   public:
-  IntHD(const TL::u32string& name, size_t index, TL::SystemHD& system)
+  IntWS(const TL::u32string& name, size_t index, TL::System& system)
   : m_system(system), m_index(index)
   {
     //m_index = system.typeRegistry().registerType(name);
@@ -546,29 +546,29 @@ class IntHD : public TL::HD
   }
 
   private:
-  TL::SystemHD& m_system;
+  TL::System& m_system;
   size_t m_index;
 };
 
 template <class T>
 void
-registerType(const TL::u32string& name, TL::SystemHD& i)
+registerType(const TL::u32string& name, TL::System& i)
 {
   mpz_class unique = TL::get_unique(&i);
 
-  TL::HD* h = new IntHD<T>(name, unique.get_ui(), i);
+  TL::WS* h = new IntWS<T>(name, unique.get_ui(), i);
 
   TL::tuple_t k;
   k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
-  i.addEquation(U"CONST", TL::GuardHD(TL::Tuple(k)), h);
+  i.addEquation(U"CONST", TL::GuardWS(TL::Tuple(k)), h);
 
   k.clear();
   k.insert(std::make_pair(TL::DIM_TYPE, TL::generate_string(name)));
   i.addEquation
   (
     U"TYPE_INDEX",
-    TL::GuardHD(TL::Tuple(k)), 
-    new TL::Hyperdatons::IntmpConstHD(unique)
+    TL::GuardWS(TL::Tuple(k)), 
+    new TL::Hyperdatons::IntmpConstWS(unique)
   );
 
   register_int_ops<Int<T>>(i, unique.get_ui());
@@ -584,7 +584,7 @@ Int<T>::print(std::ostream& os) const
 }
 
 void
-registerTypes(TransLucid::SystemHD& i)
+registerTypes(TransLucid::System& i)
 {
   #if 0
   TransLucid::TypeRegistry& r = i.typeRegistry();
@@ -619,7 +619,7 @@ extern "C"
 {
 
 void
-lib_int_init(TransLucid::SystemHD& i)
+lib_int_init(TransLucid::System& i)
 {
   IntLib::registerTypes(i);
 }

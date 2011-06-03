@@ -38,7 +38,7 @@ HeaderType::parseString
 (
   const u32string& s,
   const Tuple& c,
-  SystemHD& i
+  System& i
 )
 {
   #if 0
@@ -58,7 +58,7 @@ HeaderType::parseFile
 (
   const u32string& file,
   const Tuple& c,
-  SystemHD& i
+  System& i
 )
 {
 }

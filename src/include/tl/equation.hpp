@@ -34,7 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class SystemHD;
+  class System;
 
   class InvalidGuard : public Exception
   {
@@ -48,7 +48,7 @@ namespace TransLucid
    * The system can impose elements of the guard, it is an error for
    * the user to specify those ones too.
    **/
-  class GuardHD
+  class GuardWS
   {
     public:
 
@@ -57,7 +57,7 @@ namespace TransLucid
      *
      * Specifies the AST to use for the guard.
      **/
-    GuardHD(HD* g, HD* b)
+    GuardWS(WS* g, WS* b)
     : m_guard(g), m_boolean(b), m_timeStart(0), m_timeEnd(0)
     {
     }
@@ -68,12 +68,12 @@ namespace TransLucid
      * There are no user dimensions in the guard. System imposed
      * dimensions can still be added.
      **/
-    GuardHD()
+    GuardWS()
     : m_guard(0), m_boolean(0), m_timeStart(0), m_timeEnd(0)
     {
     }
 
-    GuardHD(const Tuple& t)
+    GuardWS(const Tuple& t)
     : m_guard(0), m_boolean(0), m_timeStart(0), m_timeEnd(0)
     {
        for (Tuple::const_iterator iter = t.begin();
@@ -84,15 +84,15 @@ namespace TransLucid
        }
     }
 
-    GuardHD(const GuardHD&);
+    GuardWS(const GuardWS&);
 
-    ~GuardHD()
+    ~GuardWS()
     {
       delete m_timeStart;
       delete m_timeEnd;
     }
 
-    GuardHD& operator=(const GuardHD&);
+    GuardWS& operator=(const GuardWS&);
 
     /**
      * @brief Determines if there are any dimensions in the guard.
@@ -128,7 +128,7 @@ namespace TransLucid
        m_dimensions[dim] = v;
     }
 
-    HD*
+    WS*
     boolean() const
     {
        return m_boolean;
@@ -147,22 +147,22 @@ namespace TransLucid
     }
 
     private:
-    HD* m_guard;
-    HD* m_boolean;
+    WS* m_guard;
+    WS* m_boolean;
     std::map<size_t, Constant> m_dimensions;
 
     mpz_class *m_timeStart;
     mpz_class *m_timeEnd;
   };
 
-  class VariableHD;
+  class VariableWS;
 
-  typedef std::map<u32string, VariableHD*> VariableMap;
+  typedef std::map<u32string, VariableWS*> VariableMap;
 
-  class EquationHD : public HD
+  class EquationWS : public WS
   {
     public:
-    EquationHD(const u32string& name, const GuardHD& valid, HD* h)
+    EquationWS(const u32string& name, const GuardWS& valid, WS* h)
     : m_name(name), m_validContext(valid), m_h(h),
     //m_id(boost::uuids::random_generator()())
     //m_id(boost::uuids::nil_generator()())
@@ -171,7 +171,7 @@ namespace TransLucid
     {
     }
 
-    EquationHD()
+    EquationWS()
     : m_h(0), m_id(boost::uuids::nil_generator()())
     {
     }
@@ -182,7 +182,7 @@ namespace TransLucid
        return m_name;
     }
 
-    const GuardHD&
+    const GuardWS&
     validContext() const
     {
        return m_validContext;
@@ -193,7 +193,7 @@ namespace TransLucid
        return m_h != 0;
     }
 
-    HD*
+    WS*
     equation() const
     {
        return m_h;
@@ -216,8 +216,8 @@ namespace TransLucid
 
     private:
     u32string m_name;
-    GuardHD m_validContext;
-    HD* m_h;
+    GuardWS m_validContext;
+    WS* m_h;
     boost::uuids::uuid m_id;
 
     static boost::uuids::basic_random_generator<boost::mt19937>
@@ -226,35 +226,35 @@ namespace TransLucid
 
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
-  class VariableHD : public HD
+  class VariableWS : public WS
   {
     public:
-    typedef std::map<uuid, EquationHD> UUIDEquationMap;
+    typedef std::map<uuid, EquationWS> UUIDEquationMap;
 
-    VariableHD(const u32string& name, HD* system);
+    VariableWS(const u32string& name, WS* system);
     
-    ~VariableHD();
+    ~VariableWS();
 
     virtual TaggedConstant 
     operator()(const Tuple& k);
 
     #if 0
     virtual uuid
-    addExpr(const Tuple& k, HD* h)
+    addExpr(const Tuple& k, WS* h)
     {
       return addExprInternal(k, h).first;
     }
     #endif
 
     uuid
-    addEquation(EquationHD* e, size_t time);
+    addEquation(EquationWS* e, size_t time);
 
     uuid
     addEquation
     (
       const u32string& name, 
-      GuardHD guard, 
-      HD* e, 
+      GuardWS guard, 
+      WS* e, 
       size_t time
     );
 
@@ -262,7 +262,7 @@ namespace TransLucid
     delexpr(uuid id, size_t time);
 
     virtual bool 
-    replexpr(uuid id, size_t time, const GuardHD& guard, HD* expr);
+    replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr);
 
     /**
      * The equations belonging directly to this variable. Returns the map of
@@ -282,20 +282,20 @@ namespace TransLucid
 
     //maps uuid to variables so that we know which child owns the equation
     //belonging to a uuid
-    typedef std::map<uuid, VariableHD*> UUIDVarMap;
+    typedef std::map<uuid, VariableWS*> UUIDVarMap;
 
     std::pair<uuid, UUIDEquationMap::iterator>
-    addExprInternal(const Tuple& k, HD* h);
+    addExprInternal(const Tuple& k, WS* h);
 
     std::pair<uuid, UUIDEquationMap::iterator>
-    addExprActual(const Tuple& k, HD* e);
+    addExprActual(const Tuple& k, WS* e);
 
-    bool equationValid(const EquationHD& e, const Tuple& k);
+    bool equationValid(const EquationWS& e, const Tuple& k);
 
     UUIDEquationMap m_equations;
 
     u32string m_name;
-    HD* m_system;
+    WS* m_system;
     bool storeuuid;
 
     BestFittable m_bestFit;
