@@ -28,7 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 //#include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 
 #include <list>
 

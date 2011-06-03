@@ -17,12 +17,6 @@
 #   <http://www.gnu.org/licenses/>.
 noinst_PROGRAMS = single echo typewriter fact1
 
-single_SOURCES = single.cpp
-
-echo_SOURCES = echo.cpp
-
-typewriter_SOURCES = typewriter.cpp
-
 fact1_SOURCES = fact1.cpp
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/include \

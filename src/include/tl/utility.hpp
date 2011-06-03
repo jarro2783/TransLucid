@@ -22,7 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/fixed_indexes.hpp>
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 #include <tl/range.hpp>
 #include <tl/types.hpp>
 

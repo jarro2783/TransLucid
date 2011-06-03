@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef CONTAINER_HPP_INCLUDED
 #define CONTAINER_HPP_INCLUDED
 
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 #include <map>
 #include <boost/tuple/tuple.hpp>
 #include <gmpxx.h>

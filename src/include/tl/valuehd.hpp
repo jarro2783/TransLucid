@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef VALUEWS_HPP_INCLUDED
 #define VALUEWS_HPP_INCLUDED
 
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 #include <tl/system.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/fixed_indexes.hpp>

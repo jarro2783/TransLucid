@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TRANSLATOR_HPP_INCLUDED
 
 #include <tl/expr_compiler.hpp>
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 //#include <tl/lexer.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_api.hpp>

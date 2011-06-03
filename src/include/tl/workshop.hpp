@@ -1,4 +1,4 @@
-/* Everything is a hyperdaton.
+/* Lots of things are workshops.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef HYPERDATON_HPP_INCLUDED
-#define HYPERDATON_HPP_INCLUDED
+#ifndef WORKSHOP_HPP_INCLUDED
+#define WORKSHOP_HPP_INCLUDED
 
 #include <tl/types.hpp>
 //#include <tl/system.hpp>
@@ -35,4 +35,4 @@ namespace TransLucid
   };
 } //namespace TransLucid
 
-#endif // HYPERDATON_HPP_INCLUDED
+#endif // WORKSHOP_HPP_INCLUDED

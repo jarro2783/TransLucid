@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <ltdl.h>
 #include <list>
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 
 namespace TransLucid
 {

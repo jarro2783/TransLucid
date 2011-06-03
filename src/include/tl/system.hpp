@@ -88,6 +88,9 @@ namespace TransLucid
       return addEquation(name, GuardWS(), e);
     }
 
+    Constant
+    parseLine(const std::string& line);
+
     //what is the input?
     uuid
     addExpr();

@@ -17,20 +17,34 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/system.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/consthd.hpp>
+#include <tl/system.hpp>
+#include <tl/parser_iterator.hpp>
+#include <tl/translator.hpp>
 #include <tl/utility.hpp>
 #include <tl/valuehd.hpp>
-//#include <tl/compiled_functors.hpp>
+
 #include <algorithm>
-#include <tl/consthd.hpp>
-#include <tl/translator.hpp>
+#include <unordered_map>
 
 namespace TransLucid
 {
 
 namespace
 {
+
+  enum LineType
+  {
+    LINE_EQN,
+    LINE_ASSIGN,
+    LINE_DIM,
+    LINE_INFIXL,
+    LINE_INFIXR,
+    LINE_INFIXN,
+    LINE_LIBRARY,
+    LINE_EXPR
+  };
 
   class UniqueWS : public WS
   {
@@ -347,6 +361,67 @@ const Tree::Expr&
 System::lastExpression() const
 {
   return m_translator->lastExpression();
+}
+
+Constant
+System::parseLine(const std::string& line)
+{
+  std::unordered_map<u32string, LineType> lineTypes = 
+  {
+    {U"eqn", LINE_EQN}, 
+    {U"assign", LINE_ASSIGN},
+    {U"dim", LINE_DIM},
+    {U"infixl", LINE_INFIXL},
+    {U"infixr", LINE_INFIXR},
+    {U"infixn", LINE_INFIXN},
+    {U"library", LINE_LIBRARY},
+    {U"expr", LINE_EXPR}
+  };
+
+  Parser::U32Iterator current
+  (
+    Parser::makeUTF8Iterator(line.begin()),
+    Parser::makeUTF8Iterator(line.end())
+  );
+  Parser::U32Iterator end;
+
+  u32string firstWord;
+  while (current != end && *current != ' ')
+  {
+    firstWord += *current;
+    ++current;
+  }
+
+  auto iter = lineTypes.find(firstWord);
+  LineType type;
+  if (iter != lineTypes.end())
+  {
+    type = iter->second;
+  }
+
+  switch (type)
+  {
+    case LINE_EQN:
+    m_translator->translate_and_add_equation_set(u32string(current, end));
+    break;
+
+    case LINE_ASSIGN:
+    //parse an assignment
+    break;
+
+    case LINE_DIM:
+    case LINE_INFIXL:
+    case LINE_INFIXR:
+    case LINE_INFIXN:
+    case LINE_LIBRARY:
+    m_translator->parse_header(utf8_to_utf32(line));
+    break;
+
+    case LINE_EXPR:
+    //work out something sensible to do here
+    break;
+  }
+  
 }
 
 } //namespace TransLucid

@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef CONSTWS_HPP_INCLUDED
 #define CONSTWS_HPP_INCLUDED
 
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 
 namespace TransLucid 
 {

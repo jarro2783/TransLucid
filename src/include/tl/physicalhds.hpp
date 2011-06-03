@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PHYSICAL_WSS_HPP_INCLUDED
 #define PHYSICAL_WSS_HPP_INCLUDED
 
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 
 namespace TransLucid
 {

@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PRINTER_HPP_INCLUDED
 #define PRINTER_HPP_INCLUDED
 
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 
 namespace TransLucid
 {

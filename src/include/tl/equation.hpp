@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 //#include <tl/ast.hpp>
 #include <tl/exception.hpp>
 #include <tl/bestfit.hpp>
-#include <tl/hyperdaton.hpp>
+#include <tl/workshop.hpp>
 #include <tl/types.hpp>
 
 #include <deque>
