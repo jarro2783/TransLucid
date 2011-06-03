@@ -38,7 +38,14 @@ LineTokenizer::readOuter()
   bool done = false;
   while (!done && m_current != Parser::U32Iterator())
   {
+    if (*m_current == ';')
+    {
+    }
     ++m_current;
+  }
+
+  if (!done && m_current == Parser::U32Iterator())
+  {
   }
 }
 
