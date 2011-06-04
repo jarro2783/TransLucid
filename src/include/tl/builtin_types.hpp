@@ -132,6 +132,42 @@ namespace TransLucid
     }
   };
 
+  class UUID : public TypedValue
+  {
+    public:
+    UUID(const uuid& u)
+    : m_uuid(u)
+    {
+    }
+
+    UUID* 
+    clone() const
+    {
+      return new UUID(*this);
+    }
+
+    size_t
+    hash() const
+    {
+      return boost::hash<uuid>()(m_uuid);
+    }
+
+    const uuid&
+    value() const
+    {
+      return m_uuid;
+    }
+
+    void
+    print(std::ostream& os) const
+    {
+      os << m_uuid;
+    }
+
+    private:
+    uuid m_uuid;
+  };
+
   class String : public TypedValue
   {
     public:

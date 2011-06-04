@@ -44,6 +44,7 @@ namespace TransLucid
         using namespace qi::labels;
         r_constant %= tok.constantINTERPRET_ | tok.constantRAW_;
 
+        //binop symbol name precedence
         r_binop = (r_constant > r_constant > tok.integer_
           > tok.dblsemi_)
           [
@@ -69,6 +70,46 @@ namespace TransLucid
       }
 
       qi::rule<Iterator, BinopHeader()> r_binop;
+      qi::rule<Iterator, std::pair<u32string, u32string>()> r_constant;
+    };
+
+    template <typename Iterator>
+    class HeaderUnopGrammar : public qi::grammar<Iterator, UnopHeader()>
+    {
+      public:
+
+      template <typename TokenDef>
+      HeaderUnopGrammar(TokenDef& tok)
+      : HeaderUnopGrammar::base_type(r_unop)
+      {
+        using namespace qi::labels;
+        r_constant %= tok.constantINTERPRET_ | tok.constantRAW_;
+
+        //unop symbol name
+        r_unop = (r_constant > r_constant
+          > tok.dblsemi_)
+          [
+            _val = ph::bind(&buildUnop, _1, _2)
+          ]
+        ;
+
+      }
+      
+      static UnopHeader
+      buildUnop
+      (
+        const std::pair<u32string, u32string>& symbol,
+        const std::pair<u32string, u32string>& name
+      )
+      {
+        if (symbol.first != U"ustring" || name.first != U"ustring")
+        {
+        }
+
+        return UnopHeader(symbol.second, name.second);
+      }
+
+      qi::rule<Iterator, UnopHeader()> r_unop;
       qi::rule<Iterator, std::pair<u32string, u32string>()> r_constant;
     };
 

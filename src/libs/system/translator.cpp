@@ -93,6 +93,7 @@ namespace detail
     , m_header_grammar(m_lexer)
     , m_header_binary(m_lexer)
     , m_header_string(m_lexer)
+    , m_header_unary(m_lexer)
     {
       m_expr.set_tuple(m_tuple);
       m_tuple.set_expr(m_expr);
@@ -111,6 +112,7 @@ namespace detail
     Parser::HeaderGrammar<Parser::iterator_t> m_header_grammar;
     Parser::HeaderBinopGrammar<Parser::iterator_t> m_header_binary;
     Parser::HeaderStringGrammar<Parser::iterator_t> m_header_string;
+    Parser::HeaderUnopGrammar<Parser::iterator_t> m_header_unary;
   };
 }
 
@@ -338,6 +340,25 @@ Translator::parseHeaderBinary
     end,
     m_parsers->m_lexer,
     m_parsers->m_header_binary,
+    op
+  );
+
+  return std::make_pair(success, op);
+}
+
+std::pair<bool, Parser::UnopHeader>
+Translator::parseHeaderUnary
+(
+  Parser::U32Iterator& begin, 
+  const Parser::U32Iterator& end
+)
+{
+  Parser::UnopHeader op;
+  bool success = boost::spirit::lex::tokenize_and_parse(
+    begin,
+    end,
+    m_parsers->m_lexer,
+    m_parsers->m_header_unary,
     op
   );
 

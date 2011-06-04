@@ -82,11 +82,13 @@ Guard::Guard(const Guard& rhs)
 TaggedConstant
 FunctionType::applyLambda(const Tuple& k, const Constant& value) const
 {
+  return TaggedConstant(make_special(Special::CONST), k);
 }
 
 TaggedConstant
 FunctionType::applyPhi(const Tuple& k, WS* expr) const
 {
+  return TaggedConstant(make_special(Special::CONST), k);
 }
 
 FunctionType::~FunctionType()

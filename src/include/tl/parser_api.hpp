@@ -34,7 +34,11 @@ namespace TransLucid
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     Equation;
 
+    //symbol, name, precedence
     typedef std::tuple<u32string, u32string, mpz_class> BinopHeader;
+
+    //symbol, name
+    typedef std::tuple<u32string, u32string> UnopHeader;
 
     /**
      * Prints an equation.

@@ -17,6 +17,18 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+//---------Header Equations-------------
+//For dimensions:
+//DIM | [name : "dimension"] = true;;
+//
+//For operations:
+//OPTYPE | [symbol : "s"] = "{PREFIX, POSTFIX, BINARY}";;
+//ATL_SYMBOL | [symbol : "s"] = "opname";;
+//
+//For binary:
+//ASSOC | [symbol : "s"] = "{LEFT, RIGHT, NON}";;
+//PREC  | [symbol : "s"] = N;;
+
 #include <tl/builtin_types.hpp>
 #include <tl/consthd.hpp>
 #include <tl/system.hpp>
@@ -27,6 +39,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <algorithm>
 #include <unordered_map>
+#include <initializer_list>
 
 namespace TransLucid
 {
@@ -46,6 +59,32 @@ namespace
     LINE_POSTFIX,
     LINE_PREFIX
   };
+
+  std::unordered_map<u32string, LineType> lineTypes = 
+  {
+    {U"eqn", LINE_EQN}, 
+    {U"assign", LINE_ASSIGN},
+    {U"dim", LINE_DIM},
+    {U"infixl", LINE_INFIXL},
+    {U"infixr", LINE_INFIXR},
+    {U"infixn", LINE_INFIXN},
+    {U"library", LINE_LIBRARY},
+    {U"prefix", LINE_PREFIX},
+    {U"postfix", LINE_POSTFIX}
+  };
+
+  bool
+  hasSpecial(const std::initializer_list<Constant>& c)
+  {
+    for(auto v : c)
+    {
+      if (v.index() == TYPE_INDEX_SPECIAL)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
 
   class UniqueWS : public WS
   {
@@ -135,6 +174,25 @@ namespace
     DimensionTranslator& m_d;
   };
 }
+//
+//adds eqn | [symbol : "s"] = value;;
+template <typename T>
+Constant
+System::addSymbolInfo
+(
+  const u32string& eqn, 
+  const u32string& s, 
+  const T& value
+)
+{
+  return addEquation(Parser::Equation(
+    eqn,
+    Tree::TupleExpr({{U"symbol", s}}),
+    Tree::Expr(),
+    value
+  ));
+}
+
 
 template <typename T>
 WS*
@@ -364,22 +422,44 @@ System::lastExpression() const
   return m_translator->lastExpression();
 }
 
+static Tree::UnaryOperator
+makeUnaryOp(LineType type, const Parser::UnopHeader& op)
+{
+  Tree::UnaryType ut = 
+    type == LINE_POSTFIX ? Tree::UNARY_POSTFIX : Tree::UNARY_PREFIX;
+  return Tree::UnaryOperator(std::get<1>(op), std::get<0>(op), ut);
+}
+
+static Tree::BinaryOperator
+makeBinaryOp(LineType type, const Parser::BinopHeader& op)
+{
+  Tree::InfixAssoc a;
+  switch (type)
+  {
+    case LINE_INFIXL:
+    a = Tree::ASSOC_LEFT;
+    break;
+
+    case LINE_INFIXR:
+    a = Tree::ASSOC_RIGHT;
+    break;
+
+    case LINE_INFIXN:
+    a = Tree::ASSOC_NON;
+    break;
+
+    default:
+    throw __FILE__ ":" STRING_(__LINE__) ": oops";
+    break;
+  }
+
+  return Tree::BinaryOperator(a, 
+    std::get<1>(op), std::get<0>(op), std::get<2>(op));
+}
+
 Constant
 System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
 {
-  std::unordered_map<u32string, LineType> lineTypes = 
-  {
-    {U"eqn", LINE_EQN}, 
-    {U"assign", LINE_ASSIGN},
-    {U"dim", LINE_DIM},
-    {U"infixl", LINE_INFIXL},
-    {U"infixr", LINE_INFIXR},
-    {U"infixn", LINE_INFIXN},
-    {U"library", LINE_LIBRARY},
-    {U"prefix", LINE_PREFIX},
-    {U"postfix", LINE_POSTFIX}
-  };
-
   u32string firstWord;
   Parser::U32Iterator& current = begin;
   while (current != end && *current != ' ')
@@ -430,6 +510,10 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
       //parse binary
       {
         auto result = m_translator->parseHeaderBinary(current, end); 
+        if (result.first)
+        {
+          addBinaryOperator(makeBinaryOp(type, result.second));
+        }
       }
       break;
 
@@ -447,6 +531,13 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
       case LINE_PREFIX:
       case LINE_POSTFIX:
       //parse unary
+      {
+        auto result = m_translator->parseHeaderUnary(current, end);
+        if (result.first)
+        {
+          return addUnaryOperator(makeUnaryOp(type, result.second));
+        }
+      }
       break;
     }
   }
@@ -480,10 +571,103 @@ System::addDimension(const u32string& dimension)
   if (c.index() != TYPE_INDEX_SPECIAL)
   {
     //TODO make the uuid type and then this is where we extract it
-    //m_dimension_uuids.insert(c)
+    m_dimension_uuids.insert(c.value<UUID>().value());
   }
 
   return c;
+}
+
+Constant
+System::addUnaryOperator(const Tree::UnaryOperator& op)
+{
+  u32string typeName;
+
+  addATLSymbol(op.symbol, op.op);
+  if (op.type == Tree::UNARY_PREFIX)
+  {
+    typeName = U"PREFIX";
+  }
+  else
+  {
+    typeName = U"POSTFIX";
+  }
+
+  addOpType(op.symbol, typeName);
+}
+
+Constant
+System::addBinaryOperator(const Tree::BinaryOperator& op)
+{
+  u32string assocName;
+
+  switch(op.assoc)
+  {
+    case Tree::ASSOC_LEFT:
+    assocName = U"LEFT";
+    break;
+
+    case Tree::ASSOC_RIGHT:
+    assocName = U"RIGHT";
+    break;
+
+    case Tree::ASSOC_NON:
+    assocName = U"NON";
+    break;
+    
+    default:
+    //if this exception is raised then we added different associativity
+    //operators but forgot to take care of them here
+    throw __FILE__ ":" STRING_(__LINE__) ": oops";
+    break;
+  }
+
+  Constant t = addOpType(op.symbol, U"BINARY");
+  Constant s = addATLSymbol(op.symbol, op.op);
+  Constant a = addAssoc(op.symbol, assocName);
+  Constant p = addPrecedence(op.symbol, op.precedence);
+
+  if (hasSpecial({t, s, a, p}))
+  {
+    return make_special(Special::CONST);
+  }
+
+  uuid u = m_uuid_generator();
+
+  m_binop_uuids.insert(std::make_pair(u, 
+    BinaryHashes
+    (
+      t.value<UUID>().value(), 
+      s.value<UUID>().value(),
+      a.value<UUID>().value(), 
+      p.value<UUID>().value()
+    )
+  ));
+
+  return Constant(UUID(u), TYPE_INDEX_UUID);
+}
+
+Constant 
+System::addOpType(const u32string& symbol, const u32string& type)
+{
+  return addSymbolInfo(U"OPTYPE", symbol, type);
+}
+
+Constant
+System::addATLSymbol(const u32string& symbol, const u32string& op)
+{
+  return addSymbolInfo(U"ATL_SYMBOL", symbol, op);
+}
+
+Constant
+System::addAssoc(const u32string& symbol, const u32string assoc)
+{
+  return addSymbolInfo(U"ASSOC", symbol, assoc);
+}
+
+Constant
+System::addPrecedence(const u32string& symbol, const mpz_class& precedence)
+{
+  return addSymbolInfo(U"PREC", symbol, precedence);
 }
 
 } //namespace TransLucid

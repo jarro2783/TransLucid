@@ -98,6 +98,12 @@ namespace TransLucid
     addDimension(const u32string& dimension);
 
     Constant
+    addBinaryOperator(const Tree::BinaryOperator& op);
+
+    Constant
+    addUnaryOperator(const Tree::UnaryOperator& op);
+
+    Constant
     parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end);
 
     //what is the input?
@@ -145,6 +151,29 @@ namespace TransLucid
     void
     tick();
 
+    // -- internal add functions --
+
+    template <typename T>
+    Constant
+    addSymbolInfo
+    (
+      const u32string& eqn, 
+      const u32string& s, 
+      const T& value
+    );
+
+    Constant 
+    addOpType(const u32string& symbol, const u32string& type);
+
+    Constant
+    addATLSymbol(const u32string& symbol, const u32string& op);
+
+    Constant
+    addAssoc(const u32string& symbol, const u32string assoc);
+
+    Constant
+    addPrecedence(const u32string& symbol, const mpz_class& precedence);
+
     std::map<u32string, size_t> builtin_name_to_index;
 
     std::map<u32string, VariableWS*> m_equations;
@@ -155,8 +184,23 @@ namespace TransLucid
 
     Translator *m_translator;
 
-    //the sets of all the uuids of objects
-    std::unordered_set<uuid> m_dimension_uuids;
+    //---- the sets of all the uuids of objects ----
+
+    // OPTYPE, ATL_SYMBOL
+    typedef std::tuple<uuid, uuid> UnaryHashes;
+
+    // OPTYPE, ATL_SYMBOL, ASSOC, PREC
+    typedef std::tuple<uuid, uuid, uuid, uuid> BinaryHashes;
+
+    typedef std::unordered_set<uuid, boost::hash<uuid>> UUIDHashSet;
+    typedef std::unordered_map<uuid, UnaryHashes, boost::hash<uuid>> 
+      UnaryHashSet;
+    typedef std::unordered_map<uuid, BinaryHashes, boost::hash<uuid>>
+      BinaryHashSet;
+
+    UUIDHashSet m_dimension_uuids;
+    UnaryHashSet m_unop_uuids;
+    BinaryHashSet m_binop_uuids;
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);
