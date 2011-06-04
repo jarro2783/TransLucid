@@ -34,6 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/translator.hpp>
+#include <tl/tree_to_wstree.hpp>
 #include <tl/utility.hpp>
 #include <tl/valuehd.hpp>
 
@@ -546,14 +547,27 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
     //invalid keyword
   }
 
-  //return std::make_tuple(
-  
+  return make_special(Special::CONST); 
 }
 
 Constant
 System::addEquation(const Parser::Equation& eqn)
 {
   //simplify, turn into workshops
+  Tree::Expr guard   = toWSTree(std::get<1>(eqn));
+  Tree::Expr boolean = toWSTree(std::get<2>(eqn));
+  Tree::Expr expr    = toWSTree(std::get<3>(eqn));
+
+  ExprCompiler compile(this);
+
+  uuid u = addEquation(
+    std::get<0>(eqn),
+    GuardWS(compile.compile_for_equation(guard),
+      compile.compile_for_equation(boolean)),
+    compile.compile_for_equation(expr)
+  );
+
+  return Constant(UUID(u), TYPE_INDEX_UUID);
 }
 
 Constant 
@@ -582,7 +596,7 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
 {
   u32string typeName;
 
-  addATLSymbol(op.symbol, op.op);
+  Constant a = addATLSymbol(op.symbol, op.op);
   if (op.type == Tree::UNARY_PREFIX)
   {
     typeName = U"PREFIX";
@@ -592,7 +606,24 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     typeName = U"POSTFIX";
   }
 
-  addOpType(op.symbol, typeName);
+  Constant t = addOpType(op.symbol, typeName);
+
+  if (hasSpecial({a, t}))
+  {
+    return make_special(Special::CONST);
+  }
+
+  uuid u = m_uuid_generator();
+
+  m_unop_uuids.insert(std::make_pair(u,
+    UnaryHashes
+    (
+      a.value<UUID>().value(),
+      t.value<UUID>().value()
+    )
+  ));
+
+  return Constant(UUID(u), TYPE_INDEX_UUID);
 }
 
 Constant
