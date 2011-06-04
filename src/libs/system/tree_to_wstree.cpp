@@ -31,82 +31,161 @@ toWSTree(const Tree::Expr& expr)
 
 Tree::Expr TreeToWSTree::operator()(const Tree::nil& n)
 {
+  return n;
 }
 
 Tree::Expr TreeToWSTree::operator()(bool b)
 {
+  return b;
 }
 
 Tree::Expr TreeToWSTree::operator()(Special::Value s)
 {
+  return s;
 }
 
 Tree::Expr TreeToWSTree::operator()(const mpz_class& i)
 {
+  return i;
 }
 
 Tree::Expr TreeToWSTree::operator()(char32_t c)
 {
+  return c;
 }
 
 Tree::Expr TreeToWSTree::operator()(const u32string& s)
 {
+  return s;
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::LiteralExpr& e)
 {
+  return e;
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::DimensionExpr& e)
 {
+  return e;
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::IdentExpr& e)
 {
+  return e;
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::ParenExpr& e)
 {
+  return boost::apply_visitor(*this, e.e);
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 {
+  //UNOP @ [arg0 : e.e, opname : e.op.op]
+  return Tree::AtExpr
+  (
+    Tree::IdentExpr(U"UNOP"),
+    Tree::TupleExpr
+    (
+      {
+        {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.e)},
+        {Tree::DimensionExpr(U"opname"), e.op.op}
+      }
+    ),
+    false
+  );
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 {
+  //BINOP @ [arg0 : e.lhs, arg1 : e.rhs, opname : e.op.op]
+  return Tree::AtExpr
+  (
+    Tree::IdentExpr(U"BINOP"),
+    Tree::TupleExpr
+    (
+      {
+        {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.lhs)},
+        {Tree::DimensionExpr(U"arg1"), boost::apply_visitor(*this, e.rhs)},
+        {Tree::DimensionExpr(U"opname"), e.op.op}
+      }
+    ),
+    false
+  );
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::IfExpr& e)
 {
+  //do the elseifs
+  std::vector<std::pair<Tree::Expr, Tree::Expr>> else_ifs;
+  for (auto p : e.else_ifs)
+  {
+    else_ifs.push_back(std::make_pair(
+      boost::apply_visitor(*this, p.first),
+      boost::apply_visitor(*this, p.second)
+    ));
+  }
+
+  return Tree::IfExpr(
+    boost::apply_visitor(*this, e.condition),
+    boost::apply_visitor(*this, e.then),
+    else_ifs,
+    boost::apply_visitor(*this, e.else_)
+  );
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::HashExpr& e)
 {
+  return Tree::HashExpr(boost::apply_visitor(*this, e.e));
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::TupleExpr& e)
 {
+  std::vector<std::pair<Tree::Expr, Tree::Expr>> tuple;
+  for (auto p : e.pairs)
+  {
+    tuple.push_back(std::make_pair(
+      boost::apply_visitor(*this, p.first),
+      boost::apply_visitor(*this, p.second)
+    ));
+  }
+
+  return Tree::TupleExpr(tuple);
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::AtExpr& e)
 {
+  return Tree::AtExpr(
+    boost::apply_visitor(*this, e.lhs),
+    boost::apply_visitor(*this, e.rhs),
+    e.absolute
+  );
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
 {
+  return e;
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::LambdaExpr& e)
 {
+  return Tree::LambdaExpr(e.name, boost::apply_visitor(*this, e.rhs));
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::NameAppExpr& e)
 {
+  return Tree::NameAppExpr(
+    boost::apply_visitor(*this, e.lhs),
+    boost::apply_visitor(*this, e.rhs)
+  );
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::ValueAppExpr& e)
 {
+  return Tree::ValueAppExpr(
+    boost::apply_visitor(*this, e.lhs),
+    boost::apply_visitor(*this, e.rhs)
+  );
 }
 
 

@@ -572,6 +572,7 @@ namespace TransLucid
       Expr rhs; /**<The right-hand-side expression.*/
     };
 
+    //TODO: fix TreeToWSTree when I implement this
     struct PhiExpr
     {
     };
