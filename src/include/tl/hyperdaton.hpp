@@ -65,18 +65,13 @@ namespace TransLucid
 
     virtual void
     put(const Tuple& k, const Constant& c) = 0;
-
-    protected:
-    OutputHD()
-    {
-    }
   };
 
   class IOHD : public InputHD, public OutputHD
   {
     public:
     IOHD(size_t lt)
-    : InputHD(lt)
+    : InputHD(lt), OutputHD(lt)
     {
     }
   };
