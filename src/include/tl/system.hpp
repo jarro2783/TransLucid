@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/dimtranslator.hpp>
 #include <tl/equation.hpp>
-#include <tl/physicalhds.hpp>
+//#include <tl/physicalhds.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 
@@ -111,8 +111,8 @@ namespace TransLucid
     addExpr();
 
     //output hyperdatons, set of context
-    void
-    eval(const std::list<uuid>& exprs, PhysicalWS* out);
+    //void
+    //eval(const std::list<uuid>& exprs, PhysicalWS* out);
 
     WS*
     translate_expr(const u32string& s);

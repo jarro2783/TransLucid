@@ -20,46 +20,278 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PHYSICAL_WSS_HPP_INCLUDED
 #define PHYSICAL_WSS_HPP_INCLUDED
 
-#include <tl/workshop.hpp>
+#include <tl/types.hpp>
 
 namespace TransLucid
 {
-  class PhysicalWS : public WS
+  class HD 
   {
     public:
+    size_t
+    lifetime() const
+    {
+      return m_lt;
+    }
 
-    virtual void
-    setValue(const Constant& c, const Tuple& k) = 0;
+    protected:
+    void
+    init(size_t lt)
+    {
+      m_lt = lt;
+    }
+
+    size_t m_lt;
   };
 
-  //stores a single value no matter the context
-  class SingleValuePhysicalWS : public PhysicalWS
+  class InputHD : public virtual HD
   {
     public:
+    InputHD(size_t lt)
+    {
+      this->init(lt);
+    }
+
+    virtual Constant
+    get(const Tuple& k) const = 0;
+  };
+
+  class OutputHD : public virtual HD
+  {
+    public:
+    OutputHD(size_t lt)
+    {
+      this->init(lt);
+    }
+
+    virtual void
+    put(const Tuple& k, const Constant& c) = 0;
+
+    protected:
+    OutputHD()
+    {
+    }
+  };
+
+  class IOHD : public InputHD, public OutputHD
+  {
+    public:
+    IOHD(size_t lt)
+    : InputHD(lt)
+    {
+    }
+  };
+
+  template <size_t First, size_t... Rest>
+  class ArrayNHD
+  {
+  };
+
+  template <size_t... Limits>
+  class ArrayHD : public IOHD
+  {
+    private:
+  };
+
+  template <typename T, typename Wrapper>
+  class Array0HD : public IOHD
+  {
+    public:
+    Array0HD(size_t index)
+    : IOHD(1)
+    {
+      m_data = new T;
+    }
+
+    ~Array0HD()
+    {
+      delete m_data;
+    }
+
+    const T&
+    operator()() const
+    {
+      return *m_data;
+    }
+
     void
-    setValue(const Constant& c, const Tuple& k)
+    operator()(const T& v)
     {
-      m_value = c;
+      *m_data = v;
     }
 
-    const Constant&
-    get() const
+    Constant
+    get(const Tuple& k) const
     {
-      return m_value;
+      return Constant(Wrapper(*m_data), index);
     }
 
-    Constant&
-    get()
+    void
+    put(const Tuple& k, const Constant& c)
     {
-      return m_value;
+      try
+      {
+        *m_data = c.value<T>().value();
+      } catch (...)
+      {
+      }
     }
 
     private:
-    Constant m_value;
+    T* m_data;
   };
 
-  class ArrayPhysicalWS : public PhysicalWS
+  template <typename T, typename Wrapper>
+  class Array1HD : public IOHD
   {
+    public:
+    Array1HD(size_t end0)
+    : IOHD(1)
+    , m_end0(end0)
+    {
+      m_data = new T[end0];
+    }
+
+    ~Array1HD()
+    {
+      delete [] m_data;
+    }
+
+    void
+    operator()(size_t i0, const T& v)
+    {
+      m_data[i0] = v;
+    }
+
+    const T&
+    operator()(size_t i0)
+    {
+      return m_data[i0];
+    }
+
+    Constant
+    get(const Tuple& k) const
+    {
+      return Constant(Wrapper(*m_data), index);
+    }
+
+    void
+    put(const Tuple& k, const Constant& c)
+    {
+      try
+      {
+        *m_data = c.value<T>().value();
+      } catch (...)
+      {
+      }
+    }
+
+    T* m_data;
+    size_t m_end0;
+  };
+
+  template <typename T, typename Wrapper>
+  class Array2HD : public IOHD
+  {
+    public:
+    Array2HD(size_t end0, size_t end1)
+    : IOHD(1)
+    , m_end0(end0)
+    , m_end1(end1)
+    {
+      m_data = new T[end0][end1];
+    }
+
+    ~Array2HD()
+    {
+      delete [] m_data;
+    }
+
+    void
+    operator()(size_t i0, size_t i1, const T& v)
+    {
+      m_data[i0 * m_end1 + i1] = v;
+    }
+
+    const T&
+    operator()(size_t i0, size_t i1)
+    {
+      return m_data[i0 * m_end1 + i1];
+    }
+
+    T* m_data;
+    size_t m_end0, m_end1, m_end2;
+  };
+
+  template <typename T, typename Wrapper>
+  class Array3HD : public IOHD
+  {
+    public:
+    Array3HD(size_t end0, size_t end1, size_t end2)
+    : IOHD(1)
+    , m_end0(end0)
+    , m_end1(end1)
+    , m_end2(end2)
+    {
+      m_data = new T[end0][end1][end2];
+    }
+
+    ~Array3HD()
+    {
+      delete [] m_data;
+    }
+
+    void
+    operator()(size_t i0, size_t i1, size_t i2, const T& v)
+    {
+      m_data[i0 * (m_end1*m_end2) + i1 * m_end2 + i2] = v;
+    }
+
+    const T&
+    operator()(size_t i0, size_t i1, size_t i2)
+    {
+      return m_data[i0 * (m_end1*m_end2) + i1 * m_end2 + i2];
+    }
+
+    T* m_data;
+
+    size_t m_end0, m_end1, m_end2;
+  };
+
+  template <typename T, typename Wrapper>
+  class Array4HD : public IOHD
+  {
+    public:
+    Array4HD(size_t end0, size_t end1, size_t end2, size_t end3)
+    : IOHD(1)
+    , m_end0(end0)
+    , m_end1(end1)
+    , m_end2(end2)
+    , m_end3(end3)
+    {
+      m_data = new T[end0][end1][end2][end3];
+    }
+
+    ~Array4HD()
+    {
+      delete [] m_data;
+    }
+
+    void
+    operator()(size_t i0, size_t i1, size_t i2, size_t i3, const T& v)
+    {
+      m_data[i0 * (m_end1*m_end2*m_end3) + 
+             i1 * (m_end2*m_end3) + i2 * m_end3 + i3] = v;
+    }
+
+    const T&
+    operator()(size_t i0, size_t i1, size_t i2, size_t i3)
+    {
+      return m_data[i0 * (m_end1*m_end2*m_end3) + 
+                    i1 * (m_end2*m_end3) + i2 * m_end3 + i3];
+    }
+
+    T* m_data;
+    size_t m_end0, m_end1, m_end2, m_end3;
   };
 }
 
