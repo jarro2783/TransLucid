@@ -90,6 +90,7 @@ namespace detail
     : m_lexer(m_errors)
     , m_expr(h, m_lexer)
     , m_equation(m_lexer)
+    , m_tuple(m_lexer)
     , m_header_grammar(m_lexer)
     , m_header_binary(m_lexer)
     , m_header_string(m_lexer)
@@ -127,24 +128,6 @@ Translator::Translator(System& system)
     m_header = new Parser::Header;
 
     m_parsers = new detail::AllParsers(*m_header);
-
-    #if 0
-    m_lexer = new Lexer::tl_lexer;
-    //m_expr = new Parser::ExprGrammar<Parser::iterator_t>(*m_header, *m_lexer);
-    m_expr = create_expr_grammar(*m_header, *m_lexer);
-    m_equation = new Parser::EquationGrammar<Parser::iterator_t>(*m_lexer);
-    //m_tuple = new Parser::TupleGrammar<Parser::iterator_t>;
-    m_tuple = Parser::create_tuple_grammar();
-    m_header_grammar = new Parser::HeaderGrammar<Parser::iterator_t>(*m_lexer);
-
-    m_expr->set_tuple(*m_tuple);
-    m_tuple->set_expr(*m_expr);
-
-    m_equation->set_expr(*m_expr);
-    m_equation->set_tuple(*m_tuple);
-
-    m_header_grammar->set_expr(*m_expr);
-    #endif
   }
   catch (...)
   {

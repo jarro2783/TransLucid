@@ -251,16 +251,16 @@ namespace TransLucid
       at_expr =
          hash_expr [_a = _1]
       >> (
-           (literal('@') >> at_expr)
+           (tok.at_ >> at_expr)
              [
-               _val = construct<Tree::AtExpr>(_a, _1, false)
+               _val = construct<Tree::AtExpr>(_a, _2, false)
              ]
          | qi::eps [_val = _a]
          )
       ;
 
       hash_expr =
-        ( literal('#') > hash_expr [_val = construct<Tree::HashExpr>(_1)])
+        ( tok.hash_ > hash_expr [_val = construct<Tree::HashExpr>(_1)])
         | phi_application [_val = _1]
       ;
 
@@ -283,7 +283,7 @@ namespace TransLucid
         (
          primary_expr[_a = _1] 
       >> *(
-            literal('.') > primary_expr
+            tok.dot_ > primary_expr
             [
               _a = construct<Tree::ValueAppExpr>(_a, _1)
             ]
@@ -301,9 +301,9 @@ namespace TransLucid
       //| specials
       | ident_constant [_val = _1]
       | context_perturb [_val = _1]
-      | (literal('(') >> expr > literal(')')) 
+      | (tok.lparen_ >> expr > tok.rparen_) 
         [
-          _val = construct<Tree::ParenExpr>(_1)
+          _val = construct<Tree::ParenExpr>(_2)
         ]
 //        | delimiters
       | function_abstraction [_val = _1]

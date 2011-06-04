@@ -47,7 +47,8 @@ namespace TransLucid
     {
       public:
 
-      TupleGrammar();
+      template <typename TokenDef>
+      TupleGrammar(TokenDef& tok);
 
       /**
        * Set the expression parser. The tuple parser requires an expression
@@ -80,14 +81,8 @@ namespace TransLucid
         pair
       ;
     };
-
-    /**
-     * Creates a new TupleGrammar.
-     * This should be freed with delete.
-     * @return A TupleGrammar allocated with new.
-     */
     TupleGrammar<iterator_t>*
-    create_tuple_grammar();
+    create_tuple_grammar(Lexer::tl_lexer& l);
   }
 }
 

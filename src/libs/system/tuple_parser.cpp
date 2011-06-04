@@ -68,35 +68,36 @@ namespace TransLucid
     template class TupleGrammar<iterator_t>;
     
     template <typename Iterator>
-    TupleGrammar<Iterator>::TupleGrammar()
+    template <typename TokenDef>
+    TupleGrammar<Iterator>::TupleGrammar(TokenDef& tok)
     : TupleGrammar::base_type(context_perturb)
     {
       using namespace qi::labels;
       using namespace boost::phoenix;
       namespace phoenix = boost::phoenix;
 
-      tuple_inside = pair[push_back(_val, _1)] % literal(',');
+      tuple_inside = pair[push_back(_val, _1)] % tok.comma_;
 
-      pair %=
+      pair =
         (
            expr
-         >  literal(':')
+         >  tok.maps_
          > expr
         )
-        //[
-        //  _val = construct<boost::fusion::vector<Tree::Expr, Tree::Expr>>
-        //         (_1, _2)
-        //]
+        [
+          _val = construct<boost::fusion::vector<Tree::Expr, Tree::Expr>>
+                 (_1, _3)
+        ]
       ;
 
       context_perturb =
          (
-            literal('[')
+            tok.lbracket_
           > tuple_inside
-          > literal(']')
+          > tok.rbracket_
          )
          [
-           _val = construct<Tree::TupleExpr>(make_tuple(_1))
+           _val = construct<Tree::TupleExpr>(make_tuple(_2))
          ]
       ;
 
@@ -111,9 +112,9 @@ namespace TransLucid
     }
 
     TupleGrammar<iterator_t>*
-    create_tuple_grammar()
+    create_tuple_grammar(Lexer::tl_lexer& l)
     {
-      return new TupleGrammar<iterator_t>;
+      return new TupleGrammar<iterator_t>(l);
     }
   }
 }

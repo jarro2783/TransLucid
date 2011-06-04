@@ -74,12 +74,28 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   integer_           = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
   character_         = L"'([^'\\\\]|\\\\.)+'";
 
+  decl_     = L':';
+  lbracket_ = L'[';
+  rbracket_ = L']';
+  dot_      = L'.'; 
+  def_      = L'=';
+  and_      = L'&';
+  hash_     = L'#';
+  at_       = L'@';
+  slash_    = L'\\';
+  lparen_   = L'(';
+  rparen_   = L')';
+  pipe_     = L'|';
+  comma_    = L',';
+
+  maps_       = L"<-";
   dblslash_   = L"\\\\\\\\";
   range_      = L"\\.\\.";
   arrow_      = L"->";
   dblsemi_    = L";;";
   dbldollar_  = L"\\$\\$";
   dblpercent_ = L"%%";
+  assign_     = L":=";
 
   real_     = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";
   rational_ = L"(0_1)|(~?)({ratDEC}|{ratNONDEC})";
@@ -108,6 +124,8 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   | dblsemi_
   | dbldollar_
   | dblpercent_
+  | assign_
+  | maps_
 
   //constants
   | constantRAW_       [detail::build_constant()]
@@ -126,20 +144,20 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   | unary_
 
   //single character symbols
-  | L':'
-  | L'['
-  | L']'
-  | L'.'
-  | L'='
-  | L'&'
-  | L'#'
-  | L'@'
-  | L'\\'
-  | L'('
-  | L')'
-  | L'|'
-  | L','
-
+  | decl_
+  | lbracket_
+  | rbracket_
+  | dot_
+  | def_
+  | and_
+  | hash_
+  | at_
+  | slash_
+  | lparen_
+  | rparen_
+  | pipe_
+  | comma_
+  
   | identifier_
   ;
 

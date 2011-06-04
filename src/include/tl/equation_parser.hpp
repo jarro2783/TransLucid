@@ -59,21 +59,22 @@ namespace TransLucid
               tok.identifier_[_a = _1]
            >> guard
            >> boolean
-           >> qi::lit('=')
+           >> tok.def_
            >> expr
           )
           [
             _val = construct<Equation>(_a, _2, _3, _4)
           ]
+           >  tok.dblsemi_
         ;
 
         guard =
-          ( qi::lit('|') >> context_perturb[_val = _1])
+          ( tok.pipe_ >> context_perturb[_val = _1])
         | qi::eps [_val = construct<Tree::nil>()]
         ;
 
         boolean =
-          ( qi::lit('&') >> expr[_val = _1])
+          ( tok.and_ >> expr[_val = _1])
         | qi::eps [_val = construct<Tree::nil>()]
         ;
 

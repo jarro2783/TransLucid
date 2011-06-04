@@ -524,6 +524,7 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
         auto result = m_translator->parseHeaderString(current, end);
         if (result.first)
         {
+          //what should loading a library return?
           loadLibrary(result.second);
         }
       }
