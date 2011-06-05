@@ -63,6 +63,12 @@ TLText::TLText()
 void 
 TLText::run()
 {
+  *m_is >> std::noskipws;
+
+  Parser::U32Iterator begin(
+    Parser::makeUTF8Iterator(boost::spirit::istream_iterator(*m_is)),
+    Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
+  );
 }
 
 } //namespace TLCore

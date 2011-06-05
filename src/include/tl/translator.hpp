@@ -169,23 +169,6 @@ namespace TransLucid
     translate_expr(const u32string& s);
 
     /**
-     * Translate an equation set and add it to the system.
-     * Parses a set of equations, compiles them, and adds them to the system
-     * that the Translator has.
-     * @param s The string representing the equation set.
-     */
-    std::list<std::pair<uuid, Parser::Equation>>
-    translate_and_add_equation_set(const u32string& s);
-
-    /**
-     * Translates an equation set.
-     * Parses a set of equations and compiles them.
-     * @param s The string representing the equation set.
-     */
-    PTEquationVector
-    translate_equation_set(const u32string& s);
-
-    /**
      * Add to the header. Parses the input string as a sequence of header
      * items and add them to the header.
      * @param s The header string.
@@ -194,7 +177,7 @@ namespace TransLucid
     bool
     parse_header(const u32string& s);
 
-    std::pair<bool, Parser::Equation>
+    std::pair<bool, std::pair<Parser::Equation, Parser::DeclType>>
     parseEquation
     (
       Parser::U32Iterator& begin, 

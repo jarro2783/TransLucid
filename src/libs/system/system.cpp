@@ -381,23 +381,11 @@ System::addEquation(const u32string& name, const GuardWS& guard, WS* e)
   return var->addEquation(name, guard, e, m_time);
 }
 
-WS*
-System::translate_expr(const u32string& s)
-{
-  return m_translator->translate_expr(s);
-}
-
-std::list<std::pair<uuid, Parser::Equation>>
-System::translate_and_add_equation_set(const u32string& s)
-{
-  return m_translator->translate_and_add_equation_set(s);
-}
-
-PTEquationVector
-System::translate_equation_set(const u32string& s)
-{
-  return m_translator->translate_equation_set(s);
-}
+//WS*
+//System::translate_expr(const u32string& s)
+//{
+//  return m_translator->translate_expr(s);
+//}
 
 bool
 System::parse_header(const u32string& s)
@@ -480,9 +468,9 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
       case LINE_EQN:
       {
         auto result = m_translator->parseEquation(current, end);
-        if (result.first)
+        if (result.first && result.second.second == Parser::DECL_DEF)
         {
-          return addEquation(result.second);
+          return addEquation(result.second.first);
         }
         else
         {
@@ -492,6 +480,13 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
 
       case LINE_ASSIGN:
       //parse an assignment
+      {
+        auto result = m_translator->parseEquation(current, end);
+        if (result.first && result.second.second == Parser::DECL_ASSIGN)
+        {
+          //return 
+        }
+      }
       break;
 
       case LINE_DIM:

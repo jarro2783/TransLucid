@@ -29,59 +29,6 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-namespace
-{
-  namespace qi = boost::spirit::qi;
-
-  template <typename Iterator>
-  class EquationSetGrammar
-  : public qi::grammar<Iterator, std::vector<Parser::Equation>()>
-  {
-    public:
-    template <typename T, typename TokenDef>
-    EquationSetGrammar(T& t, TokenDef& tok)
-    : EquationSetGrammar::base_type(equations)
-    {
-      using boost::phoenix::push_back;
-      using namespace qi::labels;
-
-      eqn %= t;
-
-      one_equation = eqn
-        [
-          _val = _1
-        ]
-      ;
-
-      equations %= *(one_equation >> tok.dblsemi_) >> qi::eoi
-        //[
-        //  push_back(_val, _1)
-        //]
-      ;
-
-      BOOST_SPIRIT_DEBUG_NODE(one_equation);
-      //BOOST_SPIRIT_DEBUG_NODE(equations);
-    }
-
-    private:
-
-    qi::rule
-    <
-      Iterator,
-      std::vector<Parser::Equation>()
-    > equations;
-
-    qi::rule
-    <
-      Iterator,
-      Parser::Equation()
-    >
-      one_equation,
-      eqn
-    ;
-  };
-}
-
 namespace detail
 {
   struct AllParsers
@@ -183,14 +130,14 @@ Translator::translate_expr(const u32string& u32s)
   return m_compiler.compile_top_level(e);
 }
 
-std::pair<bool, Parser::Equation>
+std::pair<bool, std::pair<Parser::Equation, Parser::DeclType>>
 Translator::parseEquation
 (
   Parser::U32Iterator& begin, 
   const Parser::U32Iterator& end
 )
 {
-  Parser::Equation eqn;
+  std::pair<Parser::Equation, Parser::DeclType> eqn;
   bool success = boost::spirit::lex::tokenize_and_parse(
     begin,
     end,
@@ -200,93 +147,6 @@ Translator::parseEquation
   );
 
   return std::make_pair(success, eqn);
-}
-
-PTEquationVector
-Translator::translate_equation_set(const u32string& s)
-{
-  Lexer::base_iterator_t pos(Lexer::base_iterator_t(
-    Parser::makeUTF32Iterator(s.begin()),
-    Parser::makeUTF32Iterator(s.end())));
-
-  EquationSetGrammar<Parser::iterator_t> equation_set
-    (m_parsers->m_equation, m_parsers->m_lexer);
-  std::vector<Parser::Equation> parsedEquations;
-
-  bool success = boost::spirit::lex::tokenize_and_parse(
-    pos,
-    Lexer::base_iterator_t(),
-    m_parsers->m_lexer,
-    equation_set,
-    parsedEquations);
-
-  if (!success)
-  {
-    throw "failed parsing equations";
-  }
-
-  PTEquationVector equations;
-
-  BOOST_FOREACH(auto& v, parsedEquations)
-  {
-    WS* context = m_compiler.compile_for_equation(std::get<1>(v));
-    WS* boolean = m_compiler.compile_for_equation(std::get<2>(v));
-    WS* e = m_compiler.compile_for_equation(std::get<3>(v));
-    equations.push_back(
-      std::make_pair(
-      v,
-      TranslatedEquation(
-        to_u32string(std::get<0>(v)),
-        context,
-        boolean,
-        e)
-      )
-    );
-
-    #if 0
-
-    typedef std::back_insert_iterator<std::string> out_iter;
-    Printer::ExprPrinter<out_iter> print_grammar;
-    std::string generated;
-    std::back_insert_iterator<std::string> outit(generated);
-
-    std::cerr << "parsed equation: " << std::endl;
-    std::cerr << "name: " << utf32_to_utf8(to_u32string(std::get<0>(v)))
-    << std::endl;
-
-    Printer::karma::generate(outit, print_grammar, std::get<1>(v));
-    std::cerr << "guard: " << generated << std::endl;
-
-    generated.clear();
-    Printer::karma::generate(outit, print_grammar, std::get<2>(v));
-    std::cerr << "boolean: " << generated << std::endl;
-
-    generated.clear();
-    Printer::karma::generate(outit, print_grammar, std::get<3>(v));
-    std::cerr << "equation: " << generated << std::endl;
-    #endif
-  }
-
-  return equations;
-}
-
-std::list<std::pair<uuid, Parser::Equation>>
-Translator::translate_and_add_equation_set(const u32string& s)
-{
-  PTEquationVector equations = translate_equation_set(s);
-  std::list<std::pair<uuid, Parser::Equation>> added;
-
-  BOOST_FOREACH(auto& ptv, equations)
-  {
-    auto v = ptv.second;
-    uuid id = m_system.addEquation(std::get<0>(v), 
-      GuardWS(std::get<1>(v), std::get<2>(v)), std::get<3>(v));
-
-    m_uuidParsedEqns.insert(std::make_pair(id, ptv.first));
-    added.push_back(std::make_pair(id, ptv.first));
-  }
-
-  return added;
 }
 
 bool

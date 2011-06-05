@@ -38,8 +38,7 @@ namespace TransLucid
     : public qi::grammar
       <
         Iterator, 
-        Equation(),
-        qi::locals<u32string>
+        std::pair<Equation, DeclType>()
       >
     {
       public:
@@ -56,14 +55,18 @@ namespace TransLucid
 
         equation =
           (
-              tok.identifier_[_a = _1]
+              tok.identifier_
            >> guard
            >> boolean
-           >> tok.def_
+           >> declaration
            >> expr
           )
           [
-            _val = construct<Equation>(_a, _2, _3, _4)
+            _val = construct<std::pair<Equation, DeclType>>
+              (
+                construct<Equation>(_1, _2, _3, _5),
+                _4
+              )
           ]
            >  tok.dblsemi_
         ;
@@ -76,6 +79,11 @@ namespace TransLucid
         boolean =
           ( tok.and_ >> expr[_val = _1])
         | qi::eps [_val = construct<Tree::nil>()]
+        ;
+
+        declaration =
+          tok.def_[_val = DECL_DEF]
+        | tok.assign_[_val = DECL_ASSIGN]
         ;
 
         BOOST_SPIRIT_DEBUG_NODE(boolean);
@@ -110,7 +118,7 @@ namespace TransLucid
 
       private:
 
-      qi::rule<Iterator, Equation(), qi::locals<u32string>>
+      qi::rule<Iterator, std::pair<Equation, DeclType>()>
         equation
       ;
 
@@ -120,6 +128,8 @@ namespace TransLucid
         context_perturb,
         expr
       ;
+
+      qi::rule<Iterator, DeclType()> declaration;
     };
 
     extern template class EquationGrammar<iterator_t>;

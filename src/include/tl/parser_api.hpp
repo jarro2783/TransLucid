@@ -27,9 +27,15 @@ namespace TransLucid
 {
   namespace Parser
   {
+    enum DeclType
+    {
+      DECL_DEF,
+      DECL_ASSIGN
+    };
+
     /**
      * A parsed equation.
-     * The tuple is defined as: name, | [], & bool, = WS
+     * The tuple is defined as: name, | [], & bool, Expr, = or :=
      */
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     Equation;

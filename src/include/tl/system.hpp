@@ -114,14 +114,8 @@ namespace TransLucid
     //void
     //eval(const std::list<uuid>& exprs, PhysicalWS* out);
 
-    WS*
-    translate_expr(const u32string& s);
-
-    std::list<std::pair<uuid, Parser::Equation>>
-    translate_and_add_equation_set(const u32string& s);
-
-    PTEquationVector
-    translate_equation_set(const u32string& s);
+    //WS*
+    //translate_expr(const u32string& s);
 
     bool
     parse_header(const u32string& s);
