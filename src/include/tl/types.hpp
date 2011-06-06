@@ -91,14 +91,14 @@ namespace TransLucid
 
   template <typename T>
   void
-  set_constant(Constant2& c, T v)
+  set_constant(Constant& c, T v)
   {
     detail::set_constant_func<T>()(c, v);
   }
 
   template <typename T>
   T
-  get_constant(Constant2& c)
+  get_constant(Constant& c)
   {
     return detail::get_constant_func<T>()(c);
   }
@@ -106,236 +106,48 @@ namespace TransLucid
   /**
    * @brief Constant value.
    */
-  class Constant2
-  {
-    public:
-
-    template <typename T>
-    Constant2(T value, type_index i)
-    : index(i)
-    {
-      set_constant(*this, value);
-    }
-
-    union
-    {
-      int8_t      si8;
-      uint8_t     ui8;
-      int16_t     si16;
-      uint16_t    ui16;
-      int32_t     si32;
-      uint32_t    ui32;
-      int64_t     si64;
-      uint64_t    ui64;
-      float       float_val;
-      double      double_val;
-      long double ldouble_val;
-      void*       ptr;
-    };
-
-    type_index index;
-  };
-
-  /**
-   * @brief Base class for typed value data.
-   *
-   * The actual representation for typed values are derived from this.
-   **/
-  class TypedValue
-  {
-    public:
-    virtual ~TypedValue() {}
-
-    virtual TypedValue* clone() const = 0;
-
-    /**
-     * @brief Compute the hash of a typed value.
-     **/
-    virtual size_t hash() const = 0;
-
-    virtual void print(std::ostream& os) const = 0;
-  };
-
-  /**
-   * @brief Computes the hash of a TypedValue.
-   **/
-  inline size_t
-  hash_value(const TypedValue& v)
-  {
-    return v.hash();
-  }
-
-  /**
-   * @brief Cooked value holder.
-   *
-   * Stores a cooked type value pair.
-   **/
   class Constant
   {
     public:
 
-    //error type
-    /**
-     * @brief Constructs an error value.
-     *
-     * This represents the internal error value. Nothing should ever
-     * have this value.
-     **/
     Constant()
-    : m_value(0), m_index(0)
     {
+      data.index = 0;
+      data.ptr = nullptr;
     }
 
-    /**
-     * @brief Construct a typed value.
-     *
-     * The type is referenced by @a index which must be a valid index
-     * in TransLucid::TypeRegistry. T must inherit from TypedValue.
-     **/
-    Constant(const TypedValue& value, type_index index)
-    : m_value(value.clone()),
-    m_index(index)
-    {
-    }
-
-    Constant(const Constant& rhs)
-    : 
-    m_value(rhs.m_value != 0 ? rhs.m_value->clone() : 0),
-    m_index(rhs.m_index)
-    {
-    }
-
-    ~Constant() {
-      delete m_value;
-    }
-
-    Constant&
-    operator=(const Constant& rhs)
-    {
-      if (this != &rhs)
-      {
-        //if this throws nothing else happens, the object stays as it is
-        //and the exception goes on
-        TypedValue* v = rhs.m_value->clone();
-        delete m_value;
-        m_value = v;
-        m_index = rhs.m_index;
-      }
-
-      return *this;
-    }
-
-    bool
-    operator==(const Constant& rhs) const
-    {
-      return m_index == rhs.m_index
-      && m_value->hash() == rhs.m_value->hash();
-    }
-
-    bool
-    operator!=(const Constant& rhs) const
-    {
-      return !(*this == rhs);
-    }
-
-    #if 0
-    bool
-    operator<(const Constant& rhs) const
-    {
-      if (m_index != rhs.m_index)
-      {
-        return m_index < rhs.m_index;
-      }
-      else
-      {
-        return m_value->less(*rhs.m_value);
-      }
-    }
-    #endif
-
-    /**
-     * @brief Computes the hash of the typed value.
-     *
-     * The hash includes the index.
-     **/
-    size_t
-    hash() const
-    {
-      size_t seed = m_index;
-      boost::hash_combine(seed, m_value->hash());
-      return seed;
-    }
-
-    //get the value stored, provides a function that returns the actual
-    //value and a reference and pointer function that do the dynamic
-    //cast for the user
-    /**
-     * @brief Retrieve the value stored.
-     *
-     * Attempts to cast the value stored to T.
-     * @throw bad_cast if the cast fails.
-     **/
     template <typename T>
-    const T&
-    value() const
+    Constant(T value, type_index i)
     {
-      return dynamic_cast<const T&>(*m_value);
+      data.index = i;
+      set_constant(*this, value);
     }
 
-    /**
-     * @brief Retrieve the value stored.
-     *
-     * Returns the value stored as a TypedValue reference.
-     **/
-    const TypedValue&
-    value() const
+    struct
     {
-      return *m_value;
-    }
+      union
+      {
+        //Special     sp;
+        bool        tv;
+        char32_t    ch;
+        int8_t      si8;
+        uint8_t     ui8;
+        int16_t     si16;
+        uint16_t    ui16;
+        int32_t     si32;
+        uint32_t    ui32;
+        int64_t     si64;
+        uint64_t    ui64;
+        float       f32;
+        double      f64;
+        long double f80;
+        void*       ptr;
+      };
 
-    /**
-     * @brief Retrieve the value stored.
-     *
-     * Attempts to cast the value stored to T, if it fails 0 is returned.
-     **/
-    template <typename T>
-    const T*
-    valuep() const
-    {
-      return dynamic_cast<const T*>(m_value);
-    }
-
-    /**
-     * @brief Get the type index.
-     *
-     * @return The type index this was constructed with.
-     **/
-    type_index
-    index() const
-    {
-      return m_index;
-    }
-
-    void
-    print(std::ostream& os) const
-    {
-      m_value->print(os);
-    }
-
-    private:
-
-    TypedValue* m_value;
-    type_index m_index;
+      type_index index;
+      uint16_t field;
+    } data;
   };
-
-  /**
-   * @brief Computes the hash of a Constant.
-   **/
-  inline size_t
-  hash_value(const Constant& value)
-  {
-    return value.hash();
-  }
 
   typedef size_t dimension_index;
   /**
@@ -350,7 +162,7 @@ namespace TransLucid
    * unevaluated expressions as a mapped value, TransLucid::TupleIterator
    * will ensure that these are evaluated when their value is required.
    **/
-  class Tuple : public TypedValue
+  class Tuple
   {
     public:
     typedef tuple_t::const_iterator const_iterator;
@@ -464,6 +276,7 @@ namespace TransLucid
 
 } //namespace TransLucid
 
+#if 0
 inline std::ostream&
 operator<<(std::ostream& os, const TransLucid::Constant& v)
 {
@@ -482,6 +295,7 @@ namespace std
     }
   };
 }
+#endif
 
 //this has to be included down here so that the definitions are available
 //in the right places

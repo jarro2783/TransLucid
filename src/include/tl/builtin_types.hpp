@@ -32,7 +32,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class Special : public TypedValue
+  class Special
   {
     public:
     /**

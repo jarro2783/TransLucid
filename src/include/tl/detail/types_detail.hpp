@@ -30,9 +30,9 @@ namespace TransLucid
     struct set_constant_func<int8_t>
     {
       void
-      operator()(Constant2& c, int8_t v)
+      operator()(Constant& c, int8_t v)
       {
-        c.si8 = v;
+        c.data.si8 = v;
       }
     };
 
@@ -40,9 +40,9 @@ namespace TransLucid
     struct get_constant_func<int8_t>
     {
       int8_t
-      operator()(Constant2& c)
+      operator()(Constant& c)
       {
-        return c.si8;
+        return c.data.si8;
       }
     };
   }
