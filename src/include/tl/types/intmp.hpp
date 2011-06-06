@@ -1,5 +1,5 @@
-/* Forward declaration for types.
-   Copyright (C) 2011 Jarryd Beck and John Plaice
+/* The main type interface.
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -17,35 +17,18 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TL_TYPES_DETAIL_HPP
-#define TL_TYPES_DETAIL_HPP
-
-#include <tl/types.hpp>
+#ifndef TYPES_INTMP_HPP_INCLUDED
+#define TYPES_INTMP_HPP_INCLUDED
 
 namespace TransLucid
 {
-  namespace detail
+  namespace Types
   {
-    template <>
-    struct set_constant_func<int8_t>
+    namespace Intmp
     {
-      void
-      operator()(Constant& c, int8_t v)
-      {
-        c.data.si8 = v;
-        c.data.field = TYPE_FIELD_SI8;
-      }
-    };
-
-    template <>
-    struct get_constant_func<int8_t>
-    {
-      int8_t
-      operator()(Constant& c)
-      {
-        return c.data.si8;
-      }
-    };
+      bool 
+      equality();
+    }
   }
 }
 

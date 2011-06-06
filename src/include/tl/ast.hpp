@@ -282,7 +282,7 @@ namespace TransLucid
     <
       nil,
       bool,
-      Special::Value,     //replaces SpecialExpr
+      Special,     //replaces SpecialExpr
       mpz_class,          //replaces IntegerExpr
       char32_t,           //replaces UcharExpr
       u32string,          //replaces StringExpr

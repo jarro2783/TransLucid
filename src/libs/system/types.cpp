@@ -65,4 +65,9 @@ Tuple::print(std::ostream& os) const
   os << "]";
 }
 
+size_t
+Constant::hash() const
+{
+}
+
 } //namespace TransLucid

@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  #if 0
   class Range : public TypedValue
   {
     public:
@@ -101,6 +102,7 @@ namespace TransLucid
     const mpz_class* m_lower;
     const mpz_class* m_upper;
   };
+  #endif
 }
 
 #endif // RANGE_HPP_INCLUDED

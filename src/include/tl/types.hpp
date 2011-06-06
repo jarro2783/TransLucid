@@ -1,5 +1,5 @@
-/* All the types in the system.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+/* The main type interface.
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TYPES_H_INCLUDED
-#define TYPES_H_INCLUDED
+#ifndef TYPES_HPP_INCLUDED
+#define TYPES_HPP_INCLUDED
 
 #include <tl/types_fwd.hpp>
 
@@ -89,6 +89,19 @@ namespace TransLucid
 
   class Tuple;
 
+  enum Special
+  {
+    SP_ERROR, /**<Error value. Should never have this value, having a special
+    of this value means an error occured somewhere.*/
+    SP_ACCESS, /**<Access error. Something requested could not be accessed.*/
+    SP_TYPEERROR,
+    SP_DIMENSION,
+    SP_UNDEF,
+    SP_CONST,
+    SP_MULTIDEF,
+    SP_LOOP
+  };
+
   template <typename T>
   void
   set_constant(Constant& c, T v)
@@ -103,6 +116,30 @@ namespace TransLucid
     return detail::get_constant_func<T>()(c);
   }
 
+  struct PointerValue
+  {
+    int refCount;
+
+    void* data;
+  };
+
+  enum TypeField
+  {
+    TYPE_FIELD_SP, 
+    TYPE_FIELD_TV,
+    TYPE_FIELD_CH,
+    TYPE_FIELD_SI8,
+    TYPE_FIELD_UI8,
+    TYPE_FIELD_SI16,
+    TYPE_FIELD_UI16,
+    TYPE_FIELD_SI32,
+    TYPE_FIELD_UI32,
+    TYPE_FIELD_F32,
+    TYPE_FIELD_F64,
+    TYPE_FIELD_F80,
+    TYPE_FIELD_PTR
+  };
+
   /**
    * @brief Constant value.
    */
@@ -112,8 +149,17 @@ namespace TransLucid
 
     Constant()
     {
-      data.index = 0;
       data.ptr = nullptr;
+      data.index = 0;
+      data.field = TYPE_FIELD_SP;
+    }
+
+    Constant(const Constant& other)
+    {
+      if (other.data.field == TYPE_FIELD_PTR)
+      {
+        memcpy(&data, &other.data, sizeof(data));
+      }
     }
 
     template <typename T>
@@ -123,11 +169,17 @@ namespace TransLucid
       set_constant(*this, value);
     }
 
+    size_t
+    hash() const;
+
+    bool
+    operator==(const Constant& rhs) const;
+
     struct
     {
       union
       {
-        //Special     sp;
+        Special     sp;
         bool        tv;
         char32_t    ch;
         int8_t      si8;
@@ -141,13 +193,20 @@ namespace TransLucid
         float       f32;
         double      f64;
         long double f80;
-        void*       ptr;
+
+        PointerValue* ptr;
       };
 
       type_index index;
-      uint16_t field;
+      TypeField field;
     } data;
   };
+
+  inline size_t
+  hash_value(const Constant& c)
+  {
+    return c.hash();
+  }
 
   typedef size_t dimension_index;
   /**
@@ -283,6 +342,7 @@ operator<<(std::ostream& os, const TransLucid::Constant& v)
   v.print(os);
   return os;
 }
+#endif
 
 namespace std
 {
@@ -295,7 +355,6 @@ namespace std
     }
   };
 }
-#endif
 
 //this has to be included down here so that the definitions are available
 //in the right places
