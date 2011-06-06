@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt
 
-check_PROGRAMS = expressions equations printing lexer iterator_test
+check_PROGRAMS = lexer iterator_test
 
 AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -26,11 +26,11 @@ $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(TL_LDFLAGS)
 AM_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
 
-expressions_SOURCES = expressions.cpp
+#expressions_SOURCES = expressions.cpp
 
-equations_SOURCES = equations.cpp
+#equations_SOURCES = equations.cpp
 
-printing_SOURCES = printing.cpp
+#printing_SOURCES = printing.cpp
 
 lexer_SOURCES = lexer.cpp
 
