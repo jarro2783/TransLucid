@@ -18,7 +18,7 @@ dnl   <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.61])
 AC_INIT([tl], [0.0.70], [jarrydb@cse.unsw.edu.au])
-AC_CONFIG_SRCDIR([src/dirsystem/main.cpp])
+AC_CONFIG_SRCDIR([src/libs/system/system.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -77,16 +77,15 @@ AC_CONFIG_FILES([Makefile
                  doc/Doxyfile
                  src/Makefile
                  src/basic/Makefile
-                 src/dirsystem/Makefile
                  src/include/Makefile
                  src/include/tl/Makefile
                  src/include/tl/detail/Makefile
-                 src/interactive/Makefile
                  src/libs/Makefile
                  src/libs/int/Makefile
                  src/libs/string/Makefile
                  src/libs/system/Makefile
                  src/tests/Makefile
                  src/tlcore/Makefile
+                 src/tltext/Makefile
                  ])
 AC_OUTPUT

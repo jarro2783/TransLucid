@@ -94,6 +94,9 @@ namespace TransLucid
     Constant
     addEquation(const Parser::Equation& eqn);
 
+    Constant
+    addAssignment(const Parser::Equation& eqn);
+
     Constant 
     addDimension(const u32string& dimension);
 
@@ -130,9 +133,19 @@ namespace TransLucid
     lastExpression() const;
 
     private:
-    DimensionTranslator m_dimTranslator;
+    typedef std::map<u32string, VariableWS*> DefinitionMap;
 
-    size_t m_time;
+    // OPTYPE, ATL_SYMBOL
+    typedef std::tuple<uuid, uuid> UnaryHashes;
+
+    // OPTYPE, ATL_SYMBOL, ASSOC, PREC
+    typedef std::tuple<uuid, uuid, uuid, uuid> BinaryHashes;
+
+    typedef std::unordered_set<uuid, boost::hash<uuid>> UUIDHashSet;
+    typedef std::unordered_map<uuid, UnaryHashes, boost::hash<uuid>> 
+      UnaryHashSet;
+    typedef std::unordered_map<uuid, BinaryHashes, boost::hash<uuid>>
+      BinaryHashSet;
 
     //initialises the type indexes
     void
@@ -168,33 +181,33 @@ namespace TransLucid
     Constant
     addPrecedence(const u32string& symbol, const mpz_class& precedence);
 
-    std::map<u32string, size_t> builtin_name_to_index;
+    uuid
+    addDeclInternal
+    (
+      const u32string& name, 
+      const GuardWS& guard, WS* e,
+      DefinitionMap& declarations
+    );
 
-    std::map<u32string, VariableWS*> m_equations;
+    Constant
+    addDeclInternal(const Parser::Equation& eqn, DefinitionMap& declarations);
+
+    DefinitionMap m_equations;
+    DefinitionMap m_assignments;
 
     //the uuid generator
     boost::uuids::basic_random_generator<boost::mt19937>
     m_uuid_generator;
 
-    Translator *m_translator;
-
     //---- the sets of all the uuids of objects ----
-
-    // OPTYPE, ATL_SYMBOL
-    typedef std::tuple<uuid, uuid> UnaryHashes;
-
-    // OPTYPE, ATL_SYMBOL, ASSOC, PREC
-    typedef std::tuple<uuid, uuid, uuid, uuid> BinaryHashes;
-
-    typedef std::unordered_set<uuid, boost::hash<uuid>> UUIDHashSet;
-    typedef std::unordered_map<uuid, UnaryHashes, boost::hash<uuid>> 
-      UnaryHashSet;
-    typedef std::unordered_map<uuid, BinaryHashes, boost::hash<uuid>>
-      BinaryHashSet;
-
     UUIDHashSet m_dimension_uuids;
     UnaryHashSet m_unop_uuids;
     BinaryHashSet m_binop_uuids;
+
+    DimensionTranslator m_dimTranslator;
+    size_t m_time;
+    Translator *m_translator;
+    std::map<u32string, size_t> builtin_name_to_index;
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);

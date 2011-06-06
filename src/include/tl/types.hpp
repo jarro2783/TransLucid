@@ -20,6 +20,8 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_H_INCLUDED
 #define TYPES_H_INCLUDED
 
+#include <tl/types_fwd.hpp>
+
 #include <boost/functional/hash.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -86,6 +88,53 @@ namespace TransLucid
   using boost::uuids::nil_uuid;
 
   class Tuple;
+
+  template <typename T>
+  void
+  set_constant(Constant2& c, T v)
+  {
+    detail::set_constant_func<T>()(c, v);
+  }
+
+  template <typename T>
+  T
+  get_constant(Constant2& c)
+  {
+    return detail::get_constant_func<T>()(c);
+  }
+
+  /**
+   * @brief Constant value.
+   */
+  class Constant2
+  {
+    public:
+
+    template <typename T>
+    Constant2(T value, type_index i)
+    : index(i)
+    {
+      set_constant(*this, value);
+    }
+
+    union
+    {
+      int8_t      si8;
+      uint8_t     ui8;
+      int16_t     si16;
+      uint16_t    ui16;
+      int32_t     si32;
+      uint32_t    ui32;
+      int64_t     si64;
+      uint64_t    ui64;
+      float       float_val;
+      double      double_val;
+      long double ldouble_val;
+      void*       ptr;
+    };
+
+    type_index index;
+  };
 
   /**
    * @brief Base class for typed value data.
@@ -433,5 +482,9 @@ namespace std
     }
   };
 }
+
+//this has to be included down here so that the definitions are available
+//in the right places
+#include <tl/detail/types_detail.hpp>
 
 #endif

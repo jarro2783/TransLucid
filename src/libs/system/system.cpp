@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-//---------Header Equations-------------
+//--------- Header Equations -------------
 //For dimensions:
 //DIM | [name : "dimension"] = true;;
 //
@@ -28,6 +28,22 @@ along with TransLucid; see the file COPYING.  If not see
 //For binary:
 //ASSOC | [symbol : "s"] = "{LEFT, RIGHT, NON}";;
 //PREC  | [symbol : "s"] = N;;
+
+//---- Adding Equations / Assignments ----
+//As these are both almost identical, but are stored in a different variable,
+//the code for adding these has been written only once.
+//There are two types of functions:
+//add*(Parser::Equation) and
+//add*(name, guard, varws)
+//The common code has been put in:
+//addDeclInternal
+//with both overloads. The former translates the trees and then simply calls
+//the latter. They both take a reference to the data structure to store these
+//in.
+//The specific functions addEquation and addAssignment are both wrappers for
+//the appropriate addDeclInternal, they pass m_equations and m_assignments
+//respectively.
+
 
 #include <tl/builtin_types.hpp>
 #include <tl/consthd.hpp>
@@ -365,27 +381,8 @@ System::operator()(const Tuple& k)
 uuid
 System::addEquation(const u32string& name, const GuardWS& guard, WS* e)
 {
-  auto i = m_equations.find(name);
-  VariableWS* var = nullptr;
-
-  if (i == m_equations.end())
-  {
-    var = new VariableWS(name, this);
-    m_equations.insert(std::make_pair(name, var));
-  }
-  else
-  {
-    var = i->second;
-  }
-
-  return var->addEquation(name, guard, e, m_time);
+  return addDeclInternal(name, guard, e, m_equations);
 }
-
-//WS*
-//System::translate_expr(const u32string& s)
-//{
-//  return m_translator->translate_expr(s);
-//}
 
 bool
 System::parse_header(const u32string& s)
@@ -484,7 +481,7 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
         auto result = m_translator->parseEquation(current, end);
         if (result.first && result.second.second == Parser::DECL_ASSIGN)
         {
-          //return 
+          return addAssignment(result.second.first);
         }
       }
       break;
@@ -549,21 +546,7 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
 Constant
 System::addEquation(const Parser::Equation& eqn)
 {
-  //simplify, turn into workshops
-  Tree::Expr guard   = toWSTree(std::get<1>(eqn));
-  Tree::Expr boolean = toWSTree(std::get<2>(eqn));
-  Tree::Expr expr    = toWSTree(std::get<3>(eqn));
-
-  ExprCompiler compile(this);
-
-  uuid u = addEquation(
-    std::get<0>(eqn),
-    GuardWS(compile.compile_for_equation(guard),
-      compile.compile_for_equation(boolean)),
-    compile.compile_for_equation(expr)
-  );
-
-  return Constant(UUID(u), TYPE_INDEX_UUID);
+  return addDeclInternal(eqn, m_equations);
 }
 
 Constant 
@@ -695,6 +678,61 @@ Constant
 System::addPrecedence(const u32string& symbol, const mpz_class& precedence)
 {
   return addSymbolInfo(U"PREC", symbol, precedence);
+}
+
+uuid
+System::addDeclInternal
+(
+  const u32string& name, 
+  const GuardWS& guard, WS* e,
+  DefinitionMap& declarations
+)
+{
+  auto i = declarations.find(name);
+  VariableWS* var = nullptr;
+
+  if (i == declarations.end())
+  {
+    var = new VariableWS(name, this);
+    declarations.insert(std::make_pair(name, var));
+  }
+  else
+  {
+    var = i->second;
+  }
+
+  return var->addEquation(name, guard, e, m_time);
+}
+
+Constant
+System::addDeclInternal
+(
+  const Parser::Equation& eqn, 
+  DefinitionMap& declarations
+)
+{
+  //simplify, turn into workshops
+  Tree::Expr guard   = toWSTree(std::get<1>(eqn));
+  Tree::Expr boolean = toWSTree(std::get<2>(eqn));
+  Tree::Expr expr    = toWSTree(std::get<3>(eqn));
+
+  ExprCompiler compile(this);
+
+  uuid u = addDeclInternal(
+    std::get<0>(eqn),
+    GuardWS(compile.compile_for_equation(guard),
+      compile.compile_for_equation(boolean)),
+    compile.compile_for_equation(expr),
+    declarations
+  );
+
+  return Constant(UUID(u), TYPE_INDEX_UUID);
+}
+
+Constant
+System::addAssignment(const Parser::Equation& eqn)
+{
+  return addDeclInternal(eqn, m_assignments);
 }
 
 } //namespace TransLucid
