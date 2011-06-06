@@ -31,6 +31,11 @@ namespace TransLucid
 
     template <typename t>
     struct get_constant_func;
+
+    //precondition, lhs.index == rhs.index and they don't use the
+    //ptr field
+    bool
+    constant_equality(const Constant& lhs, const Constant& rhs);
   }
 }
 

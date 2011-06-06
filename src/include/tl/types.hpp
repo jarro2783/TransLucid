@@ -173,7 +173,22 @@ namespace TransLucid
     hash() const;
 
     bool
-    operator==(const Constant& rhs) const;
+    operator==(const Constant& rhs) const
+    {
+      if (index == rhs.index)
+        if (field < TYPE_FIELD_PTR)
+        {
+          return detail::constant_equality(*this, rhs);
+        }
+        else
+        {
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
 
     struct
     {
