@@ -17,4 +17,4 @@
 #   <http://www.gnu.org/licenses/>.
 includesdir = $(prefix)/include/tl/detail
 
-includes_HEADERS = lexer_detail.hpp
+includes_HEADERS = lexer_detail.hpp types_detail.hpp
