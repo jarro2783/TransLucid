@@ -27,6 +27,28 @@ namespace TransLucid
   namespace detail
   {
     template <>
+    struct set_constant_func<bool>
+    {
+      void
+      operator()(Constant& c, bool v)
+      {
+        c.data.tv = v;
+        c.data.field = TYPE_FIELD_TV;
+      }
+    };
+
+    template <>
+    struct set_constant_func<Special>
+    {
+      void
+      operator()(Constant& c, Special s)
+      {
+        c.data.sp = s;
+        c.data.field = TYPE_FIELD_SP;
+      }
+    };
+
+    template <>
     struct set_constant_func<int8_t>
     {
       void
@@ -38,12 +60,43 @@ namespace TransLucid
     };
 
     template <>
+    struct set_constant_func<uint16_t>
+    {
+      void
+      operator()(Constant& c, uint16_t v)
+      {
+        c.data.ui16 = v;
+        c.data.field = TYPE_FIELD_UI16;
+      }
+    };
+
+    template <>
+    struct get_constant_func<bool>
+    {
+      bool
+      operator()(Constant& c)
+      {
+        return c.data.tv;
+      }
+    };
+
+    template <>
     struct get_constant_func<int8_t>
     {
       int8_t
       operator()(Constant& c)
       {
         return c.data.si8;
+      }
+    };
+
+    template <>
+    struct get_constant_func<uint64_t>
+    {
+      uint64_t
+      operator()(Constant& c)
+      {
+        return c.data.ui64;
       }
     };
   }

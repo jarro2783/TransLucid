@@ -28,9 +28,16 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/maxsharelist.hpp>
 #include <tl/system.hpp>
+#include <tl/types/dimension.hpp>
+#include <tl/types/function.hpp>
+#include <tl/types/special.hpp>
+#include <tl/types/tuple.hpp>
 #include <tl/utility.hpp>
 
 #include <sstream>
+
+//TODO: work out what looking up an identifier is
+//TODO: what do we do with VariableOpWS
 
 namespace TransLucid
 {
@@ -41,32 +48,7 @@ namespace Hyperdatons
 namespace
 {
 
-template <typename T, typename V>
-inline void
-contextInsert
-(
-  tuple_t& k,
-  WS* h,
-  const u32string& dim,
-  const V& value,
-  size_t index
-)
-{
-  k[get_dimension_index(h, dim)] = Constant(T(value), index);
-}
-
-inline void
-contextInsert
-(
-  tuple_t& k,
-  WS* i,
-  const u32string& dim,
-  const Constant& v
-)
-{
-  k[get_dimension_index(i, dim)] = v;
-}
-
+#if 0
 template <typename T>
 class TupleInserter
 {
@@ -96,9 +78,12 @@ insert_tuple(tuple_t& k, WS* h, size_t index)
 {
   return TupleInserter<T>(k, h, index);
 }
+#endif
 
 }
 
+//don't need this one because we are doing it properly with eval
+#if 0
 TaggedConstant
 SystemEvaluationWS::operator()(const Tuple& k)
 {
@@ -106,7 +91,10 @@ SystemEvaluationWS::operator()(const Tuple& k)
   newK[DIM_TIME] = Constant(Intmp(m_system->theTime()), TYPE_INDEX_INTMP);
   return (*m_e)(Tuple(newK));
 }
+#endif
 
+//this one is compiled out now
+#if 0
 TaggedConstant
 BinaryOpWS::operator()(const Tuple& k)
 {
@@ -132,30 +120,29 @@ BinaryOpWS::operator()(const Tuple& k)
   //std::cerr << "result: " << v.first << std::endl;
   return TaggedConstant(v.first, k);
 }
+#endif
 
 TaggedConstant
 BoolConstWS::operator()(const Tuple& k)
 {
-  return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
+  //return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
+  return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
 TypeConstWS::operator()(const Tuple& k)
 {
-  return TaggedConstant(Constant(Type(m_value), TYPE_INDEX_TYPE), k);
+  return TaggedConstant(m_value, k);
 }
 
 
+#if 0
 TaggedConstant
 TypedValueWS::operator()(const Tuple& k)
 {
   //evaluate CONST
   tuple_t kp = k.tuple();
-  //kp[m_system.dimTranslator().lookup("id")] =
-  //  Constant(String("CONST"), m_system.typeRegistry().indexString());
-  //contextInsertString(kp, m_system, "id", "CONST", indexString);
-  //contextInsertString(kp, m_system, "type", m_type, indexString);
-  //contextInsertString(kp, m_system, "text", m_text, indexString);
+
   insert_tuple<String>
     (kp, m_system, TYPE_INDEX_USTRING)
     (U"id", U"CONST")
@@ -165,6 +152,7 @@ TypedValueWS::operator()(const Tuple& k)
 
   return (*m_system)(Tuple(kp));
 }
+#endif
 
 //TODO work out type conversion
 #if 0
@@ -178,14 +166,14 @@ ConvertWS::operator()(const Tuple& k)
 TaggedConstant
 DimensionWS::operator()(const Tuple& k)
 {
-  size_t id = get_dimension_index(m_system, m_name);
-  return TaggedConstant (Constant(TransLucid::Dimension(id),
-                         TYPE_INDEX_DIMENSION), k);
+  dimension_index id = m_system.getDimensionIndex(m_name);
+  return TaggedConstant (Types::Dimension::create(id), k);
 }
 
 TaggedConstant
 IdentWS::operator()(const Tuple& k)
 {
+  #if 0
   tuple_t kp = k.tuple();
 
   tuple_t::iterator itid = kp.find(DIM_ID);
@@ -204,6 +192,7 @@ IdentWS::operator()(const Tuple& k)
       ;
   }
   return (*m_system)(Tuple(kp));
+  #endif
 }
 
 TaggedConstant
@@ -218,7 +207,7 @@ IfWS::operator()(const Tuple& k)
   }
   else if (condv.index() == TYPE_INDEX_BOOL)
   {
-    const Boolean& b = condv.value<Boolean>();
+    bool b = get_constant<bool>(condv);
 
     if (b)
     {
@@ -242,7 +231,7 @@ IfWS::operator()(const Tuple& k)
         }
         else if (index == TYPE_INDEX_BOOL)
         {
-          const Boolean& bcond = cond.first.value<Boolean>();
+          bool bcond = get_constant<bool>(cond.first);
           ++iter;
           if (bcond)
           {
@@ -251,8 +240,7 @@ IfWS::operator()(const Tuple& k)
         }
         else
         {
-          return TaggedConstant(Constant(Special(Special::TYPEERROR),
-                                TYPE_INDEX_SPECIAL), k);
+          return TaggedConstant(Types::Special::create(SP_TYPEERROR), k);
         }
 
         ++iter;
@@ -263,8 +251,7 @@ IfWS::operator()(const Tuple& k)
   }
   else
   {
-    return TaggedConstant(Constant(Special(Special::TYPEERROR),
-                          TYPE_INDEX_SPECIAL), k);
+    return TaggedConstant(Types::Special::create(SP_TYPEERROR),k);
   }
 }
 
@@ -311,7 +298,7 @@ HashWS::operator()(const Tuple& k)
 TaggedConstant
 IntmpConstWS::operator()(const Tuple& k)
 {
-  return TaggedConstant(Constant(Intmp(m_value), TYPE_INDEX_INTMP), k);
+  return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
@@ -328,6 +315,8 @@ IsTypeWS::operator()(const Tuple& k)
   return TaggedConstant();
 }
 
+//I don't think we even use this
+#if 0
 TaggedConstant
 VariableOpWS::operator()(const Tuple& k)
 {
@@ -348,6 +337,7 @@ VariableOpWS::operator()(const Tuple& k)
 
   return (*m_system)(Tuple(kp));
 }
+#endif
 
 #if 0
 TaggedConstant
@@ -370,13 +360,14 @@ SpecialConstWS::operator()(const Tuple& k)
 TaggedConstant
 UStringConstWS::operator()(const Tuple& k)
 {
-  return TaggedConstant(Constant(String(m_value), TYPE_INDEX_USTRING), k);
+  return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
 UCharConstWS::operator()(const Tuple& k)
 {
-  return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
+  //return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
+  return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
@@ -398,50 +389,34 @@ TupleWS::operator()(const Tuple& k)
 
     if (left.first.index() == TYPE_INDEX_DIMENSION)
     {
-      kp[left.first.value<TransLucid::Dimension>().value()] = right.first;
+      kp[get_constant<dimension_index>(left.first)] = right.first;
     }
     else
     {
-      kp[get_dimension_index(m_system, left.first)] = right.first;
+      kp[m_system.getDimensionIndex(left.first)] = right.first;
     }
   }
-  return TaggedConstant(Constant(Tuple(kp), TYPE_INDEX_TUPLE), k);
+  return TaggedConstant(Types::Tuple::create(Tuple(kp)), k);
 }
 
 TaggedConstant
-AtAbsoluteWS::operator()(const Tuple& k)
-{
-  TaggedConstant kp = (*e1)(k);
-  if (kp.first.index() != TYPE_INDEX_TUPLE)
-  {
-    return TaggedConstant(Constant(Special(Special::TYPEERROR),
-                          TYPE_INDEX_SPECIAL), k);
-  }
-  else
-  {
-    return (*e2)(kp.first.value<Tuple>());
-  }
-}
-
-TaggedConstant
-AtRelativeWS::operator()(const Tuple& k)
+AtWS::operator()(const Tuple& k)
 {
   tuple_t kNew = k.tuple();
   TaggedConstant kp = (*e1)(k);
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
-    return TaggedConstant(Constant(Special(Special::TYPEERROR),
-                          TYPE_INDEX_SPECIAL), k);
+    return TaggedConstant(Types::Special::create(SP_TYPEERROR), k);
   }
   else
   {
     //validate time
-    auto& delta = kp.first.value<Tuple>().tuple();
+    auto& delta = Types::Tuple::get(kp.first).tuple();
     const auto& dimTime = delta.find(DIM_TIME);
-    if (dimTime != delta.end() && dimTime->second.value<Intmp>().value() > 
-      kNew[DIM_TIME].value<Intmp>().value())
+    if (dimTime != delta.end() && Types::Intmp::get(dimTime->second) > 
+      Types::Intmp::get(kNew[DIM_TIME]))
     {
-      return TaggedConstant(make_special(Special::ACCESS), k);
+      return TaggedConstant(make_special(SP_ACCESS), k);
     }
 
     for(tuple_t::value_type v : delta)
@@ -455,9 +430,10 @@ AtRelativeWS::operator()(const Tuple& k)
 TaggedConstant
 LambdaAbstractionWS::operator()(const Tuple& k)
 {
-  return TaggedConstant(Constant(LambdaFunctionType(m_name, m_dim, m_rhs),
-                                 TYPE_INDEX_FUNCTION), 
-                        k);
+  return TaggedConstant(
+    Types::Function::create(LambdaFunctionType(m_name, m_dim, m_rhs)),
+    k
+  );
 }
 
 TaggedConstant
@@ -470,11 +446,11 @@ LambdaApplicationWS::operator()(const Tuple& k)
   //first make sure that it is a function
   if (lhs.index() != TYPE_INDEX_FUNCTION)
   {
-    return TaggedConstant(make_special(Special::TYPEERROR), k);
+    return TaggedConstant(make_special(SP_TYPEERROR), k);
   }
 
   Constant rhs = (*m_rhs)(k).first;
-  const FunctionType& f = lhs.value<FunctionType>();
+  const FunctionType& f = Types::Function::get(lhs);
 
   return f.applyLambda(k, rhs);
 }

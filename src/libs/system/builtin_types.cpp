@@ -19,11 +19,59 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
+#include <tl/types.hpp>
+#include <tl/types/string.hpp>
 #include <tl/utility.hpp>
 
 namespace TransLucid
 {
 
+  namespace 
+  {
+    TypeFunctions string_type_functions =
+      {
+        &Types::String::equality,
+        &Types::String::hash
+      };
+  }
+
+  namespace Types
+  {
+    namespace String
+    {
+      Constant
+      create(const u32string& s)
+      {
+        std::unique_ptr<u32string> value(new u32string(s));
+        ConstantPointerValue* p = 
+          new ConstantPointerValue(&string_type_functions, value.get());
+        value.release();
+        return Constant(p, TYPE_INDEX_USTRING);
+      }
+    }
+
+    namespace Boolean
+    {
+      Constant
+      create(bool v)
+      {
+        return Constant(v, TYPE_INDEX_BOOL);
+      }
+    }
+
+    namespace Type
+    {
+      Constant
+      create(type_index t)
+      {
+        return Constant(t, TYPE_INDEX_TYPE);
+      }
+    }
+
+  }
+}
+
+#if 0
 const Special::StringValueInitialiser Special::m_sv;
 
 Special::StringValueInitialiser::StringValueInitialiser()
@@ -48,34 +96,12 @@ Special::StringValueInitialiser::StringValueInitialiser()
     parser_stov.insert(std::make_pair(parser_string, v.first));
   }
 }
+#endif
 
-void
-String::print(std::ostream& os) const
-{
-  os << "ustring<" << utf32_to_utf8(m_s) << ">";
-}
+#if 0
 
-void
-Special::print(std::ostream& os) const
+namespace TransLucid
 {
-  os << "special<" << utf32_to_utf8(m_sv.vtos.find(m_v)->second) << ">";
-}
-
-void Char::print(std::ostream& os) const
-{
-  u32string s(1, m_c);
-  os << "uchar<" << utf32_to_utf8(s) << ">";
-}
-
-Guard::Guard(const GuardWS& g)
-: m_g(new GuardWS(g))
-{
-}
-
-Guard::Guard(const Guard& rhs)
-: m_g(new GuardWS(*rhs.m_g))
-{
-}
 
 //the default for function application is that there was a type mismatch
 //concrete base classes will implement the correct functionality
@@ -112,6 +138,8 @@ LambdaFunctionType::print(std::ostream& os) const
 
 }
 
+#endif
+
 namespace std
 {
   template <>
@@ -129,8 +157,8 @@ namespace std
 
   template <>
   size_t
-  hash<TransLucid::Special::Value>::operator()
-  (TransLucid::Special::Value v) const
+  hash<TransLucid::Special>::operator()
+  (TransLucid::Special v) const
   {
     return v;
   }

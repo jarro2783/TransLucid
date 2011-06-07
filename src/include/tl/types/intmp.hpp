@@ -1,5 +1,5 @@
-/* The main type interface.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+/* The intmp type.
+   Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -26,6 +26,12 @@ namespace TransLucid
   {
     namespace Intmp
     {
+      Constant
+      create(const mpz_class& v);
+
+      const mpz_class&
+      get(const Constant& c);
+
       bool 
       equality();
     }

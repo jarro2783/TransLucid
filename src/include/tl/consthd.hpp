@@ -20,6 +20,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef CONSTWS_HPP_INCLUDED
 #define CONSTWS_HPP_INCLUDED
 
+#include <tl/types/boolean.hpp>
+#include <tl/types/char.hpp>
+#include <tl/types/intmp.hpp>
+#include <tl/types/string.hpp>
+#include <tl/types/type.hpp>
 #include <tl/workshop.hpp>
 
 namespace TransLucid 
@@ -36,15 +41,15 @@ namespace TransLucid
     {
       public:
 
-      TypeConstWS(size_t value)
-      : m_value(value)
+      TypeConstWS(type_index value)
+      : m_value(Types::Type::create(value))
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      size_t m_value;
+      Constant m_value;
     };
 
     /**
@@ -57,20 +62,20 @@ namespace TransLucid
       public:
 
       BoolConstWS(bool value)
-      : m_value(value)
+      : m_value(Types::Boolean::create(value))
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      bool m_value;
+      Constant m_value;
     };
 
     class SpecialConstWS : public WS
     {
       public:
-      SpecialConstWS(Special::Value v)
+      SpecialConstWS(Special v)
       : m_value(v)
       {}
 
@@ -78,49 +83,49 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      Special::Value m_value;
+      Special m_value;
     };
 
     class IntmpConstWS : public WS
     {
       public:
       IntmpConstWS(const mpz_class& value)
-      : m_value(value)
+      : m_value(Types::Intmp::create(value))
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      mpz_class m_value;
+      Constant m_value;
     };
 
     class UCharConstWS : public WS
     {
       public:
       UCharConstWS(char32_t c)
-      : m_value(c)
+      : m_value(Types::UChar::create(c))
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      char32_t m_value;
+      Constant m_value;
     };
 
     class UStringConstWS : public WS
     {
       public:
       UStringConstWS(const u32string& s)
-      : m_value(s)
+      : m_value(Types::String::create(s))
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      u32string m_value;
+      Constant m_value;
     };
   }
 }

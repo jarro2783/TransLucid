@@ -116,10 +116,23 @@ namespace TransLucid
     return detail::get_constant_func<T>()(c);
   }
 
-  struct PointerValue
+  struct TypeFunctions
   {
-    int refCount;
+    bool (*equality)(const Constant&, const Constant&);
+    size_t (*hash)(const Constant&);
+  };
 
+  struct ConstantPointerValue
+  {
+    ConstantPointerValue(TypeFunctions* f, void* d)
+    : refCount(1)
+    , functions(f)
+    , data(d)
+    {
+    }
+
+    int refCount;
+    TypeFunctions* functions;
     void* data;
   };
 
@@ -136,7 +149,6 @@ namespace TransLucid
     TYPE_FIELD_UI32,
     TYPE_FIELD_F32,
     TYPE_FIELD_F64,
-    TYPE_FIELD_F80,
     TYPE_FIELD_PTR
   };
 
@@ -152,6 +164,13 @@ namespace TransLucid
       data.ptr = nullptr;
       data.index = 0;
       data.field = TYPE_FIELD_SP;
+    }
+
+    Constant(ConstantPointerValue* p, type_index i)
+    {
+      data.ptr = p;
+      data.field = TYPE_FIELD_PTR;
+      data.index = i;
     }
 
     Constant(const Constant& other)
@@ -175,13 +194,15 @@ namespace TransLucid
     bool
     operator==(const Constant& rhs) const
     {
-      if (index == rhs.index)
-        if (field < TYPE_FIELD_PTR)
+      if (data.index == rhs.data.index)
+      {
+        if (data.field < TYPE_FIELD_PTR)
         {
           return detail::constant_equality(*this, rhs);
         }
         else
         {
+          return (*data.ptr->functions->equality)(*this, rhs);
         }
       }
       else
@@ -190,12 +211,18 @@ namespace TransLucid
       }
     }
 
+    type_index
+    index() const
+    {
+      return data.index;
+    }
+
     struct
     {
       union
       {
         Special     sp;
-        bool        tv;
+        bool        tv; //truth value
         char32_t    ch;
         int8_t      si8;
         uint8_t     ui8;
@@ -207,9 +234,8 @@ namespace TransLucid
         uint64_t    ui64;
         float       f32;
         double      f64;
-        long double f80;
 
-        PointerValue* ptr;
+        ConstantPointerValue* ptr;
       };
 
       type_index index;

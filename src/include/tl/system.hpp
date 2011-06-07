@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 //#include <tl/physicalhds.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
+#include <tl/registries.hpp>
 
 #include <unordered_set>
 
@@ -48,7 +49,7 @@ namespace TransLucid
    *
    * Holds all the data necessary for an system.
    **/
-  class System : public WS
+  class System : public WS, public TypeRegistry, public DimensionRegistry
   {
     public:
 

@@ -61,7 +61,19 @@ Tree::Expr TreeToWSTree::operator()(const u32string& s)
 
 Tree::Expr TreeToWSTree::operator()(const Tree::LiteralExpr& e)
 {
-  return e;
+  //LITERAL @ [type : e.type, text : e.text]
+  return Tree::AtExpr
+  (
+    Tree::IdentExpr(U"LITERAL"),
+    Tree::TupleExpr
+    (
+      {
+        {Tree::DimensionExpr(U"type"), e.type}
+        {Tree::DimensionExpr(U"text"), e.text}
+      }
+    ),
+    false
+  );
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::DimensionExpr& e)

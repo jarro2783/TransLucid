@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/workshop.hpp>
 #include <tl/range.hpp>
 #include <tl/types.hpp>
+#include <tl/types/string.hpp>
 
 #include <vector>
 
@@ -36,12 +37,6 @@ namespace TransLucid
   class DimensionNotFound
   {
   };
-
-  inline Constant
-  makeTime(const mpz_class& time)
-  {
-    return Constant(Intmp(time), TYPE_INDEX_INTMP);
-  }
 
   class SplitID
   {
@@ -84,9 +79,11 @@ namespace TransLucid
   inline Constant
   generate_string(const u32string& name)
   {
-    return Constant(String(name), TYPE_INDEX_USTRING);
+    //return Constant(String(name), TYPE_INDEX_USTRING);
+    return Types::String::create(name);
   }
 
+  #if 0
   inline mpz_class
   get_type_index(WS* h, const u32string& name)
   {
@@ -97,6 +94,7 @@ namespace TransLucid
     //Constant(String(name), TYPE_INDEX_USTRING);
     return (*h)(Tuple(k)).first.value<Intmp>().value();
   }
+  #endif
 
   //pre: the base is valid, if not we will return 10
   //but don't rely on this for error checking
@@ -116,32 +114,6 @@ namespace TransLucid
       return c - 'a' + 10 + 26;
     }
     return 10;
-  }
-
-  inline mpz_class
-  get_unique(WS* h)
-  {
-    tuple_t k;
-    k[DIM_ID] = Constant(String(U"_unique"), TYPE_INDEX_USTRING);
-    return (*h)(Tuple(k)).first.value<Intmp>().value();
-  }
-
-  inline size_t
-  get_dimension_index(WS* h, const u32string& name)
-  {
-    tuple_t k;
-    k[DIM_ID] = generate_string(U"DIMENSION_NAMED_INDEX");
-    k[DIM_TEXT] = generate_string(name);
-    return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
-  }
-
-  inline size_t
-  get_dimension_index(WS* h, const Constant& v)
-  {
-    tuple_t k;
-    k[DIM_ID] = generate_string(U"DIMENSION_VALUE_INDEX");
-    k[DIM_VALUE] = v;
-    return (*h)(Tuple(k)).first.value<Intmp>().value().get_ui();
   }
 
   inline Constant
@@ -196,25 +168,10 @@ namespace TransLucid
   bool
   booleanTrue(const GuardWS& g, const Tuple& c);
 
-  tuple_t
-  create_add_eqn_context
-  (
-    const u32string& name,
-    WS* guard,
-    WS* boolean,
-    const mpz_class& time
-  );
-
   //looks up a value in the current context and returns the value of the
   //all dimension if it exists, otherwise special<dim> if not found
   TaggedConstant
   lookup_context(WS* system, const Constant& v, const Tuple& k);
-
-  inline Constant
-  make_special(Special::Value s)
-  {
-    return Constant(Special(s), TYPE_INDEX_SPECIAL);
-  }
 
   //returns the hash of a dimension when we only have the index
   class HashIndexWS : public WS
@@ -235,7 +192,7 @@ namespace TransLucid
       }
       else
       {
-        return TaggedConstant(make_special(Special::DIMENSION), k);
+        return TaggedConstant(make_special(SP_DIMENSION), k);
       }
     }
 

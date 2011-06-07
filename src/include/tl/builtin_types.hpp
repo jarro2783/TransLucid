@@ -32,6 +32,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  Constant
+  make_special(Special s);
+
   #if 0
   struct StringValueInitialiser
     {
@@ -549,6 +552,9 @@ namespace TransLucid
 
     virtual TaggedConstant
     applyPhi(const Tuple& k, WS* expr) const;
+
+    FunctionType*
+    clone() const;
   };
 
   class LambdaFunctionType : public FunctionType
