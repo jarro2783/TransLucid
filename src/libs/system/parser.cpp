@@ -47,6 +47,7 @@ namespace
   };
 }
 
+#if 0
 Header::Header()
 :
   //add predefined dimensions
@@ -74,6 +75,7 @@ Header::Header()
     #endif
   );
 }
+#endif
 
 std::ostream& 
 operator<<(std::ostream& os, const Header& h)

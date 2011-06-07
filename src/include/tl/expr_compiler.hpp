@@ -40,7 +40,7 @@ namespace TransLucid
 
     WS* operator()(const Tree::nil& n);
     WS* operator()(bool b);
-    WS* operator()(Special::Value s);
+    WS* operator()(Special s);
     WS* operator()(const mpz_class& i);
     WS* operator()(char32_t c);
     WS* operator()(const u32string& s);

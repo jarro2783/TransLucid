@@ -547,6 +547,7 @@ namespace TransLucid
        * Absolute context change. True if this node is an absolute context
        * change node, false if it is a relative context change node.
        */
+      //TODO: get rid of this
       bool absolute;
     };
 

@@ -29,7 +29,7 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   equation_parser.cpp \
   expr_parser.cpp \
   expr_compiler.cpp header.cpp lexer.cpp lexer_util.cpp library.cpp \
-  line_tokenizer.cpp parser.cpp printer.cpp range.cpp set_types.cpp \
+  line_tokenizer.cpp parser.cpp printer.cpp range.cpp \
   system.cpp translator.cpp tree_printer.cpp tree_to_wstree.cpp \
   tuple_parser.cpp types.cpp \
   utility.cpp valuehd.cpp

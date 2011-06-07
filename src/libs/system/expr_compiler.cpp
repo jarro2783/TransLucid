@@ -74,7 +74,7 @@ ExprCompiler::operator()(bool b)
 }
 
 WS*
-ExprCompiler::operator()(Special::Value s)
+ExprCompiler::operator()(Special s)
 {
   return new Hyperdatons::SpecialConstWS(s);
 }
@@ -106,7 +106,7 @@ ExprCompiler::operator()(const Tree::LiteralExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::DimensionExpr& e)
 {
-  return new Hyperdatons::DimensionWS(m_system, e.text);
+  return new Hyperdatons::DimensionWS(*m_system, e.text);
 }
 
 WS*
@@ -175,7 +175,7 @@ ExprCompiler::operator()(const Tree::TupleExpr& e)
     WS* rhs = boost::apply_visitor(*this, v.second);
     elements.push_back(std::make_pair(lhs, rhs));
   }
-  return new Hyperdatons::TupleWS(m_system, elements);
+  return new Hyperdatons::TupleWS(*m_system, elements);
 }
 
 WS*
@@ -184,19 +184,14 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
 
-  if (e.absolute)
-  {
-    return new Hyperdatons::AtAbsoluteWS(lhs, rhs);
-  }
-  else
-  {
-    return new Hyperdatons::AtRelativeWS(lhs, rhs);
-  }
+  return new Hyperdatons::AtWS(lhs, rhs);
 }
 
 WS*
 ExprCompiler::operator()(const Tree::LambdaExpr& e)
 {
+//TODO: we will get to this eventually
+#if 0
   //generate a new dimension
   tuple_t k = {{DIM_ID, generate_string(U"_uniquedim")}};
   Intmp uniqueIndex = (*m_system)(Tuple(k)).first.value<Intmp>();
@@ -221,6 +216,8 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
   //make a LambdaAbstractionWS
   WS* rhs = boost::apply_visitor(*this, renamed);
   return new Hyperdatons::LambdaAbstractionWS(m_system, e.name, index, rhs);
+#endif
+  return 0;
 }
 
 WS*
