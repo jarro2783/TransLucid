@@ -111,7 +111,7 @@ namespace TransLucid
 
   template <typename T>
   T
-  get_constant(Constant& c)
+  get_constant(const Constant& c)
   {
     return detail::get_constant_func<T>()(c);
   }

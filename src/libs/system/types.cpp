@@ -59,7 +59,7 @@ Tuple::print(std::ostream& os) const
   BOOST_FOREACH(const tuple_t::value_type& v, *m_value)
   {
     os << v.first << ":";
-    v.second.print(os);
+    //v.second.print(os);
     os << ", ";
   }
   os << "]";

@@ -74,7 +74,7 @@ namespace TransLucid
     struct get_constant_func<bool>
     {
       bool
-      operator()(Constant& c)
+      operator()(const Constant& c) const
       {
         return c.data.tv;
       }
@@ -84,9 +84,19 @@ namespace TransLucid
     struct get_constant_func<int8_t>
     {
       int8_t
-      operator()(Constant& c)
+      operator()(const Constant& c) const
       {
         return c.data.si8;
+      }
+    };
+
+    template <>
+    struct get_constant_func<uint16_t>
+    {
+      uint16_t
+      operator()(const Constant& c) const
+      {
+        return c.data.ui16;
       }
     };
 
@@ -94,7 +104,7 @@ namespace TransLucid
     struct get_constant_func<uint64_t>
     {
       uint64_t
-      operator()(Constant& c)
+      operator()(const Constant& c) const
       {
         return c.data.ui64;
       }

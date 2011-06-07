@@ -17,9 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/valuehd.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/types/special.hpp>
 #include <tl/utility.hpp>
+#include <tl/valuehd.hpp>
 
 namespace TransLucid
 {
@@ -39,8 +40,7 @@ BoolWS::operator()(const Tuple& k)
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedConstant(Constant(Special(Special::DIMENSION),
-                          TYPE_INDEX_SPECIAL), k);
+    return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
   }
 
   if (value->second.value<String>().value() == U"true")

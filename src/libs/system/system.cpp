@@ -47,10 +47,12 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/consthd.hpp>
-#include <tl/system.hpp>
 #include <tl/parser_iterator.hpp>
+#include <tl/system.hpp>
 #include <tl/translator.hpp>
 #include <tl/tree_to_wstree.hpp>
+#include <tl/types/special.hpp>
+#include <tl/types/uuid.hpp>
 #include <tl/utility.hpp>
 #include <tl/valuehd.hpp>
 
@@ -103,6 +105,7 @@ namespace
     return false;
   }
 
+  #if 0
   class UniqueWS : public WS
   {
     public:
@@ -190,6 +193,7 @@ namespace
     private:
     DimensionTranslator& m_d;
   };
+  #endif
 }
 //
 //adds eqn | [symbol : "s"] = value;;
@@ -217,6 +221,7 @@ System::buildConstantWS(size_t index)
 {
   WS* h = new T(this);
 
+  #if 0
   tuple_t guard =
   {
     {
@@ -224,12 +229,23 @@ System::buildConstantWS(size_t index)
       Constant(String(T::name), TYPE_INDEX_USTRING)
     }
   };
+  #endif
 
   //sets the following
 
   //CONST | [type : ustring<name>]
-  addEquation(U"CONST", GuardWS(Tuple(guard)), h);
+  //addEquation(U"CONST", GuardWS(Tuple(guard)), h);
 
+  addEquation(Parser::Equation
+    (
+      U"LITERAL", 
+      Tree::TupleExpr(Tree::TupleExpr::TuplePairs{{U"DIM_TYPE", T::name}}), 
+      Tree::Expr(),
+      h
+    )
+  );
+
+  #if 0
   //TYPE_INDEX | [type : ustring<name>] = index;;
   addEquation
   (
@@ -237,6 +253,10 @@ System::buildConstantWS(size_t index)
     GuardWS(Tuple(guard)), 
     new Hyperdatons::IntmpConstWS(index)
   );
+  #endif
+
+  //TODO: sort out the default literals
+
   return h;
 }
 
@@ -266,6 +286,7 @@ System::System()
   //create the obj, const and fun ids
 
   //we need dimensions and unique to do anything
+  #if 0
   addEquation(U"DIMENSION_NAMED_INDEX", GuardWS(),
                       new DimensionsStringWS(m_dimTranslator));
   addEquation(U"DIMENSION_VALUE_INDEX", GuardWS(),
@@ -285,6 +306,7 @@ System::System()
     U"_uniquedim", GuardWS(),
     new UniqueDimensionWS(m_dimTranslator)
   );
+  #endif
 
   //add this
   addEquation(U"this", GuardWS(), this);
@@ -356,18 +378,16 @@ System::operator()(const Tuple& k)
   //the system only varies in the id dimension
   if (iditer == k.end())
   {
-    return TaggedConstant(Constant(Special(Special::DIMENSION),
-                          TYPE_INDEX_SPECIAL), k);
+    return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
   }
   else
   {
-    const u32string& id = iditer->second.value<String>().value();
+    const u32string& id = Types::String::get(iditer->second);
     auto viter = m_equations.find(id);
 
     if (viter == m_equations.end())
     {
-      return TaggedConstant(Constant(Special(Special::UNDEF),
-                            TYPE_INDEX_SPECIAL), k);
+      return TaggedConstant(make_special(SP_UNDEF), k);
     }
     else
     {
@@ -540,7 +560,7 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
     //invalid keyword
   }
 
-  return make_special(Special::CONST); 
+  return Types::Special::create(SP_CONST); 
 }
 
 Constant
@@ -564,7 +584,7 @@ System::addDimension(const u32string& dimension)
   if (c.index() != TYPE_INDEX_SPECIAL)
   {
     //TODO make the uuid type and then this is where we extract it
-    m_dimension_uuids.insert(c.value<UUID>().value());
+    m_dimension_uuids.insert(Types::UUID::get(c));
   }
 
   return c;
@@ -589,7 +609,7 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
 
   if (hasSpecial({a, t}))
   {
-    return make_special(Special::CONST);
+    return Types::Special::create(SP_CONST);
   }
 
   uuid u = m_uuid_generator();
@@ -597,12 +617,12 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
   m_unop_uuids.insert(std::make_pair(u,
     UnaryHashes
     (
-      a.value<UUID>().value(),
-      t.value<UUID>().value()
+      Types::UUID::get(a),
+      Types::UUID::get(t)
     )
   ));
 
-  return Constant(UUID(u), TYPE_INDEX_UUID);
+  return Types::UUID::create(u);
 }
 
 Constant
@@ -638,7 +658,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
 
   if (hasSpecial({t, s, a, p}))
   {
-    return make_special(Special::CONST);
+    return Types::Special::create(SP_CONST);
   }
 
   uuid u = m_uuid_generator();
@@ -646,14 +666,14 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
   m_binop_uuids.insert(std::make_pair(u, 
     BinaryHashes
     (
-      t.value<UUID>().value(), 
-      s.value<UUID>().value(),
-      a.value<UUID>().value(), 
-      p.value<UUID>().value()
+      Types::UUID::get(t),
+      Types::UUID::get(s),
+      Types::UUID::get(a),
+      Types::UUID::get(p)
     )
   ));
 
-  return Constant(UUID(u), TYPE_INDEX_UUID);
+  return Types::UUID::create(u);
 }
 
 Constant 
@@ -726,7 +746,7 @@ System::addDeclInternal
     declarations
   );
 
-  return Constant(UUID(u), TYPE_INDEX_UUID);
+  return Types::UUID::create(u);
 }
 
 Constant

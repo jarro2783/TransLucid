@@ -36,6 +36,9 @@ namespace TransLucid
 
       Constant
       create(const u32string& s);
+
+      const u32string&
+      get(const Constant& c);
     }
   }
 }

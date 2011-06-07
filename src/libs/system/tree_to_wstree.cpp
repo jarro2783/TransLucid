@@ -39,7 +39,7 @@ Tree::Expr TreeToWSTree::operator()(bool b)
   return b;
 }
 
-Tree::Expr TreeToWSTree::operator()(Special::Value s)
+Tree::Expr TreeToWSTree::operator()(Special s)
 {
   return s;
 }
@@ -68,7 +68,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LiteralExpr& e)
     Tree::TupleExpr
     (
       {
-        {Tree::DimensionExpr(U"type"), e.type}
+        {Tree::DimensionExpr(U"type"), e.type},
         {Tree::DimensionExpr(U"text"), e.text}
       }
     ),

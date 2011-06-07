@@ -29,7 +29,7 @@ namespace TransLucid
     
     Tree::Expr operator()(const Tree::nil& n);
     Tree::Expr operator()(bool b);
-    Tree::Expr operator()(Special::Value s);
+    Tree::Expr operator()(Special s);
     Tree::Expr operator()(const mpz_class& i);
     Tree::Expr operator()(char32_t c);
     Tree::Expr operator()(const u32string& s);
