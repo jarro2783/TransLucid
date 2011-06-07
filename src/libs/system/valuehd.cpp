@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/types/special.hpp>
+#include <tl/types/string.hpp>
 #include <tl/utility.hpp>
 #include <tl/valuehd.hpp>
 
@@ -43,15 +44,20 @@ BoolWS::operator()(const Tuple& k)
     return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
   }
 
-  if (value->second.value<String>().value() == U"true")
-    return TaggedConstant(Constant(Boolean(true),
-                          TYPE_INDEX_BOOL), k);
-  else if (value->second.value<String>().value() == U"false")
-    return TaggedConstant(Constant(Boolean(false),
-                          TYPE_INDEX_BOOL), k);
+  u32string& v = Types::String::get(value->first);
+
+  if (v == U"true")
+  {
+    return TaggedConstant(Types::Boolean::create(true), k);
+  }
+  else if (v == U"false")
+  {
+    return TaggedConstant(Types::Boolean::create(false), k);
+  }
   else
-    return TaggedConstant(Constant(Special(Special::CONST),
-                          TYPE_INDEX_SPECIAL), k);
+  {
+    return TaggedConstant(Types::Special::create(SP_CONST), k);
+  }
 }
 
 TaggedConstant
