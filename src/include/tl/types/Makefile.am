@@ -15,17 +15,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
-SUBDIRS=detail types
 
-includesdir = $(prefix)/include/tl
+includesdir = $(prefix)/include/tl/types
 
-includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp cache.hpp \
-  charset.hpp compiled_functors.hpp consthd.hpp container.hpp \
-  dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
-  expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp footer.hpp \
-  header.hpp header_parser.hpp hyperdaton.hpp lexer.hpp \
-  lexer_util.hpp library.hpp \
-  parser_api.hpp parser_defs.hpp parser_header.hpp parser_iterator.hpp \
-  parser_util.hpp printer.hpp range.hpp \
-  set_types.hpp system.hpp translator.hpp tree_printer.hpp \
-  tuple_parser.hpp types.hpp utility.hpp valuehd.hpp workshop.hpp 
+includes_HEADERS = boolean.hpp char.hpp dimension.hpp function.hpp intmp.hpp \
+special.hpp string.hpp tuple.hpp type.hpp
