@@ -19,6 +19,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/equation.hpp>
 #include <tl/range.hpp>
+#include <tl/types/range.hpp>
+#include <tl/types/tuple.hpp>
 #include <tl/utility.hpp>
 
 namespace TransLucid
@@ -126,7 +128,7 @@ GuardWS::evaluate(const Tuple& k) const
     //still need to remove this magic
     if (v.first.index() == TYPE_INDEX_TUPLE)
     {
-      for(const Tuple::value_type& value : v.first.value<Tuple>())
+      for(const Tuple::value_type& value : Types::Tuple::get(v.first))
       {
         if (t.find(value.first) != t.end())
         {
@@ -154,8 +156,7 @@ GuardWS::evaluate(const Tuple& k) const
   else
   {
     t[DIM_TIME] = 
-      Constant(Range(m_timeStart, m_timeEnd),
-               TYPE_INDEX_RANGE);
+      Types::Range::create(Range(m_timeStart, m_timeEnd));
   }
 
   return Tuple(t);
@@ -166,7 +167,7 @@ GuardWS makeGuardWithTime(const mpz_class& start)
 {
   GuardWS g;
   g.addDimension(DIM_TIME,
-    Constant(Range(&start, 0), TYPE_INDEX_RANGE));
+    Types::Range::create(Range(&start, 0)));
   return g;
 }
 
@@ -274,8 +275,7 @@ VariableWS::operator()(const Tuple& k)
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
-    return TaggedConstant(Constant(Special(Special::UNDEF),
-                          TYPE_INDEX_SPECIAL),k);
+    return TaggedConstant(make_special(SP_UNDEF), k);
   }
   else if (applicable.size() == 1)
   {
@@ -332,8 +332,7 @@ VariableWS::operator()(const Tuple& k)
   }
   else
   {
-    return TaggedConstant(Constant(Special(Special::MULTIDEF),
-                          TYPE_INDEX_SPECIAL),k);
+    return TaggedConstant(make_special(SP_MULTIDEF), k);
   }
 }
 

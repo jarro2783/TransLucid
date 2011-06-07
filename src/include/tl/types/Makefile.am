@@ -19,4 +19,4 @@
 includesdir = $(prefix)/include/tl/types
 
 includes_HEADERS = boolean.hpp char.hpp dimension.hpp function.hpp intmp.hpp \
-special.hpp string.hpp tuple.hpp type.hpp
+range.hpp special.hpp string.hpp tuple.hpp type.hpp

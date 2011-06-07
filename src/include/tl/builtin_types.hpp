@@ -542,59 +542,6 @@ namespace TransLucid
     size_t m_index;
   };
 
-  class FunctionType : public TypedValue
-  {
-    public:
-    virtual ~FunctionType() = 0;
-
-    virtual TaggedConstant
-    applyLambda(const Tuple& k, const Constant& value) const;
-
-    virtual TaggedConstant
-    applyPhi(const Tuple& k, WS* expr) const;
-
-    FunctionType*
-    clone() const;
-  };
-
-  class LambdaFunctionType : public FunctionType
-  {
-    public:
-    LambdaFunctionType(const u32string& name, dimension_index dim, WS* expr)
-    : m_name(name), m_dim(dim), m_expr(expr)
-    {
-    }
-
-    TaggedConstant
-    applyLambda(const Tuple& k, const Constant& value) const;
-
-    LambdaFunctionType* 
-    clone() const
-    {
-      return new LambdaFunctionType(*this);
-    }
-
-    size_t 
-    hash() const
-    {
-      return reinterpret_cast<size_t>(m_expr);
-    }
-
-    void
-    print(std::ostream& os) const;
-
-    private:
-    u32string m_name;
-    dimension_index m_dim;
-    WS* m_expr;
-  };
-
-  class PhiFunctionType : public FunctionType
-  {
-    private:
-    WS* m_expr;
-  };
-
   #endif
 }
 

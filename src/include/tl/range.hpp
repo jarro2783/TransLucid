@@ -26,8 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  #if 0
-  class Range : public TypedValue
+  class Range
   {
     public:
     Range();
@@ -48,7 +47,7 @@ namespace TransLucid
     operator==(const Range& rhs) const;
 
     bool
-    within(const Intmp& value) const;
+    within(const mpz_class& value) const;
 
     bool
     within(const Range& other) const;
@@ -102,7 +101,6 @@ namespace TransLucid
     const mpz_class* m_lower;
     const mpz_class* m_upper;
   };
-  #endif
 }
 
 #endif // RANGE_HPP_INCLUDED
