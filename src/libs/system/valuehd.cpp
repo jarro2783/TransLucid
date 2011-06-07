@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/builtin_types.hpp>
+#include <tl/types/boolean.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/string.hpp>
 #include <tl/utility.hpp>
@@ -34,6 +35,8 @@ const char32_t* IntmpWS::name =     U"intmp";
 const char32_t* UCharWS::name =     U"uchar";
 const char32_t* UStringWS::name =   U"ustring";
 
+//TODO: these can all have their checks removed because bestfitting guarantees
+//the types
 TaggedConstant
 BoolWS::operator()(const Tuple& k)
 {
@@ -44,7 +47,7 @@ BoolWS::operator()(const Tuple& k)
     return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
   }
 
-  u32string& v = Types::String::get(value->first);
+  const u32string& v = Types::String::get(value->second);
 
   if (v == U"true")
   {
@@ -67,7 +70,7 @@ IntmpWS::operator()(const Tuple& k)
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedConstant(Constant(Special(Special::DIMENSION),
+    return TaggedConstant(Constant(Special(Special::SP_DIMENSION),
                           TYPE_INDEX_SPECIAL), k);
   }
 
