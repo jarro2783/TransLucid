@@ -216,6 +216,10 @@ namespace TransLucid
     BinaryHashSet m_binop_uuids;
 
     DimensionTranslator m_dimTranslator;
+
+    type_index m_nextTypeIndex;
+    ObjectRegistry<u32string, decltype(m_nextTypeIndex)> m_typeRegistry;
+
     size_t m_time;
     Translator *m_translator;
     std::map<u32string, size_t> builtin_name_to_index;

@@ -88,6 +88,7 @@ Translator::~Translator()
   cleanup();
 }
 
+#if 0
 WS*
 Translator::translate_expr(const u32string& u32s)
 {
@@ -129,6 +130,7 @@ Translator::translate_expr(const u32string& u32s)
 
   return m_compiler.compile_top_level(e);
 }
+#endif
 
 std::pair<bool, std::pair<Parser::Equation, Parser::DeclType>>
 Translator::parseEquation

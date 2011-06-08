@@ -1,5 +1,5 @@
 /* Maps dimensions to indexes.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -25,8 +25,10 @@ namespace TransLucid
 {
 
 DimensionTranslator::DimensionTranslator()
-: m_nextIndex(DIM_INDEX_LAST),
-  m_namedDims
+: m_nextIndex(DIM_INDEX_LAST)
+  , m_named(m_nextIndex)
+  , m_constants(m_nextIndex)
+  , m_namedDims
   {
    {U"type", DIM_TYPE},
    {U"text", DIM_TEXT},
@@ -43,26 +45,13 @@ DimensionTranslator::DimensionTranslator()
 size_t
 DimensionTranslator::lookup(const u32string& name)
 {
-  std::pair<ustring_size_map::iterator,bool> result =
-    m_namedDims.insert(std::make_pair(name, m_nextIndex));
-  if (result.second)
-  {
-    ++m_nextIndex;
-  }
-  return result.first->second;
+  return m_named(name);
 }
 
 size_t
 DimensionTranslator::lookup(const Constant& value)
 {
-  std::pair<ustring_type_map::iterator,bool> result =
-    m_typedDims.insert(std::make_pair(value, m_nextIndex));
-  if (result.second)
-  {
-    ++m_nextIndex;
-  }
-
-  return result.first->second;
+  return m_constants(value);
 }
 
 }

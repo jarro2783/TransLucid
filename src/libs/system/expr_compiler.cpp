@@ -46,6 +46,7 @@ ExprCompiler::compile_for_equation(const Tree::Expr& e)
   return boost::apply_visitor(*this, e);
 }
 
+#if 0
 WS*
 ExprCompiler::compile_top_level(const Tree::Expr& e)
 {
@@ -60,6 +61,7 @@ ExprCompiler::compile_top_level(const Tree::Expr& e)
     //return new Hyperdatons::SystemEvaluationWS(m_system, h);
   }
 }
+#endif
 
 WS*
 ExprCompiler::operator()(const Tree::nil& n)

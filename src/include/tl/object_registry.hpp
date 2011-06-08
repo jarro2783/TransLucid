@@ -20,8 +20,37 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_OBJECT_REGISTRY_HPP_INCLUDED
 #define TL_OBJECT_REGISTRY_HPP_INCLUDED
 
+#include <unordered_map>
+
 namespace TransLucid
 {
+  template <typename T, typename Index>
+  class ObjectRegistry
+  {
+    public:
+    ObjectRegistry(Index& index)
+    : m_index(index)
+    {
+    }
+
+    Index
+    operator()(const T& v)
+    {
+      auto result = m_objects.insert(std::make_pair(v, m_index));
+      if (result.second)
+      {
+        ++m_index;
+      }
+      return result.first->second;
+    }
+
+    private:
+
+    typedef std::unordered_map<T, Index> ObjectMap;
+    ObjectMap m_objects;
+
+    Index& m_index;
+  };
 }
 
 #endif

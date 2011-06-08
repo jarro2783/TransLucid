@@ -54,7 +54,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types/uuid.hpp>
 #include <tl/utility.hpp>
-#include <tl/valuehd.hpp>
 
 #include <algorithm>
 #include <unordered_map>
@@ -268,11 +267,14 @@ System::init_types()
     addEquation(v.first, GuardWS(),
                         new Hyperdatons::TypeConstWS(v.second));
   }
+
+  //LITERAL | [type : "t", text : ustring] = "hostfun"!(#text)
 }
 
 System::System()
-: m_time(0),
-  builtin_name_to_index
+: m_typeRegistry(m_nextTypeIndex)
+, m_time(0)
+, builtin_name_to_index
   {
    {U"ustring", TYPE_INDEX_USTRING},
    {U"intmp", TYPE_INDEX_INTMP},
@@ -316,13 +318,13 @@ System::System()
   init_types();
 
   //build the constant creators
-  buildConstantWS<Hyperdatons::BoolWS>(TYPE_INDEX_BOOL);
-  buildConstantWS<Hyperdatons::UCharWS>(TYPE_INDEX_UCHAR);
-  WS* intmpWS = buildConstantWS<Hyperdatons::IntmpWS>(TYPE_INDEX_INTMP);
-  buildConstantWS<Hyperdatons::UStringWS>(TYPE_INDEX_USTRING);
+  //buildConstantWS<Hyperdatons::BoolWS>(TYPE_INDEX_BOOL);
+  //buildConstantWS<Hyperdatons::UCharWS>(TYPE_INDEX_UCHAR);
+  //WS* intmpWS = buildConstantWS<Hyperdatons::IntmpWS>(TYPE_INDEX_INTMP);
+  //buildConstantWS<Hyperdatons::UStringWS>(TYPE_INDEX_USTRING);
 
   //set this as the default int too
-  addEquation(U"DEFAULTINT", GuardWS(), intmpWS);
+  //addEquation(U"DEFAULTINT", GuardWS(), intmpWS);
 
   m_translator = new Translator(*this);
 }
@@ -758,6 +760,7 @@ System::addAssignment(const Parser::Equation& eqn)
 type_index
 System::getTypeIndex(const u32string& name)
 {
+  return m_typeRegistry(name);
 }
 
 dimension_index

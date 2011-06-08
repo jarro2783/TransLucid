@@ -36,7 +36,7 @@ namespace TransLucid
     ~ExprCompiler();
 
     WS* compile_for_equation(const Tree::Expr&);
-    WS* compile_top_level(const Tree::Expr&);
+    //WS* compile_top_level(const Tree::Expr&);
 
     WS* operator()(const Tree::nil& n);
     WS* operator()(bool b);
