@@ -25,6 +25,11 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/utility.hpp>
 #include <tl/equation.hpp>
 #include <tl/types.hpp>
+#include <tl/types/intmp.hpp>
+#include <tl/types/special.hpp>
+#include <tl/types/range.hpp>
+#include <tl/system.hpp>
+#include <tl/types/type.hpp>
 
 #ifdef ICONV_CONVERT
 #include <iconv.h>
@@ -82,7 +87,7 @@ valueRefines(const Constant& a, const Constant& b)
   {
     if (a.index() == TYPE_INDEX_RANGE)
     {
-      if (!b.value<Range>().within(a.value<Range>()))
+      if (!Types::Range::get(b).within(Types::Range::get(a)))
       {
         //std::cerr << "no" << std::endl;
         return false;
@@ -90,7 +95,7 @@ valueRefines(const Constant& a, const Constant& b)
     }
     else if (a.index() == TYPE_INDEX_INTMP)
     {
-      if (!b.value<Range>().within(a.value<Intmp>()))
+      if (!Types::Range::get(b).within(Types::Intmp::get(a)))
       {
         //std::cerr << "no" << std::endl;
         return false;
@@ -108,7 +113,7 @@ valueRefines(const Constant& a, const Constant& b)
   {
     //std::cerr << "type type index == " << b.value<Type>().index()
     //<< std::endl;
-    if (a.index() == b.value<Type>().index())
+    if (a.index() == get_constant<type_index>(b))
     {
         //std::cerr << "yes" << std::endl;
       return true;
@@ -217,7 +222,7 @@ booleanTrue(const GuardWS& g, const Tuple& k)
     TaggedConstant v = (*b)(k);// = i.evaluate(g.boolean(), c);
 
     return v.first.index() == TYPE_INDEX_BOOL
-    && v.first.value<Boolean>();
+    && get_constant<bool>(v.first);
   }
   else
   {
@@ -342,16 +347,16 @@ u32_to_ascii(const u32string& s)
 }
 
 TaggedConstant
-lookup_context(WS* system, const Constant& v, const Tuple& k)
+lookup_context(System& system, const Constant& v, const Tuple& k)
 {
   size_t index;
   if (v.index() == TYPE_INDEX_DIMENSION)
   {
-    index = v.value<TransLucid::Dimension>().value();
+    index = get_constant<dimension_index>(v);
   }
   else
   {
-    index = get_dimension_index(system, v);
+    index = system.getDimensionIndex(v);
   }
 
   Tuple::const_iterator iter = k.find(index);
@@ -365,35 +370,13 @@ lookup_context(WS* system, const Constant& v, const Tuple& k)
     Tuple::const_iterator all = k.find(DIM_ALL);
     if (all == k.end())
     {
-      return TaggedConstant(Constant(Special(Special::DIMENSION),
-                            TYPE_INDEX_SPECIAL), k);
+      return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
     }
     else
     {
       return TaggedConstant(all->second, k);
     }
   }
-}
-
-tuple_t
-create_add_eqn_context
-(
-  const u32string& name,
-  WS* guard,
-  WS* boolean,
-  const mpz_class& time
-)
-{
-  return tuple_t
-  {
-    {DIM_ID, generate_string(name)},
-    {
-      DIM_VALID_GUARD,
-      Constant(Guard(GuardWS(guard, boolean)),
-                 TYPE_INDEX_GUARD)
-    },
-    {DIM_TIME, makeTime(time)}
-  };
 }
 
 }

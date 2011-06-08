@@ -160,6 +160,7 @@ namespace TransLucid
     Translator(System& system);
     ~Translator();
 
+    #if 0
     /**
      * Translate an expression into a hyperdaton.
      * Parses and compiles an expression string.
@@ -167,6 +168,7 @@ namespace TransLucid
      */
     WS*
     translate_expr(const u32string& s);
+    #endif
 
     /**
      * Add to the header. Parses the input string as a sequence of header

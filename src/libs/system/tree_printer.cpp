@@ -137,13 +137,13 @@ namespace TransLucid
       : ExprPrinter::base_type(expr),
       special_map
       {
-        {Special::ERROR, "sperror"},
-        {Special::ACCESS, "spaccess"},
-        {Special::TYPEERROR, "sptype"},
-        {Special::DIMENSION, "spdim"},
-        {Special::UNDEF, "spundef"},
-        {Special::CONST, "spconst"},
-        {Special::LOOP, "sploop"}
+        {SP_ERROR, "sperror"},
+        {SP_ACCESS, "spaccess"},
+        {SP_TYPEERROR, "sptype"},
+        {SP_DIMENSION, "spdim"},
+        {SP_UNDEF, "spundef"},
+        {SP_CONST, "spconst"},
+        {SP_LOOP, "sploop"}
       }
       {
         nil = karma::omit[nildummy] << "nil";
@@ -212,7 +212,7 @@ namespace TransLucid
       }
 
       const std::string&
-      getSpecial(Special::Value v)
+      getSpecial(Special v)
       {
         return special_map[v];
       }
@@ -221,7 +221,7 @@ namespace TransLucid
 
       karma::rule<Iterator, Tree::nil()> nil;
       karma::rule<Iterator, Tree::nil()> nildummy;
-      karma::rule<Iterator, Special::Value()> special;
+      karma::rule<Iterator, Special()> special;
       karma::rule<Iterator, mpz_class()> integer;
       karma::rule<Iterator, u32string()> ustring;
       karma::rule<Iterator, char32_t()> uchar;
@@ -249,7 +249,7 @@ namespace TransLucid
         std::pair<Tree::Expr, Tree::Expr>()
       > one_pair;
 
-      std::map<Special::Value, std::string> special_map;
+      std::map<Special, std::string> special_map;
     };
   }
 

@@ -1,4 +1,4 @@
-/* Forward declaration for types.
+/* The dimension type.
    Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,29 +17,22 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TL_TYPES_FWD_HPP
-#define TL_TYPES_FWD_HPP
+#ifndef TL_TYPES_DIMENSION_HPP_INCLUDED
+#define TL_TYPES_DIMENSION_HPP_INCLUDED
+
+#include <tl/types.hpp>
 
 namespace TransLucid
 {
-  class Constant;
-
-  namespace detail
+  namespace Types
   {
-    template <typename t>
-    struct set_constant_func;
-
-    template <typename t>
-    struct get_constant_func;
-
-    template <typename T>
-    struct make_constant_pointer;
-
-    //precondition, lhs.index == rhs.index and they don't use the
-    //ptr field
-    bool
-    constant_equality(const Constant& lhs, const Constant& rhs);
+    namespace Dimension
+    {
+      Constant
+      create(dimension_index d);
+    }
   }
 }
 
 #endif
+

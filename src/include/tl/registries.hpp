@@ -1,4 +1,4 @@
-/* Forward declaration for types.
+/* Object registries.
    Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,29 +17,29 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TL_TYPES_FWD_HPP
-#define TL_TYPES_FWD_HPP
+#ifndef TL_REGISTRIES_HPP_INCLUDED
+#define TL_REGISTRIES_HPP_INCLUDED
+
+#include <tl/types.hpp>
 
 namespace TransLucid
 {
-  class Constant;
-
-  namespace detail
+  class TypeRegistry
   {
-    template <typename t>
-    struct set_constant_func;
+    public:
+    virtual type_index
+    getTypeIndex(const u32string& name) = 0;
+  };
 
-    template <typename t>
-    struct get_constant_func;
+  class DimensionRegistry
+  {
+    public:
+    virtual dimension_index
+    getDimensionIndex(const u32string& name) = 0;
 
-    template <typename T>
-    struct make_constant_pointer;
-
-    //precondition, lhs.index == rhs.index and they don't use the
-    //ptr field
-    bool
-    constant_equality(const Constant& lhs, const Constant& rhs);
-  }
+    virtual dimension_index
+    getDimensionIndex(const Constant& c) = 0;
+  };
 }
 
 #endif

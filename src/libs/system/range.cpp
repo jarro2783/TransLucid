@@ -159,7 +159,7 @@ Range::operator==(const Range& rhs) const
 }
 
 bool
-Range::within(const Intmp& value) const
+Range::within(const mpz_class& value) const
 {
 
   #if 0
@@ -205,8 +205,8 @@ Range::within(const Intmp& value) const
   std::cout << std::endl;
   #endif
 
-  return (!m_lower || *m_lower <= value.value())
-      && (!m_upper || *m_upper >= value.value());
+  return (!m_lower || *m_lower <= value)
+      && (!m_upper || *m_upper >= value);
 }
 
 bool

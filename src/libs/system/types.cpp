@@ -34,6 +34,38 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+namespace 
+{
+
+template <typename T>
+bool
+equality(const Constant& lhs, const Constant& rhs)
+{
+  return get_constant<T>(lhs) == get_constant<T>(rhs);
+}
+
+bool (*equality_functions[TYPE_FIELD_PTR])(const Constant&, const Constant&) = 
+{ 
+  &equality<Special>,
+  &equality<bool>,
+  &equality<char32_t>,
+  &equality<int8_t>,
+  &equality<uint32_t>
+};
+
+}
+
+namespace detail
+{
+
+bool
+constant_equality(const Constant& lhs, const Constant& rhs)
+{
+  return (*equality_functions[lhs.data.field])(lhs, rhs);
+}
+
+}
+
 Tuple::Tuple()
 : m_value(new tuple_t)
 {
@@ -59,10 +91,15 @@ Tuple::print(std::ostream& os) const
   BOOST_FOREACH(const tuple_t::value_type& v, *m_value)
   {
     os << v.first << ":";
-    v.second.print(os);
+    //v.second.print(os);
     os << ", ";
   }
   os << "]";
+}
+
+size_t
+Constant::hash() const
+{
 }
 
 } //namespace TransLucid

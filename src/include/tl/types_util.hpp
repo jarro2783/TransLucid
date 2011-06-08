@@ -1,4 +1,4 @@
-/* Forward declaration for types.
+/* Types utility functions.
    Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,28 +17,29 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TL_TYPES_FWD_HPP
-#define TL_TYPES_FWD_HPP
+#ifndef TL_TYPES_UTIL_HPP_INCLUDED
+#define TL_TYPES_UTIL_HPP_INCLUDED
+
+#include <tl/types.hpp>
 
 namespace TransLucid
 {
-  class Constant;
-
-  namespace detail
+  template <typename T>
+  Constant
+  make_constant_pointer(const T& v, TypeFunctions* funs, type_index index)
   {
-    template <typename t>
-    struct set_constant_func;
+    std::unique_ptr<T> value(detail::clone<T>()(v));
+    ConstantPointerValue* p = 
+      new ConstantPointerValue(funs, value.get());
+    value.release();
+    return Constant(p, index);
+  }
 
-    template <typename t>
-    struct get_constant_func;
-
-    template <typename T>
-    struct make_constant_pointer;
-
-    //precondition, lhs.index == rhs.index and they don't use the
-    //ptr field
-    bool
-    constant_equality(const Constant& lhs, const Constant& rhs);
+  template <typename T>
+  const T&
+  get_constant_pointer(const Constant& c)
+  {
+    return *static_cast<T*>(c.data.ptr->data);
   }
 }
 

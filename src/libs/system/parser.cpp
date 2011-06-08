@@ -48,6 +48,11 @@ namespace
 }
 
 Header::Header()
+{
+}
+
+#if 0
+Header::Header()
 :
   //add predefined dimensions
   system_dimension_symbols(
@@ -74,6 +79,7 @@ Header::Header()
     #endif
   );
 }
+#endif
 
 std::ostream& 
 operator<<(std::ostream& os, const Header& h)

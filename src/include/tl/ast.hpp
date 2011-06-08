@@ -282,7 +282,7 @@ namespace TransLucid
     <
       nil,
       bool,
-      Special::Value,     //replaces SpecialExpr
+      Special,     //replaces SpecialExpr
       mpz_class,          //replaces IntegerExpr
       char32_t,           //replaces UcharExpr
       u32string,          //replaces StringExpr
@@ -547,6 +547,7 @@ namespace TransLucid
        * Absolute context change. True if this node is an absolute context
        * change node, false if it is a relative context change node.
        */
+      //TODO: get rid of this
       bool absolute;
     };
 

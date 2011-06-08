@@ -32,76 +32,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class Special : public TypedValue
-  {
-    public:
-    /**
-     * Special values. The enum values of the specials.
-     */
-    enum Value
-    {
-      ERROR, /**<Error value. Should never have this value, having a special
-      of this value means an error occured somewhere.*/
-      ACCESS, /**<Access error. Something requested could not be accessed.*/
-      TYPEERROR,
-      DIMENSION,
-      UNDEF,
-      CONST,
-      MULTIDEF,
-      LOOP
-    };
-
-    Special(const u32string& text)
-    : m_v(stringToValue(text))
-    {}
-
-    Special(Value v)
-    : m_v(v)
-    {}
-
-    Special(const Special& rhs)
-    : m_v(rhs.m_v)
-    {
-    }
-
-    Special* clone() const
-    {
-      return new Special(*this);
-    }
-
-    const Value
-    value() const
-    {
-      return m_v;
-    }
-
-    void
-    print(std::ostream& os) const;
-
-    bool
-    operator==(const Special& rhs) const
-    {
-      return m_v == rhs.m_v;
-    }
-
-    size_t
-    hash() const
-    {
-      return m_v;
-    }
-
-    bool
-    operator<(const Special& rhs) const
-    {
-      return m_v < rhs.m_v;
-    }
-
-    private:
-    Value m_v;
-
-    public:
-
-    struct StringValueInitialiser
+  #if 0
+  struct StringValueInitialiser
     {
       typedef std::unordered_map<u32string, Value> StringValueMap;
       StringValueMap stov;
@@ -131,99 +63,12 @@ namespace TransLucid
       }
     }
   };
+  #endif
 
-  class UUID : public TypedValue
-  {
-    public:
-    UUID(const uuid& u)
-    : m_uuid(u)
-    {
-    }
+  //string
+  //uuid
 
-    UUID* 
-    clone() const
-    {
-      return new UUID(*this);
-    }
-
-    size_t
-    hash() const
-    {
-      return boost::hash<uuid>()(m_uuid);
-    }
-
-    const uuid&
-    value() const
-    {
-      return m_uuid;
-    }
-
-    void
-    print(std::ostream& os) const
-    {
-      os << m_uuid;
-    }
-
-    private:
-    uuid m_uuid;
-  };
-
-  class String : public TypedValue
-  {
-    public:
-    String(const u32string& s)
-    : m_s(s)
-    {
-    }
-
-    String(const String& rhs)
-    : m_s(rhs.m_s)
-    {
-    }
-
-    String* clone() const
-    {
-      return new String(*this);
-    }
-
-    size_t
-    hash() const
-    {
-      boost::hash<u32string> hasher;
-      return hasher(m_s);
-    }
-
-    static String
-    parse(const u32string& text)
-    {
-      return String(text);
-    }
-
-    void
-    print(std::ostream& os) const;
-
-    bool
-    operator==(const String& rhs) const
-    {
-      return m_s == rhs.m_s;
-    }
-
-    bool
-    operator<(const String& rhs) const
-    {
-      return m_s < rhs.m_s;
-    }
-
-    const u32string&
-    value() const
-    {
-      return m_s;
-    }
-
-    private:
-    u32string m_s;
-  };
-
+  #if 0
   class Boolean : public TypedValue
   {
     public:
@@ -694,55 +539,7 @@ namespace TransLucid
     size_t m_index;
   };
 
-  class FunctionType : public TypedValue
-  {
-    public:
-    virtual ~FunctionType() = 0;
-
-    virtual TaggedConstant
-    applyLambda(const Tuple& k, const Constant& value) const;
-
-    virtual TaggedConstant
-    applyPhi(const Tuple& k, WS* expr) const;
-  };
-
-  class LambdaFunctionType : public FunctionType
-  {
-    public:
-    LambdaFunctionType(const u32string& name, dimension_index dim, WS* expr)
-    : m_name(name), m_dim(dim), m_expr(expr)
-    {
-    }
-
-    TaggedConstant
-    applyLambda(const Tuple& k, const Constant& value) const;
-
-    LambdaFunctionType* 
-    clone() const
-    {
-      return new LambdaFunctionType(*this);
-    }
-
-    size_t 
-    hash() const
-    {
-      return reinterpret_cast<size_t>(m_expr);
-    }
-
-    void
-    print(std::ostream& os) const;
-
-    private:
-    u32string m_name;
-    dimension_index m_dim;
-    WS* m_expr;
-  };
-
-  class PhiFunctionType : public FunctionType
-  {
-    private:
-    WS* m_expr;
-  };
+  #endif
 }
 
 #endif // BUILTIN_TYPES_HPP_INCLUDED

@@ -46,6 +46,7 @@ ExprCompiler::compile_for_equation(const Tree::Expr& e)
   return boost::apply_visitor(*this, e);
 }
 
+#if 0
 WS*
 ExprCompiler::compile_top_level(const Tree::Expr& e)
 {
@@ -57,9 +58,10 @@ ExprCompiler::compile_top_level(const Tree::Expr& e)
   }
   else
   {
-    return new Hyperdatons::SystemEvaluationWS(m_system, h);
+    //return new Hyperdatons::SystemEvaluationWS(m_system, h);
   }
 }
+#endif
 
 WS*
 ExprCompiler::operator()(const Tree::nil& n)
@@ -74,7 +76,7 @@ ExprCompiler::operator()(bool b)
 }
 
 WS*
-ExprCompiler::operator()(Special::Value s)
+ExprCompiler::operator()(Special s)
 {
   return new Hyperdatons::SpecialConstWS(s);
 }
@@ -100,13 +102,14 @@ ExprCompiler::operator()(const u32string& s)
 WS*
 ExprCompiler::operator()(const Tree::LiteralExpr& e)
 {
-  return new Hyperdatons::TypedValueWS(m_system, e.type, e.text);
+  //return new Hyperdatons::TypedValueWS(m_system, e.type, e.text);
+  return 0;
 }
 
 WS*
 ExprCompiler::operator()(const Tree::DimensionExpr& e)
 {
-  return new Hyperdatons::DimensionWS(m_system, e.text);
+  return new Hyperdatons::DimensionWS(*m_system, e.text);
 }
 
 WS*
@@ -131,10 +134,14 @@ ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
 {
+  #if 0
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
 
   return new Hyperdatons::BinaryOpWS(m_system, {lhs, rhs}, e.op.op);
+  #endif
+  throw "ExprCompiler::operator()(BinaryOpExpr)";
+  return 0;
 }
 
 WS*
@@ -162,7 +169,7 @@ WS*
 ExprCompiler::operator()(const Tree::HashExpr& e)
 {
   WS* expr = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::HashWS(m_system, expr);
+  return new Hyperdatons::HashWS(*m_system, expr);
 }
 
 WS*
@@ -175,7 +182,7 @@ ExprCompiler::operator()(const Tree::TupleExpr& e)
     WS* rhs = boost::apply_visitor(*this, v.second);
     elements.push_back(std::make_pair(lhs, rhs));
   }
-  return new Hyperdatons::TupleWS(m_system, elements);
+  return new Hyperdatons::TupleWS(*m_system, elements);
 }
 
 WS*
@@ -184,19 +191,14 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
 
-  if (e.absolute)
-  {
-    return new Hyperdatons::AtAbsoluteWS(lhs, rhs);
-  }
-  else
-  {
-    return new Hyperdatons::AtRelativeWS(lhs, rhs);
-  }
+  return new Hyperdatons::AtWS(lhs, rhs);
 }
 
 WS*
 ExprCompiler::operator()(const Tree::LambdaExpr& e)
 {
+//TODO: we will get to this eventually
+#if 0
   //generate a new dimension
   tuple_t k = {{DIM_ID, generate_string(U"_uniquedim")}};
   Intmp uniqueIndex = (*m_system)(Tuple(k)).first.value<Intmp>();
@@ -221,6 +223,8 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
   //make a LambdaAbstractionWS
   WS* rhs = boost::apply_visitor(*this, renamed);
   return new Hyperdatons::LambdaAbstractionWS(m_system, e.name, index, rhs);
+#endif
+  return 0;
 }
 
 WS*

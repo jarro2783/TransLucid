@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef DIMTRANSLATOR_HPP_INCLUDED
 #define DIMTRANSLATOR_HPP_INCLUDED
 
+#include <tl/object_registry.hpp>
 #include <tl/types.hpp>
 #include <unordered_map>
 
@@ -63,6 +64,9 @@ namespace TransLucid
     private:
 
     size_t m_nextIndex;
+
+    ObjectRegistry<u32string, decltype(m_nextIndex)> m_named;
+    ObjectRegistry<Constant, decltype(m_nextIndex)> m_constants;
 
     typedef std::unordered_map<u32string, size_t> ustring_size_map;
     typedef std::unordered_map<Constant, size_t> ustring_type_map;

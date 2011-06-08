@@ -80,6 +80,7 @@ AC_CONFIG_FILES([Makefile
                  src/include/Makefile
                  src/include/tl/Makefile
                  src/include/tl/detail/Makefile
+                 src/include/tl/types/Makefile
                  src/libs/Makefile
                  src/libs/int/Makefile
                  src/libs/string/Makefile

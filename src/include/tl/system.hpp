@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 //#include <tl/physicalhds.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
+#include <tl/registries.hpp>
 
 #include <unordered_set>
 
@@ -48,7 +49,7 @@ namespace TransLucid
    *
    * Holds all the data necessary for an system.
    **/
-  class System : public WS
+  class System : public WS, public TypeRegistry, public DimensionRegistry
   {
     public:
 
@@ -57,6 +58,16 @@ namespace TransLucid
 
     //don't want to copy
     System(const System&) = delete;
+
+    //the registry interface
+    type_index
+    getTypeIndex(const u32string& name);
+
+    dimension_index
+    getDimensionIndex(const u32string& name);
+
+    dimension_index
+    getDimensionIndex(const Constant& c);
 
     TaggedConstant
     operator()(const Tuple& k);
@@ -205,6 +216,10 @@ namespace TransLucid
     BinaryHashSet m_binop_uuids;
 
     DimensionTranslator m_dimTranslator;
+
+    type_index m_nextTypeIndex;
+    ObjectRegistry<u32string, decltype(m_nextTypeIndex)> m_typeRegistry;
+
     size_t m_time;
     Translator *m_translator;
     std::map<u32string, size_t> builtin_name_to_index;
