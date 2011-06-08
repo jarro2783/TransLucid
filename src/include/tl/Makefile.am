@@ -28,4 +28,4 @@ includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp cache.hpp \
   parser_api.hpp parser_defs.hpp parser_header.hpp parser_iterator.hpp \
   parser_util.hpp printer.hpp range.hpp \
   set_types.hpp system.hpp translator.hpp tree_printer.hpp \
-  tuple_parser.hpp types.hpp utility.hpp valuehd.hpp workshop.hpp 
+  tuple_parser.hpp types.hpp utility.hpp workshop.hpp 

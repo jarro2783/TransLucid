@@ -44,13 +44,44 @@ equality(const Constant& lhs, const Constant& rhs)
   return get_constant<T>(lhs) == get_constant<T>(rhs);
 }
 
+template <typename T>
+size_t
+hash_func(const Constant& c)
+{
+  return std::hash<T>()(get_constant<T>(c));
+}
+
 bool (*equality_functions[TYPE_FIELD_PTR])(const Constant&, const Constant&) = 
 { 
   &equality<Special>,
   &equality<bool>,
   &equality<char32_t>,
   &equality<int8_t>,
-  &equality<uint32_t>
+  &equality<uint8_t>,
+  &equality<int16_t>,
+  &equality<uint16_t>,
+  &equality<int32_t>,
+  &equality<uint32_t>,
+  &equality<int64_t>,
+  &equality<uint64_t>,
+  &equality<float>,
+  &equality<double>
+};
+
+size_t (*hash_functions[TYPE_FIELD_PTR])(const Constant&) =
+{
+  &hash_func<Special>,
+  &hash_func<bool>,
+  &hash_func<int8_t>,
+  &hash_func<uint8_t>,
+  &hash_func<int16_t>,
+  &hash_func<uint16_t>,
+  &hash_func<int32_t>,
+  &hash_func<uint32_t>,
+  &hash_func<int64_t>,
+  &hash_func<uint64_t>,
+  &hash_func<float>,
+  &hash_func<double>
 };
 
 }
@@ -100,6 +131,14 @@ Tuple::print(std::ostream& os) const
 size_t
 Constant::hash() const
 {
+  if (data.field == TYPE_FIELD_PTR)
+  {
+    return (*data.ptr->functions->hash)(*this);
+  }
+  else
+  {
+    return (*hash_functions[data.field])(*this);
+  }
 }
 
 } //namespace TransLucid

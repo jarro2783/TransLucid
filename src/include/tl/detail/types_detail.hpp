@@ -26,9 +26,15 @@ namespace TransLucid
 {
   namespace detail
   {
+    //Clone is used when an object of known type needs to be copied, but we 
+    //don't necessarily know how to copy it. Clone is specialised for all the
+    //things that might need to be copied.
     template <typename T>
     struct clone;
 
+    //All of set_constant_func<T> and get_constant_func<T> are specialisations
+    //which given the type of the object either set or get the correct field
+    //from the union in a Constant.
     template <>
     struct set_constant_func<bool>
     {
@@ -188,6 +194,16 @@ namespace TransLucid
     };
 
     template <>
+    struct get_constant_func<int32_t>
+    {
+      int32_t
+      operator()(const Constant& c) const
+      {
+        return c.data.si32;
+      }
+    };
+
+    template <>
     struct get_constant_func<uint32_t>
     {
       uint32_t
@@ -198,12 +214,42 @@ namespace TransLucid
     };
 
     template <>
+    struct get_constant_func<int64_t>
+    {
+      int64_t
+      operator()(const Constant& c) const
+      {
+        return c.data.si64;
+      }
+    };
+
+    template <>
     struct get_constant_func<uint64_t>
     {
       uint64_t
       operator()(const Constant& c) const
       {
         return c.data.ui64;
+      }
+    };
+
+    template <>
+    struct get_constant_func<float>
+    {
+      float
+      operator()(const Constant& c) const
+      {
+        return c.data.f32;
+      }
+    };
+
+    template <>
+    struct get_constant_func<double>
+    {
+      double
+      operator()(const Constant& c) const
+      {
+        return c.data.f64;
       }
     };
   }
