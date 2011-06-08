@@ -24,7 +24,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-
   class FunctionType
   {
     public:
@@ -35,6 +34,12 @@ namespace TransLucid
 
     virtual TaggedConstant
     applyPhi(const Tuple& k, WS* expr) const;
+
+    virtual FunctionType*
+    clone() const = 0;
+
+    virtual size_t
+    hash() const = 0;
   };
 
   class LambdaFunctionType : public FunctionType
@@ -47,6 +52,18 @@ namespace TransLucid
 
     TaggedConstant
     applyLambda(const Tuple& k, const Constant& value) const;
+
+    LambdaFunctionType*
+    clone() const
+    {
+      return new LambdaFunctionType(*this);
+    }
+
+    size_t
+    hash() const
+    {
+      return reinterpret_cast<size_t>(m_expr);
+    }
 
     private:
     u32string m_name;
@@ -68,8 +85,14 @@ namespace TransLucid
       Constant
       create(const FunctionType& f);
 
-      FunctionType&
+      const FunctionType&
       get(const Constant& c);
+
+      bool
+      equality(const Constant& lhs, const Constant& rhs);
+
+      size_t
+      hash(const Constant& c);
     }
   }
 }

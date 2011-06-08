@@ -387,7 +387,7 @@ System::operator()(const Tuple& k)
 
     if (viter == m_equations.end())
     {
-      return TaggedConstant(make_special(SP_UNDEF), k);
+      return TaggedConstant(Types::Special::create(SP_UNDEF), k);
     }
     else
     {
@@ -753,6 +753,23 @@ Constant
 System::addAssignment(const Parser::Equation& eqn)
 {
   return addDeclInternal(eqn, m_assignments);
+}
+
+type_index
+System::getTypeIndex(const u32string& name)
+{
+}
+
+dimension_index
+System::getDimensionIndex(const u32string& name)
+{
+  return m_dimTranslator.lookup(name);
+}
+
+dimension_index
+System::getDimensionIndex(const Constant& c)
+{
+  return m_dimTranslator.lookup(c);
 }
 
 } //namespace TransLucid

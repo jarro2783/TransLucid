@@ -57,7 +57,7 @@ ExprCompiler::compile_top_level(const Tree::Expr& e)
   }
   else
   {
-    return new Hyperdatons::SystemEvaluationWS(m_system, h);
+    //return new Hyperdatons::SystemEvaluationWS(m_system, h);
   }
 }
 
@@ -100,7 +100,8 @@ ExprCompiler::operator()(const u32string& s)
 WS*
 ExprCompiler::operator()(const Tree::LiteralExpr& e)
 {
-  return new Hyperdatons::TypedValueWS(m_system, e.type, e.text);
+  //return new Hyperdatons::TypedValueWS(m_system, e.type, e.text);
+  return 0;
 }
 
 WS*
@@ -131,10 +132,14 @@ ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
 {
+  #if 0
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
 
   return new Hyperdatons::BinaryOpWS(m_system, {lhs, rhs}, e.op.op);
+  #endif
+  throw "ExprCompiler::operator()(BinaryOpExpr)";
+  return 0;
 }
 
 WS*
@@ -162,7 +167,7 @@ WS*
 ExprCompiler::operator()(const Tree::HashExpr& e)
 {
   WS* expr = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::HashWS(m_system, expr);
+  return new Hyperdatons::HashWS(*m_system, expr);
 }
 
 WS*

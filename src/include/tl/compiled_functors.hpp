@@ -68,23 +68,6 @@ namespace TransLucid
       WS* m_e;
     };
 
-    class TypedValueWS : public WS
-    {
-      public:
-
-      TypedValueWS(WS* system, const u32string& type, const u32string& text)
-      : m_system(system), m_type(type), m_text(text)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      WS* m_system;
-      std::u32string m_type;
-      std::u32string m_text;
-    };
-
     class DimensionWS : public WS
     {
       public:
@@ -256,7 +239,7 @@ namespace TransLucid
     class HashWS : public WS
     {
       public:
-      HashWS(WS* system, WS* e)
+      HashWS(System& system, WS* e)
       : m_system(system), m_e(e)
       {}
 
@@ -264,7 +247,7 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      WS* m_system;
+      System& m_system;
       WS* m_e;
     };
 

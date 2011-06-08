@@ -275,7 +275,7 @@ VariableWS::operator()(const Tuple& k)
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
-    return TaggedConstant(make_special(SP_UNDEF), k);
+    return TaggedConstant(Types::Special::create(SP_UNDEF), k);
   }
   else if (applicable.size() == 1)
   {
@@ -332,7 +332,7 @@ VariableWS::operator()(const Tuple& k)
   }
   else
   {
-    return TaggedConstant(make_special(SP_MULTIDEF), k);
+    return TaggedConstant(Types::Special::create(SP_MULTIDEF), k);
   }
 }
 

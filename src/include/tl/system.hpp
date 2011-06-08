@@ -59,6 +59,16 @@ namespace TransLucid
     //don't want to copy
     System(const System&) = delete;
 
+    //the registry interface
+    type_index
+    getTypeIndex(const u32string& name);
+
+    dimension_index
+    getDimensionIndex(const u32string& name);
+
+    dimension_index
+    getDimensionIndex(const Constant& c);
+
     TaggedConstant
     operator()(const Tuple& k);
 

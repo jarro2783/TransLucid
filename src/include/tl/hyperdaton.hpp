@@ -125,7 +125,7 @@ namespace TransLucid
     {
       try
       {
-        *m_data = c.value<T>().value();
+        //*m_data = c.value<T>().value();
       } catch (...)
       {
       }
@@ -174,7 +174,7 @@ namespace TransLucid
     {
       try
       {
-        *m_data = c.value<T>().value();
+        //*m_data = c.value<T>().value();
       } catch (...)
       {
       }

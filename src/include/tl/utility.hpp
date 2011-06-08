@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/range.hpp>
 #include <tl/types.hpp>
 #include <tl/types/string.hpp>
+#include <tl/types/special.hpp>
 
 #include <vector>
 
@@ -172,7 +173,7 @@ namespace TransLucid
   //looks up a value in the current context and returns the value of the
   //all dimension if it exists, otherwise special<dim> if not found
   TaggedConstant
-  lookup_context(WS* system, const Constant& v, const Tuple& k);
+  lookup_context(System& system, const Constant& v, const Tuple& k);
 
   //returns the hash of a dimension when we only have the index
   class HashIndexWS : public WS
@@ -193,7 +194,7 @@ namespace TransLucid
       }
       else
       {
-        return TaggedConstant(make_special(SP_DIMENSION), k);
+        return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
       }
     }
 

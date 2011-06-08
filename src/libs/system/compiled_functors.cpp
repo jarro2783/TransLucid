@@ -416,7 +416,7 @@ AtWS::operator()(const Tuple& k)
     if (dimTime != delta.end() && Types::Intmp::get(dimTime->second) > 
       Types::Intmp::get(kNew[DIM_TIME]))
     {
-      return TaggedConstant(make_special(SP_ACCESS), k);
+      return TaggedConstant(Types::Special::create(SP_ACCESS), k);
     }
 
     for(tuple_t::value_type v : delta)
@@ -446,7 +446,7 @@ LambdaApplicationWS::operator()(const Tuple& k)
   //first make sure that it is a function
   if (lhs.index() != TYPE_INDEX_FUNCTION)
   {
-    return TaggedConstant(make_special(SP_TYPEERROR), k);
+    return TaggedConstant(Types::Special::create(SP_TYPEERROR), k);
   }
 
   Constant rhs = (*m_rhs)(k).first;

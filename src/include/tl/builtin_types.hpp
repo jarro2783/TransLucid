@@ -32,9 +32,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  Constant
-  make_special(Special s);
-
   #if 0
   struct StringValueInitialiser
     {

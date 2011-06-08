@@ -32,7 +32,7 @@ namespace TransLucid
       create(const TransLucid::Tuple& t);
 
       const TransLucid::Tuple&
-      get(Constant& c);
+      get(const Constant& c);
     }
   }
 }

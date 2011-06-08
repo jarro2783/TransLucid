@@ -66,6 +66,7 @@ BoolWS::operator()(const Tuple& k)
 TaggedConstant
 IntmpWS::operator()(const Tuple& k)
 {
+#if 0
   Tuple::const_iterator value = k.find(DIM_TEXT);
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
@@ -85,11 +86,13 @@ IntmpWS::operator()(const Tuple& k)
     return TaggedConstant(Constant(Special(Special::CONST),
                           TYPE_INDEX_SPECIAL), k);
   }
+#endif
 }
 
 TaggedConstant
 UCharWS::operator()(const Tuple& k)
 {
+#if 0
   size_t valueindex = get_dimension_index(m_system, U"text");
   Tuple::const_iterator value = k.find(valueindex);
 
@@ -108,11 +111,13 @@ UCharWS::operator()(const Tuple& k)
                           TYPE_INDEX_SPECIAL), k);
   }
   return TaggedConstant(Constant(Char(s[0]), TYPE_INDEX_UCHAR), k);
+#endif
 }
 
 TaggedConstant
 UStringWS::operator()(const Tuple& k)
 {
+#if 0
   Tuple::const_iterator value = k.find(DIM_TEXT);
 
   if (value == k.end() || value->second.index() != TYPE_INDEX_USTRING)
@@ -121,6 +126,7 @@ UStringWS::operator()(const Tuple& k)
                           TYPE_INDEX_SPECIAL), k);
   }
   return TaggedConstant(value->second, k);
+#endif
 }
 
 } //namespace Hyperdatons

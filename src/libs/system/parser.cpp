@@ -47,6 +47,10 @@ namespace
   };
 }
 
+Header::Header()
+{
+}
+
 #if 0
 Header::Header()
 :

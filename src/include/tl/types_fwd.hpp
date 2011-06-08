@@ -32,6 +32,9 @@ namespace TransLucid
     template <typename t>
     struct get_constant_func;
 
+    template <typename T>
+    struct make_constant_pointer;
+
     //precondition, lhs.index == rhs.index and they don't use the
     //ptr field
     bool
