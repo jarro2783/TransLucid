@@ -69,6 +69,14 @@ TLText::run()
     Parser::makeUTF8Iterator(boost::spirit::istream_iterator(*m_is)),
     Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
   );
+
+  Parser::U32Iterator end;
+
+  Constant c;
+  while (begin != end)
+  {
+    c = m_system.parseLine(begin, end);
+  }
 }
 
 } //namespace TLCore
