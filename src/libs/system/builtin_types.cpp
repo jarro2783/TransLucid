@@ -22,7 +22,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/intmp.hpp>
+#include <tl/types/range.hpp>
 #include <tl/types/string.hpp>
+#include <tl/types/tuple.hpp>
+#include <tl/types/uuid.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
@@ -42,9 +45,17 @@ namespace TransLucid
         &Types::Function::hash
       };
 
-    TypeFunctions range_type_functions;
+    TypeFunctions range_type_functions =
+      {
+        &Types::Range::equality,
+        &Types::Range::hash
+      };
 
-    TypeFunctions tuple_type_functions;
+    TypeFunctions tuple_type_functions =
+      {
+        &Types::Tuple::equality,
+        &Types::Tuple::hash
+      };
 
     TypeFunctions intmp_type_functions = 
       {
@@ -52,7 +63,11 @@ namespace TransLucid
         &Types::Intmp::hash
       };
 
-    TypeFunctions uuid_type_functions;
+    TypeFunctions uuid_type_functions =
+      {
+        &Types::UUID::equality,
+        &Types::UUID::hash
+      };
   }
 
   namespace detail
@@ -222,6 +237,18 @@ namespace TransLucid
       {
         return get_constant_pointer<TransLucid::Range>(r);
       }
+
+      bool 
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return get(c).hash();
+      }
     }
 
     namespace Tuple
@@ -238,6 +265,18 @@ namespace TransLucid
       {
         return get_constant_pointer<TransLucid::Tuple>(t);
       }
+
+      bool 
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return get(c).hash();
+      }
     }
 
     namespace UUID
@@ -253,6 +292,18 @@ namespace TransLucid
       get(const Constant& u)
       {
         return get_constant_pointer<uuid>(u);
+      }
+
+      bool 
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return boost::hash<uuid>()(get(c));
       }
     }
 

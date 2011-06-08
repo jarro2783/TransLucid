@@ -35,7 +35,10 @@ namespace TransLucid
       get(const Constant& c);
 
       bool 
-      equality();
+      equality(const Constant& lhs, const Constant& rhs);
+
+      size_t
+      hash(const Constant& c);
     }
   }
 }
