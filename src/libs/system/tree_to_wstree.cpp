@@ -71,8 +71,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LiteralExpr& e)
         {Tree::DimensionExpr(U"type"), e.type},
         {Tree::DimensionExpr(U"text"), e.text}
       }
-    ),
-    false
+    )
   );
 }
 
@@ -103,8 +102,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
         {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.e)},
         {Tree::DimensionExpr(U"opname"), e.op.op}
       }
-    ),
-    false
+    )
   );
 }
 
@@ -121,8 +119,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
         {Tree::DimensionExpr(U"arg1"), boost::apply_visitor(*this, e.rhs)},
         {Tree::DimensionExpr(U"opname"), e.op.op}
       }
-    ),
-    false
+    )
   );
 }
 
@@ -169,8 +166,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::AtExpr& e)
 {
   return Tree::AtExpr(
     boost::apply_visitor(*this, e.lhs),
-    boost::apply_visitor(*this, e.rhs),
-    e.absolute
+    boost::apply_visitor(*this, e.rhs)
   );
 }
 

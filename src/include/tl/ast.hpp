@@ -529,8 +529,8 @@ namespace TransLucid
        * @param rhs The right hand side expression.
        * @param absolute True if absolute context change, false if relative.
        */
-      AtExpr(const Expr& lhs, const Expr& rhs, bool absolute)
-      : lhs(lhs), rhs(rhs), absolute(absolute)
+      AtExpr(const Expr& lhs, const Expr& rhs)
+      : lhs(lhs), rhs(rhs)
       {}
 
       /**
@@ -547,8 +547,6 @@ namespace TransLucid
        * Absolute context change. True if this node is an absolute context
        * change node, false if it is a relative context change node.
        */
-      //TODO: get rid of this
-      bool absolute;
     };
 
     /**
