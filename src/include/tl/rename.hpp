@@ -99,8 +99,7 @@ namespace TransLucid
       return Tree::AtExpr
       (
         boost::apply_visitor(*this, e.lhs),
-        boost::apply_visitor(*this, e.rhs),
-        e.absolute
+        boost::apply_visitor(*this, e.rhs)
       );
     }
 

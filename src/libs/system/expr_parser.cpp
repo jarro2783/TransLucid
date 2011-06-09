@@ -253,7 +253,7 @@ namespace TransLucid
       >> (
            (tok.at_ >> at_expr)
              [
-               _val = construct<Tree::AtExpr>(_a, _2, false)
+               _val = construct<Tree::AtExpr>(_a, _2)
              ]
          | qi::eps [_val = _a]
          )
