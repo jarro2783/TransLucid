@@ -126,10 +126,11 @@ namespace TransLucid
       {
         using namespace qi::labels;
         r_constant = 
-          ((tok.constantINTERPRET_ | tok.constantRAW_) > tok.dblsemi_)
+          (tok.constantINTERPRET_ | tok.constantRAW_)
           [
             _val = ph::bind(&buildString, _1)
           ]
+          > tok.dblsemi_
         ;
 
         BOOST_SPIRIT_DEBUG_NODE(r_constant);
