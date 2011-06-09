@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define PHYSICAL_WSS_HPP_INCLUDED
 
 #include <tl/types.hpp>
+#include <boost/multi_array.hpp>
 
 namespace TransLucid
 {
@@ -76,9 +77,65 @@ namespace TransLucid
     }
   };
 
-  template <size_t First, size_t... Rest>
+  template <typename Array, typename Index>
+  auto
+  array_get(const Array& a, Index i)
+    -> decltype(a[i])
+  {
+    return a[i];
+  }
+
+  #if 0
+  template <typename Array, typename First, typename... Location>
+  auto 
+  array_get(const Array& a, First f, Location... loc)
+    -> decltype(array_get(a[f], loc...))
+  {
+    return array_get(a[f], loc...);
+  }
+  #endif
+
+  template <typename Array, typename First, typename... Location>
+  int
+  array_get(const Array& a, First f, Location... loc)
+    //-> decltype(array_get(a[f], loc...))
+  {
+    return array_get(a[f], loc...);
+  }
+
+  template <typename T, size_t N>
   class ArrayNHD
   {
+    public:
+    typedef boost::multi_array<T, N> type;
+
+    type& get_array()
+    {
+      return m_array;
+    }
+
+    //if you get a compile error here, maybe all the types of Dimensions
+    //weren't integers
+    template <typename... Dimensions>
+    ArrayNHD(Dimensions... dims)
+    : m_array(std::vector<size_t>{dims...})
+    {
+      for (size_t i = 0; i != sizeof...(Dimensions); ++i)
+      {
+        m_dimensions.push_back(i);
+      }
+    }
+
+    template <typename... Location>
+    const T 
+    get(Location... loc) const
+    {
+      return array_get(m_array, loc...);
+    }
+
+    private:
+    type m_array;
+    std::vector<mpz_class> m_dimensions;
   };
 
   template <size_t... Limits>

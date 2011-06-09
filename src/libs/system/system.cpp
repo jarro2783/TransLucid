@@ -311,7 +311,7 @@ System::System()
   #endif
 
   //add this
-  addEquation(U"this", GuardWS(), this);
+  //addEquation(U"this", GuardWS(), this);
 
   //add variables for all the types
   //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
@@ -370,34 +370,6 @@ System::tick()
 
   ++m_time;
   #endif
-}
-
-TaggedConstant
-System::operator()(const Tuple& k)
-{
-  Tuple::const_iterator iditer = k.find(DIM_ID);
-
-  //the system only varies in the id dimension
-  if (iditer == k.end())
-  {
-    return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
-  }
-  else
-  {
-    const u32string& id = Types::String::get(iditer->second);
-    auto viter = m_equations.find(id);
-
-    if (viter == m_equations.end())
-    {
-      return TaggedConstant(Types::Special::create(SP_UNDEF), k);
-    }
-    else
-    {
-      tuple_t kp = k.tuple();
-      kp.erase(DIM_ID);
-      return (*viter->second)(Tuple(kp));
-    }
-  }
 }
 
 uuid
@@ -468,14 +440,30 @@ makeBinaryOp(LineType type, const Parser::BinopHeader& op)
 Constant
 System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
 {
-  u32string firstWord;
+  std::cerr << "parse line..." << std::endl;
   Parser::U32Iterator& current = begin;
+
+  //skip over spaces
+  char32_t c = *current;
+  while (current != end)
+  {
+    c = *current;
+    if (!(c == ' ' || c == '\t' || c == '\n'))
+    {
+      break;
+    }
+    ++current;
+  }
+
+  //read the first word
+  u32string firstWord;
   while (current != end && *current != ' ')
   {
     firstWord += *current;
     ++current;
   }
 
+  std::cerr << "parsing thing of type " << firstWord << std::endl;
   auto iter = lineTypes.find(firstWord);
   if (iter != lineTypes.end())
   {
@@ -574,6 +562,7 @@ System::addEquation(const Parser::Equation& eqn)
 Constant 
 System::addDimension(const u32string& dimension)
 {
+  std::cerr << "adding dimension: " << dimension << std::endl;
   //add equation DIM | [name : "dimension"] = true
   Constant c = addEquation(Parser::Equation(
     U"DIM", 
@@ -715,7 +704,7 @@ System::addDeclInternal
 
   if (i == declarations.end())
   {
-    var = new VariableWS(name, this);
+    var = new VariableWS(name);
     declarations.insert(std::make_pair(name, var));
   }
   else

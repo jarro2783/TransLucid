@@ -63,6 +63,7 @@ TLText::TLText()
 void 
 TLText::run()
 {
+  std::cerr << "TLText..." << std::endl;
   *m_is >> std::noskipws;
 
   Parser::U32Iterator begin(
@@ -76,6 +77,7 @@ TLText::run()
   while (begin != end)
   {
     c = m_system.parseLine(begin, end);
+    std::cerr << "got Constant of type " << c.index() << std::endl;
   }
 }
 

@@ -193,6 +193,16 @@ IdentWS::operator()(const Tuple& k)
   }
   return (*m_system)(Tuple(kp));
   #endif
+  WS* e = m_identifiers.lookup(m_name);
+
+  if (e != 0)
+  {
+    return (*e)(k);
+  }
+  else
+  {
+    return TaggedConstant(Types::Special::create(SP_UNDEF), k);
+  }
 }
 
 TaggedConstant

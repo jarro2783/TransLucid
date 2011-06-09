@@ -28,6 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 //#include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/system.hpp>
 #include <tl/workshop.hpp>
 
 #include <list>
@@ -86,15 +87,15 @@ namespace TransLucid
     class IdentWS : public WS
     {
       public:
-      IdentWS(WS* system, const u32string& name)
-      : m_system(system), m_name(name)
+      IdentWS(const System::IdentifierLookup& idents, const u32string& name)
+      : m_identifiers(idents), m_name(name)
       {}
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      WS* m_system;
+      System::IdentifierLookup m_identifiers;
       u32string m_name;
     };
 
@@ -332,9 +333,8 @@ namespace TransLucid
     class LambdaApplicationWS : public WS
     {
       public:
-      LambdaApplicationWS(WS* system, WS* lhs, WS* rhs)
-      : m_system(system)
-      , m_lhs(lhs)
+      LambdaApplicationWS(WS* lhs, WS* rhs)
+      : m_lhs(lhs)
       , m_rhs(rhs)
       {
       }
@@ -343,7 +343,6 @@ namespace TransLucid
       operator()(const Tuple& k);
 
       private:
-      WS* m_system;
       WS* m_lhs;
       WS* m_rhs;
     };

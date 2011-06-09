@@ -22,9 +22,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/header_parser.hpp>
 #include <tl/expr_parser.hpp>
 #include <tl/tuple_parser.hpp>
-#include <boost/spirit/home/qi/parser.hpp>
 #include <tl/types.hpp>
 #include <tl/utility.hpp>
+
+#include <boost/spirit/home/qi/parser.hpp>
+#include <boost/spirit/include/qi_parse.hpp>
+#include <boost/spirit/include/qi_parse_attr.hpp>
 
 namespace TransLucid
 {
@@ -218,10 +221,23 @@ Translator::parseHeaderString
 )
 {
   u32string arg;
+  #if 0
   bool success = boost::spirit::lex::tokenize_and_parse(
     begin,
     end,
     m_parsers->m_lexer,
+    m_parsers->m_header_string,
+    arg
+  );
+  #endif
+
+  Lexer::lexer_type::iterator_type iter = 
+    m_parsers->m_lexer.begin(begin, end);
+  Lexer::lexer_type::iterator_type last = m_parsers->m_lexer.end();
+
+  bool success = boost::spirit::qi::parse(
+    iter,
+    last,
     m_parsers->m_header_string,
     arg
   );
@@ -253,7 +269,7 @@ std::string Translator::EquationIterator::print() const
 void
 Translator::loadLibrary(const u32string& s)
 {
-  m_lt.loadLibrary(s, &m_system);
+  m_lt.loadLibrary(s, m_system);
 }
 
 }

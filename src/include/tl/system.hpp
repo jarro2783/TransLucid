@@ -29,6 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/registries.hpp>
 
 #include <unordered_set>
+#include <unordered_map>
 
 /**
  * @file system.hpp
@@ -49,7 +50,7 @@ namespace TransLucid
    *
    * Holds all the data necessary for an system.
    **/
-  class System : public WS, public TypeRegistry, public DimensionRegistry
+  class System : public TypeRegistry, public DimensionRegistry
   {
     public:
 
@@ -68,9 +69,6 @@ namespace TransLucid
 
     dimension_index
     getDimensionIndex(const Constant& c);
-
-    TaggedConstant
-    operator()(const Tuple& k);
 
     /**
      * Get the time.
@@ -144,7 +142,7 @@ namespace TransLucid
     lastExpression() const;
 
     private:
-    typedef std::map<u32string, VariableWS*> DefinitionMap;
+    typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
 
     // OPTYPE, ATL_SYMBOL
     typedef std::tuple<uuid, uuid> UnaryHashes;
@@ -223,6 +221,38 @@ namespace TransLucid
     size_t m_time;
     Translator *m_translator;
     std::map<u32string, size_t> builtin_name_to_index;
+
+    public:
+
+    struct IdentifierLookup
+    {
+      IdentifierLookup(DefinitionMap& identifiers)
+      : m_identifiers(identifiers)
+      {
+      }
+
+      WS*
+      lookup(const u32string& name) const
+      {
+        auto r = m_identifiers.find(name);
+        if (r != m_identifiers.end())
+        {
+          return r->second;
+        }
+        else
+        {
+          return nullptr;
+        }
+      }
+
+      private:
+      DefinitionMap& m_identifiers;
+    };
+
+    IdentifierLookup lookupIdentifiers()
+    {
+      return IdentifierLookup(m_equations);
+    }
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);

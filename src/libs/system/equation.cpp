@@ -29,9 +29,8 @@ namespace TransLucid
 boost::uuids::basic_random_generator<boost::mt19937>
 EquationWS::m_generator;
 
-VariableWS::VariableWS(const u32string& name, WS* system)
+VariableWS::VariableWS(const u32string& name)
 : m_name(name)
- ,m_system(system)
 #if 0
  ,m_compileBestFit
   (

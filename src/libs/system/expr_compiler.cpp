@@ -115,7 +115,7 @@ ExprCompiler::operator()(const Tree::DimensionExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::IdentExpr& e)
 {
-  return new Hyperdatons::IdentWS(m_system, e.text);
+  return new Hyperdatons::IdentWS(m_system->lookupIdentifiers(), e.text);
 }
 
 WS* 
@@ -127,8 +127,10 @@ ExprCompiler::operator()(const Tree::ParenExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {
-  WS* operand = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::UnaryOpWS(m_system, e.op.op, operand);
+  //this should be compiled out
+  throw "ExprCompiler::operator()(UnaryOpExpr)";
+  //WS* operand = boost::apply_visitor(*this, e.e);
+  //return new Hyperdatons::UnaryOpWS(m_system, e.op.op, operand);
 }
 
 WS*
@@ -140,6 +142,7 @@ ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
 
   return new Hyperdatons::BinaryOpWS(m_system, {lhs, rhs}, e.op.op);
   #endif
+  //this should be compiled out
   throw "ExprCompiler::operator()(BinaryOpExpr)";
   return 0;
 }
@@ -248,7 +251,7 @@ ExprCompiler::operator()(const Tree::ValueAppExpr& e)
   //create a LambdaApplicationWS with the compiled sub expression
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
-  return new Hyperdatons::LambdaApplicationWS(m_system, lhs, rhs);
+  return new Hyperdatons::LambdaApplicationWS(lhs, rhs);
 }
 
 WS* 

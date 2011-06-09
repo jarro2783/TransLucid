@@ -231,7 +231,7 @@ namespace TransLucid
     public:
     typedef std::map<uuid, EquationWS> UUIDEquationMap;
 
-    VariableWS(const u32string& name, WS* system);
+    VariableWS(const u32string& name);
     
     ~VariableWS();
 

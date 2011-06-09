@@ -126,11 +126,13 @@ namespace TransLucid
       {
         using namespace qi::labels;
         r_constant = 
-          (tok.constantINTERPRET_ | tok.constantRAW_)
+          ((tok.constantINTERPRET_ | tok.constantRAW_) > tok.dblsemi_)
           [
             _val = ph::bind(&buildString, _1)
           ]
         ;
+
+        BOOST_SPIRIT_DEBUG_NODE(r_constant);
       }
 
       static u32string
@@ -139,6 +141,8 @@ namespace TransLucid
         if (literal.first != U"ustring")
         {
         }
+
+        std::cerr << "adding string: " << literal.second << std::endl;
 
         return literal.second;
       }

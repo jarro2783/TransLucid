@@ -1,5 +1,5 @@
 /* Library loading.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <ltdl.h>
 
+#define WD_LENGTH 1000
+
 namespace TransLucid
 {
 
@@ -35,10 +37,9 @@ namespace
   (
     const u32string& file,
     const u32string& name,
-    WS* system
+    System& system
   )
   {
-    #warning fix library loading
     bool success = true;
     std::string filename = utf32_to_utf8(file);
 
@@ -101,7 +102,7 @@ Libtool::~Libtool()
 }
 
 void
-Libtool::loadLibrary(const u32string& name, WS* system)
+Libtool::loadLibrary(const u32string& name, System& system)
 {
 
   #if 0
@@ -123,8 +124,8 @@ Libtool::loadLibrary(const u32string& name, WS* system)
     //std::cerr << "warning: unable to open library " << name << std::endl;
   }
   #endif
-  char wd[1000];
-  getcwd(wd, 1000);
+  char wd[WD_LENGTH];
+  getcwd(wd, WD_LENGTH);
   //std::cout << "working directory: " << wd << std::endl;
   bool result = attemptLibraryOpen(U"lib" + name, name, system);
 
