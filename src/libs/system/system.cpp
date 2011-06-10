@@ -47,6 +47,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/consthd.hpp>
+#include <tl/function_registry.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
 #include <tl/translator.hpp>

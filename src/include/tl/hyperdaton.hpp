@@ -96,9 +96,9 @@ namespace TransLucid
   #endif
 
   template <typename Array, typename First, typename... Location>
-  int
+  auto
   array_get(const Array& a, First f, Location... loc)
-    //-> decltype(array_get(a[f], loc...))
+    -> decltype(array_get(a[f], loc...))
   {
     return array_get(a[f], loc...);
   }
@@ -113,29 +113,38 @@ namespace TransLucid
     {
       return m_array;
     }
+    private:
+    type m_array;
+    std::vector<mpz_class> m_dimensions;
 
+    public:
     //if you get a compile error here, maybe all the types of Dimensions
     //weren't integers
-    template <typename... Dimensions>
-    ArrayNHD(Dimensions... dims)
-    : m_array(std::vector<size_t>{dims...})
+    ArrayNHD(const std::vector<size_t>& dims)
+    : m_array(dims)
     {
-      for (size_t i = 0; i != sizeof...(Dimensions); ++i)
+      for (size_t i = 0; i != dims.size(); ++i)
       {
         m_dimensions.push_back(i);
       }
     }
 
+    #if 0
     template <typename... Location>
-    const T 
+    auto
     get(Location... loc) const
+      -> decltype(array_get(m_array, loc...))
     {
       return array_get(m_array, loc...);
     }
+    #endif
 
-    private:
-    type m_array;
-    std::vector<mpz_class> m_dimensions;
+    auto
+    operator[](int i)
+      -> decltype(m_array[i])
+    {
+      return m_array[i];
+    }
   };
 
   template <size_t... Limits>

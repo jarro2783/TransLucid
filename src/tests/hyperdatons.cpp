@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[])
 {
-  TransLucid::ArrayNHD<int, 3> a(5, 6, 7);
+  TransLucid::ArrayNHD<int, 3> a({5,6,7});
 
   auto c = a.get_array();
   c[1][2][3] = 5;
@@ -30,7 +30,8 @@ int main(int argc, char *argv[])
       for (int k = 0; k != 7; ++k)
       {
         //std::cout << c[i][j][k] << " ";
-        std::cout << a.get(i, j, k) << " ";
+        //std::cout << a.get(i, j, k) << " ";
+        std::cout << a[i][j][k] << " ";
       }
       std::cout << std::endl;
     }
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
 
   std::cout << std::endl;
 
-  std::cout << a.get(1, 1, 1) << std::endl;
+  //std::cout << a.get(1, 1, 1) << std::endl;
 
   return 0;
 }

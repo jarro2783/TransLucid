@@ -1,4 +1,4 @@
-/* System hyperdaton.
+/* The System.
    Copyright (C) 2009-2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/dimtranslator.hpp>
 #include <tl/equation.hpp>
+#include <tl/function_registry.hpp>
 //#include <tl/physicalhds.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
@@ -221,6 +222,10 @@ namespace TransLucid
     size_t m_time;
     Translator *m_translator;
     std::map<u32string, size_t> builtin_name_to_index;
+
+    //give ourselves a function registry which can register functions of
+    //up to ten arguments
+    FunctionRegistry<10> m_functions;
 
     public:
 

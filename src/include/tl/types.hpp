@@ -168,6 +168,20 @@ namespace TransLucid
       data.field = TYPE_FIELD_SP;
     }
 
+    ~Constant()
+    {
+      if (data.field == TYPE_FIELD_PTR)
+      {
+        --data.ptr->refCount;
+
+        if (data.ptr->refCount == 0)
+        {
+          //destroy object here
+          delete data.ptr;
+        }
+      }
+    }
+
     Constant(ConstantPointerValue* p, type_index i)
     {
       data.ptr = p;
@@ -177,9 +191,10 @@ namespace TransLucid
 
     Constant(const Constant& other)
     {
+      memcpy(&data, &other.data, sizeof(data));
       if (other.data.field == TYPE_FIELD_PTR)
       {
-        memcpy(&data, &other.data, sizeof(data));
+        ++data.ptr->refCount;
       }
     }
 
