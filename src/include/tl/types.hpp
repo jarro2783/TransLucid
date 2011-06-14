@@ -120,6 +120,7 @@ namespace TransLucid
   {
     bool (*equality)(const Constant&, const Constant&);
     size_t (*hash)(const Constant&);
+    void (*destroy)(void*);
   };
 
   struct ConstantPointerValue
@@ -176,6 +177,7 @@ namespace TransLucid
 
         if (data.ptr->refCount == 0)
         {
+          (*data.ptr->functions->destroy)(data.ptr->data);
           //destroy object here
           delete data.ptr;
         }

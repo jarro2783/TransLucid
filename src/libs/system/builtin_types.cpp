@@ -36,37 +36,43 @@ namespace TransLucid
     TypeFunctions string_type_functions =
       {
         &Types::String::equality,
-        &Types::String::hash
+        &Types::String::hash,
+        &delete_ptr<u32string>
       };
 
     TypeFunctions function_type_functions =
       {
         &Types::Function::equality,
-        &Types::Function::hash
+        &Types::Function::hash,
+        &delete_ptr<FunctionType>
       };
 
     TypeFunctions range_type_functions =
       {
         &Types::Range::equality,
-        &Types::Range::hash
+        &Types::Range::hash,
+        &delete_ptr<Range>
       };
 
     TypeFunctions tuple_type_functions =
       {
         &Types::Tuple::equality,
-        &Types::Tuple::hash
+        &Types::Tuple::hash,
+        &delete_ptr<Tuple>
       };
 
     TypeFunctions intmp_type_functions = 
       {
         &Types::Intmp::equality,
-        &Types::Intmp::hash
+        &Types::Intmp::hash,
+        &delete_ptr<mpz_class>
       };
 
     TypeFunctions uuid_type_functions =
       {
         &Types::UUID::equality,
-        &Types::UUID::hash
+        &Types::UUID::hash,
+        &delete_ptr<uuid>
       };
   }
 
@@ -341,6 +347,12 @@ namespace TransLucid
       hash(const Constant& c)
       {
         return boost::hash<mpz_class>()(get(c));
+      }
+
+      void
+      destroy(void* p)
+      {
+        delete reinterpret_cast<mpz_class*>(p);
       }
     }
 

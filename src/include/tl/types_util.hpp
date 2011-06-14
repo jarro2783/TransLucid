@@ -25,6 +25,13 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
   template <typename T>
+  void
+  delete_ptr(void* p)
+  {
+    delete reinterpret_cast<T*>(p);
+  }
+
+  template <typename T>
   Constant
   make_constant_pointer(const T& v, TypeFunctions* funs, type_index index)
   {
