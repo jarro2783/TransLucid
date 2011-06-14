@@ -34,10 +34,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 #include <boost/spirit/include/lex_lexertl.hpp>
 #include <gmpxx.h>
-#include <tl/lexer_util.hpp>
-#include <tl/charset.hpp>
+
 #include <tl/ast.hpp>
+#include <tl/charset.hpp>
+#include <tl/lexer_util.hpp>
 #include <tl/parser_api.hpp>
+#include <tl/utility.hpp>
 
 #define XSTRING(x) STRING(x)
 #define STRING(x) #x

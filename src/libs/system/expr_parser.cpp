@@ -43,6 +43,14 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/bind/bind_function.hpp>
 #include <boost/spirit/home/phoenix/statement/sequence.hpp>
 
+namespace boost { namespace spirit { namespace traits
+{
+  template <>
+  struct is_container<mpz_class>
+  {
+    typedef boost::mpl::bool_<false> type;
+  };
+}}}
 
 namespace TransLucid
 {
