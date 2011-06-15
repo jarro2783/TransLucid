@@ -23,6 +23,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <boost/multi_array.hpp>
 
+#include <type_traits>
+
 namespace TransLucid
 {
   class HD 
@@ -77,14 +79,6 @@ namespace TransLucid
     }
   };
 
-  template <typename Array, typename Index>
-  auto
-  array_get(const Array& a, Index i)
-    -> decltype(a[i])
-  {
-    return a[i];
-  }
-
   #if 0
   template <typename Array, typename First, typename... Location>
   auto 
@@ -95,7 +89,38 @@ namespace TransLucid
   }
   #endif
 
+  #if 0
+  struct array_get
+  {
+    template <typename Array, typename Index>
+    auto
+    operator()(const Array& a, Index i)
+      -> decltype(a[i])
+    {
+      return a[i];
+    }
+
+    template <typename Array, typename First, typename... Location>
+    //typename std::result_of<array_get(Array, Location...)>::type
+    auto
+    operator()(const Array& a, First f, Location... loc)
+      -> decltype(operator()(a[f], loc...))
+    {
+      return array_get(a[f], loc...);
+    }
+  };
+  #endif
+
+  template <typename Array, typename Index>
+  auto
+  array_get(const Array& a, Index i)
+    -> decltype(a[i])
+  {
+    return a[i];
+  }
+
   template <typename Array, typename First, typename... Location>
+  //typename std::result_of<array_get(Array, Location...)>::type
   auto
   array_get(const Array& a, First f, Location... loc)
     -> decltype(array_get(a[f], loc...))
@@ -132,6 +157,7 @@ namespace TransLucid
     #if 0
     template <typename... Location>
     auto
+    //typename std::result_of<array_get(type, Location...)>::type
     get(Location... loc) const
       -> decltype(array_get(m_array, loc...))
     {
