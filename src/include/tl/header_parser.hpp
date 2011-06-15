@@ -45,8 +45,7 @@ namespace TransLucid
         r_constant %= tok.constantINTERPRET_ | tok.constantRAW_;
 
         //binop symbol name precedence
-        r_binop = (r_constant > r_constant > tok.integer_
-          > tok.dblsemi_)
+        r_binop = (r_constant > r_constant > tok.integer_)
           [
             _val = ph::bind(&buildBinop, _1, _2, _3)
           ]
@@ -86,8 +85,7 @@ namespace TransLucid
         r_constant %= tok.constantINTERPRET_ | tok.constantRAW_;
 
         //unop symbol name
-        r_unop = (r_constant > r_constant
-          > tok.dblsemi_)
+        r_unop = (r_constant > r_constant)
           [
             _val = ph::bind(&buildUnop, _1, _2)
           ]
@@ -130,7 +128,6 @@ namespace TransLucid
           [
             _val = ph::bind(&buildString, _1)
           ]
-          > tok.dblsemi_
         ;
 
         BOOST_SPIRIT_DEBUG_NODE(r_constant);

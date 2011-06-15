@@ -242,6 +242,18 @@ Translator::parseHeaderString
     arg
   );
 
+  std::cerr << "after parser" << std::endl;
+
+  if (*iter != m_parsers->m_lexer.dblsemi_.id())
+  {
+    success = false;
+  }
+  else
+  {
+    std::cerr << "we saw a ;;, continue..." << std::endl;
+    ++begin;
+  }
+
   return std::make_pair(success, arg);
 }
 
