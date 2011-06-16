@@ -1,5 +1,5 @@
-/* Parser Header.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+/* Header parsers.
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
