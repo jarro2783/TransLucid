@@ -26,8 +26,8 @@ namespace TransLucid
     {
       public:
       template <typename TokenDef>
-      InstantParser(TokenDef& tok)
-      : InstantParser::base_type(r_instant)
+      LineParser(TokenDef& tok)
+      : LineParser::base_type(r_instant)
       {
       }
 
