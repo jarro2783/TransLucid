@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_header.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
+#include <boost/spirit/include/qi_and_predicate.hpp>
 
 namespace TransLucid
 {
@@ -124,7 +125,7 @@ namespace TransLucid
       {
         using namespace qi::labels;
         r_constant = 
-          (tok.constantINTERPRET_ | tok.constantRAW_)
+          ((tok.constantINTERPRET_ | tok.constantRAW_) >> &tok.dblsemi_)
           [
             _val = ph::bind(&buildString, _1)
           ]
