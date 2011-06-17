@@ -89,9 +89,9 @@ namespace TransLucid
   }
   #endif
 
-  #if 0
   struct array_get
   {
+    #if 0
     template <typename Array, typename Index>
     auto
     operator()(const Array& a, Index i)
@@ -99,18 +99,27 @@ namespace TransLucid
     {
       return a[i];
     }
+    #endif
+
+    template <typename Array>
+    Array
+    operator()(const Array& a)
+    {
+      return a;
+    }
 
     template <typename Array, typename First, typename... Location>
     //typename std::result_of<array_get(Array, Location...)>::type
     auto
     operator()(const Array& a, First f, Location... loc)
-      -> decltype(operator()(a[f], loc...))
+    //  -> decltype(operator()(a[f], loc...))
+      -> typename std::result_of<array_get(decltype(a[f]), Location...)>::type
     {
-      return array_get(a[f], loc...);
+      return operator()(a[f], loc...);
     }
   };
-  #endif
 
+  #if 0
   template <typename Array, typename Index>
   auto
   array_get(const Array& a, Index i)
@@ -127,6 +136,7 @@ namespace TransLucid
   {
     return array_get(a[f], loc...);
   }
+  #endif
 
   template <typename T, size_t N>
   class ArrayNHD
@@ -154,16 +164,15 @@ namespace TransLucid
       }
     }
 
-    #if 0
     template <typename... Location>
-    auto
-    //typename std::result_of<array_get(type, Location...)>::type
+    //auto
+    typename std::result_of<array_get(type, Location...)>::type
     get(Location... loc) const
-      -> decltype(array_get(m_array, loc...))
+    //  -> decltype(array_get(m_array, loc...))
     {
-      return array_get(m_array, loc...);
+      //return array_get(m_array, loc...);
+      return array_get()(m_array, loc...);
     }
-    #endif
 
     auto
     operator[](int i)

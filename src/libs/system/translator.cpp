@@ -17,10 +17,12 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/translator.hpp>
 #include <tl/equation_parser.hpp>
-#include <tl/header_parser.hpp>
 #include <tl/expr_parser.hpp>
+#include <tl/header_parser.hpp>
+#include <tl/instant_parser.hpp>
+#include <tl/line_parser.hpp>
+#include <tl/translator.hpp>
 #include <tl/tuple_parser.hpp>
 #include <tl/types.hpp>
 #include <tl/utility.hpp>
@@ -45,6 +47,7 @@ namespace detail
     , m_header_binary(m_lexer)
     , m_header_string(m_lexer)
     , m_header_unary(m_lexer)
+    , m_instant(m_lexer)
     {
       m_expr.set_tuple(m_tuple);
       m_tuple.set_expr(m_expr);
@@ -64,6 +67,7 @@ namespace detail
     Parser::HeaderBinopGrammar<Parser::iterator_t> m_header_binary;
     Parser::HeaderStringGrammar<Parser::iterator_t> m_header_string;
     Parser::HeaderUnopGrammar<Parser::iterator_t> m_header_unary;
+    Parser::InstantGrammar<Parser::iterator_t> m_instant;
   };
 }
 

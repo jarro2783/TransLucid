@@ -101,7 +101,8 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   rational_ = L"(0_1)|(~?)({ratDEC}|{ratNONDEC})";
 
   library_ =      L"library";
-  dimension_ =    L"dimension";
+  dimension_ =    L"dim";
+  eqn_ =          L"eqn";
   infix_binary_ = L"infix[lrnpm]";
   unary_ =        L"(prefix)|(postfix)";
 

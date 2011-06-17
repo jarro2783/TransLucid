@@ -41,7 +41,11 @@ int main(int argc, char *argv[])
 
   std::cout << std::endl;
 
-  //std::cout << a.get(1, 1, 1) << std::endl;
+  //auto h = a.get(1);
+  int val = a.get(1, 1, 1);
+  std::cout << val << std::endl;
+  //
+  //std::cout << h << std::endl;
 
   return 0;
 }

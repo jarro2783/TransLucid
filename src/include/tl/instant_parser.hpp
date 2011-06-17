@@ -17,6 +17,12 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifndef TL_INSTANT_PARSER_HPP_INCLUDED
+#define TL_INSTANT_PARSER_HPP_INCLUDED
+
+#include <boost/spirit/include/qi_grammar.hpp>
+#include <boost/spirit/include/qi_rule.hpp>
+
 #include <tl/line_parser.hpp>
 
 namespace TransLucid
@@ -24,16 +30,21 @@ namespace TransLucid
   namespace Parser
   {
     template <typename Iterator>
-    class InstantParser
+    class InstantGrammar : public qi::grammar<Iterator>
     {
       public:
       template <typename TokenDef>
-      InstantParser(TokenDef& tok)
-      : InstantParser::base_type(r_instant)
+      InstantGrammar(TokenDef& tok)
+      : InstantGrammar::base_type(r_instant)
+      , g_line(tok)
       {
+        r_instant = *g_line >> tok.dbldollar_;
       }
 
       qi::rule<Iterator> r_instant;
+      LineGrammar<Iterator> g_line;
     };
   }
 }
+
+#endif
