@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/types.hpp>
+#include <boost/variant.hpp>
 
 namespace TransLucid
 {
@@ -45,6 +46,15 @@ namespace TransLucid
 
     //symbol, name
     typedef std::tuple<u32string, u32string> UnopHeader;
+
+    typedef boost::variant
+    <
+      Equation,
+      UnopHeader,
+      BinopHeader
+    > Line;
+
+    typedef std::vector<Line> Instant;
 
     /**
      * Prints an equation.

@@ -32,6 +32,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_set>
 #include <unordered_map>
 
+#include <boost/function.hpp>
+
 /**
  * @file system.hpp
  * The System Hyperdaton header file.
@@ -45,6 +47,8 @@ namespace TransLucid
   };
 
   class Translator;
+
+  typedef boost::function<void(Parser::Instant)> InstantFunctor;
 
   /**
    * @brief System base class.
@@ -118,6 +122,12 @@ namespace TransLucid
 
     Constant
     parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end);
+
+    void parseInstant
+    (
+      Parser::U32Iterator& begin,
+      const Parser::U32Iterator& end
+    );
 
     //what is the input?
     uuid

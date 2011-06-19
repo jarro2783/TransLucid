@@ -45,6 +45,14 @@ namespace TransLucid
 namespace TLText
 {
 
+struct Instant
+{
+  void
+  operator()(const Parser::Instant& i)
+  {
+  }
+};
+
 TLText::TLText()
 : 
   m_verbose(false)
@@ -73,12 +81,16 @@ TLText::run()
 
   Parser::U32Iterator end;
 
+  #if 0
   Constant c;
   while (begin != end)
   {
     c = m_system.parseLine(begin, end);
     std::cerr << "got Constant of type " << c.index() << std::endl;
   }
+  #endif
+
+  m_system.parseInstant(begin, end);
 }
 
 } //namespace TLCore

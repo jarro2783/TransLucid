@@ -23,6 +23,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
 
+#include <tl/equation_parser.hpp>
+
 namespace TransLucid
 {
   namespace Parser
@@ -32,20 +34,32 @@ namespace TransLucid
     {
       public:
       template <typename TokenDef>
-      LineGrammar(TokenDef& tok)
+      LineGrammar
+      (
+        TokenDef& tok,
+        EquationGrammar<Iterator>& eqn
+      )
       : LineGrammar::base_type(r_line)
+      , g_equation(eqn)
+      , g_hstring(tok)
       {
         r_line = 
-          tok.dimension_
-        | tok.library_
-        | tok.eqn_
+        (
+          (tok.dimension_ > g_hstring)
+        | (tok.library_ > g_hstring)
+        | (tok.eqn_ > g_equation)
         | tok.assignment_
         | tok.infix_binary_
         | tok.unary_
+        )
+
+        > tok.dblsemi_
         ;
       }
 
       qi::rule<Iterator> r_line;
+      EquationGrammar<Iterator>& g_equation;
+      HeaderStringGrammar<Iterator> g_hstring;
     };
   }
 }

@@ -47,7 +47,8 @@ namespace detail
     , m_header_binary(m_lexer)
     , m_header_string(m_lexer)
     , m_header_unary(m_lexer)
-    , m_instant(m_lexer)
+    , m_line(m_lexer, m_equation)
+    , m_instant(m_lexer, m_line)
     {
       m_expr.set_tuple(m_tuple);
       m_tuple.set_expr(m_expr);
@@ -67,6 +68,7 @@ namespace detail
     Parser::HeaderBinopGrammar<Parser::iterator_t> m_header_binary;
     Parser::HeaderStringGrammar<Parser::iterator_t> m_header_string;
     Parser::HeaderUnopGrammar<Parser::iterator_t> m_header_unary;
+    Parser::LineGrammar<Parser::iterator_t> m_line;
     Parser::InstantGrammar<Parser::iterator_t> m_instant;
   };
 }
@@ -286,6 +288,37 @@ void
 Translator::loadLibrary(const u32string& s)
 {
   m_lt.loadLibrary(s, m_system);
+}
+
+void
+Translator::parseInstant
+(
+  Parser::U32Iterator& begin,
+  const Parser::U32Iterator& end,
+  InstantFunctor endInstant
+)
+{
+  Parser::Instant instant;
+
+  Lexer::lexer_type::iterator_type iter = 
+    m_parsers->m_lexer.begin(begin, end);
+  Lexer::lexer_type::iterator_type last = m_parsers->m_lexer.end();
+
+  bool success = boost::spirit::qi::parse(
+    iter,
+    last,
+    m_parsers->m_instant,
+    instant
+  );
+
+  if (success)
+  {
+    endInstant(instant);
+  }
+  else
+  {
+    std::cerr << "failed to parse instant" << std::endl;
+  }
 }
 
 }

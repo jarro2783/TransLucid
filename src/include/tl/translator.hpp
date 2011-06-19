@@ -32,6 +32,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/parser_iterator.hpp>
 
+#include <boost/function.hpp>
+
 namespace TransLucid
 {
   namespace Lexer
@@ -205,6 +207,14 @@ namespace TransLucid
     (
       Parser::U32Iterator& begin, 
       const Parser::U32Iterator& end
+    );
+
+    void
+    parseInstant
+    (
+      Parser::U32Iterator& begin,
+      const Parser::U32Iterator& end,
+      InstantFunctor endInstant
     );
 
     /**

@@ -102,6 +102,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
 
   library_ =      L"library";
   dimension_ =    L"dim";
+  assignment_ =   L"assign";
   eqn_ =          L"eqn";
   infix_binary_ = L"infix[lrnpm]";
   unary_ =        L"(prefix)|(postfix)";

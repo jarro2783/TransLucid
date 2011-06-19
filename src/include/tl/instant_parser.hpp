@@ -34,15 +34,19 @@ namespace TransLucid
     {
       public:
       template <typename TokenDef>
-      InstantGrammar(TokenDef& tok)
+      InstantGrammar
+      (
+        TokenDef& tok,
+        LineGrammar<Iterator>& line 
+      )
       : InstantGrammar::base_type(r_instant)
-      , g_line(tok)
+      , g_line(line)
       {
         r_instant = *g_line >> tok.dbldollar_;
       }
 
       qi::rule<Iterator> r_instant;
-      LineGrammar<Iterator> g_line;
+      LineGrammar<Iterator>& g_line;
     };
   }
 }
