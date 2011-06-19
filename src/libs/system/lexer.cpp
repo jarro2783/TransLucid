@@ -139,9 +139,11 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   | real_    [detail::build_real()]
   | rational_[detail::build_rational()]
 
-  //header items
+  //type of line items
   | library_
   | dimension_
+  | assignment_
+  | eqn_
   | infix_binary_
   | unary_
 

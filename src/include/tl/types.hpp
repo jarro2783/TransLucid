@@ -139,6 +139,7 @@ namespace TransLucid
 
   enum TypeField
   {
+    TYPE_FIELD_ERROR,
     TYPE_FIELD_SP, 
     TYPE_FIELD_TV,
     TYPE_FIELD_CH,
@@ -166,7 +167,7 @@ namespace TransLucid
     {
       data.ptr = nullptr;
       data.index = 0;
-      data.field = TYPE_FIELD_SP;
+      data.field = TYPE_FIELD_ERROR;
     }
 
     ~Constant()
@@ -182,6 +183,14 @@ namespace TransLucid
           delete data.ptr;
         }
       }
+    }
+
+    Constant(Constant&& other)
+    {
+      memcpy(&data, &other.data, sizeof(data));
+      other.data.ptr = nullptr;
+      other.data.index = 0;
+      other.data.field = TYPE_FIELD_ERROR;
     }
 
     Constant(ConstantPointerValue* p, type_index i)

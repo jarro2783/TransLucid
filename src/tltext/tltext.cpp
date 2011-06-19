@@ -90,7 +90,10 @@ TLText::run()
   }
   #endif
 
-  m_system.parseInstant(begin, end);
+  while (true)
+  {
+    m_system.parseInstant(begin, end);
+  }
 }
 
 } //namespace TLCore
