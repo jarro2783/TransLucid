@@ -48,8 +48,6 @@ namespace TransLucid
 
   class Translator;
 
-  typedef boost::function<void(Parser::Instant)> InstantFunctor;
-
   /**
    * @brief System base class.
    *

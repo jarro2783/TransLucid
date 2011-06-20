@@ -214,7 +214,7 @@ namespace TransLucid
     (
       Parser::U32Iterator& begin,
       const Parser::U32Iterator& end,
-      InstantFunctor endInstant
+      Parser::InstantFunctor endInstant
     );
 
     /**

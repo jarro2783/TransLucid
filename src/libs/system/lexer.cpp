@@ -36,7 +36,8 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
 , else_(L"else")
 , true_(L"true")
 , false_(L"false")
-, spaces(L"([ \\n\\t])|(\\/\\/[^\\n]\\n)")
+//, spaces(L"([ \\n\\t])|(\\/\\/[^\\n]*\\n)")
+, spaces(L"[ \\n\\t]")
 , m_errors(errors)
 {
   using boost::phoenix::ref;
@@ -87,13 +88,14 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   rparen_   = L')';
   pipe_     = L'|';
   comma_    = L',';
+  dollar_   = L"\\$";
 
   maps_       = L"<-";
   dblslash_   = L"\\\\\\\\";
   range_      = L"\\.\\.";
   arrow_      = L"->";
   dblsemi_    = L";;";
-  dbldollar_  = L"\\$\\$";
+  //dbldollar_  = L"\\$\\$\\n";
   dblpercent_ = L"%%";
   assign_     = L":=";
 
@@ -124,7 +126,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   | dblslash_
   | arrow_
   | dblsemi_
-  | dbldollar_
+  //| dbldollar_
   | dblpercent_
   | assign_
   | maps_
@@ -161,6 +163,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   | rparen_
   | pipe_
   | comma_
+  | dollar_
   
   | identifier_
   ;

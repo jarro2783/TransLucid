@@ -295,7 +295,7 @@ Translator::parseInstant
 (
   Parser::U32Iterator& begin,
   const Parser::U32Iterator& end,
-  InstantFunctor endInstant
+  Parser::InstantFunctor endInstant
 )
 {
   Parser::Instant instant;
@@ -307,13 +307,12 @@ Translator::parseInstant
   bool success = boost::spirit::qi::parse(
     iter,
     last,
-    m_parsers->m_instant,
-    instant
+    (m_parsers->m_instant)(boost::phoenix::ref(endInstant))
   );
 
   if (success)
   {
-    endInstant(instant);
+    //endInstant(instant);
   }
   else
   {

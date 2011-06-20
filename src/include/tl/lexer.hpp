@@ -85,13 +85,14 @@ namespace TransLucid
         if_, fi_, where_, then_, elsif_, else_, true_, false_
       , library_, dimension_, eqn_, assignment_
         //symbols
-      , arrow_, dblsemi_, dblslash_, range_, dbldollar_, dblpercent_, assign_
+      , arrow_, dblsemi_, dblslash_, range_//, dbldollar_
+      , dblpercent_, assign_
       , maps_
         //white space
       , spaces
       //single characters
       , decl_, lbracket_, rbracket_, dot_, def_, and_, hash_, at_, slash_
-      , lparen_, rparen_, pipe_, comma_
+      , lparen_, rparen_, pipe_, comma_, dollar_
       ;
 
       lex::token_def<Tree::InfixAssoc, lex_char_type>

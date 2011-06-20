@@ -30,7 +30,7 @@ namespace TransLucid
   namespace Parser
   {
     template <typename Iterator>
-    class InstantGrammar : public qi::grammar<Iterator>
+    class InstantGrammar : public qi::grammar<Iterator, void(InstantFunctor&)>
     {
       public:
       template <typename TokenDef>
@@ -39,14 +39,29 @@ namespace TransLucid
         TokenDef& tok,
         LineGrammar<Iterator>& line 
       )
-      : InstantGrammar::base_type(r_instant)
+      : InstantGrammar::base_type(r_instants)
       , g_line(line)
       {
-        r_instant = *g_line >> tok.dbldollar_;
+        using namespace qi::labels;
+        r_instant = (*g_line >> tok.dollar_)
+        [
+          boost::phoenix::bind(
+            &InstantGrammar<Iterator>::call_instant_functor, _r1)
+        ];
+
+        r_instants = r_instant(_r1) 
+          >> *(tok.dollar_ >> tok.dollar_ >> r_instant(_r1));
       }
 
-      qi::rule<Iterator> r_instant;
+      qi::rule<Iterator, void(InstantFunctor&)> r_instants;
+      qi::rule<Iterator, void(InstantFunctor&)> r_instant;
       LineGrammar<Iterator>& g_line;
+
+      static void
+      call_instant_functor(const InstantFunctor& i)
+      {
+        i(Instant());
+      }
     };
   }
 }
