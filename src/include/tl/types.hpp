@@ -141,7 +141,7 @@ namespace TransLucid
   {
     TYPE_FIELD_ERROR,
     TYPE_FIELD_SP, 
-    TYPE_FIELD_TV,
+    TYPE_FIELD_TV, //truth value
     TYPE_FIELD_CH,
     TYPE_FIELD_SI8,
     TYPE_FIELD_UI8,
@@ -424,6 +424,15 @@ namespace std
     }
   };
 }
+
+#if 0
+std::ostream&
+operator<<(std::ostream& os, const mpz_class& z)
+{
+  os << z.get_str();
+  return os;
+}
+#endif
 
 //this has to be included down here so that the definitions are available
 //in the right places

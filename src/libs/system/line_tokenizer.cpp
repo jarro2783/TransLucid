@@ -21,13 +21,35 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+
+namespace
+{
+  struct EndOfInput
+  {
+  };
+
+  struct NewLineInString
+  {
+  };
+}
  
 u32string
 LineTokenizer::next()
 {
-  m_line.clear();
+  try
+  {
+    m_state = READ_SCANNING;
+    m_line.clear();
 
-  readOuter();
+    readOuter();
+  } 
+  catch (EndOfInput&)
+  {
+    //end of input whilst reading line
+  }
+  catch (NewLineInString&)
+  {
+  }
   
   return m_line;
 }
@@ -38,14 +60,84 @@ LineTokenizer::readOuter()
   bool done = false;
   while (!done && m_current != Parser::U32Iterator())
   {
-    if (*m_current == ';')
+    char32_t c = nextChar();
+    switch (c)
     {
+      case ';':
+      m_state = READ_SEMI;
+      {
+        c = nextChar();
+        if (c == ';')
+        {
+          done = true;
+        }
+      }
+      case '"':
+      readInterpretedString();
+      break;
+
+      case '`':
+      readRawString();
+      break;
+
+      default:
+      break;
     }
-    ++m_current;
+    c = nextChar();
+  }
+}
+
+void
+LineTokenizer::readRawString()
+{
+  //read until another "`"
+  m_state = READ_RAW;
+
+  char32_t c = nextChar();
+  while (c != '`')
+  {
+    c = nextChar();
   }
 
-  if (!done && m_current == Parser::U32Iterator())
+  m_state = READ_SCANNING;
+}
+
+char32_t
+LineTokenizer::nextChar()
+{
+  ++m_current;
+
+  if (m_current == m_end)
   {
+    throw EndOfInput();
+  }
+  char32_t c = *m_current;
+  m_line += c;
+  return c;
+}
+
+void
+LineTokenizer::readInterpretedString()
+{
+  //read until ", but skip backslash and complain about new lines
+  m_state = READ_INTERPRETED;
+  char32_t c = nextChar();
+  while (c != '"')
+  {
+    if (c == '\\')
+    {
+      nextChar();
+      c = nextChar();
+    }
+    else if (c == '\n')
+    {
+      //throw new line in string constant
+      throw NewLineInString();
+    }
+    else
+    {
+      c = nextChar();
+    }
   }
 }
 

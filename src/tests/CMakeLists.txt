@@ -12,6 +12,7 @@ link_libraries(tlsystem ${TLLIBS} ${Boost_LIBRARIES})
 #add_executable(iterator iterator.cpp)
 add_executable(lexer lexer.cpp)
 add_executable(hyperdatons hyperdatons.cpp)
+add_executable(iterinput iterinput.cpp)
 add_definitions(${TLCFLAGS})
 
 add_test(iterator ./iterator)

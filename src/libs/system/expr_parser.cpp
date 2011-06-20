@@ -45,11 +45,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace boost { namespace spirit { namespace traits
 {
-  template <>
-  struct is_container<mpz_class>
-  {
-    typedef boost::mpl::bool_<false> type;
-  };
+  template <typename Enable>
+  struct is_container<mpz_class, Enable>
+  : mpl::false_
+  {};
 }}}
 
 namespace TransLucid

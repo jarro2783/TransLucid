@@ -43,7 +43,7 @@ namespace TransLucid
       , g_line(line)
       {
         using namespace qi::labels;
-        r_instant = (*g_line >> tok.dollar_)
+        r_instant = (*(g_line >> tok.dblsemi_) >> &tok.dollar_)
         [
           boost::phoenix::bind(
             &InstantGrammar<Iterator>::call_instant_functor, _r1)

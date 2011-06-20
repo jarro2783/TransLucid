@@ -125,7 +125,7 @@ namespace TransLucid
       {
         using namespace qi::labels;
         r_constant = 
-          ((tok.constantINTERPRET_ | tok.constantRAW_) >> &tok.dblsemi_)
+          ((tok.constantINTERPRET_ | tok.constantRAW_))
           [
             _val = ph::bind(&buildString, _1)
           ]

@@ -39,6 +39,14 @@ namespace TransLucid
 
     private:
 
+    enum State
+    {
+      READ_SCANNING,
+      READ_RAW,
+      READ_INTERPRETED,
+      READ_SEMI
+    };
+
     /**
      * Reads a line up to the next ;; at the outer level of nesting of various
      * gizmos.
@@ -46,9 +54,20 @@ namespace TransLucid
     void
     readOuter();
 
+    void
+    readRawString();
+
+    void
+    readInterpretedString();
+
+    char32_t
+    nextChar();
+
     std::deque<char32_t> m_lookahead;
     Parser::U32Iterator& m_current;
+    Parser::U32Iterator m_end;
     u32string m_line;
+    State m_state;
   };
 }
 
