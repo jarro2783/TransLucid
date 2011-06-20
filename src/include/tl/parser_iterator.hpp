@@ -20,9 +20,10 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PARSER_ITERATOR_HPP_INCLUDED
 #define PARSER_ITERATOR_HPP_INCLUDED
 
-#include <iterator>
-#include <typeinfo>
 #include <iostream>
+#include <iterator>
+#include <memory>
+#include <typeinfo>
 
 #include <tl/charset.hpp>
 
@@ -281,6 +282,23 @@ namespace TransLucid
       Iterator* m_end;
     };
 
+    namespace detail
+    {
+      template <typename T>
+      struct UTF8Iterator_shared
+      {
+        UTF8Iterator_shared(const T& iter)
+        : m_iter(iter)
+        {
+        }
+
+        private:
+        T m_iter;
+        bool haveRead;
+        char32_t m_value;
+      };
+    }
+
     /**
      * Iterates through a UTF-8 stream. The character type of the stream
      * will be interpreted as individual bytes in a UTF-8 sequence.
@@ -305,6 +323,7 @@ namespace TransLucid
        */
       UTF8Iterator(const T& iter)
       : m_iter(iter)
+      , m_data(new detail::UTF8Iterator_shared<T>(iter))
       {
         if (!(iter == T())) {
           readNext();
@@ -416,6 +435,7 @@ namespace TransLucid
 
       mutable T m_iter;
       mutable value_type m_value;
+      std::shared_ptr<detail::UTF8Iterator_shared<T>> m_data;
     };
 
     /**
