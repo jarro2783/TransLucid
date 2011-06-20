@@ -289,9 +289,16 @@ namespace TransLucid
       {
         public:
         UTF8Iterator_shared(const T& iter)
-        : m_iter(iter)
+        : m_iter_actual(iter)
+        , m_iter(iter)
         , m_haveRead(false)
         {
+        }
+
+        bool
+        operator==(const UTF8Iterator_shared<T>& rhs) const
+        {
+          return m_iter_actual == rhs.m_iter_actual;
         }
 
         void 
@@ -301,6 +308,10 @@ namespace TransLucid
           {
             readNext();
           }
+          else
+          {
+            m_iter_actual = m_iter;
+          }
 
           m_haveRead = false;
         }
@@ -308,7 +319,7 @@ namespace TransLucid
         wchar_t&
         get()
         {
-          if (m_haveRead)
+          if (!m_haveRead)
           {
             readNext();
           }
@@ -317,6 +328,7 @@ namespace TransLucid
 
         void readNext()
         {
+          m_iter_actual = m_iter;
           //std::cerr << "readNext() ";
           m_value = 0;
           typename T::value_type c = *m_iter;
@@ -368,9 +380,11 @@ namespace TransLucid
             m_value |= ((0x3F & c) << nextShift);
             nextShift -= 6;
           }
+          ++m_iter;
         }
 
         private:
+        T m_iter_actual;
         T m_iter;
         bool m_haveRead;
         wchar_t m_value;
@@ -423,7 +437,7 @@ namespace TransLucid
         try
         {
           const UTF8Iterator& crhs = dynamic_cast<const UTF8Iterator&>(rhs);
-          return m_data == crhs.m_data;
+          return *m_data == *crhs.m_data;
         }
         catch (std::bad_cast&)
         {
