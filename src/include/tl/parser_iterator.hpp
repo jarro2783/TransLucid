@@ -287,15 +287,93 @@ namespace TransLucid
       template <typename T>
       struct UTF8Iterator_shared
       {
+        public:
         UTF8Iterator_shared(const T& iter)
         : m_iter(iter)
+        , m_haveRead(false)
         {
+        }
+
+        void 
+        increment()
+        {
+          if (!m_haveRead)
+          {
+            readNext();
+          }
+
+          m_haveRead = false;
+        }
+
+        wchar_t&
+        get()
+        {
+          if (m_haveRead)
+          {
+            readNext();
+          }
+          return m_value;
+        }
+
+        void readNext()
+        {
+          //std::cerr << "readNext() ";
+          m_value = 0;
+          typename T::value_type c = *m_iter;
+          int toRead = 0;
+          int nextShift = 0;
+
+          //std::cerr << std::hex << (int)c << " ";
+
+          if ((c & 0x80) == 0)
+          {
+            //ascii
+            m_value = c;
+          }
+          else if ((c & 0xE0) == 0xC0)
+          {
+            //two characters
+            toRead = 1;
+            m_value = 0x7C0 & (c << 6);
+            nextShift = 0;
+          }
+          else if ((c & 0xF0) == 0xE0)
+          {
+            //three characters
+            toRead = 2;
+            nextShift = 6;
+          }
+          else if ((c & 0xF8) == 0xF0)
+          {
+            //four characters
+            toRead = 3;
+            nextShift = 12;
+          }
+          else
+          {
+            //invalid character
+            std::cerr << "warning: invalid initial unicode byte" << std::endl;
+          }
+
+          for (int i = 0; i != toRead; ++i)
+          {
+            ++m_iter;
+            c = *m_iter;
+            //std::cerr << (int)c << " ";
+            if ((c & 0xC0) != 0x80)
+            {
+              //invalid character
+              std::cerr << "warning: invalid unicode byte" << std::endl;
+            }
+            m_value |= ((0x3F & c) << nextShift);
+            nextShift -= 6;
+          }
         }
 
         private:
         T m_iter;
-        bool haveRead;
-        char32_t m_value;
+        bool m_haveRead;
+        wchar_t m_value;
       };
     }
 
@@ -322,12 +400,8 @@ namespace TransLucid
        * @param iter The underlying iterator.
        */
       UTF8Iterator(const T& iter)
-      : m_iter(iter)
-      , m_data(new detail::UTF8Iterator_shared<T>(iter))
+      : m_data(new detail::UTF8Iterator_shared<T>(iter))
       {
-        if (!(iter == T())) {
-          readNext();
-        }
       }
 
       /**
@@ -335,8 +409,7 @@ namespace TransLucid
        * @param other The UTF8Iterator to copy.
        */
       UTF8Iterator(const UTF8Iterator& other)
-      : m_iter(other.m_iter)
-      , m_value(other.m_value)
+      : m_data(other.m_data)
       {
       }
 
@@ -350,7 +423,7 @@ namespace TransLucid
         try
         {
           const UTF8Iterator& crhs = dynamic_cast<const UTF8Iterator&>(rhs);
-          return m_iter == crhs.m_iter;
+          return m_data == crhs.m_data;
         }
         catch (std::bad_cast&)
         {
@@ -360,81 +433,27 @@ namespace TransLucid
 
       Iterator& operator++() 
       {
-        ++m_iter;
-        readNext();
+        if (m_data.use_count() != 1)
+        {
+          m_data.reset(new detail::UTF8Iterator_shared<T>(*m_data.get()));
+        }
+
+        m_data->increment();
 
         return *this;
       }
 
       reference operator*() const
       {
-        return m_value;
+        return m_data->get();
       }
 
       pointer operator->() const
       {
-        return &m_value;
+        return &m_data->get();
       }
 
       private:
-
-      void readNext() const
-      {
-        //std::cerr << "readNext() ";
-        m_value = 0;
-        typename T::value_type c = *m_iter;
-        int toRead = 0;
-        int nextShift = 0;
-
-        //std::cerr << std::hex << (int)c << " ";
-
-        if ((c & 0x80) == 0)
-        {
-          //ascii
-          m_value = c;
-        }
-        else if ((c & 0xE0) == 0xC0)
-        {
-          //two characters
-          toRead = 1;
-          m_value = 0x7C0 & (c << 6);
-          nextShift = 0;
-        }
-        else if ((c & 0xF0) == 0xE0)
-        {
-          //three characters
-          toRead = 2;
-          nextShift = 6;
-        }
-        else if ((c & 0xF8) == 0xF0)
-        {
-          //four characters
-          toRead = 3;
-          nextShift = 12;
-        }
-        else
-        {
-          //invalid character
-          std::cerr << "warning: invalid initial unicode byte" << std::endl;
-        }
-
-        for (int i = 0; i != toRead; ++i)
-        {
-          ++m_iter;
-          c = *m_iter;
-          //std::cerr << (int)c << " ";
-          if ((c & 0xC0) != 0x80)
-          {
-            //invalid character
-            std::cerr << "warning: invalid unicode byte" << std::endl;
-          }
-          m_value |= ((0x3F & c) << nextShift);
-          nextShift -= 6;
-        }
-      }
-
-      mutable T m_iter;
-      mutable value_type m_value;
       std::shared_ptr<detail::UTF8Iterator_shared<T>> m_data;
     };
 

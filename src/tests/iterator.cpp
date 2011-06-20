@@ -87,6 +87,23 @@ BOOST_AUTO_TEST_CASE ( copying )
   BOOST_CHECK(copy == correct);
 }
 
+BOOST_AUTO_TEST_CASE ( copy_increment )
+{
+  std::string s = "hello world";
+
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
+    TL::Parser::makeUTF8Iterator(s.end()));
+
+  auto iter2 = iter;
+
+  BOOST_CHECK(*iter == 'h');
+
+  ++iter;
+
+  BOOST_CHECK(*iter == 'e');
+  BOOST_CHECK(*iter2 == 'h');
+}
+
 BOOST_AUTO_TEST_CASE ( nonascii )
 {
   std::string s = u8"\u00e9";
