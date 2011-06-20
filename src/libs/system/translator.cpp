@@ -290,7 +290,7 @@ Translator::loadLibrary(const u32string& s)
   m_lt.loadLibrary(s, m_system);
 }
 
-void
+bool
 Translator::parseInstant
 (
   Parser::U32Iterator& begin,
@@ -319,6 +319,8 @@ Translator::parseInstant
   {
     std::cerr << "failed to parse instant" << std::endl;
   }
+
+  return success;
 }
 
 }

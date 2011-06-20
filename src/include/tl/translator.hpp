@@ -209,7 +209,7 @@ namespace TransLucid
       const Parser::U32Iterator& end
     );
 
-    void
+    bool
     parseInstant
     (
       Parser::U32Iterator& begin,

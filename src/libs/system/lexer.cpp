@@ -36,7 +36,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
 , else_(L"else")
 , true_(L"true")
 , false_(L"false")
-, spaces(L"([ \\n\\t])|(\\/\\/[^\\n]*)")
+, spaces(L"([ \\n\\t])|(\\/\\/[^\\n]\\n)")
 , m_errors(errors)
 {
   using boost::phoenix::ref;

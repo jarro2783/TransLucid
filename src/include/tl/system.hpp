@@ -123,7 +123,8 @@ namespace TransLucid
     Constant
     parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end);
 
-    void parseInstant
+    bool 
+    parseInstant
     (
       Parser::U32Iterator& begin,
       const Parser::U32Iterator& end

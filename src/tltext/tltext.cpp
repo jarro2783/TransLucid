@@ -90,9 +90,10 @@ TLText::run()
   }
   #endif
 
-  while (true)
+  bool success = true;
+  while (success)
   {
-    m_system.parseInstant(begin, end);
+    success = m_system.parseInstant(begin, end);
   }
 }
 
