@@ -295,6 +295,14 @@ namespace TransLucid
         {
         }
 
+        UTF8Iterator_shared(const UTF8Iterator_shared& other)
+        : m_iter_actual(other.m_iter_actual)
+        , m_iter(other.m_iter)
+        , m_haveRead(other.m_haveRead)
+        , m_value(other.m_value)
+        {
+        }
+
         bool
         operator==(const UTF8Iterator_shared<T>& rhs) const
         {
@@ -308,11 +316,9 @@ namespace TransLucid
           {
             readNext();
           }
-          else
-          {
-            m_iter_actual = m_iter;
-          }
 
+          ++m_iter;
+          m_iter_actual = m_iter;
           m_haveRead = false;
         }
 
@@ -380,7 +386,6 @@ namespace TransLucid
             m_value |= ((0x3F & c) << nextShift);
             nextShift -= 6;
           }
-          ++m_iter;
         }
 
         private:
