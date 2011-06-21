@@ -97,7 +97,8 @@ enum Token
   TOKEN_ARROW,
   TOKEN_BAR,
   TOKEN_DOUBLE_SEMI,
-  TOKEN_DBL_PERCENT
+  TOKEN_DBL_PERCENT,
+  TOKEN_MAPS
 };
 
 //the types of values that we can have
@@ -315,6 +316,7 @@ struct checker_grammar
       | tok.lparen_   [_val = TOKEN_OPAREN]
       | tok.rparen_   [_val = TOKEN_CPAREN]
       | tok.pipe_     [_val = TOKEN_BAR]
+      | tok.maps_     [_val = TOKEN_MAPS]
       ;
     }
 
@@ -512,7 +514,7 @@ BOOST_AUTO_TEST_CASE ( floats )
 
 BOOST_AUTO_TEST_CASE ( symbols )
 {
-  TL::u32string input = U":[].=&#@\\ \\\\..()->|;;\\\\\\ %%";
+  TL::u32string input = U":[].=&#@\\ \\\\..()->|;;\\\\\\ %%<-";
   Checker checker({
     TOKEN_COLON,
     TOKEN_OBRACKET,
@@ -532,7 +534,8 @@ BOOST_AUTO_TEST_CASE ( symbols )
     TOKEN_DOUBLE_SEMI,
     TOKEN_DOUBLE_SLASH,
     TOKEN_SLASH,
-    TOKEN_DBL_PERCENT
+    TOKEN_DBL_PERCENT,
+    TOKEN_MAPS
   });
 
   check(input, checker);

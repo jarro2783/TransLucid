@@ -29,8 +29,21 @@ namespace TransLucid
 {
   namespace Parser
   {
+    inline Tree::UnaryOperator
+    makeUnaryOp(Tree::UnaryType type, const Parser::UnopHeader& op)
+    {
+      return Tree::UnaryOperator(std::get<1>(op), std::get<0>(op), type);
+    }
+
+    inline Tree::BinaryOperator
+    makeBinaryOp(Tree::InfixAssoc type, const Parser::BinopHeader& op)
+    {
+      return Tree::BinaryOperator(type, 
+        std::get<1>(op), std::get<0>(op), std::get<2>(op));
+    }
+
     template <typename Iterator>
-    class LineGrammar : public qi::grammar<Iterator>
+    class LineGrammar : public qi::grammar<Iterator, Line>
     {
       public:
       template <typename TokenDef>
@@ -42,24 +55,36 @@ namespace TransLucid
       : LineGrammar::base_type(r_line)
       , g_equation(eqn)
       , g_hstring(tok)
+      , g_binop(tok)
+      , g_unop(tok)
       {
+        using namespace qi::labels;
+
         r_line = 
         (
-          (tok.dimension_ > g_hstring)
-        | (tok.library_ > g_hstring)
-        | (tok.eqn_ > g_equation)
-        | tok.assignment_
-        | tok.infix_binary_
-        | tok.unary_
+          (tok.dimension_ > g_hstring[_val = construct<DimensionDecl>(_1)])
+        | (tok.library_ > g_hstring[_val = construct<LibraryDecl>(_1)])
+        | (tok.eqn_ > g_equation[_val = _1])
+        | (tok.assignment_ > g_equation[_val = _1])
+        | ((tok.infix_binary_ > g_binop)
+          [
+            ph::bind(&makeBinaryOp, _1, _2)
+          ])
+        | ((tok.unary_ > g_unop)
+          [
+            ph::bind(&makeUnaryOp, _1, _2)
+          ])
         )
 
-        //>> &tok.dblsemi_
+        > tok.dblsemi_
         ;
       }
 
-      qi::rule<Iterator> r_line;
+      qi::rule<Iterator, Line> r_line;
       EquationGrammar<Iterator>& g_equation;
       HeaderStringGrammar<Iterator> g_hstring;
+      HeaderBinopGrammar<Iterator> g_binop;
+      HeaderUnopGrammar<Iterator> g_unop;
     };
   }
 }

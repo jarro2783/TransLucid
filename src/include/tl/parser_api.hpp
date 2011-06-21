@@ -42,17 +42,31 @@ namespace TransLucid
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     Equation;
 
-    //symbol, name, precedence
-    typedef std::tuple<u32string, u32string, mpz_class> BinopHeader;
+    struct DimensionDecl
+    {
+      DimensionDecl(const u32string& d)
+      : dim(d)
+      {}
 
-    //symbol, name
-    typedef std::tuple<u32string, u32string> UnopHeader;
+      u32string dim;
+    };
+
+    struct LibraryDecl
+    {
+      LibraryDecl(const u32string& l)
+      : lib(l)
+      {}
+
+      u32string lib;
+    };
 
     typedef boost::variant
     <
-      Equation,
-      UnopHeader,
-      BinopHeader
+      std::pair<Equation, DeclType>,
+      Tree::UnaryOperator,
+      Tree::BinaryOperator,
+      DimensionDecl,
+      LibraryDecl
     > Line;
 
     typedef std::vector<Line> Instant;

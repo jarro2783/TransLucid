@@ -65,33 +65,6 @@ namespace TransLucid
 
 namespace
 {
-
-  enum LineType
-  {
-    LINE_EQN,
-    LINE_ASSIGN,
-    LINE_DIM,
-    LINE_INFIXL,
-    LINE_INFIXR,
-    LINE_INFIXN,
-    LINE_LIBRARY,
-    LINE_POSTFIX,
-    LINE_PREFIX
-  };
-
-  std::unordered_map<u32string, LineType> lineTypes = 
-  {
-    {U"eqn", LINE_EQN}, 
-    {U"assign", LINE_ASSIGN},
-    {U"dim", LINE_DIM},
-    {U"infixl", LINE_INFIXL},
-    {U"infixr", LINE_INFIXR},
-    {U"infixn", LINE_INFIXN},
-    {U"library", LINE_LIBRARY},
-    {U"prefix", LINE_PREFIX},
-    {U"postfix", LINE_POSTFIX}
-  };
-
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {
@@ -195,7 +168,65 @@ namespace
   };
   #endif
 }
-//
+
+namespace detail
+{
+  class LineAdder
+  {
+    public:
+
+    LineAdder(System& s)
+    : m_system(s)
+    {
+    }
+
+    typedef Constant result_type;
+
+    Constant
+    operator()(const Tree::BinaryOperator& binop)
+    {
+      return m_system.addBinaryOperator(binop);
+    }
+
+    Constant
+    operator()(const Tree::UnaryOperator& unop)
+    {
+      return m_system.addUnaryOperator(unop);
+    }
+
+    Constant
+    operator()(const std::pair<Parser::Equation, Parser::DeclType>& eqn)
+    {
+      if (eqn.second == Parser::DECL_DEF)
+      {
+        std::cout << "adding equation" << std::endl;
+        return m_system.addEquation(eqn.first);
+      }
+      else
+      {
+        return m_system.addAssignment(eqn.first);
+      }
+    }
+
+    Constant
+    operator()(const Parser::DimensionDecl& dim)
+    {
+      return m_system.addDimension(dim.dim);
+    }
+
+    Constant
+    operator()(const Parser::LibraryDecl& lib)
+    {
+      //what should this return
+      m_system.loadLibrary(lib.lib);
+      return Constant();
+    }
+
+    private:
+    System& m_system;
+  };
+}
+
 //adds eqn | [symbol : "s"] = value;;
 template <typename T>
 Constant
@@ -403,159 +434,19 @@ System::lastExpression() const
   return m_translator->lastExpression();
 }
 
-static Tree::UnaryOperator
-makeUnaryOp(LineType type, const Parser::UnopHeader& op)
-{
-  Tree::UnaryType ut = 
-    type == LINE_POSTFIX ? Tree::UNARY_POSTFIX : Tree::UNARY_PREFIX;
-  return Tree::UnaryOperator(std::get<1>(op), std::get<0>(op), ut);
-}
-
-static Tree::BinaryOperator
-makeBinaryOp(LineType type, const Parser::BinopHeader& op)
-{
-  Tree::InfixAssoc a;
-  switch (type)
-  {
-    case LINE_INFIXL:
-    a = Tree::ASSOC_LEFT;
-    break;
-
-    case LINE_INFIXR:
-    a = Tree::ASSOC_RIGHT;
-    break;
-
-    case LINE_INFIXN:
-    a = Tree::ASSOC_NON;
-    break;
-
-    default:
-    throw __FILE__ ":" STRING_(__LINE__) ": oops";
-    break;
-  }
-
-  return Tree::BinaryOperator(a, 
-    std::get<1>(op), std::get<0>(op), std::get<2>(op));
-}
-
 Constant
 System::parseLine(Parser::U32Iterator& begin)
 {
   std::cerr << "parse line..." << std::endl;
-  Parser::U32Iterator& current = begin;
   Parser::U32Iterator end;
 
   auto result = m_translator->parseLine(begin);
 
-  #if 0
-  //skip over spaces
-  char32_t c = *current;
-  while (current != end)
+  if (result.first)
   {
-    c = *current;
-    if (!(c == ' ' || c == '\t' || c == '\n'))
-    {
-      break;
-    }
-    ++current;
+    detail::LineAdder adder(*this);
+    return boost::apply_visitor(adder, result.second);
   }
-
-  //read the first word
-  u32string firstWord;
-  while (current != end && *current != ' ')
-  {
-    firstWord += *current;
-    ++current;
-  }
-
-  std::cerr << "parsing thing of type " << firstWord << std::endl;
-  auto iter = lineTypes.find(firstWord);
-  if (iter != lineTypes.end())
-  {
-    LineType type;
-    type = iter->second;
-
-    switch (type)
-    {
-      case LINE_EQN:
-      {
-        auto result = m_translator->parseEquation(current, end);
-        if (result.first && result.second.second == Parser::DECL_DEF)
-        {
-          return addEquation(result.second.first);
-        }
-        else
-        {
-        }
-      }
-      break;
-
-      case LINE_ASSIGN:
-      //parse an assignment
-      {
-        auto result = m_translator->parseEquation(current, end);
-        if (result.first && result.second.second == Parser::DECL_ASSIGN)
-        {
-          return addAssignment(result.second.first);
-        }
-      }
-      break;
-
-      case LINE_DIM:
-      //parse dim
-      {
-        auto result = m_translator->parseHeaderString(current, end);
-        if (result.first)
-        {
-          addDimension(result.second);
-        }
-      }
-      break;
-
-      case LINE_INFIXL:
-      case LINE_INFIXR:
-      case LINE_INFIXN:
-      //parse binary
-      {
-        auto result = m_translator->parseHeaderBinary(current, end); 
-        if (result.first)
-        {
-          addBinaryOperator(makeBinaryOp(type, result.second));
-        }
-      }
-      break;
-
-      case LINE_LIBRARY:
-      //parse library
-      {
-        auto result = m_translator->parseHeaderString(current, end);
-        if (result.first)
-        {
-          //what should loading a library return?
-          loadLibrary(result.second);
-        }
-      }
-      break;
-
-      case LINE_PREFIX:
-      case LINE_POSTFIX:
-      //parse unary
-      {
-        auto result = m_translator->parseHeaderUnary(current, end);
-        if (result.first)
-        {
-          return addUnaryOperator(makeUnaryOp(type, result.second));
-        }
-      }
-      break;
-    }
-  }
-  else
-  {
-    //invalid keyword
-  }
-
-  #endif
 
   return Types::Special::create(SP_CONST); 
 }

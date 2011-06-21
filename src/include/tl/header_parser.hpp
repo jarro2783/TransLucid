@@ -33,6 +33,12 @@ namespace TransLucid
     namespace ph = boost::phoenix;
     using namespace ph;
 
+    //symbol, name, precedence
+    typedef std::tuple<u32string, u32string, mpz_class> BinopHeader;
+
+    //symbol, name
+    typedef std::tuple<u32string, u32string> UnopHeader;
+
     template <typename Iterator>
     class HeaderBinopGrammar : public qi::grammar<Iterator, BinopHeader()>
     {

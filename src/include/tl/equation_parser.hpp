@@ -68,7 +68,6 @@ namespace TransLucid
                 _4
               )
           ]
-           >  tok.dblsemi_
         ;
 
         guard =
