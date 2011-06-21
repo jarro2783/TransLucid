@@ -16,7 +16,7 @@ add_executable(tltext main.cpp tltext.cpp)
 target_link_libraries(tltext tlsystem ${Boost_LIBRARIES})
 add_definitions(${TLCFLAGS})
 
-add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})
+#add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})
 
 install(TARGETS tltext
    RUNTIME DESTINATION bin

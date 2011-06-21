@@ -439,11 +439,15 @@ makeBinaryOp(LineType type, const Parser::BinopHeader& op)
 }
 
 Constant
-System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
+System::parseLine(Parser::U32Iterator& begin)
 {
   std::cerr << "parse line..." << std::endl;
   Parser::U32Iterator& current = begin;
+  Parser::U32Iterator end;
 
+  auto result = m_translator->parseLine(begin);
+
+  #if 0
   //skip over spaces
   char32_t c = *current;
   while (current != end)
@@ -550,6 +554,8 @@ System::parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end)
   {
     //invalid keyword
   }
+
+  #endif
 
   return Types::Special::create(SP_CONST); 
 }

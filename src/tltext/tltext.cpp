@@ -19,9 +19,11 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/expr_parser.hpp>
 #include <tl/equation_parser.hpp>
+#include <tl/line_tokenizer.hpp>
 #include <tl/tuple_parser.hpp>
 #include <tl/system.hpp>
 #include <tl/expr_compiler.hpp>
+
 #include <iterator>
 #include <iostream>
 
@@ -90,10 +92,17 @@ TLText::run()
   }
   #endif
 
-  bool success = true;
-  while (success)
+  LineTokenizer tokenizer(begin);
+  while (!tokenizer.end())
   {
-    success = m_system.parseInstant(begin, end);
+    u32string line = tokenizer.next();
+
+    Parser::U32Iterator lineBegin(
+      Parser::makeUTF32Iterator(line.begin()),
+      Parser::makeUTF32Iterator(line.end())
+    );
+
+    m_system.parseLine(lineBegin);
   }
 }
 

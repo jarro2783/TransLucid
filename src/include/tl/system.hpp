@@ -119,7 +119,7 @@ namespace TransLucid
     addUnaryOperator(const Tree::UnaryOperator& op);
 
     Constant
-    parseLine(Parser::U32Iterator& begin, const Parser::U32Iterator& end);
+    parseLine(Parser::U32Iterator& begin);
 
     bool 
     parseInstant

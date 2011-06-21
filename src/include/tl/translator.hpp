@@ -217,6 +217,12 @@ namespace TransLucid
       Parser::InstantFunctor endInstant
     );
 
+    std::pair<bool, Parser::Line>
+    parseLine
+    (
+      Parser::U32Iterator& begin
+    );
+
     /**
      * The Translator's system.
      * @return The System belonging to the Translator.

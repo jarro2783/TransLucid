@@ -41,6 +41,20 @@ LineTokenizer::next()
     m_state = READ_SCANNING;
     m_line.clear();
 
+    if (m_first)
+    {
+      m_first = false;
+
+      if (m_current != m_end)
+      {
+        m_line += *m_current;
+      }
+    }
+    else
+    {
+      nextChar();
+    }
+
     readOuter();
   } 
   catch (EndOfInput&)
@@ -49,6 +63,7 @@ LineTokenizer::next()
   }
   catch (NewLineInString&)
   {
+    //new line token found in string
   }
   
   return m_line;
@@ -60,7 +75,7 @@ LineTokenizer::readOuter()
   bool done = false;
   while (!done && m_current != Parser::U32Iterator())
   {
-    char32_t c = nextChar();
+    char32_t c = currentChar();
     switch (c)
     {
       case ';':
@@ -72,6 +87,8 @@ LineTokenizer::readOuter()
           done = true;
         }
       }
+      break;
+
       case '"':
       readInterpretedString();
       break;
@@ -83,7 +100,11 @@ LineTokenizer::readOuter()
       default:
       break;
     }
-    c = nextChar();
+
+    if (!done)
+    {
+      c = nextChar();
+    }
   }
 }
 
@@ -100,6 +121,12 @@ LineTokenizer::readRawString()
   }
 
   m_state = READ_SCANNING;
+}
+
+char32_t
+LineTokenizer::currentChar()
+{
+  return *m_current;
 }
 
 char32_t
@@ -131,7 +158,7 @@ LineTokenizer::readInterpretedString()
     }
     else if (c == '\n')
     {
-      //throw new line in string constant
+      //pretend that the line ends here
       throw NewLineInString();
     }
     else
@@ -139,6 +166,8 @@ LineTokenizer::readInterpretedString()
       c = nextChar();
     }
   }
+
+  m_state = READ_SCANNING;
 }
 
 }

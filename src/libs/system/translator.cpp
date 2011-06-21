@@ -322,4 +322,26 @@ Translator::parseInstant
   return success;
 }
 
+std::pair<bool, Parser::Line>
+Translator::parseLine
+(
+  Parser::U32Iterator& begin
+)
+{
+  Parser::Line line;
+  Parser::U32Iterator end;
+
+  Lexer::lexer_type::iterator_type iter = 
+    m_parsers->m_lexer.begin(begin, end);
+  Lexer::lexer_type::iterator_type last = m_parsers->m_lexer.end();
+
+  bool success = boost::spirit::qi::parse(
+    iter,
+    last,
+    m_parsers->m_line
+  );
+
+  return std::make_pair(success, line);
+}
+
 }

@@ -20,23 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef LINE_TOKENIZER_HPP_INCLUDED
 #define LINE_TOKENIZER_HPP_INCLUDED
 
-#include <deque>
-
 #include <tl/parser_iterator.hpp>
 
 namespace TransLucid
 {
   class LineTokenizer
   {
-    public:
-    //construct with an iterator
-    LineTokenizer(TransLucid::Parser::U32Iterator& begin)
-    : m_current(begin)
-    {
-    }
-
-    u32string next();
-
     private:
 
     enum State
@@ -46,6 +35,25 @@ namespace TransLucid
       READ_INTERPRETED,
       READ_SEMI
     };
+
+    public:
+    //construct with an iterator
+    LineTokenizer(TransLucid::Parser::U32Iterator& begin)
+    : m_current(begin)
+    , m_state(READ_SCANNING)
+    , m_first(true)
+    {
+    }
+
+    u32string next();
+
+    bool
+    end() const
+    {
+      return m_current == m_end;
+    }
+
+    private:
 
     /**
      * Reads a line up to the next ;; at the outer level of nesting of various
@@ -63,11 +71,14 @@ namespace TransLucid
     char32_t
     nextChar();
 
-    std::deque<char32_t> m_lookahead;
+    char32_t
+    currentChar();
+
     Parser::U32Iterator& m_current;
     Parser::U32Iterator m_end;
     u32string m_line;
     State m_state;
+    bool m_first;
   };
 }
 
