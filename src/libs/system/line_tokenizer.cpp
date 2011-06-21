@@ -32,27 +32,62 @@ namespace
   {
   };
 }
+
+inline bool
+is_space(char32_t c)
+{
+  return c == ' ' || c == '\t' || c == '\n';
+}
  
 u32string
 LineTokenizer::next()
 {
   try
   {
-    m_state = READ_SCANNING;
+    m_state = READ_SKIP_SPACE;
     m_line.clear();
 
+    //handle some special cases first
+
+    //the first time we tokenize something we are already pointing at
+    //the first character
     if (m_first)
     {
       m_first = false;
 
+      //but we have to make sure that there is actually some input
       if (m_current != m_end)
       {
-        m_line += *m_current;
+        //if we see a space then do nothing
+        //otherwise start the reading
+        char32_t c = *m_current;
+        if (!is_space(c))
+        {
+          m_line += *m_current;
+          m_state = READ_SCANNING;
+        }
       }
     }
     else
     {
-      nextChar();
+      //otherwise get going on the next character
+      ++m_current;
+    }
+
+    //are we still in skipping spaces mode?
+    //if so, start reading and don't add to the buffer
+    if (m_state == READ_SKIP_SPACE)
+    {
+      char32_t c = *m_current;
+
+      while (is_space(c))
+      {
+        ++m_current;
+        c = *m_current;
+      }
+
+      //the last one that failed needs to go onto the buffer
+      m_line += c;
     }
 
     readOuter();
@@ -69,13 +104,38 @@ LineTokenizer::next()
   return m_line;
 }
 
+//upon entering this function, we will have skipped all the spaces at the
+//start, and we will be at the first character which has already been added to
+//the buffer
 void
 LineTokenizer::readOuter()
 {
+  //first we need to determine if we have a $$ or %%
+  char32_t c = currentChar();
   bool done = false;
+
+  if (c == '$')
+  {
+    c = nextChar();
+    if (c == '$')
+    {
+      done = true;
+    }
+  }
+  else if (c == '%')
+  {
+    c = nextChar();
+    if (c == '%')
+    {
+      done = true;
+    }
+  }
+
+  //do nothing if they didn't match, because the rest of the algorithm needs
+  //to start with that character (it could be the first ; or a " or `)
+
   while (!done && m_current != Parser::U32Iterator())
   {
-    char32_t c = currentChar();
     switch (c)
     {
       case ';':

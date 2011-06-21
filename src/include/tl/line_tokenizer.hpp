@@ -33,7 +33,8 @@ namespace TransLucid
       READ_SCANNING,
       READ_RAW,
       READ_INTERPRETED,
-      READ_SEMI
+      READ_SEMI,
+      READ_SKIP_SPACE
     };
 
     public:
