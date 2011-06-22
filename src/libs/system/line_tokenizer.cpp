@@ -39,12 +39,14 @@ is_space(char32_t c)
   return c == ' ' || c == '\t' || c == '\n';
 }
  
-u32string
+std::pair<LineType, u32string>
 LineTokenizer::next()
 {
+  LineType type = LineType::LINE;
+
   try
   {
-    m_state = READ_SKIP_SPACE;
+    m_state = State::READ_SKIP_SPACE;
     m_line.clear();
 
     //handle some special cases first
@@ -64,25 +66,41 @@ LineTokenizer::next()
         if (!is_space(c))
         {
           m_line += *m_current;
-          m_state = READ_SCANNING;
+          m_state = State::READ_SCANNING;
         }
+      }
+      else
+      {
+        throw EndOfInput();
       }
     }
     else
     {
       //otherwise get going on the next character
       ++m_current;
+
+      //make sure we didn't get to the end
+      if (m_current == m_end)
+      {
+        throw EndOfInput();
+      }
     }
 
     //are we still in skipping spaces mode?
     //if so, start reading and don't add to the buffer
-    if (m_state == READ_SKIP_SPACE)
+    if (m_state == State::READ_SKIP_SPACE)
     {
       char32_t c = *m_current;
 
       while (is_space(c))
       {
         ++m_current;
+
+        if (m_current == m_end)
+        {
+          throw EndOfInput();
+        }
+
         c = *m_current;
       }
 
@@ -90,27 +108,34 @@ LineTokenizer::next()
       m_line += c;
     }
 
-    readOuter();
+    type = readOuter();
   } 
   catch (EndOfInput&)
   {
     //end of input whilst reading line
+
+    //if we are still skipping spaces then the line is empty
+    if (m_state == State::READ_SKIP_SPACE)
+    {
+      type = LineType::EMPTY;
+    }
   }
   catch (NewLineInString&)
   {
     //new line token found in string
   }
   
-  return m_line;
+  return std::make_pair(type, m_line);
 }
 
 //upon entering this function, we will have skipped all the spaces at the
 //start, and we will be at the first character which has already been added to
 //the buffer
-void
+LineType
 LineTokenizer::readOuter()
 {
   //first we need to determine if we have a $$ or %%
+  LineType type = LineType::LINE;
   char32_t c = currentChar();
   bool done = false;
 
@@ -120,6 +145,7 @@ LineTokenizer::readOuter()
     if (c == '$')
     {
       done = true;
+      type = LineType::DOUBLE_DOLLAR;
     }
   }
   else if (c == '%')
@@ -128,6 +154,7 @@ LineTokenizer::readOuter()
     if (c == '%')
     {
       done = true;
+      type = LineType::DOUBLE_PERCENT;
     }
   }
 
@@ -139,7 +166,7 @@ LineTokenizer::readOuter()
     switch (c)
     {
       case ';':
-      m_state = READ_SEMI;
+      m_state = State::READ_SEMI;
       {
         c = nextChar();
         if (c == ';')
@@ -166,13 +193,15 @@ LineTokenizer::readOuter()
       c = nextChar();
     }
   }
+
+  return type;
 }
 
 void
 LineTokenizer::readRawString()
 {
   //read until another "`"
-  m_state = READ_RAW;
+  m_state = State::READ_RAW;
 
   char32_t c = nextChar();
   while (c != '`')
@@ -180,7 +209,7 @@ LineTokenizer::readRawString()
     c = nextChar();
   }
 
-  m_state = READ_SCANNING;
+  m_state = State::READ_SCANNING;
 }
 
 char32_t
@@ -207,7 +236,7 @@ void
 LineTokenizer::readInterpretedString()
 {
   //read until ", but skip backslash and complain about new lines
-  m_state = READ_INTERPRETED;
+  m_state = State::READ_INTERPRETED;
   char32_t c = nextChar();
   while (c != '"')
   {
@@ -227,7 +256,31 @@ LineTokenizer::readInterpretedString()
     }
   }
 
-  m_state = READ_SCANNING;
+  m_state = State::READ_SCANNING;
 }
 
+std::ostream&
+operator<<(std::ostream& os, LineType l)
+{
+  switch (l)
+  {
+    case LineType::LINE:
+    os << "LineType::LINE";
+    break;
+
+    case LineType::DOUBLE_DOLLAR:
+    os << "LineType::DOUBLE_DOLLAR";
+    break;
+
+    case LineType::DOUBLE_PERCENT:
+    os << "LineType::DOUBLE_PERCENT";
+    break;
+
+    case LineType::EMPTY:
+    os << "LineType::EMPTY";
+    break;
+  }
+  return os;
 }
+
+} //namespace TransLucid

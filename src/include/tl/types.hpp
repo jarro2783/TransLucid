@@ -425,15 +425,6 @@ namespace std
   };
 }
 
-#if 0
-std::ostream&
-operator<<(std::ostream& os, const mpz_class& z)
-{
-  os << z.get_str();
-  return os;
-}
-#endif
-
 //this has to be included down here so that the definitions are available
 //in the right places
 #include <tl/detail/types_detail.hpp>

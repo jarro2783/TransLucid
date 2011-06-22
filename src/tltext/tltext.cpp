@@ -95,11 +95,11 @@ TLText::run()
   LineTokenizer tokenizer(begin);
   while (!tokenizer.end())
   {
-    u32string line = tokenizer.next();
+    auto line = tokenizer.next();
 
     Parser::U32Iterator lineBegin(
-      Parser::makeUTF32Iterator(line.begin()),
-      Parser::makeUTF32Iterator(line.end())
+      Parser::makeUTF32Iterator(line.second.begin()),
+      Parser::makeUTF32Iterator(line.second.end())
     );
 
     m_system.parseLine(lineBegin);

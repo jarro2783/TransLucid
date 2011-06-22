@@ -26,6 +26,23 @@ namespace TL = TransLucid;
 
 BOOST_AUTO_TEST_SUITE( line_tokenizer_tests )
 
+BOOST_AUTO_TEST_CASE( empty )
+{
+  std::string input;
+
+  TL::Parser::U32Iterator iter(
+    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.end())
+  );
+
+  TL::LineTokenizer tokenize(iter);
+
+  auto n = tokenize.next();
+
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+}
+
 BOOST_AUTO_TEST_CASE( simple )
 {
   std::string input = "eqn a = 5;; assign y := 6;;";
@@ -37,11 +54,62 @@ BOOST_AUTO_TEST_CASE( simple )
 
   TL::LineTokenizer tokenize(iter);
 
-  TL::u32string n = tokenize.next();
-  BOOST_CHECK_EQUAL(n, TL::u32string(U"eqn a = 5;;"));
+  auto n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = 5;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n, TL::u32string(U" assign y := 6;;"));
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"assign y := 6;;"));
+}
+
+BOOST_AUTO_TEST_CASE( dollar )
+{
+  std::string input = "eqn a = b;;  $$";
+
+  TL::Parser::U32Iterator iter(
+    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.end())
+  );
+
+  TL::LineTokenizer tokenize(iter);
+
+  auto n = tokenize.next();
+
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = b;;"));
+
+  n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_DOLLAR);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"$$"));
+
+  n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+}
+
+BOOST_AUTO_TEST_CASE( extra_spaces )
+{
+  std::string input = "eqn a = b;;  $$  ";
+
+  TL::Parser::U32Iterator iter(
+    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.end())
+  );
+
+  TL::LineTokenizer tokenize(iter);
+
+  auto n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = b;;"));
+
+  n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_DOLLAR);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"$$"));
+
+  n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

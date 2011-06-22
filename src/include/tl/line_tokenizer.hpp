@@ -24,11 +24,19 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  enum class LineType
+  {
+    LINE,
+    DOUBLE_DOLLAR,
+    DOUBLE_PERCENT,
+    EMPTY
+  };
+
   class LineTokenizer
   {
     private:
 
-    enum State
+    enum class State
     {
       READ_SCANNING,
       READ_RAW,
@@ -41,12 +49,12 @@ namespace TransLucid
     //construct with an iterator
     LineTokenizer(TransLucid::Parser::U32Iterator& begin)
     : m_current(begin)
-    , m_state(READ_SCANNING)
+    , m_state(State::READ_SCANNING)
     , m_first(true)
     {
     }
 
-    u32string next();
+    std::pair<LineType, u32string> next();
 
     bool
     end() const
@@ -60,7 +68,7 @@ namespace TransLucid
      * Reads a line up to the next ;; at the outer level of nesting of various
      * gizmos.
      */
-    void
+    LineType
     readOuter();
 
     void
@@ -81,6 +89,9 @@ namespace TransLucid
     State m_state;
     bool m_first;
   };
+
+  std::ostream&
+  operator<<(std::ostream& os, LineType l);
 }
 
 #endif
