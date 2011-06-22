@@ -35,6 +35,14 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_defs.hpp>
 #include <tl/parser_header.hpp>
 
+namespace boost { namespace spirit { namespace traits
+{
+  template <typename Enable>
+  struct is_container<mpz_class, Enable>
+  : mpl::false_
+  {};
+}}}
+
 namespace TransLucid
 {
   namespace Parser

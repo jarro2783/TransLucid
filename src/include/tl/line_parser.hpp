@@ -43,7 +43,7 @@ namespace TransLucid
     }
 
     template <typename Iterator>
-    class LineGrammar : public qi::grammar<Iterator, Line>
+    class LineGrammar : public qi::grammar<Iterator, Line()>
     {
       public:
       template <typename TokenDef>
@@ -68,11 +68,11 @@ namespace TransLucid
         | (tok.assignment_ > g_equation[_val = _1])
         | ((tok.infix_binary_ > g_binop)
           [
-            ph::bind(&makeBinaryOp, _1, _2)
+            _val = ph::bind(&makeBinaryOp, _1, _2)
           ])
         | ((tok.unary_ > g_unop)
           [
-            ph::bind(&makeUnaryOp, _1, _2)
+            _val = ph::bind(&makeUnaryOp, _1, _2)
           ])
         )
 
@@ -80,7 +80,7 @@ namespace TransLucid
         ;
       }
 
-      qi::rule<Iterator, Line> r_line;
+      qi::rule<Iterator, Line()> r_line;
       EquationGrammar<Iterator>& g_equation;
       HeaderStringGrammar<Iterator> g_hstring;
       HeaderBinopGrammar<Iterator> g_binop;

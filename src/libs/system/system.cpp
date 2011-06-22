@@ -54,6 +54,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/tree_to_wstree.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/uuid.hpp>
+#include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
 #include <algorithm>
@@ -199,7 +200,8 @@ namespace detail
     {
       if (eqn.second == Parser::DECL_DEF)
       {
-        std::cout << "adding equation" << std::endl;
+        std::cerr << "adding equation " << 
+          std::get<0>(eqn.first)  << std::endl;
         return m_system.addEquation(eqn.first);
       }
       else
@@ -367,7 +369,7 @@ System::~System()
 }
 
 void
-System::tick()
+System::go()
 {
   #if 0
   tuple_t current;
@@ -402,6 +404,35 @@ System::tick()
 
   ++m_time;
   #endif
+
+  for (const auto& ident : m_assignments)
+  {
+    std::cerr << "evaluating " << ident.first << std::endl;
+    auto equations = ident.second->equations();
+    for (auto& assign : equations)
+    {
+      Tuple k;
+      const GuardWS& guard = assign.second.validContext();
+
+      k = guard.evaluate(Tuple());
+
+      auto time = k.find(DIM_TIME);
+      if ((time == k.end() ||
+          get_constant_pointer<mpz_class>(time->second) == m_time))
+      {
+        TaggedConstant v = assign.second(k);
+
+        std::cout << "type: " << v.first.index() << std::endl;
+
+        if (v.first.index() == TYPE_INDEX_INTMP)
+        {
+          std::cout << "value: " << get_constant_pointer<mpz_class>(v.first) 
+            << std::endl;
+        }
+        //std::cout << ident.first << " = " << v.first << std::endl;
+      }
+    }
+  }
 }
 
 uuid
@@ -444,6 +475,7 @@ System::parseLine(Parser::U32Iterator& begin)
 
   if (result.first)
   {
+    std::cerr << "visiting result" << std::endl;
     detail::LineAdder adder(*this);
     return boost::apply_visitor(adder, result.second);
   }

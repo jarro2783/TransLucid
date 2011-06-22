@@ -44,6 +44,8 @@ namespace TransLucid
 
     struct DimensionDecl
     {
+      DimensionDecl() = default;
+
       DimensionDecl(const u32string& d)
       : dim(d)
       {}
@@ -53,6 +55,8 @@ namespace TransLucid
 
     struct LibraryDecl
     {
+      LibraryDecl() = default;
+
       LibraryDecl(const u32string& l)
       : lib(l)
       {}

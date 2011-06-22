@@ -97,25 +97,45 @@ TLText::run()
   bool done = false;
   while (!done)
   {
-    auto line = tokenizer.next();
-
-    Parser::U32Iterator lineBegin(
-      Parser::makeUTF32Iterator(line.second.begin()),
-      Parser::makeUTF32Iterator(line.second.end())
-    );
-
     auto defs = processDefinitions(tokenizer);
 
     //only continue if the instant is valid
     if (defs.first)
     {
+      std::vector<Tree::Expr> exprs;
       //only parse expressions if the right tokens were seen
       if (defs.second)
       {
-        processExpressions(tokenizer);
+        exprs = processExpressions(tokenizer);
       }
 
       //now process the instant
+
+      //add equations for the exprs entered
+      int slot = 0;
+      size_t time = m_system.theTime();
+
+      for (const Tree::Expr& e : exprs)
+      {
+        std::cerr << "adding demand slot " << slot << std::endl;
+        m_system.addAssignment(Parser::Equation
+        (
+          U"demand",
+          Tree::TupleExpr
+          (
+            {
+              {Tree::DimensionExpr(U"time"), mpz_class(time)},
+              {Tree::DimensionExpr(U"slot"), mpz_class(slot)}
+            }
+          ),
+          Tree::Expr(),
+          e
+        ));
+        ++slot;
+      }
+
+      //run the demands
+      m_system.go();
     }
     else
     {
@@ -129,53 +149,55 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
 {
   bool instantValid = true;
   bool parseExpressions = true;
+  bool first = true;
 
-  auto line = tokenizer.next();
-
-  if (line.first == LineType::EMPTY)
+  bool done = false;
+  while (!done)
   {
-    instantValid = false;
-  }
-  else
-  {
-    bool done = false;
-    while (!done)
+    auto line = tokenizer.next();
+    switch(line.first)
     {
-      switch(line.first)
+      case LineType::LINE:
+      //parse a line with the system
       {
-        case LineType::LINE:
-        //parse a line with the system
-        {
-          Parser::U32Iterator lineBegin(
-            Parser::makeUTF32Iterator(line.second.begin()),
-            Parser::makeUTF32Iterator(line.second.end())
-          );
+        Parser::U32Iterator lineBegin(
+          Parser::makeUTF32Iterator(line.second.begin()),
+          Parser::makeUTF32Iterator(line.second.end())
+        );
 
-          auto result = m_system.parseLine(lineBegin);
-        }
-        break;
-
-        case LineType::DOUBLE_DOLLAR:
-        case LineType::EMPTY:
-        parseExpressions = false;
-        done = true;
-        break;
-
-        case LineType::DOUBLE_PERCENT:
-        done = true;
-        break;
+        auto result = m_system.parseLine(lineBegin);
       }
+      break;
 
-      line = tokenizer.next();
+      case LineType::DOUBLE_DOLLAR:
+      parseExpressions = false;
+      done = true;
+      break;
+
+      case LineType::EMPTY:
+      if (first)
+      {
+        instantValid = false;
+      }
+      parseExpressions = false;
+      done = true;
+      break;
+
+      case LineType::DOUBLE_PERCENT:
+      done = true;
+      break;
     }
+    first = false;
   }
 
   return std::make_pair(instantValid, parseExpressions);
 }
 
-void
+std::vector<Tree::Expr>
 TLText::processExpressions(LineTokenizer& tokenizer)
 {
+  std::cerr << "processExpressions" << std::endl;
+  std::vector<Tree::Expr> exprs;
   bool done = false;
   while (!done)
   {
@@ -183,6 +205,7 @@ TLText::processExpressions(LineTokenizer& tokenizer)
 
     switch(line.first)
     {
+      std::cerr << "got a line of type " << line.first << std::endl;
       case LineType::LINE:
       //parse an expression
       {
@@ -191,7 +214,15 @@ TLText::processExpressions(LineTokenizer& tokenizer)
           Parser::makeUTF32Iterator(line.second.end())
         );
 
+        std::cerr << "parsing \"" << line.second << "\"" << std::endl;
+
         auto expr = m_system.parseExpression(lineBegin);
+        if (expr.first)
+        {
+          std::cerr << "adding expression \"" << line.second << "\"" <<
+            std::endl;
+          exprs.push_back(expr.second);
+        }
       }
       break;
 
@@ -206,6 +237,8 @@ TLText::processExpressions(LineTokenizer& tokenizer)
       break;
     }
   }
+
+  return exprs;
 }
 
 } //namespace TLCore

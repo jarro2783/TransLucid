@@ -163,7 +163,7 @@ namespace TransLucid
       std::pair<bool, bool>
       processDefinitions(LineTokenizer& line);
 
-      void
+      std::vector<Tree::Expr>
       processExpressions(LineTokenizer& line);
     };
   }

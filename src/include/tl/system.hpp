@@ -156,6 +156,9 @@ namespace TransLucid
     const Tree::Expr&
     lastExpression() const;
 
+    void
+    go();
+
     private:
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
 
@@ -178,9 +181,6 @@ namespace TransLucid
     template <typename T>
     WS*
     buildConstantWS(size_t index);
-
-    void
-    tick();
 
     // -- internal add functions --
 

@@ -30,6 +30,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/qi/parser.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_parse_attr.hpp>
+#include <boost/spirit/include/qi_expect.hpp>
 
 namespace TransLucid
 {
@@ -243,11 +244,47 @@ Translator::parseLine
     m_parsers->m_lexer.begin(begin, end);
   Lexer::lexer_type::iterator_type last = m_parsers->m_lexer.end();
 
-  bool success = boost::spirit::qi::parse(
-    iter,
-    last,
-    m_parsers->m_line
-  );
+  bool success = false;
+  try
+  {
+    success = boost::spirit::qi::parse(
+      iter,
+      last,
+      m_parsers->m_line,
+      line
+    );
+
+    if (!success)
+    {
+      std::cerr << "Absolute rubbish was typed" << std::endl;
+    }
+  }
+  catch (boost::spirit::qi::expectation_failure<Parser::iterator_t>& e)
+  {
+    std::cerr << "error parsing input:" << std::endl;
+
+    std::cerr << "expecting " << e.what_ << std::endl;
+
+    #if 0
+    boost::spirit::simple_printer<std::ostream> printer(std::cerr);
+
+    boost::spirit::basic_info_walker<
+      boost::spirit::simple_printer<std::ostream>
+    > 
+    walker
+    (
+      printer,
+      "line",
+      0
+    );
+
+    boost::apply_visitor(walker, e.what_.value);
+    #endif
+  }
+  catch (...)
+  {
+    std::cerr << "failed to parse line" << std::endl;
+  }
 
   return std::make_pair(success, line);
 }

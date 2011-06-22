@@ -112,4 +112,32 @@ BOOST_AUTO_TEST_CASE( extra_spaces )
   BOOST_CHECK_EQUAL(n.second, TL::u32string());
 }
 
+BOOST_AUTO_TEST_CASE( percent )
+{
+  std::string input = "eqn x = 42;;\n%%\nx;;";
+
+  TL::Parser::U32Iterator iter(
+    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.end())
+  );
+
+  TL::LineTokenizer tokenize(iter);
+
+  auto n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn x = 42;;"));
+
+  n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_PERCENT);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"%%"));
+
+  n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"x;;"));
+
+  n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
+  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
