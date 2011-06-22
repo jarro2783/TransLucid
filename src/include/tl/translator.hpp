@@ -162,15 +162,12 @@ namespace TransLucid
     Translator(System& system);
     ~Translator();
 
-    #if 0
     /**
-     * Translate an expression into a hyperdaton.
-     * Parses and compiles an expression string.
-     * @param s The string representing the expression.
+     * Parses an expression into an AST.
+     * @param iter The iterator pointing to the start of the text.
      */
-    WS*
-    translate_expr(const u32string& s);
-    #endif
+    std::pair<bool, Tree::Expr>
+    parseExpr(Parser::U32Iterator& iter);
 
     /**
      * Add to the header. Parses the input string as a sequence of header

@@ -677,4 +677,10 @@ System::parseInstant
   );
 }
 
+std::pair<bool, Tree::Expr>
+System::parseExpression(Parser::U32Iterator& iter)
+{
+  return m_translator->parseExpr(iter);
+}
+
 } //namespace TransLucid

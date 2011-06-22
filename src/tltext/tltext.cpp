@@ -93,7 +93,9 @@ TLText::run()
   #endif
 
   LineTokenizer tokenizer(begin);
-  while (!tokenizer.end())
+
+  bool done = false;
+  while (!done)
   {
     auto line = tokenizer.next();
 
@@ -102,7 +104,107 @@ TLText::run()
       Parser::makeUTF32Iterator(line.second.end())
     );
 
-    m_system.parseLine(lineBegin);
+    auto defs = processDefinitions(tokenizer);
+
+    //only continue if the instant is valid
+    if (defs.first)
+    {
+      //only parse expressions if the right tokens were seen
+      if (defs.second)
+      {
+        processExpressions(tokenizer);
+      }
+
+      //now process the instant
+    }
+    else
+    {
+      done = true;
+    }
+  }
+}
+
+std::pair<bool, bool>
+TLText::processDefinitions(LineTokenizer& tokenizer)
+{
+  bool instantValid = true;
+  bool parseExpressions = true;
+
+  auto line = tokenizer.next();
+
+  if (line.first == LineType::EMPTY)
+  {
+    instantValid = false;
+  }
+  else
+  {
+    bool done = false;
+    while (!done)
+    {
+      switch(line.first)
+      {
+        case LineType::LINE:
+        //parse a line with the system
+        {
+          Parser::U32Iterator lineBegin(
+            Parser::makeUTF32Iterator(line.second.begin()),
+            Parser::makeUTF32Iterator(line.second.end())
+          );
+
+          auto result = m_system.parseLine(lineBegin);
+        }
+        break;
+
+        case LineType::DOUBLE_DOLLAR:
+        case LineType::EMPTY:
+        parseExpressions = false;
+        done = true;
+        break;
+
+        case LineType::DOUBLE_PERCENT:
+        done = true;
+        break;
+      }
+
+      line = tokenizer.next();
+    }
+  }
+
+  return std::make_pair(instantValid, parseExpressions);
+}
+
+void
+TLText::processExpressions(LineTokenizer& tokenizer)
+{
+  bool done = false;
+  while (!done)
+  {
+    auto line = tokenizer.next();
+
+    switch(line.first)
+    {
+      case LineType::LINE:
+      //parse an expression
+      {
+        Parser::U32Iterator lineBegin(
+          Parser::makeUTF32Iterator(line.second.begin()),
+          Parser::makeUTF32Iterator(line.second.end())
+        );
+
+        auto expr = m_system.parseExpression(lineBegin);
+      }
+      break;
+
+      case LineType::DOUBLE_DOLLAR:
+      case LineType::EMPTY:
+      //end happily
+      done = true;
+      break;
+
+      case LineType::DOUBLE_PERCENT:
+      //ignore
+      break;
+    }
   }
 }
 

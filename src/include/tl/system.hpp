@@ -48,11 +48,6 @@ namespace TransLucid
 
   class Translator;
 
-  namespace detail
-  {
-    class LineAdder;
-  }
-
   /**
    * @brief System base class.
    *
@@ -126,6 +121,11 @@ namespace TransLucid
     Constant
     parseLine(Parser::U32Iterator& begin);
 
+    //parses an expression, returns a tree of the expression as parsed by
+    //the current definitions of the system
+    std::pair<bool, Tree::Expr>
+    parseExpression(Parser::U32Iterator& iter);
+
     bool 
     parseInstant
     (
@@ -170,8 +170,6 @@ namespace TransLucid
       UnaryHashSet;
     typedef std::unordered_map<uuid, BinaryHashes, boost::hash<uuid>>
       BinaryHashSet;
-
-    friend class LineAdder;
 
     //initialises the type indexes
     void

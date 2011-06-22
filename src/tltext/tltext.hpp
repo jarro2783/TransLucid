@@ -40,6 +40,8 @@ namespace TransLucid
     class Header;
   }
 
+  class LineTokenizer;
+
   /**
    * The TLText namespace. Contains all of the tlcore implementation.
    */
@@ -156,6 +158,13 @@ namespace TransLucid
       //does the actual adding to the system
       void
       addNewEquations();
+
+      //is the instant valid, do we parse expressions
+      std::pair<bool, bool>
+      processDefinitions(LineTokenizer& line);
+
+      void
+      processExpressions(LineTokenizer& line);
     };
   }
 }

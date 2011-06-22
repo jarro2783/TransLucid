@@ -97,33 +97,26 @@ Translator::~Translator()
   cleanup();
 }
 
-#if 0
-WS*
-Translator::translate_expr(const u32string& u32s)
+std::pair<bool, Tree::Expr>
+Translator::parseExpr(Parser::U32Iterator& iter)
 {
-  Lexer::base_iterator_t pos
-  (
-    Parser::makeUTF32Iterator(u32s.begin()),
-    Parser::makeUTF32Iterator(u32s.end())
-  );
+  Parser::U32Iterator end;
+
   Tree::Expr e;
   
   bool success = boost::spirit::lex::tokenize_and_parse(
-    pos,
-    Lexer::base_iterator_t(),
+    iter,
+    end,
     m_parsers->m_lexer,
     m_parsers->m_expr,
     e);
-
-  //std::cerr << "pos at: ";
-  //std::cerr << *pos << std::endl;
 
   if (success == false)
   {
     std::cerr << "failed to parse" << std::endl;
   }
 
-  if (pos != Lexer::base_iterator_t())
+  if (iter != end)
   {
     std::cerr << "didn't read all input" << std::endl;
   }
@@ -135,11 +128,8 @@ Translator::translate_expr(const u32string& u32s)
   }
   #endif
 
-  m_lastExpr = e;
-
-  return m_compiler.compile_top_level(e);
+  return std::make_pair(success, e);
 }
-#endif
 
 std::pair<bool, std::pair<Parser::Equation, Parser::DeclType>>
 Translator::parseEquation
