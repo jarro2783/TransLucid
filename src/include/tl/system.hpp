@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/dimtranslator.hpp>
 #include <tl/equation.hpp>
 #include <tl/function_registry.hpp>
-//#include <tl/physicalhds.hpp>
+#include <tl/hyperdaton.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
@@ -119,6 +119,13 @@ namespace TransLucid
     addUnaryOperator(const Tree::UnaryOperator& op);
 
     Constant
+    addOutputHyperdaton
+    (
+      const u32string& name,
+      OutputHD* hd
+    );
+
+    Constant
     parseLine(Parser::U32Iterator& begin);
 
     //parses an expression, returns a tree of the expression as parsed by
@@ -137,13 +144,6 @@ namespace TransLucid
     uuid
     addExpr();
 
-    //output hyperdatons, set of context
-    //void
-    //eval(const std::list<uuid>& exprs, PhysicalWS* out);
-
-    //WS*
-    //translate_expr(const u32string& s);
-
     bool
     parse_header(const u32string& s);
 
@@ -161,6 +161,10 @@ namespace TransLucid
 
     private:
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
+    typedef std::unordered_map<u32string, OutputHD*> OutputHDMap;
+
+    typedef std::unordered_map<uuid, u32string, boost::hash<uuid>> 
+      UUIDStringMap;
 
     // OPTYPE, ATL_SYMBOL
     typedef std::tuple<uuid, uuid> UnaryHashes;
@@ -218,6 +222,10 @@ namespace TransLucid
 
     DefinitionMap m_equations;
     DefinitionMap m_assignments;
+
+    //maps of string to hds and the hds uuids
+    OutputHDMap m_outputHDs;
+    UUIDStringMap m_outputUUIDs;
 
     //the uuid generator
     boost::uuids::basic_random_generator<boost::mt19937>

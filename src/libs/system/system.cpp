@@ -371,43 +371,19 @@ System::~System()
 void
 System::go()
 {
-  #if 0
-  tuple_t current;
-  current[DIM_TIME] = Constant(Intmp(m_time), TYPE_INDEX_INTMP);
-
-  tuple_t toSave = current;
-
-  Tuple k(current);
-
-  //run the applicable demands
-
-  for(const DemandStore::value_type& d : m_demands)
-  {
-    Tuple t = d.second.evaluate(Tuple());
-    if (tupleApplicable(t, k))
-    {
-      IOList::const_iterator iter = m_variables.find(d.first);
-      if (iter != m_variables.end())
-      {
-        //evaluate the demand
-        TaggedConstant r = (*iter->second)(k);
-        //save it in the output
-        toSave[DIM_VALUE] = r.first;
-        IOList::iterator iter = m_outputs.find(d.first);
-        if (iter != m_outputs.end())
-        {
-          iter->second->addExpr(Tuple(toSave), 0);
-        }
-      }
-    }
-  }
-
-  ++m_time;
-  #endif
-
   for (const auto& ident : m_assignments)
   {
     std::cerr << "evaluating " << ident.first << std::endl;
+
+    auto hd = m_outputHDs.find(ident.first);
+
+    if (hd == m_outputHDs.end())
+    {
+      std::cerr << "warning: output hyperdaton \"" << ident.first
+        << "\" doesn't exist" << std::endl;
+      continue;
+    }
+
     auto equations = ident.second->equations();
     for (auto& assign : equations)
     {
@@ -422,6 +398,8 @@ System::go()
       {
         TaggedConstant v = assign.second(k);
 
+        hd->second->put(k, v.first);
+
         std::cout << "type: " << v.first.index() << std::endl;
 
         if (v.first.index() == TYPE_INDEX_INTMP)
@@ -429,6 +407,7 @@ System::go()
           std::cout << "value: " << get_constant_pointer<mpz_class>(v.first) 
             << std::endl;
         }
+
         //std::cout << ident.first << " = " << v.first << std::endl;
       }
     }
@@ -713,6 +692,30 @@ std::pair<bool, Tree::Expr>
 System::parseExpression(Parser::U32Iterator& iter)
 {
   return m_translator->parseExpr(iter);
+}
+
+Constant
+System::addOutputHyperdaton
+(
+  const u32string& name,
+  OutputHD* hd
+)
+{
+  //make sure the name isn't already there
+  auto i = m_outputHDs.find(name);
+
+  if (i == m_outputHDs.end())
+  {
+    m_outputHDs.insert(std::make_pair(name, hd));
+    uuid u = m_uuid_generator();
+    m_outputUUIDs.insert(std::make_pair(u, name));
+
+    return Types::UUID::create(u);
+  }
+  else
+  {
+    return Types::Special::create(SP_MULTIDEF); 
+  }
 }
 
 } //namespace TransLucid
