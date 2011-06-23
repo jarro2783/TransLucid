@@ -66,6 +66,11 @@ ostream& operator<<(ostream& os, const pair<TL::u32string, TL::u32string>& p)
 
 }
 
+namespace
+{
+  TransLucid::System theSystem;
+}
+
 BOOST_AUTO_TEST_SUITE( lexer_tests )
 
 enum Keyword
@@ -272,7 +277,7 @@ struct checker_grammar
         | real
         | constant
         | tok.character_[ph::bind(&Checker::character, m_checker, _1)]
-        | tok.any_[ph::bind(&Checker::identifier, m_checker, _1)]
+        | tok.operator_[ph::bind(&Checker::identifier, m_checker, _1)]
         )
         >> qi::eoi
       ;
@@ -346,7 +351,7 @@ typedef checker_grammar<TL::Lexer::iterator_t> cgrammar;
 bool check(const TL::u32string& input, Checker& checker)
 {
   TL::Parser::Errors errors;
-  TL::Lexer::tl_lexer lexer(errors);
+  TL::Lexer::tl_lexer lexer(errors, theSystem);
   cgrammar checkg(lexer, checker);
 
   TL::Parser::U32Iterator first(
@@ -372,7 +377,7 @@ bool check_utf8(const std::string& input, Checker& checker)
   TL::Parser::U32Iterator last;
 
   TL::Parser::Errors errors;
-  TL::Lexer::tl_lexer lexer(errors);
+  TL::Lexer::tl_lexer lexer(errors, theSystem);
   cgrammar checkg(lexer, checker);
 
   return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last
@@ -514,7 +519,7 @@ BOOST_AUTO_TEST_CASE ( floats )
 
 BOOST_AUTO_TEST_CASE ( symbols )
 {
-  TL::u32string input = U":[].=&#@\\ \\\\..()->|;;\\\\\\ %%<-";
+  TL::u32string input = UR"*(: [ ] . = & # @ \ \\ .. ( ) -> | ;; \\\ %% <-)*";
   Checker checker({
     TOKEN_COLON,
     TOKEN_OBRACKET,
@@ -543,7 +548,7 @@ BOOST_AUTO_TEST_CASE ( symbols )
 
 BOOST_AUTO_TEST_CASE ( mixed )
 {
-  TL::u32string input = U"intmp @ 10 (hello if) cats [1 : 5]";
+  TL::u32string input = U"intmp @ 10 (hello if) cats [1 <- 5]";
   Checker checker({
     U"intmp",
     TOKEN_AT,
@@ -555,7 +560,7 @@ BOOST_AUTO_TEST_CASE ( mixed )
     U"cats",
     TOKEN_OBRACKET,
     mpz_class(1),
-    TOKEN_COLON,
+    TOKEN_MAPS,
     mpz_class(5),
     TOKEN_CBRACKET
   });
@@ -566,12 +571,13 @@ BOOST_AUTO_TEST_CASE ( mixed )
 BOOST_AUTO_TEST_CASE ( any )
 {
   BOOST_TEST_MESSAGE("testing the any symbol");
-  TL::u32string input = U"4 % -5";
+  TL::u32string input = U"4 % -5 <<";
   Checker checker({
     mpz_class(4),
     U"%",
     U"-",
-    mpz_class(5)
+    mpz_class(5),
+    U"<<"
   });
 
   check(input, checker);

@@ -38,6 +38,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/lexer_util.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
+#include <tl/system.hpp>
 #include <tl/utility.hpp>
 
 namespace TransLucid
@@ -78,7 +79,7 @@ namespace TransLucid
     template <typename Lexer>
     struct lex_tl_tokens : lex::lexer<Lexer>
     {
-      lex_tl_tokens(Parser::Errors& errors);
+      lex_tl_tokens(Parser::Errors& errors, System& system);
 
       lex::token_def<lex::unused_type, lex_char_type> 
         //keywords
@@ -104,7 +105,7 @@ namespace TransLucid
       ;
 
       lex::token_def<u32string, lex_char_type>
-        identifier_, any_
+        identifier_, operator_
       ;
 
       lex::token_def<value_wrapper<mpz_class>, lex_char_type> 
@@ -133,6 +134,7 @@ namespace TransLucid
       //std::wstring m_constant_type;
       //std::wstring m_constant_value;
       Parser::Errors& m_errors;
+      System::IdentifierLookup m_identifiers;
     };
 
     //the lexer class

@@ -39,8 +39,8 @@ namespace detail
 {
   struct AllParsers
   {
-    AllParsers(Parser::Header& h)
-    : m_lexer(m_errors)
+    AllParsers(Parser::Header& h, System& system)
+    : m_lexer(m_errors, system)
     , m_expr(h, m_lexer)
     , m_equation(m_lexer)
     , m_tuple(m_lexer)
@@ -84,7 +84,7 @@ Translator::Translator(System& system)
   {
     m_header = new Parser::Header;
 
-    m_parsers = new detail::AllParsers(*m_header);
+    m_parsers = new detail::AllParsers(*m_header, system);
   }
   catch (...)
   {

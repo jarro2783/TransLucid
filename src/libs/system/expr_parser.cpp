@@ -201,7 +201,7 @@ namespace TransLucid
       binary_op =
          prefix_expr [_a = _1]
       >> (
-           *(   tok.any_
+           *(   tok.operator_
              >> prefix_expr
             )
             [
@@ -233,7 +233,7 @@ namespace TransLucid
       #if 0
          at_expr [_a = _1]
       >> (
-           ( tok.any_
+           ( tok.operator_
              [
                _val = construct<Tree::UnaryOpExpr>(_1, _a)
              ]

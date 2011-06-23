@@ -27,7 +27,7 @@ namespace Lexer
 {
 
 template <typename Lexer>
-lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
+lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
 : if_(L"if")
 , fi_(L"fi")
 , where_(L"where")
@@ -39,6 +39,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
 //, spaces(L"([ \\n\\t])|(\\/\\/[^\\n]*\\n)")
 , spaces(L"[ \\n\\t]")
 , m_errors(errors)
+, m_identifiers(system.lookupIdentifiers())
 {
   using boost::phoenix::ref;
   using lex::_val;
@@ -109,7 +110,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   infix_binary_ = L"infix[lrnpm]";
   unary_ =        L"(prefix)|(postfix)";
 
-  any_ = L".+?";
+  operator_ = LR"**([!@#\$%\^&\*\(\)\-_\:;\?/<>=]+)**";
 
   this->self =
     spaces[lex::_pass = lex::pass_flags::pass_ignore]
@@ -166,14 +167,15 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors)
   | dollar_
   
   | identifier_
+  | operator_
   ;
 
   //anything else not matched
-  this->self.add(any_)
+  //this->self.add(operator_)
   ;
 }
 
-template lex_tl_tokens<lexer_type>::lex_tl_tokens(Parser::Errors&);
+template lex_tl_tokens<lexer_type>::lex_tl_tokens(Parser::Errors&, System&);
 
 } //namespace Lexer
 
