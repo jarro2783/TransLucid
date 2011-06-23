@@ -400,14 +400,6 @@ System::go()
 
         hd->second->put(k, v.first);
 
-        std::cout << "type: " << v.first.index() << std::endl;
-
-        if (v.first.index() == TYPE_INDEX_INTMP)
-        {
-          std::cout << "value: " << get_constant_pointer<mpz_class>(v.first) 
-            << std::endl;
-        }
-
         //std::cout << ident.first << " = " << v.first << std::endl;
       }
     }

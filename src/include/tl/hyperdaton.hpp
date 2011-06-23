@@ -54,6 +54,8 @@ namespace TransLucid
       this->init(lt);
     }
 
+    virtual ~InputHD() = default;
+
     virtual Constant
     get(const Tuple& k) const = 0;
   };
@@ -66,6 +68,8 @@ namespace TransLucid
       this->init(lt);
     }
 
+    virtual ~OutputHD() = default;
+
     virtual void
     put(const Tuple& k, const Constant& c) = 0;
   };
@@ -77,6 +81,8 @@ namespace TransLucid
     : InputHD(lt), OutputHD(lt)
     {
     }
+
+    virtual ~IOHD() throw() = default;
   };
 
   #if 0

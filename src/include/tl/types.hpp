@@ -174,20 +174,13 @@ namespace TransLucid
     {
       if (data.field == TYPE_FIELD_PTR)
       {
-        --data.ptr->refCount;
-
-        if (data.ptr->refCount == 0)
-        {
-          (*data.ptr->functions->destroy)(data.ptr->data);
-          //destroy object here
-          delete data.ptr;
-        }
+        removeReference();    
       }
     }
 
     Constant(Constant&& other)
     {
-      memcpy(&data, &other.data, sizeof(data));
+      copyData(other);
       other.data.ptr = nullptr;
       other.data.index = 0;
       other.data.field = TYPE_FIELD_ERROR;
@@ -202,11 +195,32 @@ namespace TransLucid
 
     Constant(const Constant& other)
     {
-      memcpy(&data, &other.data, sizeof(data));
+      copyData(other);
       if (other.data.field == TYPE_FIELD_PTR)
       {
-        ++data.ptr->refCount;
+        increaseReference();
       }
+    }
+
+    Constant&
+    operator=(const Constant& rhs)
+    {
+      if (this != &rhs)
+      {
+        //nothrow assignment
+        if (data.field == TYPE_FIELD_PTR)
+        {
+          removeReference();
+        }
+
+        copyData(rhs);
+
+        if (data.field == TYPE_FIELD_PTR)
+        {
+          increaseReference();
+        }
+      }
+      return *this;
     }
 
     template <typename T>
@@ -269,6 +283,32 @@ namespace TransLucid
       type_index index;
       TypeField field;
     } data;
+
+    private:
+
+    void
+    removeReference()
+    {
+      --data.ptr->refCount;
+
+      if (data.ptr->refCount == 0)
+      {
+        (*data.ptr->functions->destroy)(data.ptr->data);
+        delete data.ptr;
+      }
+    }
+
+    void 
+    increaseReference()
+    {
+      ++data.ptr->refCount;
+    }
+
+    void
+    copyData(const Constant& other)
+    {
+      memcpy(&data, &other.data, sizeof(data));
+    }
   };
 
   inline size_t

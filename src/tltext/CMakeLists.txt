@@ -12,7 +12,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 link_directories(${Boost_LIBRARY_DIRS})
-add_executable(tltext main.cpp tltext.cpp)
+add_executable(tltext main.cpp tltext.cpp demandhd.cpp)
 target_link_libraries(tltext tlsystem ${Boost_LIBRARIES})
 add_definitions(${TLCFLAGS})
 

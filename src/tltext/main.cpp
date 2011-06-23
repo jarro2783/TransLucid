@@ -71,7 +71,6 @@ int main(int argc, char *argv[])
   po::variables_map vm;
   po::options_description desc("tltext options");
   desc.add_options()
-    ("demands", "demand system")
     ("help,h", "show this message")
     ("input,i", po::value<std::string>(), "input file")
     ("output,o", po::value<std::string>(), "output file")
@@ -117,11 +116,6 @@ int main(int argc, char *argv[])
   if (vm.count("reactive"))
   {
     tltext.reactive(true);
-  }
-
-  if (vm.count("demands"))
-  {
-    tltext.demands(true);
   }
 
   if (vm.count("uuid"))

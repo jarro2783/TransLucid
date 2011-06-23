@@ -1,5 +1,5 @@
 /* Core TransLucid application header.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/library.hpp>
 //#include <tl/parser_header_util.hpp>
 #include <tl/expr_compiler.hpp>
+
+#include "demandhd.hpp"
 
 /**
  * @file src/tlcore/tlcore.hpp
@@ -64,6 +66,8 @@ namespace TransLucid
        */
       TLText();
 
+      ~TLText();
+
       /**
        * Set verbose.
        * @param v @b true to turn verbose on, @b false to turn it off.
@@ -82,16 +86,6 @@ namespace TransLucid
       reactive(bool r)
       {
         m_reactive = r;
-      }
-
-      /**
-       * Set demands.
-       * @param d @b true to turn demands on, @b false to turn them off.
-       */
-      void
-      demands(bool d)
-      {
-        m_demands = d;
       }
 
       /**
@@ -135,7 +129,6 @@ namespace TransLucid
       private:
       bool m_verbose;
       bool m_reactive;
-      bool m_demands;
       bool m_uuids;
 
       std::istream* m_is;
@@ -165,6 +158,8 @@ namespace TransLucid
 
       std::vector<Tree::Expr>
       processExpressions(LineTokenizer& line);
+
+      DemandHD* m_demands;
     };
   }
 }

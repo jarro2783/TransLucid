@@ -1,5 +1,5 @@
 /* Core TransLucid application implementation.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/expr_parser.hpp>
 #include <tl/equation_parser.hpp>
 #include <tl/line_tokenizer.hpp>
+#include <tl/types_util.hpp>
 #include <tl/tuple_parser.hpp>
 #include <tl/system.hpp>
 #include <tl/expr_compiler.hpp>
@@ -59,7 +60,6 @@ TLText::TLText()
 : 
   m_verbose(false)
  ,m_reactive(false)
- ,m_demands(false)
  ,m_uuids(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
@@ -68,6 +68,15 @@ TLText::TLText()
  ,m_lastLibLoaded(0)
 {
   m_libtool.addSearchPath(to_u32string(std::string(PREFIX "/share/tl")));
+
+  m_demands = new DemandHD(m_system);
+
+  m_system.addOutputHyperdaton(U"demand", m_demands);
+}
+
+TLText::~TLText()
+{
+  delete m_demands;
 }
 
 void 
@@ -136,6 +145,17 @@ TLText::run()
 
       //run the demands
       m_system.go();
+
+      //print some stuff
+      for (int s = 0; s != slot; ++s)
+      {
+        const auto& c = (*m_demands)(s);
+        if (c.index() == TYPE_INDEX_INTMP)
+        {
+          std::cout << "intmp<" << get_constant_pointer<mpz_class>(c)
+            << ">" << std::endl;
+        }
+      }
     }
     else
     {
