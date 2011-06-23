@@ -106,6 +106,8 @@ namespace TransLucid
 
       lex::token_def<u32string, lex_char_type>
         identifier_, operator_
+        //fake tokens for operators
+        , binary_op_
       ;
 
       lex::token_def<value_wrapper<mpz_class>, lex_char_type> 
@@ -135,6 +137,7 @@ namespace TransLucid
       //std::wstring m_constant_value;
       Parser::Errors& m_errors;
       System::IdentifierLookup m_identifiers;
+      Tuple* m_context;
     };
 
     //the lexer class

@@ -278,6 +278,7 @@ struct checker_grammar
         | constant
         | tok.character_[ph::bind(&Checker::character, m_checker, _1)]
         | tok.operator_[ph::bind(&Checker::identifier, m_checker, _1)]
+        | tok.binary_op_[ph::bind(&Checker::identifier, m_checker, _1)]
         )
         >> qi::eoi
       ;
@@ -568,9 +569,9 @@ BOOST_AUTO_TEST_CASE ( mixed )
   check(input, checker);
 }
 
-BOOST_AUTO_TEST_CASE ( any )
+BOOST_AUTO_TEST_CASE ( operators )
 {
-  BOOST_TEST_MESSAGE("testing the any symbol");
+  BOOST_TEST_MESSAGE("testing the operator symbol");
   TL::u32string input = U"4 % -5 <<";
   Checker checker({
     mpz_class(4),

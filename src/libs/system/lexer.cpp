@@ -26,6 +26,11 @@ namespace TransLucid
 namespace Lexer
 {
 
+enum OpTokens
+{
+  TOK_BINARY_OP = 1000
+};
+
 template <typename Lexer>
 lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
 : if_(L"if")
@@ -38,6 +43,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
 , false_(L"false")
 //, spaces(L"([ \\n\\t])|(\\/\\/[^\\n]*\\n)")
 , spaces(L"[ \\n\\t]")
+, binary_op_(L".", TOK_BINARY_OP)
 , m_errors(errors)
 , m_identifiers(system.lookupIdentifiers())
 {
@@ -167,7 +173,12 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   | dollar_
   
   | identifier_
-  | operator_
+  | operator_ 
+    [
+      //detail::handle_operator<decltype(binary_op_)>(m_identifiers, binary_op_)
+      detail::handle_operator(m_identifiers, binary_op_, m_context)
+    ]
+  | binary_op_
   ;
 
   //anything else not matched
