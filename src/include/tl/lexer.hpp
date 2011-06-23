@@ -132,12 +132,16 @@ namespace TransLucid
         character_
       ;
 
+      //this must be set beforing entering the lexer, unfortunately
+      //there is no way to ensure this, so someone will probably forget...
+      const Tuple* m_context;
+
       private:
       //std::wstring m_constant_type;
       //std::wstring m_constant_value;
       Parser::Errors& m_errors;
       System::IdentifierLookup m_identifiers;
-      Tuple* m_context;
+      dimension_index m_symbolDim;
     };
 
     //the lexer class

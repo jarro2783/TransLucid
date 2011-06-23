@@ -170,9 +170,11 @@ GuardWS makeGuardWithTime(const mpz_class& start)
   return g;
 }
 
+#if 0
 bool VariableWS::equationValid(const EquationWS& e, const Tuple& k)
 {
 }
+#endif
 
 TaggedConstant
 VariableWS::operator()(const Tuple& k)

@@ -360,6 +360,8 @@ System::System()
   //set this as the default int too
   //addEquation(U"DEFAULTINT", GuardWS(), intmpWS);
 
+  setDefaultContext();
+
   m_translator = new Translator(*this);
 }
 
@@ -371,14 +373,6 @@ System::~System()
 void
 System::go()
 {
-  Tuple context
-  (
-    tuple_t
-      {
-        {DIM_TIME, Types::Intmp::create(m_time)}
-      }
-  );
-
   for (const auto& ident : m_assignments)
   {
     std::cerr << "evaluating " << ident.first << std::endl;
@@ -398,7 +392,7 @@ System::go()
       Tuple k;
       const GuardWS& guard = assign.second.validContext();
 
-      k = guard.evaluate(context);
+      k = guard.evaluate(m_defaultk);
 
       auto time = k.find(DIM_TIME);
       if ((time == k.end() ||
@@ -413,6 +407,10 @@ System::go()
       }
     }
   }
+
+  ++m_time;
+
+  setDefaultContext();
 }
 
 uuid
@@ -451,7 +449,7 @@ System::parseLine(Parser::U32Iterator& begin)
   std::cerr << "parse line..." << std::endl;
   Parser::U32Iterator end;
 
-  auto result = m_translator->parseLine(begin);
+  auto result = m_translator->parseLine(begin, m_defaultk);
 
   if (result.first)
   {
@@ -717,6 +715,18 @@ System::addOutputHyperdaton
   {
     return Types::Special::create(SP_MULTIDEF); 
   }
+}
+
+void
+System::setDefaultContext()
+{
+  m_defaultk = Tuple
+  (
+    tuple_t
+      {
+        {DIM_TIME, Types::Intmp::create(m_time)}
+      }
+  );
 }
 
 } //namespace TransLucid

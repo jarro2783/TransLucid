@@ -46,6 +46,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
 , binary_op_(L".", TOK_BINARY_OP)
 , m_errors(errors)
 , m_identifiers(system.lookupIdentifiers())
+, m_symbolDim(system.getDimensionIndex(U"symbol"))
 {
   using boost::phoenix::ref;
   using lex::_val;
@@ -176,7 +177,13 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   | operator_ 
     [
       //detail::handle_operator<decltype(binary_op_)>(m_identifiers, binary_op_)
-      detail::handle_operator(m_identifiers, binary_op_, m_context)
+      detail::handle_operator
+      (
+        m_identifiers, 
+        binary_op_, 
+        m_context, 
+        m_symbolDim
+      )
     ]
   | binary_op_
   ;

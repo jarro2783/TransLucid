@@ -108,6 +108,19 @@ Tuple::Tuple(const tuple_t& tuple)
 }
 
 Tuple
+Tuple::at(const tuple_t& k) const
+{
+  tuple_t result = *m_value;
+
+  for (auto v : k)
+  {
+    result.insert(v);
+  }
+
+  return Tuple(result);
+}
+
+Tuple
 Tuple::insert(size_t key, const Constant& value) const
 {
   tuple_t t = *m_value;

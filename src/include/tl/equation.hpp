@@ -290,7 +290,8 @@ namespace TransLucid
     std::pair<uuid, UUIDEquationMap::iterator>
     addExprActual(const Tuple& k, WS* e);
 
-    bool equationValid(const EquationWS& e, const Tuple& k);
+    //bool 
+    //equationValid(const EquationWS& e, const Tuple& k);
 
     UUIDEquationMap m_equations;
 

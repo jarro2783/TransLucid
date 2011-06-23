@@ -344,6 +344,11 @@ namespace TransLucid
     {
     }
 
+    Tuple(tuple_t&& rhs)
+    : m_value(new tuple_t(std::move(rhs)))
+    {
+    }
+
     Tuple* clone() const
     {
       return new Tuple(*this);
@@ -367,6 +372,10 @@ namespace TransLucid
     {
       return m_value->end();
     }
+
+    //perturb the current tuple and return a new one
+    Tuple
+    at(const tuple_t& k) const;
 
     Tuple
     insert(size_t key, const Constant& value) const;

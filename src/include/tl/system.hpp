@@ -220,6 +220,9 @@ namespace TransLucid
     Constant
     addDeclInternal(const Parser::Equation& eqn, DefinitionMap& declarations);
 
+    void
+    setDefaultContext();
+
     DefinitionMap m_equations;
     DefinitionMap m_assignments;
 
@@ -248,6 +251,8 @@ namespace TransLucid
     //give ourselves a function registry which can register functions of
     //up to ten arguments
     FunctionRegistry<10> m_functions;
+
+    Tuple m_defaultk;
 
     public:
 

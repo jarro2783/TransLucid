@@ -40,6 +40,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/lexer_util.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/system.hpp>
+#include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
 #define XSTRING(x) STRING(x)
@@ -485,16 +486,23 @@ namespace TransLucid
         System::IdentifierLookup& m_idents;
         //BinTok& m_binaryOp;
         int m_binaryOp;
-        Tuple*& m_context;
+        const Tuple*& m_context;
+        dimension_index m_symbol;
 
         public:
         template <typename BinTok>
-        handle_operator(System::IdentifierLookup& idents, BinTok& binary,
-          Tuple*& context)
+        handle_operator
+        (
+          System::IdentifierLookup& idents, 
+          BinTok& binary,
+          const Tuple*& context,
+          dimension_index symbol
+        )
         : m_idents(idents)
         //, m_binaryOp(binary)
         , m_binaryOp(binary.id())
         , m_context(context)
+        , m_symbol(symbol)
         {
           std::cerr << "The binary op id is " << m_binaryOp << std::endl;
         }
@@ -514,6 +522,34 @@ namespace TransLucid
           //appropriately
           //std::cerr << "The binary op id is " << m_binaryOp.id() << std::endl;
           //id = m_binaryOp.id();
+
+          //need OPTYPE @ [symbol <- u32string(first, last)]
+          WS* ws = m_idents.lookup(U"OPTYPE");
+          Constant v = (*ws)(m_context->at(
+              tuple_t{
+                {
+                  m_symbol,
+                  Types::String::create(u32string(first, last))
+                }
+              }
+            )
+          ).first;
+
+          //the result is either a string or a special, just ignore if not
+          //a string
+          if (v.index() == TYPE_INDEX_USTRING)
+          {
+            const u32string& type = get_constant_pointer<u32string>(v);
+
+            if (type == U"BINARY")
+            {
+            }
+          }
+          else
+          {
+            matched = lex::pass_flags::pass_fail;
+          }
+
           id = m_binaryOp;
 
           ctx.set_value(u32string(first, last));

@@ -196,7 +196,8 @@ namespace TransLucid
     std::pair<bool, Parser::Line>
     parseLine
     (
-      Parser::U32Iterator& begin
+      Parser::U32Iterator& begin,
+      const Tuple& k
     );
 
     /**

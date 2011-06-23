@@ -234,11 +234,14 @@ Translator::parseInstant
 std::pair<bool, Parser::Line>
 Translator::parseLine
 (
-  Parser::U32Iterator& begin
+  Parser::U32Iterator& begin,
+  const Tuple& k
 )
 {
   Parser::Line line;
   Parser::U32Iterator end;
+
+  m_parsers->m_lexer.m_context = &k;
 
   Lexer::lexer_type::iterator_type iter = 
     m_parsers->m_lexer.begin(begin, end);
@@ -285,6 +288,8 @@ Translator::parseLine
   {
     std::cerr << "failed to parse line" << std::endl;
   }
+
+  m_parsers->m_lexer.m_context = 0;
 
   return std::make_pair(success, line);
 }
