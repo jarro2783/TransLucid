@@ -152,8 +152,8 @@ TLText::run()
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_INTMP)
         {
-          std::cout << "intmp<" << get_constant_pointer<mpz_class>(c)
-            << ">" << std::endl;
+          std::cout << get_constant_pointer<mpz_class>(c)
+            << std::endl;
         }
       }
     }

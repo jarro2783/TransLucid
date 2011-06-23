@@ -371,6 +371,14 @@ System::~System()
 void
 System::go()
 {
+  Tuple context
+  (
+    tuple_t
+      {
+        {DIM_TIME, Types::Intmp::create(m_time)}
+      }
+  );
+
   for (const auto& ident : m_assignments)
   {
     std::cerr << "evaluating " << ident.first << std::endl;
@@ -390,13 +398,14 @@ System::go()
       Tuple k;
       const GuardWS& guard = assign.second.validContext();
 
-      k = guard.evaluate(Tuple());
+      k = guard.evaluate(context);
 
       auto time = k.find(DIM_TIME);
       if ((time == k.end() ||
           get_constant_pointer<mpz_class>(time->second) == m_time))
       {
-        TaggedConstant v = assign.second(k);
+        TaggedConstant v = 
+          assign.second(k.insert(DIM_TIME, Types::Intmp::create(m_time)));
 
         hd->second->put(k, v.first);
 
