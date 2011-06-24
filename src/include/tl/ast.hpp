@@ -261,6 +261,7 @@ namespace TransLucid
     class ParenExpr;
     class UnaryOpExpr;
     class BinaryOpExpr;
+    class BangOpExpr;
     class HashExpr;
     class TupleExpr;
     class IfExpr;
@@ -292,6 +293,7 @@ namespace TransLucid
       boost::recursive_wrapper<ParenExpr>,
       boost::recursive_wrapper<UnaryOpExpr>,
       boost::recursive_wrapper<BinaryOpExpr>,
+      boost::recursive_wrapper<BangOpExpr>,
       boost::recursive_wrapper<IfExpr>,
       boost::recursive_wrapper<HashExpr>,
       boost::recursive_wrapper<TupleExpr>,
@@ -402,6 +404,19 @@ namespace TransLucid
       Expr& lhs,
       Expr& rhs
     );
+
+    struct BangOpExpr
+    {
+      BangOpExpr() = default;
+
+      BangOpExpr(const u32string& name, std::vector<Expr> args)
+      : name(name), args(args)
+      {
+      }
+
+      u32string name;
+      std::vector<Expr> args;
+    };
 
     /**
      * An if expression. Represents if e1 then elsif e2 else fi.

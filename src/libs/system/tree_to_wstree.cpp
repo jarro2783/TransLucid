@@ -123,6 +123,19 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
   );
 }
 
+Tree::Expr
+TreeToWSTree::operator()(const Tree::BangOpExpr& e)
+{
+  std::vector<Tree::Expr> args;
+
+  for (auto expr : e.args)
+  {
+    args.push_back(boost::apply_visitor(*this, expr));
+  }
+
+  return Tree::BangOpExpr(e.name, args);
+}
+
 Tree::Expr TreeToWSTree::operator()(const Tree::IfExpr& e)
 {
   //do the elseifs

@@ -46,23 +46,6 @@ ExprCompiler::compile_for_equation(const Tree::Expr& e)
   return boost::apply_visitor(*this, e);
 }
 
-#if 0
-WS*
-ExprCompiler::compile_top_level(const Tree::Expr& e)
-{
-  WS* h = boost::apply_visitor(*this, e);
-
-  if (h == 0)
-  {
-    return 0;
-  }
-  else
-  {
-    //return new Hyperdatons::SystemEvaluationWS(m_system, h);
-  }
-}
-#endif
-
 WS*
 ExprCompiler::operator()(const Tree::nil& n)
 {
@@ -145,6 +128,12 @@ ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
   //this should be compiled out
   throw "ExprCompiler::operator()(BinaryOpExpr)";
   return 0;
+}
+
+WS*
+ExprCompiler::operator()(const Tree::BangOpExpr& e)
+{
+  #warning make a bangop workshop
 }
 
 WS*
