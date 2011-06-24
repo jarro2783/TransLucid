@@ -41,7 +41,7 @@ namespace detail
   {
     AllParsers(Parser::Header& h, System& system)
     : m_lexer(m_errors, system)
-    , m_expr(h, m_lexer)
+    , m_expr(m_lexer, system)
     , m_equation(m_lexer)
     , m_tuple(m_lexer)
     , m_header_grammar(m_lexer)
@@ -99,11 +99,14 @@ Translator::~Translator()
 }
 
 std::pair<bool, Tree::Expr>
-Translator::parseExpr(Parser::U32Iterator& iter)
+Translator::parseExpr(Parser::U32Iterator& iter, const Tuple& k)
 {
   Parser::U32Iterator end;
 
   Tree::Expr e;
+
+  m_parsers->m_lexer.m_context = &k;
+  m_parsers->m_expr.m_context = &k;
   
   bool success = boost::spirit::lex::tokenize_and_parse(
     iter,
@@ -121,6 +124,9 @@ Translator::parseExpr(Parser::U32Iterator& iter)
   {
     std::cerr << "didn't read all input" << std::endl;
   }
+
+  m_parsers->m_lexer.m_context = 0;
+  m_parsers->m_expr.m_context = 0;
 
   #if 0
   if (r == false || pos != Parser::iterator_t()) 
@@ -242,6 +248,7 @@ Translator::parseLine
   Parser::U32Iterator end;
 
   m_parsers->m_lexer.m_context = &k;
+  m_parsers->m_expr.m_context = &k;
 
   Lexer::lexer_type::iterator_type iter = 
     m_parsers->m_lexer.begin(begin, end);
@@ -290,6 +297,7 @@ Translator::parseLine
   }
 
   m_parsers->m_lexer.m_context = 0;
+  m_parsers->m_expr.m_context = 0;
 
   return std::make_pair(success, line);
 }

@@ -129,17 +129,29 @@ Tree::Expr
 construct_identifier
 (
   const u32string& id,
-  const ReservedIdentifierMap& ids
+  const System::IdentifierLookup& ids,
+  const Tuple*& context,
+  dimension_index nameDim
 )
 {
-  auto iter = ids.find(id);
-  if (iter == ids.end())
+  WS* ws = ids.lookup(U"DIM");
+
+  Constant v = (*ws)(context->at(tuple_t(
+    {
+      {
+        nameDim,
+        Types::String::create(id)
+      }
+    }
+  ))).first;
+
+  if (get_constant<bool>(v) == true)
   {
-    return Tree::IdentExpr(id);
+    return Tree::DimensionExpr(id);
   }
   else
   {
-    return iter->second;
+    return Tree::IdentExpr(id);
   }
 }
 

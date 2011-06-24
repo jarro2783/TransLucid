@@ -21,14 +21,14 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/assign/list_of.hpp>
 #include <tl/fixed_indexes.hpp>
 
+#include <initializer_list>
+
 namespace TransLucid
 {
 
 DimensionTranslator::DimensionTranslator()
 : m_nextIndex(DIM_INDEX_LAST)
-  , m_named(m_nextIndex)
-  , m_constants(m_nextIndex)
-  , m_namedDims
+, m_named(m_nextIndex, std::vector<std::pair<u32string, dimension_index>>
   {
    {U"type", DIM_TYPE},
    {U"text", DIM_TEXT},
@@ -36,9 +36,10 @@ DimensionTranslator::DimensionTranslator()
    {U"id", DIM_ID},
    {U"value", DIM_VALUE},
    {U"time", DIM_TIME},
-   {U"_validguard", DIM_VALID_GUARD},
    {U"all", DIM_ALL}
   }
+  )
+, m_constants(m_nextIndex)
 {
 }
 

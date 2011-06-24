@@ -278,7 +278,6 @@ struct checker_grammar
         | constant
         | tok.character_[ph::bind(&Checker::character, m_checker, _1)]
         | tok.operator_[ph::bind(&Checker::identifier, m_checker, _1)]
-        | tok.binary_op_[ph::bind(&Checker::identifier, m_checker, _1)]
         )
         >> qi::eoi
       ;

@@ -363,6 +363,10 @@ System::System()
   setDefaultContext();
 
   m_translator = new Translator(*this);
+
+  addDimension(U"time");
+  addDimension(U"name");
+  addDimension(U"symbol");
 }
 
 System::~System()
@@ -395,6 +399,7 @@ System::go()
       k = guard.evaluate(m_defaultk);
 
       auto time = k.find(DIM_TIME);
+
       if ((time == k.end() ||
           get_constant_pointer<mpz_class>(time->second) == m_time))
       {
@@ -404,6 +409,13 @@ System::go()
         hd->second->put(k, v.first);
 
         //std::cout << ident.first << " = " << v.first << std::endl;
+      }
+      else
+      {
+        std::cerr << "time of equation is " 
+                  << get_constant_pointer<mpz_class>(time->second) 
+                  << std::endl;
+        std::cerr << "equation not valid" << std::endl;
       }
     }
   }
@@ -690,7 +702,7 @@ System::parseInstant
 std::pair<bool, Tree::Expr>
 System::parseExpression(Parser::U32Iterator& iter)
 {
-  return m_translator->parseExpr(iter);
+  return m_translator->parseExpr(iter, m_defaultk);
 }
 
 Constant

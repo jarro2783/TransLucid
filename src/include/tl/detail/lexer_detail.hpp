@@ -479,32 +479,24 @@ namespace TransLucid
         }
       };
 
-      //template <typename BinTok>
       struct handle_operator
       {
         private:
         System::IdentifierLookup& m_idents;
-        //BinTok& m_binaryOp;
-        int m_binaryOp;
         const Tuple*& m_context;
         dimension_index m_symbol;
 
         public:
-        template <typename BinTok>
         handle_operator
         (
           System::IdentifierLookup& idents, 
-          BinTok& binary,
           const Tuple*& context,
           dimension_index symbol
         )
         : m_idents(idents)
-        //, m_binaryOp(binary)
-        , m_binaryOp(binary.id())
         , m_context(context)
         , m_symbol(symbol)
         {
-          std::cerr << "The binary op id is " << m_binaryOp << std::endl;
         }
 
         template <typename Iterator, typename Idtype, typename Context>
@@ -520,8 +512,6 @@ namespace TransLucid
         {
           //look up the operator in the system and set the match information
           //appropriately
-          //std::cerr << "The binary op id is " << m_binaryOp.id() << std::endl;
-          //id = m_binaryOp.id();
 
           //need OPTYPE @ [symbol <- u32string(first, last)]
           WS* ws = m_idents.lookup(U"OPTYPE");
@@ -543,14 +533,22 @@ namespace TransLucid
 
             if (type == U"BINARY")
             {
+              id = TOK_BINARY_OP;
+            }
+            else if (type == U"PREFIX")
+            {
+              id = TOK_PREFIX_OP;
+            }
+            else
+            {
+              //postfix
+              id = TOK_POSTFIX_OP;
             }
           }
           else
           {
             matched = lex::pass_flags::pass_fail;
           }
-
-          id = m_binaryOp;
 
           ctx.set_value(u32string(first, last));
         }
@@ -723,31 +721,6 @@ namespace boost { namespace spirit { namespace traits
       }
     }
   };
-  
-  #if 0
-  template <typename Iterator>
-  struct assign_to_attribute_from_iterators<TransLucid::u32string, Iterator>
-  {
-    static void
-    call
-    (
-      Iterator const& first,
-      Iterator const& last,
-      TransLucid::u32string& attr
-    )
-    {
-      attr.clear();
-      std::cerr << "constructing u32string" << std::endl;
-      Iterator current = first;
-      while (current != last)
-      {
-        attr += *current;
-        std::cerr << attr << std::endl;
-        ++current;
-      }
-    }
-  };
-  #endif
 
   template <>
   struct token_printer_debug<wchar_t>

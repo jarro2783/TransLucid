@@ -166,8 +166,7 @@ ConvertWS::operator()(const Tuple& k)
 TaggedConstant
 DimensionWS::operator()(const Tuple& k)
 {
-  dimension_index id = m_system.getDimensionIndex(m_name);
-  return TaggedConstant (Types::Dimension::create(id), k);
+  return TaggedConstant (Types::Dimension::create(m_id), k);
 }
 
 TaggedConstant

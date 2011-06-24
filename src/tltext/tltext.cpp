@@ -124,6 +124,8 @@ TLText::run()
       int slot = 0;
       size_t time = m_system.theTime();
 
+      std::cerr << "evaluating time " << time << std::endl;
+
       for (const Tree::Expr& e : exprs)
       {
         std::cerr << "adding demand slot " << slot << std::endl;
@@ -154,6 +156,26 @@ TLText::run()
         {
           std::cout << get_constant_pointer<mpz_class>(c)
             << std::endl;
+        }
+        else if (c.index() == TYPE_INDEX_SPECIAL)
+        {
+          std::cout << "special: " << get_constant<Special>(c)
+            << std::endl;
+        }
+        else if (c.index() == TYPE_INDEX_USTRING)
+        {
+          std::cout << "\"" << get_constant_pointer<u32string>(c) << "\""
+            << std::endl;
+        }
+        else if (c.index() == TYPE_INDEX_UCHAR)
+        {
+          std::cout << "'" << u32string(1, get_constant<char32_t>(c)) << "'"
+            << std::endl;
+        }
+        else if (c.index() == TYPE_INDEX_BOOL)
+        {
+          std::cout << std::boolalpha << get_constant<bool>(c) 
+                    << std::noboolalpha << std::endl;
         }
       }
     }

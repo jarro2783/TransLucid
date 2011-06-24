@@ -164,8 +164,10 @@ namespace TransLucid
      */
     template <typename Iterator>
     template <typename TokenDef>
-    ExprGrammar<Iterator>::ExprGrammar(Header& h, TokenDef& tok)
-    : ExprGrammar::base_type(expr), header(h)
+    ExprGrammar<Iterator>::ExprGrammar(TokenDef& tok, System& system)
+    : ExprGrammar::base_type(expr)
+    , m_idents(system.lookupIdentifiers())
+    , m_dimName(system.getDimensionIndex(U"name"))
     {
       using namespace qi::labels;
 
@@ -201,17 +203,20 @@ namespace TransLucid
       binary_op =
          prefix_expr [_a = _1]
       >> (
-           *(   tok.operator_
+           *(   qi::token(Lexer::TOK_BINARY_OP)
              >> prefix_expr
             )
+            #if 0
             [
               _a = ph::bind(&Tree::insert_binary_operator, 
                      ph::bind(&find_binary_operator, 
                        //ph::construct<u32string>(ph::begin(_1), ph::end(_1)), 
                        _1,
-                       ph::ref(header)), 
+                       ph::ref(m_idents),
+                       ph::ref(m_context)), 
                      _a, _2)
             ]
+            #endif
          )
          [
            _val = _a
@@ -314,7 +319,9 @@ namespace TransLucid
           _val = ph::bind(
             construct_identifier, 
             _1, 
-            ph::ref(header.reserved_ids)
+            ph::ref(m_idents),
+            ph::ref(m_context),
+            m_dimName
           )
         ]
       | tok.constantINTERPRET_
@@ -383,9 +390,9 @@ namespace TransLucid
     }
   
     ExprGrammar<iterator_t>*
-    create_expr_grammar(Header& h, Lexer::tl_lexer& l)
+    create_expr_grammar(Lexer::tl_lexer& l, System& system)
     {
-      return new ExprGrammar<iterator_t>(h, l);
+      return new ExprGrammar<iterator_t>(l, system);
     }
   }
 }

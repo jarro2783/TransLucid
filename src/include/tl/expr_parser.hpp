@@ -44,7 +44,7 @@ namespace TransLucid
        * @param tok The lexer from which to match tokens.
        */
       template <typename TokenDef>
-      ExprGrammar(Header& h, TokenDef& tok);
+      ExprGrammar(TokenDef& tok, System& system);
 
       /**
        * Set the tuple parser for this expression parser.
@@ -56,6 +56,8 @@ namespace TransLucid
       {
         context_perturb = t;
       }
+
+      const Tuple* m_context;
 
       private:
 
@@ -89,7 +91,8 @@ namespace TransLucid
         ident_constant
       ;
 
-      Header &header;
+      System::IdentifierLookup m_idents;
+      dimension_index m_dimName;
     };
  
     /**

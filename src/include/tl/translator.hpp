@@ -167,7 +167,7 @@ namespace TransLucid
      * @param iter The iterator pointing to the start of the text.
      */
     std::pair<bool, Tree::Expr>
-    parseExpr(Parser::U32Iterator& iter);
+    parseExpr(Parser::U32Iterator& iter, const Tuple& k);
 
     /**
      * Add to the header. Parses the input string as a sequence of header

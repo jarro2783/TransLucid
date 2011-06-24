@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_OBJECT_REGISTRY_HPP_INCLUDED
 
 #include <unordered_map>
+#include <initializer_list>
 
 namespace TransLucid
 {
@@ -31,6 +32,16 @@ namespace TransLucid
     ObjectRegistry(Index& index)
     : m_index(index)
     {
+    }
+
+    template <typename List>
+    ObjectRegistry(Index& index, const List& initial)
+    : m_index(index)
+    {
+      for (auto i : initial)
+      {
+        m_objects.insert(i);
+      }
     }
 
     Index

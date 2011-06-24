@@ -59,74 +59,10 @@ namespace TransLucid
     construct_identifier
     (
       const u32string& id,
-      const ReservedIdentifierMap& ids
+      const System::IdentifierLookup& ids,
+      const Tuple*& context,
+      dimension_index nameDim
     );
-
-    //TODO this may be useful for handling errors
-    #if 0
-    struct handle_expr_error
-    {
-      template <class ScannerT, class ErrorT>
-      Spirit::error_status<>
-      operator()(ScannerT const& scan, ErrorT error) const
-      {
-
-        //for some reason spirit resets the scanner start position
-        //after a retry fails so we need to be past the error before
-        //we can keep going
-        while (scan.first != error.where)
-        {
-          ++scan;
-        }
-
-        //look for a ;;
-        bool found = false;
-        bool firstFound = false;
-        while (!found && !scan.at_end())
-        {
-          if (!firstFound)
-          {
-            if (*scan == ';')
-            {
-              firstFound = true;
-            }
-            ++scan;
-          }
-          else
-          {
-            if (*scan == ';')
-            {
-              found = true;
-            }
-            else
-            {
-              firstFound = false;
-              ++scan;
-            }
-          }
-        }
-
-        //if we get to the end of input without finding a ;; then print
-        //the error message
-        if (!scan.at_end() && found)
-        {
-          printErrorMessage(error.where.get_position(), error.descriptor);
-        }
-
-        if (!scan.at_end())
-        {
-          ++scan;
-        }
-
-        Spirit::error_status<>::result_t result =
-          !found && scan.at_end() ?
-          Spirit::error_status<>::fail :
-          Spirit::error_status<>::retry;
-
-        return Spirit::error_status<>(result);
-      }
-    };
-    #endif
   }
 }
 

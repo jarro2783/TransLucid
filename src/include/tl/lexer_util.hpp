@@ -35,6 +35,13 @@ namespace TransLucid
 {
   namespace Lexer
   {
+    enum OpTokens
+    {
+      TOK_BINARY_OP = 1000,
+      TOK_PREFIX_OP,
+      TOK_POSTFIX_OP
+    };
+
     template <typename Iterator>
     mpq_class
     init_mpq

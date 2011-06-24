@@ -67,12 +67,6 @@ namespace TransLucid
 
     ObjectRegistry<u32string, decltype(m_nextIndex)> m_named;
     ObjectRegistry<Constant, decltype(m_nextIndex)> m_constants;
-
-    typedef std::unordered_map<u32string, size_t> ustring_size_map;
-    typedef std::unordered_map<Constant, size_t> ustring_type_map;
-
-    ustring_size_map m_namedDims;
-    ustring_type_map m_typedDims;
   };
 }
 
