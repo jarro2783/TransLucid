@@ -112,19 +112,11 @@ ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
 {
   //this should be compiled out
   throw "ExprCompiler::operator()(UnaryOpExpr)";
-  //WS* operand = boost::apply_visitor(*this, e.e);
-  //return new Hyperdatons::UnaryOpWS(m_system, e.op.op, operand);
 }
 
 WS*
 ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
 {
-  #if 0
-  WS* lhs = boost::apply_visitor(*this, e.lhs);
-  WS* rhs = boost::apply_visitor(*this, e.rhs);
-
-  return new Hyperdatons::BinaryOpWS(m_system, {lhs, rhs}, e.op.op);
-  #endif
   //this should be compiled out
   throw "ExprCompiler::operator()(BinaryOpExpr)";
   return 0;
@@ -133,7 +125,14 @@ ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::BangOpExpr& e)
 {
-  #warning make a bangop workshop
+  std::vector<WS*> args;
+
+  for (auto& expr : e.args)
+  {
+    args.push_back(boost::apply_visitor(*this, expr));
+  }
+
+  return new Hyperdatons::BangOpWS(*m_system, e.name, args);
 }
 
 WS*

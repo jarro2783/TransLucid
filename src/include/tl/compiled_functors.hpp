@@ -212,6 +212,32 @@ namespace TransLucid
     };
     #endif
 
+    class BangOpWS : public WS
+    {
+      public:
+      BangOpWS
+      (
+        System& system, 
+        const u32string& name, 
+        const std::vector<WS*>& args
+      )
+      : m_system(system)
+      , m_name(name)
+      , m_args(args)
+      , m_numArgs(args.size())
+      {
+      }
+
+      TaggedConstant
+      operator()(const Tuple& k);
+
+      private:
+      System& m_system;
+      u32string m_name;
+      std::vector<WS*> m_args;
+      size_t m_numArgs;
+    };
+
     class IfWS : public WS
     {
       public:

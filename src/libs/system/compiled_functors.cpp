@@ -45,83 +45,6 @@ namespace TransLucid
 namespace Hyperdatons
 {
 
-namespace
-{
-
-#if 0
-template <typename T>
-class TupleInserter
-{
-  public:
-  TupleInserter(tuple_t& k, WS* h, size_t index)
-  : m_k(k), m_h(h), m_index(index)
-  {
-  }
-
-  template <typename V>
-  const TupleInserter<T>&
-  operator()(const u32string& dim, const V& v) const
-  {
-    m_k[get_dimension_index(m_h, dim)] = Constant(T(v), m_index);
-    return *this;
-  }
-
-  private:
-  tuple_t& m_k;
-  WS* m_h;
-  size_t m_index;
-};
-
-template <typename T>
-TupleInserter<T>
-insert_tuple(tuple_t& k, WS* h, size_t index)
-{
-  return TupleInserter<T>(k, h, index);
-}
-#endif
-
-}
-
-//don't need this one because we are doing it properly with eval
-#if 0
-TaggedConstant
-SystemEvaluationWS::operator()(const Tuple& k)
-{
-  tuple_t newK = k.tuple();
-  newK[DIM_TIME] = Constant(Intmp(m_system->theTime()), TYPE_INDEX_INTMP);
-  return (*m_e)(Tuple(newK));
-}
-#endif
-
-//this one is compiled out now
-#if 0
-TaggedConstant
-BinaryOpWS::operator()(const Tuple& k)
-{
-  //Constant v1 = (*m_operands.at(0))(k).first;
-  //Constant v2 = (*m_operands.at(1))(k).first;
-  //std::cerr << "operands to binary op " << m_name << ":" << std::endl;
-  //std::cerr << v1 << std::endl;
-  //std::cerr << v2 << std::endl;
-  tuple_t t =
-  {
-    {get_dimension_index(m_system, U"arg0"), (*m_operands.at(0))(k).first},
-    {get_dimension_index(m_system, U"arg1"), (*m_operands.at(1))(k).first},
-    {DIM_ID, generate_string(U"OP")},
-    {DIM_NAME, generate_string(m_name)}
-  };
-
-  tuple_t kNew = k.tuple();
-  kNew.insert(t.begin(), t.end());
-
-  //std::cerr << "finding OP @ [name : " << utf32_to_utf8(m_name) << " ..." << std::endl;
-
-  TaggedConstant v = (*m_system)(Tuple(kNew));
-  //std::cerr << "result: " << v.first << std::endl;
-  return TaggedConstant(v.first, k);
-}
-#endif
-
 TaggedConstant
 BoolConstWS::operator()(const Tuple& k)
 {
@@ -135,34 +58,6 @@ TypeConstWS::operator()(const Tuple& k)
   return TaggedConstant(m_value, k);
 }
 
-
-#if 0
-TaggedConstant
-TypedValueWS::operator()(const Tuple& k)
-{
-  //evaluate CONST
-  tuple_t kp = k.tuple();
-
-  insert_tuple<String>
-    (kp, m_system, TYPE_INDEX_USTRING)
-    (U"id", U"CONST")
-    (U"type", m_type)
-    (U"text", m_text)
-  ;
-
-  return (*m_system)(Tuple(kp));
-}
-#endif
-
-//TODO work out type conversion
-#if 0
-TaggedConstant
-ConvertWS::operator()(const Tuple& k)
-{
-  return TaggedConstant();
-}
-#endif
-
 TaggedConstant
 DimensionWS::operator()(const Tuple& k)
 {
@@ -172,26 +67,6 @@ DimensionWS::operator()(const Tuple& k)
 TaggedConstant
 IdentWS::operator()(const Tuple& k)
 {
-  #if 0
-  tuple_t kp = k.tuple();
-
-  tuple_t::iterator itid = kp.find(DIM_ID);
-  if (itid != kp.end())
-  {
-    itid->second = Constant(
-      String(m_name + U"." + itid->second.value<String>().value()),
-      TYPE_INDEX_USTRING
-     );
-  }
-  else 
-  {
-    insert_tuple<String>
-      (kp, m_system, TYPE_INDEX_USTRING)
-      (U"id", m_name)
-      ;
-  }
-  return (*m_system)(Tuple(kp));
-  #endif
   WS* e = m_identifiers.lookup(m_name);
 
   if (e != 0)
@@ -202,6 +77,12 @@ IdentWS::operator()(const Tuple& k)
   {
     return TaggedConstant(Types::Special::create(SP_UNDEF), k);
   }
+}
+
+TaggedConstant
+BangOpWS::operator()(const Tuple& k)
+{
+  //lookup function in the system and call it
 }
 
 TaggedConstant
@@ -269,39 +150,6 @@ HashWS::operator()(const Tuple& k)
 {
   TaggedConstant r = (*m_e)(k);
   return lookup_context(m_system, r.first, k);
-  //std::cerr << "hash " << r.first << " = ";
-  #if 0
-  size_t index;
-  if (r.first.index() == TYPE_INDEX_DIMENSION)
-  {
-    index = r.first.value<TransLucid::Dimension>().value();
-  }
-  else
-  {
-    index = get_dimension_index(m_system, r.first);
-  }
-
-  Tuple::const_iterator iter = k.find(index);
-  if (iter != k.end())
-  {
-    //std::cerr << iter->second << std::endl;
-    return TaggedConstant(iter->second, k);
-  }
-  else
-  {
-    //find the all dimension
-    Tuple::const_iterator all = k.find(DIM_ALL);
-    if (all == k.end())
-    {
-      return TaggedConstant(Constant(Special(Special::DIMENSION),
-                            TYPE_INDEX_SPECIAL), k);
-    }
-    else
-    {
-      return TaggedConstant(all->second, k);
-    }
-  }
-  #endif
 }
 
 TaggedConstant
@@ -323,42 +171,6 @@ IsTypeWS::operator()(const Tuple& k)
   //this is going away, but to stop warnings
   return TaggedConstant();
 }
-
-//I don't think we even use this
-#if 0
-TaggedConstant
-VariableOpWS::operator()(const Tuple& k)
-{
-  tuple_t kp = k.tuple();
-
-  TupleInserter<String> insert(kp, m_system, TYPE_INDEX_USTRING);
-  insert(U"id", U"OP");
-
-  int i = 0;
-  std::ostringstream os;
-  for(WS* h : m_operands)
-  {
-    os.str("arg");
-    os << i;
-    kp[get_dimension_index(h, to_u32string(os.str()))] = (*h)(k).first;
-    ++i;
-  }
-
-  return (*m_system)(Tuple(kp));
-}
-#endif
-
-#if 0
-TaggedConstant
-PairWS::operator()(const Tuple& k)
-{
-  TaggedConstant l = (*m_lhs)(k);
-  TaggedConstant r = (*m_rhs)(k);
-
-  return TaggedConstant(Constant(Pair((*m_lhs)(k).first, (*m_rhs)(k).first),
-                     TYPE_INDEX_PAIR), k);
-}
-#endif
 
 TaggedConstant
 SpecialConstWS::operator()(const Tuple& k)
