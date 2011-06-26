@@ -515,42 +515,50 @@ namespace TransLucid
 
           //need OPTYPE @ [symbol <- u32string(first, last)]
           WS* ws = m_idents.lookup(U"OPTYPE");
-          Constant v = (*ws)(m_context->at(
-              tuple_t{
-                {
-                  m_symbol,
-                  Types::String::create(u32string(first, last))
-                }
-              }
-            )
-          ).first;
 
-          //the result is either a string or a special, just ignore if not
-          //a string
-          if (v.index() == TYPE_INDEX_USTRING)
-          {
-            const u32string& type = get_constant_pointer<u32string>(v);
-
-            if (type == U"BINARY")
-            {
-              id = TOK_BINARY_OP;
-            }
-            else if (type == U"PREFIX")
-            {
-              id = TOK_PREFIX_OP;
-            }
-            else
-            {
-              //postfix
-              id = TOK_POSTFIX_OP;
-            }
-          }
-          else
+          if (ws == nullptr)
           {
             matched = lex::pass_flags::pass_fail;
           }
+          else
+          {
+            Constant v = (*ws)(m_context->at(
+                tuple_t{
+                  {
+                    m_symbol,
+                    Types::String::create(u32string(first, last))
+                  }
+                }
+              )
+            ).first;
 
-          ctx.set_value(u32string(first, last));
+            //the result is either a string or a special, just ignore if not
+            //a string
+            if (v.index() == TYPE_INDEX_USTRING)
+            {
+              const u32string& type = get_constant_pointer<u32string>(v);
+
+              if (type == U"BINARY")
+              {
+                id = TOK_BINARY_OP;
+              }
+              else if (type == U"PREFIX")
+              {
+                id = TOK_PREFIX_OP;
+              }
+              else
+              {
+                //postfix
+                id = TOK_POSTFIX_OP;
+              }
+            }
+            else
+            {
+              matched = lex::pass_flags::pass_fail;
+            }
+
+            ctx.set_value(u32string(first, last));
+          }
         }
       };
     } //namespace detail

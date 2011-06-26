@@ -71,7 +71,18 @@ namespace
   TransLucid::System&
   getSystem()
   {
+    static bool initialized = false;
     static TransLucid::System theSystem;
+
+    if (!initialized)
+    {
+      theSystem.addUnaryOperator(
+        TransLucid::Tree::UnaryOperator
+          {U"operator-", U"-", TransLucid::Tree::UNARY_PREFIX}
+      );
+      initialized = true;
+    }
+
     return theSystem;
   }
 }
