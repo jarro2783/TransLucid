@@ -68,7 +68,12 @@ ostream& operator<<(ostream& os, const pair<TL::u32string, TL::u32string>& p)
 
 namespace
 {
-  TransLucid::System theSystem;
+  TransLucid::System&
+  getSystem()
+  {
+    static TransLucid::System theSystem;
+    return theSystem;
+  }
 }
 
 BOOST_AUTO_TEST_SUITE( lexer_tests )
@@ -350,8 +355,10 @@ typedef checker_grammar<TL::Lexer::iterator_t> cgrammar;
 
 bool check(const TL::u32string& input, Checker& checker)
 {
+  TL::Tuple t;
   TL::Parser::Errors errors;
-  TL::Lexer::tl_lexer lexer(errors, theSystem);
+  TL::Lexer::tl_lexer lexer(errors, getSystem());
+  lexer.m_context = &t;
   cgrammar checkg(lexer, checker);
 
   TL::Parser::U32Iterator first(
@@ -376,8 +383,11 @@ bool check_utf8(const std::string& input, Checker& checker)
   ;
   TL::Parser::U32Iterator last;
 
+  TL::Tuple t;
+
   TL::Parser::Errors errors;
-  TL::Lexer::tl_lexer lexer(errors, theSystem);
+  TL::Lexer::tl_lexer lexer(errors, getSystem());
+  lexer.m_context = &t;
   cgrammar checkg(lexer, checker);
 
   return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last
