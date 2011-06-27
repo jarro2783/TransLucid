@@ -278,6 +278,7 @@ class Checker
     BOOST_REQUIRE(opval != nullptr);
     BOOST_CHECK(opval->first == text);
     BOOST_CHECK(opval->second == type);
+    ++m_current;
   }
 
 	private:

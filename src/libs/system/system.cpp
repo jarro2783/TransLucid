@@ -241,7 +241,7 @@ System::addSymbolInfo
 {
   return addEquation(Parser::Equation(
     eqn,
-    Tree::TupleExpr({{U"symbol", s}}),
+    Tree::TupleExpr({{Tree::DimensionExpr(U"symbol"), s}}),
     Tree::Expr(),
     value
   ));
