@@ -83,6 +83,10 @@ TaggedConstant
 BangOpWS::operator()(const Tuple& k)
 {
   //lookup function in the system and call it
+
+  //evaluate all the args in context k and pass them as the parameters
+  //to the function
+  return m_caller(m_name, m_args, k);
 }
 
 TaggedConstant

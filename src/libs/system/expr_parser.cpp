@@ -203,7 +203,7 @@ namespace TransLucid
       binary_op =
          prefix_expr [_a = _1]
       >> (
-           *(   qi::token(Lexer::TOK_BINARY_OP)
+           *(   tok.binary_op_
              >> prefix_expr
             )
             #if 0
