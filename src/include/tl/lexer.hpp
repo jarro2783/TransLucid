@@ -107,6 +107,7 @@ namespace TransLucid
       lex::token_def<u32string, lex_char_type>
         identifier_, operator_
         //fake tokens for operators
+        , binary_op_, prefix_op_, postfix_op_
       ;
 
       lex::token_def<value_wrapper<mpz_class>, lex_char_type> 

@@ -151,6 +151,8 @@ TLText::run()
       //print some stuff
       for (int s = 0; s != slot; ++s)
       {
+        std::cerr << s << " : ";
+
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_INTMP)
         {
@@ -176,6 +178,10 @@ TLText::run()
         {
           std::cout << std::boolalpha << get_constant<bool>(c) 
                     << std::noboolalpha << std::endl;
+        }
+        else
+        {
+          std::cerr << "index: " << c.index() << std::endl;
         }
       }
     }

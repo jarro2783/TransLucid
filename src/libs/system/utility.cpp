@@ -38,9 +38,6 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-const u32string
-SplitID::m_split_match = U".";
-
 bool
 tupleApplicable(const Tuple& def, const Tuple& c)
 {

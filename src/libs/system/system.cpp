@@ -367,6 +367,15 @@ System::System()
   addDimension(U"time");
   addDimension(U"name");
   addDimension(U"symbol");
+
+  //add DIM=false default equation
+  addEquation(Parser::Equation
+  (
+    U"DIM", 
+    Tree::Expr(),
+    Tree::Expr(),
+    false
+  ));
 }
 
 System::~System()
@@ -539,6 +548,10 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
 Constant
 System::addBinaryOperator(const Tree::BinaryOperator& op)
 {
+  std::cerr << "adding binary operator: " << std::endl
+            << "symbol: " << op.symbol << std::endl
+            << "op: " << op.op << std::endl;
+         
   u32string assocName;
 
   switch(op.assoc)

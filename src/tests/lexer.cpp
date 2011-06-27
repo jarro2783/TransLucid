@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/lexer.hpp>
 #include <tl/charset.hpp>
+#include <tl/lexer.hpp>
+#include <tl/lexer_util.hpp>
+
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
@@ -80,6 +82,11 @@ namespace
         TransLucid::Tree::UnaryOperator
           {U"operator-", U"-", TransLucid::Tree::UNARY_PREFIX}
       );
+
+      theSystem.addBinaryOperator(
+        TransLucid::Tree::BinaryOperator
+          {TransLucid::Tree::ASSOC_LEFT, U"operator%", U"%", 10}
+      );
       initialized = true;
     }
 
@@ -132,7 +139,8 @@ typedef boost::variant
   TL::u32string,
   Token,
   std::pair<TL::u32string, TL::u32string>,
-  char32_t
+  char32_t,
+  std::pair<TL::u32string, TL::Lexer::OpTokens>
 > Values;
 
 //checks that the tokens are correct
@@ -258,6 +266,20 @@ class Checker
     ++m_current;
   }
 
+  void
+  op(const TL::u32string& text, TL::Lexer::OpTokens type)
+  {
+    BOOST_TEST_MESSAGE("Testing op: " << text);
+    BOOST_REQUIRE(m_current != m_tokens.end());
+
+    auto opval = boost::get<std::pair<TL::u32string, TL::Lexer::OpTokens>>
+      (&*m_current);
+
+    BOOST_REQUIRE(opval != nullptr);
+    BOOST_CHECK(opval->first == text);
+    BOOST_CHECK(opval->second == type);
+  }
+
 	private:
   //the list of the expected tokens
   std::list<Values> m_tokens;
@@ -293,7 +315,10 @@ struct checker_grammar
         | real
         | constant
         | tok.character_[ph::bind(&Checker::character, m_checker, _1)]
-        | tok.operator_[ph::bind(&Checker::identifier, m_checker, _1)]
+        | tok.binary_op_
+          [
+            ph::bind(&Checker::op, m_checker, _1, TL::Lexer::TOK_BINARY_OP)
+          ]
         )
         >> qi::eoi
       ;
@@ -366,9 +391,10 @@ typedef checker_grammar<TL::Lexer::iterator_t> cgrammar;
 
 bool check(const TL::u32string& input, Checker& checker)
 {
-  TL::Tuple t;
+  TL::System& system = getSystem();
+  const TL::Tuple& t = system.getDefaultContext();
   TL::Parser::Errors errors;
-  TL::Lexer::tl_lexer lexer(errors, getSystem());
+  TL::Lexer::tl_lexer lexer(errors, system);
   lexer.m_context = &t;
   cgrammar checkg(lexer, checker);
 
@@ -394,10 +420,11 @@ bool check_utf8(const std::string& input, Checker& checker)
   ;
   TL::Parser::U32Iterator last;
 
-  TL::Tuple t;
+  TL::System& system = getSystem();
+  const TL::Tuple& t = system.getDefaultContext();
 
   TL::Parser::Errors errors;
-  TL::Lexer::tl_lexer lexer(errors, getSystem());
+  TL::Lexer::tl_lexer lexer(errors, system);
   lexer.m_context = &t;
   cgrammar checkg(lexer, checker);
 
@@ -592,13 +619,11 @@ BOOST_AUTO_TEST_CASE ( mixed )
 BOOST_AUTO_TEST_CASE ( operators )
 {
   BOOST_TEST_MESSAGE("testing the operator symbol");
-  TL::u32string input = U"4 % -5 <<";
+  TL::u32string input = U"4 % 5";
   Checker checker({
     mpz_class(4),
-    U"%",
-    U"-",
+    std::make_pair(U"%", TL::Lexer::TOK_BINARY_OP),
     mpz_class(5),
-    U"<<"
   });
 
   check(input, checker);

@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/lexer.hpp>
+#include <tl/lexer_util.hpp>
 
 namespace TransLucid
 {
@@ -38,6 +39,9 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
 , false_(L"false")
 //, spaces(L"([ \\n\\t])|(\\/\\/[^\\n]*\\n)")
 , spaces(L"[ \\n\\t]")
+, binary_op_(L".", OpTokens::TOK_BINARY_OP)
+, prefix_op_(L".", OpTokens::TOK_BINARY_OP)
+, postfix_op_(L".", OpTokens::TOK_BINARY_OP)
 , m_context(nullptr)
 , m_errors(errors)
 , m_identifiers(system.lookupIdentifiers())
@@ -181,9 +185,12 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
     ]
   ;
 
+  this->self.add(binary_op_);
+  this->self.add(prefix_op_);
+  this->self.add(postfix_op_);
+
   //anything else not matched
-  //this->self.add(operator_)
-  ;
+  //this->self.add(operator_);
 }
 
 template lex_tl_tokens<lexer_type>::lex_tl_tokens(Parser::Errors&, System&);

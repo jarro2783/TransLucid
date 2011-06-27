@@ -256,6 +256,12 @@ namespace TransLucid
 
     public:
 
+    const Tuple&
+    getDefaultContext()
+    {
+      return m_defaultk;
+    }
+
     struct IdentifierLookup
     {
       IdentifierLookup(DefinitionMap& identifiers)
@@ -284,6 +290,14 @@ namespace TransLucid
     IdentifierLookup lookupIdentifiers()
     {
       return IdentifierLookup(m_equations);
+    }
+
+    template <size_t N>
+    auto
+    lookupFunction(const u32string& name)
+      -> decltype(m_functions.lookupFunction<N>(name))
+    {
+      return m_functions.lookupFunction<N>(name);
     }
   };
 
