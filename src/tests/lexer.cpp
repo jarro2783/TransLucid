@@ -202,6 +202,7 @@ class Checker
 
 	void keyword(Keyword t)
 	{
+    BOOST_TEST_MESSAGE("Testing keyword: " << t);
     BOOST_REQUIRE(m_current != m_tokens.end());
 
     const Keyword* tp = boost::get<Keyword>(&*m_current);
@@ -695,6 +696,8 @@ BOOST_AUTO_TEST_CASE ( comments )
     mpz_class(5),
     TOKEN_DOUBLE_SEMI
   });
+
+  check_utf8(input, checker);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
