@@ -37,11 +37,11 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
 , else_(L"else")
 , true_(L"true")
 , false_(L"false")
-//, spaces(L"([ \\n\\t])|(\\/\\/[^\\n]*\\n)")
-, spaces(L"[ \\n\\t]")
+, spaces(L"([ \\n\\t])|(\\/\\/([^\\n]*)\\n)")
+//, spaces(L"[ \\n\\t]")
 , binary_op_(L".", OpTokens::TOK_BINARY_OP)
-, prefix_op_(L".", OpTokens::TOK_BINARY_OP)
-, postfix_op_(L".", OpTokens::TOK_BINARY_OP)
+, prefix_op_(L".", OpTokens::TOK_PREFIX_OP)
+, postfix_op_(L".", OpTokens::TOK_POSTFIX_OP)
 , m_context(nullptr)
 , m_errors(errors)
 , m_identifiers(system.lookupIdentifiers())
@@ -98,8 +98,9 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   dollar_   = L"\\$";
 
   maps_       = L"<-";
-  dblslash_   = L"\\\\\\\\";
-  range_      = L"\\.\\.";
+  //dblslash_   = L"\\\\\\\\";
+  dblslash_   = LR"(\\\\)";
+  range_      = LR"(\.\.)";
   arrow_      = L"->";
   dblsemi_    = L";;";
   //dbldollar_  = L"\\$\\$\\n";
@@ -116,7 +117,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   infix_binary_ = L"infix[lrnpm]";
   unary_ =        L"(prefix)|(postfix)";
 
-  operator_ = LR"**([!@#\$%\^&\*\(\)\-_\:;\?/<>=]+)**";
+  operator_ = LR"**([\+!@#\$%\^&\*\(\)\-_\:;\?/<>=]+)**";
 
   this->self =
     spaces[lex::_pass = lex::pass_flags::pass_ignore]

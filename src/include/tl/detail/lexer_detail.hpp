@@ -554,11 +554,13 @@ namespace TransLucid
               }
               else if (type == U"PREFIX")
               {
+                std::cerr << "setting token as prefix" << std::endl;
                 id = TOK_PREFIX_OP;
               }
               else
               {
                 //postfix
+                std::cerr << "setting token as postfix" << std::endl;
                 id = TOK_POSTFIX_OP;
               }
 

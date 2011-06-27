@@ -80,6 +80,11 @@ namespace
     {
       theSystem.addUnaryOperator(
         TransLucid::Tree::UnaryOperator
+          {U"operator+", U"+", TransLucid::Tree::UNARY_POSTFIX}
+      );
+
+      theSystem.addUnaryOperator(
+        TransLucid::Tree::UnaryOperator
           {U"operator-", U"-", TransLucid::Tree::UNARY_PREFIX}
       );
 
@@ -104,7 +109,8 @@ enum Keyword
 	KEYWORD_THEN,
 	KEYWORD_ELSIF,
 	KEYWORD_TRUE,
-	KEYWORD_FALSE
+	KEYWORD_FALSE,
+  KEYWORD_EQN
 };
 
 enum Token
@@ -157,6 +163,13 @@ class Checker
   ~Checker()
   {
     BOOST_CHECK(m_current == m_tokens.end());
+  }
+
+  void
+  error(const TL::u32string& message)
+  {
+    BOOST_TEST_MESSAGE("should not have reached here: " << message);
+    BOOST_REQUIRE(false);
   }
 
 	void identifier(const TL::u32string& ws)
@@ -320,6 +333,18 @@ struct checker_grammar
           [
             ph::bind(&Checker::op, m_checker, _1, TL::Lexer::TOK_BINARY_OP)
           ]
+        | tok.prefix_op_
+          [
+            ph::bind(&Checker::op, m_checker, _1, TL::Lexer::TOK_PREFIX_OP)
+          ]
+        | tok.postfix_op_
+          [
+            ph::bind(&Checker::op, m_checker, _1, TL::Lexer::TOK_POSTFIX_OP)
+          ]
+        | tok.operator_
+          [
+            ph::bind(&Checker::error, m_checker, TL::u32string(U"operator"))
+          ]
         )
         >> qi::eoi
       ;
@@ -342,6 +367,7 @@ struct checker_grammar
       | tok.elsif_[_val = KEYWORD_ELSIF]
       | tok.true_ [_val = KEYWORD_TRUE]
       | tok.false_[_val = KEYWORD_FALSE]
+      | tok.eqn_  [_val = KEYWORD_EQN]
       ;
 
       symbol = 
@@ -620,11 +646,13 @@ BOOST_AUTO_TEST_CASE ( mixed )
 BOOST_AUTO_TEST_CASE ( operators )
 {
   BOOST_TEST_MESSAGE("testing the operator symbol");
-  TL::u32string input = U"4 % 5";
+  TL::u32string input = U"4 % 5 - +";
   Checker checker({
     mpz_class(4),
     std::make_pair(U"%", TL::Lexer::TOK_BINARY_OP),
     mpz_class(5),
+    std::make_pair(U"-", TL::Lexer::TOK_PREFIX_OP),
+    std::make_pair(U"+", TL::Lexer::TOK_POSTFIX_OP)
   });
 
   check(input, checker);
@@ -641,6 +669,32 @@ BOOST_AUTO_TEST_CASE ( utf8 )
     mpz_class(600)
   });
   BOOST_CHECK(check_utf8(input, checker));
+}
+
+BOOST_AUTO_TEST_CASE ( comments )
+{
+  BOOST_TEST_MESSAGE("testing comments");
+
+  std::string input = 
+  R"(
+    //comment
+    eqn y = 6;; //more comments
+    eqn z = 5;;
+    //end comment
+  )";
+
+  Checker checker({
+    KEYWORD_EQN,
+    U"y",
+    TOKEN_EQUALS,
+    mpz_class(6),
+    TOKEN_DOUBLE_SEMI,
+    KEYWORD_EQN,
+    U"z",
+    TOKEN_EQUALS,
+    mpz_class(5),
+    TOKEN_DOUBLE_SEMI
+  });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
