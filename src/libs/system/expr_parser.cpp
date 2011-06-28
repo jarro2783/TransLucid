@@ -321,12 +321,21 @@ namespace TransLucid
       ;
 
       postfix_expr =
-      #if 0
          at_expr [_a = _1]
       >> (
-           ( tok.operator_
+           ( tok.postfix_op_
              [
-               _val = construct<Tree::UnaryOpExpr>(_1, _a)
+               _val = construct<Tree::UnaryOpExpr>
+                      (
+                        ph::bind(&find_unary_operator,
+                                 _1, 
+                                 ph::ref(m_idents),
+                                 m_symbolDim,
+                                 ph::ref(m_context),
+                                 Tree::UNARY_POSTFIX
+                                ),
+                        _a
+                      )
              ]
            )
          | qi::eps
@@ -334,8 +343,7 @@ namespace TransLucid
             _val = _a
            ]
          )
-      #endif
-        at_expr[_val = _1]
+        //at_expr[_val = _1]
       ;
 
       at_expr =
