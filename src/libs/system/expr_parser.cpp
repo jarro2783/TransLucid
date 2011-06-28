@@ -145,17 +145,67 @@ namespace TransLucid
      * @todo Implement the error flagging.
      */
     inline Tree::BinaryOperator
-    find_binary_operator(const u32string& s, const Header& h)
+    //find_binary_operator(const u32string& s, const Header& h)
+    find_binary_operator
+    (
+      const u32string& symbol, 
+      const System::IdentifierLookup& idents,
+      dimension_index symbolDim,
+      const Tuple*& k
+    )
     {
-      auto iter = h.binary_op_symbols.find(s);
-      if (iter != h.binary_op_symbols.end())
+      //lookup ATL_SYMBOL, ASSOC, PREC
+
+      tuple_t sk
       {
-        return iter->second;
-      }
-      else
+        {
+          symbolDim,
+          Types::String::create(symbol)
+        }
+      };
+
+      Tuple t = k->at(sk);
+
+      WS* atlWS = idents.lookup(U"ATL_SYMBOL");
+      Constant atl = (*atlWS)(t).first;
+
+      WS* assocWS = idents.lookup(U"ASSOC");
+      Constant assoc = (*assocWS)(t).first;
+
+      WS* precWS = idents.lookup(U"PREC");
+      Constant prec = (*precWS)(t).first;
+
+      const u32string& assocName = get_constant_pointer<u32string>(assoc);
+
+      Tree::InfixAssoc ia;
+      if (assocName == U"LEFT")
       {
-        throw "invalid binary operator: " + utf32_to_utf8(s);
+        ia = Tree::ASSOC_LEFT;
       }
+      else if (assocName == U"RIGHT")
+      {
+        ia = Tree::ASSOC_RIGHT;
+      }
+      else if (assocName == U"NON")
+      {
+        ia = Tree::ASSOC_NON;
+      }
+
+      std::cerr << "retrieved op" << std::endl
+                << "  symbol: " << symbol << std::endl
+                << "  op    : " << get_constant_pointer<u32string>(atl)
+                << std::endl
+                << "  assoc : " << assocName << std::endl
+                << "  prec  : " << get_constant_pointer<mpz_class>(prec)
+                << std::endl;
+
+      return Tree::BinaryOperator
+      {
+        ia,
+        get_constant_pointer<u32string>(atl),
+        symbol,
+        get_constant_pointer<mpz_class>(prec)
+      };
     }
 
     /**
@@ -168,6 +218,7 @@ namespace TransLucid
     : ExprGrammar::base_type(expr)
     , m_idents(system.lookupIdentifiers())
     , m_dimName(system.getDimensionIndex(U"name"))
+    , m_symbolDim(system.getDimensionIndex(U"symbol"))
     {
       using namespace qi::labels;
 
@@ -206,17 +257,15 @@ namespace TransLucid
            *(   tok.binary_op_
              >> prefix_expr
             )
-            #if 0
             [
               _a = ph::bind(&Tree::insert_binary_operator, 
                      ph::bind(&find_binary_operator, 
-                       //ph::construct<u32string>(ph::begin(_1), ph::end(_1)), 
                        _1,
                        ph::ref(m_idents),
+                       m_symbolDim,
                        ph::ref(m_context)), 
                      _a, _2)
             ]
-            #endif
          )
          [
            _val = _a

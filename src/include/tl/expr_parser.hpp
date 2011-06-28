@@ -93,6 +93,7 @@ namespace TransLucid
 
       System::IdentifierLookup m_idents;
       dimension_index m_dimName;
+      dimension_index m_symbolDim;
     };
  
     /**

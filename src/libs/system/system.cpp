@@ -367,6 +367,7 @@ System::System()
   addDimension(U"time");
   addDimension(U"name");
   addDimension(U"symbol");
+  addDimension(U"opname");
 
   //add DIM=false default equation
   addEquation(Parser::Equation
