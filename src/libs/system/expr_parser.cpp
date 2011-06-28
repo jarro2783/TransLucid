@@ -133,6 +133,35 @@ namespace TransLucid
       return std::u32string(s.begin(), s.end());
     }
 
+    inline Tree::UnaryOperator
+    find_unary_operator
+    (
+      const u32string& symbol,
+      const System::IdentifierLookup& idents,
+      dimension_index symbolDim,
+      const Tuple*& k,
+      Tree::UnaryType type
+    )
+    {
+      //lookup ATL_SYMBOL
+
+      tuple_t sk
+      {
+        {
+          symbolDim,
+          Types::String::create(symbol)
+        }
+      };
+
+      Tuple t = k->at(sk);
+
+      WS* atlWS = idents.lookup(U"ATL_SYMBOL");
+      Constant atl = (*atlWS)(t).first;
+
+      return Tree::UnaryOperator
+        {get_constant_pointer<u32string>(atl), symbol, type};
+    }
+
     /**
      * Finds a binary operator from a string.
      *
@@ -145,7 +174,6 @@ namespace TransLucid
      * @todo Implement the error flagging.
      */
     inline Tree::BinaryOperator
-    //find_binary_operator(const u32string& s, const Header& h)
     find_binary_operator
     (
       const u32string& symbol, 
@@ -191,6 +219,7 @@ namespace TransLucid
         ia = Tree::ASSOC_NON;
       }
 
+      #if 0
       std::cerr << "retrieved op" << std::endl
                 << "  symbol: " << symbol << std::endl
                 << "  op    : " << get_constant_pointer<u32string>(atl)
@@ -198,6 +227,7 @@ namespace TransLucid
                 << "  assoc : " << assocName << std::endl
                 << "  prec  : " << get_constant_pointer<mpz_class>(prec)
                 << std::endl;
+      #endif
 
       return Tree::BinaryOperator
       {
@@ -273,14 +303,21 @@ namespace TransLucid
       ;
 
       prefix_expr =
-      #if 0
-        ( header.prefix_op_symbols >> postfix_expr)
+        ( tok.prefix_op_ > postfix_expr)
         [
-          _val = construct<Tree::UnaryOpExpr>(_1, _2)
+          _val = construct<Tree::UnaryOpExpr>
+                 (  
+                   ph::bind(&find_unary_operator,
+                            _1, 
+                            ph::ref(m_idents),
+                            m_symbolDim,
+                            ph::ref(m_context),
+                            Tree::UNARY_PREFIX
+                           ),
+                   _2
+                 )
         ]
-      | 
-      #endif 
-      postfix_expr [_val = _1]
+      | postfix_expr [_val = _1]
       ;
 
       postfix_expr =

@@ -148,9 +148,13 @@ GuardWS::evaluate(const Tuple& k) const
   tuple_t::const_iterator timeIter = t.find(DIM_TIME);
   if (timeIter != t.end())
   {
-    std::cerr << "warning: user specified time, don't know what to do" 
-      << std::endl;
+    //std::cerr << "warning: user specified time, don't know what to do" 
+    //  << std::endl;
     //fix this, don't know what to do if the user has specified time
+    
+    // This is complicated, at t, we can't add an equation with time t - i,
+    // i > 0, effectively changing the past. However, we can add equations
+    // for time > t.
   }
   else
   {

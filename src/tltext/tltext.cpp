@@ -92,15 +92,6 @@ TLText::run()
 
   Parser::U32Iterator end;
 
-  #if 0
-  Constant c;
-  while (begin != end)
-  {
-    c = m_system.parseLine(begin, end);
-    std::cerr << "got Constant of type " << c.index() << std::endl;
-  }
-  #endif
-
   LineTokenizer tokenizer(begin);
 
   bool done = false;
@@ -124,11 +115,8 @@ TLText::run()
       int slot = 0;
       size_t time = m_system.theTime();
 
-      std::cerr << "evaluating time " << time << std::endl;
-
       for (const Tree::Expr& e : exprs)
       {
-        std::cerr << "adding demand slot " << slot << std::endl;
         m_system.addAssignment(Parser::Equation
         (
           U"demand",
@@ -151,8 +139,6 @@ TLText::run()
       //print some stuff
       for (int s = 0; s != slot; ++s)
       {
-        std::cerr << s << " : ";
-
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_INTMP)
         {

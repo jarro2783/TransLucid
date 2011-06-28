@@ -510,7 +510,6 @@ namespace TransLucid
           Context& ctx
         ) const
         {
-          std::cerr << "constructing an operator" << std::endl;
           //look up the operator in the system and set the match information
           //appropriately
 
@@ -519,14 +518,11 @@ namespace TransLucid
 
           if (ws == nullptr)
           {
-            std::cerr << "fail" << std::endl;
             matched = lex::pass_flags::pass_fail;
           }
           else
           {
-            std::cerr << "evaluating OPTYPE" << std::endl;
             std::u32string text = u32string(first, last);
-            std::cerr << "op is " << text << std::endl;
             Constant v = (*ws)(m_context->at(
                 tuple_t{
                   {
@@ -537,30 +533,23 @@ namespace TransLucid
               )
             ).first;
 
-            std::cerr << "type is " << v.index() << std::endl;
-
             //the result is either a string or a special, just ignore if not
             //a string
             if (v.index() == TYPE_INDEX_USTRING)
             {
               const u32string& type = get_constant_pointer<u32string>(v);
 
-              std::cerr << "type of op is " << type << std::endl;
-
               if (type == U"BINARY")
               {
-                std::cerr << "setting token as binary" << std::endl;
                 id = TOK_BINARY_OP;
               }
               else if (type == U"PREFIX")
               {
-                std::cerr << "setting token as prefix" << std::endl;
                 id = TOK_PREFIX_OP;
               }
               else
               {
-                //postfix
-                std::cerr << "setting token as postfix" << std::endl;
+                //postfix is all that is left
                 id = TOK_POSTFIX_OP;
               }
 
@@ -568,7 +557,6 @@ namespace TransLucid
             }
             else
             {
-              std::cerr << "fail" << std::endl;
               matched = lex::pass_flags::pass_fail;
             }
           }
