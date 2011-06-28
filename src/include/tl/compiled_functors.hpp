@@ -305,7 +305,7 @@ namespace TransLucid
       BangCaller(System& system)
       : m_system(system)
       {
-        generate_bang_funcs<N-1> tmp(m_funcs);
+        generate_bang_funcs<N> tmp(m_funcs);
       }
 
       TaggedConstant
@@ -332,7 +332,8 @@ namespace TransLucid
       private:
       System& m_system;
 
-      BangFunc m_funcs[N];
+      //N+1 spots for 0 to N parameters
+      BangFunc m_funcs[N+1];
     };
 
     class BangOpWS : public WS
@@ -360,7 +361,7 @@ namespace TransLucid
       u32string m_name;
       std::vector<WS*> m_args;
       size_t m_numArgs;
-      BangCaller<10> m_caller;
+      BangCaller<MAX_FUNCTION_PARAMETERS> m_caller;
     };
 
     class IfWS : public WS

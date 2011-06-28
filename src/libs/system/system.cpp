@@ -389,8 +389,6 @@ System::go()
 {
   for (const auto& ident : m_assignments)
   {
-    std::cerr << "evaluating " << ident.first << std::endl;
-
     auto hd = m_outputHDs.find(ident.first);
 
     if (hd == m_outputHDs.end())
@@ -417,15 +415,6 @@ System::go()
           assign.second(k.insert(DIM_TIME, Types::Intmp::create(m_time)));
 
         hd->second->put(k, v.first);
-
-        //std::cout << ident.first << " = " << v.first << std::endl;
-      }
-      else
-      {
-        std::cerr << "time of equation is " 
-                  << get_constant_pointer<mpz_class>(time->second) 
-                  << std::endl;
-        std::cerr << "equation not valid" << std::endl;
       }
     }
   }
@@ -468,14 +457,12 @@ System::lastExpression() const
 Constant
 System::parseLine(Parser::U32Iterator& begin)
 {
-  std::cerr << "parse line..." << std::endl;
   Parser::U32Iterator end;
 
   auto result = m_translator->parseLine(begin, m_defaultk);
 
   if (result.first)
   {
-    std::cerr << "visiting result" << std::endl;
     detail::LineAdder adder(*this);
     return boost::apply_visitor(adder, result.second);
   }
@@ -492,7 +479,6 @@ System::addEquation(const Parser::Equation& eqn)
 Constant 
 System::addDimension(const u32string& dimension)
 {
-  std::cerr << "adding dimension: " << dimension << std::endl;
   //add equation DIM | [name : "dimension"] = true
   Constant c = addEquation(Parser::Equation(
     U"DIM", 
@@ -549,10 +535,6 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
 Constant
 System::addBinaryOperator(const Tree::BinaryOperator& op)
 {
-  std::cerr << "adding binary operator: " << std::endl
-            << "symbol: " << op.symbol << std::endl
-            << "op: " << op.op << std::endl;
-         
   u32string assocName;
 
   switch(op.assoc)

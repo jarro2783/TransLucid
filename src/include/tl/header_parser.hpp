@@ -145,9 +145,8 @@ namespace TransLucid
       {
         if (literal.first != U"ustring")
         {
+          throw "invalid constant";
         }
-
-        std::cerr << "adding string: " << literal.second << std::endl;
 
         return literal.second;
       }

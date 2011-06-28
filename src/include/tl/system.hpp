@@ -42,6 +42,8 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+  constexpr int MAX_FUNCTION_PARAMETERS = 10;
+
   template <typename T>
   class uuidmap : public std::map<uuid, T> {
   };
@@ -250,7 +252,7 @@ namespace TransLucid
 
     //give ourselves a function registry which can register functions of
     //up to ten arguments
-    FunctionRegistry<10> m_functions;
+    FunctionRegistry<MAX_FUNCTION_PARAMETERS> m_functions;
 
     Tuple m_defaultk;
 
