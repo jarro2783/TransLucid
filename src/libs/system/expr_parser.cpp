@@ -205,7 +205,7 @@ namespace TransLucid
 
       const u32string& assocName = get_constant_pointer<u32string>(assoc);
 
-      Tree::InfixAssoc ia;
+      Tree::InfixAssoc ia = Tree::ASSOC_LEFT;
       if (assocName == U"LEFT")
       {
         ia = Tree::ASSOC_LEFT;

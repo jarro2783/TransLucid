@@ -359,7 +359,6 @@ System::System()
 
   //set this as the default int too
   //addEquation(U"DEFAULTINT", GuardWS(), intmpWS);
-
   setDefaultContext();
 
   m_translator = new Translator(*this);
@@ -377,6 +376,7 @@ System::System()
     Tree::Expr(),
     false
   ));
+
 }
 
 System::~System()
@@ -420,7 +420,6 @@ System::go()
   }
 
   ++m_time;
-
   setDefaultContext();
 }
 

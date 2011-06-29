@@ -107,11 +107,14 @@ Translator::parseExpr(Parser::U32Iterator& iter, const Tuple& k)
 
   m_parsers->m_lexer.m_context = &k;
   m_parsers->m_expr.m_context = &k;
+
+  using namespace Parser::qi::labels;
   
   bool success = boost::spirit::lex::tokenize_and_parse(
     iter,
     end,
     m_parsers->m_lexer,
+    //(m_parsers->m_expr > m_parsers->m_lexer.dblsemi_)[_val = _1],
     m_parsers->m_expr,
     e);
 

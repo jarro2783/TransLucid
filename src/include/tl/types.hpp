@@ -23,12 +23,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_fwd.hpp>
 
 #include <boost/functional/hash.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <vector>
 
 #include <gmpxx.h>
@@ -430,7 +430,7 @@ namespace TransLucid
     : m_value(t)
     {}
 
-    boost::shared_ptr<tuple_t> m_value;
+    std::shared_ptr<tuple_t> m_value;
   };
 
   /**

@@ -550,6 +550,7 @@ namespace TransLucid
               else
               {
                 //postfix is all that is left
+                std::cerr << "token is postfix" << std::endl;
                 id = TOK_POSTFIX_OP;
               }
 

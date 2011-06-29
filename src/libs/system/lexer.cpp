@@ -117,7 +117,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   infix_binary_ = L"infix[lrnpm]";
   unary_ =        L"(prefix)|(postfix)";
 
-  operator_ = LR"**([\+!@#\$%\^&\*\(\)\-_\:;\?/<>=]+)**";
+  operator_ = LR"**([\+!@#\$%\^&\*\(\)\-_\:\?/<>=]+)**";
 
   this->self =
     spaces[lex::_pass = lex::pass_flags::pass_ignore]

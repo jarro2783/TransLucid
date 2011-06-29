@@ -650,6 +650,7 @@ namespace TransLucid
     PRINT_NODE(ParenExpr)
     PRINT_NODE(UnaryOpExpr)
     PRINT_NODE(BinaryOpExpr)
+    PRINT_NODE(BangOpExpr)
     PRINT_NODE(IfExpr)
     PRINT_NODE(HashExpr)
     PRINT_NODE(TupleExpr)

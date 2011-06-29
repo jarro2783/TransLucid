@@ -230,7 +230,6 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
 std::vector<Tree::Expr>
 TLText::processExpressions(LineTokenizer& tokenizer)
 {
-  std::cerr << "processExpressions" << std::endl;
   std::vector<Tree::Expr> exprs;
   bool done = false;
   while (!done)
@@ -239,7 +238,6 @@ TLText::processExpressions(LineTokenizer& tokenizer)
 
     switch(line.first)
     {
-      std::cerr << "got a line of type " << line.first << std::endl;
       case LineType::LINE:
       //parse an expression
       {
@@ -248,13 +246,9 @@ TLText::processExpressions(LineTokenizer& tokenizer)
           Parser::makeUTF32Iterator(line.second.end())
         );
 
-        std::cerr << "parsing \"" << line.second << "\"" << std::endl;
-
         auto expr = m_system.parseExpression(lineBegin);
         if (expr.first)
         {
-          std::cerr << "adding expression \"" << line.second << "\"" <<
-            std::endl;
           exprs.push_back(expr.second);
         }
       }
