@@ -92,7 +92,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::ParenExpr& e)
 
 Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 {
-  //UNOP @ [arg0 : e.e, opname : e.op.op]
+  //FN1 @ [fnname <- e.op.op, arg0 <- T(e.e)] ! (T(e.e))
+  //UNOP @ [arg0 <- e.e, opname <- e.op.op]
   return Tree::AtExpr
   (
     Tree::IdentExpr(U"UNOP"),
@@ -108,7 +109,9 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 
 Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 {
-  //BINOP @ [arg0 : e.lhs, arg1 : e.rhs, opname : e.op.op]
+  //FN2 @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)] 
+  //  ! (T(e.lhs), T(e.rhs))
+  //BINOP @ [arg0 <- e.lhs, arg1 <- e.rhs, opname <- e.op.op]
   return Tree::AtExpr
   (
     Tree::IdentExpr(U"BINOP"),
