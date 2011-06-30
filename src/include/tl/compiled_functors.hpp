@@ -342,7 +342,7 @@ namespace TransLucid
       BangOpWS
       (
         System& system, 
-        const u32string& name, 
+        WS* name,
         const std::vector<WS*>& args
       )
       : m_system(system)
@@ -358,7 +358,7 @@ namespace TransLucid
 
       private:
       System& m_system;
-      u32string m_name;
+      WS* m_name;
       std::vector<WS*> m_args;
       size_t m_numArgs;
       BangCaller<MAX_FUNCTION_PARAMETERS> m_caller;

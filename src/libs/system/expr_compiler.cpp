@@ -125,6 +125,7 @@ ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::BangOpExpr& e)
 {
+  WS* name = boost::apply_visitor(*this, e.name);
   std::vector<WS*> args;
 
   for (auto& expr : e.args)
@@ -132,7 +133,7 @@ ExprCompiler::operator()(const Tree::BangOpExpr& e)
     args.push_back(boost::apply_visitor(*this, expr));
   }
 
-  return new Hyperdatons::BangOpWS(*m_system, e.name, args);
+  return new Hyperdatons::BangOpWS(*m_system, name, args);
 }
 
 WS*

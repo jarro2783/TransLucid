@@ -409,12 +409,12 @@ namespace TransLucid
     {
       BangOpExpr() = default;
 
-      BangOpExpr(const u32string& name, std::vector<Expr> args)
+      BangOpExpr(const Expr& name, std::vector<Expr> args)
       : name(name), args(args)
       {
       }
 
-      u32string name;
+      Expr name;
       std::vector<Expr> args;
     };
 

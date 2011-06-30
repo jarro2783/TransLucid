@@ -32,6 +32,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/function.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
+#include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
 #include <sstream>
@@ -84,9 +85,19 @@ BangOpWS::operator()(const Tuple& k)
 {
   //lookup function in the system and call it
 
-  //evaluate all the args in context k and pass them as the parameters
-  //to the function
-  return m_caller(m_name, m_args, k);
+  //evaluate name expr
+  Constant name = (*m_name)(k).first;
+
+  if (name.index() != TYPE_INDEX_USTRING)
+  {
+    return TaggedConstant(Types::Special::create(SP_UNDEF), k);
+  }
+  else
+  {
+    //evaluate all the args in context k and pass them as the parameters
+    //to the function
+    return m_caller(get_constant_pointer<u32string>(name), m_args, k);
+  }
 }
 
 TaggedConstant
