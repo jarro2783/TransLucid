@@ -46,8 +46,6 @@ DemandHD::put(const Tuple& k, const Constant& c)
   {
     size_t slot = get_constant_pointer<mpz_class>(iter->second).get_ui();
 
-    std::cerr << "stuffing into slot " << slot << std::endl;
-
     if (m_results.size() <= slot)
     {
       //let's just allocate twice as much because the most common case is
