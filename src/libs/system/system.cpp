@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 //
 //For operations:
 //OPTYPE | [symbol : "s"] = "{PREFIX, POSTFIX, BINARY}";;
-//ATL_SYMBOL | [symbol : "s"] = "opname";;
+//ATL_SYMBOL | [symbol : "s"] = "fnname";;
 //
 //For binary:
 //ASSOC | [symbol : "s"] = "{LEFT, RIGHT, NON}";;
@@ -366,7 +366,7 @@ System::System()
   addDimension(U"time");
   addDimension(U"name");
   addDimension(U"symbol");
-  addDimension(U"opname");
+  addDimension(U"fnname");
 
   //add DIM=false default equation
   addEquation(Parser::Equation

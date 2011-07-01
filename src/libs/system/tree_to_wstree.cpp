@@ -93,6 +93,28 @@ Tree::Expr TreeToWSTree::operator()(const Tree::ParenExpr& e)
 Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 {
   //FN1 @ [fnname <- e.op.op, arg0 <- T(e.e)] ! (T(e.e))
+
+  //for now just get this working, we can optimise by only calculating the
+  //expr once, but how do I do that...
+
+  return Tree::BangOpExpr
+  (
+    Tree::AtExpr
+    (
+      Tree::IdentExpr(U"FN1"),
+      Tree::TupleExpr
+      (
+        {
+          {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.e)},
+          {Tree::DimensionExpr(U"fnname"), e.op.op}
+        }
+      )
+    ),
+
+    {boost::apply_visitor(*this, e.e)}
+  );
+
+  #if 0
   //UNOP @ [arg0 <- e.e, opname <- e.op.op]
   return Tree::AtExpr
   (
@@ -105,12 +127,37 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
       }
     )
   );
+  #endif
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 {
   //FN2 @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)] 
   //  ! (T(e.lhs), T(e.rhs))
+
+  //optimise as above
+  return Tree::BangOpExpr
+  (
+    Tree::AtExpr
+    (
+      Tree::IdentExpr(U"FN2"),
+      Tree::TupleExpr
+      (
+        {
+          {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.lhs)},
+          {Tree::DimensionExpr(U"arg1"), boost::apply_visitor(*this, e.rhs)},
+          {Tree::DimensionExpr(U"fnname"), e.op.op}
+        }
+      )
+    ),
+    {
+      boost::apply_visitor(*this, e.lhs),
+      boost::apply_visitor(*this, e.rhs)
+    }
+  );
+
+
+  #if 0
   //BINOP @ [arg0 <- e.lhs, arg1 <- e.rhs, opname <- e.op.op]
   return Tree::AtExpr
   (
@@ -124,6 +171,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
       }
     )
   );
+  #endif
 }
 
 Tree::Expr
