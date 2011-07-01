@@ -189,6 +189,7 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::LambdaExpr& e)
 {
+  throw "Lambda expressions not implemented";
 //TODO: we will get to this eventually
 #if 0
   //generate a new dimension
@@ -222,6 +223,7 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
 WS*
 ExprCompiler::operator()(const Tree::PhiExpr& e)
 {
+  throw "phi expressions not implemented";
   //generate a new dimension gamma
 
   //generate a unique name alpha
