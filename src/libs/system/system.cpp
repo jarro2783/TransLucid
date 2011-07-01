@@ -305,6 +305,14 @@ System::init_types()
   //LITERAL | [type : "t", text : ustring] = "hostfun"!(#text)
 }
 
+Constant
+mpz_plus(Constant a, Constant b)
+{
+  return Types::Intmp::create(get_constant_pointer<mpz_class>(a) +
+    get_constant_pointer<mpz_class>(b))
+  ;
+}
+
 System::System()
 : m_typeRegistry(m_nextTypeIndex)
 , m_time(0)
@@ -377,6 +385,12 @@ System::System()
     false
   ));
 
+  m_functions.registerFunction
+  (
+    U"int_plus",
+
+    &mpz_plus
+  );
 }
 
 System::~System()
