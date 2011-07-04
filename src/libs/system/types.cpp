@@ -28,8 +28,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/range.hpp>
 #include <tl/system.hpp>
 #include <tl/exception.hpp>
-#include <tl/header.hpp>
-#include <tl/footer.hpp>
 
 namespace TransLucid
 {

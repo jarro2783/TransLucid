@@ -22,10 +22,12 @@ includesdir = $(prefix)/include/tl
 includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp cache.hpp \
   charset.hpp compiled_functors.hpp consthd.hpp container.hpp \
   dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
-  expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp footer.hpp \
-  header.hpp header_parser.hpp hyperdaton.hpp lexer.hpp \
-  lexer_util.hpp library.hpp object_registry.hpp \
+  expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp function_registry.hpp \
+  header_parser.hpp hyperdaton.hpp instant_parser.hpp lexer.hpp \
+  lexer_util.hpp library.hpp line_parser.hpp line_tokenizer.hpp \
+  object_registry.hpp \
   parser_api.hpp parser_defs.hpp parser_header.hpp parser_iterator.hpp \
-  parser_util.hpp printer.hpp range.hpp \
-  set_types.hpp system.hpp translator.hpp tree_printer.hpp \
-  tuple_parser.hpp types.hpp utility.hpp workshop.hpp 
+  parser_util.hpp printer.hpp range.hpp registries.hpp rename.hpp \
+  set_types.hpp system.hpp translator.hpp tree_printer.hpp tree_to_wstree.hpp \
+  tuple_parser.hpp types.hpp types_fwd.hpp types_util.hpp utility.hpp \
+  workshop.hpp 

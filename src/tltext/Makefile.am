@@ -8,7 +8,7 @@ tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -DPREFIX=\"$(prefix)\" \
 -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
 
-tltext_SOURCES = main.cpp tltext.cpp tltext.hpp
+tltext_SOURCES = main.cpp tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp
 
 TESTS_ENVIRONMENT = TLCORE=$(top_builddir)/src/tltext/tltext \
   TESTDIR=$(top_srcdir)/src/tltext/tests \
