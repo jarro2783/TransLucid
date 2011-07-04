@@ -15,7 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
-EXTRA_DIST=CMakeLists.txt
+EXTRA_DIST=CMakeLists.txt runtest runbinary.sh
 
 check_PROGRAMS = lexer iterator_test line_tokenizer
 
@@ -44,3 +44,5 @@ run_%.sh: runtest
 	sed 's&PROGRAM_NAME&$(top_builddir)/src/tests/$*&' < \
 	  $(top_srcdir)/src/tests/runtest > $@
 	chmod +x $@
+
+CLEANFILES=$(TESTS)

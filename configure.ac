@@ -77,17 +77,13 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  doc/Doxyfile
                  src/Makefile
-                 src/basic/Makefile
                  src/include/Makefile
                  src/include/tl/Makefile
                  src/include/tl/detail/Makefile
                  src/include/tl/types/Makefile
                  src/libs/Makefile
-                 src/libs/int/Makefile
-                 src/libs/string/Makefile
                  src/libs/system/Makefile
                  src/tests/Makefile
-                 src/tlcore/Makefile
                  src/tltext/Makefile
                  ])
 AC_OUTPUT
