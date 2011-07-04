@@ -15,7 +15,8 @@ TESTS_ENVIRONMENT = TLCORE=$(top_builddir)/src/tltext/tltext \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh \
   RUNTESTS=$(top_srcdir)/src/tltext/runtests.sh \
   LIBPATH=$(top_builddir)/src/libs/int:$(top_builddir)/src/libs/string $(SHELL) -x
-TESTS = tltext-tests.sh
+
+#TESTS = tltext-tests.sh
 
 #check-local:
 #	$(top_srcdir)/src/tests/runbinary.sh $(top_srcdir)/src/tlcore/runtests.sh \

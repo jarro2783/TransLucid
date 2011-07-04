@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt
 
-check_PROGRAMS = lexer iterator_test
+check_PROGRAMS = lexer iterator_test line_tokenizer
 
 AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -33,8 +33,8 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/include \
 #printing_SOURCES = printing.cpp
 
 lexer_SOURCES = lexer.cpp
-
 iterator_test_SOURCES = iterator.cpp
+line_tokenizer_SOURCES = line_tokenizer.cpp
 
 TESTS_ENVIRONMENT = LIBRARY_PATH=$(top_builddir)/src/libs/int \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh $(SHELL) -x
