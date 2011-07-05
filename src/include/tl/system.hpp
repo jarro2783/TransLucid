@@ -184,6 +184,13 @@ namespace TransLucid
     void
     init_types();
 
+    //initialises the default equations
+    void
+    init_equations();
+
+    void 
+    init_dimensions(const std::initializer_list<u32string>& args);
+
     template <typename T>
     WS*
     buildConstantWS(size_t index);

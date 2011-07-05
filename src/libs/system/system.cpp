@@ -200,8 +200,6 @@ namespace detail
     {
       if (eqn.second == Parser::DECL_DEF)
       {
-        std::cerr << "adding equation " << 
-          std::get<0>(eqn.first)  << std::endl;
         return m_system.addEquation(eqn.first);
       }
       else
@@ -313,6 +311,52 @@ mpz_plus(Constant a, Constant b)
   ;
 }
 
+template <typename... Args>
+void 
+addEqn(System& s, Args... args)
+{
+  s.addEquation(Parser::Equation(
+    args...
+  ));
+}
+
+template <typename Arg>
+void
+addInitEqn(System& s, const u32string& name, const Arg& e)
+{
+  s.addEquation(Parser::Equation(
+    name,
+    Tree::Expr(),
+    Tree::Expr(),
+    e
+  ));
+}
+
+void
+System::init_equations()
+{
+  //add DIM=false default equation
+  addInitEqn(*this,
+    U"DIM", 
+    false
+  );
+
+  //add PRINT="this type has no printer"
+  addInitEqn(*this,
+    U"PRINT",
+    u32string(U"This type has no printer!")
+  );
+}
+
+void 
+System::init_dimensions(const std::initializer_list<u32string>& args)
+{
+  for (auto s : args)
+  {
+    addDimension(s);
+  }
+}
+
 System::System()
 : m_typeRegistry(m_nextTypeIndex)
 , m_time(0)
@@ -371,20 +415,20 @@ System::System()
 
   m_translator = new Translator(*this);
 
-  addDimension(U"time");
-  addDimension(U"name");
-  addDimension(U"symbol");
-  addDimension(U"fnname");
-
-  //add DIM=false default equation
-  addEquation(Parser::Equation
+  init_dimensions
   (
-    U"DIM", 
-    Tree::Expr(),
-    Tree::Expr(),
-    false
-  ));
+    {
+      U"time",
+      U"name",
+      U"symbol",
+      U"fnname",
+      U"arg0",
+      U"arg1",
+      U"arg2"
+    }
+  );
 
+  init_equations();
   m_functions.registerFunction
   (
     U"int_plus",

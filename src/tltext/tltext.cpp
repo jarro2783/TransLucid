@@ -128,7 +128,11 @@ TLText::run()
             }
           ),
           Tree::Expr(),
-          e
+
+          Tree::AtExpr(
+            Tree::IdentExpr(U"PRINT"),
+            Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), e}})
+          )
         ));
         ++slot;
       }
@@ -140,6 +144,18 @@ TLText::run()
       for (int s = 0; s != slot; ++s)
       {
         const auto& c = (*m_demands)(s);
+        if (c.index() == TYPE_INDEX_USTRING)
+        {
+          std::cout << "`" << get_constant_pointer<u32string>(c) << "`"
+            << std::endl;
+        }
+        else
+        {
+          std::cerr << "Error: PRINT didn't return a string" << std::endl;
+          std::cerr << "Type index: " << c.index() << std::endl;
+        }
+
+        #if 0
         if (c.index() == TYPE_INDEX_INTMP)
         {
           std::cout << get_constant_pointer<mpz_class>(c)
@@ -169,6 +185,7 @@ TLText::run()
         {
           std::cerr << "index: " << c.index() << std::endl;
         }
+        #endif
       }
     }
     else
