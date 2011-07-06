@@ -187,6 +187,12 @@ namespace TransLucid
         return m_count;
       }
 
+      void
+      reset()
+      {
+        m_count = 0;
+      }
+
       private:
       int m_count;
     };

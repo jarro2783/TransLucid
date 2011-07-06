@@ -97,6 +97,16 @@ namespace
 
     return theSystem;
   }
+
+  TL::Parser::Errors errors;
+
+  TL::Lexer::tl_lexer&
+  getLexer()
+  {
+    static TL::Lexer::tl_lexer lexer(errors, getSystem());
+
+    return lexer;
+  }
 }
 
 BOOST_AUTO_TEST_SUITE( lexer_tests )
@@ -421,8 +431,7 @@ bool check(const TL::u32string& input, Checker& checker)
 {
   TL::System& system = getSystem();
   const TL::Tuple& t = system.getDefaultContext();
-  TL::Parser::Errors errors;
-  TL::Lexer::tl_lexer lexer(errors, system);
+  auto& lexer = getLexer();
   lexer.m_context = &t;
   cgrammar checkg(lexer, checker);
 
@@ -431,6 +440,8 @@ bool check(const TL::u32string& input, Checker& checker)
     TL::Parser::makeUTF32Iterator(input.end())
   );
   TL::Parser::U32Iterator last;
+
+  errors.reset();
 
 	return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last
     && errors.count() == 0;
@@ -451,10 +462,11 @@ bool check_utf8(const std::string& input, Checker& checker)
   TL::System& system = getSystem();
   const TL::Tuple& t = system.getDefaultContext();
 
-  TL::Parser::Errors errors;
-  TL::Lexer::tl_lexer lexer(errors, system);
+  auto& lexer = getLexer();
   lexer.m_context = &t;
   cgrammar checkg(lexer, checker);
+
+  errors.reset();
 
   return lex::tokenize_and_parse(first, last, lexer, checkg) && first == last
     && errors.count() == 0;
