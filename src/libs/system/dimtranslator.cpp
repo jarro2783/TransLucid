@@ -30,7 +30,7 @@ DimensionTranslator::DimensionTranslator()
 : m_nextIndex(DIM_INDEX_LAST)
 , m_named(m_nextIndex, std::vector<std::pair<u32string, dimension_index>>
   {
-   {U"type", DIM_TYPE},
+   {U"typename", DIM_TYPE},
    {U"text", DIM_TEXT},
    {U"name", DIM_NAME},
    {U"id", DIM_ID},

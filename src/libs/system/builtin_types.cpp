@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
+#include <tl/internal_strings.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
 #include <tl/types/function.hpp>
@@ -434,7 +435,7 @@ addTypeEquation(System& s, const u32string& type)
     type,
     Tree::Expr(),
     Tree::Expr(),
-    Tree::LiteralExpr(U"type", type)
+    Tree::LiteralExpr(type_name_dim, type)
   ));
 }
 
@@ -449,8 +450,16 @@ addTypeNames(System& s, const std::initializer_list<u32string>& types)
 }
 
 void
+add_builtin_literals(System& s)
+{
+}
+
+void
 init_builtin_types(System& s)
 {
+  //add all of the literals (LITERAL ... =)
+  add_builtin_literals(s);
+
   //add all the definitions of t = type"t";;
   addTypeNames
   (

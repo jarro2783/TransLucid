@@ -21,5 +21,13 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  u32string type_name;
+  //dims
+  u32string type_name_dim = U"typename";
+  u32string text_dim = U"text";
+  u32string fnname_dim = U"fnname";
+
+  //identifiers
+  u32string LITERAL_IDENT = U"LITERAL";
+  u32string FN1_IDENT = U"FN1";
+  u32string FN2_IDENT = U"FN2";
 }

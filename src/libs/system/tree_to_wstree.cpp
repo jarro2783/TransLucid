@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/tree_to_wstree.hpp>
+#include <tl/internal_strings.hpp>
 
 namespace TransLucid
 {
@@ -64,12 +65,12 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LiteralExpr& e)
   //LITERAL @ [type : e.type, text : e.text]
   return Tree::AtExpr
   (
-    Tree::IdentExpr(U"LITERAL"),
+    Tree::IdentExpr(LITERAL_IDENT),
     Tree::TupleExpr
     (
       {
-        {Tree::DimensionExpr(U"type"), e.type},
-        {Tree::DimensionExpr(U"text"), e.text}
+        {Tree::DimensionExpr(type_name_dim), e.type},
+        {Tree::DimensionExpr(text_dim), e.text}
       }
     )
   );
@@ -101,12 +102,12 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
   (
     Tree::AtExpr
     (
-      Tree::IdentExpr(U"FN1"),
+      Tree::IdentExpr(FN1_IDENT),
       Tree::TupleExpr
       (
         {
           {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.e)},
-          {Tree::DimensionExpr(U"fnname"), e.op.op}
+          {Tree::DimensionExpr(fnname_dim), e.op.op}
         }
       )
     ),
@@ -140,13 +141,13 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
   (
     Tree::AtExpr
     (
-      Tree::IdentExpr(U"FN2"),
+      Tree::IdentExpr(FN2_IDENT),
       Tree::TupleExpr
       (
         {
           {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.lhs)},
           {Tree::DimensionExpr(U"arg1"), boost::apply_visitor(*this, e.rhs)},
-          {Tree::DimensionExpr(U"fnname"), e.op.op}
+          {Tree::DimensionExpr(fnname_dim), e.op.op}
         }
       )
     ),
