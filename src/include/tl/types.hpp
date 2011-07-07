@@ -139,7 +139,7 @@ namespace TransLucid
 
   enum TypeField
   {
-    TYPE_FIELD_ERROR,
+    TYPE_FIELD_ERROR, //not a value, don't read any field
     TYPE_FIELD_SP, 
     TYPE_FIELD_TV, //truth value
     TYPE_FIELD_CH,

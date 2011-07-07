@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
+#include <tl/system.hpp>
 #include <tl/types.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/intmp.hpp>
@@ -425,11 +426,58 @@ LambdaFunctionType::applyLambda(const Tuple& k, const Constant& value) const
   return (*m_expr)(Tuple(k_f));
 }
 
+inline
+void
+addTypeEquation(System& s, const u32string& type)
+{
+  s.addEquation(Parser::Equation(
+    type,
+    Tree::Expr(),
+    Tree::Expr(),
+    Tree::LiteralExpr(U"type", type)
+  ));
+}
+
+inline
+void
+addTypeNames(System& s, const std::initializer_list<u32string>& types)
+{
+  for (auto t : types)
+  {
+    addTypeEquation(s, t);
+  }
+}
+
 void
 init_builtin_types(System& s)
 {
+  //add all the definitions of t = type"t";;
+  addTypeNames
+  (
+    s,
+    {
+      U"type",
+      U"ustring",
+      U"uchar"
+    }
+  );
+
   //add all the printers for each type
   //PRINT | [arg0 : t] = "print_t"!(#arg0)
+
+  //string returns itself
+  //PRINT | [arg0 : ustring] = #arg0;;
+  s.addEquation(Parser::Equation
+  (
+    U"PRINT",
+    Tree::TupleExpr(
+    {{
+      Tree::DimensionExpr(u32string(U"arg0")),
+      Tree::IdentExpr(u32string(U"ustring"))
+    }}),
+    Tree::Expr(),
+    Tree::HashExpr(Tree::DimensionExpr(u32string(U"arg0")))
+  ));
 }
 
 } //namespace TransLucid
