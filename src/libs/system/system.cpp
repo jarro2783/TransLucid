@@ -435,6 +435,8 @@ System::System()
 
     &mpz_plus
   );
+
+  init_builtin_types(*this);
 }
 
 System::~System()

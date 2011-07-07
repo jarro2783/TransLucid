@@ -1,5 +1,5 @@
 /* Built-in types.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -425,7 +425,14 @@ LambdaFunctionType::applyLambda(const Tuple& k, const Constant& value) const
   return (*m_expr)(Tuple(k_f));
 }
 
+void
+init_builtin_types(System& s)
+{
+  //add all the printers for each type
+  //PRINT | [arg0 : t] = "print_t"!(#arg0)
 }
+
+} //namespace TransLucid
 
 namespace std
 {
