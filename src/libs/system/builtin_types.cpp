@@ -76,6 +76,22 @@ namespace TransLucid
         &Types::UUID::hash,
         &delete_ptr<uuid>
       };
+
+    class TypeConstructor : public WS
+    {
+      public:
+
+      TypeConstructor(System& s)
+      : m_system(s)
+      {
+      }
+
+      TaggedConstant
+      operator()(const Tuple& k);
+
+      private:
+      System& m_system;
+    };
   }
 
   namespace detail
@@ -435,7 +451,7 @@ addTypeEquation(System& s, const u32string& type)
     type,
     Tree::Expr(),
     Tree::Expr(),
-    Tree::LiteralExpr(type_name_dim, type)
+    Tree::LiteralExpr(U"type", type)
   ));
 }
 
@@ -452,6 +468,9 @@ addTypeNames(System& s, const std::initializer_list<u32string>& types)
 void
 add_builtin_literals(System& s)
 {
+  //LITERAL [typename : "typename-text"] = ...
+
+  //LITERAL [typename : "type"] = magic that looks up typename in system
 }
 
 void
