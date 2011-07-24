@@ -76,6 +76,22 @@ namespace TransLucid
         &Types::UUID::hash,
         &delete_ptr<uuid>
       };
+
+    class TypeConstructor : public WS
+    {
+      public:
+
+      TypeConstructor(System& s)
+      : m_system(s)
+      {
+      }
+
+      TaggedConstant
+      operator()(const Tuple& k);
+
+      private:
+      System& m_system;
+    };
   }
 
   namespace detail
