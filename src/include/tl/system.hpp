@@ -308,6 +308,17 @@ namespace TransLucid
     {
       return m_functions.lookupFunction<N>(name);
     }
+
+    template <typename... Args>
+    void
+    registerFunction
+    (
+      const u32string& name, 
+      std::function<Constant(Args... args)> f
+    )
+    {
+      m_functions.registerFunction(name, f);
+    }
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);

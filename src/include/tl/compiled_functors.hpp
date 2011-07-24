@@ -253,7 +253,7 @@ namespace TransLucid
         Args... args
       )
       {
-        return (*f)(args...);
+        return f(args...);
       }
     };
 
@@ -292,7 +292,7 @@ namespace TransLucid
     template <>
     struct generate_bang_funcs<-1>
     {
-      generate_bang_funcs(BangFunc *funcs)
+      generate_bang_funcs(BangFunc* funcs)
       {
       }
     };

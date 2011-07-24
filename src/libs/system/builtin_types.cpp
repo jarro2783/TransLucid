@@ -435,13 +435,13 @@ addTypeEquation(System& s, const u32string& type)
     type,
     Tree::Expr(),
     Tree::Expr(),
-    Tree::LiteralExpr(type_name_dim, type)
+    Tree::LiteralExpr(U"type", type)
   ));
 }
 
 inline
 void
-addTypeNames(System& s, const std::initializer_list<u32string>& types)
+addTypeNames(System& s, const std::vector<u32string>& types)
 {
   for (auto t : types)
   {
@@ -450,29 +450,96 @@ addTypeNames(System& s, const std::initializer_list<u32string>& types)
 }
 
 void
-add_builtin_literals(System& s)
+add_builtin_literals(System& s, const std::vector<u32string>& types)
 {
+  //the type type
+  #if 0
+  s.addEquation(Parser::Equation(
+    U"LITERAL",
+    Tree::TupleExpr({{Tree::DimensionExpr(U"typename"), U"type"}}),
+    Tree::Expr(),
+    Tree::BangOpExpr(U"construct_type",
+      {
+        Tree::HashExpr(Tree::DimensionExpr(U"text")),
+      }
+    )
+  ));
+  #endif
+
+  for (auto t : types)
+  {
+    s.addEquation(Parser::Equation(
+      U"LITERAL",
+      Tree::TupleExpr({{Tree::DimensionExpr(U"typename"), t}}),
+      Tree::Expr(),
+      Tree::BangOpExpr(U"construct_" + t,
+        {
+          Tree::HashExpr(Tree::DimensionExpr(U"text")),
+        }
+      )
+    ));
+  }
+
+  s.registerFunction(U"construct_type",
+    std::function<Constant(const Constant&)>(
+      [&s] (const Constant& text) -> Constant
+    {
+      type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
+
+      if (t == 0)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+      else
+      {
+        return Types::Type::create(t);
+      }
+    })
+  );
 }
 
 void
 init_builtin_types(System& s)
 {
+  //this must be sorted
+  std::vector<u32string> type_names{
+    U"bool",
+    U"intmp",
+    U"special"
+    U"type",
+    U"uchar",
+    U"ustring",
+  };
+    
   //add all of the literals (LITERAL ... =)
-  add_builtin_literals(s);
+  add_builtin_literals(s, type_names);
 
   //add all the definitions of t = type"t";;
-  addTypeNames
-  (
-    s,
-    {
-      U"type",
-      U"ustring",
-      U"uchar"
-    }
-  );
+  addTypeNames(s, type_names);
 
   //add all the printers for each type
   //PRINT | [arg0 : t] = "print_t"!(#arg0)
+
+  //remove "ustring" from the types
+  std::vector<u32string> to_print_types;
+  std::vector<u32string> string{U"ustring"};
+  std::set_difference(type_names.begin(), type_names.end(),
+    string.begin(), string.end(),
+    std::back_inserter(to_print_types));
+
+  for (auto t : type_names)
+  {
+    s.addEquation(Parser::Equation(
+      U"PRINT",
+      Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(t)}}),
+      Tree::Expr(),
+      Tree::BangOpExpr(U"print_" + t,
+        {
+          Tree::HashExpr(Tree::DimensionExpr(U"arg0")),
+        }
+      )
+    ));
+  }
 
   //string returns itself
   //PRINT | [arg0 : ustring] = #arg0;;

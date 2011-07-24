@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 
+#include <functional>
 #include <unordered_map>
 
 namespace TransLucid
@@ -41,7 +42,8 @@ namespace TransLucid
   template <typename... Args>
   struct make_function_type<0, Args...>
   {
-    typedef typename identity<Constant(*)(Args...)>::type type;
+    //typedef typename identity<Constant(*)(Args...)>::type type;
+    typedef typename std::function<Constant(Args...)> type;
   };
 
   template <size_t N, typename... Types>
@@ -79,7 +81,11 @@ namespace TransLucid
     //Constant(Constant...)
     template <typename... Args>
     void
-    registerFunction(const u32string& name, Constant(*f)(Args... args))
+    registerFunction
+    (
+      const u32string& name, 
+      std::function<Constant(Args... args)> f
+    )
     {
       //die(m_functions);
       static_assert(sizeof...(Args) <= N, "function takes too many arguments");
@@ -112,7 +118,8 @@ namespace TransLucid
       }
       else
       {
-        return nullptr;
+        //return nullptr;
+        return typename make_function_type<U>::type();
       }
     }
   };

@@ -358,10 +358,8 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
 }
 
 System::System()
-: m_typeRegistry(m_nextTypeIndex)
-, m_time(0)
-, builtin_name_to_index
-  {
+: m_typeRegistry(m_nextTypeIndex,
+  std::vector<std::pair<u32string, type_index>>{
    {U"ustring", TYPE_INDEX_USTRING},
    {U"intmp", TYPE_INDEX_INTMP},
    {U"bool", TYPE_INDEX_BOOL},
@@ -370,6 +368,8 @@ System::System()
    {U"dim", TYPE_INDEX_DIMENSION},
    {U"type", TYPE_INDEX_TYPE}
   }
+  )
+, m_time(0)
 {
   //create the obj, const and fun ids
 
@@ -401,7 +401,7 @@ System::System()
 
   //add variables for all the types
   //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
-  init_types();
+  //init_types();
 
   //build the constant creators
   //buildConstantWS<Hyperdatons::BoolWS>(TYPE_INDEX_BOOL);
@@ -432,8 +432,7 @@ System::System()
   m_functions.registerFunction
   (
     U"int_plus",
-
-    &mpz_plus
+    make_function_type<2>::type(&mpz_plus)
   );
 
   init_builtin_types(*this);
