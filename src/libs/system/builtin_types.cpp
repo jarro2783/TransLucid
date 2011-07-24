@@ -497,7 +497,7 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
   }
 
   s.registerFunction(U"construct_type",
-    std::function<Constant(const Constant&)>(
+    make_function_type<1>::type(
       [&s] (const Constant& text) -> Constant
     {
       type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
@@ -543,6 +543,7 @@ init_builtin_types(System& s)
     string.begin(), string.end(),
     std::back_inserter(to_print_types));
 
+  #if 0
   for (auto t : type_names)
   {
     s.addEquation(Parser::Equation(
@@ -556,6 +557,17 @@ init_builtin_types(System& s)
       )
     ));
   }
+  #endif
+
+  s.registerFunction(U"print_intmp",
+    make_function_type<1>::type(
+    [] (const Constant& i) -> Constant
+    {
+      return Types::String::create(
+        to_u32string(get_constant_pointer<mpz_class>(i).get_str()));
+    }
+    )
+  );
 
   //string returns itself
   //PRINT | [arg0 : ustring] = #arg0;;
