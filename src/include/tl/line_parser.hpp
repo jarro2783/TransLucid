@@ -64,7 +64,7 @@ namespace TransLucid
         (
           (tok.dimension_ > g_hstring[_val = construct<DimensionDecl>(_1)])
         | (tok.library_ > g_hstring[_val = construct<LibraryDecl>(_1)])
-        | (tok.eqn_ > g_equation[_val = _1])
+        | (tok.var_ > g_equation[_val = _1])
         | (tok.assignment_ > g_equation[_val = _1])
         | ((tok.infix_binary_ > g_binop)
           [

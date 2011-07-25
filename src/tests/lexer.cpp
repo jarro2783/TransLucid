@@ -378,7 +378,7 @@ struct checker_grammar
       | tok.elsif_[_val = KEYWORD_ELSIF]
       | tok.true_ [_val = KEYWORD_TRUE]
       | tok.false_[_val = KEYWORD_FALSE]
-      | tok.eqn_  [_val = KEYWORD_EQN]
+      | tok.var_  [_val = KEYWORD_EQN]
       ;
 
       symbol = 
