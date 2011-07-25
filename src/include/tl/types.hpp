@@ -99,7 +99,8 @@ namespace TransLucid
     SP_UNDEF,
     SP_CONST,
     SP_MULTIDEF,
-    SP_LOOP
+    SP_LOOP,
+    SPECIAL_LAST //the number of specials, not an actual special value
   };
 
   template <typename T>

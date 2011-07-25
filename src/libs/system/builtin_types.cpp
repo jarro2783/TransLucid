@@ -93,6 +93,32 @@ namespace TransLucid
       private:
       System& m_system;
     };
+
+    #if 0
+    SP_ERROR, /**<Error value. Should never have this value, having a special
+    of this value means an error occured somewhere.*/
+    SP_ACCESS, /**<Access error. Something requested could not be accessed.*/
+    SP_TYPEERROR,
+    SP_DIMENSION,
+    SP_UNDEF,
+    SP_CONST,
+    SP_MULTIDEF,
+    SP_LOOP,
+    SPECIAL_LAST //the number of specials, not an actual special value
+    #endif
+
+    u32string special_names[SPECIAL_LAST] = 
+    {
+      U"error",
+      U"access",
+      U"typeerror",
+      U"dim",
+      U"undef",
+      U"const",
+      U"multidef",
+      U"loop"
+    }
+    ;
   }
 
   namespace detail
@@ -245,6 +271,14 @@ namespace TransLucid
       create(TransLucid::Special s)
       {
         return Constant(s, TYPE_INDEX_SPECIAL);
+      }
+
+      Constant
+      print(const Constant& c)
+      {
+        auto s = get_constant<TransLucid::Special>(c);
+
+        return String::create(U"sp" + special_names[s]);
       }
     }
 
@@ -572,6 +606,9 @@ init_builtin_types(System& s)
 
   s.registerFunction(U"print_uchar",
     make_function_type<1>::type(&Types::UChar::print));
+
+  s.registerFunction(U"print_special",
+    make_function_type<1>::type(&Types::Special::print));
 
   //string returns itself
   //PRINT | [arg0 : ustring] = #arg0;;

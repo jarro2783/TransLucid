@@ -30,6 +30,9 @@ namespace TransLucid
     {
       Constant
       create(TransLucid::Special s);
+
+      Constant
+      print(const Constant& c);
     }
   }
 }
