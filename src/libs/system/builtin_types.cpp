@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/internal_strings.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
+#include <tl/types/char.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
@@ -338,6 +339,14 @@ namespace TransLucid
       {
         return Constant(c, TYPE_INDEX_UCHAR);
       }
+
+      Constant
+      print(const Constant& c)
+      {
+        return String::create(
+          u32string(1, get_constant<char32_t>(c)));
+        ;
+      }
     }
 
     namespace Intmp
@@ -371,6 +380,13 @@ namespace TransLucid
       destroy(void* p)
       {
         delete reinterpret_cast<mpz_class*>(p);
+      }
+
+      Constant
+      print(const Constant& c)
+      {
+        return Types::String::create(
+          to_u32string(get_constant_pointer<mpz_class>(c).get_str()));
       }
     }
 
@@ -486,7 +502,7 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
   {
     s.addEquation(Parser::Equation(
       U"LITERAL",
-      Tree::TupleExpr({{Tree::DimensionExpr(U"typename"), t}}),
+      Tree::TupleExpr({{Tree::DimensionExpr(type_name_dim), t}}),
       Tree::Expr(),
       Tree::BangOpExpr(U"construct_" + t,
         {
@@ -517,15 +533,16 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
 void
 init_builtin_types(System& s)
 {
-  //this must be sorted
-  std::vector<u32string> type_names{
+  std::vector<u32string> to_print_types{
     U"bool",
     U"intmp",
-    U"special"
+    U"special",
     U"type",
     U"uchar",
-    U"ustring",
   };
+
+  std::vector<u32string> type_names = to_print_types;
+  type_names.push_back(U"ustring");
     
   //add all of the literals (LITERAL ... =)
   add_builtin_literals(s, type_names);
@@ -536,15 +553,7 @@ init_builtin_types(System& s)
   //add all the printers for each type
   //PRINT | [arg0 : t] = "print_t"!(#arg0)
 
-  //remove "ustring" from the types
-  std::vector<u32string> to_print_types;
-  std::vector<u32string> string{U"ustring"};
-  std::set_difference(type_names.begin(), type_names.end(),
-    string.begin(), string.end(),
-    std::back_inserter(to_print_types));
-
-  #if 0
-  for (auto t : type_names)
+  for (auto t : to_print_types)
   {
     s.addEquation(Parser::Equation(
       U"PRINT",
@@ -557,17 +566,12 @@ init_builtin_types(System& s)
       )
     ));
   }
-  #endif
 
-  s.registerFunction(U"print_intmp",
-    make_function_type<1>::type(
-    [] (const Constant& i) -> Constant
-    {
-      return Types::String::create(
-        to_u32string(get_constant_pointer<mpz_class>(i).get_str()));
-    }
-    )
-  );
+  s.registerFunction(U"print_intmp", 
+    make_function_type<1>::type(&Types::Intmp::print));
+
+  s.registerFunction(U"print_uchar",
+    make_function_type<1>::type(&Types::UChar::print));
 
   //string returns itself
   //PRINT | [arg0 : ustring] = #arg0;;
