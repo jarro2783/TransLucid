@@ -569,25 +569,8 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
 }
 
 void
-init_builtin_types(System& s)
+add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
 {
-  std::vector<u32string> to_print_types{
-    U"bool",
-    U"intmp",
-    U"special",
-    U"type",
-    U"uchar",
-  };
-
-  std::vector<u32string> type_names = to_print_types;
-  type_names.push_back(U"ustring");
-    
-  //add all of the literals (LITERAL ... =)
-  add_builtin_literals(s, type_names);
-
-  //add all the definitions of t = type"t";;
-  addTypeNames(s, type_names);
-
   //add all the printers for each type
   //PRINT | [arg0 : t] = "print_t"!(#arg0)
 
@@ -630,6 +613,30 @@ init_builtin_types(System& s)
     Tree::Expr(),
     Tree::HashExpr(Tree::DimensionExpr(u32string(U"arg0")))
   ));
+
+}
+
+void
+init_builtin_types(System& s)
+{
+  std::vector<u32string> to_print_types{
+    U"bool",
+    U"intmp",
+    U"special",
+    U"type",
+    U"uchar",
+  };
+
+  std::vector<u32string> type_names = to_print_types;
+  type_names.push_back(U"ustring");
+    
+  //add all of the literals (LITERAL ... =)
+  add_builtin_literals(s, type_names);
+
+  //add all the definitions of t = type"t";;
+  addTypeNames(s, type_names);
+
+  add_builtin_printers(s, to_print_types);
 }
 
 } //namespace TransLucid
