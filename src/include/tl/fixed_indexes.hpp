@@ -33,6 +33,7 @@ namespace TransLucid
   enum TypeIndexes
   {
     //types
+    TYPE_INDEX_ERROR,
     TYPE_INDEX_BOOL,
     TYPE_INDEX_SPECIAL,
     TYPE_INDEX_INTMP,

@@ -30,6 +30,9 @@ namespace TransLucid
     {
       Constant
       create(bool v);
+
+      Constant
+      print(const Constant& c);
     }
   }
 }

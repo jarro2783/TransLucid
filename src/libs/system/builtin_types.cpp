@@ -78,22 +78,6 @@ namespace TransLucid
         &delete_ptr<uuid>
       };
 
-    class TypeConstructor : public WS
-    {
-      public:
-
-      TypeConstructor(System& s)
-      : m_system(s)
-      {
-      }
-
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      System& m_system;
-    };
-
     #if 0
     SP_ERROR, /**<Error value. Should never have this value, having a special
     of this value means an error occured somewhere.*/
@@ -225,6 +209,20 @@ namespace TransLucid
       create(bool v)
       {
         return Constant(v, TYPE_INDEX_BOOL);
+      }
+
+      Constant
+      print(const Constant& c)
+      {
+        bool b = get_constant<bool>(c);
+        if (b)
+        {
+          return String::create(U"true");
+        }
+        else
+        {
+          return String::create(U"false");
+        }
       }
     }
 
@@ -550,7 +548,13 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
     make_function_type<1>::type(
       [&s] (const Constant& text) -> Constant
     {
+      std::cerr << "looking up the type of \"" 
+                << get_constant_pointer<u32string>(text)
+                << "\"" << std::endl;
+
       type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
+
+      std::cerr << "got: " << t << std::endl;
 
       if (t == 0)
       {
@@ -609,6 +613,9 @@ init_builtin_types(System& s)
 
   s.registerFunction(U"print_special",
     make_function_type<1>::type(&Types::Special::print));
+
+  s.registerFunction(U"print_bool",
+    make_function_type<1>::type(&Types::Boolean::print));
 
   //string returns itself
   //PRINT | [arg0 : ustring] = #arg0;;

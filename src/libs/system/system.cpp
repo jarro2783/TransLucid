@@ -291,18 +291,6 @@ System::buildConstantWS(size_t index)
   return h;
 }
 
-void
-System::init_types()
-{
-  for(auto v : builtin_name_to_index)
-  {
-    addEquation(v.first, GuardWS(),
-                        new Hyperdatons::TypeConstWS(v.second));
-  }
-
-  //LITERAL | [type : "t", text : ustring] = "hostfun"!(#text)
-}
-
 Constant
 mpz_plus(Constant a, Constant b)
 {
@@ -399,18 +387,6 @@ System::System()
   //add this
   //addEquation(U"this", GuardWS(), this);
 
-  //add variables for all the types
-  //std::vector<ustring_t> typeNames = {"intmp", "uchar"};
-  //init_types();
-
-  //build the constant creators
-  //buildConstantWS<Hyperdatons::BoolWS>(TYPE_INDEX_BOOL);
-  //buildConstantWS<Hyperdatons::UCharWS>(TYPE_INDEX_UCHAR);
-  //WS* intmpWS = buildConstantWS<Hyperdatons::IntmpWS>(TYPE_INDEX_INTMP);
-  //buildConstantWS<Hyperdatons::UStringWS>(TYPE_INDEX_USTRING);
-
-  //set this as the default int too
-  //addEquation(U"DEFAULTINT", GuardWS(), intmpWS);
   setDefaultContext();
 
   m_translator = new Translator(*this);
