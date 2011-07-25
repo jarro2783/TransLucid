@@ -103,6 +103,14 @@ namespace TransLucid
       U"loop"
     }
     ;
+
+    Constant
+    mpz_plus(const Constant& a, const Constant& b)
+    {
+      return Types::Intmp::create(get_constant_pointer<mpz_class>(a) +
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
   }
 
   namespace detail
@@ -548,13 +556,7 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
     make_function_type<1>::type(
       [&s] (const Constant& text) -> Constant
     {
-      std::cerr << "looking up the type of \"" 
-                << get_constant_pointer<u32string>(text)
-                << "\"" << std::endl;
-
       type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
-
-      std::cerr << "got: " << t << std::endl;
 
       if (t == 0)
       {
@@ -577,7 +579,7 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
   for (auto t : to_print_types)
   {
     s.addEquation(Parser::Equation(
-      U"PRINT",
+      PRINT_IDENT,
       Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(t)}}),
       Tree::Expr(),
       Tree::BangOpExpr(U"print_" + t,
@@ -604,7 +606,7 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
   //PRINT | [arg0 : ustring] = #arg0;;
   s.addEquation(Parser::Equation
   (
-    U"PRINT",
+    PRINT_IDENT,
     Tree::TupleExpr(
     {{
       Tree::DimensionExpr(u32string(U"arg0")),
@@ -613,7 +615,28 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
     Tree::Expr(),
     Tree::HashExpr(Tree::DimensionExpr(u32string(U"arg0")))
   ));
+}
 
+void
+add_builtin_ops(System& s)
+{
+  s.addEquation(Parser::Equation(
+    FN2_IDENT,
+    Tree::TupleExpr
+    ({
+      {Tree::DimensionExpr(fnname_dim), u32string(U"plus")},
+      {Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(U"intmp")},
+      {Tree::DimensionExpr(U"arg1"), Tree::IdentExpr(U"intmp")}
+    }),
+    Tree::Expr(),
+    u32string(U"int_plus")
+  ));
+
+  s.registerFunction
+  (
+    U"int_plus",
+    make_function_type<2>::type(&mpz_plus)
+  );
 }
 
 void
@@ -637,6 +660,8 @@ init_builtin_types(System& s)
   addTypeNames(s, type_names);
 
   add_builtin_printers(s, to_print_types);
+
+  add_builtin_ops(s);
 }
 
 } //namespace TransLucid

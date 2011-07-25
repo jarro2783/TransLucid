@@ -63,10 +63,7 @@ namespace TransLucid
 
       BoolConstWS(bool value)
       : m_value(Types::Boolean::create(value))
-      {
-        std::cerr << "constructing boolean constant " << std::boolalpha
-          << value << std::noboolalpha << std::endl;
-      }
+      {}
 
       TaggedConstant
       operator()(const Tuple& k);

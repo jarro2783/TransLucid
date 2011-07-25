@@ -30,4 +30,5 @@ namespace TransLucid
   extern u32string LITERAL_IDENT;
   extern u32string FN1_IDENT;
   extern u32string FN2_IDENT;
+  extern u32string PRINT_IDENT;
 }

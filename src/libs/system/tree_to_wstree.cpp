@@ -142,6 +142,12 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
   //FN2 @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)] 
   //  ! (T(e.lhs), T(e.rhs))
 
+  Tree::Expr elhs = boost::apply_visitor(*this, e.lhs);
+  Tree::Expr erhs = boost::apply_visitor(*this, e.rhs);
+
+  std::cerr << "translating op to FN2 @ [fnname <- " << e.op.op
+    << "...]" << std::endl;
+
   //optimise as above
   return Tree::BangOpExpr
   (
@@ -151,15 +157,15 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
       Tree::TupleExpr
       (
         {
-          {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.lhs)},
-          {Tree::DimensionExpr(U"arg1"), boost::apply_visitor(*this, e.rhs)},
+          {Tree::DimensionExpr(U"arg0"), elhs},
+          {Tree::DimensionExpr(U"arg1"), erhs},
           {Tree::DimensionExpr(fnname_dim), e.op.op}
         }
       )
     ),
     {
-      boost::apply_visitor(*this, e.lhs),
-      boost::apply_visitor(*this, e.rhs)
+      elhs,
+      erhs
     }
   );
 

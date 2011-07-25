@@ -291,14 +291,6 @@ System::buildConstantWS(size_t index)
   return h;
 }
 
-Constant
-mpz_plus(Constant a, Constant b)
-{
-  return Types::Intmp::create(get_constant_pointer<mpz_class>(a) +
-    get_constant_pointer<mpz_class>(b))
-  ;
-}
-
 template <typename... Args>
 void 
 addEqn(System& s, Args... args)
@@ -405,11 +397,6 @@ System::System()
   );
 
   init_equations();
-  m_functions.registerFunction
-  (
-    U"int_plus",
-    make_function_type<2>::type(&mpz_plus)
-  );
 
   init_builtin_types(*this);
 }

@@ -30,4 +30,5 @@ namespace TransLucid
   u32string LITERAL_IDENT = U"LITERAL";
   u32string FN1_IDENT = U"FN1";
   u32string FN2_IDENT = U"FN2";
+  u32string PRINT_IDENT = U"PRINT";
 }
