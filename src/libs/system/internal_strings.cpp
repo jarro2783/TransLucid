@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/internal_strings.hpp>
 #include <tl/types.hpp>
+#include <tl/types/string.hpp>
 
 namespace TransLucid
 {
@@ -31,4 +33,6 @@ namespace TransLucid
   u32string FN1_IDENT = U"FN1";
   u32string FN2_IDENT = U"FN2";
   u32string PRINT_IDENT = U"PRINT";
+
+  std::unordered_map<u32string, Constant> string_constants;
 }

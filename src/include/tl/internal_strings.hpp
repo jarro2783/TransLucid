@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/types.hpp>
+#include <unordered_map>
 
 namespace TransLucid
 {
@@ -31,4 +32,6 @@ namespace TransLucid
   extern u32string FN1_IDENT;
   extern u32string FN2_IDENT;
   extern u32string PRINT_IDENT;
+
+  extern std::unordered_map<u32string, Constant> string_constants;
 }

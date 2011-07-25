@@ -117,9 +117,7 @@ namespace TransLucid
     class UStringConstWS : public WS
     {
       public:
-      UStringConstWS(const u32string& s)
-      : m_value(Types::String::create(s))
-      {}
+      UStringConstWS(const u32string& s);
 
       TaggedConstant
       operator()(const Tuple& k);

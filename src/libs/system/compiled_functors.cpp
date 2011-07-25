@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/compiled_functors.hpp>
 #include <tl/consthd.hpp>
 #include <tl/fixed_indexes.hpp>
+#include <tl/internal_strings.hpp>
 #include <tl/maxsharelist.hpp>
 #include <tl/system.hpp>
 #include <tl/types/dimension.hpp>
@@ -191,6 +192,21 @@ TaggedConstant
 SpecialConstWS::operator()(const Tuple& k)
 {
   return TaggedConstant(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
+}
+
+UStringConstWS::UStringConstWS(const u32string& s)
+{
+  auto iter = string_constants.find(s);
+
+  if (iter != string_constants.end())
+  {
+    m_value = iter->second;
+  }
+  else
+  {
+    m_value = string_constants
+      .insert(std::make_pair(s, Types::String::create(s))).first->second;
+  }
 }
 
 TaggedConstant

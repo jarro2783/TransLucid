@@ -120,7 +120,7 @@ enum Keyword
 	KEYWORD_ELSIF,
 	KEYWORD_TRUE,
 	KEYWORD_FALSE,
-  KEYWORD_EQN
+  KEYWORD_VAR
 };
 
 enum Token
@@ -378,7 +378,7 @@ struct checker_grammar
       | tok.elsif_[_val = KEYWORD_ELSIF]
       | tok.true_ [_val = KEYWORD_TRUE]
       | tok.false_[_val = KEYWORD_FALSE]
-      | tok.var_  [_val = KEYWORD_EQN]
+      | tok.var_  [_val = KEYWORD_VAR]
       ;
 
       symbol = 
@@ -691,18 +691,18 @@ BOOST_AUTO_TEST_CASE ( comments )
   std::string input = 
   R"(
     //comment
-    eqn y = 6;; //more comments
-    eqn z = 5;;
+    var y = 6;; //more comments
+    var z = 5;;
     //end comment
   )";
 
   Checker checker({
-    KEYWORD_EQN,
+    KEYWORD_VAR,
     U"y",
     TOKEN_EQUALS,
     mpz_class(6),
     TOKEN_DOUBLE_SEMI,
-    KEYWORD_EQN,
+    KEYWORD_VAR,
     U"z",
     TOKEN_EQUALS,
     mpz_class(5),
