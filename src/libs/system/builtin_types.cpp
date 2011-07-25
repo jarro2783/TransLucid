@@ -347,7 +347,9 @@ namespace TransLucid
       bool
       equality(const Constant& lhs, const Constant& rhs)
       {
-        return get(lhs) == get(rhs);
+        //same pointer means same string
+        return lhs.data.ptr == rhs.data.ptr
+          || get(lhs) == get(rhs);
       }
     }
 
