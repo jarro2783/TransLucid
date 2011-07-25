@@ -111,6 +111,30 @@ namespace TransLucid
         get_constant_pointer<mpz_class>(b))
       ;
     }
+
+    Constant
+    mpz_minus(const Constant& a, const Constant& b)
+    {
+      return Types::Intmp::create(get_constant_pointer<mpz_class>(a) -
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
+
+    Constant
+    mpz_times(const Constant& a, const Constant& b)
+    {
+      return Types::Intmp::create(get_constant_pointer<mpz_class>(a) *
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
+
+    Constant
+    mpz_divide(const Constant& a, const Constant& b)
+    {
+      return Types::Intmp::create(get_constant_pointer<mpz_class>(a) /
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
   }
 
   namespace detail
@@ -617,26 +641,47 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
   ));
 }
 
+template <typename F>
 void
-add_builtin_ops(System& s)
+add_one_binop
+(
+  System& s, 
+  const u32string& opname, 
+  const u32string& sysop,
+  const u32string& type,
+  F func
+)
 {
   s.addEquation(Parser::Equation(
     FN2_IDENT,
     Tree::TupleExpr
     ({
-      {Tree::DimensionExpr(fnname_dim), u32string(U"plus")},
-      {Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(U"intmp")},
-      {Tree::DimensionExpr(U"arg1"), Tree::IdentExpr(U"intmp")}
+      //{Tree::DimensionExpr(fnname_dim), u32string(U"plus")},
+      {Tree::DimensionExpr(fnname_dim), opname},
+      {Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(type)},
+      {Tree::DimensionExpr(U"arg1"), Tree::IdentExpr(type)}
     }),
     Tree::Expr(),
-    u32string(U"int_plus")
+    //u32string(U"int_plus")
+    sysop
   ));
 
   s.registerFunction
   (
-    U"int_plus",
-    make_function_type<2>::type(&mpz_plus)
+    //U"int_plus",
+    //make_function_type<2>::type(&mpz_plus)
+    sysop,
+    make_function_type<2>::type(func)
   );
+}
+
+void
+add_builtin_ops(System& s)
+{
+  add_one_binop(s, U"plus", U"int_plus", U"intmp", &mpz_plus);
+  add_one_binop(s, U"minus", U"int_minus", U"intmp", &mpz_minus);
+  add_one_binop(s, U"times", U"int_times", U"intmp", &mpz_times);
+  add_one_binop(s, U"divide", U"int_divide", U"intmp", &mpz_divide);
 }
 
 void

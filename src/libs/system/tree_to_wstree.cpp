@@ -145,9 +145,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
   Tree::Expr elhs = boost::apply_visitor(*this, e.lhs);
   Tree::Expr erhs = boost::apply_visitor(*this, e.rhs);
 
-  std::cerr << "translating op to FN2 @ [fnname <- " << e.op.op
-    << "...]" << std::endl;
-
   //optimise as above
   return Tree::BangOpExpr
   (
