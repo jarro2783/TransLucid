@@ -96,6 +96,7 @@ namespace TransLucid
     SP_ACCESS, /**<Access error. Something requested could not be accessed.*/
     SP_TYPEERROR,
     SP_DIMENSION,
+    SP_ARITH,
     SP_UNDEF,
     SP_CONST,
     SP_MULTIDEF,

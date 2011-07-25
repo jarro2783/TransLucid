@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/internal_strings.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
+#include <tl/types/boolean.hpp>
 #include <tl/types/char.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/intmp.hpp>
@@ -84,6 +85,7 @@ namespace TransLucid
     SP_ACCESS, /**<Access error. Something requested could not be accessed.*/
     SP_TYPEERROR,
     SP_DIMENSION,
+    SP_ARITH,
     SP_UNDEF,
     SP_CONST,
     SP_MULTIDEF,
@@ -97,6 +99,7 @@ namespace TransLucid
       U"access",
       U"typeerror",
       U"dim",
+      U"arith",
       U"undef",
       U"const",
       U"multidef",
@@ -131,10 +134,123 @@ namespace TransLucid
     Constant
     mpz_divide(const Constant& a, const Constant& b)
     {
-      return Types::Intmp::create(get_constant_pointer<mpz_class>(a) /
+      mpz_class bval = get_constant_pointer<mpz_class>(b);
+      if (bval == 0)
+      {
+        return Types::Special::create(Special::SP_ARITH);
+      }
+      else
+      {
+        return Types::Intmp::create(get_constant_pointer<mpz_class>(a) /
+          bval);
+      }
+      ;
+    }
+
+    Constant
+    mpz_modulus(const Constant& a, const Constant& b)
+    {
+      mpz_class bval = get_constant_pointer<mpz_class>(b);
+      if (bval == 0)
+      {
+        return Types::Special::create(Special::SP_ARITH);
+      }
+      else
+      {
+        return Types::Intmp::create(get_constant_pointer<mpz_class>(a) %
+          bval);
+      }
+      ;
+    }
+
+    Constant
+    mpz_lte(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpz_class>(a) <=
         get_constant_pointer<mpz_class>(b))
       ;
     }
+
+    Constant
+    mpz_lt(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpz_class>(a) <
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
+
+    Constant
+    mpz_gte(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpz_class>(a) >=
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
+
+    Constant
+    mpz_gt(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpz_class>(a) >
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
+
+    Constant
+    mpz_eq(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpz_class>(a) ==
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
+
+    Constant
+    mpz_ne(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpz_class>(a) !=
+        get_constant_pointer<mpz_class>(b))
+      ;
+    }
+
+    Constant
+    bool_eq(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant<bool>(a) ==
+        get_constant<bool>(b))
+      ;
+    }
+
+    Constant
+    bool_ne(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant<bool>(a) !=
+        get_constant<bool>(b))
+      ;
+    }
+
+    Constant
+    ustring_eq(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<u32string>(a) ==
+        get_constant_pointer<u32string>(b))
+      ;
+    }
+
+    Constant
+    ustring_ne(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<u32string>(a) !=
+        get_constant_pointer<u32string>(b))
+      ;
+    }
+
+    Constant
+    ustring_plus(const Constant& a, const Constant& b)
+    {
+      return Types::String::create(get_constant_pointer<u32string>(a) +
+        get_constant_pointer<u32string>(b))
+      ;
+    }
+
   }
 
   namespace detail
@@ -643,10 +759,10 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
 
 template <typename F>
 void
-add_one_binop
+add_one_fun2
 (
   System& s, 
-  const u32string& opname, 
+  const u32string& fnname, 
   const u32string& sysop,
   const u32string& type,
   F func
@@ -657,7 +773,7 @@ add_one_binop
     Tree::TupleExpr
     ({
       //{Tree::DimensionExpr(fnname_dim), u32string(U"plus")},
-      {Tree::DimensionExpr(fnname_dim), opname},
+      {Tree::DimensionExpr(fnname_dim), fnname},
       {Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(type)},
       {Tree::DimensionExpr(U"arg1"), Tree::IdentExpr(type)}
     }),
@@ -678,10 +794,24 @@ add_one_binop
 void
 add_builtin_ops(System& s)
 {
-  add_one_binop(s, U"plus", U"int_plus", U"intmp", &mpz_plus);
-  add_one_binop(s, U"minus", U"int_minus", U"intmp", &mpz_minus);
-  add_one_binop(s, U"times", U"int_times", U"intmp", &mpz_times);
-  add_one_binop(s, U"divide", U"int_divide", U"intmp", &mpz_divide);
+  add_one_fun2(s, U"plus", U"int_plus", U"intmp", &mpz_plus);
+  add_one_fun2(s, U"minus", U"int_minus", U"intmp", &mpz_minus);
+  add_one_fun2(s, U"times", U"int_times", U"intmp", &mpz_times);
+  add_one_fun2(s, U"divide", U"int_divide", U"intmp", &mpz_divide);
+  add_one_fun2(s, U"modulus", U"int_modulus", U"intmp", &mpz_modulus);
+  add_one_fun2(s, U"lte", U"int_lte", U"intmp", &mpz_lte);
+  add_one_fun2(s, U"lt", U"int_lt", U"intmp", &mpz_lt);
+  add_one_fun2(s, U"gte", U"int_gte", U"intmp", &mpz_gte);
+  add_one_fun2(s, U"gt", U"int_gt", U"intmp", &mpz_gt);
+  add_one_fun2(s, U"eq", U"int_eq", U"intmp", &mpz_eq);
+  add_one_fun2(s, U"ne", U"int_ne", U"intmp", &mpz_ne);
+
+  add_one_fun2(s, U"eq", U"bool_eq", U"bool", &bool_eq);
+  add_one_fun2(s, U"ne", U"bool_ne", U"bool", &bool_ne);
+
+  add_one_fun2(s, U"eq", U"ustring_eq", U"ustring", &ustring_eq);
+  add_one_fun2(s, U"ne", U"ustring_ne", U"ustring", &ustring_ne);
+  add_one_fun2(s, U"plus", U"ustring_plus", U"ustring", &ustring_plus);
 }
 
 void
