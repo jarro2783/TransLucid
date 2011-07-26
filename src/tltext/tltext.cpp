@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iterator>
 #include <iostream>
+#include <fstream>
 
 #include <boost/spirit/include/support_istream_iterator.hpp>
 
@@ -72,6 +73,8 @@ TLText::TLText()
   m_demands = new DemandHD(m_system);
 
   m_system.addOutputHyperdaton(U"demand", m_demands);
+
+  m_headers.push_back(PREFIX "/share/tltext/header.tl");
 }
 
 TLText::~TLText()
@@ -82,6 +85,24 @@ TLText::~TLText()
 void 
 TLText::run()
 {
+  //load up headers
+  for (auto h : m_headers)
+  {
+    std::ifstream is(h.c_str());
+
+    if (is)
+    {
+      is >> std::noskipws;
+      Parser::U32Iterator begin(
+        Parser::makeUTF8Iterator(boost::spirit::istream_iterator(is)),
+        Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
+      );
+
+      LineTokenizer tokens(begin);
+      processDefinitions(tokens);
+    }
+  }
+
   std::cerr << "TLText..." << std::endl;
   *m_is >> std::noskipws;
 
@@ -130,7 +151,7 @@ TLText::run()
           Tree::Expr(),
 
           Tree::AtExpr(
-            Tree::IdentExpr(U"PRINT"),
+            Tree::IdentExpr(U"PRINT_TLTEXT"),
             Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), e}})
           )
         ));
@@ -146,8 +167,7 @@ TLText::run()
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_USTRING)
         {
-          std::cout << "`" << get_constant_pointer<u32string>(c) << "`"
-            << std::endl;
+          std::cout << get_constant_pointer<u32string>(c) << std::endl;
         }
         else
         {

@@ -160,6 +160,8 @@ namespace TransLucid
       processExpressions(LineTokenizer& line);
 
       DemandHD* m_demands;
+
+      std::vector<std::string> m_headers;
     };
   }
 }

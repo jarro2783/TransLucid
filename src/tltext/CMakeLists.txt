@@ -21,3 +21,5 @@ add_definitions(${TLCFLAGS})
 install(TARGETS tltext
    RUNTIME DESTINATION bin
 )
+
+install(FILES header.tl DESTINATION share/tltext)
