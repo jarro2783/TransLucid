@@ -128,7 +128,7 @@ namespace TransLucid
     );
 
     Constant
-    parseLine(Parser::U32Iterator& begin);
+    parseLine(Parser::U32Iterator& begin, bool verbose = false);
 
     //parses an expression, returns a tree of the expression as parsed by
     //the current definitions of the system

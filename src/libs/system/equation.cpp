@@ -280,6 +280,7 @@ VariableWS::operator()(const Tuple& k)
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
+    std::cerr << "undef for " << m_name << std::endl;
     return TaggedConstant(Types::Special::create(SP_UNDEF), k);
   }
   else if (applicable.size() == 1)

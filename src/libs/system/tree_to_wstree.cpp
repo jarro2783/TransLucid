@@ -99,26 +99,28 @@ Tree::Expr TreeToWSTree::operator()(const Tree::ParenExpr& e)
 
 Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 {
-  //FN1 @ [fnname <- e.op.op, arg0 <- T(e.e)] ! (T(e.e))
+  //(FN1 ! (#arg0)) @ [fnname <- e.op.op, arg0 <- T(e.e)]
 
   //for now just get this working, we can optimise by only calculating the
   //expr once, but how do I do that...
+  //
+  Tree::DimensionExpr arg0(U"arg0");
 
-  return Tree::BangOpExpr
+  return 
+  Tree::AtExpr
   (
-    Tree::AtExpr
+    Tree::BangOpExpr
     (
       Tree::IdentExpr(FN1_IDENT),
-      Tree::TupleExpr
-      (
-        {
-          {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.e)},
-          {Tree::DimensionExpr(fnname_dim), e.op.op}
-        }
-      )
+      {Tree::HashExpr(arg0)}
     ),
-
-    {boost::apply_visitor(*this, e.e)}
+    Tree::TupleExpr
+    (
+      {
+        {Tree::DimensionExpr(fnname_dim), e.op.op},
+        {arg0, boost::apply_visitor(*this, e.e)}
+      }
+    )
   );
 
   #if 0
@@ -139,31 +141,36 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 
 Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 {
-  //FN2 @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)] 
-  //  ! (T(e.lhs), T(e.rhs))
+  //(FN2 ! (#arg0, #arg1))
+  //  @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)]
 
   Tree::Expr elhs = boost::apply_visitor(*this, e.lhs);
   Tree::Expr erhs = boost::apply_visitor(*this, e.rhs);
 
+  Tree::DimensionExpr arg0(U"arg0");
+  Tree::DimensionExpr arg1(U"arg1");
+
   //optimise as above
-  return Tree::BangOpExpr
+  return 
+  
+  Tree::AtExpr
   (
-    Tree::AtExpr
+    Tree::BangOpExpr
     (
       Tree::IdentExpr(FN2_IDENT),
-      Tree::TupleExpr
-      (
-        {
-          {Tree::DimensionExpr(U"arg0"), elhs},
-          {Tree::DimensionExpr(U"arg1"), erhs},
-          {Tree::DimensionExpr(fnname_dim), e.op.op}
-        }
-      )
+      {
+        Tree::HashExpr(arg0),
+        Tree::HashExpr(arg1)
+      }
     ),
-    {
-      elhs,
-      erhs
-    }
+    Tree::TupleExpr
+    (
+      {
+        {Tree::DimensionExpr(U"arg0"), elhs},
+        {Tree::DimensionExpr(U"arg1"), erhs},
+        {Tree::DimensionExpr(fnname_dim), e.op.op}
+      }
+    )
   );
 
 
