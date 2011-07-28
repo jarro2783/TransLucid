@@ -398,7 +398,7 @@ namespace TransLucid
       //| dimensions
       //| specials
       | ident_constant [_val = _1]
-      | context_perturb [_val = _1]
+      | context_perturb(false) [_val = _1]
       | (tok.lparen_ > expr > tok.rparen_) 
         [
           _val = construct<Tree::ParenExpr>(_2)

@@ -1,5 +1,5 @@
 /* Parses [E11:E12, ..., En1:En2]
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -40,10 +40,12 @@ namespace TransLucid
 
     /**
      * Parses a tuple. A tuple is [E:E, ...].
+     * The inherited attribute is true if we are in a guard, ie, parse :,
+     * otherwise, parse <-
      */
     template <typename Iterator>
     class TupleGrammar
-    : public qi::grammar<Iterator, Tree::Expr()>
+    : public qi::grammar<Iterator, Tree::Expr(bool)>
     {
       public:
 
@@ -65,22 +67,28 @@ namespace TransLucid
       private:
 
       qi::rule<Iterator, Tree::Expr()>
-        expr,
+        expr
+      ;
+
+      qi::rule<Iterator, Tree::Expr(bool)>
         context_perturb
       ;
 
-      qi::rule<Iterator, vector_pair_expr()>
+      qi::rule<Iterator, vector_pair_expr(bool)>
         tuple_inside
       ;
 
       qi::rule
       <
         Iterator,
-        boost::fusion::vector<Tree::Expr, Tree::Expr>()
+        boost::fusion::vector<Tree::Expr, Tree::Expr>(bool)
       >
         pair
       ;
+
+      qi::rule<Iterator> maps, colon;
     };
+
     TupleGrammar<iterator_t>*
     create_tuple_grammar(Lexer::tl_lexer& l);
   }

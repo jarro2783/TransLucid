@@ -54,7 +54,8 @@ namespace TransLucid
       void
       set_tuple(const T& t)
       {
-        context_perturb = t;
+        using namespace qi::labels;
+        context_perturb = t(_r1);
       }
 
       const Tuple* m_context;
@@ -67,8 +68,11 @@ namespace TransLucid
         boolean,
         prefix_expr,
         hash_expr,
-        context_perturb,
         function_abstraction
+      ;
+
+      qi::rule<Iterator, Tree::Expr(bool)>
+        context_perturb
       ;
 
       qi::rule<Iterator, Tree::Expr(),

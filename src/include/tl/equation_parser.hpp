@@ -71,7 +71,7 @@ namespace TransLucid
         ;
 
         guard =
-          ( context_perturb[_val = _1])
+          ( context_guard(true)[_val = _1])
         | qi::eps [_val = construct<Tree::nil>()]
         ;
 
@@ -89,7 +89,7 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(guard);
         BOOST_SPIRIT_DEBUG_NODE(equation);
         BOOST_SPIRIT_DEBUG_NODE(expr);
-        BOOST_SPIRIT_DEBUG_NODE(context_perturb);
+        BOOST_SPIRIT_DEBUG_NODE(context_guard);
       }
 
       /**
@@ -101,7 +101,7 @@ namespace TransLucid
       set_tuple(const T& t)
       {
         using namespace qi::labels;
-        context_perturb = t[_val = _1];
+        context_guard = t(_r1)[_val = _1];
       }
 
       /**
@@ -124,8 +124,11 @@ namespace TransLucid
       qi::rule<Iterator, Tree::Expr()>
         guard,
         boolean,
-        context_perturb,
         expr
+      ;
+
+      qi::rule<Iterator, Tree::Expr(bool)>
+        context_guard
       ;
 
       qi::rule<Iterator, DeclType()> declaration;

@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/tuple_parser.hpp>
+#include <boost/spirit/include/qi_eps.hpp>
 
 namespace TransLucid
 {
@@ -65,6 +66,17 @@ namespace TransLucid
      */
     ph::function<make_tuple_imp> make_tuple;
 
+    #if 0
+    template <typename ParsableTrueT, typename ParsableFalseT, typename CondT>
+    boost::spirit::classic::impl::if_else_parser
+      <ParsableTrueT, ParsableFalseT, CondT>
+    if_else_p(const ParsableTrueT& t, const ParsableFalseT& f, const CondT& c)
+    {
+      return boost::spirit::classic::impl::if_else_parser
+        <ParsableTrueT, ParsableFalseT, CondT>(t, f, c);
+    }
+    #endif
+
     template class TupleGrammar<iterator_t>;
     
     template <typename Iterator>
@@ -76,12 +88,16 @@ namespace TransLucid
       using namespace boost::phoenix;
       namespace phoenix = boost::phoenix;
 
-      tuple_inside = pair[push_back(_val, _1)] % tok.comma_;
+      tuple_inside = pair(_r1)[push_back(_val, _1)] % tok.comma_;
+
+      maps = tok.maps_;
+      colon = tok.decl_;
 
       pair =
         (
            expr
-         >  tok.maps_
+         //> if_else_p(colon, maps, _r1)
+         > ((qi::eps(_r1) > tok.decl_) | tok.maps_)
          > expr
         )
         [
@@ -93,7 +109,7 @@ namespace TransLucid
       context_perturb =
          (
             tok.lbracket_
-          > tuple_inside
+          > tuple_inside(_r1)
           > tok.rbracket_
          )
          [
