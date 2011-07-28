@@ -228,6 +228,22 @@ namespace TransLucid
     }
 
     Constant
+    bool_and(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant<bool>(a) &&
+        get_constant<bool>(b))
+      ;
+    }
+
+    Constant
+    bool_or(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant<bool>(a) ||
+        get_constant<bool>(b))
+      ;
+    }
+
+    Constant
     ustring_eq(const Constant& a, const Constant& b)
     {
       return Types::Boolean::create(get_constant_pointer<u32string>(a) ==
@@ -819,6 +835,8 @@ add_builtin_ops(System& s)
 
   add_one_fun2(s, U"eq", U"bool_eq", U"bool", &bool_eq);
   add_one_fun2(s, U"ne", U"bool_ne", U"bool", &bool_ne);
+  add_one_fun2(s, U"and", U"bool_and", U"bool", &bool_and);
+  add_one_fun2(s, U"or", U"bool_or", U"bool", &bool_or);
 
   add_one_fun2(s, U"eq", U"ustring_eq", U"ustring", &ustring_eq);
   add_one_fun2(s, U"ne", U"ustring_ne", U"ustring", &ustring_ne);

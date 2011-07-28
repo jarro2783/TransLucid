@@ -13,6 +13,8 @@ infixl ">" "gt" 50;;
 infixl ">=" "gte" 50;;
 infixl "==" "eq" 25;;
 infixl "!=" "ne" 25;;
+infixl "&&" "and" 20;;
+infixl "||" "or" 20;;
 
 //the print equations
 var PRINT_TLTEXT [arg0 : intmp]   = PRINT;;
