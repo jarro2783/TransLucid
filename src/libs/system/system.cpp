@@ -176,8 +176,9 @@ namespace detail
   {
     public:
 
-    LineAdder(System& s)
+    LineAdder(System& s, bool verbose)
     : m_system(s)
+    , m_verbose(verbose)
     {
     }
 
@@ -200,6 +201,10 @@ namespace detail
     {
       if (eqn.second == Parser::DECL_DEF)
       {
+        if (m_verbose)
+        {
+          std::cout << Parser::printEquation(eqn.first) << std::endl;
+        }
         return m_system.addEquation(eqn.first);
       }
       else
@@ -224,6 +229,7 @@ namespace detail
 
     private:
     System& m_system;
+    bool m_verbose;
   };
 }
 
@@ -476,7 +482,7 @@ System::lastExpression() const
 }
 
 Constant
-System::parseLine(Parser::U32Iterator& begin)
+System::parseLine(Parser::U32Iterator& begin, bool verbose)
 {
   Parser::U32Iterator end;
 
@@ -484,7 +490,7 @@ System::parseLine(Parser::U32Iterator& begin)
 
   if (result.first)
   {
-    detail::LineAdder adder(*this);
+    detail::LineAdder adder(*this, verbose);
     return boost::apply_visitor(adder, result.second);
   }
 

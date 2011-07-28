@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/expr_parser.hpp>
 #include <tl/equation_parser.hpp>
 #include <tl/line_tokenizer.hpp>
+#include <tl/tree_printer.hpp>
 #include <tl/types_util.hpp>
 #include <tl/tuple_parser.hpp>
 #include <tl/system.hpp>
@@ -236,7 +237,7 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
           Parser::makeUTF32Iterator(line.second.end())
         );
 
-        auto result = m_system.parseLine(lineBegin);
+        auto result = m_system.parseLine(lineBegin, m_verbose);
       }
       break;
 
@@ -286,6 +287,10 @@ TLText::processExpressions(LineTokenizer& tokenizer)
         auto expr = m_system.parseExpression(lineBegin);
         if (expr.first)
         {
+          if (m_verbose)
+          {
+            std::cout << print_expr_tree(expr.second) << std::endl;
+          }
           exprs.push_back(expr.second);
         }
       }
