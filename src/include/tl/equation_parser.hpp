@@ -71,12 +71,12 @@ namespace TransLucid
         ;
 
         guard =
-          ( tok.pipe_ >> context_perturb[_val = _1])
+          ( context_perturb[_val = _1])
         | qi::eps [_val = construct<Tree::nil>()]
         ;
 
         boolean =
-          ( tok.and_ >> expr[_val = _1])
+          ( tok.pipe_ >> expr[_val = _1])
         | qi::eps [_val = construct<Tree::nil>()]
         ;
 

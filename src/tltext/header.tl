@@ -15,8 +15,8 @@ infixl "==" "eq" 25;;
 infixl "!=" "ne" 25;;
 
 //the print equations
-var PRINT_TLTEXT | [arg0 <- intmp]   = PRINT;;
-var PRINT_TLTEXT | [arg0 <- ustring] = "`" + PRINT + "`";;
-var PRINT_TLTEXT | [arg0 <- uchar]   = "'" + PRINT + "'";;
-var PRINT_TLTEXT | [arg0 <- bool]    = PRINT;;
+var PRINT_TLTEXT [arg0 <- intmp]   = PRINT;;
+var PRINT_TLTEXT [arg0 <- ustring] = "`" + PRINT + "`";;
+var PRINT_TLTEXT [arg0 <- uchar]   = "'" + PRINT + "'";;
+var PRINT_TLTEXT [arg0 <- bool]    = PRINT;;
 var PRINT_TLTEXT                     = TYPENAME + "`" + PRINT + "`";;
