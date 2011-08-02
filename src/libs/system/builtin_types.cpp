@@ -449,6 +449,15 @@ namespace TransLucid
     namespace Range
     {
       Constant
+      create(const Constant& lhs, const Constant& rhs)
+      {
+        const mpz_class* lhsp = &get_constant_pointer<mpz_class>(lhs);
+        const mpz_class* rhsp = &get_constant_pointer<mpz_class>(rhs);
+
+        return Range::create(TransLucid::Range(lhsp, rhsp));
+      }
+
+      Constant
       create(const TransLucid::Range& r)
       {
         return make_constant_pointer
@@ -471,6 +480,12 @@ namespace TransLucid
       hash(const Constant& c)
       {
         return get(c).hash();
+      }
+
+      Constant
+      print(const Constant& c)
+      {
+        return String::create(U"range");
       }
     }
 
@@ -769,6 +784,9 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
   s.registerFunction(U"print_bool",
     make_function_type<1>::type(&Types::Boolean::print));
 
+  s.registerFunction(U"print_range",
+    make_function_type<1>::type(&Types::Range::print));
+
   //string returns itself
   //PRINT | [arg0 : ustring] = #arg0;;
   s.addEquation(Parser::Equation
@@ -841,6 +859,11 @@ add_builtin_ops(System& s)
   add_one_fun2(s, U"eq", U"ustring_eq", U"ustring", &ustring_eq);
   add_one_fun2(s, U"ne", U"ustring_ne", U"ustring", &ustring_ne);
   add_one_fun2(s, U"plus", U"ustring_plus", U"ustring", &ustring_plus);
+
+  //range construction a..b
+  add_one_fun2(s, U"range_construct", U"range_construct", U"intmp", 
+    static_cast<Constant (*)(const Constant&, const Constant&)>
+      (&Types::Range::create));
 }
 
 void
@@ -852,6 +875,7 @@ init_builtin_types(System& s)
     U"special",
     U"type",
     U"uchar",
+    U"range"
   };
 
   std::vector<u32string> type_names = to_print_types;

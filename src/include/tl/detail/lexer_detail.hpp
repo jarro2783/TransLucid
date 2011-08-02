@@ -563,6 +563,24 @@ namespace TransLucid
           }
         }
       };
+
+      struct handle_range
+      {
+        template <typename Iterator, typename Idtype, typename Context>
+        void
+        operator()
+        (
+          Iterator& first, 
+          Iterator& last, 
+          lex::pass_flags& matched,
+          Idtype& id,
+          Context& ctx
+        ) const 
+        {
+          id = TOK_BINARY_OP;
+          ctx.set_value(u32string(first, last));
+        }
+      };
     } //namespace detail
   } //namespace Parser
 } //namespace TransLucid

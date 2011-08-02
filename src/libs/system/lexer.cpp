@@ -130,7 +130,6 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   | else_
   | true_
   | false_
-  | range_
   | dblslash_
   | arrow_
   | dblsemi_
@@ -138,6 +137,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   | dblpercent_
   | assign_
   | maps_
+  | range_ [detail::handle_range()]
 
   //constants
   | constantRAW_       [detail::build_constant()]

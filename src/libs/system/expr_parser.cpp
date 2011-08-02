@@ -184,6 +184,8 @@ namespace TransLucid
     {
       //lookup ATL_SYMBOL, ASSOC, PREC
 
+      //std::cerr << "looking up symbol " << symbol << std::endl;
+
       tuple_t sk
       {
         {

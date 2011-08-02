@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/charset.hpp>
+#include <tl/parser_util.hpp>
 #include <tl/utility.hpp>
 
 #include <boost/spirit/home/phoenix/bind/bind_function.hpp>

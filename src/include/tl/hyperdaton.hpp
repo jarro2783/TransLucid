@@ -36,6 +36,10 @@ namespace TransLucid
       return m_lt;
     }
 
+    //virtual = 0 soon
+    Tuple
+    variance() const;
+
     protected:
     void
     init(size_t lt)

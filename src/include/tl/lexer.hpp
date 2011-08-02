@@ -86,7 +86,7 @@ namespace TransLucid
         if_, fi_, where_, then_, elsif_, else_, true_, false_
       , library_, dimension_, var_, assignment_
         //symbols
-      , arrow_, dblsemi_, dblslash_, range_//, dbldollar_
+      , arrow_, dblsemi_, dblslash_ //, dbldollar_
       , dblpercent_, assign_
       , maps_
         //white space
@@ -105,7 +105,7 @@ namespace TransLucid
       ;
 
       lex::token_def<u32string, lex_char_type>
-        identifier_, operator_
+        identifier_, operator_, range_
         //fake tokens for operators
         , binary_op_, prefix_op_, postfix_op_
       ;

@@ -352,7 +352,8 @@ System::System()
    {U"special", TYPE_INDEX_SPECIAL},
    {U"uchar", TYPE_INDEX_UCHAR},
    {U"dim", TYPE_INDEX_DIMENSION},
-   {U"type", TYPE_INDEX_TYPE}
+   {U"type", TYPE_INDEX_TYPE},
+   {U"range", TYPE_INDEX_RANGE}
   }
   )
 , m_time(0)
