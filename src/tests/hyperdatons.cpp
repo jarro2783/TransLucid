@@ -20,7 +20,8 @@ int main(int argc, char *argv[])
       {dim0, dim1, dim2},
       s,
       s,
-      U"intmp"
+      &TL::Types::Intmp::create,
+      &TL::Types::Intmp::get
     );
 
   TL::Tuple var = array.variance();
