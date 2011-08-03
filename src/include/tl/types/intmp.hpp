@@ -20,6 +20,10 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_INTMP_HPP_INCLUDED
 #define TYPES_INTMP_HPP_INCLUDED
 
+#include <tl/types.hpp>
+
+#include <gmpxx.h>
+
 namespace TransLucid
 {
   namespace Types

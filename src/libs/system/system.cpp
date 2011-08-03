@@ -53,6 +53,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/translator.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/types/special.hpp>
+#include <tl/types/tuple.hpp>
 #include <tl/types/uuid.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
@@ -79,95 +80,17 @@ namespace
     return false;
   }
 
-  #if 0
-  class UniqueWS : public WS
+  Constant
+  compile_and_evaluate(const Tree::Expr& expr, System& system)
   {
-    public:
+    Tree::Expr wsTree = toWSTree(expr);
 
-    UniqueWS(int start)
-    : m_index(start)
-    {
-    }
+    ExprCompiler compiler(&system);
 
-    TaggedConstant
-    operator()(const Tuple& k)
-    {
-      return TaggedConstant(Constant(Intmp(m_index++), TYPE_INDEX_INTMP), k);
-    }
+    std::auto_ptr<WS> ws(compiler.compile_for_equation(wsTree));
 
-    private:
-    mpz_class m_index;
-  };
-
-  class DimensionsStringWS : public WS
-  {
-    public:
-
-    DimensionsStringWS(DimensionTranslator& d)
-    : m_d(d)
-    {}
-
-    TaggedConstant
-    operator()(const Tuple& k)
-    {
-      Tuple::const_iterator iter = k.find(DIM_TEXT);
-      if (iter == k.end())
-      {
-        throw "called dim lookup without text dimension";
-      }
-      return TaggedConstant(Constant(Intmp(
-        m_d.lookup(iter->second.value<String>().value())),
-                   TYPE_INDEX_INTMP), k);
-    }
-
-    private:
-    DimensionTranslator& m_d;
-  };
-
-  class DimensionsTypedWS : public WS
-  {
-    public:
-
-    DimensionsTypedWS(DimensionTranslator& d)
-    : m_d(d)
-    {}
-
-    TaggedConstant
-    operator()(const Tuple& k)
-    {
-      Tuple::const_iterator iter = k.find(DIM_VALUE);
-      if (iter == k.end())
-      {
-        throw "called dim lookup without value dimension";
-      }
-      return TaggedConstant(Constant(Intmp(
-        m_d.lookup(iter->second)), TYPE_INDEX_INTMP), k);
-    }
-
-    private:
-    DimensionTranslator& m_d;
-  };
-
-  class UniqueDimensionWS : public WS
-  {
-    public:
-
-    UniqueDimensionWS(DimensionTranslator& d)
-    : m_d(d)
-    {
-    }
-
-    TaggedConstant
-    operator()(const Tuple& k)
-    {
-      size_t i = m_d.unique();
-      return TaggedConstant(Constant(Intmp(i), TYPE_INDEX_INTMP), k);
-    }
-
-    private:
-    DimensionTranslator& m_d;
-  };
-  #endif
+    return (*ws)(system.getDefaultContext()).first;
+  }
 }
 
 namespace detail
@@ -430,6 +353,7 @@ System::go()
     auto equations = ident.second->equations();
     for (auto& assign : equations)
     {
+      const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
       Tuple k;
       const GuardWS& guard = assign.second.validContext();
 
@@ -437,13 +361,20 @@ System::go()
 
       auto time = k.find(DIM_TIME);
 
-      if ((time == k.end() ||
-          get_constant_pointer<mpz_class>(time->second) == m_time))
+      if (tupleApplicable(constraint, k) &&
+           (time == k.end() ||
+            get_constant_pointer<mpz_class>(time->second) == m_time
+           )
+         )
       {
         TaggedConstant v = 
           assign.second(k.insert(DIM_TIME, Types::Intmp::create(m_time)));
 
         hd->second->put(k, v.first);
+      }
+      else
+      {
+        std::cerr << "not applicable to the constraint" << std::endl;
       }
     }
   }
@@ -550,7 +481,7 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
   uuid u = m_uuid_generator();
 
   m_unop_uuids.insert(std::make_pair(u,
-    UnaryHashes
+    UnaryUUIDs
     (
       Types::UUID::get(a),
       Types::UUID::get(t)
@@ -599,7 +530,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
   uuid u = m_uuid_generator();
 
   m_binop_uuids.insert(std::make_pair(u, 
-    BinaryHashes
+    BinaryUUIDs
     (
       Types::UUID::get(t),
       Types::UUID::get(s),
@@ -745,6 +676,9 @@ System::addOutputHyperdaton
     uuid u = m_uuid_generator();
     m_outputUUIDs.insert(std::make_pair(u, name));
 
+    //add the constraint
+    m_outputHDDecls.insert(std::make_pair(name, hd->variance()));
+
     return Types::UUID::create(u);
   }
   else
@@ -763,6 +697,56 @@ System::setDefaultContext()
         {DIM_TIME, Types::Intmp::create(m_time)}
       }
   );
+}
+
+template <typename T>
+void
+System::addHDDecl
+(
+  const u32string& name,
+  const Tree::Expr& guard,
+  T& decls
+)
+{
+  //compile and evaluate guard
+  Constant c = compile_and_evaluate(guard, *this);
+  
+  //add as new constraint to output HD
+  if (c.index() == TYPE_INDEX_TUPLE)
+  {
+    auto iter = decls.find(name);
+
+    if (iter != decls.end())
+    {
+      const Tuple& t = Types::Tuple::get(c);
+      //only update if the tuple is more specific than or the same as the
+      //existing one
+      if (t == iter->second || tupleRefines(t, iter->second))
+      {
+        iter->second = t;
+      }
+    }
+  }
+}
+
+void
+System::addOutputDeclaration
+(
+  const u32string& name,
+  const Tree::Expr& guard
+)
+{
+  addHDDecl(name, guard, m_outputHDDecls);
+}
+
+void
+System::addInputDeclaration
+(
+  const u32string& name,
+  const Tree::Expr& guard
+)
+{
+  addHDDecl(name, guard, m_inputHDDecls);
 }
 
 } //namespace TransLucid

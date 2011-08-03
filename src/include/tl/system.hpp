@@ -128,6 +128,27 @@ namespace TransLucid
     );
 
     Constant
+    addInputHyperdaton
+    (
+      const u32string& name,
+      InputHD* hd
+    );
+
+    void
+    addOutputDeclaration
+    (
+      const u32string& name,
+      const Tree::Expr& guard
+    );
+
+    void
+    addInputDeclaration
+    (
+      const u32string& name,
+      const Tree::Expr& guard
+    );
+
+    Constant
     parseLine(Parser::U32Iterator& begin, bool verbose = false);
 
     //parses an expression, returns a tree of the expression as parsed by
@@ -162,23 +183,32 @@ namespace TransLucid
     go();
 
     private:
+    //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
+
+    //output hyperdatons
     typedef std::unordered_map<u32string, OutputHD*> OutputHDMap;
 
+    //uuid to string
     typedef std::unordered_map<uuid, u32string, boost::hash<uuid>> 
       UUIDStringMap;
 
     // OPTYPE, ATL_SYMBOL
-    typedef std::tuple<uuid, uuid> UnaryHashes;
+    typedef std::tuple<uuid, uuid> UnaryUUIDs;
 
     // OPTYPE, ATL_SYMBOL, ASSOC, PREC
-    typedef std::tuple<uuid, uuid, uuid, uuid> BinaryHashes;
+    typedef std::tuple<uuid, uuid, uuid, uuid> BinaryUUIDs;
 
+    //set of uuids
     typedef std::unordered_set<uuid, boost::hash<uuid>> UUIDHashSet;
-    typedef std::unordered_map<uuid, UnaryHashes, boost::hash<uuid>> 
-      UnaryHashSet;
-    typedef std::unordered_map<uuid, BinaryHashes, boost::hash<uuid>>
-      BinaryHashSet;
+
+    //uuids of set of uuids of unary operator equations
+    typedef std::unordered_map<uuid, UnaryUUIDs, boost::hash<uuid>> 
+      UnaryUUIDSet;
+
+    //uuids of set of uuids of binary operator equations
+    typedef std::unordered_map<uuid, BinaryUUIDs, boost::hash<uuid>>
+      BinaryUUIDSet;
 
     //initialises the type indexes
     void
@@ -204,6 +234,15 @@ namespace TransLucid
       const u32string& eqn, 
       const u32string& s, 
       const T& value
+    );
+
+    template <typename T>
+    void
+    addHDDecl
+    (
+      const u32string& name,
+      const Tree::Expr& guard,
+      T& decls
     );
 
     Constant 
@@ -239,29 +278,39 @@ namespace TransLucid
     OutputHDMap m_outputHDs;
     UUIDStringMap m_outputUUIDs;
 
+    //input and output hd declarations, for now just have the valid range
+    std::unordered_map<u32string, Tuple> m_outputHDDecls;
+    std::unordered_map<u32string, Tuple> m_inputHDDecls;
+
     //the uuid generator
     boost::uuids::basic_random_generator<boost::mt19937>
     m_uuid_generator;
 
     //---- the sets of all the uuids of objects ----
+
+    //the uuids of the dimensions
     UUIDHashSet m_dimension_uuids;
-    UnaryHashSet m_unop_uuids;
-    BinaryHashSet m_binop_uuids;
 
-    DimensionTranslator m_dimTranslator;
+    //the uuids of the unary operators
+    UnaryUUIDSet m_unop_uuids;
 
+    //the uuids of the binary operators
+    BinaryUUIDSet m_binop_uuids;
+
+    //registries
     type_index m_nextTypeIndex;
     ObjectRegistry<u32string, decltype(m_nextTypeIndex)> m_typeRegistry;
+    DimensionTranslator m_dimTranslator;
 
-    size_t m_time;
-    Translator *m_translator;
-    std::map<u32string, size_t> builtin_name_to_index;
+    //std::map<u32string, size_t> builtin_name_to_index;
 
     //give ourselves a function registry which can register functions of
     //up to ten arguments
     FunctionRegistry<MAX_FUNCTION_PARAMETERS> m_functions;
 
     Tuple m_defaultk;
+    size_t m_time;
+    Translator *m_translator;
 
     public:
 

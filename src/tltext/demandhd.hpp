@@ -44,6 +44,9 @@ namespace TransLucid
         return m_results.at(i);
       }
 
+      Tuple
+      variance() const;
+
       private:
 
       std::vector<Constant> m_results;

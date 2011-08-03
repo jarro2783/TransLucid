@@ -1,10 +1,24 @@
+#include <tl/types/intmp.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/system.hpp>
 
 int main(int argc, char *argv[])
 {
-  TransLucid::ArrayNHD<int, 3> a({5,6,7});
+  namespace Intmp = TransLucid::Types::Intmp;
 
-  auto c = a.get_array();
+  TransLucid::System s;
+  TransLucid::ArrayNHD<mpz_class, 3> a
+    (
+      {5,6,7},
+      {Intmp::create(0), Intmp::create(1), Intmp::create(2)},
+      s,
+      s,
+      U"intmp"
+    );
+
+  a.variance();
+
+  auto& c = a.get_array();
   c[1][2][3] = 5;
 
   auto x = c[1];
@@ -29,8 +43,6 @@ int main(int argc, char *argv[])
     {
       for (int k = 0; k != 7; ++k)
       {
-        //std::cout << c[i][j][k] << " ";
-        //std::cout << a.get(i, j, k) << " ";
         std::cout << a[i][j][k] << " ";
       }
       std::cout << std::endl;
@@ -39,13 +51,8 @@ int main(int argc, char *argv[])
     std::cout << std::endl;
   }
 
-  std::cout << std::endl;
-
-  //auto h = a.get(1);
-  int val = a.get(1, 1, 1);
+  auto val = a.get(1, 1, 1);
   std::cout << val << std::endl;
-  //
-  //std::cout << h << std::endl;
 
   return 0;
 }

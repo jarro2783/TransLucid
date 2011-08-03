@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/range.hpp>
+#include <tl/types/range.hpp>
 #include <tl/types_util.hpp>
 
 #include "demandhd.hpp"
@@ -55,6 +57,19 @@ DemandHD::put(const Tuple& k, const Constant& c)
 
     m_results.at(slot) = c;
   }
+}
+
+Tuple
+DemandHD::variance() const
+{
+  mpz_class lhs = 0;
+
+  tuple_t v
+  {
+    {m_slot, Types::Range::create(Range(&lhs, nullptr))}
+  };
+
+  return Tuple(v);
 }
 
 } //namespace TLText

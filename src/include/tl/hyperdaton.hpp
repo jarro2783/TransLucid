@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PHYSICAL_WSS_HPP_INCLUDED
 #define PHYSICAL_WSS_HPP_INCLUDED
 
+#include <tl/registries.hpp>
 #include <tl/types.hpp>
 #include <boost/multi_array.hpp>
 
@@ -36,9 +37,9 @@ namespace TransLucid
       return m_lt;
     }
 
-    //virtual = 0 soon
+    virtual
     Tuple
-    variance() const;
+    variance() const = 0;
 
     protected:
     void
@@ -149,7 +150,7 @@ namespace TransLucid
   #endif
 
   template <typename T, size_t N>
-  class ArrayNHD
+  class ArrayNHD : public IOHD
   {
     public:
     typedef boost::multi_array<T, N> type;
@@ -160,18 +161,40 @@ namespace TransLucid
     }
     private:
     type m_array;
-    std::vector<mpz_class> m_dimensions;
+    std::vector<mpz_class> m_bounds;
 
     public:
     //if you get a compile error here, maybe all the types of Dimensions
     //weren't integers
-    ArrayNHD(const std::vector<size_t>& dims)
-    : m_array(dims)
+
+    /**
+     * Construct an ArrayNHD. Takes the name of the type in the array
+     * and the array dimensions.
+     * @param bounds The size of the array.
+     * @param dims The dimensions of variance.
+     * @param typeReg The type registry.
+     * @param dimReg The dimension registry.
+     * @param typeName The name of the type being stored.
+     * @note N = bounds = dim
+     */
+    ArrayNHD
+    (
+      const std::vector<size_t>& bounds, 
+      const std::vector<Constant> dims,
+      TypeRegistry& typeReg,
+      DimensionRegistry& dimReg,
+      const u32string& typeName
+    )
+    : IOHD(1), m_array(bounds)
     {
-      for (size_t i = 0; i != dims.size(); ++i)
+      for (size_t i = 0; i != bounds.size(); ++i)
       {
-        m_dimensions.push_back(i);
+        m_bounds.push_back(i);
       }
+    }
+
+    ~ArrayNHD() throw()
+    {
     }
 
     template <typename... Location>
@@ -184,11 +207,31 @@ namespace TransLucid
       return array_get()(m_array, loc...);
     }
 
+    void
+    put (const Tuple& index, const Constant& v) override
+    {
+      //pull out the relevant variables of the tuple and access the array
+      std::vector<int> indices;
+      m_array(indices) = T();
+    }
+
+    Constant
+    get(const Tuple& index) const
+    {
+      return Constant();
+    }
+
     auto
     operator[](int i)
       -> decltype(m_array[i])
     {
       return m_array[i];
+    }
+
+    Tuple
+    variance() const
+    {
+      return Tuple();
     }
   };
 
