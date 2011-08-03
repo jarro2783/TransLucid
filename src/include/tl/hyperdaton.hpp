@@ -20,7 +20,10 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PHYSICAL_WSS_HPP_INCLUDED
 #define PHYSICAL_WSS_HPP_INCLUDED
 
+#include <tl/range.hpp>
 #include <tl/registries.hpp>
+#include <tl/types/intmp.hpp>
+#include <tl/types/range.hpp>
 #include <tl/types.hpp>
 #include <boost/multi_array.hpp>
 
@@ -162,6 +165,7 @@ namespace TransLucid
     private:
     type m_array;
     std::vector<mpz_class> m_bounds;
+    Tuple m_variance;
 
     public:
     //if you get a compile error here, maybe all the types of Dimensions
@@ -187,10 +191,21 @@ namespace TransLucid
     )
     : IOHD(1), m_array(bounds)
     {
+      assert(N == bounds.size() && N == dims.size());
+
+      tuple_t variance;
       for (size_t i = 0; i != bounds.size(); ++i)
       {
-        m_bounds.push_back(i);
+        m_bounds.push_back(bounds[i]);
+
+        //create variance tuple
+        mpz_class a = 0;
+        variance.insert(std::make_pair(dimReg.getDimensionIndex(dims[i]), 
+          Types::Range::create(Range(&a, &m_bounds[i])) 
+        ));
       }
+
+      m_variance = variance;
     }
 
     ~ArrayNHD() throw()
@@ -231,7 +246,7 @@ namespace TransLucid
     Tuple
     variance() const
     {
-      return Tuple();
+      return m_variance;
     }
   };
 

@@ -1,27 +1,63 @@
 #include <tl/types/intmp.hpp>
+#include <tl/types/range.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/system.hpp>
 
 int main(int argc, char *argv[])
 {
-  namespace Intmp = TransLucid::Types::Intmp;
+  namespace TL = TransLucid;
+  namespace Intmp = TL::Types::Intmp;
 
-  TransLucid::System s;
-  TransLucid::ArrayNHD<mpz_class, 3> a
+  TL::Constant dim0, dim1, dim2;
+  dim0 = Intmp::create(0);
+  dim1 = Intmp::create(1);
+  dim2 = Intmp::create(2);
+
+  TL::System s;
+  TL::ArrayNHD<mpz_class, 3> array
     (
       {5,6,7},
-      {Intmp::create(0), Intmp::create(1), Intmp::create(2)},
+      {dim0, dim1, dim2},
       s,
       s,
       U"intmp"
     );
 
-  a.variance();
+  TL::Tuple var = array.variance();
 
-  auto& c = a.get_array();
-  c[1][2][3] = 5;
+  mpz_class zero = 0, a = 5, b = 6, c = 7;
+  TL::tuple_t expected
+  {
+    {s.getDimensionIndex(dim0), 
+      TL::Types::Range::create(TL::Range(&zero, &a))},
+    {s.getDimensionIndex(dim1), 
+      TL::Types::Range::create(TL::Range(&zero, &b))},
+    {s.getDimensionIndex(dim2), 
+      TL::Types::Range::create(TL::Range(&zero, &c))}
+  };
 
-  auto x = c[1];
+  for (auto v : var)
+  {
+    std::cerr << v.first << ": ";
+    TL::Types::Range::get(v.second).print(std::cout);
+    std::cerr << ", ";
+  }
+  std::cerr << std::endl;
+
+  for (auto v : expected)
+  {
+    std::cerr << v.first << ": ";
+    TL::Types::Range::get(v.second).print(std::cout);
+    std::cerr << ", ";
+  }
+  std::cerr << std::endl;
+
+  assert(var == TL::Tuple(expected));
+
+  auto& d = array.get_array();
+  d[1][2][3] = 5;
+
+  auto x = d[1];
   auto y = x[2];
   auto z = y[3];
   std::cout << z << std::endl;
@@ -32,7 +68,7 @@ int main(int argc, char *argv[])
     {
       for (int k = 0; k != 7; ++k)
       {
-        c[i][j][k] = i * j * k;
+        d[i][j][k] = i * j * k;
       }
     }
   }
@@ -43,7 +79,7 @@ int main(int argc, char *argv[])
     {
       for (int k = 0; k != 7; ++k)
       {
-        std::cout << a[i][j][k] << " ";
+        std::cout << array[i][j][k] << " ";
       }
       std::cout << std::endl;
     }
@@ -51,7 +87,7 @@ int main(int argc, char *argv[])
     std::cout << std::endl;
   }
 
-  auto val = a.get(1, 1, 1);
+  auto val = array.get(1, 1, 1);
   std::cout << val << std::endl;
 
   return 0;

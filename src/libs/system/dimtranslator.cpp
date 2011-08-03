@@ -52,7 +52,14 @@ DimensionTranslator::lookup(const u32string& name)
 size_t
 DimensionTranslator::lookup(const Constant& value)
 {
-  return m_constants(value);
+  if (value.index() == TYPE_INDEX_DIMENSION)
+  {
+    return get_constant<dimension_index>(value);
+  }
+  else
+  {
+    return m_constants(value);
+  }
 }
 
 }
