@@ -77,7 +77,7 @@ TLText::TLText()
 
   m_system.addOutputHyperdaton(U"demand", m_demands);
 
-  m_headers.push_back(PREFIX "/share/tltext/header.tl");
+  m_headers.push_back(PREFIX "/share/tl/tltext/header.tl");
 }
 
 TLText::~TLText()

@@ -22,4 +22,4 @@ install(TARGETS tltext
    RUNTIME DESTINATION bin
 )
 
-install(FILES header.tl DESTINATION share/tltext)
+install(FILES header.tl DESTINATION share/tl/tltext)
