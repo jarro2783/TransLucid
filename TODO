@@ -1,3 +1,12 @@
+-- IO hyperdaton stuff
+
+env vars ENV = ...
+file IO
+could start pretending to be bash or something like that with all this
+
+-- random things
+
+clean up this TODO
 check that 2 - -a works - make it work if it doesn't
 -2- - -2-
 footer for output
@@ -7,8 +16,6 @@ optional parens in pretty printer
 make tuple dim_index -> constant and change everywhere that uses it
 check for redefinition of symbols in parser
 guarantee that the parser takes the longest match for operators
-subdimensions
-make specials be called sp
 fix special symbols and make them come from the same definition in both the 
 parser and the special type
 check out tuple_refines, it looks wrong - really need better tests for best 
@@ -19,7 +26,6 @@ clean up exception handling and parse error handling
 
 -- Added by John
 
-configure should check for doxygen and graphviz.
 m4 macros should be created to look for the tl libraries and includes,
   in order that other applications can use tl,
   or maybe we can set up pkg-config for tl.
