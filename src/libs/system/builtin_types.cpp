@@ -571,6 +571,26 @@ namespace TransLucid
           (i, &intmp_type_functions, TYPE_INDEX_INTMP);
       }
 
+      Constant
+      create(const Constant& text)
+      {
+        if (text.index() == TYPE_INDEX_USTRING)
+        {
+          try {
+            return create(mpz_class(
+              u32_to_ascii(get_constant_pointer<u32string>(text))));
+          }
+          catch (...)
+          {
+            return Types::Special::create(SP_CONST);
+          }
+        }
+        else
+        {
+          return Types::Special::create(SP_CONST);
+        }
+      }
+
       const mpz_class&
       get(const Constant& i)
       {
@@ -750,6 +770,10 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
       }
     })
   );
+
+  s.registerFunction(U"construct_intmp", 
+    make_function_type<1>::type(
+      static_cast<Constant (*)(const Constant&)>(Types::Intmp::create)));
 }
 
 void

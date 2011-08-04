@@ -42,6 +42,11 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+  namespace detail
+  {
+    class InputHDWS;
+  }
+
   constexpr int MAX_FUNCTION_PARAMETERS = 10;
 
   template <typename T>
@@ -188,6 +193,8 @@ namespace TransLucid
 
     //output hyperdatons
     typedef std::unordered_map<u32string, OutputHD*> OutputHDMap;
+    //input hyperdatons
+    typedef std::unordered_map<u32string, InputHD*> InputHDMap;
 
     //uuid to string
     typedef std::unordered_map<uuid, u32string, boost::hash<uuid>> 
@@ -278,6 +285,8 @@ namespace TransLucid
     OutputHDMap m_outputHDs;
     UUIDStringMap m_outputUUIDs;
 
+    InputHDMap m_inputHDs;
+
     //input and output hd declarations, for now just have the valid range
     std::unordered_map<u32string, Tuple> m_outputHDDecls;
     std::unordered_map<u32string, Tuple> m_inputHDDecls;
@@ -311,6 +320,8 @@ namespace TransLucid
     Tuple m_defaultk;
     size_t m_time;
     Translator *m_translator;
+
+    friend class detail::InputHDWS;
 
     public:
 

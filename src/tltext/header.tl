@@ -1,5 +1,6 @@
 //some necessary dimensions
 dim "slot";;
+dim "n";;
 
 //the basic operators
 infixl "+" "plus" 100;;

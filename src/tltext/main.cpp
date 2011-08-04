@@ -142,16 +142,9 @@ int main(int argc, char *argv[])
       tltext.set_output(output.get());
     }
 
-    std::vector<std::string> args;
     if (vm.count("args"))
     {
-      args = vm["args"].as<std::vector<std::string>>();
-      std::cout << "args:";
-      for (auto s : args)
-      {
-        std::cout << " " << s;
-      }
-      std::cout << std::endl;
+      tltext.set_clargs(vm["args"].as<std::vector<std::string>>());
     }
 
     tltext.run();

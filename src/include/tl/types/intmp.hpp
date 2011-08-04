@@ -30,6 +30,9 @@ namespace TransLucid
     namespace Intmp
     {
       Constant
+      create(const Constant& text);
+
+      Constant
       create(const mpz_class& v);
 
       const mpz_class&

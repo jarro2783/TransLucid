@@ -113,7 +113,6 @@ namespace TransLucid
     (
       const std::vector<size_t>& bounds, 
       const std::vector<Constant> dims,
-      TypeRegistry& typeReg,
       DimensionRegistry& dimReg,
       Create create,
       Get getF

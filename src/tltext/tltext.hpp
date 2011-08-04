@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/arrayhd.hpp>
+#include <tl/ast.hpp>
+#include <tl/library.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_defs.hpp>
 #include <tl/system.hpp>
 #include <iostream>
-#include <tl/ast.hpp>
-#include <tl/library.hpp>
 //#include <tl/parser_header_util.hpp>
 #include <tl/expr_compiler.hpp>
 
@@ -126,6 +127,12 @@ namespace TransLucid
         m_os = os;
       }
 
+      void
+      set_clargs(const std::vector<std::string>& args)
+      {
+        m_clargs = args;
+      }
+
       private:
       bool m_verbose;
       bool m_reactive;
@@ -159,9 +166,14 @@ namespace TransLucid
       std::vector<Tree::Expr>
       processExpressions(LineTokenizer& line);
 
+      void
+      setup_clargs();
+
       DemandHD* m_demands;
 
       std::vector<std::string> m_headers;
+      std::vector<std::string> m_clargs;
+      ArrayNHD<u32string, 1>* m_argsHD;
     };
   }
 }

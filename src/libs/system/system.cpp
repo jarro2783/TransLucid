@@ -95,6 +95,33 @@ namespace
 
 namespace detail
 {
+  class InputHDWS : public WS
+  {
+    public:
+    InputHDWS(const u32string& name, System& system)
+    : m_name(name)
+    , m_system(system)
+    {
+    }
+
+    TaggedConstant
+    operator()(const Tuple& k)
+    {
+      auto iter = m_system.m_inputHDs.find(m_name);
+      if (iter == m_system.m_inputHDs.end())
+      {
+        //this should never be true, throw if it fails because
+        //the system has bombed on us
+        throw "InputHDWS: input HD doesn't exist";
+      }
+      return TaggedConstant(iter->second->get(k), k);
+    }
+
+    private:
+    u32string m_name;
+    System& m_system;
+  };
+
   class LineAdder
   {
     public:
@@ -322,7 +349,9 @@ System::System()
       U"fnname",
       U"arg0",
       U"arg1",
-      U"arg2"
+      U"arg2",
+      U"typename",
+      U"text"
     }
   );
 
@@ -747,6 +776,35 @@ System::addInputDeclaration
 )
 {
   addHDDecl(name, guard, m_inputHDDecls);
+}
+
+Constant
+System::addInputHyperdaton
+(
+  const u32string& name,
+  InputHD* hd
+)
+{
+  //make sure the name isn't already there
+  auto i = m_inputHDs.find(name);
+
+  if (i == m_inputHDs.end())
+  {
+    m_inputHDs.insert(std::make_pair(name, hd));
+    uuid u = m_uuid_generator();
+    //m_outputUUIDs.insert(std::make_pair(u, name));
+
+    //add the constraint
+    //m_outputHDDecls.insert(std::make_pair(name, hd->variance()));
+    auto ws = new detail::InputHDWS(name, *this);
+    addEquation(name, ws);
+
+    return Types::UUID::create(u);
+  }
+  else
+  {
+    return Types::Special::create(SP_MULTIDEF); 
+  }
 }
 
 } //namespace TransLucid

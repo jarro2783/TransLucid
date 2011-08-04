@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/equation_parser.hpp>
 #include <tl/line_tokenizer.hpp>
 #include <tl/tree_printer.hpp>
+#include <tl/types/dimension.hpp>
 #include <tl/types_util.hpp>
 #include <tl/tuple_parser.hpp>
 #include <tl/system.hpp>
@@ -68,6 +69,7 @@ TLText::TLText()
  ,m_compiler(&m_system)
  ,m_time(0)
  ,m_lastLibLoaded(0)
+ ,m_argsHD(0)
 {
   m_libtool.addSearchPath(to_u32string(std::string(PREFIX "/share/tl")));
 
@@ -81,11 +83,15 @@ TLText::TLText()
 TLText::~TLText()
 {
   delete m_demands;
+  delete m_argsHD;
 }
 
 void 
 TLText::run()
 {
+  //setup command line arguments
+  setup_clargs();
+
   //load up headers
   for (auto h : m_headers)
   {
@@ -309,6 +315,37 @@ TLText::processExpressions(LineTokenizer& tokenizer)
   }
 
   return exprs;
+}
+
+void
+TLText::setup_clargs()
+{
+  if (m_clargs.size() != 0)
+  {
+    std::vector<size_t> bounds{m_clargs.size()};
+    std::vector<Constant> dims
+    {
+      Types::Dimension::create(m_system.getDimensionIndex(U"n"))
+    };
+
+    m_argsHD = new ArrayNHD<u32string, 1>
+    (
+      bounds,
+      dims,
+      m_system,
+      Types::String::create,
+      Types::String::get
+    );
+
+    int i = 0;
+    for (auto v : m_clargs)
+    {
+      (*m_argsHD)[i] = u32string(v.begin(), v.end());
+      ++i;
+    }
+
+    m_system.addInputHyperdaton(U"CL_ARGS", m_argsHD);
+  }
 }
 
 } //namespace TLCore

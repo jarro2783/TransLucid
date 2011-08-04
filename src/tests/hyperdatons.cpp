@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
       {5,6,7},
       {dim0, dim1, dim2},
       s,
-      s,
-      &TL::Types::Intmp::create,
+      static_cast<TL::Constant (*)(const mpz_class&)>
+        (&TL::Types::Intmp::create),
       &TL::Types::Intmp::get
     );
 
