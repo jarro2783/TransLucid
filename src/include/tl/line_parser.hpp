@@ -74,6 +74,8 @@ namespace TransLucid
           [
             _val = ph::bind(&makeUnaryOp, _1, _2)
           ])
+        | tok.in_
+        | tok.out_
         )
 
         > tok.dblsemi_
