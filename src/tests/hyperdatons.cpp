@@ -1,6 +1,6 @@
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
-#include <tl/arrayhd.hpp>
+#include <tl/hyperdatons/arrayhd.hpp>
 #include <tl/system.hpp>
 
 int main(int argc, char *argv[])

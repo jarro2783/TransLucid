@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/arrayhd.hpp>
+#include <tl/hyperdatons/arrayhd.hpp>
 #include <tl/ast.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_api.hpp>
