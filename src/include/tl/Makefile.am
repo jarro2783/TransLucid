@@ -19,7 +19,8 @@ SUBDIRS=detail types
 
 includesdir = $(prefix)/include/tl
 
-includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp cache.hpp \
+includes_HEADERS = arrayhd.hpp ast.hpp bestfit.hpp builtin_types.hpp 
+  cache.hpp \
   charset.hpp compiled_functors.hpp consthd.hpp container.hpp \
   dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
   expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp function_registry.hpp \
