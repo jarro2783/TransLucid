@@ -71,6 +71,9 @@ int main(int argc, char *argv[])
   po::variables_map vm;
   po::options_description desc("tltext options");
   desc.add_options()
+    ("args", 
+      po::value<std::vector<std::string>>()->multitoken(),
+      "arguments to pass to TransLucid in the CL_ARGS variable")
     ("help,h", "show this message")
     ("input,i", po::value<std::string>(), "input file")
     ("output,o", po::value<std::string>(), "output file")
@@ -137,6 +140,18 @@ int main(int argc, char *argv[])
     {
       output = openOutput(vm["output"].as<std::string>());
       tltext.set_output(output.get());
+    }
+
+    std::vector<std::string> args;
+    if (vm.count("args"))
+    {
+      args = vm["args"].as<std::vector<std::string>>();
+      std::cout << "args:";
+      for (auto s : args)
+      {
+        std::cout << " " << s;
+      }
+      std::cout << std::endl;
     }
 
     tltext.run();
