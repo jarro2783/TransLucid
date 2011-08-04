@@ -84,7 +84,7 @@ namespace TransLucid
       lex::token_def<lex::unused_type, lex_char_type> 
         //keywords
         if_, fi_, where_, then_, elsif_, else_, true_, false_
-      , library_, dimension_, var_, assignment_
+      , library_, dimension_, var_, assignment_, out_, in_
         //symbols
       , arrow_, dblsemi_, dblslash_ //, dbldollar_
       , dblpercent_, assign_
