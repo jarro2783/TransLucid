@@ -131,7 +131,7 @@ namespace TransLucid
         //create variance tuple
         mpz_class a = 0;
         variance.insert(std::make_pair(d,
-          Types::Range::create(Range(&a, &m_bounds[i])) 
+          Types::Range::create(Range(&a, &m_bounds[i]-1)) 
         ));
       }
 
@@ -190,19 +190,15 @@ namespace TransLucid
         auto iter = index.find(d);
         if (iter == index.end())
         {
-          return Types::Special::create(SP_DIMENSION);
+          //this should never happen
+          throw "Invalid index in ArrayHD get: " __FILE__ ": " 
+            STRING_(__LINE__);
         }
         else
         {
-          if (iter->second.index() == TYPE_INDEX_INTMP)
-          {
-            vecIndex.push_back(
-              get_constant_pointer<mpz_class>(iter->second).get_ui());
-          }
-          else
-          {
-            return Types::Special::create(SP_DIMENSION);
-          }
+          //the preconditions of get are guaranteed by bestfitting
+          vecIndex.push_back(
+            get_constant_pointer<mpz_class>(iter->second).get_ui());
         }
       }
 

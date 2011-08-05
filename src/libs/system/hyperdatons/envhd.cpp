@@ -56,7 +56,9 @@ EnvHD::get(const Tuple& index) const
   }
   else
   {
-    return Types::Special::create(SP_DIMENSION);
+    //this should never happen because the system guarantees the preconditions
+    //with bestfitting
+    throw "EnvHD: index invalid: " __FILE__ ": " STRING_(__LINE__);
   }
 }
 
