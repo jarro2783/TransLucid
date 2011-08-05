@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/hyperdatons/arrayhd.hpp>
+#include <tl/hyperdatons/envhd.hpp>
 #include <tl/ast.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_api.hpp>
@@ -169,11 +170,18 @@ namespace TransLucid
       void
       setup_clargs();
 
+      void
+      setup_envhd();
+
+      void
+      setup_hds();
+
       DemandHD* m_demands;
 
       std::vector<std::string> m_headers;
       std::vector<std::string> m_clargs;
       ArrayNHD<u32string, 1>* m_argsHD;
+      EnvHD* m_envHD;
     };
   }
 }

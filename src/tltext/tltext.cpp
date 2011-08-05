@@ -86,11 +86,19 @@ TLText::~TLText()
   delete m_argsHD;
 }
 
+void
+TLText::setup_hds()
+{
+  //command line arguments
+  setup_clargs();
+  //environment variables
+  setup_envhd();
+}
+
 void 
 TLText::run()
 {
-  //setup command line arguments
-  setup_clargs();
+  setup_hds();
 
   //load up headers
   for (auto h : m_headers)
@@ -346,6 +354,14 @@ TLText::setup_clargs()
 
     m_system.addInputHyperdaton(U"CL_ARGS", m_argsHD);
   }
+}
+
+void
+TLText::setup_envhd()
+{
+  m_envHD = new EnvHD(m_system, m_system);
+
+  m_system.addInputHyperdaton(U"ENV", m_envHD);
 }
 
 } //namespace TLCore

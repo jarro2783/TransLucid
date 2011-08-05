@@ -13,6 +13,7 @@ expr_parser.cpp header.cpp internal_strings.cpp lexer.cpp lexer_util.cpp
 library.cpp line_tokenizer.cpp parser.cpp printer.cpp
 range.cpp system.cpp translator.cpp tree_printer.cpp
 tree_to_wstree.cpp tuple_parser.cpp types.cpp utility.cpp
+hyperdatons/envhd.cpp
 )
 
 target_link_libraries(tlsystem ltdl rt gmpxx)

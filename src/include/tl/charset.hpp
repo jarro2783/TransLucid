@@ -137,10 +137,10 @@ namespace TransLucid
    * @return The string object.
    */
   template <typename T>
-  std::basic_string<uint32_t>
-  chars_to_unsigned_u32string(T* s)
+  u32string
+  chars_to_u32string(T* s)
   {
-    std::basic_string<uint32_t> ustring;
+    u32string ustring;
     for (auto i = s; *i != 0; ++i)
     {
       ustring += *i; 

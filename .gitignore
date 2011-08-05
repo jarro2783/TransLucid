@@ -1,0 +1,12 @@
+Makefile.in
+/missing
+/config.*
+!/config.h.cmake
+/INSTALL
+/aclocal.m4
+/autom4te.cache/
+/configure
+/build/
+/depcomp
+/install-sh
+/ltmain.sh
