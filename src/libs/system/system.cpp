@@ -796,8 +796,11 @@ System::addInputHyperdaton
 
     //add the constraint
     //m_outputHDDecls.insert(std::make_pair(name, hd->variance()));
+
+    //the variance becomes the guard, this guarantees that requests are for
+    //a valid index
     auto ws = new detail::InputHDWS(name, *this);
-    addEquation(name, ws);
+    addEquation(name, GuardWS(hd->variance()), ws);
 
     return Types::UUID::create(u);
   }
