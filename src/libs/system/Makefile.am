@@ -31,7 +31,7 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   line_tokenizer.cpp parser.cpp printer.cpp range.cpp \
   system.cpp translator.cpp tree_printer.cpp tree_to_wstree.cpp \
   tuple_parser.cpp types.cpp \
-  utility.cpp
+  utility.cpp hyperdatons/envhd.cpp
 
 libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)

@@ -82,6 +82,7 @@ AC_CONFIG_FILES([
                  src/include/Makefile
                  src/include/tl/Makefile
                  src/include/tl/detail/Makefile
+                 src/include/tl/hyperdatons/Makefile
                  src/include/tl/types/Makefile
                  src/libs/Makefile
                  src/libs/system/Makefile
