@@ -1,20 +1,42 @@
 \documentclass[a4paper]{article}
 
+\usepackage{a4wide}
+
 \begin{document}
 
 \section{Introduction}
 
+TransLucid is a programming language in which equations are defined to
+vary in an arbitrary dimensional context. A TransLucid instance can run several
+instants; at each instant, the user optionally defines new equations, and makes
+demands for expressions to be evaluated in the current instant.
+
 \section{Getting Started}
 
-\begin{verbatim}
-tlcore
-\end{verbatim}
+The simplest program to run is the empty program which runs for one instant and
+does nothing. Simply run \verb|tltext| on the command line, and type 
+\verb|Ctrl-D|.
 
+To print the string \emph{``Hello world!''} to the screen, we can make a 
+demand in the first instant to evaluate the string \verb|"Hello world!"|.
+Unless otherwise specified, all programs will be run by typing \verb|tltext| on
+the command line.
 \begin{verbatim}
-%%
 %%
 "Hello world!";;
+^D
+`Hello world!`
+\end{verbatim}
+
+Next, we will define the variable \verb|x|, which will be the constant value
+\verb|42| in all contexts, then in the first instant we will make a demand for
+the expression \verb|x|.
+\begin{verbatim}
+var x = 42;;
 %%
+x;;
+^D
+42
 \end{verbatim}
 
 \end{document}
