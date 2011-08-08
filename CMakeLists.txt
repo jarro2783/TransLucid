@@ -52,6 +52,10 @@ if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
+# look for documentation requirements
+find_program(DOXYGEN doxygen)
+find_program(DOT dot)
+
 INCLUDE_DIRECTORIES(src/include ${CMAKE_BINARY_DIR})
 
 set(PREFIX \"${CMAKE_INSTALL_PREFIX}\")

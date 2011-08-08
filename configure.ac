@@ -73,6 +73,14 @@ fi
 DX_INIT_DOXYGEN([TransLucid], [doc])
 DX_DOT_FEATURE([ON])
 
+if test -n "$DX_DOT"; then
+  HAVE_DOT="YES"
+else
+  HAVE_DOT="NO"
+fi
+
+AC_SUBST(HAVE_DOT)
+
 AC_CONFIG_FILES([
                  translucid.pc
                  Makefile
