@@ -32,3 +32,5 @@ includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp \
   set_types.hpp system.hpp translator.hpp tree_printer.hpp tree_to_wstree.hpp \
   tuple_parser.hpp types.hpp types_fwd.hpp types_util.hpp utility.hpp \
   workshop.hpp 
+
+EXTRA_DIST = CMakeLists.txt

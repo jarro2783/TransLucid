@@ -19,6 +19,8 @@ TESTS_ENVIRONMENT = TLCORE=$(top_builddir)/src/tltext/tltext \
 tltextdatadir = $(pkgdatadir)/tltext
 dist_tltextdata_DATA = header.tl
 
+EXTRA_DIST = CMakeLists.txt
+
 #TESTS = tltext-tests.sh
 
 #check-local:

@@ -18,3 +18,5 @@
 #   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 SUBDIRS = include libs tests tltext
+
+EXTRA_DIST = CMakeLists.txt

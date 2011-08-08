@@ -18,3 +18,5 @@
 includesdir = $(prefix)/include/tl/detail
 
 includes_HEADERS = lexer_detail.hpp types_detail.hpp
+
+EXTRA_DIST = CMakeLists.txt
