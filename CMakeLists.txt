@@ -56,6 +56,10 @@ endif()
 find_program(DOXYGEN doxygen)
 find_program(DOT dot)
 
+if (DOT STREQUAL "DOT-NOTFOUND")
+  message(WARNING "documentation will be built without graphs")
+endif()
+
 INCLUDE_DIRECTORIES(src/include ${CMAKE_BINARY_DIR})
 
 set(PREFIX \"${CMAKE_INSTALL_PREFIX}\")
