@@ -40,14 +40,14 @@ GCC_MIN_VERSION=`cat $srcdir/checks/gcc_min_version`
 # check for the correct version of gcc
 AC_MSG_CHECKING([for gcc >= $GCC_MIN_VERSION])
 GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
-AC_COMPILE_IFELSE($GCC_CHECK_TEXT, 
-[AC_MSG_RESULT([yes])],
-[AC_MSG_ERROR([gcc version $GCC_MIN_VERSION or greater is required])]
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([$GCC_CHECK_TEXT])], 
+  [AC_MSG_RESULT([yes])],
+  [AC_MSG_ERROR([gcc version $GCC_MIN_VERSION or greater is required])]
 )
 
 # Checks for libraries.
 
-AX_BOOST_BASE([1.43])
+AX_BOOST_BASE([1.46])
 AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_THREAD
 
