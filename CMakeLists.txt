@@ -18,6 +18,7 @@
 
 cmake_minimum_required(VERSION 2.6)
 project(TransLucid)
+include(CPack)
 
 set(VERSION "0.0.80")
 set(builddir ${CMAKE_BINARY_DIR}/doc)
@@ -44,9 +45,9 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
 set(CMAKE_BUILD_TYPE build)
 
 set (Boost_USE_STATIC_LIBS OFF)
-set (Boost_ADDITIONAL_VERSIONS 1.46.1 1.46.0)
+set (Boost_ADDITIONAL_VERSIONS 1.46.1 1.46.0 1.47.0)
 set (Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.45.0 REQUIRED COMPONENTS program_options)
+find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options)
 
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
