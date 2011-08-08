@@ -1,3 +1,7 @@
+-- source distribution stuff --
+
+pkg-config files
+
 -- IO hyperdaton stuff
 
 env vars ENV = ...
