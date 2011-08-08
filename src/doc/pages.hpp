@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/*
+ * This file is only for the TransLucid API documentation built by
+ * Doxygen. All of the extra pages that we need to create will go here.
+ */
+
 /**
  * @mainpage
  * 
