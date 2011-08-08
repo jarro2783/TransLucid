@@ -619,7 +619,7 @@ BOOST_AUTO_TEST_CASE ( symbols )
     TOKEN_AT,
     TOKEN_SLASH,
     TOKEN_DOUBLE_SLASH,
-    TOKEN_RANGE,
+    std::make_pair(U"..", TL::Lexer::TOK_BINARY_OP),
     TOKEN_OPAREN,
     TOKEN_CPAREN,
     TOKEN_ARROW,
