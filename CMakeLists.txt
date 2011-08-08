@@ -19,6 +19,10 @@
 cmake_minimum_required(VERSION 2.6)
 project(TransLucid)
 
+set(VERSION "0.0.80")
+set(builddir ${CMAKE_BINARY_DIR}/doc)
+set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
+
 enable_testing()
 
 try_compile(GCC_IS_CORRECT_VERSION ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/checks/version.cpp)
@@ -54,3 +58,4 @@ set(PREFIX \"${CMAKE_INSTALL_PREFIX}\")
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
 add_subdirectory(src)
+add_subdirectory(doc)
