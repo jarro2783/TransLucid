@@ -17,7 +17,7 @@ TESTS_ENVIRONMENT = TLCORE=$(top_builddir)/src/tltext/tltext \
   LIBPATH=$(top_builddir)/src/libs/int:$(top_builddir)/src/libs/string $(SHELL) -x
 
 tltextdatadir = $(pkgdatadir)/tltext
-tltextdata_DATA = header.tl
+dist_tltextdata_DATA = header.tl
 
 #TESTS = tltext-tests.sh
 

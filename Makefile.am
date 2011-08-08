@@ -18,7 +18,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS=src doc
-EXTRA_DIST=CMakeLists.txt tl.cbp
+EXTRA_DIST=CMakeLists.txt
 
 doc:
 if DX_COND_doc
