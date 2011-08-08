@@ -417,6 +417,17 @@ VariableWS::delexpr(uuid id, size_t time)
 bool
 VariableWS::replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr)
 {
+  UUIDEquationMap::iterator iter = m_equations.find(id);
+
+  if (iter != m_equations.end())
+  {
+    //not sure how to do this yet, but how about we turn off that warning
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void
