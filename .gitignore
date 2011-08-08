@@ -1,7 +1,6 @@
 Makefile.in
 /missing
 /config.*
-!/config.h.cmake
 /INSTALL
 /aclocal.m4
 /autom4te.cache/
