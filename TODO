@@ -13,7 +13,6 @@ could start pretending to be bash or something like that with all this
 clean up this TODO
 check that 2 - -a works - make it work if it doesn't
 -2- - -2-
-footer for output
 add error checking for all parsing
 aether and all in tuples
 optional parens in pretty printer
