@@ -18,7 +18,6 @@
 
 cmake_minimum_required(VERSION 2.6)
 project(TransLucid)
-include(CPack)
 
 set(VERSION "0.0.80")
 set(builddir ${CMAKE_BINARY_DIR}/doc)
