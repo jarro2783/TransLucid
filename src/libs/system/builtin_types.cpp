@@ -19,12 +19,14 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
+#include <tl/hyperdatons/filehd.hpp>
 #include <tl/internal_strings.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
 #include <tl/types/boolean.hpp>
 #include <tl/types/char.hpp>
 #include <tl/types/function.hpp>
+#include <tl/types/hyperdatons.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/string.hpp>
@@ -79,6 +81,14 @@ namespace TransLucid
         &delete_ptr<uuid>
       };
 
+    TypeFunctions hyperdaton_type_functions =
+      {
+        &Types::Hyperdatons::equality,
+        &Types::Hyperdatons::hash,
+        &delete_ptr<HD>
+      };
+
+    //copied and pasted from types.hpp, this should match the strings below
     #if 0
     SP_ERROR, /**<Error value. Should never have this value, having a special
     of this value means an error occured somewhere.*/
@@ -104,6 +114,7 @@ namespace TransLucid
       U"const",
       U"multidef",
       U"loop"
+      //SPECIAL_LAST is not an actual value
     }
     ;
 
@@ -266,6 +277,75 @@ namespace TransLucid
         get_constant_pointer<u32string>(b))
       ;
     }
+
+    //the following functions will create the appropriate file hyperdaton
+    //which contains an appropriate fstream object and then wrap it up
+    //as a constant
+    inline Constant
+    open_input_file(type_index ti, const u32string& file)
+    {
+      FileInputHD* in = new FileInputHD(file);
+
+      return Types::Hyperdatons::create(in, ti);
+    }
+
+    inline Constant
+    open_output_file(type_index ti, const u32string& file)
+    {
+      //TODO implement me
+      return Types::Special::create(SP_ERROR);
+    }
+
+    inline Constant
+    open_io_file(type_index ti, const u32string& file)
+    {
+      //TODO implement me
+      return Types::Special::create(SP_ERROR);
+    }
+
+    struct FileOpener
+    {
+      FileOpener(type_index in, type_index out, type_index io)
+      : m_in(in), m_out(out), m_io(io)
+      {
+      }
+
+      Constant
+      operator()(const Constant& file, const Constant& mode)
+      {
+        if (mode.index() != TYPE_INDEX_INTMP || 
+            file.index() != TYPE_INDEX_USTRING)
+        {
+          return Types::Special::create(SP_TYPEERROR);
+        }
+
+        const mpz_class& intmode = get_constant_pointer<mpz_class>(mode);
+        const u32string& sfile = get_constant_pointer<u32string>(file);
+
+        switch (intmode.get_ui())
+        {
+          case 1:
+          //input
+          return open_input_file(m_in, sfile);
+          break;
+
+          case 2:
+          //output
+          return open_output_file(m_out, sfile);
+          break;
+
+          case 3:
+          //io
+          return open_io_file(m_out, sfile);
+          break;
+
+          default:
+          return Types::Special::create(SP_DIMENSION);
+        }
+      }
+
+      type_index m_in, m_out, m_io;
+    };
 
   }
 
@@ -632,6 +712,38 @@ namespace TransLucid
       }
     }
 
+    namespace Hyperdatons
+    {
+      const HD*
+      get(const Constant& h)
+      {
+        return &get_constant_pointer<HD>(h);
+      }
+
+      Constant
+      create(const HD* hd, type_index ti)
+      {
+        ConstantPointerValue* p = 
+          new ConstantPointerValue(
+            &hyperdaton_type_functions, 
+            const_cast<HD*>(hd));
+        return Constant(p, ti);
+      }
+
+      bool 
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return reinterpret_cast<size_t>(get(c));
+      }
+
+    }
+
   }
 }
 
@@ -690,6 +802,28 @@ LambdaFunctionType::applyLambda(const Tuple& k, const Constant& value) const
   tuple_t k_f = k.tuple();
   k_f[m_dim] = value;
   return (*m_expr)(Tuple(k_f));
+}
+
+//everything that creates hyperdatons
+void
+add_file_io(System& s)
+{
+  type_index in, out, io;
+
+  in = s.getTypeIndex(U"inhd");
+  out = s.getTypeIndex(U"outhd");
+  io = s.getTypeIndex(U"iohd");
+
+  s.registerFunction(U"fileopen", 
+    make_function_type<2>::type(
+      FileOpener(in, out, io)
+    )
+  );
+
+  //file [arg0 : string, arg1 : intmp] = "openfile"!(#arg0, #arg1);;
+  //ifile [arg0 : string] = file @ [arg1 <- 1];;
+  //ofile [arg0 : string] = file @ [arg1 <- 2];;
+  //iofile [arg0 : string] = file @ [arg1 <- 3];;
 }
 
 inline
@@ -914,6 +1048,8 @@ init_builtin_types(System& s)
   add_builtin_printers(s, to_print_types);
 
   add_builtin_ops(s);
+
+  add_file_io(s);
 }
 
 } //namespace TransLucid

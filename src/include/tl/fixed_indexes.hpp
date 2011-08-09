@@ -63,6 +63,11 @@ namespace TransLucid
     DIM_VALID_GUARD,
     DIM_ALL,
 
+    //for array indices, these are the integers 0, 1, 2
+    DIM_ZERO,
+    DIM_ONE,
+    DIM_TWO,
+
     //the last one
     DIM_INDEX_LAST
   };

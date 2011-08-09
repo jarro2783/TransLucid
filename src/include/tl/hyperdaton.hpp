@@ -34,6 +34,8 @@ namespace TransLucid
   class HD 
   {
     public:
+    virtual ~HD() {};
+
     size_t
     lifetime() const
     {
@@ -90,7 +92,7 @@ namespace TransLucid
     {
     }
 
-    virtual ~IOHD() throw() = default;
+    virtual ~IOHD() = default;
   };
 
   #if 0

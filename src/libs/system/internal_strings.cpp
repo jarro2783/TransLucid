@@ -34,5 +34,12 @@ namespace TransLucid
   u32string FN2_IDENT = U"FN2";
   u32string PRINT_IDENT = U"PRINT";
 
+  //type names
+  u32string typename_intmp = U"intmp";
+  u32string typename_ustring = U"ustring";
+  u32string typename_inhd = U"inhd";
+  u32string typename_outhd = U"outhd";
+  u32string typename_iohd = U"iohd";
+
   std::unordered_map<u32string, Constant> string_constants;
 }

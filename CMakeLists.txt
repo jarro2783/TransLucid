@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>. 
 
 cmake_minimum_required(VERSION 2.6)
-project(TransLucid)
+project(tl)
 
 set(VERSION "0.0.80")
 set(builddir ${CMAKE_BINARY_DIR}/doc)
@@ -28,7 +28,7 @@ enable_testing()
 try_compile(GCC_IS_CORRECT_VERSION ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/checks/version.cpp)
 
 if (NOT GCC_IS_CORRECT_VERSION)
-   message(FATAL_ERROR "g++ version 4.5.0 or greater is required")
+   message(FATAL_ERROR "g++ version 4.7.0 or greater is required")
 endif()
 
 find_package(PkgConfig REQUIRED)

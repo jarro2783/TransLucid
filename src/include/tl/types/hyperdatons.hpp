@@ -1,5 +1,5 @@
-/* Predefined strings used internally.
-   Copyright (C) 2011 Jarryd Beck
+/* Hyperdatons types.
+   Copyright (C) 2011 Jarryd Beck.
 
 This file is part of TransLucid.
 
@@ -17,28 +17,22 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/types.hpp>
-#include <unordered_map>
+#include <tl/hyperdaton.hpp>
 
 namespace TransLucid
 {
-  //dimensions
-  extern u32string type_name_dim;
-  extern u32string text_dim;
-  extern u32string fnname_dim;
+  namespace Types
+  {
+    namespace Hyperdatons
+    {
+      Constant
+      create(const HD* hd, type_index index);
 
-  //identifiers
-  extern u32string LITERAL_IDENT;
-  extern u32string FN1_IDENT;
-  extern u32string FN2_IDENT;
-  extern u32string PRINT_IDENT;
+      bool 
+      equality(const Constant& lhs, const Constant& rhs);
 
-  //type names
-  extern u32string typename_intmp;
-  extern u32string typename_ustring;
-  extern u32string typename_inhd;
-  extern u32string typename_outhd;
-  extern u32string typename_iohd;
-
-  extern std::unordered_map<u32string, Constant> string_constants;
+      size_t
+      hash(const Constant& c);
+    }
+  }
 }

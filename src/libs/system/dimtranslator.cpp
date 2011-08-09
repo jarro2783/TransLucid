@@ -18,8 +18,8 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/dimtranslator.hpp>
-#include <boost/assign/list_of.hpp>
 #include <tl/fixed_indexes.hpp>
+#include <tl/types/intmp.hpp>
 
 #include <initializer_list>
 
@@ -39,7 +39,13 @@ DimensionTranslator::DimensionTranslator()
    {U"all", DIM_ALL}
   }
   )
-, m_constants(m_nextIndex)
+, m_constants(m_nextIndex, std::vector<std::pair<Constant, dimension_index>>
+  {
+    {Types::Intmp::create(0), DIM_ZERO},
+    {Types::Intmp::create(1), DIM_ONE},
+    {Types::Intmp::create(2), DIM_TWO}
+  }
+  )
 {
 }
 
