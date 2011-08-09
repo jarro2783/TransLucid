@@ -3,4 +3,4 @@ file src/boost_1_47_0-nowarnings.patch.
 
 To apply the patch:
 cd $BOOST_ROOT/include/boost_1_47
-patch -p2 $TRANSLUCID_SOURCE/src/boost_1_47_0-nowarnings.patch
+patch -p1 $TRANSLUCID_SOURCE/src/boost_1_47_0-nowarnings.patch
