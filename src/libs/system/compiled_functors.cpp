@@ -69,11 +69,14 @@ DimensionWS::operator()(const Tuple& k)
 TaggedConstant
 IdentWS::operator()(const Tuple& k)
 {
-  WS* e = m_identifiers.lookup(m_name);
-
-  if (e != 0)
+  if (m_e == 0)
   {
-    return (*e)(k);
+    m_e = m_identifiers.lookup(m_name);
+  }
+
+  if (m_e != 0)
+  {
+    return (*m_e)(k);
   }
   else
   {

@@ -89,7 +89,7 @@ namespace TransLucid
     {
       public:
       IdentWS(const System::IdentifierLookup& idents, const u32string& name)
-      : m_identifiers(idents), m_name(name)
+      : m_identifiers(idents), m_name(name), m_e(nullptr)
       {}
 
       TaggedConstant
@@ -98,6 +98,7 @@ namespace TransLucid
       private:
       System::IdentifierLookup m_identifiers;
       u32string m_name;
+      WS* m_e;
     };
 
     class UnaryOpWS : public WS
