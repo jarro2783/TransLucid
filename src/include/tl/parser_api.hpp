@@ -64,13 +64,23 @@ namespace TransLucid
       u32string lib;
     };
 
+    struct OutputDecl
+    {
+    };
+
+    struct InputDecl
+    {
+    };
+
     typedef boost::variant
     <
       std::pair<Equation, DeclType>,
       Tree::UnaryOperator,
       Tree::BinaryOperator,
       DimensionDecl,
-      LibraryDecl
+      LibraryDecl,
+      OutputDecl,
+      InputDecl
     > Line;
 
     typedef std::vector<Line> Instant;

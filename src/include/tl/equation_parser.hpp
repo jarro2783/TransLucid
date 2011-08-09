@@ -49,6 +49,8 @@ namespace TransLucid
        */
       template <typename TokenDef>
       EquationGrammar(TokenDef& tok)
+      ;
+      #if 0
       : EquationGrammar::base_type(equation)
       {
         using namespace qi::labels;
@@ -91,6 +93,7 @@ namespace TransLucid
         BOOST_SPIRIT_DEBUG_NODE(expr);
         BOOST_SPIRIT_DEBUG_NODE(context_guard);
       }
+      #endif
 
       /**
        * Set the tuple parser for this equation parser.

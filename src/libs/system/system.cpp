@@ -177,6 +177,20 @@ namespace detail
       return Constant();
     }
 
+    Constant
+    operator()(const Parser::OutputDecl& lib)
+    {
+      //output hd declaration
+      return Constant();
+    }
+
+    Constant
+    operator()(const Parser::InputDecl& lib)
+    {
+      //input hd declaration
+      return Constant();
+    }
+
     private:
     System& m_system;
     bool m_verbose;

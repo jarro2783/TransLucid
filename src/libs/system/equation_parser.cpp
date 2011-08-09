@@ -28,6 +28,54 @@ namespace TransLucid
 {
   namespace Parser
   {
+    template <typename Iterator>
+    template <typename TokenDef>
+    EquationGrammar<Iterator>::EquationGrammar(TokenDef& tok)
+    : EquationGrammar::base_type(equation)
+    {
+      using namespace qi::labels;
+
+      equation =
+        (
+            tok.identifier_
+         >> guard
+         >> boolean
+         >> declaration
+         >> expr
+        )
+        [
+          _val = construct<std::pair<Equation, DeclType>>
+            (
+              construct<Equation>(_1, _2, _3, _5),
+              _4
+            )
+        ]
+      ;
+
+      guard =
+        ( context_guard(true)[_val = _1])
+      | qi::eps [_val = construct<Tree::nil>()]
+      ;
+
+      boolean =
+        ( tok.pipe_ >> expr[_val = _1])
+      | qi::eps [_val = construct<Tree::nil>()]
+      ;
+
+      declaration =
+        tok.def_[_val = DECL_DEF]
+      | tok.assign_[_val = DECL_ASSIGN]
+      ;
+
+      BOOST_SPIRIT_DEBUG_NODE(boolean);
+      BOOST_SPIRIT_DEBUG_NODE(guard);
+      BOOST_SPIRIT_DEBUG_NODE(equation);
+      BOOST_SPIRIT_DEBUG_NODE(expr);
+      BOOST_SPIRIT_DEBUG_NODE(context_guard);
+    }
+
     template class EquationGrammar<iterator_t>;
+    template EquationGrammar<iterator_t>::
+      EquationGrammar(Lexer::tl_lexer&);
   }
 }

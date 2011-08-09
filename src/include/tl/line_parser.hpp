@@ -74,15 +74,18 @@ namespace TransLucid
           [
             _val = ph::bind(&makeUnaryOp, _1, _2)
           ])
-        | tok.in_
-        | tok.out_
+        | (tok.in_ > g_equation)
+        | (tok.out_ > g_equation)
         )
 
         > tok.dblsemi_
         ;
       }
 
-      qi::rule<Iterator, Line()> r_line;
+      qi::rule<Iterator, Line()> 
+        r_line
+      ;
+
       EquationGrammar<Iterator>& g_equation;
       HeaderStringGrammar<Iterator> g_hstring;
       HeaderBinopGrammar<Iterator> g_binop;
