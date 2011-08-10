@@ -101,11 +101,7 @@ namespace detail
     InputHDWS(const u32string& name, System& system)
     : m_name(name)
     , m_system(system)
-    {
-    }
-
-    TaggedConstant
-    operator()(const Tuple& k)
+    , m_hd(0)
     {
       auto iter = m_system.m_inputHDs.find(m_name);
       if (iter == m_system.m_inputHDs.end())
@@ -114,12 +110,19 @@ namespace detail
         //the system has bombed on us
         throw "InputHDWS: input HD doesn't exist";
       }
-      return TaggedConstant(iter->second->get(k), k);
+      m_hd = iter->second;
+    }
+
+    TaggedConstant
+    operator()(const Tuple& k)
+    {
+      return TaggedConstant(m_hd->get(k), k);
     }
 
     private:
     u32string m_name;
     System& m_system;
+    InputHD* m_hd;
   };
 
   class LineAdder
