@@ -22,11 +22,14 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 #include <iconv.h>
+//this can go to charset.cpp
+#include <string>
 
 /**
  * @file charset.hpp
  * Character set utility functions. Contains functions for converting
  * between character sets.
+ * TODO implement this in charset.cpp
  */
 
 namespace TransLucid

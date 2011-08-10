@@ -162,12 +162,6 @@ Tuple::hash() const
 namespace std
 {
   size_t
-  hash<mpz_class>::operator()(const mpz_class& v) const
-  {
-    return std::hash<std::string>()(v.get_str());
-  }
-
-  size_t
   hash<TransLucid::tuple_t>::operator()(const TransLucid::tuple_t& t) const
   {
     size_t h = 0;

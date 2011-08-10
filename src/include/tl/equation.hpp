@@ -32,6 +32,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <boost/shared_ptr.hpp>
 #include <boost/uuid/uuid_generators.hpp>
+#include <gmpxx.h>
 
 namespace TransLucid
 {

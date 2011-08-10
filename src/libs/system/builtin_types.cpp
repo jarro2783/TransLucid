@@ -35,6 +35,21 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
+#include <gmpxx.h>
+
+namespace std
+{
+  template<>
+  struct hash<mpz_class>
+  {
+    size_t
+    operator()(const mpz_class& v) const
+    {
+      return std::hash<std::string>()(v.get_str());
+    }
+  };
+}
+
 namespace TransLucid
 {
   namespace 

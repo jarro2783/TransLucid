@@ -26,8 +26,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <map>
 #include <memory>
-
-#include <gmpxx.h>
+#include <cstdint>
+#include <cstring>
+#include <string>
 
 /**
  * @file types.hpp
@@ -38,15 +39,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #define STRING(x) #x
 #define STRING_(x) STRING(x)
-
-#if 0
-inline size_t
-hash_value(const mpz_class& v)
-{
-  boost::hash<std::string> hasher;
-  return hasher(v.get_str());
-}
-#endif
 
 /**
  * @brief The namespace that all of the TransLucid library is placed in.
@@ -447,13 +439,6 @@ namespace std
     {
       return c.hash();
     }
-  };
-
-  template<>
-  struct hash<mpz_class>
-  {
-    size_t
-    operator()(const mpz_class& v) const;
   };
 
   template<>
