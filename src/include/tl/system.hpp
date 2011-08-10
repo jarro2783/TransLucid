@@ -33,6 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_map>
 
 #include <boost/function.hpp>
+#include <boost/functional/hash.hpp>
 
 /**
  * @file system.hpp

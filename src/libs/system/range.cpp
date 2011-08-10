@@ -19,6 +19,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/range.hpp>
 
+#include <functional>
+
 namespace TransLucid
 {
 
@@ -100,20 +102,20 @@ Range::hash() const
   size_t seed = 0;
 
   if (m_lower == 0) {
-    boost::hash_combine(seed, 0);
+    std::_Hash_impl::__hash_combine(0, seed);
   }
   else
   {
-    boost::hash_combine(seed, *m_lower);
+    std::_Hash_impl::__hash_combine(*m_lower, seed);
   }
 
   if (m_upper == 0)
   {
-    boost::hash_combine(seed, 0);
+    std::_Hash_impl::__hash_combine(0, seed);
   }
   else
   {
-    boost::hash_combine(seed, *m_upper);
+    std::_Hash_impl::__hash_combine(*m_upper, seed);
   }
 
   return seed;

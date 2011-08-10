@@ -686,7 +686,7 @@ namespace TransLucid
       size_t
       hash(const Constant& c)
       {
-        return boost::hash<mpz_class>()(get(c));
+        return std::hash<mpz_class>()(get(c));
       }
 
       void

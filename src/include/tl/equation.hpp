@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/bestfit.hpp>
 #include <tl/workshop.hpp>
 #include <tl/types.hpp>
+#include <tl/uuid.hpp>
 
 #include <deque>
 #include <list>
