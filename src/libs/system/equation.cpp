@@ -134,7 +134,7 @@ GuardWS::evaluate(const Tuple& k) const
           throw InvalidGuard();
         }
 
-        t.insert(std::make_pair(value.first, value.second));
+        t.insert(value);
       }
     }
     else

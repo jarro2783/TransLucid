@@ -130,8 +130,9 @@ namespace TransLucid
 
         //create variance tuple
         mpz_class a = 0;
+        mpz_class b = m_bounds[i]-1;
         variance.insert(std::make_pair(d,
-          Types::Range::create(Range(&a, &m_bounds[i]-1)) 
+          Types::Range::create(Range(&a, &b))
         ));
       }
 
