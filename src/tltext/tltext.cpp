@@ -352,7 +352,7 @@ TLText::setup_clargs()
       ++i;
     }
 
-    m_system.addInputHyperdaton(U"CL_ARGS", m_argsHD);
+    m_system.addInputHyperdaton(U"CLARGS", m_argsHD);
   }
 }
 
