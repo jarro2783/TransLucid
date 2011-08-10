@@ -24,7 +24,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 //#include <boost/functional/hash.hpp>
 
-#include <iostream>
 #include <map>
 #include <memory>
 #include <vector>
