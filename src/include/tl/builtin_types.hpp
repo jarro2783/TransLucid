@@ -26,9 +26,6 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/types.hpp>
-//#include <tl/equation.hpp>
-#include <set>
-#include <unordered_map>
 
 namespace TransLucid
 {

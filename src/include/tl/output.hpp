@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iostream>
 
+#include <tl/uuid.hpp>
+
 namespace boost
 {
   namespace uuids

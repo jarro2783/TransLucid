@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file equation.cpp
+ * All of the code related to equations. The main part of bestfitting
+ * and the management of equations is done here.
+ */
+
 #include <tl/equation.hpp>
 #include <tl/range.hpp>
 #include <tl/types/range.hpp>

@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/types/intmp.hpp>
 
-#include <initializer_list>
+#include <vector>
 
 namespace TransLucid
 {

@@ -20,13 +20,13 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef AST_HPP_INCLUDED
 #define AST_HPP_INCLUDED
 
-#include <tl/types.hpp>
-#include <boost/variant.hpp>
 #include <tl/exception.hpp>
+#include <tl/types.hpp>
+
+#include <vector>
+
 #include <gmpxx.h>
-#include <tl/builtin_types.hpp>
-//#include <boost/fusion/include/vector.hpp>
-//#include <boost/fusion/container.hpp>
+#include <boost/variant.hpp>
 
 /**
  * @file ast.hpp

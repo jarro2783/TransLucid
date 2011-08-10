@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file range.cpp
+ * The range object. Defines a set of integers in a range.
+ */
+
+#include <tl/output.hpp>
 #include <tl/range.hpp>
 
 #include <functional>

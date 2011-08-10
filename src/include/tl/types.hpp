@@ -26,7 +26,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <map>
 #include <memory>
-#include <vector>
 
 #include <gmpxx.h>
 
@@ -64,7 +63,6 @@ namespace TransLucid
   typedef std::u32string u32string;
 
   typedef std::tuple<u32string, WS*, WS*, WS*> TranslatedEquation;
-  typedef std::vector<TranslatedEquation> equation_v;
 
   class Tuple;
 
@@ -427,12 +425,6 @@ namespace TransLucid
   //        (const Constant&, const Constant&, const Tuple&)> OpFunction;
   //typedef boost::function<Constant
   //        (const Constant&, const Tuple&)> ConvertFunction;
-
-  /**
-   * @brief Vector of type indexes.
-   **/
-  typedef std::vector<type_index> type_vec;
-
 
 } //namespace TransLucid
 
