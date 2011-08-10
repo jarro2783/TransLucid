@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
   desc.add_options()
     ("args", 
       po::value<std::vector<std::string>>()->multitoken(),
-      "arguments to pass to TransLucid in the CL_ARGS variable")
+      "arguments to pass to TransLucid in the CLARGS variable")
     ("help,h", "show this message")
     ("input,i", po::value<std::string>(), "input file")
     ("output,o", po::value<std::string>(), "output file")
