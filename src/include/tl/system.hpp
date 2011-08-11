@@ -37,7 +37,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_set>
 #include <unordered_map>
 
-#include <boost/function.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace TransLucid
@@ -49,10 +48,6 @@ namespace TransLucid
   }
 
   constexpr int MAX_FUNCTION_PARAMETERS = 10;
-
-  template <typename T>
-  class uuidmap : public std::map<uuid, T> {
-  };
 
   class Translator;
 
@@ -280,10 +275,6 @@ namespace TransLucid
     //input and output hd declarations, for now just have the valid range
     std::unordered_map<u32string, Tuple> m_outputHDDecls;
     std::unordered_map<u32string, Tuple> m_inputHDDecls;
-
-    //the uuid generator
-    boost::uuids::basic_random_generator<boost::mt19937>
-    m_uuid_generator;
 
     //---- the sets of all the uuids of objects ----
 

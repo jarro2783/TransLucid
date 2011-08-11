@@ -29,11 +29,28 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/tuple.hpp>
 #include <tl/utility.hpp>
 
+#include <boost/uuid/uuid_generators.hpp>
+
+#include <vector>
+
 namespace TransLucid
 {
 
-boost::uuids::basic_random_generator<boost::mt19937>
-EquationWS::m_generator;
+namespace
+{
+boost::uuids::basic_random_generator<boost::mt19937> uuid_generator;
+}
+
+EquationWS::EquationWS(const u32string& name, const GuardWS& valid, WS* h)
+: m_name(name), m_validContext(valid), m_h(h),
+  m_id(uuid_generator())
+{
+}
+
+EquationWS::EquationWS()
+: m_h(0), m_id(boost::uuids::nil_generator()())
+{
+}
 
 VariableWS::VariableWS(const u32string& name)
 : m_name(name)
@@ -198,8 +215,9 @@ VariableWS::operator()(const Tuple& k)
   #endif
 
   typedef std::tuple<Tuple, UUIDEquationMap::const_iterator> ApplicableTuple;
-  typedef std::list<ApplicableTuple> applicable_list;
+  typedef std::vector<ApplicableTuple> applicable_list;
   applicable_list applicable;
+  applicable.reserve(m_equations.size());
 
   //find all the applicable ones
   for (UUIDEquationMap::const_iterator eqn_i = m_equations.begin();
@@ -247,7 +265,7 @@ VariableWS::operator()(const Tuple& k)
   }
 
   //find the best ones
-  std::list<applicable_list::const_iterator> bestIters;
+  std::vector<applicable_list::const_iterator> bestIters;
 
   for (applicable_list::const_iterator i = applicable.begin();
        i != applicable.end(); ++i)

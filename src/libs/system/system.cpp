@@ -63,11 +63,17 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_map>
 #include <initializer_list>
 
+#include <boost/uuid/uuid_generators.hpp>
+
 namespace TransLucid
 {
 
 namespace
 {
+  //the uuid generator
+  boost::uuids::basic_random_generator<boost::mt19937>
+  uuid_generator;
+
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {
@@ -525,7 +531,7 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     return Types::Special::create(SP_CONST);
   }
 
-  uuid u = m_uuid_generator();
+  uuid u = uuid_generator();
 
   m_unop_uuids.insert(std::make_pair(u,
     UnaryUUIDs
@@ -574,7 +580,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
     return Types::Special::create(SP_CONST);
   }
 
-  uuid u = m_uuid_generator();
+  uuid u = uuid_generator();
 
   m_binop_uuids.insert(std::make_pair(u, 
     BinaryUUIDs
@@ -705,7 +711,7 @@ System::addOutputHyperdaton
   if (i == m_outputHDs.end())
   {
     m_outputHDs.insert(std::make_pair(name, hd));
-    uuid u = m_uuid_generator();
+    uuid u = uuid_generator();
     m_outputUUIDs.insert(std::make_pair(u, name));
 
     //add the constraint
@@ -794,7 +800,7 @@ System::addInputHyperdaton
   if (i == m_inputHDs.end())
   {
     m_inputHDs.insert(std::make_pair(name, hd));
-    uuid u = m_uuid_generator();
+    uuid u = uuid_generator();
     //m_outputUUIDs.insert(std::make_pair(u, name));
 
     //add the constraint

@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file builtin_types.cpp
+ * Builtin type definitions.
+ */
+
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
 #include <tl/hyperdatons/filehd.hpp>
