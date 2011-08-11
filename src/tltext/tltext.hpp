@@ -27,9 +27,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include "demandhd.hpp"
 
 /**
- * @file src/tlcore/tlcore.hpp
- * The main header for tlcore. Contains all the definitions that a main
- * file needs to run the tlcore application.
+ * @file src/tltext/tltext.hpp
+ * The main header for tltext. Contains all the definitions that a main
+ * file needs to run the tltext application.
  */
 
 namespace TransLucid

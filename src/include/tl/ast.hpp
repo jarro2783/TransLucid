@@ -29,7 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/variant.hpp>
 
 /**
- * @file ast.hpp
+ * @file tl/ast.hpp
  * Everything related to abstract syntax trees.
  * Contains everything needed to build and traverse an abstract syntax tree.
  */
