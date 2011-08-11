@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file tree_to_wstree.hpp
+ * Rewrites expression trees.
+ */
+
 #include <tl/ast.hpp>
 
 namespace TransLucid

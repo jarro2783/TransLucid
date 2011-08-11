@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/charset.hpp>
 #include <tl/lexer.hpp>
 #include <tl/lexer_util.hpp>
+#include <tl/output.hpp>
 
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_operator.hpp>

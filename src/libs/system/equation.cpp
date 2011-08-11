@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/equation.hpp>
+#include <tl/output.hpp>
 #include <tl/range.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/tuple.hpp>

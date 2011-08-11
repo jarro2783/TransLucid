@@ -17,14 +17,20 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file expr_compiler.hpp
+ * Expression compiler definition.
+ * Compiles a tree to workshops.
+ */
+
 #ifndef EXPR_COMPILER_HPP_INCLUDED
 #define EXPR_COMPILER_HPP_INCLUDED
 
 #include <tl/ast.hpp>
-#include <tl/system.hpp>
 
 namespace TransLucid
 {
+
+  class System;
 
   class ExprCompiler
   {

@@ -6,7 +6,7 @@ add_definitions(${TLCFLAGS}
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
 -Wall)
 add_library(tlsystem SHARED 
-ast.cpp bestfit.cpp builtin_types.cpp
+ast.cpp bestfit.cpp builtin_types.cpp charset.cpp
 compiled_functors.cpp dimtranslator.cpp 
 equation.cpp equation_parser.cpp expr_compiler.cpp 
 expr_parser.cpp header.cpp 

@@ -17,16 +17,12 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/hyperdatons/arrayhd.hpp>
-#include <tl/hyperdatons/envhd.hpp>
 #include <tl/ast.hpp>
+#include <tl/hyperdatons/arrayhd_fwd.hpp>
+#include <tl/hyperdatons/envhd.hpp>
 #include <tl/library.hpp>
-#include <tl/parser_api.hpp>
-#include <tl/parser_defs.hpp>
 #include <tl/system.hpp>
 #include <iostream>
-//#include <tl/parser_header_util.hpp>
-#include <tl/expr_compiler.hpp>
 
 #include "demandhd.hpp"
 
@@ -144,7 +140,6 @@ namespace TransLucid
 
       System m_system;
       ExprList m_exprs;
-      ExprCompiler m_compiler;
 
       mpz_class m_time;
 

@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
  * Iterator tests.
  */
 
+#include <tl/output.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
 //#include <tl/parser_fwd.hpp>

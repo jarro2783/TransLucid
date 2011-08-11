@@ -207,21 +207,11 @@ namespace TransLucid
       int m_count;
     };
 
-    inline
     std::ostream&
-    operator<<(std::ostream& os, const Equation& eqn)
-    {
-      os << "Equation(" << std::get<0>(eqn) << ")" << std::endl;
-      return os;
-    }
-    
-    inline
+    operator<<(std::ostream& os, const Equation& eqn);
+
     std::ostream&
-    operator<<(std::ostream& os, const std::pair<Equation, DeclType>& p)
-    {
-      os << "Declaration " << p.second << ": " << p.first << std::endl;
-      return os;
-    }
+    operator<<(std::ostream& os, const std::pair<Equation, DeclType>& p);
   }
 
   typedef std::pair<Parser::Equation, TranslatedEquation> PTEquation;

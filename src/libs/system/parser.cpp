@@ -17,16 +17,20 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file parser.cpp
+ * Miscellaneous parser utility.
+ */
+
 #include <tl/builtin_types.hpp>
 #include <tl/charset.hpp>
-#include <tl/exception.hpp>
+#include <tl/output.hpp>
 #include <tl/parser_header.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/parser_util.hpp>
 #include <tl/parser_api.hpp>
 
-#include <algorithm>
-#include <iterator>
+//#include <algorithm>
+//#include <iterator>
 
 namespace TransLucid
 {
@@ -34,52 +38,23 @@ namespace TransLucid
 namespace Parser
 {
 
-namespace
+std::ostream&
+operator<<(std::ostream& os, const Equation& eqn)
 {
-  struct IdMapper
-  {
-    template <typename Value>
-    auto operator()(const Value& v) 
-      -> decltype(std::make_pair(v.first, Tree::Expr()))
-    {
-      return std::make_pair(v.first, Tree::Expr(v.second));
-    }
-  };
+  os << "Equation(" << std::get<0>(eqn) << ")" << std::endl;
+  return os;
+}
+
+std::ostream&
+operator<<(std::ostream& os, const std::pair<Equation, DeclType>& p)
+{
+  os << "Declaration " << p.second << ": " << p.first << std::endl;
+  return os;
 }
 
 Header::Header()
 {
 }
-
-#if 0
-Header::Header()
-:
-  //add predefined dimensions
-  system_dimension_symbols(
-    {U"time",
-    U"id",
-    U"all"}
-  )
-{ 
-  ReservedIdentifierMap& m = reserved_ids;;
-
-  auto inserter = std::inserter(m, m.end());
-  std::transform(
-    Special::m_sv.parser_stov.begin(), 
-    Special::m_sv.parser_stov.end(), 
-    inserter,
-    IdMapper()
-
-    #if 0
-    [](const Special::StringValueInitialiser::StringValueMap::value_type& 
-       iter) 
-    {
-      return std::make_pair(p.first, Tree::Expr(p.second));
-    } 
-    #endif
-  );
-}
-#endif
 
 std::ostream& 
 operator<<(std::ostream& os, const Header& h)

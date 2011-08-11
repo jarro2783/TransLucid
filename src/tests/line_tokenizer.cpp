@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/line_tokenizer.hpp>
+#include <tl/output.hpp>
 
 #define BOOST_TEST_MODULE LineTokenizer
 #include <boost/test/included/unit_test.hpp>

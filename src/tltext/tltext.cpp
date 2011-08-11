@@ -19,7 +19,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/expr_parser.hpp>
 #include <tl/equation_parser.hpp>
+#include <tl/hyperdatons/arrayhd.hpp>
 #include <tl/line_tokenizer.hpp>
+#include <tl/output.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types_util.hpp>
@@ -66,7 +68,6 @@ TLText::TLText()
  ,m_uuids(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
- ,m_compiler(&m_system)
  ,m_time(0)
  ,m_lastLibLoaded(0)
  ,m_argsHD(0)
