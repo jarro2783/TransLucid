@@ -1,5 +1,5 @@
 /* Character set conversion.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -22,7 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 #include <iconv.h>
-//this can go to charset.cpp
 #include <string>
 
 /**
@@ -48,19 +47,9 @@ namespace TransLucid
      * @param from The character set to convert from.
      * @todo What is the best way to handle errors here?
      */
-    Iconv(const char* to, const char* from)
-    {
-      m_iconv = iconv_open(to, from);
-      if (m_iconv == (iconv_t)-1) 
-      {
-        throw std::string("Failed to initialise iconv");
-      }
-    }
+    Iconv(const char* to, const char* from);
 
-    ~Iconv()
-    {
-      iconv_close(m_iconv);
-    }
+    ~Iconv();
 
     /**
      * Do the conversion directly calling ::iconv.
@@ -200,24 +189,6 @@ namespace TransLucid
   literal(char c)
   {
     return std::basic_string<unsigned int>(1, static_cast<unsigned int>(c));
-  }
-}
-
-namespace std
-{
-  inline ostream&
-  operator<<(ostream& os, const u32string& s)
-  {
-    os << TransLucid::utf32_to_utf8(s);
-    return os;
-  }
-
-  inline ostream&
-  operator<<(ostream& os, const std::basic_string<unsigned int>& s)
-  {
-    u32string u32s(s.begin(), s.end());
-    os << u32s;
-    return os;
   }
 }
 

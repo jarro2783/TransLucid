@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file utility.cpp
+ * Random utility functions that don't really belong anywhere.
+ */
+
 //iconv is being silly, so we'll see what happens with this
 //possibly it was just a stack overflow from something else
 //#define HAND_CONVERT
@@ -38,6 +42,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+//these should go in bestfit.cpp
 bool
 tupleApplicable(const Tuple& def, const Tuple& c)
 {
@@ -227,6 +232,7 @@ booleanTrue(const GuardWS& g, const Tuple& k)
   }
 }
 
+//these should go in charset.cpp
 //TODO fix these
 std::string
 utf32_to_utf8(const std::u32string& s) {

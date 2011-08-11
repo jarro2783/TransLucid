@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types_util.hpp>
 
+#include <boost/multi_array.hpp>
+
 namespace TransLucid
 {
   struct array_get

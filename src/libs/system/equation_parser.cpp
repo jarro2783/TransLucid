@@ -75,7 +75,14 @@ namespace TransLucid
     }
 
     template class EquationGrammar<iterator_t>;
-    template EquationGrammar<iterator_t>::
-      EquationGrammar(Lexer::tl_lexer&);
+
+    //template EquationGrammar<iterator_t>::
+    //  EquationGrammar(Lexer::tl_lexer&);
+
+    EquationGrammar<iterator_t>*
+    create_equation_grammar(Lexer::tl_lexer& l)
+    {
+      return new EquationGrammar<iterator_t>(l);
+    }
   }
 }
