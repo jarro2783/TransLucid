@@ -27,7 +27,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 #include <tl/tuple_parser.hpp>
 #include <tl/system.hpp>
-#include <tl/expr_compiler.hpp>
 
 #include <iterator>
 #include <iostream>
@@ -52,14 +51,6 @@ namespace TransLucid
 
 namespace TLText
 {
-
-struct Instant
-{
-  void
-  operator()(const Parser::Instant& i)
-  {
-  }
-};
 
 TLText::TLText()
 : 

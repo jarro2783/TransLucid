@@ -185,14 +185,6 @@ namespace TransLucid
       const Parser::U32Iterator& end
     );
 
-    bool
-    parseInstant
-    (
-      Parser::U32Iterator& begin,
-      const Parser::U32Iterator& end,
-      Parser::InstantFunctor endInstant
-    );
-
     std::pair<bool, Parser::Line>
     parseLine
     (

@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/ast.hpp>
+#include <tl/exception.hpp>
 
 #include <set>
 #include <unordered_map>

@@ -202,56 +202,6 @@ VariableWS::operator()(const Tuple& k)
   applicable_list applicable;
 
   //find all the applicable ones
-
-  #if 0
-  Tuple::const_iterator iditer = k.find(DIM_ID);
-
-  if (iditer != k.end())
-  {
-    try
-    {
-      
-      const u32string& id = iditer->second.value<String>().value();
-      SplitID split(id);
-      u32string begin = split.first();
-      u32string end = split.last();
-
-      //std::cerr << "looking for id: " <<
-        //utf32_to_utf8(iditer->second.value<String>().value()) << std::endl;
-      //VariableMap::const_iterator viter =
-      //  m_variables.find(iditer->second.value<String>().value());
-      VariableMap::const_iterator viter =
-        m_variables.find(begin);
-      //std::cout << "looking for "
-      //          << iditer->second.value<String>().value() << std::endl;
-      if (viter == m_variables.end())
-      {
-        //std::cerr << "not found" << std::endl;
-        return TaggedConstant(Constant(Special(Special::UNDEF),
-                              TYPE_INDEX_SPECIAL), k);
-      }
-      else
-      {
-        tuple_t kp = k.tuple();
-        if (end.empty())
-        {
-          kp.erase(DIM_ID);
-        }
-        else
-        {
-          kp[DIM_ID] = Constant(String(end), TYPE_INDEX_USTRING);
-        }
-        return (*viter->second)(Tuple(kp));
-      }
-    }
-    catch (std::bad_cast& e)
-    {
-      return TaggedConstant(Constant(Special(Special::DIMENSION),
-                            TYPE_INDEX_SPECIAL), k);
-    }
-  }
-  #endif
-
   for (UUIDEquationMap::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
@@ -369,44 +319,6 @@ VariableWS::addEquation
 
   return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
 }
-
-#if 0
-std::pair<uuid, VariableWS::UUIDEquationMap::iterator>
-VariableWS::addExprInternal(const Tuple& k, WS* e)
-{
-  Tuple::const_iterator iter = k.find(DIM_ID);
-  if (iter == k.end())
-  {
-    return addExprActual(k, e);
-  }
-  else
-  {
-    const String* id = iter->second.valuep<String>();
-    if (id == 0)
-    {
-      return std::make_pair(nil_uuid(), m_equations.end());
-    }
-
-    SplitID split(id->value());
-
-    //add the equation, don't add any id dimension if the end is empty
-    u32string begin = split.first();
-    u32string end = split.last();
-
-    tuple_t kp = k.tuple();
-    if (end.size() != 0)
-    {
-      kp[DIM_ID] = Constant(String(end), TYPE_INDEX_USTRING);
-    }
-    else
-    {
-      kp.erase(DIM_ID);
-    }
-
-    return addToVariableActual(begin, Tuple(kp), e);
-  }
-}
-#endif
 
 bool
 VariableWS::delexpr(uuid id, size_t time)

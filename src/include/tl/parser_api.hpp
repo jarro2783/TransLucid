@@ -22,8 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/types.hpp>
-#include <boost/variant.hpp>
-#include <boost/function.hpp>
 
 namespace TransLucid
 {
@@ -82,10 +80,6 @@ namespace TransLucid
       OutputDecl,
       InputDecl
     > Line;
-
-    typedef std::vector<Line> Instant;
-
-    typedef boost::function<void(Instant)> InstantFunctor;
 
     /**
      * Prints an equation.

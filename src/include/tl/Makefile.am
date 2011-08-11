@@ -24,7 +24,7 @@ includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp \
   charset.hpp compiled_functors.hpp consthd.hpp container.hpp \
   dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
   expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp function_registry.hpp \
-  header_parser.hpp hyperdaton.hpp instant_parser.hpp \
+  header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer.hpp lexer_util.hpp library.hpp \
   line_parser.hpp line_tokenizer.hpp maxsharelist.hpp object_registry.hpp \
   output.hpp \

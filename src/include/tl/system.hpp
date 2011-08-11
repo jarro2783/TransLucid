@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file system.hpp
+ * The System.
+ */
+
 #ifndef SYSTEM_HPP_INCLUDED
 #define SYSTEM_HPP_INCLUDED
 
@@ -34,11 +39,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <boost/function.hpp>
 #include <boost/functional/hash.hpp>
-
-/**
- * @file system.hpp
- * The System Hyperdaton header file.
- */
 
 namespace TransLucid
 {
@@ -161,17 +161,6 @@ namespace TransLucid
     //the current definitions of the system
     std::pair<bool, Tree::Expr>
     parseExpression(Parser::U32Iterator& iter);
-
-    bool 
-    parseInstant
-    (
-      Parser::U32Iterator& begin,
-      const Parser::U32Iterator& end
-    );
-
-    //what is the input?
-    uuid
-    addExpr();
 
     bool
     parse_header(const u32string& s);

@@ -686,21 +686,6 @@ System::getDimensionIndex(const Constant& c)
   return m_dimTranslator.lookup(c);
 }
 
-bool 
-System::parseInstant
-(
-  Parser::U32Iterator& begin,
-  const Parser::U32Iterator& end
-)
-{
-  return m_translator->parseInstant(begin, end,
-  [](const Parser::Instant& i) -> void 
-  {
-    std::cerr << "end of instant" << std::endl;
-  }
-  );
-}
-
 std::pair<bool, Tree::Expr>
 System::parseExpression(Parser::U32Iterator& iter)
 {
