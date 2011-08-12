@@ -1,19 +1,15 @@
-//tlcore --reactive -i reactive.tl
-//this example doesn't work properly yet
+//tltext -i reactive.tl
+// This should work, but ... it does not.
 
-%%
-x = 1;;
+var x = 1;;
 %%
 #time;;
 x;;
 $$
-%%
-x = 2;;
-%%
+var x = 2;;
 $$
-%%
 %%
 #time;;
 x;;
-x @ [time : 0];;
+x @ [time <- 0];;
 
