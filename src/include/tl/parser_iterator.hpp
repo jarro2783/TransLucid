@@ -328,6 +328,7 @@ namespace TransLucid
           if (!m_haveRead)
           {
             readNext();
+            m_haveRead = true;
           }
           return m_value;
         }
@@ -341,7 +342,8 @@ namespace TransLucid
           int toRead = 0;
           int nextShift = 0;
 
-          //std::cerr << std::hex << (int)c << " ";
+          //std::cerr << std::hex << 
+          //  static_cast<unsigned int>(static_cast<unsigned char>(c)) << " ";
 
           if ((c & 0x80) == 0)
           {
@@ -373,6 +375,7 @@ namespace TransLucid
             std::cerr << "warning: invalid initial unicode byte" << std::endl;
           }
 
+          //std::cerr << "reading " << toRead << "bytes" << std::endl;
           for (int i = 0; i != toRead; ++i)
           {
             ++m_iter;

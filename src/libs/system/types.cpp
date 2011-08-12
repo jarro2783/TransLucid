@@ -23,8 +23,6 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/types.hpp>
-#include <boost/foreach.hpp>
-//#include <boost/bind.hpp>
 #include <tl/range.hpp>
 #include <tl/system.hpp>
 #include <tl/exception.hpp>
@@ -130,7 +128,7 @@ void
 Tuple::print(std::ostream& os) const
 {
   os << "[";
-  BOOST_FOREACH(const tuple_t::value_type& v, *m_value)
+  for(auto& v : *m_value)
   {
     os << v.first << ":";
     //v.second.print(os);
@@ -152,4 +150,27 @@ Constant::hash() const
   }
 }
 
+size_t
+Tuple::hash() const
+{
+  std::hash<tuple_t> hasher;
+  return hasher(*m_value);
+}
+
 } //namespace TransLucid
+
+namespace std
+{
+  size_t
+  hash<TransLucid::tuple_t>::operator()(const TransLucid::tuple_t& t) const
+  {
+    size_t h = 0;
+    for(auto& v : t)
+    {
+      std::_Hash_impl::__hash_combine(v.first, h);
+      std::_Hash_impl::__hash_combine(v.second, h);
+    }
+
+    return h;
+  }
+}

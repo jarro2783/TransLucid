@@ -22,8 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/types.hpp>
-#include <boost/variant.hpp>
-#include <boost/function.hpp>
 
 namespace TransLucid
 {
@@ -82,10 +80,6 @@ namespace TransLucid
       OutputDecl,
       InputDecl
     > Line;
-
-    typedef std::vector<Line> Instant;
-
-    typedef boost::function<void(Instant)> InstantFunctor;
 
     /**
      * Prints an equation.
@@ -207,21 +201,11 @@ namespace TransLucid
       int m_count;
     };
 
-    inline
     std::ostream&
-    operator<<(std::ostream& os, const Equation& eqn)
-    {
-      os << "Equation(" << std::get<0>(eqn) << ")" << std::endl;
-      return os;
-    }
-    
-    inline
+    operator<<(std::ostream& os, const Equation& eqn);
+
     std::ostream&
-    operator<<(std::ostream& os, const std::pair<Equation, DeclType>& p)
-    {
-      os << "Declaration " << p.second << ": " << p.first << std::endl;
-      return os;
-    }
+    operator<<(std::ostream& os, const std::pair<Equation, DeclType>& p);
   }
 
   typedef std::pair<Parser::Equation, TranslatedEquation> PTEquation;

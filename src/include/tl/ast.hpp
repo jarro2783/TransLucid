@@ -17,22 +17,21 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef AST_HPP_INCLUDED
-#define AST_HPP_INCLUDED
-
-#include <tl/types.hpp>
-#include <boost/variant.hpp>
-#include <tl/exception.hpp>
-#include <gmpxx.h>
-#include <tl/builtin_types.hpp>
-//#include <boost/fusion/include/vector.hpp>
-//#include <boost/fusion/container.hpp>
-
 /**
  * @file ast.hpp
  * Everything related to abstract syntax trees.
  * Contains everything needed to build and traverse an abstract syntax tree.
  */
+
+#ifndef AST_HPP_INCLUDED
+#define AST_HPP_INCLUDED
+
+#include <tl/types.hpp>
+
+#include <vector>
+
+#include <gmpxx.h>
+#include <boost/variant.hpp>
 
 namespace TransLucid
 {
@@ -405,17 +404,27 @@ namespace TransLucid
       Expr& rhs
     );
 
+    /**
+     * Host operation. Evaluates an operation that has been provided
+     * in the host environment. It is strict and there is no partial
+     * application.
+     */
     struct BangOpExpr
     {
       BangOpExpr() = default;
 
+      /**
+       * Construct a bang operation node.
+       * @param name The expression that will return the name.
+       * @param args A vector of the arguments.
+       */
       BangOpExpr(const Expr& name, std::vector<Expr> args)
       : name(name), args(args)
       {
       }
 
-      Expr name;
-      std::vector<Expr> args;
+      Expr name; /**< The operation name. */
+      std::vector<Expr> args; /**< The arguments. */
     };
 
     /**
@@ -542,7 +551,6 @@ namespace TransLucid
        * whether it is a relative or absolute context change.
        * @param lhs The left hand side expression.
        * @param rhs The right hand side expression.
-       * @param absolute True if absolute context change, false if relative.
        */
       AtExpr(const Expr& lhs, const Expr& rhs)
       : lhs(lhs), rhs(rhs)

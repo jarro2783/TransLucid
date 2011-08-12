@@ -17,7 +17,14 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file range.cpp
+ * The range object. Defines a set of integers in a range.
+ */
+
+#include <tl/output.hpp>
 #include <tl/range.hpp>
+
+#include <functional>
 
 namespace TransLucid
 {
@@ -34,8 +41,7 @@ m_upper(upper != 0 ? new mpz_class(*upper) : 0)
 }
 
 Range::Range(const Range& other)
-: m_lower(other.m_lower != 0 ? new mpz_class(*other.m_lower) : 0),
-m_upper(other.m_upper != 0 ? new mpz_class(*other.m_upper) : 0)
+: m_lower(0), m_upper(0)
 {
   mpz_class* lower = 0;
   mpz_class* upper = 0;
@@ -101,20 +107,20 @@ Range::hash() const
   size_t seed = 0;
 
   if (m_lower == 0) {
-    boost::hash_combine(seed, 0);
+    std::_Hash_impl::__hash_combine(0, seed);
   }
   else
   {
-    boost::hash_combine(seed, *m_lower);
+    std::_Hash_impl::__hash_combine(*m_lower, seed);
   }
 
   if (m_upper == 0)
   {
-    boost::hash_combine(seed, 0);
+    std::_Hash_impl::__hash_combine(0, seed);
   }
   else
   {
-    boost::hash_combine(seed, *m_upper);
+    std::_Hash_impl::__hash_combine(*m_upper, seed);
   }
 
   return seed;

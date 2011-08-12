@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
   TL::Tuple var = array.variance();
 
-  mpz_class zero = 0, a = 5, b = 6, c = 7;
+  mpz_class zero = 0, a = 4, b = 5, c = 6;
   TL::tuple_t expected
   {
     {s.getDimensionIndex(dim0), 
@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
       TL::Types::Range::create(TL::Range(&zero, &c))}
   };
 
+  std::cerr << "variance: ";
   for (auto v : var)
   {
     std::cerr << v.first << ": ";
@@ -45,6 +46,7 @@ int main(int argc, char *argv[])
   }
   std::cerr << std::endl;
 
+  std::cerr << "expected: ";
   for (auto v : expected)
   {
     std::cerr << v.first << ": ";

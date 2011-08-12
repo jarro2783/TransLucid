@@ -48,6 +48,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/consthd.hpp>
 #include <tl/function_registry.hpp>
+#include <tl/output.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
 #include <tl/translator.hpp>
@@ -62,11 +63,17 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_map>
 #include <initializer_list>
 
+#include <boost/uuid/uuid_generators.hpp>
+
 namespace TransLucid
 {
 
 namespace
 {
+  //the uuid generator
+  boost::uuids::basic_random_generator<boost::mt19937>
+  uuid_generator;
+
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {
@@ -101,11 +108,7 @@ namespace detail
     InputHDWS(const u32string& name, System& system)
     : m_name(name)
     , m_system(system)
-    {
-    }
-
-    TaggedConstant
-    operator()(const Tuple& k)
+    , m_hd(0)
     {
       auto iter = m_system.m_inputHDs.find(m_name);
       if (iter == m_system.m_inputHDs.end())
@@ -114,12 +117,19 @@ namespace detail
         //the system has bombed on us
         throw "InputHDWS: input HD doesn't exist";
       }
-      return TaggedConstant(iter->second->get(k), k);
+      m_hd = iter->second;
+    }
+
+    TaggedConstant
+    operator()(const Tuple& k)
+    {
+      return TaggedConstant(m_hd->get(k), k);
     }
 
     private:
     u32string m_name;
     System& m_system;
+    InputHD* m_hd;
   };
 
   class LineAdder
@@ -521,7 +531,7 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     return Types::Special::create(SP_CONST);
   }
 
-  uuid u = m_uuid_generator();
+  uuid u = uuid_generator();
 
   m_unop_uuids.insert(std::make_pair(u,
     UnaryUUIDs
@@ -570,7 +580,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
     return Types::Special::create(SP_CONST);
   }
 
-  uuid u = m_uuid_generator();
+  uuid u = uuid_generator();
 
   m_binop_uuids.insert(std::make_pair(u, 
     BinaryUUIDs
@@ -682,21 +692,6 @@ System::getDimensionIndex(const Constant& c)
   return m_dimTranslator.lookup(c);
 }
 
-bool 
-System::parseInstant
-(
-  Parser::U32Iterator& begin,
-  const Parser::U32Iterator& end
-)
-{
-  return m_translator->parseInstant(begin, end,
-  [](const Parser::Instant& i) -> void 
-  {
-    std::cerr << "end of instant" << std::endl;
-  }
-  );
-}
-
 std::pair<bool, Tree::Expr>
 System::parseExpression(Parser::U32Iterator& iter)
 {
@@ -716,7 +711,7 @@ System::addOutputHyperdaton
   if (i == m_outputHDs.end())
   {
     m_outputHDs.insert(std::make_pair(name, hd));
-    uuid u = m_uuid_generator();
+    uuid u = uuid_generator();
     m_outputUUIDs.insert(std::make_pair(u, name));
 
     //add the constraint
@@ -805,7 +800,7 @@ System::addInputHyperdaton
   if (i == m_inputHDs.end())
   {
     m_inputHDs.insert(std::make_pair(name, hd));
-    uuid u = m_uuid_generator();
+    uuid u = uuid_generator();
     //m_outputUUIDs.insert(std::make_pair(u, name));
 
     //add the constraint

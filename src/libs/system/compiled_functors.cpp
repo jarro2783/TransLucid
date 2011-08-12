@@ -47,6 +47,11 @@ namespace TransLucid
 namespace Hyperdatons
 {
 
+DimensionWS::DimensionWS(System& system, const std::u32string& name)
+: m_value(Types::Dimension::create(system.getDimensionIndex(name)))
+{
+}
+
 TaggedConstant
 BoolConstWS::operator()(const Tuple& k)
 {
@@ -63,7 +68,7 @@ TypeConstWS::operator()(const Tuple& k)
 TaggedConstant
 DimensionWS::operator()(const Tuple& k)
 {
-  return TaggedConstant (Types::Dimension::create(m_id), k);
+  return TaggedConstant (m_value, k);
 }
 
 TaggedConstant

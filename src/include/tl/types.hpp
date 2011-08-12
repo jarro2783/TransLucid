@@ -22,16 +22,13 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types_fwd.hpp>
 
-#include <boost/functional/hash.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
+//#include <boost/functional/hash.hpp>
 
-#include <iostream>
 #include <map>
 #include <memory>
-#include <vector>
-
-#include <gmpxx.h>
+#include <cstdint>
+#include <cstring>
+#include <string>
 
 /**
  * @file types.hpp
@@ -43,35 +40,11 @@ along with TransLucid; see the file COPYING.  If not see
 #define STRING(x) #x
 #define STRING_(x) STRING(x)
 
-inline size_t
-hash_value(const mpz_class& v)
-{
-  boost::hash<std::string> hasher;
-  return hasher(v.get_str());
-}
-
-namespace boost
-{
-  namespace uuids
-  {
-    inline std::ostream&
-    operator<<(std::ostream& os, const uuid& id)
-    {
-      for(int i : id)
-      {
-        os << std::hex << i;
-      }
-      return os;
-    }
-  }
-}
-
 /**
  * @brief The namespace that all of the TransLucid library is placed in.
  **/
 namespace TransLucid
 {
-
   class System;
 
   class WS;
@@ -82,10 +55,6 @@ namespace TransLucid
   typedef std::u32string u32string;
 
   typedef std::tuple<u32string, WS*, WS*, WS*> TranslatedEquation;
-  typedef std::vector<TranslatedEquation> equation_v;
-
-  typedef boost::uuids::uuid uuid;
-  using boost::uuids::nil_uuid;
 
   class Tuple;
 
@@ -313,11 +282,13 @@ namespace TransLucid
     }
   };
 
+  #if 0
   inline size_t
   hash_value(const Constant& c)
   {
     return c.hash();
   }
+  #endif
 
   typedef size_t dimension_index;
   /**
@@ -395,11 +366,11 @@ namespace TransLucid
     }
 
     size_t
-    hash() const
-    {
-      boost::hash<tuple_t> hasher;
-      return hasher(*m_value);
-    }
+    hash() const;
+    //{
+      //boost::hash<tuple_t> hasher;
+      //return hasher(*m_value);
+    //}
 
     bool
     operator==(const Tuple& rhs) const
@@ -447,12 +418,6 @@ namespace TransLucid
   //typedef boost::function<Constant
   //        (const Constant&, const Tuple&)> ConvertFunction;
 
-  /**
-   * @brief Vector of type indexes.
-   **/
-  typedef std::vector<type_index> type_vec;
-
-
 } //namespace TransLucid
 
 #if 0
@@ -469,10 +434,18 @@ namespace std
   template<>
   struct hash<TransLucid::Constant>
   {
-    size_t operator()(const TransLucid::Constant& c) const
+    size_t 
+    operator()(const TransLucid::Constant& c) const
     {
       return c.hash();
     }
+  };
+
+  template<>
+  struct hash<TransLucid::tuple_t>
+  {
+    size_t
+    operator()(const TransLucid::tuple_t& t) const;
   };
 }
 

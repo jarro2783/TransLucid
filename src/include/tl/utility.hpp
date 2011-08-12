@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file utility.hpp
+ * Random utility stuff.
+ */
+
 #ifndef TL_UTILITY_HPP_INCLUDED
 #define TL_UTILITY_HPP_INCLUDED
 
@@ -31,51 +35,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <vector>
 
-#include <boost/algorithm/string/find.hpp>
-#include <boost/algorithm/string/classification.hpp>
-
 namespace TransLucid
 {
   class DimensionNotFound
   {
-  };
-
-  class SplitID
-  {
-    private:
-    static const u32string m_split_match;;
-
-    u32string::const_iterator m_begin;
-    u32string::const_iterator m_end;
-    const u32string& m_s;
-
-    public:
-    SplitID(const u32string& s)
-    : m_s(s)
-    {
-      boost::iterator_range<u32string::const_iterator> r =
-        boost::algorithm::find_first(s, m_split_match);
-      m_begin = r.begin();
-      m_end = r.end();
-    }
-
-    bool
-    has_components()
-    {
-      return m_begin != m_end;
-    }
-
-    u32string
-    first()
-    {
-      return u32string(m_s.begin(), m_begin);
-    }
-
-    u32string
-    last()
-    {
-      return u32string(m_end, m_s.end());
-    }
   };
 
   inline Constant

@@ -24,13 +24,14 @@ includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp \
   charset.hpp compiled_functors.hpp consthd.hpp container.hpp \
   dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
   expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp function_registry.hpp \
-  header_parser.hpp hyperdaton.hpp instant_parser.hpp \
+  header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer.hpp lexer_util.hpp library.hpp \
   line_parser.hpp line_tokenizer.hpp maxsharelist.hpp object_registry.hpp \
+  output.hpp \
   parser_api.hpp parser_defs.hpp parser_header.hpp parser_iterator.hpp \
   parser_util.hpp range.hpp registries.hpp rename.hpp \
   set_types.hpp system.hpp translator.hpp tree_printer.hpp tree_to_wstree.hpp \
   tuple_parser.hpp types.hpp types_fwd.hpp types_util.hpp utility.hpp \
-  workshop.hpp 
+  uuid.hpp workshop.hpp 
 
 EXTRA_DIST = CMakeLists.txt

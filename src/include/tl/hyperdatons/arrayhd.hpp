@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types_util.hpp>
 
+#include <boost/multi_array.hpp>
+
 namespace TransLucid
 {
   struct array_get
@@ -130,8 +132,9 @@ namespace TransLucid
 
         //create variance tuple
         mpz_class a = 0;
+        mpz_class b = m_bounds[i]-1;
         variance.insert(std::make_pair(d,
-          Types::Range::create(Range(&a, &m_bounds[i]-1)) 
+          Types::Range::create(Range(&a, &b))
         ));
       }
 

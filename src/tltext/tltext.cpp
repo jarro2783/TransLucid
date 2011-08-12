@@ -19,13 +19,14 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/expr_parser.hpp>
 #include <tl/equation_parser.hpp>
+#include <tl/hyperdatons/arrayhd.hpp>
 #include <tl/line_tokenizer.hpp>
+#include <tl/output.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types_util.hpp>
 #include <tl/tuple_parser.hpp>
 #include <tl/system.hpp>
-#include <tl/expr_compiler.hpp>
 
 #include <iterator>
 #include <iostream>
@@ -51,14 +52,6 @@ namespace TransLucid
 namespace TLText
 {
 
-struct Instant
-{
-  void
-  operator()(const Parser::Instant& i)
-  {
-  }
-};
-
 TLText::TLText()
 : 
   m_verbose(false)
@@ -66,7 +59,6 @@ TLText::TLText()
  ,m_uuids(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
- ,m_compiler(&m_system)
  ,m_time(0)
  ,m_lastLibLoaded(0)
  ,m_argsHD(0)
@@ -352,7 +344,7 @@ TLText::setup_clargs()
       ++i;
     }
 
-    m_system.addInputHyperdaton(U"CL_ARGS", m_argsHD);
+    m_system.addInputHyperdaton(U"CLARGS", m_argsHD);
   }
 }
 

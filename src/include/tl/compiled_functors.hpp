@@ -73,16 +73,13 @@ namespace TransLucid
     class DimensionWS : public WS
     {
       public:
-      DimensionWS(System& system, const std::u32string& name)
-      : m_id(system.getDimensionIndex(name))
-      {
-      }
+      DimensionWS(System& system, const std::u32string& name);
 
       TaggedConstant
       operator()(const Tuple& k);
 
       private:
-      dimension_index m_id;
+      Constant m_value;
     };
 
     class IdentWS : public WS

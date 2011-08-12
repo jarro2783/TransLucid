@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file system.hpp
+ * The System.
+ */
+
 #ifndef SYSTEM_HPP_INCLUDED
 #define SYSTEM_HPP_INCLUDED
 
@@ -32,12 +37,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_set>
 #include <unordered_map>
 
-#include <boost/function.hpp>
-
-/**
- * @file system.hpp
- * The System Hyperdaton header file.
- */
+#include <boost/functional/hash.hpp>
 
 namespace TransLucid
 {
@@ -48,10 +48,6 @@ namespace TransLucid
   }
 
   constexpr int MAX_FUNCTION_PARAMETERS = 10;
-
-  template <typename T>
-  class uuidmap : public std::map<uuid, T> {
-  };
 
   class Translator;
 
@@ -160,17 +156,6 @@ namespace TransLucid
     //the current definitions of the system
     std::pair<bool, Tree::Expr>
     parseExpression(Parser::U32Iterator& iter);
-
-    bool 
-    parseInstant
-    (
-      Parser::U32Iterator& begin,
-      const Parser::U32Iterator& end
-    );
-
-    //what is the input?
-    uuid
-    addExpr();
 
     bool
     parse_header(const u32string& s);
@@ -290,10 +275,6 @@ namespace TransLucid
     //input and output hd declarations, for now just have the valid range
     std::unordered_map<u32string, Tuple> m_outputHDDecls;
     std::unordered_map<u32string, Tuple> m_inputHDDecls;
-
-    //the uuid generator
-    boost::uuids::basic_random_generator<boost::mt19937>
-    m_uuid_generator;
 
     //---- the sets of all the uuids of objects ----
 

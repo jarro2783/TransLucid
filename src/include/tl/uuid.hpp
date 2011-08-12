@@ -1,4 +1,4 @@
-/* Built-in types.
+/* UUID definitions.
    Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -17,20 +17,9 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef BUILTIN_TYPES_HPP_INCLUDED
-#define BUILTIN_TYPES_HPP_INCLUDED
-
-/**
- * @file builtin_types.hpp
- * The header for the types that are built directly into the system.
- */
-
-#include <tl/types.hpp>
+#include <boost/uuid/uuid.hpp>
 
 namespace TransLucid
 {
-  void
-  init_builtin_types(System& system);
+  typedef boost::uuids::uuid uuid;
 }
-
-#endif // BUILTIN_TYPES_HPP_INCLUDED

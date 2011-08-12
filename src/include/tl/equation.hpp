@@ -25,12 +25,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/bestfit.hpp>
 #include <tl/workshop.hpp>
 #include <tl/types.hpp>
+#include <tl/uuid.hpp>
 
-#include <deque>
-#include <list>
-
-#include <boost/shared_ptr.hpp>
-#include <boost/uuid/uuid_generators.hpp>
+#include <gmpxx.h>
 
 namespace TransLucid
 {
@@ -162,19 +159,9 @@ namespace TransLucid
   class EquationWS : public WS
   {
     public:
-    EquationWS(const u32string& name, const GuardWS& valid, WS* h)
-    : m_name(name), m_validContext(valid), m_h(h),
-    //m_id(boost::uuids::random_generator()())
-    //m_id(boost::uuids::nil_generator()())
-    //m_id(boost::uuids::basic_random_generator<boost::rand48>()())
-    m_id(m_generator())
-    {
-    }
+    EquationWS(const u32string& name, const GuardWS& valid, WS* h);
 
-    EquationWS()
-    : m_h(0), m_id(boost::uuids::nil_generator()())
-    {
-    }
+    EquationWS();
 
     const u32string&
     name() const
@@ -219,9 +206,6 @@ namespace TransLucid
     GuardWS m_validContext;
     WS* m_h;
     boost::uuids::uuid m_id;
-
-    static boost::uuids::basic_random_generator<boost::mt19937>
-    m_generator;
   };
 
   //represents all definitions of a variable, is responsible for

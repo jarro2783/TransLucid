@@ -1,5 +1,5 @@
-/* Built-in types.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+/* Array hyperdaton forward declaration.
+   Copyright (C) 2011 Jarryd Beck.
 
 This file is part of TransLucid.
 
@@ -17,20 +17,19 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef BUILTIN_TYPES_HPP_INCLUDED
-#define BUILTIN_TYPES_HPP_INCLUDED
-
-/**
- * @file builtin_types.hpp
- * The header for the types that are built directly into the system.
+/** @file arrayhd_fwd.hpp
+ * ArrayHD forward declaration.
  */
 
-#include <tl/types.hpp>
+#ifndef TL_ARRAYHD_FWD_HPP_INCLUDED
+#define TL_ARRAYHD_FWD_HPP_INCLUDED
+
+#include <cstdlib>
 
 namespace TransLucid
 {
-  void
-  init_builtin_types(System& system);
+  template <typename T, size_t N>
+  class ArrayNHD;
 }
 
-#endif // BUILTIN_TYPES_HPP_INCLUDED
+#endif

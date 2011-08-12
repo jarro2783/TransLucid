@@ -17,17 +17,40 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file equation.cpp
+ * All of the code related to equations. The main part of bestfitting
+ * and the management of equations is done here.
+ */
+
 #include <tl/equation.hpp>
+#include <tl/output.hpp>
 #include <tl/range.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/utility.hpp>
 
+#include <boost/uuid/uuid_generators.hpp>
+
+#include <vector>
+
 namespace TransLucid
 {
 
-boost::uuids::basic_random_generator<boost::mt19937>
-EquationWS::m_generator;
+namespace
+{
+boost::uuids::basic_random_generator<boost::mt19937> uuid_generator;
+}
+
+EquationWS::EquationWS(const u32string& name, const GuardWS& valid, WS* h)
+: m_name(name), m_validContext(valid), m_h(h),
+  m_id(uuid_generator())
+{
+}
+
+EquationWS::EquationWS()
+: m_h(0), m_id(boost::uuids::nil_generator()())
+{
+}
 
 VariableWS::VariableWS(const u32string& name)
 : m_name(name)
@@ -134,7 +157,7 @@ GuardWS::evaluate(const Tuple& k) const
           throw InvalidGuard();
         }
 
-        t.insert(std::make_pair(value.first, value.second));
+        t.insert(value);
       }
     }
     else
@@ -192,60 +215,11 @@ VariableWS::operator()(const Tuple& k)
   #endif
 
   typedef std::tuple<Tuple, UUIDEquationMap::const_iterator> ApplicableTuple;
-  typedef std::list<ApplicableTuple> applicable_list;
+  typedef std::vector<ApplicableTuple> applicable_list;
   applicable_list applicable;
+  applicable.reserve(m_equations.size());
 
   //find all the applicable ones
-
-  #if 0
-  Tuple::const_iterator iditer = k.find(DIM_ID);
-
-  if (iditer != k.end())
-  {
-    try
-    {
-      
-      const u32string& id = iditer->second.value<String>().value();
-      SplitID split(id);
-      u32string begin = split.first();
-      u32string end = split.last();
-
-      //std::cerr << "looking for id: " <<
-        //utf32_to_utf8(iditer->second.value<String>().value()) << std::endl;
-      //VariableMap::const_iterator viter =
-      //  m_variables.find(iditer->second.value<String>().value());
-      VariableMap::const_iterator viter =
-        m_variables.find(begin);
-      //std::cout << "looking for "
-      //          << iditer->second.value<String>().value() << std::endl;
-      if (viter == m_variables.end())
-      {
-        //std::cerr << "not found" << std::endl;
-        return TaggedConstant(Constant(Special(Special::UNDEF),
-                              TYPE_INDEX_SPECIAL), k);
-      }
-      else
-      {
-        tuple_t kp = k.tuple();
-        if (end.empty())
-        {
-          kp.erase(DIM_ID);
-        }
-        else
-        {
-          kp[DIM_ID] = Constant(String(end), TYPE_INDEX_USTRING);
-        }
-        return (*viter->second)(Tuple(kp));
-      }
-    }
-    catch (std::bad_cast& e)
-    {
-      return TaggedConstant(Constant(Special(Special::DIMENSION),
-                            TYPE_INDEX_SPECIAL), k);
-    }
-  }
-  #endif
-
   for (UUIDEquationMap::const_iterator eqn_i = m_equations.begin();
       eqn_i != m_equations.end(); ++eqn_i)
   {
@@ -291,7 +265,7 @@ VariableWS::operator()(const Tuple& k)
   }
 
   //find the best ones
-  std::list<applicable_list::const_iterator> bestIters;
+  std::vector<applicable_list::const_iterator> bestIters;
 
   for (applicable_list::const_iterator i = applicable.begin();
        i != applicable.end(); ++i)
@@ -363,44 +337,6 @@ VariableWS::addEquation
 
   return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
 }
-
-#if 0
-std::pair<uuid, VariableWS::UUIDEquationMap::iterator>
-VariableWS::addExprInternal(const Tuple& k, WS* e)
-{
-  Tuple::const_iterator iter = k.find(DIM_ID);
-  if (iter == k.end())
-  {
-    return addExprActual(k, e);
-  }
-  else
-  {
-    const String* id = iter->second.valuep<String>();
-    if (id == 0)
-    {
-      return std::make_pair(nil_uuid(), m_equations.end());
-    }
-
-    SplitID split(id->value());
-
-    //add the equation, don't add any id dimension if the end is empty
-    u32string begin = split.first();
-    u32string end = split.last();
-
-    tuple_t kp = k.tuple();
-    if (end.size() != 0)
-    {
-      kp[DIM_ID] = Constant(String(end), TYPE_INDEX_USTRING);
-    }
-    else
-    {
-      kp.erase(DIM_ID);
-    }
-
-    return addToVariableActual(begin, Tuple(kp), e);
-  }
-}
-#endif
 
 bool
 VariableWS::delexpr(uuid id, size_t time)

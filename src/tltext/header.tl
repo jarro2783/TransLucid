@@ -27,3 +27,5 @@ var PRINT_TLTEXT [arg0 : uchar]   = "'" + PRINT + "'";;
 var PRINT_TLTEXT [arg0 : bool]    = PRINT;;
 var PRINT_TLTEXT [arg0 : range]   = PRINT;;
 var PRINT_TLTEXT                  = TYPENAME + "`" + PRINT + "`";;
+
+var CLARGS = "";;

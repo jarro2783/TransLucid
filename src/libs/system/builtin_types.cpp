@@ -17,10 +17,15 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file builtin_types.cpp
+ * Builtin type definitions.
+ */
+
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
 #include <tl/hyperdatons/filehd.hpp>
 #include <tl/internal_strings.hpp>
+#include <tl/output.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
 #include <tl/types/boolean.hpp>
@@ -34,6 +39,21 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/uuid.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
+
+#include <gmpxx.h>
+
+namespace std
+{
+  template<>
+  struct hash<mpz_class>
+  {
+    size_t
+    operator()(const mpz_class& v) const
+    {
+      return std::hash<std::string>()(v.get_str());
+    }
+  };
+}
 
 namespace TransLucid
 {
@@ -686,7 +706,7 @@ namespace TransLucid
       size_t
       hash(const Constant& c)
       {
-        return boost::hash<mpz_class>()(get(c));
+        return std::hash<mpz_class>()(get(c));
       }
 
       void

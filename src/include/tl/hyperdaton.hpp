@@ -25,7 +25,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types.hpp>
-#include <boost/multi_array.hpp>
 
 #include <type_traits>
 

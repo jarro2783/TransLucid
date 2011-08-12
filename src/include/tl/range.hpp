@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/** @file tl/range.hpp
+ * The range object. Defines a set of integers in a range.
+ */
+
 #ifndef RANGE_HPP_INCLUDED
 #define RANGE_HPP_INCLUDED
 
