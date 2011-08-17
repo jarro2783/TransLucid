@@ -403,6 +403,8 @@ System::go()
       continue;
     }
 
+    //this needs to be way better
+    //for a start: only look at demands for the current time
     auto equations = ident.second->equations();
     for (auto& assign : equations)
     {
@@ -427,7 +429,10 @@ System::go()
       }
       else
       {
-        std::cerr << "not applicable to the constraint" << std::endl;
+        if (get_constant_pointer<mpz_class>(time->second) == m_time)
+        {
+          std::cerr << "output not applicable to the constraint" << std::endl;
+        }
       }
     }
   }
