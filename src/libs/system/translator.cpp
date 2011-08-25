@@ -191,6 +191,7 @@ Translator::loadLibraries()
 void
 Translator::cleanup()
 {
+  delete m_parsers;
   delete m_header;
 }
 

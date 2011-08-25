@@ -47,6 +47,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/consthd.hpp>
+#include <tl/context.hpp>
 #include <tl/function_registry.hpp>
 #include <tl/output.hpp>
 #include <tl/parser_iterator.hpp>
@@ -387,6 +388,17 @@ System::System()
 System::~System()
 {
   delete m_translator;
+
+  //delete the equations
+  for (auto& v : m_assignments)
+  {
+    delete v.second;
+  }
+
+  for (auto& v : m_equations)
+  {
+    delete v.second;
+  }
 }
 
 void

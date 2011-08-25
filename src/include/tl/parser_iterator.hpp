@@ -101,6 +101,12 @@ namespace TransLucid
         #endif
       }
 
+      ~U32Iterator()
+      {
+        delete m_end;
+        delete m_iter;
+      }
+
       /**
        * Construct a U32Iterator.
        * We need to know where the end of the stream is to decide when we

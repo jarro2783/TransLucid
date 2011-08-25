@@ -146,7 +146,7 @@ namespace TransLucid
     private:
     WS* m_guard;
     WS* m_boolean;
-    std::map<size_t, Constant> m_dimensions;
+    tuple_t m_dimensions;
 
     mpz_class *m_timeStart;
     mpz_class *m_timeEnd;

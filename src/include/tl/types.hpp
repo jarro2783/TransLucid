@@ -290,7 +290,7 @@ namespace TransLucid
   }
   #endif
 
-  typedef size_t dimension_index;
+  typedef int32_t dimension_index;
   /**
    * The underlying data structure of a tuple.
    **/
