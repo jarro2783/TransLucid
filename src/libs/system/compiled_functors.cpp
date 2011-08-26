@@ -231,13 +231,6 @@ UCharConstWS::operator()(const Tuple& k)
 }
 
 TaggedConstant
-UnaryOpWS::operator()(const Tuple& k)
-{
-  //TODO: resolve what to do with operators
-  return TaggedConstant();
-}
-
-TaggedConstant
 TupleWS::operator()(const Tuple& k)
 {
   tuple_t kp;

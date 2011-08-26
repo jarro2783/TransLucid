@@ -100,49 +100,6 @@ namespace TransLucid
       WS* m_e;
     };
 
-    class UnaryOpWS : public WS
-    {
-      public:
-      UnaryOpWS
-      (
-        WS* system,
-        u32string name,
-        WS* e
-      )
-      : m_system(system), m_name(name), m_e(e)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      WS* m_system;
-      u32string m_name;
-      WS* m_e;
-    };
-
-    class BinaryOpWS : public WS
-    {
-      public:
-
-      BinaryOpWS
-      (
-        WS* system,
-        const std::vector<WS*>& operands,
-        const u32string& name
-      )
-      : m_system(system), m_operands(operands), m_name(name)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      WS* m_system;
-      std::vector<WS*> m_operands;
-      u32string m_name;
-    };
-
     class VariableOpWS : public WS
     {
       public:
