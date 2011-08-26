@@ -95,6 +95,8 @@ namespace TransLucid
       private:
       System::IdentifierLookup m_identifiers;
       u32string m_name;
+
+      //don't delete this, it doesn't belong to you
       WS* m_e;
     };
 
@@ -351,6 +353,15 @@ namespace TransLucid
       {
       }
 
+      ~BangOpWS()
+      {
+        delete m_name;
+        for (auto w : m_args)
+        {
+          delete w;
+        }
+      }
+
       TaggedConstant
       operator()(const Tuple& k);
 
@@ -394,6 +405,11 @@ namespace TransLucid
       : m_system(system), m_e(e)
       {}
 
+      ~HashWS()
+      {
+        delete m_e;
+      }
+
       TaggedConstant
       operator()(const Tuple& k);
 
@@ -429,6 +445,15 @@ namespace TransLucid
       : m_system(system), m_elements(elements)
       {}
 
+      ~TupleWS()
+      {
+        for (auto& p : m_elements)
+        {
+          delete p.first;
+          delete p.second;
+        }
+      }
+
       TaggedConstant
       operator()(const Tuple& k);
 
@@ -444,6 +469,12 @@ namespace TransLucid
       AtWS(WS* e2, WS* e1)
       : e2(e2), e1(e1)
       {}
+
+      ~AtWS()
+      {
+        delete e1;
+        delete e2;
+      }
 
       TaggedConstant
       operator()(const Tuple& k);

@@ -29,6 +29,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <gmpxx.h>
 
+#include <memory>
+
 namespace TransLucid
 {
   class System;
@@ -87,6 +89,8 @@ namespace TransLucid
     {
       delete m_timeStart;
       delete m_timeEnd;
+      //delete m_guard;
+      //delete m_boolean;
     }
 
     GuardWS& operator=(const GuardWS&);
@@ -163,6 +167,8 @@ namespace TransLucid
 
     EquationWS();
 
+    ~EquationWS();
+
     const u32string&
     name() const
     {
@@ -183,7 +189,7 @@ namespace TransLucid
     WS*
     equation() const
     {
-       return m_h;
+       return m_h.get();
     }
 
     const uuid&
@@ -204,7 +210,7 @@ namespace TransLucid
     private:
     u32string m_name;
     GuardWS m_validContext;
-    WS* m_h;
+    std::shared_ptr<WS> m_h;
     boost::uuids::uuid m_id;
   };
 
