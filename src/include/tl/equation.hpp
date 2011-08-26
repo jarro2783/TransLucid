@@ -68,12 +68,12 @@ namespace TransLucid
      * dimensions can still be added.
      **/
     GuardWS()
-    : m_guard(0), m_boolean(0), m_timeStart(0), m_timeEnd(0)
+    : m_timeStart(0), m_timeEnd(0)
     {
     }
 
     GuardWS(const Tuple& t)
-    : m_guard(0), m_boolean(0), m_timeStart(0), m_timeEnd(0)
+    : m_timeStart(0), m_timeEnd(0)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();
@@ -132,7 +132,7 @@ namespace TransLucid
     WS*
     boolean() const
     {
-       return m_boolean;
+       return m_boolean.get();
     }
 
     void 
@@ -148,8 +148,8 @@ namespace TransLucid
     }
 
     private:
-    WS* m_guard;
-    WS* m_boolean;
+    std::shared_ptr<WS> m_guard;
+    std::shared_ptr<WS> m_boolean;
     tuple_t m_dimensions;
 
     mpz_class *m_timeStart;
