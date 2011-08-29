@@ -1,4 +1,4 @@
-/* Forward declaration for types.
+/* Type detail implementation.
    Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.

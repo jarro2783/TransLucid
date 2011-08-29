@@ -43,7 +43,7 @@ Context::lookup(dimension_index dim)
   }
   else
   {
-    const auto& s = m_context[dim - m_min + 1];
+    const auto& s = m_context[makeIndex(dim)];
 
     if (s.empty())
     {
@@ -51,10 +51,31 @@ Context::lookup(dimension_index dim)
     }
     else
     {
+      return s.top();
     }
   }
 
   return m_all;
+}
+
+void
+Context::restore(const Tuple& t)
+{
+  for (const auto& v : t)
+  {
+    m_context[makeIndex(v.first)].pop();
+  }
+}
+
+void
+Context::perturb(const Tuple& t)
+{
+  for (const auto& v : t)
+  {
+    if (v.first == 0)
+    {
+    }
+  }
 }
 
 }

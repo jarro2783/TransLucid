@@ -45,6 +45,8 @@ namespace TransLucid
      * Restores to the previous context.
      * Pops one value from every dimension that exists in t.
      * @param t The tuple to restore from.
+     * @pre All of the dimensions in t have at least one value in the stack
+     * of this; the behaviour is undefined otherwise.
      */
     void 
     restore(const Tuple& t);
@@ -53,6 +55,12 @@ namespace TransLucid
     lookup(dimension_index dim);
 
     private:
+
+    dimension_index
+    makeIndex(dimension_index i)
+    {
+      return i - m_min + 1;
+    }
 
     typedef std::deque<std::stack<Constant>> ContextType;
 
