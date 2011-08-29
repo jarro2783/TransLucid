@@ -51,7 +51,7 @@ namespace TransLucid
     void 
     restore(const Tuple& t);
 
-    Constant
+    const Constant&
     lookup(dimension_index dim);
 
     private:

@@ -34,7 +34,7 @@ Context::Context()
 {
 }
 
-Constant
+const Constant&
 Context::lookup(dimension_index dim)
 {
   if (dim <= m_min || dim >= m_max)
