@@ -7,7 +7,7 @@ add_definitions(${TLCFLAGS}
 -Wall)
 add_library(tlsystem SHARED 
 ast.cpp bestfit.cpp builtin_types.cpp charset.cpp
-compiled_functors.cpp dimtranslator.cpp 
+compiled_functors.cpp context.cpp dimtranslator.cpp 
 equation.cpp equation_parser.cpp expr_compiler.cpp 
 expr_parser.cpp header.cpp 
 hyperdatons/envhd.cpp
