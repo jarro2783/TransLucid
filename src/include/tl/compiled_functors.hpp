@@ -95,50 +95,9 @@ namespace TransLucid
       private:
       System::IdentifierLookup m_identifiers;
       u32string m_name;
+
+      //don't delete this, it doesn't belong to you
       WS* m_e;
-    };
-
-    class UnaryOpWS : public WS
-    {
-      public:
-      UnaryOpWS
-      (
-        WS* system,
-        u32string name,
-        WS* e
-      )
-      : m_system(system), m_name(name), m_e(e)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      WS* m_system;
-      u32string m_name;
-      WS* m_e;
-    };
-
-    class BinaryOpWS : public WS
-    {
-      public:
-
-      BinaryOpWS
-      (
-        WS* system,
-        const std::vector<WS*>& operands,
-        const u32string& name
-      )
-      : m_system(system), m_operands(operands), m_name(name)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      WS* m_system;
-      std::vector<WS*> m_operands;
-      u32string m_name;
     };
 
     class VariableOpWS : public WS
@@ -351,6 +310,15 @@ namespace TransLucid
       {
       }
 
+      ~BangOpWS()
+      {
+        delete m_name;
+        for (auto w : m_args)
+        {
+          delete w;
+        }
+      }
+
       TaggedConstant
       operator()(const Tuple& k);
 
@@ -394,6 +362,11 @@ namespace TransLucid
       : m_system(system), m_e(e)
       {}
 
+      ~HashWS()
+      {
+        delete m_e;
+      }
+
       TaggedConstant
       operator()(const Tuple& k);
 
@@ -429,6 +402,15 @@ namespace TransLucid
       : m_system(system), m_elements(elements)
       {}
 
+      ~TupleWS()
+      {
+        for (auto& p : m_elements)
+        {
+          delete p.first;
+          delete p.second;
+        }
+      }
+
       TaggedConstant
       operator()(const Tuple& k);
 
@@ -444,6 +426,12 @@ namespace TransLucid
       AtWS(WS* e2, WS* e1)
       : e2(e2), e1(e1)
       {}
+
+      ~AtWS()
+      {
+        delete e1;
+        delete e2;
+      }
 
       TaggedConstant
       operator()(const Tuple& k);

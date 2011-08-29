@@ -29,6 +29,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <gmpxx.h>
 
+#include <memory>
+
 namespace TransLucid
 {
   class System;
@@ -66,12 +68,12 @@ namespace TransLucid
      * dimensions can still be added.
      **/
     GuardWS()
-    : m_guard(0), m_boolean(0), m_timeStart(0), m_timeEnd(0)
+    : m_timeStart(0), m_timeEnd(0)
     {
     }
 
     GuardWS(const Tuple& t)
-    : m_guard(0), m_boolean(0), m_timeStart(0), m_timeEnd(0)
+    : m_timeStart(0), m_timeEnd(0)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();
@@ -87,6 +89,8 @@ namespace TransLucid
     {
       delete m_timeStart;
       delete m_timeEnd;
+      //delete m_guard;
+      //delete m_boolean;
     }
 
     GuardWS& operator=(const GuardWS&);
@@ -128,7 +132,7 @@ namespace TransLucid
     WS*
     boolean() const
     {
-       return m_boolean;
+       return m_boolean.get();
     }
 
     void 
@@ -144,8 +148,8 @@ namespace TransLucid
     }
 
     private:
-    WS* m_guard;
-    WS* m_boolean;
+    std::shared_ptr<WS> m_guard;
+    std::shared_ptr<WS> m_boolean;
     tuple_t m_dimensions;
 
     mpz_class *m_timeStart;
@@ -162,6 +166,8 @@ namespace TransLucid
     EquationWS(const u32string& name, const GuardWS& valid, WS* h);
 
     EquationWS();
+
+    ~EquationWS();
 
     const u32string&
     name() const
@@ -183,7 +189,7 @@ namespace TransLucid
     WS*
     equation() const
     {
-       return m_h;
+       return m_h.get();
     }
 
     const uuid&
@@ -204,7 +210,7 @@ namespace TransLucid
     private:
     u32string m_name;
     GuardWS m_validContext;
-    WS* m_h;
+    std::shared_ptr<WS> m_h;
     boost::uuids::uuid m_id;
   };
 

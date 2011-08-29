@@ -52,6 +52,10 @@ EquationWS::EquationWS()
 {
 }
 
+EquationWS::~EquationWS()
+{
+}
+
 VariableWS::VariableWS(const u32string& name)
 : m_name(name)
 #if 0
