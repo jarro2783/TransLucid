@@ -23,18 +23,37 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/context.hpp>
+#include <tl/types/special.hpp>
 
 namespace TransLucid
 {
 
 Context::Context()
-: m_min(0), m_max(0)
+: m_min(0), m_max(0),
+ m_all(Types::Special::create(SP_DIMENSION))
 {
 }
 
 Constant
 Context::lookup(dimension_index dim)
 {
+  if (dim <= m_min || dim >= m_max)
+  {
+    return m_all;
+  }
+  else
+  {
+    const auto& s = m_context[dim - m_min + 1];
+
+    if (s.empty())
+    {
+      return m_all;
+    }
+    else
+    {
+    }
+  }
+
   return m_all;
 }
 

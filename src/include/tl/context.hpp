@@ -56,7 +56,9 @@ namespace TransLucid
 
     typedef std::deque<std::stack<Constant>> ContextType;
 
+    //one before the smallest
     dimension_index m_min;
+    //one before the biggest
     dimension_index m_max;
 
     Constant m_all;
