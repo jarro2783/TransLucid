@@ -27,29 +27,28 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
 
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
 #include <boost/spirit/include/classic_multi_pass.hpp>
 #include <boost/spirit/include/support_istream_iterator.hpp>
 
-#define BOOST_TEST_MODULE SystemTest
-#include <boost/test/included/unit_test.hpp>
-
 namespace TL = TransLucid;
 
 //first some iterator tests
-BOOST_AUTO_TEST_SUITE( utf8_iterator_tests )
 
-BOOST_AUTO_TEST_CASE ( comparison )
+TEST_CASE ( "utf8 iterator comparison", 
+  "two constructed iterators compare equal" )
 {
   std::string s = "test";
   TL::Parser::U32Iterator iter3(TL::Parser::makeUTF8Iterator(s.begin()),
     TL::Parser::makeUTF8Iterator(s.end()));
   TL::Parser::U32Iterator iter4(TL::Parser::makeUTF8Iterator(s.begin()),
     TL::Parser::makeUTF8Iterator(s.end()));
-  BOOST_CHECK(iter3 == iter4);
+  CHECK(iter3 == iter4);
 }
 
-BOOST_AUTO_TEST_CASE ( iterator_end )
+TEST_CASE ( "utf8 iterator end", "go to the end, do they compare equal" )
 {
   std::string s = "ab";
 
@@ -58,20 +57,20 @@ BOOST_AUTO_TEST_CASE ( iterator_end )
 
   ++utf8iter;
   ++utf8iter;
-  BOOST_CHECK(utf8iter == utf8iter_end);
+  CHECK(utf8iter == utf8iter_end);
 
   TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
     TL::Parser::makeUTF8Iterator(s.end()));
 
-  BOOST_CHECK(iter != TL::Parser::U32Iterator());
+  CHECK(iter != TL::Parser::U32Iterator());
 
   ++iter;
   ++iter;
-  BOOST_CHECK(iter == TL::Parser::U32Iterator());
+  CHECK(iter == TL::Parser::U32Iterator());
 
 }
 
-BOOST_AUTO_TEST_CASE ( iterator_copying )
+TEST_CASE ( "utf8 iterator copying", "do the iterators copy correctly" )
 {
   std::string s = "test";
   TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
@@ -87,10 +86,10 @@ BOOST_AUTO_TEST_CASE ( iterator_copying )
   }
 
   std::basic_string<unsigned int> correct = {'t', 'e', 's', 't'};
-  BOOST_CHECK(copy == correct);
+  CHECK(copy == correct);
 }
 
-BOOST_AUTO_TEST_CASE ( iterator_copy_increment )
+TEST_CASE ( "utf8 iterator copy increment", "copy then increment" )
 {
   std::string s = "hello world";
 
@@ -99,15 +98,16 @@ BOOST_AUTO_TEST_CASE ( iterator_copy_increment )
 
   auto iter2 = iter;
 
-  BOOST_CHECK(*iter == 'h');
+  CHECK(*iter == 'h');
 
   ++iter;
 
-  BOOST_CHECK(*iter == 'e');
-  BOOST_CHECK(*iter2 == 'h');
+  CHECK(*iter == 'e');
+  CHECK(*iter2 == 'h');
 }
 
-BOOST_AUTO_TEST_CASE ( iterator_nonascii )
+TEST_CASE ( "utf8 iterator non-ascii", 
+  "does the iterator read a non-ascii character correctly")
 {
   std::string s = u8"\u00e9";
   TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
@@ -115,10 +115,11 @@ BOOST_AUTO_TEST_CASE ( iterator_nonascii )
 
   unsigned int c = *iter;
 
-  BOOST_CHECK_EQUAL(c, U'\u00e9');
+  CHECK(c == U'\u00e9');
 }
 
-BOOST_AUTO_TEST_CASE ( iterator_stream )
+TEST_CASE ( "utf8 iterator stream", 
+  "does the iterator read from a stream correctly" )
 {
   std::istringstream is("%%\n%%\n5;;");
   is >> std::noskipws;
@@ -141,10 +142,11 @@ BOOST_AUTO_TEST_CASE ( iterator_stream )
     ++pos;
   }
 
-  BOOST_CHECK_EQUAL(s, TL::u32string(U"%%\n%%\n5;;"));
+  CHECK(s == TL::u32string(U"%%\n%%\n5;;"));
 }
 
-BOOST_AUTO_TEST_CASE( iterator_stream_increment )
+TEST_CASE( "utf8 iterator stream increment", 
+  "read from a stream and increment" )
 {
   std::istringstream is("1234567890");
   is >> std::noskipws;
@@ -165,34 +167,35 @@ BOOST_AUTO_TEST_CASE( iterator_stream_increment )
   TL::Parser::U32Iterator pos2 = pos1;
   TL::Parser::U32Iterator end;
 
-  BOOST_CHECK(pos != end);
+  CHECK(pos != end);
 
-  BOOST_CHECK_EQUAL(*pos++, '1');
+  CHECK(*pos++ == '1');
   pos2 = pos;
-  BOOST_CHECK(pos != end);
+  CHECK(pos != end);
 
-  BOOST_CHECK_EQUAL(*pos++, '2');
+  CHECK(*pos++ == '2');
   pos2 = pos;
-  BOOST_CHECK(pos != end);
+  CHECK(pos != end);
 
-  BOOST_CHECK_EQUAL(*pos++, '3');
+  CHECK(*pos++ == '3');
   pos2 = pos;
-  BOOST_CHECK(pos != end);
+  CHECK(pos != end);
 
-  BOOST_CHECK_EQUAL(*pos++, '4');
+  CHECK(*pos++ == '4');
   pos2 = pos;
-  BOOST_CHECK(pos != end);
+  CHECK(pos != end);
 
-  BOOST_CHECK_EQUAL(*pos++, '5');
+  CHECK(*pos++ == '5');
   pos2 = pos;
-  BOOST_CHECK(pos != end);
+  CHECK(pos != end);
 
-  BOOST_CHECK_EQUAL(*pos++, '6');
+  CHECK(*pos++ == '6');
   pos2 = pos;
-  BOOST_CHECK(pos != end);
+  CHECK(pos != end);
 }
 
-BOOST_AUTO_TEST_CASE( iterator_stream_weird )
+TEST_CASE( "utf8 iterator stream weird", 
+  "some convoluted iterator stream test" )
 {
   std::istringstream is("%%%%5;;");
   is >> std::noskipws;
@@ -208,17 +211,17 @@ BOOST_AUTO_TEST_CASE( iterator_stream_weird )
     TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
   );
 
-  BOOST_CHECK_EQUAL(*pos++, '%');
-  BOOST_CHECK_EQUAL(*pos++, '%');
-  BOOST_CHECK_EQUAL(*pos++, '%');
-  BOOST_CHECK_EQUAL(*pos++, '%');
-  BOOST_CHECK_EQUAL(*pos++, '5');
-  BOOST_CHECK_EQUAL(*pos++, ';');
-  BOOST_CHECK_EQUAL(*pos++, ';');
-  BOOST_CHECK(pos == TL::Parser::U32Iterator());
+  CHECK(*pos++ == '%');
+  CHECK(*pos++ == '%');
+  CHECK(*pos++ == '%');
+  CHECK(*pos++ == '%');
+  CHECK(*pos++ == '5');
+  CHECK(*pos++ == ';');
+  CHECK(*pos++ == ';');
+  CHECK(pos == TL::Parser::U32Iterator());
 }
 
-BOOST_AUTO_TEST_CASE( iterator_multi_pass )
+TEST_CASE( "utf8 iterator multi_pass", "iterator with multi_pass" )
 {
   std::istringstream is("abcdefghijklmnop");
   boost::spirit::classic::multi_pass<TL::Parser::U32Iterator> pos
@@ -232,14 +235,14 @@ BOOST_AUTO_TEST_CASE( iterator_multi_pass )
 
   auto pos2 = pos;
   auto segment_begin = pos;
-  BOOST_CHECK(*pos == 'a');
+  CHECK(*pos == 'a');
 
   for (int i = 0; i != 7; ++i)
   {
     ++pos;
   }
 
-  BOOST_CHECK(*pos == 'h');
+  CHECK(*pos == 'h');
   auto segment_end = pos;
 
   TL::u32string result;
@@ -249,9 +252,9 @@ BOOST_AUTO_TEST_CASE( iterator_multi_pass )
     ++pos2;
   }
 
-  BOOST_CHECK_EQUAL(result, TL::u32string(U"abcdefghijklmnop"));
+  CHECK(result == TL::u32string(U"abcdefghijklmnop"));
 
-  BOOST_CHECK(pos2 == 
+  CHECK(pos2 == 
     boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
 
   result.clear();
@@ -262,50 +265,47 @@ BOOST_AUTO_TEST_CASE( iterator_multi_pass )
   }
 
   result += *pos;
-  BOOST_CHECK(pos !=
+  CHECK(pos !=
     boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
 
-  BOOST_CHECK_EQUAL(result, TL::u32string(U"hijklmnop"));
+  CHECK(result == TL::u32string(U"hijklmnop"));
 
   ++pos;
-  BOOST_CHECK(pos == 
+  CHECK(pos == 
     boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
 
-  BOOST_CHECK_EQUAL(TL::u32string(segment_begin, segment_end), 
+  CHECK(TL::u32string(segment_begin, segment_end) ==
     TL::u32string(U"abcdefg"));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE( utf32_iterator_tests)
 #if 0
-BOOST_AUTO_TEST_CASE ( comparison )
+TEST_CASE ( comparison )
 {
   TL::u32string s(U"test");
   TL::Parser::U32Iterator iter1(TL::Parser::makeUTF32Iterator(s.begin()));
   TL::Parser::U32Iterator iter2(TL::Parser::makeUTF32Iterator(s.begin()));
-  BOOST_CHECK(iter1 == iter2);
+  CHECK(iter1 == iter2);
 
   TL::Parser::U32Iterator iter3(TL::Parser::makeUTF32Iterator(s.end()));
   TL::Parser::U32Iterator iter4(TL::Parser::makeUTF32Iterator(s.end()));
-  BOOST_CHECK(iter3 == iter4);
+  CHECK(iter3 == iter4);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE ( iterator_end )
+TEST_CASE ( "utf32 iterator end", "the end iterator" )
 {
   TL::u32string s = U"ab";
   TL::Parser::U32Iterator iter(TL::Parser::makeUTF32Iterator(s.begin()),
     TL::Parser::makeUTF32Iterator(s.end()));
 
-  BOOST_CHECK(iter != TL::Parser::U32Iterator());
+  CHECK(iter != TL::Parser::U32Iterator());
 
   ++iter;
   ++iter;
-  BOOST_CHECK(iter == TL::Parser::U32Iterator());
+  CHECK(iter == TL::Parser::U32Iterator());
 }
 
-BOOST_AUTO_TEST_CASE ( iterator_copying )
+TEST_CASE ( "utf32 iterator copying", "can we copy them" )
 {
   TL::u32string s(U"test");
   TL::u32string result;
@@ -319,11 +319,11 @@ BOOST_AUTO_TEST_CASE ( iterator_copying )
     ++iter;
   }
 
-  BOOST_CHECK(s == result);
+  CHECK(s == result);
 }
 
 //need to test this since lex uses multipass
-BOOST_AUTO_TEST_CASE( iterator_multi_pass )
+TEST_CASE( "utf32 iterator multi_pass", "can we use it with multi_pass" )
 {
   TL::u32string s = U"abcdefghijklmnop";
   boost::spirit::classic::multi_pass<TL::Parser::U32Iterator> pos
@@ -336,14 +336,14 @@ BOOST_AUTO_TEST_CASE( iterator_multi_pass )
   );
 
   auto pos2 = pos;
-  BOOST_CHECK(*pos == 'a');
+  CHECK(*pos == 'a');
 
   for (int i = 0; i != 7; ++i)
   {
     ++pos;
   }
 
-  BOOST_CHECK(*pos == 'h');
+  CHECK(*pos == 'h');
 
   TL::u32string result;
   for (int i = 0; i != 16; ++i)
@@ -352,9 +352,9 @@ BOOST_AUTO_TEST_CASE( iterator_multi_pass )
     ++pos2;
   }
 
-  BOOST_CHECK_EQUAL(result, TL::u32string(U"abcdefghijklmnop"));
+  CHECK(result == TL::u32string(U"abcdefghijklmnop"));
 
-  BOOST_CHECK(pos2 == 
+  CHECK(pos2 == 
     boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
 
   result.clear();
@@ -363,12 +363,12 @@ BOOST_AUTO_TEST_CASE( iterator_multi_pass )
     result += *pos;
     ++pos;
   }
-  BOOST_CHECK_EQUAL(result, TL::u32string(U"hijklmnop"));
-  BOOST_CHECK(pos == 
+  CHECK(result == TL::u32string(U"hijklmnop"));
+  CHECK(pos == 
     boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
 }
 
-BOOST_AUTO_TEST_CASE( iterator_copy_iter)
+TEST_CASE( "utf32 iterator copy", "copy the iterator")
 { 
   TL::u32string s = U"test";
   TL::Parser::U32Iterator iter
@@ -380,46 +380,42 @@ BOOST_AUTO_TEST_CASE( iterator_copy_iter)
 
   TL::Parser::U32Iterator savePos = iter;
 
-  BOOST_CHECK(*iter == 't');
+  CHECK(*iter == 't');
 
   ++iter;
-  BOOST_CHECK(*iter == 'e');
+  CHECK(*iter == 'e');
 
   TL::Parser::U32Iterator iter2 = iter;
-  BOOST_CHECK(*iter2 == 'e');
+  CHECK(*iter2 == 'e');
 
   ++iter;
-  BOOST_CHECK(*iter == 's');
-  BOOST_CHECK(*iter2 == 'e');
+  CHECK(*iter == 's');
+  CHECK(*iter2 == 'e');
 
   ++iter2;
-  BOOST_CHECK(*iter2 == 's');
+  CHECK(*iter2 == 's');
 
   TL::Parser::U32Iterator fakeEnd = iter;
 
   ++iter2;
-  BOOST_CHECK(*iter2 == 't');
+  CHECK(*iter2 == 't');
 
   ++iter;
-  BOOST_CHECK(iter == iter2);
+  CHECK(iter == iter2);
 
   ++iter;
   ++iter2;
-  BOOST_CHECK(iter == iter2);
-  BOOST_CHECK(iter == end);
-  BOOST_CHECK(iter2 == end);
+  CHECK(iter == iter2);
+  CHECK(iter == end);
+  CHECK(iter2 == end);
 
-  BOOST_CHECK(TL::u32string(savePos, end) == U"test");
-  BOOST_CHECK_EQUAL(TL::u32string(savePos, fakeEnd), TL::u32string(U"te"));
+  CHECK(TL::u32string(savePos, end) == U"test");
+  CHECK(TL::u32string(savePos, fakeEnd) == TL::u32string(U"te"));
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 //now some line tokenizer tests
 
-BOOST_AUTO_TEST_SUITE( line_tokenizer_tests )
-
-BOOST_AUTO_TEST_CASE( empty )
+TEST_CASE( "line tokenizer empty input", "is it correct with empty input")
 {
   std::string input;
 
@@ -432,11 +428,11 @@ BOOST_AUTO_TEST_CASE( empty )
 
   auto n = tokenize.next();
 
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+  CHECK(n.first == TL::LineType::EMPTY);
+  CHECK(n.second == TL::u32string());
 }
 
-BOOST_AUTO_TEST_CASE( simple )
+TEST_CASE( "line tokenizer simple splitting", "some simply tests" )
 {
   std::string input = "eqn a = 5;; assign y := 6;;";
 
@@ -448,15 +444,15 @@ BOOST_AUTO_TEST_CASE( simple )
   TL::LineTokenizer tokenize(iter);
 
   auto n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = 5;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"eqn a = 5;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"assign y := 6;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"assign y := 6;;"));
 }
 
-BOOST_AUTO_TEST_CASE( dollar )
+TEST_CASE( "line tokenizer $ symbol", "does it handle $$ correctly" )
 {
   std::string input = "eqn a = b;;  $$";
 
@@ -469,19 +465,19 @@ BOOST_AUTO_TEST_CASE( dollar )
 
   auto n = tokenize.next();
 
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = b;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"eqn a = b;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_DOLLAR);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"$$"));
+  CHECK(n.first == TL::LineType::DOUBLE_DOLLAR);
+  CHECK(n.second == TL::u32string(U"$$"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+  CHECK(n.first == TL::LineType::EMPTY);
+  CHECK(n.second == TL::u32string());
 }
 
-BOOST_AUTO_TEST_CASE( extra_spaces )
+TEST_CASE( "line tokenizer extra spaces", "arbitrary white space to skip" )
 {
   std::string input = "eqn a = b;;  $$  ";
 
@@ -493,19 +489,19 @@ BOOST_AUTO_TEST_CASE( extra_spaces )
   TL::LineTokenizer tokenize(iter);
 
   auto n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = b;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"eqn a = b;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_DOLLAR);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"$$"));
+  CHECK(n.first == TL::LineType::DOUBLE_DOLLAR);
+  CHECK(n.second == TL::u32string(U"$$"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+  CHECK(n.first == TL::LineType::EMPTY);
+  CHECK(n.second == TL::u32string());
 }
 
-BOOST_AUTO_TEST_CASE( percent )
+TEST_CASE( "line tokenizer %% symbol", "does it handle %% correctly"  )
 {
   std::string input = "eqn x = 42;;\n%%\nx;;";
 
@@ -517,20 +513,18 @@ BOOST_AUTO_TEST_CASE( percent )
   TL::LineTokenizer tokenize(iter);
 
   auto n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn x = 42;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"eqn x = 42;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_PERCENT);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"%%"));
+  CHECK(n.first == TL::LineType::DOUBLE_PERCENT);
+  CHECK(n.second == TL::u32string(U"%%"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"x;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"x;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+  CHECK(n.first == TL::LineType::EMPTY);
+  CHECK(n.second == TL::u32string());
 }
-
-BOOST_AUTO_TEST_SUITE_END()

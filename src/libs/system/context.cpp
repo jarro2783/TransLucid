@@ -25,6 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/context.hpp>
 #include <tl/types/special.hpp>
 
+#include <algorithm>
+
 namespace TransLucid
 {
 
@@ -72,9 +74,23 @@ Context::perturb(const Tuple& t)
 {
   for (const auto& v : t)
   {
-    if (v.first == 0)
+    //do we need to allocate some more slots
+    //putting max first means that if the 0th is added first it will be pushed
+    //back, this might be slightly better than pushing front first
+    if (v.first >= m_max)
     {
+      std::fill_n(std::back_inserter(m_context), v.first - m_max + 1,
+        std::stack<Constant>());
+      m_max = v.first + 1;
     }
+    else if (v.first <= m_min)
+    {
+      std::fill_n(std::front_inserter(m_context), v.first - m_min + 1,
+        std::stack<Constant>());
+      m_min = v.first - 1;
+    }
+
+    m_context[makeIndex(v.first)].push(v.second);
   }
 }
 
