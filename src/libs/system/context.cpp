@@ -31,7 +31,7 @@ namespace TransLucid
 {
 
 Context::Context()
-: m_min(0), m_max(0),
+: m_min(-1), m_max(0),
  m_all(Types::Special::create(SP_DIMENSION))
 {
 }

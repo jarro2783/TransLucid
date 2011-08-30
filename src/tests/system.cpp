@@ -22,16 +22,19 @@ along with TransLucid; see the file COPYING.  If not see
  * Iterator tests.
  */
 
+#include <tl/context.hpp>
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
+#include <tl/types/intmp.hpp>
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
 
 #include <boost/spirit/include/classic_multi_pass.hpp>
 #include <boost/spirit/include/support_istream_iterator.hpp>
+
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
 namespace TL = TransLucid;
 
@@ -527,4 +530,40 @@ TEST_CASE( "line tokenizer %% symbol", "does it handle %% correctly"  )
   n = tokenize.next();
   CHECK(n.first == TL::LineType::EMPTY);
   CHECK(n.second == TL::u32string());
+}
+
+TEST_CASE( "context manipulation", "perturb and restore some contexts")
+{
+  TL::Context k;
+
+  TL::Constant v1 = TL::Types::Intmp::create(5);
+  TL::Constant v2 = TL::Types::Intmp::create(6);
+  TL::Constant v3 = TL::Types::Intmp::create(7);
+  TL::Constant v4 = TL::Types::Intmp::create(8);
+
+  TL::Tuple t1(TL::tuple_t{
+    {0, v1},
+    {1, v2}
+  });
+
+  k.perturb(t1);
+
+  CHECK(k.lookup(0) == v1);
+  CHECK(k.lookup(1) == v2);
+
+  TL::Tuple t2(TL::tuple_t{
+    {0, v3},
+    {2, v4}
+  });
+
+  k.perturb(t2);
+
+  CHECK(k.lookup(0) == v3);
+  CHECK(k.lookup(1) == v2);
+  CHECK(k.lookup(2) == v4);
+
+  k.restore(t2);
+
+  CHECK(k.lookup(0) == v1);
+  CHECK(k.lookup(1) == v2);
 }

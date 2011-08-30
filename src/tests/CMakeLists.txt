@@ -16,7 +16,6 @@ link_libraries(tlsystem ${TLLIBS} ${Boost_LIBRARIES})
 
 add_executable(system system.cpp)
 add_executable(lexer lexer.cpp)
-add_executable(catch catch.cpp)
 
 add_definitions(${TLCFLAGS})
 
@@ -27,4 +26,3 @@ add_definitions(${TLCFLAGS})
 #add_test(printing ./printing)
 add_test(system ./system)
 add_test(lexer ./lexer)
-add_test(catch ./catch)

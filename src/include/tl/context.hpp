@@ -59,7 +59,7 @@ namespace TransLucid
     dimension_index
     makeIndex(dimension_index i)
     {
-      return i - m_min + 1;
+      return i - m_min - 1;
     }
 
     typedef std::deque<std::stack<Constant>> ContextType;
