@@ -1,11 +1,11 @@
 #!/bin/sh
 
 if [ $# -ne 2 ]; then
-  echo Usage: $0 tlcore testpath
+  echo Usage: $0 tltext testpath
   exit 1
 fi
 
-TLCORE=$1
+TLTEXT=$1
 TESTPATH=$2
 PASSED=0
 FAILED=0
