@@ -718,8 +718,18 @@ namespace TransLucid
       Constant
       print(const Constant& c)
       {
-        return Types::String::create(
-          to_u32string(get_constant_pointer<mpz_class>(c).get_str()));
+        const mpz_class& z = get_constant_pointer<mpz_class>(c);
+
+        if (z < 0)
+        {
+          mpz_class pos = -z;
+          return Types::String::create(
+            U"~" + to_u32string(pos.get_str()));
+        }
+        else
+        {
+          return Types::String::create(to_u32string(z.get_str()));
+        }
       }
     }
 
