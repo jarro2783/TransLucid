@@ -25,7 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/ast.hpp>
 #include <tl/compiled_functors.hpp>
 #include <tl/constws.hpp>
-#include <tl/expr_compiler.hpp>
+#include <tl/workshop_builder.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/rename.hpp>
 #include <tl/utility.hpp>
@@ -33,99 +33,99 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-ExprCompiler::ExprCompiler(System* system)
+WorkshopBuilder::WorkshopBuilder(System* system)
 : m_system(system)
 {
 }
 
-ExprCompiler::~ExprCompiler()
+WorkshopBuilder::~WorkshopBuilder()
 {
 }
 
 WS*
-ExprCompiler::compile_for_equation(const Tree::Expr& e)
+WorkshopBuilder::compile_for_equation(const Tree::Expr& e)
 {
   return boost::apply_visitor(*this, e);
 }
 
 WS*
-ExprCompiler::operator()(const Tree::nil& n)
+WorkshopBuilder::operator()(const Tree::nil& n)
 {
   return 0;
 }
 
 WS*
-ExprCompiler::operator()(bool b)
+WorkshopBuilder::operator()(bool b)
 {
   return new Workshops::BoolConstWS(b);
 }
 
 WS*
-ExprCompiler::operator()(Special s)
+WorkshopBuilder::operator()(Special s)
 {
   return new Workshops::SpecialConstWS(s);
 }
 
 WS*
-ExprCompiler::operator()(const mpz_class& i)
+WorkshopBuilder::operator()(const mpz_class& i)
 {
   return new Workshops::IntmpConstWS(i);
 }
 
 WS*
-ExprCompiler::operator()(char32_t c)
+WorkshopBuilder::operator()(char32_t c)
 {
   return new Workshops::UCharConstWS(c);
 }
 
 WS*
-ExprCompiler::operator()(const u32string& s)
+WorkshopBuilder::operator()(const u32string& s)
 {
   return new Workshops::UStringConstWS(s);
 }
 
 WS*
-ExprCompiler::operator()(const Tree::LiteralExpr& e)
+WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 {
   //return new Workshops::TypedValueWS(m_system, e.type, e.text);
   return 0;
 }
 
 WS*
-ExprCompiler::operator()(const Tree::DimensionExpr& e)
+WorkshopBuilder::operator()(const Tree::DimensionExpr& e)
 {
   return new Workshops::DimensionWS(*m_system, e.text);
 }
 
 WS*
-ExprCompiler::operator()(const Tree::IdentExpr& e)
+WorkshopBuilder::operator()(const Tree::IdentExpr& e)
 {
   return new Workshops::IdentWS(m_system->lookupIdentifiers(), e.text);
 }
 
 WS* 
-ExprCompiler::operator()(const Tree::ParenExpr& e)
+WorkshopBuilder::operator()(const Tree::ParenExpr& e)
 {
   return boost::apply_visitor(*this, e.e);
 }
 
 WS*
-ExprCompiler::operator()(const Tree::UnaryOpExpr& e)
+WorkshopBuilder::operator()(const Tree::UnaryOpExpr& e)
 {
   //this should be compiled out
-  throw "ExprCompiler::operator()(UnaryOpExpr)";
+  throw "WorkshopBuilder::operator()(UnaryOpExpr)";
 }
 
 WS*
-ExprCompiler::operator()(const Tree::BinaryOpExpr& e)
+WorkshopBuilder::operator()(const Tree::BinaryOpExpr& e)
 {
   //this should be compiled out
-  throw "ExprCompiler::operator()(BinaryOpExpr)";
+  throw "WorkshopBuilder::operator()(BinaryOpExpr)";
   return 0;
 }
 
 WS*
-ExprCompiler::operator()(const Tree::BangOpExpr& e)
+WorkshopBuilder::operator()(const Tree::BangOpExpr& e)
 {
   WS* name = boost::apply_visitor(*this, e.name);
   std::vector<WS*> args;
@@ -139,7 +139,7 @@ ExprCompiler::operator()(const Tree::BangOpExpr& e)
 }
 
 WS*
-ExprCompiler::operator()(const Tree::IfExpr& e)
+WorkshopBuilder::operator()(const Tree::IfExpr& e)
 {
   WS* condition = boost::apply_visitor(*this, e.condition);
   WS* then = boost::apply_visitor(*this, e.then);
@@ -160,14 +160,14 @@ ExprCompiler::operator()(const Tree::IfExpr& e)
 }
 
 WS*
-ExprCompiler::operator()(const Tree::HashExpr& e)
+WorkshopBuilder::operator()(const Tree::HashExpr& e)
 {
   WS* expr = boost::apply_visitor(*this, e.e);
   return new Workshops::HashWS(*m_system, expr);
 }
 
 WS*
-ExprCompiler::operator()(const Tree::TupleExpr& e)
+WorkshopBuilder::operator()(const Tree::TupleExpr& e)
 {
   std::list<std::pair<WS*, WS*>> elements;
   for(auto& v : e.pairs)
@@ -180,7 +180,7 @@ ExprCompiler::operator()(const Tree::TupleExpr& e)
 }
 
 WS*
-ExprCompiler::operator()(const Tree::AtExpr& e)
+WorkshopBuilder::operator()(const Tree::AtExpr& e)
 {
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
@@ -189,7 +189,7 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
 }
 
 WS*
-ExprCompiler::operator()(const Tree::LambdaExpr& e)
+WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 {
   throw "Lambda expressions not implemented";
 //TODO: we will get to this eventually
@@ -223,7 +223,7 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
 }
 
 WS*
-ExprCompiler::operator()(const Tree::PhiExpr& e)
+WorkshopBuilder::operator()(const Tree::PhiExpr& e)
 {
   throw "phi expressions not implemented";
   //generate a new dimension gamma
@@ -239,7 +239,7 @@ ExprCompiler::operator()(const Tree::PhiExpr& e)
 }
 
 WS* 
-ExprCompiler::operator()(const Tree::ValueAppExpr& e)
+WorkshopBuilder::operator()(const Tree::ValueAppExpr& e)
 {
   //create a LambdaApplicationWS with the compiled sub expression
   WS* lhs = boost::apply_visitor(*this, e.lhs);
@@ -248,7 +248,7 @@ ExprCompiler::operator()(const Tree::ValueAppExpr& e)
 }
 
 WS* 
-ExprCompiler::operator()(const Tree::NameAppExpr& e)
+WorkshopBuilder::operator()(const Tree::NameAppExpr& e)
 {
   return 0;
 }

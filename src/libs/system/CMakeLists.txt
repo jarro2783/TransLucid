@@ -8,13 +8,14 @@ add_definitions(${TLCFLAGS}
 add_library(tlsystem SHARED 
 ast.cpp bestfit.cpp builtin_types.cpp charset.cpp
 compiled_functors.cpp context.cpp dimtranslator.cpp 
-equation.cpp equation_parser.cpp expr_compiler.cpp 
+equation.cpp equation_parser.cpp
 expr_parser.cpp header.cpp 
 hyperdatons/envhd.cpp
 internal_strings.cpp lexer.cpp lexer_util.cpp 
 library.cpp line_tokenizer.cpp parser.cpp
 range.cpp system.cpp translator.cpp tree_printer.cpp
 tree_to_wstree.cpp tuple_parser.cpp types.cpp utility.cpp uuid.cpp
+workshop_builder.cpp
 )
 
 target_link_libraries(tlsystem ltdl rt gmpxx)

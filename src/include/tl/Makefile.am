@@ -23,7 +23,7 @@ includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp \
   cache.hpp \
   charset.hpp compiled_functors.hpp constws.hpp container.hpp \
   dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
-  expr_compiler.hpp expr_parser.hpp fixed_indexes.hpp function_registry.hpp \
+  expr_parser.hpp fixed_indexes.hpp function_registry.hpp \
   header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer.hpp lexer_util.hpp library.hpp \
   line_parser.hpp line_tokenizer.hpp maxsharelist.hpp object_registry.hpp \
@@ -32,6 +32,6 @@ includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp \
   parser_util.hpp range.hpp registries.hpp rename.hpp \
   set_types.hpp system.hpp translator.hpp tree_printer.hpp tree_to_wstree.hpp \
   tuple_parser.hpp types.hpp types_fwd.hpp types_util.hpp utility.hpp \
-  uuid.hpp workshop.hpp 
+  uuid.hpp workshop.hpp workshop_builder.hpp
 
 EXTRA_DIST = CMakeLists.txt

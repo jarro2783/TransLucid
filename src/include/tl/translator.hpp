@@ -25,7 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TRANSLATOR_HPP_INCLUDED
 #define TRANSLATOR_HPP_INCLUDED
 
-#include <tl/expr_compiler.hpp>
+#include <tl/workshop_builder.hpp>
 #include <tl/workshop.hpp>
 #include <tl/library.hpp>
 #include <tl/parser_api.hpp>
@@ -276,7 +276,7 @@ namespace TransLucid
 
     System& m_system;
 
-    ExprCompiler m_compiler;
+    WorkshopBuilder m_compiler;
 
     Libtool m_lt;
 

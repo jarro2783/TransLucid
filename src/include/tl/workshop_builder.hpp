@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-/** @file expr_compiler.hpp
+/** @file workshop_builder.hpp
  * Expression compiler definition.
  * Compiles a tree to workshops.
  */
@@ -32,14 +32,14 @@ namespace TransLucid
 
   class System;
 
-  class ExprCompiler
+  class WorkshopBuilder
   {
     public:
     //boost::apply_visitor requires this
     typedef WS* result_type;
 
-    ExprCompiler(System* system);
-    ~ExprCompiler();
+    WorkshopBuilder(System* system);
+    ~WorkshopBuilder();
 
     WS* compile_for_equation(const Tree::Expr&);
     //WS* compile_top_level(const Tree::Expr&);

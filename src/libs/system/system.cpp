@@ -93,7 +93,7 @@ namespace
   {
     Tree::Expr wsTree = toWSTree(expr);
 
-    ExprCompiler compiler(&system);
+    WorkshopBuilder compiler(&system);
 
     std::auto_ptr<WS> ws(compiler.compile_for_equation(wsTree));
 
@@ -672,7 +672,7 @@ System::addDeclInternal
   Tree::Expr boolean = toWSTree(std::get<2>(eqn));
   Tree::Expr expr    = toWSTree(std::get<3>(eqn));
 
-  ExprCompiler compile(this);
+  WorkshopBuilder compile(this);
 
   uuid u = addDeclInternal(
     std::get<0>(eqn),
