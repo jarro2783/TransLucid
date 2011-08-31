@@ -1,4 +1,4 @@
-/* Hyperdatons generated from AST::Expr.
+/* Workshops generated from AST::Expr.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -48,7 +48,7 @@ namespace TransLucid
 {
   class System;
 
-  namespace Hyperdatons
+  namespace Workshops
   {
     /**
      * @brief The outermost hyperdaton which starts an evaluation.

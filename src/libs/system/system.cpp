@@ -46,7 +46,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 
 #include <tl/builtin_types.hpp>
-#include <tl/consthd.hpp>
+#include <tl/constws.hpp>
 #include <tl/context.hpp>
 #include <tl/function_registry.hpp>
 #include <tl/output.hpp>

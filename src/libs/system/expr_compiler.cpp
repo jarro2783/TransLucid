@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/compiled_functors.hpp>
-#include <tl/consthd.hpp>
+#include <tl/constws.hpp>
 #include <tl/expr_compiler.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/rename.hpp>
@@ -57,50 +57,50 @@ ExprCompiler::operator()(const Tree::nil& n)
 WS*
 ExprCompiler::operator()(bool b)
 {
-  return new Hyperdatons::BoolConstWS(b);
+  return new Workshops::BoolConstWS(b);
 }
 
 WS*
 ExprCompiler::operator()(Special s)
 {
-  return new Hyperdatons::SpecialConstWS(s);
+  return new Workshops::SpecialConstWS(s);
 }
 
 WS*
 ExprCompiler::operator()(const mpz_class& i)
 {
-  return new Hyperdatons::IntmpConstWS(i);
+  return new Workshops::IntmpConstWS(i);
 }
 
 WS*
 ExprCompiler::operator()(char32_t c)
 {
-  return new Hyperdatons::UCharConstWS(c);
+  return new Workshops::UCharConstWS(c);
 }
 
 WS*
 ExprCompiler::operator()(const u32string& s)
 {
-  return new Hyperdatons::UStringConstWS(s);
+  return new Workshops::UStringConstWS(s);
 }
 
 WS*
 ExprCompiler::operator()(const Tree::LiteralExpr& e)
 {
-  //return new Hyperdatons::TypedValueWS(m_system, e.type, e.text);
+  //return new Workshops::TypedValueWS(m_system, e.type, e.text);
   return 0;
 }
 
 WS*
 ExprCompiler::operator()(const Tree::DimensionExpr& e)
 {
-  return new Hyperdatons::DimensionWS(*m_system, e.text);
+  return new Workshops::DimensionWS(*m_system, e.text);
 }
 
 WS*
 ExprCompiler::operator()(const Tree::IdentExpr& e)
 {
-  return new Hyperdatons::IdentWS(m_system->lookupIdentifiers(), e.text);
+  return new Workshops::IdentWS(m_system->lookupIdentifiers(), e.text);
 }
 
 WS* 
@@ -135,7 +135,7 @@ ExprCompiler::operator()(const Tree::BangOpExpr& e)
     args.push_back(boost::apply_visitor(*this, expr));
   }
 
-  return new Hyperdatons::BangOpWS(*m_system, name, args);
+  return new Workshops::BangOpWS(*m_system, name, args);
 }
 
 WS*
@@ -156,14 +156,14 @@ ExprCompiler::operator()(const Tree::IfExpr& e)
     ));
   }
 
-  return new Hyperdatons::IfWS(condition, then, else_ifs, else_);
+  return new Workshops::IfWS(condition, then, else_ifs, else_);
 }
 
 WS*
 ExprCompiler::operator()(const Tree::HashExpr& e)
 {
   WS* expr = boost::apply_visitor(*this, e.e);
-  return new Hyperdatons::HashWS(*m_system, expr);
+  return new Workshops::HashWS(*m_system, expr);
 }
 
 WS*
@@ -176,7 +176,7 @@ ExprCompiler::operator()(const Tree::TupleExpr& e)
     WS* rhs = boost::apply_visitor(*this, v.second);
     elements.push_back(std::make_pair(lhs, rhs));
   }
-  return new Hyperdatons::TupleWS(*m_system, elements);
+  return new Workshops::TupleWS(*m_system, elements);
 }
 
 WS*
@@ -185,7 +185,7 @@ ExprCompiler::operator()(const Tree::AtExpr& e)
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
 
-  return new Hyperdatons::AtWS(lhs, rhs);
+  return new Workshops::AtWS(lhs, rhs);
 }
 
 WS*
@@ -217,7 +217,7 @@ ExprCompiler::operator()(const Tree::LambdaExpr& e)
 
   //make a LambdaAbstractionWS
   WS* rhs = boost::apply_visitor(*this, renamed);
-  return new Hyperdatons::LambdaAbstractionWS(m_system, e.name, index, rhs);
+  return new Workshops::LambdaAbstractionWS(m_system, e.name, index, rhs);
 #endif
   return 0;
 }
@@ -244,7 +244,7 @@ ExprCompiler::operator()(const Tree::ValueAppExpr& e)
   //create a LambdaApplicationWS with the compiled sub expression
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
-  return new Hyperdatons::LambdaApplicationWS(lhs, rhs);
+  return new Workshops::LambdaApplicationWS(lhs, rhs);
 }
 
 WS* 

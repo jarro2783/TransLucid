@@ -1,5 +1,5 @@
-/* Hyperdatons which return constants.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+/* Workshops that return constants.
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -35,7 +35,7 @@ namespace TransLucid
    * The namespace that contains all of the hyperdatons which are
    * in the system.
    */
-  namespace Hyperdatons
+  namespace Workshops
   {
     class TypeConstWS : public WS
     {

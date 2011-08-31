@@ -1,4 +1,4 @@
-/* Hyperdatons generated from AST::Expr.
+/* Workshops generated from AST::Expr.
    Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/compiled_functors.hpp>
-#include <tl/consthd.hpp>
+#include <tl/constws.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
 #include <tl/maxsharelist.hpp>
@@ -44,7 +44,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-namespace Hyperdatons
+namespace Workshops
 {
 
 DimensionWS::DimensionWS(System& system, const std::u32string& name)
@@ -308,6 +308,6 @@ LambdaApplicationWS::operator()(const Tuple& k)
   return f.applyLambda(k, rhs);
 }
 
-} //namespace Hyperdatons
+} //namespace Workshops
 
 } //namespace TransLucid
