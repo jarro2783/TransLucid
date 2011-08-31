@@ -10,7 +10,7 @@ tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 
 tltext_SOURCES = main.cpp tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp
 
-TESTS_ENVIRONMENT = TLCORE=$(top_builddir)/src/tltext/tltext \
+TESTS_ENVIRONMENT = TLTEXT=$(top_builddir)/src/tltext/tltext \
   TESTDIR=$(top_srcdir)/src/tltext/tests \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh \
   RUNTESTS=$(top_srcdir)/src/tltext/runtests.sh \
@@ -21,7 +21,7 @@ dist_tltextdata_DATA = header.tl
 
 EXTRA_DIST = CMakeLists.txt
 
-#TESTS = tltext-tests.sh
+TESTS = tltext-tests.sh
 
 #check-local:
 #	$(top_srcdir)/src/tests/runbinary.sh $(top_srcdir)/src/tlcore/runtests.sh \
