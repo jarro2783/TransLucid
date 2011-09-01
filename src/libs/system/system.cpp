@@ -99,6 +99,19 @@ namespace
 
     return (*ws)(system.getDefaultContext()).first;
   }
+
+  //for every context in ctxts that is valid in k,
+  //output the result of computation compute to out
+  void
+  enumerateContextSet
+  (
+    const Tuple& ctxts, 
+    const Tuple& k,
+    WS& compute,
+    OutputHD* out
+  )
+  {
+  }
 }
 
 namespace detail
@@ -428,6 +441,14 @@ System::go()
 
       auto time = k.find(DIM_TIME);
 
+      //constraints could have ranges, so we need to enumerate them
+      enumerateContextSet(constraint, k, assign.second, hd->second);
+
+      #if 0
+      enumerateContextSet(constraint, k,
+      [hd&, assign&] (const Tuple& k) -> void
+      {
+
       if (tupleApplicable(constraint, k) &&
            (time == k.end() ||
             get_constant_pointer<mpz_class>(time->second) == m_time
@@ -437,15 +458,11 @@ System::go()
         TaggedConstant v = 
           assign.second(k.insert(DIM_TIME, Types::Intmp::create(m_time)));
 
-        hd->second->put(k, v.first);
-      }
-      else
-      {
-        if (get_constant_pointer<mpz_class>(time->second) == m_time)
-        {
-          std::cerr << "output not applicable to the constraint" << std::endl;
+          hd->second->put(k, v.first);
         }
-      }
+
+      });
+      #endif
     }
   }
 
