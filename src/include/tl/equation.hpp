@@ -202,7 +202,7 @@ namespace TransLucid
     del(size_t time);
 
     TaggedConstant
-    operator()(const Tuple& k)
+    operator()(const Context& k)
     {
       return (*m_h)(k);
     }
@@ -226,7 +226,7 @@ namespace TransLucid
     ~VariableWS();
 
     virtual TaggedConstant 
-    operator()(const Tuple& k);
+    operator()(const Context& k);
 
     #if 0
     virtual uuid
