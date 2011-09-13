@@ -23,8 +23,8 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/ast.hpp>
-#include <tl/compiled_functors.hpp>
 #include <tl/constws.hpp>
+#include <tl/eval_workshops.hpp>
 #include <tl/workshop_builder.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/rename.hpp>

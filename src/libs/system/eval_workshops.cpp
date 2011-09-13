@@ -23,8 +23,8 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/builtin_types.hpp>
-#include <tl/compiled_functors.hpp>
 #include <tl/constws.hpp>
+#include <tl/eval_workshops.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
 #include <tl/maxsharelist.hpp>
