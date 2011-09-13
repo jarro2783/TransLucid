@@ -74,24 +74,30 @@ Context::perturb(const Tuple& t)
 {
   for (const auto& v : t)
   {
-    //do we need to allocate some more slots
-    //putting max first means that if the 0th is added first it will be pushed
-    //back, this might be slightly better than pushing front first
-    if (v.first >= m_max)
-    {
-      std::fill_n(std::back_inserter(m_context), v.first - m_max + 1,
-        std::stack<Constant>());
-      m_max = v.first + 1;
-    }
-    else if (v.first <= m_min)
-    {
-      std::fill_n(std::front_inserter(m_context), v.first - m_min + 1,
-        std::stack<Constant>());
-      m_min = v.first - 1;
-    }
-
-    m_context[makeIndex(v.first)].push(v.second);
+    perturb(v.first, v.second);
   }
+}
+
+void
+Context::perturb(dimension_index d, const Constant& c)
+{
+  //do we need to allocate some more slots
+  //putting max first means that if the 0th is added first it will be pushed
+  //back, this might be slightly better than pushing front first
+  if (d >= m_max)
+  {
+    std::fill_n(std::back_inserter(m_context), d - m_max + 1,
+      std::stack<Constant>());
+    m_max = d + 1;
+  }
+  else if (d <= m_min)
+  {
+    std::fill_n(std::front_inserter(m_context), d - m_min + 1,
+      std::stack<Constant>());
+    m_min = d - 1;
+  }
+
+  m_context[makeIndex(d)].push(c);
 }
 
 }

@@ -28,7 +28,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 
 #include <deque>
+#include <initializer_list>
 #include <stack>
+#include <vector>
 
 namespace TransLucid
 {
@@ -38,8 +40,13 @@ namespace TransLucid
 
     Context();
 
+    operator Tuple() const;
+
     void
     perturb(const Tuple& t);
+
+    void
+    perturb(dimension_index d, const Constant& c);
 
     /**
      * Restores to the previous context.
@@ -53,6 +60,16 @@ namespace TransLucid
 
     const Constant&
     lookup(dimension_index dim);
+
+    template <typename List>
+    void
+    restore(const List& list)
+    {
+      for (const auto& v : list)
+      {
+        m_context[v].pop();
+      }
+    }
 
     private:
 
@@ -72,6 +89,33 @@ namespace TransLucid
     Constant m_all;
 
     ContextType m_context;
+  };
+
+  class ContextPerturber
+  {
+    public:
+
+    ContextPerturber
+    (
+      Context& k, 
+      const std::initializer_list<std::pair<dimension_index, Constant>>& p
+    )
+    : m_k(k)
+    {
+      for (const auto& v : p)
+      {
+        m_k.perturb(v.first, v.second);
+      }
+    }
+
+    ~ContextPerturber()
+    {
+      m_k.restore(m_dims);
+    }
+
+    private:
+    Context& m_k;
+    std::vector<dimension_index> m_dims;
   };
 }
 

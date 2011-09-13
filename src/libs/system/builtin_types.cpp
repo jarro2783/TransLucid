@@ -810,13 +810,13 @@ namespace TransLucid
 //the default for function application is that there was a type mismatch
 //concrete base classes will implement the correct functionality
 TaggedConstant
-FunctionType::applyLambda(const Tuple& k, const Constant& value) const
+FunctionType::applyLambda(Context& k, const Constant& value) const
 {
   return TaggedConstant(Types::Special::create(SP_CONST), k);
 }
 
 TaggedConstant
-FunctionType::applyPhi(const Tuple& k, WS* expr) const
+FunctionType::applyPhi(Context& k, WS* expr) const
 {
   return TaggedConstant(Types::Special::create(SP_CONST), k);
 }
@@ -829,12 +829,8 @@ TaggedConstant
 LambdaFunctionType::applyLambda(Context& k, const Constant& value) const
 {
   //set m_dim = value in the context and evaluate the expr
-  tuple_t k_f = k.tuple();
-  k_f[m_dim] = value;
-
-  k.perturb(m_dim, value);
-  auto r = (*m_expr)(Tuple(k_f));
-  k.restore(m_dim);
+  ContextPerturber p(k, {{m_dim, value}});
+  auto r = (*m_expr)(k);
 
   return r;
 }
