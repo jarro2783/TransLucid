@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/builtin_types.hpp>
+#include <tl/context.hpp>
 #include <tl/constws.hpp>
 #include <tl/eval_workshops.hpp>
 #include <tl/fixed_indexes.hpp>
@@ -53,26 +54,26 @@ DimensionWS::DimensionWS(System& system, const std::u32string& name)
 }
 
 TaggedConstant
-BoolConstWS::operator()(const Tuple& k)
+BoolConstWS::operator()(const Context& k)
 {
   //return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-TypeConstWS::operator()(const Tuple& k)
+TypeConstWS::operator()(const Context& k)
 {
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-DimensionWS::operator()(const Tuple& k)
+DimensionWS::operator()(const Context& k)
 {
   return TaggedConstant (m_value, k);
 }
 
 TaggedConstant
-IdentWS::operator()(const Tuple& k)
+IdentWS::operator()(const Context& k)
 {
   if (m_e == 0)
   {
@@ -90,7 +91,7 @@ IdentWS::operator()(const Tuple& k)
 }
 
 TaggedConstant
-BangOpWS::operator()(const Tuple& k)
+BangOpWS::operator()(const Context& k)
 {
   //lookup function in the system and call it
 
@@ -110,7 +111,7 @@ BangOpWS::operator()(const Tuple& k)
 }
 
 TaggedConstant
-IfWS::operator()(const Tuple& k)
+IfWS::operator()(const Context& k)
 {
   TaggedConstant cond = (*m_condition)(k);
   Constant& condv = cond.first;
@@ -170,34 +171,34 @@ IfWS::operator()(const Tuple& k)
 }
 
 TaggedConstant
-HashWS::operator()(const Tuple& k)
+HashWS::operator()(const Context& k)
 {
   TaggedConstant r = (*m_e)(k);
   return lookup_context(m_system, r.first, k);
 }
 
 TaggedConstant
-IntmpConstWS::operator()(const Tuple& k)
+IntmpConstWS::operator()(const Context& k)
 {
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-IsSpecialWS::operator()(const Tuple& k)
+IsSpecialWS::operator()(const Context& k)
 {
   //this is going away, but to stop warnings
   return TaggedConstant();
 }
 
 TaggedConstant
-IsTypeWS::operator()(const Tuple& k)
+IsTypeWS::operator()(const Context& k)
 {
   //this is going away, but to stop warnings
   return TaggedConstant();
 }
 
 TaggedConstant
-SpecialConstWS::operator()(const Tuple& k)
+SpecialConstWS::operator()(const Context& k)
 {
   return TaggedConstant(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
 }
@@ -218,20 +219,20 @@ UStringConstWS::UStringConstWS(const u32string& s)
 }
 
 TaggedConstant
-UStringConstWS::operator()(const Tuple& k)
+UStringConstWS::operator()(const Context& k)
 {
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-UCharConstWS::operator()(const Tuple& k)
+UCharConstWS::operator()(const Context& k)
 {
   //return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-TupleWS::operator()(const Tuple& k)
+TupleWS::operator()(const Context& k)
 {
   tuple_t kp;
   for(auto& pair : m_elements)
@@ -253,7 +254,7 @@ TupleWS::operator()(const Tuple& k)
 }
 
 TaggedConstant
-AtWS::operator()(const Tuple& k)
+AtWS::operator()(const Context& k)
 {
   tuple_t kNew = k.tuple();
   TaggedConstant kp = (*e1)(k);
@@ -281,7 +282,7 @@ AtWS::operator()(const Tuple& k)
 }
 
 TaggedConstant
-LambdaAbstractionWS::operator()(const Tuple& k)
+LambdaAbstractionWS::operator()(const Context& k)
 {
   return TaggedConstant(
     Types::Function::create(LambdaFunctionType(m_name, m_dim, m_rhs)),
@@ -290,7 +291,7 @@ LambdaAbstractionWS::operator()(const Tuple& k)
 }
 
 TaggedConstant
-LambdaApplicationWS::operator()(const Tuple& k)
+LambdaApplicationWS::operator()(const Context& k)
 {
   //evaluate the lhs, evaluate the rhs
   //and pass the value to the function to evaluate

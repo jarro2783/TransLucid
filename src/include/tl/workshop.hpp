@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef WORKSHOP_HPP_INCLUDED
 #define WORKSHOP_HPP_INCLUDED
 
+#include <tl/context.hpp>
 #include <tl/types.hpp>
 //#include <tl/system.hpp>
 
@@ -31,7 +32,7 @@ namespace TransLucid
     virtual ~WS() {}
 
     virtual TaggedConstant
-    operator()(const Tuple& k) = 0;
+    operator()(const Context& k) = 0;
   };
 } //namespace TransLucid
 
