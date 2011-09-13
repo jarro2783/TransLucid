@@ -30,10 +30,10 @@ namespace TransLucid
     virtual ~FunctionType() = 0;
 
     virtual TaggedConstant
-    applyLambda(const Tuple& k, const Constant& value) const;
+    applyLambda(Context& k, const Constant& value) const;
 
     virtual TaggedConstant
-    applyPhi(const Tuple& k, WS* expr) const;
+    applyPhi(Context& k, WS* expr) const;
 
     virtual FunctionType*
     clone() const = 0;
@@ -51,7 +51,7 @@ namespace TransLucid
     }
 
     TaggedConstant
-    applyLambda(const Tuple& k, const Constant& value) const;
+    applyLambda(Context& k, const Constant& value) const;
 
     LambdaFunctionType*
     clone() const

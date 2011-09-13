@@ -826,12 +826,17 @@ FunctionType::~FunctionType()
 }
 
 TaggedConstant
-LambdaFunctionType::applyLambda(const Tuple& k, const Constant& value) const
+LambdaFunctionType::applyLambda(Context& k, const Constant& value) const
 {
   //set m_dim = value in the context and evaluate the expr
   tuple_t k_f = k.tuple();
   k_f[m_dim] = value;
-  return (*m_expr)(Tuple(k_f));
+
+  k.perturb(m_dim, value);
+  auto r = (*m_expr)(Tuple(k_f));
+  k.restore(m_dim);
+
+  return r;
 }
 
 //everything that creates hyperdatons
