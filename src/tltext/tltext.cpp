@@ -55,7 +55,6 @@ namespace TLText
 TLText::TLText()
 : 
   m_verbose(false)
- ,m_reactive(false)
  ,m_uuids(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)

@@ -77,7 +77,6 @@ int main(int argc, char *argv[])
     ("help,h", "show this message")
     ("input,i", po::value<std::string>(), "input file")
     ("output,o", po::value<std::string>(), "output file")
-    ("reactive", "reactive system")
     ("uuid", "print uuids")
     ("verbose", "verbose output")
     ("version", "show version")
@@ -114,11 +113,6 @@ int main(int argc, char *argv[])
   if (vm.count("verbose"))
   {
     tltext.verbose(true);
-  }
-
-  if (vm.count("reactive"))
-  {
-    tltext.reactive(true);
   }
 
   if (vm.count("uuid"))

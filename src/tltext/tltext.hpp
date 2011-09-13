@@ -77,16 +77,6 @@ namespace TransLucid
       }
 
       /**
-       * Set reactive.
-       * @param r @b true to turn reactive on, @b false to turn it off.
-       */
-      void 
-      reactive(bool r)
-      {
-        m_reactive = r;
-      }
-
-      /**
        * Set UUIDs. Sets the printing of UUIDs.
        * @param u @b true to turn uuids on, @b false to turn them off.
        */
@@ -132,7 +122,6 @@ namespace TransLucid
 
       private:
       bool m_verbose;
-      bool m_reactive;
       bool m_uuids;
 
       std::istream* m_is;
