@@ -143,7 +143,7 @@ GuardWS::operator=(const GuardWS& rhs)
 }
 
 Tuple
-GuardWS::evaluate(const Tuple& k) const
+GuardWS::evaluate(Context& k) const
 {
   tuple_t t = m_dimensions;
 
@@ -208,7 +208,7 @@ bool VariableWS::equationValid(const EquationWS& e, const Tuple& k)
 #endif
 
 TaggedConstant
-VariableWS::operator()(const Tuple& k)
+VariableWS::operator()(Context& k)
 {
 
   #if 0

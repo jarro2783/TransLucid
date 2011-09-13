@@ -115,7 +115,7 @@ namespace TransLucid
      * dimension.
      **/
     Tuple
-    evaluate(const Tuple& k) const;
+    evaluate(Context& k) const;
 
     /**
      * @brief Adds a system imposed dimension.
@@ -202,7 +202,7 @@ namespace TransLucid
     del(size_t time);
 
     TaggedConstant
-    operator()(const Context& k)
+    operator()(Context& k)
     {
       return (*m_h)(k);
     }
@@ -226,7 +226,7 @@ namespace TransLucid
     ~VariableWS();
 
     virtual TaggedConstant 
-    operator()(const Context& k);
+    operator()(Context& k);
 
     #if 0
     virtual uuid
