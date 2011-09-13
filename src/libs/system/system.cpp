@@ -441,13 +441,14 @@ System::go()
 
       auto time = k.find(DIM_TIME);
 
+      #if 0
       //constraints could have ranges, so we need to enumerate them
       enumerateContextSet(constraint, k, assign.second, hd->second);
 
-      #if 0
       enumerateContextSet(constraint, k,
       [hd&, assign&] (const Tuple& k) -> void
       {
+      #endif
 
       if (tupleApplicable(constraint, k) &&
            (time == k.end() ||
@@ -459,9 +460,12 @@ System::go()
           assign.second(k.insert(DIM_TIME, Types::Intmp::create(m_time)));
 
           hd->second->put(k, v.first);
-        }
+      }
 
-      });
+      #if 0
+      }
+      
+      );
       #endif
     }
   }
