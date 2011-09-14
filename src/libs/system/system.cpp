@@ -436,10 +436,9 @@ System::go()
     for (auto& assign : equations)
     {
       const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
-      Tuple k;
       const GuardWS& guard = assign.second.validContext();
 
-      k = guard.evaluate(theContext);
+      Tuple k = guard.evaluate(theContext);
 
       auto time = k.find(DIM_TIME);
 

@@ -69,7 +69,7 @@ TypeConstWS::operator()(Context& k)
 TaggedConstant
 DimensionWS::operator()(Context& k)
 {
-  return TaggedConstant (m_value, k);
+  return TaggedConstant (m_value, Tuple());
 }
 
 TaggedConstant
@@ -221,7 +221,7 @@ UStringConstWS::UStringConstWS(const u32string& s)
 TaggedConstant
 UStringConstWS::operator()(Context& k)
 {
-  return TaggedConstant(m_value, k);
+  return TaggedConstant(m_value, Tuple());
 }
 
 TaggedConstant
@@ -250,7 +250,7 @@ TupleWS::operator()(Context& k)
       kp[m_system.getDimensionIndex(left.first)] = right.first;
     }
   }
-  return TaggedConstant(Types::Tuple::create(Tuple(kp)), k);
+  return TaggedConstant(Types::Tuple::create(Tuple(kp)), Tuple());
 }
 
 TaggedConstant
