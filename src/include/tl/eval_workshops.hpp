@@ -414,6 +414,20 @@ namespace TransLucid
       private:
       System& m_system;
       std::list<std::pair<WS*, WS*>> m_elements;
+
+      public:
+      auto
+      getElements() const ->
+      const decltype(m_elements)&
+      {
+        return m_elements;
+      }
+
+      System&
+      getSystem()
+      {
+        return m_system;
+      }
     };
 
     class AtWS : public WS

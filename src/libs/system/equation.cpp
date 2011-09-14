@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/equation.hpp>
+#include <tl/eval_workshops.hpp>
 #include <tl/output.hpp>
 #include <tl/range.hpp>
 #include <tl/types/range.hpp>
@@ -80,6 +81,8 @@ GuardWS::GuardWS(const GuardWS& other)
 : m_guard(other.m_guard)
 , m_boolean(other.m_boolean)
 , m_dimensions(other.m_dimensions)
+, m_constDims(other.m_constDims)
+, m_nonConstDims(other.m_nonConstDims)
 , m_timeStart(0)
 , m_timeEnd(0)
 {
@@ -100,6 +103,70 @@ GuardWS::GuardWS(const GuardWS& other)
     delete m_timeStart;
     delete m_timeEnd;
     throw;
+  }
+}
+
+GuardWS::GuardWS(WS* g, WS* b)
+: m_guard(g), m_boolean(b), m_timeStart(0), m_timeEnd(0)
+{
+  if (b != 0)
+  {
+    std::cerr << "I don't know how to handle boolean guards" << std::endl;
+    throw "I don't know how to handle boolean guards";
+  }
+
+  if (g == 0)
+  {
+    return;
+  }
+
+  Context k;
+
+  //set time to zero for now
+  k.perturb(DIM_TIME, Types::Intmp::create(0));
+
+  //some trickery to evaluate guards at compile time
+  Workshops::TupleWS* t = dynamic_cast<Workshops::TupleWS*>(g);
+
+  if (t != 0)
+  {
+    const auto& pairs = t->getElements();
+    System& s = t->getSystem();
+
+    for (const auto& val : pairs)
+    {
+      Constant lhs = val.first->operator()(k);
+
+      if (lhs.index() == TYPE_INDEX_SPECIAL)
+      {
+        std::cerr << "special encountered in lhs of guard" << std::endl;
+        throw "special encountered in lhs of guard";
+      }
+
+      dimension_index dimIndex = 
+        lhs.index() == TYPE_INDEX_DIMENSION 
+        ? get_constant<dimension_index>(lhs)
+        : s.getDimensionIndex(lhs);
+
+      Constant rhs = val.second->operator()(k);
+
+      if (rhs.index() == TYPE_INDEX_SPECIAL)
+      {
+        //std::cerr << "putting " << dimIndex << " in non const dims" 
+        //  << std::endl;
+        m_nonConstDims.insert(std::make_pair(dimIndex, val.second));
+      }
+      else
+      {
+        //std::cerr << "putting " << dimIndex << " in const dims" << std::endl;
+        m_constDims.insert(std::make_pair(dimIndex, rhs));
+      }
+    }
+  }
+  else
+  {
+    std::cerr << "guard is not a tuple" << std::endl;
+    throw "guard is not a tuple";
   }
 }
 
@@ -149,9 +216,19 @@ GuardWS::evaluate(Context& k) const
 
   if (m_guard)
   {
-    Constant v = (*m_guard)(k);
+    //start with the const dimensions and evaluate the non-const ones
+    //Constant v = (*m_guard)(k);
+    t.insert(m_constDims.begin(), m_constDims.end());
+
+    //evaluate the ones left
+    for (const auto& nonConst : m_nonConstDims)
+    {
+      Constant ord = nonConst.second->operator()(k);
+      t.insert(std::make_pair(nonConst.first, ord));
+    }
 
     //still need to remove this magic
+    #if 0
     if (v.index() == TYPE_INDEX_TUPLE)
     {
       for(const Tuple::value_type& value : Types::Tuple::get(v))
@@ -169,6 +246,7 @@ GuardWS::evaluate(Context& k) const
       throw ParseError(__FILE__ ":" STRING_(__LINE__)
                        U": guard is not a tuple");
     }
+    #endif
   }
 
   //add the time
@@ -233,7 +311,10 @@ VariableWS::operator()(Context& k)
       {
         const GuardWS& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
-        if (tupleApplicable(evalContext, k) && booleanTrue(guard, k))
+        if (tupleApplicable(evalContext, k) 
+          //we don't know how to do booleans for now
+          //&& booleanTrue(guard, k)
+        )
         {
           applicable.push_back
             (ApplicableTuple(evalContext, eqn_i));

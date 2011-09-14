@@ -108,20 +108,20 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  TransLucid::TLText::TLText tltext;
-  
-  if (vm.count("verbose"))
-  {
-    tltext.verbose(true);
-  }
-
-  if (vm.count("uuid"))
-  {
-    tltext.uuids(true);
-  }
-
   try
   {
+    TransLucid::TLText::TLText tltext;
+    
+    if (vm.count("verbose"))
+    {
+      tltext.verbose(true);
+    }
+
+    if (vm.count("uuid"))
+    {
+      tltext.uuids(true);
+    }
+
     std::unique_ptr<std::ifstream> input;
     if (vm.count("input"))
     {

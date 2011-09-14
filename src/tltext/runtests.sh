@@ -14,7 +14,7 @@ echo Testing 'in' $TESTPATH
 
 for t in `find $TESTPATH -name '*.in' | sort`; do
   EXPECTED_OUT=`echo $t | sed 's/\(.*\).in/\1.out/'`
-  echo tlcore --input $t
+  echo tltext --input $t
   $TLTEXT --input $t | diff $EXPECTED_OUT -
   RESULT=$?
   if [ $RESULT -eq 0 ]; then

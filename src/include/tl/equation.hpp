@@ -56,10 +56,7 @@ namespace TransLucid
      *
      * Specifies the AST to use for the guard.
      **/
-    GuardWS(WS* g, WS* b)
-    : m_guard(g), m_boolean(b), m_timeStart(0), m_timeEnd(0)
-    {
-    }
+    GuardWS(WS* g, WS* b);
 
     /**
      * @brief Creates a guard with no AST.
@@ -151,6 +148,9 @@ namespace TransLucid
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
     tuple_t m_dimensions;
+
+    std::map<dimension_index, Constant> m_constDims;
+    std::map<dimension_index, WS*> m_nonConstDims;
 
     mpz_class *m_timeStart;
     mpz_class *m_timeEnd;

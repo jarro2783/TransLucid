@@ -435,6 +435,7 @@ System::go()
     auto equations = ident.second->equations();
     for (auto& assign : equations)
     {
+      //std::cerr << "doing a demand" << std::endl;
       const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
       const GuardWS& guard = assign.second.validContext();
 
@@ -463,6 +464,7 @@ System::go()
           {{DIM_TIME, Types::Intmp::create(m_time)}});
 
         Constant v = assign.second(theContext);
+        //std::cerr << "putting result" << std::endl;
         hd->second->put(k, v);
       }
 
