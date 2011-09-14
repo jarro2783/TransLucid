@@ -44,7 +44,7 @@ namespace TransLucid
 
 //these should go in bestfit.cpp
 bool
-tupleApplicable(const Tuple& def, const Tuple& c)
+tupleApplicable(const Tuple& def, const Context& k)
 {
   #if 0
   std::cerr << "tupleApplicable: def = ";
@@ -55,17 +55,10 @@ tupleApplicable(const Tuple& def, const Tuple& c)
   //equal or within the range
   for (Tuple::const_iterator iter = def.begin(); iter != def.end(); ++iter)
   {
-    Tuple::const_iterator citer = c.find(iter->first);
-    if (citer == c.end())
+    const Constant& val = k.lookup(iter->first);
+    if (!valueRefines(val, iter->second))
     {
       return false;
-    }
-    else
-    {
-      if (!valueRefines(citer->second, iter->second))
-      {
-        return false;
-      }
     }
   }
 
@@ -221,10 +214,10 @@ booleanTrue(const GuardWS& g, Context& k)
 
   if (b)
   {
-    TaggedConstant v = (*b)(k);// = i.evaluate(g.boolean(), c);
+    Constant v = (*b)(k);// = i.evaluate(g.boolean(), c);
 
-    return v.first.index() == TYPE_INDEX_BOOL
-    && get_constant<bool>(v.first);
+    return v.index() == TYPE_INDEX_BOOL
+    && get_constant<bool>(v);
   }
   else
   {
@@ -349,7 +342,7 @@ u32_to_ascii(const u32string& s)
   return r;
 }
 
-TaggedConstant
+Constant
 lookup_context(System& system, const Constant& v, const Context& k)
 {
   size_t index;
@@ -362,7 +355,7 @@ lookup_context(System& system, const Constant& v, const Context& k)
     index = system.getDimensionIndex(v);
   }
 
-  return TaggedConstant(k.lookup(index), k);
+  return Constant(k.lookup(index));
 
 #if 0
   Tuple::const_iterator iter = k.find(index);

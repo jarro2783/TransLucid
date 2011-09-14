@@ -148,7 +148,7 @@ namespace TransLucid
       ContextPerturber p(*k, {{symbolDim, Types::String::create(symbol)}});
 
       WS* atlWS = idents.lookup(U"ATL_SYMBOL");
-      Constant atl = (*atlWS)(*k).first;
+      Constant atl = (*atlWS)(*k);
 
       return Tree::UnaryOperator
         {get_constant_pointer<u32string>(atl), symbol, type};
@@ -180,13 +180,13 @@ namespace TransLucid
 
       ContextPerturber p(*k, {{symbolDim, Types::String::create(symbol)}});
       WS* atlWS = idents.lookup(U"ATL_SYMBOL");
-      Constant atl = (*atlWS)(*k).first;
+      Constant atl = (*atlWS)(*k);
 
       WS* assocWS = idents.lookup(U"ASSOC");
-      Constant assoc = (*assocWS)(*k).first;
+      Constant assoc = (*assocWS)(*k);
 
       WS* precWS = idents.lookup(U"PREC");
-      Constant prec = (*precWS)(*k).first;
+      Constant prec = (*precWS)(*k);
 
       const u32string& assocName = get_constant_pointer<u32string>(assoc);
 

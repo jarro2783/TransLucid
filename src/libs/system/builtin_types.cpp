@@ -809,23 +809,23 @@ namespace TransLucid
 
 //the default for function application is that there was a type mismatch
 //concrete base classes will implement the correct functionality
-TaggedConstant
+Constant
 FunctionType::applyLambda(Context& k, const Constant& value) const
 {
-  return TaggedConstant(Types::Special::create(SP_CONST), k);
+  return Types::Special::create(SP_CONST);
 }
 
-TaggedConstant
+Constant
 FunctionType::applyPhi(Context& k, WS* expr) const
 {
-  return TaggedConstant(Types::Special::create(SP_CONST), k);
+  return Types::Special::create(SP_CONST);
 }
 
 FunctionType::~FunctionType()
 {
 }
 
-TaggedConstant
+Constant
 LambdaFunctionType::applyLambda(Context& k, const Constant& value) const
 {
   //set m_dim = value in the context and evaluate the expr

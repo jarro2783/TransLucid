@@ -112,7 +112,7 @@ construct_identifier
   WS* ws = ids.lookup(U"DIM");
 
   ContextPerturber p(*context, {{nameDim, Types::String::create(id)}});
-  Constant v = (*ws)(*context).first;
+  Constant v = (*ws)(*context);
 
   if (get_constant<bool>(v) == true)
   {

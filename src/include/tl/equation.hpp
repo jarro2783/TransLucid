@@ -201,7 +201,7 @@ namespace TransLucid
     void
     del(size_t time);
 
-    TaggedConstant
+    Constant
     operator()(Context& k)
     {
       return (*m_h)(k);
@@ -225,7 +225,7 @@ namespace TransLucid
     
     ~VariableWS();
 
-    virtual TaggedConstant 
+    virtual Constant
     operator()(Context& k);
 
     #if 0

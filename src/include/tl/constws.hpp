@@ -45,7 +45,7 @@ namespace TransLucid
       : m_value(Types::Type::create(value))
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -65,7 +65,7 @@ namespace TransLucid
       : m_value(Types::Boolean::create(value))
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -79,7 +79,7 @@ namespace TransLucid
       : m_value(v)
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -93,7 +93,7 @@ namespace TransLucid
       : m_value(Types::Intmp::create(value))
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -107,7 +107,7 @@ namespace TransLucid
       : m_value(Types::UChar::create(c))
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -119,7 +119,7 @@ namespace TransLucid
       public:
       UStringConstWS(const u32string& s);
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:

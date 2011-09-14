@@ -62,7 +62,7 @@ namespace TransLucid
       {
       }
 
-      TaggedConstant 
+      Constant 
       operator()(Context& k);
 
       private:
@@ -75,7 +75,7 @@ namespace TransLucid
       public:
       DimensionWS(System& system, const std::u32string& name);
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -89,7 +89,7 @@ namespace TransLucid
       : m_identifiers(idents), m_name(name), m_e(nullptr)
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -110,7 +110,7 @@ namespace TransLucid
       {
       }
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -127,7 +127,7 @@ namespace TransLucid
       m_e(e)
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -143,7 +143,7 @@ namespace TransLucid
       : m_system(system), m_type(type), m_e(e)
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -161,7 +161,7 @@ namespace TransLucid
       : m_to(to), m_e(e)
       {}
 
-      TaggedConstant
+      Constant
       operator()(const Tuple& k);
 
       private:
@@ -193,7 +193,7 @@ namespace TransLucid
       )
       {
         return evaluate_bang_func<N-1>()
-          (f, uneval, k, (*uneval[N-1])(k).first, args...);
+          (f, uneval, k, (*uneval[N-1])(k), args...);
       }
     };
 
@@ -265,7 +265,7 @@ namespace TransLucid
         generate_bang_funcs<N> tmp(m_funcs);
       }
 
-      TaggedConstant
+      Constant
       operator()
       (
         const u32string& name, 
@@ -275,14 +275,11 @@ namespace TransLucid
       {
         if (args.size() < N)
         {
-          return TaggedConstant(
-            (*m_funcs[args.size()])(m_system, name, args, k),
-            k)
-          ;
+          return (*m_funcs[args.size()])(m_system, name, args, k);
         }
         else
         {
-          return TaggedConstant(Types::Special::create(SP_UNDEF), k);
+          return Types::Special::create(SP_UNDEF);
         }
       }
 
@@ -319,7 +316,7 @@ namespace TransLucid
         }
       }
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -343,7 +340,7 @@ namespace TransLucid
         m_else(else_)
       {}
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -367,7 +364,7 @@ namespace TransLucid
         delete m_e;
       }
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -411,7 +408,7 @@ namespace TransLucid
         }
       }
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -433,7 +430,7 @@ namespace TransLucid
         delete e2;
       }
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -458,7 +455,7 @@ namespace TransLucid
       {
       }
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:
@@ -477,7 +474,7 @@ namespace TransLucid
       {
       }
 
-      TaggedConstant
+      Constant
       operator()(Context& k);
 
       private:

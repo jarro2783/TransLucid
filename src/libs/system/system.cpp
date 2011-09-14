@@ -97,7 +97,7 @@ namespace
 
     std::auto_ptr<WS> ws(compiler.compile_for_equation(wsTree));
 
-    return (*ws)(system.getDefaultContext()).first;
+    return (*ws)(system.getDefaultContext());
   }
 
   //for every context in ctxts that is valid in k,
@@ -134,10 +134,10 @@ namespace detail
       m_hd = iter->second;
     }
 
-    TaggedConstant
+    Constant
     operator()(Context& k)
     {
-      return TaggedConstant(m_hd->get(k), k);
+      return m_hd->get(k);
     }
 
     private:
@@ -451,7 +451,8 @@ System::go()
       {
       #endif
 
-      if (tupleApplicable(constraint, k) &&
+      //We have to check if the assignment is valid for the constraint
+      if (//tupleApplicable(constraint, k) &&
            (time == k.end() ||
             get_constant_pointer<mpz_class>(time->second) == m_time
            )
@@ -461,8 +462,8 @@ System::go()
         ContextPerturber p2(theContext, 
           {{DIM_TIME, Types::Intmp::create(m_time)}});
 
-        TaggedConstant v = assign.second(theContext);
-        hd->second->put(k, v.first);
+        Constant v = assign.second(theContext);
+        hd->second->put(k, v);
       }
 
       #if 0

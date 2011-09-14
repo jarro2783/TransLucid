@@ -29,10 +29,10 @@ namespace TransLucid
     public:
     virtual ~FunctionType() = 0;
 
-    virtual TaggedConstant
+    virtual Constant
     applyLambda(Context& k, const Constant& value) const;
 
-    virtual TaggedConstant
+    virtual Constant
     applyPhi(Context& k, WS* expr) const;
 
     virtual FunctionType*
@@ -50,7 +50,7 @@ namespace TransLucid
     {
     }
 
-    TaggedConstant
+    Constant
     applyLambda(Context& k, const Constant& value) const;
 
     LambdaFunctionType*

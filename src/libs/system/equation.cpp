@@ -149,12 +149,12 @@ GuardWS::evaluate(Context& k) const
 
   if (m_guard)
   {
-    TaggedConstant v = (*m_guard)(k);
+    Constant v = (*m_guard)(k);
 
     //still need to remove this magic
-    if (v.first.index() == TYPE_INDEX_TUPLE)
+    if (v.index() == TYPE_INDEX_TUPLE)
     {
-      for(const Tuple::value_type& value : Types::Tuple::get(v.first))
+      for(const Tuple::value_type& value : Types::Tuple::get(v))
       {
         if (t.find(value.first) != t.end())
         {
@@ -207,7 +207,7 @@ bool VariableWS::equationValid(const EquationWS& e, const Tuple& k)
 }
 #endif
 
-TaggedConstant
+Constant
 VariableWS::operator()(Context& k)
 {
 
@@ -259,7 +259,7 @@ VariableWS::operator()(Context& k)
   if (applicable.size() == 0)
   {
     std::cerr << "undef for " << m_name << std::endl;
-    return TaggedConstant(Types::Special::create(SP_UNDEF), k);
+    return Types::Special::create(SP_UNDEF);
   }
   else if (applicable.size() == 1)
   {
@@ -316,7 +316,7 @@ VariableWS::operator()(Context& k)
   }
   else
   {
-    return TaggedConstant(Types::Special::create(SP_MULTIDEF), k);
+    return Types::Special::create(SP_MULTIDEF);
   }
 }
 

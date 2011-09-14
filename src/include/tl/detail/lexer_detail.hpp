@@ -528,7 +528,7 @@ namespace TransLucid
               {{m_symbol, Types::String::create(text)}}
             );
 
-            Constant v = (*ws)(*m_context).first;
+            Constant v = (*ws)(*m_context);
 
             //the result is either a string or a special, just ignore if not
             //a string

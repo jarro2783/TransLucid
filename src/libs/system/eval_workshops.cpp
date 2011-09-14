@@ -53,26 +53,26 @@ DimensionWS::DimensionWS(System& system, const std::u32string& name)
 {
 }
 
-TaggedConstant
+Constant
 BoolConstWS::operator()(Context& k)
 {
   //return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
-  return TaggedConstant(m_value, Tuple());
+  return m_value;
 }
 
-TaggedConstant
+Constant
 TypeConstWS::operator()(Context& k)
 {
-  return TaggedConstant(m_value, k);
+  return m_value;
 }
 
-TaggedConstant
+Constant
 DimensionWS::operator()(Context& k)
 {
-  return TaggedConstant (m_value, Tuple());
+  return m_value;
 }
 
-TaggedConstant
+Constant
 IdentWS::operator()(Context& k)
 {
   if (m_e == 0)
@@ -86,21 +86,21 @@ IdentWS::operator()(Context& k)
   }
   else
   {
-    return TaggedConstant(Types::Special::create(SP_UNDEF), k);
+    return Types::Special::create(SP_UNDEF);
   }
 }
 
-TaggedConstant
+Constant
 BangOpWS::operator()(Context& k)
 {
   //lookup function in the system and call it
 
   //evaluate name expr
-  Constant name = (*m_name)(k).first;
+  Constant name = (*m_name)(k);
 
   if (name.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedConstant(Types::Special::create(SP_UNDEF), Tuple());
+    return Types::Special::create(SP_UNDEF);
   }
   else
   {
@@ -110,15 +110,14 @@ BangOpWS::operator()(Context& k)
   }
 }
 
-TaggedConstant
+Constant
 IfWS::operator()(Context& k)
 {
-  TaggedConstant cond = (*m_condition)(k);
-  Constant& condv = cond.first;
+  Constant condv = (*m_condition)(k);
 
   if (condv.index() == TYPE_INDEX_SPECIAL)
   {
-    return cond;
+    return condv;
   }
   else if (condv.index() == TYPE_INDEX_BOOL)
   {
@@ -136,9 +135,9 @@ IfWS::operator()(Context& k)
       while (iter != m_elsifs.end())
       {
         //std::auto_ptr<ValueV> cond(makeValue((*iter)->visit(this, d)));
-        TaggedConstant cond = (*iter)->operator()(k);
+        Constant cond = (*iter)->operator()(k);
 
-        type_index index = cond.first.index();
+        type_index index = cond.index();
 
         if (index == TYPE_INDEX_SPECIAL)
         {
@@ -146,7 +145,7 @@ IfWS::operator()(Context& k)
         }
         else if (index == TYPE_INDEX_BOOL)
         {
-          bool bcond = get_constant<bool>(cond.first);
+          bool bcond = get_constant<bool>(cond);
           ++iter;
           if (bcond)
           {
@@ -155,7 +154,7 @@ IfWS::operator()(Context& k)
         }
         else
         {
-          return TaggedConstant(Types::Special::create(SP_TYPEERROR), k);
+          return Types::Special::create(SP_TYPEERROR);
         }
 
         ++iter;
@@ -166,41 +165,41 @@ IfWS::operator()(Context& k)
   }
   else
   {
-    return TaggedConstant(Types::Special::create(SP_TYPEERROR),k);
+    return Types::Special::create(SP_TYPEERROR);
   }
 }
 
-TaggedConstant
+Constant
 HashWS::operator()(Context& k)
 {
-  TaggedConstant r = (*m_e)(k);
-  return lookup_context(m_system, r.first, k);
+  Constant r = (*m_e)(k);
+  return lookup_context(m_system, r, k);
 }
 
-TaggedConstant
+Constant
 IntmpConstWS::operator()(Context& k)
 {
-  return TaggedConstant(m_value, Tuple());
+  return m_value;
 }
 
-TaggedConstant
+Constant
 IsSpecialWS::operator()(Context& k)
 {
   //this is going away, but to stop warnings
-  return TaggedConstant();
+  return Constant();
 }
 
-TaggedConstant
+Constant
 IsTypeWS::operator()(Context& k)
 {
   //this is going away, but to stop warnings
-  return TaggedConstant();
+  return Constant();
 }
 
-TaggedConstant
+Constant
 SpecialConstWS::operator()(Context& k)
 {
-  return TaggedConstant(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
+  return Constant(Special(m_value), TYPE_INDEX_SPECIAL);
 }
 
 UStringConstWS::UStringConstWS(const u32string& s)
@@ -218,60 +217,59 @@ UStringConstWS::UStringConstWS(const u32string& s)
   }
 }
 
-TaggedConstant
+Constant
 UStringConstWS::operator()(Context& k)
 {
-  return TaggedConstant(m_value, Tuple());
+  return m_value;
 }
 
-TaggedConstant
+Constant
 UCharConstWS::operator()(Context& k)
 {
-  //return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
-  return TaggedConstant(m_value, k);
+  return m_value;
 }
 
-TaggedConstant
+Constant
 TupleWS::operator()(Context& k)
 {
   tuple_t kp;
   for(auto& pair : m_elements)
   {
     //const Pair& p = v.first.value<Pair>();
-    TaggedConstant left = (*pair.first)(k);
-    TaggedConstant right = (*pair.second)(k);
+    Constant left = (*pair.first)(k);
+    Constant right = (*pair.second)(k);
 
-    if (left.first.index() == TYPE_INDEX_DIMENSION)
+    if (left.index() == TYPE_INDEX_DIMENSION)
     {
-      kp[get_constant<dimension_index>(left.first)] = right.first;
+      kp[get_constant<dimension_index>(left)] = right;
     }
     else
     {
-      kp[m_system.getDimensionIndex(left.first)] = right.first;
+      kp[m_system.getDimensionIndex(left)] = right;
     }
   }
-  return TaggedConstant(Types::Tuple::create(Tuple(kp)), Tuple());
+  return Types::Tuple::create(Tuple(kp));
 }
 
-TaggedConstant
+Constant
 AtWS::operator()(Context& k)
 {
   //tuple_t kNew = k.tuple();
-  TaggedConstant kp = (*e1)(k);
-  if (kp.first.index() != TYPE_INDEX_TUPLE)
+  Constant val1 = (*e1)(k);
+  if (val1.index() != TYPE_INDEX_TUPLE)
   {
-    return TaggedConstant(Types::Special::create(SP_TYPEERROR), k);
+    return Types::Special::create(SP_TYPEERROR);
   }
   else
   {
     //validate time
-    auto& t = Types::Tuple::get(kp.first);
+    auto& t = Types::Tuple::get(val1);
     auto& delta = t.tuple();
     const auto& dimTime = delta.find(DIM_TIME);
     if (dimTime != delta.end() && Types::Intmp::get(dimTime->second) > 
       Types::Intmp::get(k.lookup(DIM_TIME)))
     {
-      return TaggedConstant(Types::Special::create(SP_ACCESS), k);
+      return Types::Special::create(SP_ACCESS);
     }
 
     ContextPerturber p(k, t);
@@ -279,29 +277,26 @@ AtWS::operator()(Context& k)
   }
 }
 
-TaggedConstant
+Constant
 LambdaAbstractionWS::operator()(Context& k)
 {
-  return TaggedConstant(
-    Types::Function::create(LambdaFunctionType(m_name, m_dim, m_rhs)),
-    k
-  );
+  return Types::Function::create(LambdaFunctionType(m_name, m_dim, m_rhs));
 }
 
-TaggedConstant
+Constant
 LambdaApplicationWS::operator()(Context& k)
 {
   //evaluate the lhs, evaluate the rhs
   //and pass the value to the function to evaluate
 
-  Constant lhs = (*m_lhs)(k).first;
+  Constant lhs = (*m_lhs)(k);
   //first make sure that it is a function
   if (lhs.index() != TYPE_INDEX_FUNCTION)
   {
-    return TaggedConstant(Types::Special::create(SP_TYPEERROR), k);
+    return Types::Special::create(SP_TYPEERROR);
   }
 
-  Constant rhs = (*m_rhs)(k).first;
+  Constant rhs = (*m_rhs)(k);
   const FunctionType& f = Types::Function::get(lhs);
 
   return f.applyLambda(k, rhs);

@@ -122,7 +122,7 @@ namespace TransLucid
   }
 
   bool
-  tupleApplicable(const Tuple& def, const Tuple& c);
+  tupleApplicable(const Tuple& def, const Context& c);
 
   bool
   tupleRefines(const Tuple& a, const Tuple& b);
@@ -135,7 +135,7 @@ namespace TransLucid
 
   //looks up a value in the current context and returns the value of the
   //all dimension if it exists, otherwise special<dim> if not found
-  TaggedConstant
+  Constant
   lookup_context(System& system, const Constant& v, const Context& k);
 
   //returns the hash of a dimension when we only have the index

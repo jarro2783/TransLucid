@@ -31,7 +31,7 @@ namespace TransLucid
     public:
     virtual ~WS() {}
 
-    virtual TaggedConstant
+    virtual Constant
     operator()(Context& k) = 0;
   };
 } //namespace TransLucid
