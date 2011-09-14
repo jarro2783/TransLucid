@@ -57,7 +57,7 @@ TaggedConstant
 BoolConstWS::operator()(Context& k)
 {
   //return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
-  return TaggedConstant(m_value, k);
+  return TaggedConstant(m_value, Tuple());
 }
 
 TaggedConstant
@@ -100,7 +100,7 @@ BangOpWS::operator()(Context& k)
 
   if (name.index() != TYPE_INDEX_USTRING)
   {
-    return TaggedConstant(Types::Special::create(SP_UNDEF), k);
+    return TaggedConstant(Types::Special::create(SP_UNDEF), Tuple());
   }
   else
   {
@@ -180,7 +180,7 @@ HashWS::operator()(Context& k)
 TaggedConstant
 IntmpConstWS::operator()(Context& k)
 {
-  return TaggedConstant(m_value, k);
+  return TaggedConstant(m_value, Tuple());
 }
 
 TaggedConstant
