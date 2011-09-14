@@ -54,26 +54,26 @@ DimensionWS::DimensionWS(System& system, const std::u32string& name)
 }
 
 TaggedConstant
-BoolConstWS::operator()(const Context& k)
+BoolConstWS::operator()(Context& k)
 {
   //return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-TypeConstWS::operator()(const Context& k)
+TypeConstWS::operator()(Context& k)
 {
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-DimensionWS::operator()(const Context& k)
+DimensionWS::operator()(Context& k)
 {
   return TaggedConstant (m_value, k);
 }
 
 TaggedConstant
-IdentWS::operator()(const Context& k)
+IdentWS::operator()(Context& k)
 {
   if (m_e == 0)
   {
@@ -91,7 +91,7 @@ IdentWS::operator()(const Context& k)
 }
 
 TaggedConstant
-BangOpWS::operator()(const Context& k)
+BangOpWS::operator()(Context& k)
 {
   //lookup function in the system and call it
 
@@ -111,7 +111,7 @@ BangOpWS::operator()(const Context& k)
 }
 
 TaggedConstant
-IfWS::operator()(const Context& k)
+IfWS::operator()(Context& k)
 {
   TaggedConstant cond = (*m_condition)(k);
   Constant& condv = cond.first;
@@ -171,34 +171,34 @@ IfWS::operator()(const Context& k)
 }
 
 TaggedConstant
-HashWS::operator()(const Context& k)
+HashWS::operator()(Context& k)
 {
   TaggedConstant r = (*m_e)(k);
   return lookup_context(m_system, r.first, k);
 }
 
 TaggedConstant
-IntmpConstWS::operator()(const Context& k)
+IntmpConstWS::operator()(Context& k)
 {
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-IsSpecialWS::operator()(const Context& k)
+IsSpecialWS::operator()(Context& k)
 {
   //this is going away, but to stop warnings
   return TaggedConstant();
 }
 
 TaggedConstant
-IsTypeWS::operator()(const Context& k)
+IsTypeWS::operator()(Context& k)
 {
   //this is going away, but to stop warnings
   return TaggedConstant();
 }
 
 TaggedConstant
-SpecialConstWS::operator()(const Context& k)
+SpecialConstWS::operator()(Context& k)
 {
   return TaggedConstant(Constant(Special(m_value), TYPE_INDEX_SPECIAL), k);
 }
@@ -219,20 +219,20 @@ UStringConstWS::UStringConstWS(const u32string& s)
 }
 
 TaggedConstant
-UStringConstWS::operator()(const Context& k)
+UStringConstWS::operator()(Context& k)
 {
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-UCharConstWS::operator()(const Context& k)
+UCharConstWS::operator()(Context& k)
 {
   //return TaggedConstant(Constant(Char(m_value), TYPE_INDEX_UCHAR), k);
   return TaggedConstant(m_value, k);
 }
 
 TaggedConstant
-TupleWS::operator()(const Context& k)
+TupleWS::operator()(Context& k)
 {
   tuple_t kp;
   for(auto& pair : m_elements)
@@ -254,9 +254,9 @@ TupleWS::operator()(const Context& k)
 }
 
 TaggedConstant
-AtWS::operator()(const Context& k)
+AtWS::operator()(Context& k)
 {
-  tuple_t kNew = k.tuple();
+  //tuple_t kNew = k.tuple();
   TaggedConstant kp = (*e1)(k);
   if (kp.first.index() != TYPE_INDEX_TUPLE)
   {
@@ -265,24 +265,22 @@ AtWS::operator()(const Context& k)
   else
   {
     //validate time
-    auto& delta = Types::Tuple::get(kp.first).tuple();
+    auto& t = Types::Tuple::get(kp.first);
+    auto& delta = t.tuple();
     const auto& dimTime = delta.find(DIM_TIME);
     if (dimTime != delta.end() && Types::Intmp::get(dimTime->second) > 
-      Types::Intmp::get(kNew[DIM_TIME]))
+      Types::Intmp::get(k.lookup(DIM_TIME)))
     {
       return TaggedConstant(Types::Special::create(SP_ACCESS), k);
     }
 
-    for(tuple_t::value_type v : delta)
-    {
-      kNew[v.first] = v.second;
-    }
-    return (*e2)(Tuple(kNew));
+    ContextPerturber p(k, t);
+    return (*e2)(k);
   }
 }
 
 TaggedConstant
-LambdaAbstractionWS::operator()(const Context& k)
+LambdaAbstractionWS::operator()(Context& k)
 {
   return TaggedConstant(
     Types::Function::create(LambdaFunctionType(m_name, m_dim, m_rhs)),
@@ -291,7 +289,7 @@ LambdaAbstractionWS::operator()(const Context& k)
 }
 
 TaggedConstant
-LambdaApplicationWS::operator()(const Context& k)
+LambdaApplicationWS::operator()(Context& k)
 {
   //evaluate the lhs, evaluate the rhs
   //and pass the value to the function to evaluate

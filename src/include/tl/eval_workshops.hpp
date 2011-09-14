@@ -63,7 +63,7 @@ namespace TransLucid
       }
 
       TaggedConstant 
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       System* m_system;
@@ -76,7 +76,7 @@ namespace TransLucid
       DimensionWS(System& system, const std::u32string& name);
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       Constant m_value;
@@ -90,7 +90,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       System::IdentifierLookup m_identifiers;
@@ -111,7 +111,7 @@ namespace TransLucid
       }
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       WS* m_system;
@@ -128,7 +128,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       WS* m_system;
@@ -144,7 +144,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       WS* m_system;
@@ -175,7 +175,7 @@ namespace TransLucid
       System& system,
       const u32string&,
       const std::vector<WS*>&, 
-      const Tuple&
+      Context&
     );
 
     //N arguments, but they go from 0 to N-1, so evaluate the (N-1)th
@@ -188,7 +188,7 @@ namespace TransLucid
       (
         F f, 
         const std::vector<WS*>& uneval, 
-        const Tuple& k,
+        Context& k,
         Args... args
       )
       {
@@ -206,7 +206,7 @@ namespace TransLucid
       (
         F f,
         const std::vector<WS*>& uneval,
-        const Tuple& k,
+        Context& k,
         Args... args
       )
       {
@@ -221,7 +221,7 @@ namespace TransLucid
       System& system,
       const u32string& name,
       const std::vector<WS*>& args,
-      const Tuple& k
+      Context& k
     )
     {
       auto f = system.lookupFunction<N>(name);
@@ -270,7 +270,7 @@ namespace TransLucid
       (
         const u32string& name, 
         const std::vector<WS*>& args,
-        const Tuple& k
+        Context& k
       )
       {
         if (args.size() < N)
@@ -320,7 +320,7 @@ namespace TransLucid
       }
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       System& m_system;
@@ -344,7 +344,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       //WS* m_system;
@@ -368,7 +368,7 @@ namespace TransLucid
       }
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       System& m_system;
@@ -412,7 +412,7 @@ namespace TransLucid
       }
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       System& m_system;
@@ -434,7 +434,7 @@ namespace TransLucid
       }
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       WS* e2;
@@ -459,7 +459,7 @@ namespace TransLucid
       }
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       WS* m_system;
@@ -478,7 +478,7 @@ namespace TransLucid
       }
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       WS* m_lhs;

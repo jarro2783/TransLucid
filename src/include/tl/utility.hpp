@@ -131,12 +131,12 @@ namespace TransLucid
   valueRefines(const Constant& a, const Constant& b);
 
   bool
-  booleanTrue(const GuardWS& g, const Tuple& c);
+  booleanTrue(const GuardWS& g, Context& c);
 
   //looks up a value in the current context and returns the value of the
   //all dimension if it exists, otherwise special<dim> if not found
   TaggedConstant
-  lookup_context(System& system, const Constant& v, const Tuple& k);
+  lookup_context(System& system, const Constant& v, const Context& k);
 
   //returns the hash of a dimension when we only have the index
   class HashIndexWS : public WS

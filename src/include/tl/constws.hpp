@@ -46,7 +46,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       Constant m_value;
@@ -66,7 +66,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       Constant m_value;
@@ -80,7 +80,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       Special m_value;
@@ -94,7 +94,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       Constant m_value;
@@ -108,7 +108,7 @@ namespace TransLucid
       {}
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       Constant m_value;
@@ -120,7 +120,7 @@ namespace TransLucid
       UStringConstWS(const u32string& s);
 
       TaggedConstant
-      operator()(const Tuple& k);
+      operator()(Context& k);
 
       private:
       Constant m_value;

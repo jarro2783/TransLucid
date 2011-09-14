@@ -30,14 +30,20 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+namespace
+{
+  static const int DEFAULT_MIN = -1;
+  static const int DEFAULT_MAX = 0;
+}
+
 Context::Context()
-: m_min(-1), m_max(0),
+: m_min(DEFAULT_MIN), m_max(DEFAULT_MAX),
  m_all(Types::Special::create(SP_DIMENSION))
 {
 }
 
 const Constant&
-Context::lookup(dimension_index dim)
+Context::lookup(dimension_index dim) const
 {
   if (dim <= m_min || dim >= m_max)
   {
@@ -98,6 +104,30 @@ Context::perturb(dimension_index d, const Constant& c)
   }
 
   m_context[makeIndex(d)].push(c);
+}
+
+void
+Context::reset()
+{
+  m_context.clear();
+  m_min = DEFAULT_MIN;
+  m_max = DEFAULT_MAX;
+}
+
+Context::operator Tuple() const
+{
+  tuple_t t;
+
+  for (dimension_index d = m_min + 1; d != m_max; ++d)
+  {
+    const auto& s = m_context[makeIndex(d)];
+    if (!s.empty())
+    {
+      t.insert(std::make_pair(d, s.top()));
+    }
+  }
+
+  return Tuple(t);
 }
 
 }

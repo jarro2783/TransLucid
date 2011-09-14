@@ -105,20 +105,14 @@ construct_identifier
 (
   const u32string& id,
   const System::IdentifierLookup& ids,
-  const Tuple*& context,
+  Context*& context,
   dimension_index nameDim
 )
 {
   WS* ws = ids.lookup(U"DIM");
 
-  Constant v = (*ws)(context->at(tuple_t(
-    {
-      {
-        nameDim,
-        Types::String::create(id)
-      }
-    }
-  ))).first;
+  ContextPerturber p(*context, {{nameDim, Types::String::create(id)}});
+  Constant v = (*ws)(*context).first;
 
   if (get_constant<bool>(v) == true)
   {

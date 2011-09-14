@@ -32,7 +32,7 @@ namespace TransLucid
     virtual ~WS() {}
 
     virtual TaggedConstant
-    operator()(const Context& k) = 0;
+    operator()(Context& k) = 0;
   };
 } //namespace TransLucid
 

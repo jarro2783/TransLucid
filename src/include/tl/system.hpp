@@ -298,7 +298,7 @@ namespace TransLucid
     //up to ten arguments
     FunctionRegistry<MAX_FUNCTION_PARAMETERS> m_functions;
 
-    Tuple m_defaultk;
+    Context m_defaultk;
     size_t m_time;
     Translator *m_translator;
 
@@ -306,7 +306,7 @@ namespace TransLucid
 
     public:
 
-    const Tuple&
+    Context&
     getDefaultContext()
     {
       return m_defaultk;

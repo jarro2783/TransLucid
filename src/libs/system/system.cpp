@@ -135,7 +135,7 @@ namespace detail
     }
 
     TaggedConstant
-    operator()(const Tuple& k)
+    operator()(Context& k)
     {
       return TaggedConstant(m_hd->get(k), k);
     }
@@ -428,6 +428,8 @@ System::go()
       continue;
     }
 
+    Context theContext = m_defaultk;
+
     //this needs to be way better
     //for a start: only look at demands for the current time
     auto equations = ident.second->equations();
@@ -437,7 +439,7 @@ System::go()
       Tuple k;
       const GuardWS& guard = assign.second.validContext();
 
-      k = guard.evaluate(m_defaultk);
+      k = guard.evaluate(theContext);
 
       auto time = k.find(DIM_TIME);
 
@@ -456,10 +458,12 @@ System::go()
            )
          )
       {
-        TaggedConstant v = 
-          assign.second(k.insert(DIM_TIME, Types::Intmp::create(m_time)));
+        ContextPerturber p1(theContext, k);
+        ContextPerturber p2(theContext, 
+          {{DIM_TIME, Types::Intmp::create(m_time)}});
 
-          hd->second->put(k, v.first);
+        TaggedConstant v = assign.second(theContext);
+        hd->second->put(k, v.first);
       }
 
       #if 0
@@ -766,13 +770,15 @@ System::addOutputHyperdaton
 void
 System::setDefaultContext()
 {
-  m_defaultk = Tuple
+  m_defaultk.reset();
+
+  m_defaultk.perturb(Tuple
   (
     tuple_t
       {
         {DIM_TIME, Types::Intmp::create(m_time)}
       }
-  );
+  ));
 }
 
 template <typename T>

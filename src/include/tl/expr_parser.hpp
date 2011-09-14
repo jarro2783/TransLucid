@@ -58,7 +58,7 @@ namespace TransLucid
         context_perturb = t(_r1);
       }
 
-      const Tuple* m_context;
+      Context* m_context;
 
       private:
 

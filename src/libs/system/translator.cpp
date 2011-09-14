@@ -96,7 +96,7 @@ Translator::~Translator()
 }
 
 std::pair<bool, Tree::Expr>
-Translator::parseExpr(Parser::U32Iterator& iter, const Tuple& k)
+Translator::parseExpr(Parser::U32Iterator& iter, Context& k)
 {
   Parser::U32Iterator end;
 
@@ -210,7 +210,7 @@ std::pair<bool, Parser::Line>
 Translator::parseLine
 (
   Parser::U32Iterator& begin,
-  const Tuple& k
+  Context& k
 )
 {
   Parser::Line line;

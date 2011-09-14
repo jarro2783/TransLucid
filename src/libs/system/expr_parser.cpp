@@ -139,24 +139,16 @@ namespace TransLucid
       const u32string& symbol,
       const System::IdentifierLookup& idents,
       dimension_index symbolDim,
-      const Tuple*& k,
+      Context*& k,
       Tree::UnaryType type
     )
     {
       //lookup ATL_SYMBOL
 
-      tuple_t sk
-      {
-        {
-          symbolDim,
-          Types::String::create(symbol)
-        }
-      };
-
-      Tuple t = k->at(sk);
+      ContextPerturber p(*k, {{symbolDim, Types::String::create(symbol)}});
 
       WS* atlWS = idents.lookup(U"ATL_SYMBOL");
-      Constant atl = (*atlWS)(t).first;
+      Constant atl = (*atlWS)(*k).first;
 
       return Tree::UnaryOperator
         {get_constant_pointer<u32string>(atl), symbol, type};
@@ -179,31 +171,22 @@ namespace TransLucid
       const u32string& symbol, 
       const System::IdentifierLookup& idents,
       dimension_index symbolDim,
-      const Tuple*& k
+      Context*& k
     )
     {
       //lookup ATL_SYMBOL, ASSOC, PREC
 
       //std::cerr << "looking up symbol " << symbol << std::endl;
 
-      tuple_t sk
-      {
-        {
-          symbolDim,
-          Types::String::create(symbol)
-        }
-      };
-
-      Tuple t = k->at(sk);
-
+      ContextPerturber p(*k, {{symbolDim, Types::String::create(symbol)}});
       WS* atlWS = idents.lookup(U"ATL_SYMBOL");
-      Constant atl = (*atlWS)(t).first;
+      Constant atl = (*atlWS)(*k).first;
 
       WS* assocWS = idents.lookup(U"ASSOC");
-      Constant assoc = (*assocWS)(t).first;
+      Constant assoc = (*assocWS)(*k).first;
 
       WS* precWS = idents.lookup(U"PREC");
-      Constant prec = (*precWS)(t).first;
+      Constant prec = (*precWS)(*k).first;
 
       const u32string& assocName = get_constant_pointer<u32string>(assoc);
 

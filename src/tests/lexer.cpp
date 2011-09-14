@@ -431,9 +431,9 @@ typedef checker_grammar<TL::Lexer::iterator_t> cgrammar;
 bool check(const TL::u32string& input, Checker& checker)
 {
   TL::System& system = getSystem();
-  const TL::Tuple& t = system.getDefaultContext();
+  TL::Context& k = system.getDefaultContext();
   auto& lexer = getLexer();
-  lexer.m_context = &t;
+  lexer.m_context = &k;
   cgrammar checkg(lexer, checker);
 
   TL::Parser::U32Iterator first(
@@ -461,10 +461,10 @@ bool check_utf8(const std::string& input, Checker& checker)
   TL::Parser::U32Iterator last;
 
   TL::System& system = getSystem();
-  const TL::Tuple& t = system.getDefaultContext();
+  TL::Context& k = system.getDefaultContext();
 
   auto& lexer = getLexer();
-  lexer.m_context = &t;
+  lexer.m_context = &k;
   cgrammar checkg(lexer, checker);
 
   errors.reset();

@@ -483,14 +483,14 @@ namespace TransLucid
       {
         private:
         System::IdentifierLookup& m_idents;
-        const Tuple*& m_context;
+        Context*& m_context;
         dimension_index m_symbol;
 
         public:
         handle_operator
         (
           System::IdentifierLookup& idents, 
-          const Tuple*& context,
+          Context*& context,
           dimension_index symbol
         )
         : m_idents(idents)
@@ -523,15 +523,12 @@ namespace TransLucid
           else
           {
             std::u32string text = u32string(first, last);
-            Constant v = (*ws)(m_context->at(
-                tuple_t{
-                  {
-                    m_symbol,
-                    Types::String::create(text)
-                  }
-                }
-              )
-            ).first;
+
+            ContextPerturber p(*m_context, 
+              {{m_symbol, Types::String::create(text)}}
+            );
+
+            Constant v = (*ws)(*m_context).first;
 
             //the result is either a string or a special, just ignore if not
             //a string

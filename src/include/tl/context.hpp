@@ -58,8 +58,14 @@ namespace TransLucid
     void 
     restore(const Tuple& t);
 
+    /**
+     * Lookup a dimension.
+     * If there is no value set, then use the all dimension.
+     * @param dim The dimension index to lookup.
+     * @return The ordinate of that dimension.
+     */
     const Constant&
-    lookup(dimension_index dim);
+    lookup(dimension_index dim) const;
 
     template <typename List>
     void
@@ -71,10 +77,13 @@ namespace TransLucid
       }
     }
 
+    void
+    reset();
+
     private:
 
     dimension_index
-    makeIndex(dimension_index i)
+    makeIndex(dimension_index i) const
     {
       return i - m_min - 1;
     }
@@ -106,6 +115,16 @@ namespace TransLucid
       {
         m_k.perturb(v.first, v.second);
       }
+    }
+
+    ContextPerturber
+    (
+      Context& k,
+      const Tuple& delta
+    )
+    : m_k(k)
+    {
+      m_k.perturb(delta);
     }
 
     ~ContextPerturber()

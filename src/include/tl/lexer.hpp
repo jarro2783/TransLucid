@@ -134,7 +134,7 @@ namespace TransLucid
 
       //this must be set beforing entering the lexer, unfortunately
       //there is no way to ensure this, so someone will probably forget...
-      const Tuple* m_context;
+      Context* m_context;
 
       private:
       //std::wstring m_constant_type;

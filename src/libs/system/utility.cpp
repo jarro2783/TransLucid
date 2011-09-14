@@ -215,7 +215,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
 }
 
 bool
-booleanTrue(const GuardWS& g, const Tuple& k)
+booleanTrue(const GuardWS& g, Context& k)
 {
   WS* b = g.boolean();
 
@@ -350,7 +350,7 @@ u32_to_ascii(const u32string& s)
 }
 
 TaggedConstant
-lookup_context(System& system, const Constant& v, const Tuple& k)
+lookup_context(System& system, const Constant& v, const Context& k)
 {
   size_t index;
   if (v.index() == TYPE_INDEX_DIMENSION)
@@ -362,6 +362,9 @@ lookup_context(System& system, const Constant& v, const Tuple& k)
     index = system.getDimensionIndex(v);
   }
 
+  return TaggedConstant(k.lookup(index), k);
+
+#if 0
   Tuple::const_iterator iter = k.find(index);
   if (iter != k.end())
   {
@@ -380,6 +383,7 @@ lookup_context(System& system, const Constant& v, const Tuple& k)
       return TaggedConstant(all->second, k);
     }
   }
+#endif
 }
 
 }

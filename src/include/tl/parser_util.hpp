@@ -60,7 +60,7 @@ namespace TransLucid
     (
       const u32string& id,
       const System::IdentifierLookup& ids,
-      const Tuple*& context,
+      Context*& context,
       dimension_index nameDim
     );
   }
