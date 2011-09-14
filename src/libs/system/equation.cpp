@@ -81,6 +81,8 @@ GuardWS::GuardWS(const GuardWS& other)
 : m_guard(other.m_guard)
 , m_boolean(other.m_boolean)
 , m_dimensions(other.m_dimensions)
+, m_constDims(other.m_constDims)
+, m_nonConstDims(other.m_nonConstDims)
 , m_timeStart(0)
 , m_timeEnd(0)
 {
@@ -109,6 +111,7 @@ GuardWS::GuardWS(WS* g, WS* b)
 {
   if (b != 0)
   {
+    std::cerr << "I don't know how to handle boolean guards" << std::endl;
     throw "I don't know how to handle boolean guards";
   }
 
@@ -136,6 +139,7 @@ GuardWS::GuardWS(WS* g, WS* b)
 
       if (lhs.index() == TYPE_INDEX_SPECIAL)
       {
+        std::cerr << "special encountered in lhs of guard" << std::endl;
         throw "special encountered in lhs of guard";
       }
 
@@ -148,16 +152,20 @@ GuardWS::GuardWS(WS* g, WS* b)
 
       if (rhs.index() == TYPE_INDEX_SPECIAL)
       {
+        //std::cerr << "putting " << dimIndex << " in non const dims" 
+        //  << std::endl;
         m_nonConstDims.insert(std::make_pair(dimIndex, val.second));
       }
       else
       {
+        //std::cerr << "putting " << dimIndex << " in const dims" << std::endl;
         m_constDims.insert(std::make_pair(dimIndex, rhs));
       }
     }
   }
   else
   {
+    std::cerr << "guard is not a tuple" << std::endl;
     throw "guard is not a tuple";
   }
 }
