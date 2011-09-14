@@ -230,32 +230,45 @@ booleanTrue(const GuardWS& g, Context& k)
 std::string
 utf32_to_utf8(const std::u32string& s) {
   #ifdef ICONV_CONVERT
-  const size_t buffer_size = 8000;
-  if (s.size()+1 > buffer_size/sizeof(char32_t))
-  {
-    return std::string("string too big");
-  }
+
+  std::unique_ptr<char[]> out;
+  const char32_t* in = 0;
+  //const size_t buffer_size = 8000;
+  //if (s.size()+1 > buffer_size/sizeof(char32_t))
+  //{
+  //  return std::string("string too big");
+  //}
   iconv_t id = iconv_open("UTF8", "UTF32LE");
   if (id == (iconv_t)-1)
   {
     perror("unable to open iconv: ");
   }
 
-  size_t inSize = (s.size())* sizeof(char32_t);
-  size_t outSize = buffer_size * sizeof(char32_t);
-  char out[buffer_size];
-  char32_t in[buffer_size];
-  memcpy(in, s.c_str(), s.size()*sizeof(char32_t));
+  //this is the number of bytes, s.size is the length in chars
+  size_t inSize = s.size() * sizeof(char32_t);
+  size_t outSize = s.size() * sizeof(char32_t);
 
-  char* outp = out;
-  char* inp = reinterpret_cast<char*>(in);
+  //char out[buffer_size];
+  //this is the maximum size that the string will be
+  //we could probably do better
+  out.reset(new char[s.size() * 4]);
+
+  //in = new char32_t[];
+  //char32_t in[buffer_size];
+  //memcpy(in, s.c_str(), s.size()*sizeof(char32_t));
+
+  in = s.c_str();
+
+  char* outp = out.get();
+  //silly iconv doesn't do const
+  char* inp = const_cast<char*>(reinterpret_cast<const char*>(in));
 
   while (inSize > 0) {
     size_t r = iconv(id, &inp, &inSize, &outp, &outSize);
     if (r == (size_t)-1)
     {
       //std::cerr << "iconv failed: " << errno << std::endl;
-      perror("iconv failed: ");
+      perror("iconv failed 32->8: ");
       iconv_close(id);
       inSize = 0;
       return std::string();
@@ -264,7 +277,8 @@ utf32_to_utf8(const std::u32string& s) {
 
   iconv_close(id);
   *outp = '\0';
-  return std::string(out);
+
+  return std::string(out.get());
   #endif
 
   #ifdef HAND_CONVERT
@@ -291,36 +305,37 @@ utf32_to_utf8(const std::u32string& s) {
 std::u32string
 utf8_to_utf32(const std::string& s)
 {
-  const size_t buffer_size = 8000;
-  if (s.size()+1 > buffer_size/sizeof(char32_t))
-  {
-    return U"string too big";
-  }
+  //const size_t buffer_size = 8000;
+  //if (s.size()+1 > buffer_size/sizeof(char32_t))
+  //{
+  //  return U"string too big";
+  //}
   Iconv id("UTF32LE", "UTF8");
 
   //we don't actually know how many characters the output will be
   //it is at most sizeof(char32_t) * input size
   size_t inSize = s.size();
-  size_t outSize = buffer_size * sizeof(char32_t);
-  char32_t out[buffer_size];
-  char in[buffer_size];
-  memcpy(in, s.c_str(), s.size());
+  size_t outSize = s.size() * sizeof(char32_t);
 
-  char* outp = reinterpret_cast<char*>(out);
-  char* inp = in;
+  std::unique_ptr<char32_t[]> out(new char32_t[outSize]);
+  //char in[buffer_size];
+  //memcpy(in, s.c_str(), s.size());
+
+  char* outp = reinterpret_cast<char*>(out.get());
+  char* inp = const_cast<char*>(s.c_str());
 
   while (inSize > 0) {
     size_t r = id.iconv(&inp, &inSize, &outp, &outSize);
     if (r == (size_t)-1)
     {
-      perror("iconv failed: ");
+      perror("iconv failed, 8->32: ");
       inSize = 0;
       return std::u32string();
     }
   }
 
   *reinterpret_cast<char32_t*>(outp) = U'\0';
-  return std::u32string(out);
+  return std::u32string(out.get());
 }
 
 std::string
