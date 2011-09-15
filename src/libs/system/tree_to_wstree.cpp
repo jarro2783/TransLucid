@@ -282,5 +282,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::ValueAppExpr& e)
   );
 }
 
+Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
+{
+}
 
 }

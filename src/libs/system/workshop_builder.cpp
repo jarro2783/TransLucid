@@ -253,4 +253,9 @@ WorkshopBuilder::operator()(const Tree::NameAppExpr& e)
   return 0;
 }
 
+WS* 
+WorkshopBuilder::operator()(const Tree::WhereExpr& e)
+{
+}
+
 } //namespace TransLucid

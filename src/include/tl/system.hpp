@@ -76,6 +76,13 @@ namespace TransLucid
     dimension_index
     getDimensionIndex(const Constant& c);
 
+    //generate a new dimension index
+    dimension_index
+    nextDimensionIndex()
+    {
+      return m_dimTranslator.unique();
+    }
+
     /**
      * Get the time.
      * @return The current time of the system.

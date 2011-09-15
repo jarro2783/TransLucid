@@ -269,6 +269,7 @@ namespace TransLucid
     class LambdaExpr;
     class NameAppExpr;
     class ValueAppExpr;
+    class WhereExpr;
 
     // Not defined in ast.hpp
     class OpExpr;
@@ -300,7 +301,8 @@ namespace TransLucid
       boost::recursive_wrapper<PhiExpr>,
       boost::recursive_wrapper<LambdaExpr>,
       boost::recursive_wrapper<NameAppExpr>,
-      boost::recursive_wrapper<ValueAppExpr>
+      boost::recursive_wrapper<ValueAppExpr>,
+      boost::recursive_wrapper<WhereExpr>
     > Expr;
 
     /**
@@ -643,6 +645,24 @@ namespace TransLucid
       Expr rhs; /**<The rhs expression.*/
     };
 
+    struct WhereExpr
+    {
+      Expr e;
+
+      std::vector<std::pair<u32string, Expr>> dims;
+
+      //redefinition of Equation because otherwise the definition would be
+      //circular
+      std::vector
+      <
+        std::tuple<u32string, Expr, Expr, Expr>
+      > vars;
+
+      dimension_index myDim;
+      std::vector<dimension_index> Lin;
+      std::vector<dimension_index> Lout;
+    };
+
     #define PRINT_NODE(n) \
     inline \
     std::ostream& operator<<(std::ostream& os, const n &) \
@@ -667,6 +687,7 @@ namespace TransLucid
     PRINT_NODE(LambdaExpr)
     PRINT_NODE(NameAppExpr)
     PRINT_NODE(ValueAppExpr)
+    PRINT_NODE(WhereExpr)
   }
 }
 
