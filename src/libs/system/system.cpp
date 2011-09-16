@@ -91,7 +91,9 @@ namespace
   Constant
   compile_and_evaluate(const Tree::Expr& expr, System& system)
   {
-    Tree::Expr wsTree = toWSTree(expr);
+    TreeToWSTree tows(&system);
+
+    Tree::Expr wsTree = tows.toWSTree(expr);
 
     WorkshopBuilder compiler(&system);
 
@@ -694,10 +696,12 @@ System::addDeclInternal
   DefinitionMap& declarations
 )
 {
+  TreeToWSTree tows(this);
+
   //simplify, turn into workshops
-  Tree::Expr guard   = toWSTree(std::get<1>(eqn));
-  Tree::Expr boolean = toWSTree(std::get<2>(eqn));
-  Tree::Expr expr    = toWSTree(std::get<3>(eqn));
+  Tree::Expr guard   = tows.toWSTree(std::get<1>(eqn));
+  Tree::Expr boolean = tows.toWSTree(std::get<2>(eqn));
+  Tree::Expr expr    = tows.toWSTree(std::get<3>(eqn));
 
   WorkshopBuilder compile(this);
 

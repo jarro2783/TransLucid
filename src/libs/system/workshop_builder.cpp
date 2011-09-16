@@ -256,6 +256,9 @@ WorkshopBuilder::operator()(const Tree::NameAppExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::WhereExpr& e)
 {
+  //this should compile the expr of each var and add it to
+  //the system already compiled
+  return 0;
 }
 
 } //namespace TransLucid

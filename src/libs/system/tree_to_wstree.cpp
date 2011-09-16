@@ -19,8 +19,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 /** @file tree_to_wstree.cpp
  * Rewrites an expression tree to remove operators and literals.
+ * Also annotates tree with labels.
  */
 
+#include <tl/system.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/internal_strings.hpp>
 
@@ -28,10 +30,11 @@ namespace TransLucid
 {
 
 Tree::Expr
-toWSTree(const Tree::Expr& expr)
+TreeToWSTree::toWSTree(const Tree::Expr& expr)
 {
-  TreeToWSTree t;
-  return boost::apply_visitor(t, expr);
+  m_Lout.clear();
+  m_newVars.clear();
+  return boost::apply_visitor(*this, expr);
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::nil& n)
@@ -284,6 +287,36 @@ Tree::Expr TreeToWSTree::operator()(const Tree::ValueAppExpr& e)
 
 Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
 {
+  Tree::WhereExpr w = e;
+  
+  //generate new label
+  dimension_index label = m_system->nextDimensionIndex();
+  w.myDim = label;
+  //store L_out
+  //visit children variables
+  m_Lout.push_back(label);
+
+  boost::apply_visitor(*this, e.e);
+
+  for (const auto& evar : e.vars)
+  {
+    Tree::Expr varExpr = boost::apply_visitor(*this, std::get<3>(evar));
+  }
+
+  //visit child E
+
+  //store L_in
+
+  //rewrite E to
+  //E @ [d_i <- E_i, Lin_i <- 0]
+  //d_i is [which <- index_d, Lout_i <- #Lout_i]
+
+  //generate a new equation for every dim
+
+  //we return the rewritten E and add the variables to the list of variables
+  //to add to the system
+
+  return w;
 }
 
 }
