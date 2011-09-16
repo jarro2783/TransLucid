@@ -54,14 +54,17 @@ namespace TransLucid
   enum DimensionIndexes
   {
     //dimensions
+    DIM_TIME,
+    DIM_ALL,
     DIM_ID,
     DIM_TYPE,
     DIM_TEXT,
     DIM_NAME,
     DIM_VALUE,
-    DIM_TIME,
-    DIM_VALID_GUARD,
-    DIM_ALL,
+
+    //the two global dims for phi functions
+    DIM_PI,
+    DIM_PSI,
 
     //for array indices, these are the integers 0, 1, 2
     DIM_ZERO,

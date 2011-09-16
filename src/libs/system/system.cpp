@@ -95,7 +95,7 @@ namespace
 
     WorkshopBuilder compiler(&system);
 
-    std::auto_ptr<WS> ws(compiler.compile_for_equation(wsTree));
+    std::auto_ptr<WS> ws(compiler.build_workshops(wsTree));
 
     return (*ws)(system.getDefaultContext());
   }
@@ -703,9 +703,9 @@ System::addDeclInternal
 
   uuid u = addDeclInternal(
     std::get<0>(eqn),
-    GuardWS(compile.compile_for_equation(guard),
-      compile.compile_for_equation(boolean)),
-    compile.compile_for_equation(expr),
+    GuardWS(compile.build_workshops(guard),
+      compile.build_workshops(boolean)),
+    compile.build_workshops(expr),
     declarations
   );
 

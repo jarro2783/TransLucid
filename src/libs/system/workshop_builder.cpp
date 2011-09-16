@@ -43,7 +43,7 @@ WorkshopBuilder::~WorkshopBuilder()
 }
 
 WS*
-WorkshopBuilder::compile_for_equation(const Tree::Expr& e)
+WorkshopBuilder::build_workshops(const Tree::Expr& e)
 {
   return boost::apply_visitor(*this, e);
 }

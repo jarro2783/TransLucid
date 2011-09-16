@@ -41,7 +41,7 @@ namespace TransLucid
     WorkshopBuilder(System* system);
     ~WorkshopBuilder();
 
-    WS* compile_for_equation(const Tree::Expr&);
+    WS* build_workshops(const Tree::Expr&);
     //WS* compile_top_level(const Tree::Expr&);
 
     WS* operator()(const Tree::nil& n);
@@ -70,6 +70,15 @@ namespace TransLucid
     private:
     //the system to compile with
     System* m_system;
+
+    //the lambda scope
+    std::vector<dimension_index> m_lambdaScope;
+
+    //the phi scope
+    std::vector<dimension_index> m_phiScope;
+
+    //the where L_{out}s
+    std::vector<dimension_index> m_whereOut;
   };
 
 } //namespace TransLucid

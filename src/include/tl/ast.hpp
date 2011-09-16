@@ -574,6 +574,13 @@ namespace TransLucid
        */
     };
 
+    struct FunctionInfo
+    {
+      dimension_index myDim;
+      std::vector<dimension_index> lambda_scope;
+      std::vector<dimension_index> phi_scope;
+    };
+
     /**
      * A lambda expression. An expression node representing a lambda 
      * expression which creates an unnamed function.
@@ -594,11 +601,14 @@ namespace TransLucid
 
       u32string name; /**<The bound parameter.*/
       Expr rhs; /**<The right-hand-side expression.*/
+
+      FunctionInfo info;
     };
 
     //TODO: fix TreeToWSTree when I implement this
     struct PhiExpr
     {
+      FunctionInfo info;
     };
 
     /**
