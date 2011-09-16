@@ -26,11 +26,24 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  class System;
+
   class TreeToWSTree
   {
-    public:
+    private:
 
+    System *m_system;
+
+    public:
     typedef Tree::Expr result_type;
+
+    TreeToWSTree(System* system)
+    : m_system(system)
+    {
+    }
+
+    Tree::Expr
+    toWSTree(const Tree::Expr& expr);
     
     Tree::Expr operator()(const Tree::nil& n);
     Tree::Expr operator()(bool b);
@@ -55,8 +68,10 @@ namespace TransLucid
     Tree::Expr operator()(const Tree::ValueAppExpr& e);
     Tree::Expr operator()(const Tree::WhereExpr& e);
 
-  };
+    private:
 
-  Tree::Expr
-  toWSTree(const Tree::Expr& expr);
+    std::vector<dimension_index> m_Lout;
+
+    std::vector<Parser::Equation> m_newVars;
+  };
 }

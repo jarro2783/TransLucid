@@ -9,3 +9,22 @@ Then recompile and reinstall boost.
 
 Note that this can probably also be applied to the headers after being
 installed with no problems.
+
+
+== Bugs in GCC ==
+
+Currently there is a bug in GCC which causes our code to bomb when compiled
+with -O2 or -O3. Compiling with -O1 or -O0 works. It is probably better with
+-O1 as it is faster and inlines templates.
+
+This bug appears to be in every version of GCC since at least 4.7.0.
+
+If someone can fix it, please do so.
+It might be related to this bug:
+  http://gcc.gnu.org/bugzilla/show_bug.cgi?id=49538
+Which was supposedly fixed. The problem did actually go away for a while, but
+then it came back when our code changed a bit more.
+
+
+For autoconf: configure CXXFLAGS=-O1
+For cmake: cmake -DCMAKE_CXXFLAGS=-O1
