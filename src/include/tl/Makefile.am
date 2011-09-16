@@ -21,9 +21,9 @@ includesdir = $(prefix)/include/tl
 
 includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp \
   cache.hpp \
-  charset.hpp compiled_functors.hpp constws.hpp container.hpp \
+  charset.hpp constws.hpp container.hpp \
   dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \
-  expr_parser.hpp fixed_indexes.hpp function_registry.hpp \
+  expr_parser.hpp eval_workshops.hpp fixed_indexes.hpp function_registry.hpp \
   header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer.hpp lexer_util.hpp library.hpp \
   line_parser.hpp line_tokenizer.hpp maxsharelist.hpp object_registry.hpp \
