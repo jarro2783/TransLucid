@@ -236,7 +236,15 @@ namespace TransLucid
       : text(text)
       {}
 
+      DimensionExpr(dimension_index dim)
+      : dim(dim) {}
+
       u32string text; /**< The name of the dimension.*/
+
+      /** This is a bit of a hack.
+       * If the text isn't set, use the dimension index instead.
+       */
+      dimension_index dim;
     };
 
     /**
@@ -671,6 +679,7 @@ namespace TransLucid
       dimension_index myDim;
       std::vector<dimension_index> Lin;
       std::vector<dimension_index> Lout;
+      std::vector<size_t> whichDims;
     };
 
     #define PRINT_NODE(n) \

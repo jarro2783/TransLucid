@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
  * Also annotates tree with labels.
  */
 
+#include <tl/parser_api.hpp>
 #include <tl/system.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/internal_strings.hpp>
@@ -288,6 +289,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::ValueAppExpr& e)
 Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
 {
   Tree::WhereExpr w = e;
+
+  std::vector<dimension_index> myLin;
   
   //generate new label
   dimension_index label = m_system->nextDimensionIndex();
@@ -296,25 +299,110 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
   //visit children variables
   m_Lout.push_back(label);
 
+  //L_in is all of the inner where clauses 
   boost::apply_visitor(*this, e.e);
 
+  m_Lin.clear();
   for (const auto& evar : e.vars)
   {
+    //expr
+    m_Lin.clear();
     Tree::Expr varExpr = boost::apply_visitor(*this, std::get<3>(evar));
+    myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
+
+    //guard
+    m_Lin.clear();
+    Tree::Expr guardExpr = boost::apply_visitor(*this, std::get<1>(evar));
+    myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
+
+    //boolean
+    m_Lin.clear();
+    Tree::Expr booleanExpr = boost::apply_visitor(*this, std::get<2>(evar));;
+    myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
+
+    m_newVars.push_back
+    (
+      Parser::Equation
+      (
+        std::get<0>(evar),
+        guardExpr,
+        booleanExpr,
+        varExpr
+      )
+    );
+    m_Lin.clear();
   }
 
   //visit child E
+  Tree::Expr expr = boost::apply_visitor(*this, e.e);
 
   //store L_in
+  w.Lin = myLin;
 
   //rewrite E to
   //E @ [d_i <- E_i, Lin_i <- 0]
   //d_i is [which <- index_d, Lout_i <- #Lout_i]
+  Tree::TupleExpr::TuplePairs odometerDims;
+
+  Tree::TupleExpr::TuplePairs outPairs;
+  //generate the Lout_i pairs
+  for (dimension_index d : m_Lout)
+  {
+    outPairs.push_back(std::make_pair(Tree::DimensionExpr(d),
+      Tree::HashExpr(Tree::DimensionExpr(d))));
+  }
+
+  //generate a unique "which" for each dimension
+  for (const auto& v : e.dims)
+  {
+    //TODO actually generate a new one
+    int next = 0;
+    w.whichDims.push_back(next);
+    odometerDims.push_back
+    (
+      std::make_pair(Tree::DimensionExpr(v.first), mpz_class(next))
+    );
+
+    //generate the dimExpr
+    Tree::TupleExpr::TuplePairs dimTuple
+      {{Tree::DimensionExpr(U"which"), mpz_class(next)}}
+    ;
+
+    dimTuple.insert(dimTuple.end(), outPairs.begin(), outPairs.end());
+
+    //make a new var d = dimval
+    m_newVars.push_back
+    (
+      Parser::Equation(v.first, Tree::Expr(), Tree::Expr(), 
+        //replace this with the dimexpr
+        dimTuple
+      )
+    );
+  }
+
+  for (auto dim : m_Lin)
+  {
+    odometerDims.push_back(
+      std::make_pair(Tree::DimensionExpr(dim), mpz_class(0)));
+  }
+
+  w.e = Tree::AtExpr
+    (
+      e.e,
+      Tree::TupleExpr(odometerDims)
+    );
 
   //generate a new equation for every dim
 
   //we return the rewritten E and add the variables to the list of variables
   //to add to the system
+
+  //also add ourselves to the L_in to return
+  myLin.push_back(label);
+  m_Lin = std::move(myLin);
+
+  //restore L_out
+  m_Lout.pop_back();
 
   return w;
 }

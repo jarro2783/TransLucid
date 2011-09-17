@@ -71,6 +71,7 @@ namespace TransLucid
     private:
 
     std::vector<dimension_index> m_Lout;
+    std::vector<dimension_index> m_Lin;
 
     std::vector<Parser::Equation> m_newVars;
   };
