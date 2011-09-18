@@ -256,9 +256,10 @@ WorkshopBuilder::operator()(const Tree::NameAppExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::WhereExpr& e)
 {
-  //this should compile the expr of each var and add it to
-  //the system already compiled
-  return 0;
+  //the where expression must already be annotated and transformed
+  //which means that we can simply translate the expression
+
+  return boost::apply_visitor(*this, e.e);
 }
 
 } //namespace TransLucid

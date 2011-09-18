@@ -70,6 +70,9 @@ namespace TransLucid
 
     private:
 
+    Tree::WhereExpr 
+    renameWhereExpr(const Tree::WhereExpr& e);
+
     std::vector<dimension_index> m_Lout;
     std::vector<dimension_index> m_Lin;
 

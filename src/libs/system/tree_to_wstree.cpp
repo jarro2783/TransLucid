@@ -27,6 +27,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/tree_to_wstree.hpp>
 #include <tl/internal_strings.hpp>
 
+#include <sstream>
+
 namespace TransLucid
 {
 
@@ -286,9 +288,17 @@ Tree::Expr TreeToWSTree::operator()(const Tree::ValueAppExpr& e)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
+Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& whereExpr)
 {
+  //we need to do the where expression transformation and rename all
+  //variables at the same time
+  //for every dimension and variable declared, rename them in every 
+  //expression
+
+  Tree::WhereExpr e = renameWhereExpr(whereExpr);
   Tree::WhereExpr w = e;
+
+  //now all of the names are unique
 
   std::vector<dimension_index> myLin;
   
@@ -405,6 +415,23 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
   m_Lout.pop_back();
 
   return w;
+}
+
+Tree::WhereExpr 
+TreeToWSTree::renameWhereExpr(const Tree::WhereExpr& e)
+{
+  //generate a list of renames
+
+  std::unordered_map<u32string, u32string> renames;
+  for (const auto& var : e.vars)
+  {
+    size_t index = m_system->nextVarIndex();
+
+    std::ostringstream os;
+    os << index << "_uniquevar";
+
+    renames.insert(std::make_pair(std::get<0>(var), to_u32string(os.str())));
+  }
 }
 
 }

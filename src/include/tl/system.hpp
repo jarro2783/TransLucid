@@ -309,9 +309,17 @@ namespace TransLucid
     size_t m_time;
     Translator *m_translator;
 
+    size_t m_uniqueVarIndex;
+
     friend class detail::InputHDWS;
 
     public:
+
+    size_t
+    nextVarIndex()
+    {
+      return m_uniqueVarIndex++;
+    }
 
     Context&
     getDefaultContext()
