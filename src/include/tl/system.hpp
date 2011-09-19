@@ -310,6 +310,7 @@ namespace TransLucid
     Translator *m_translator;
 
     size_t m_uniqueVarIndex;
+    size_t m_uniqueDimIndex;
 
     friend class detail::InputHDWS;
 
@@ -319,6 +320,12 @@ namespace TransLucid
     nextVarIndex()
     {
       return m_uniqueVarIndex++;
+    }
+
+    size_t
+    nextDimIndex()
+    {
+      return m_uniqueDimIndex++;
     }
 
     Context&

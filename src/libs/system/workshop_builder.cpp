@@ -239,7 +239,7 @@ WorkshopBuilder::operator()(const Tree::PhiExpr& e)
 }
 
 WS* 
-WorkshopBuilder::operator()(const Tree::ValueAppExpr& e)
+WorkshopBuilder::operator()(const Tree::LambdaAppExpr& e)
 {
   //create a LambdaApplicationWS with the compiled sub expression
   WS* lhs = boost::apply_visitor(*this, e.lhs);
@@ -248,7 +248,7 @@ WorkshopBuilder::operator()(const Tree::ValueAppExpr& e)
 }
 
 WS* 
-WorkshopBuilder::operator()(const Tree::NameAppExpr& e)
+WorkshopBuilder::operator()(const Tree::PhiAppExpr& e)
 {
   return 0;
 }

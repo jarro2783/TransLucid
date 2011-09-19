@@ -113,7 +113,7 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
-  TransLucid::Tree::ValueAppExpr,
+  TransLucid::Tree::LambdaAppExpr,
   (TransLucid::Tree::Expr, lhs)
   (TransLucid::Tree::Expr, rhs)
 )
@@ -236,7 +236,7 @@ namespace TransLucid
       karma::rule<Iterator, Tree::TupleExpr()> tuple;
       karma::rule<Iterator, Tree::AtExpr()> at_expr;
       karma::rule<Iterator, Tree::LambdaExpr()> lambda_function;
-      karma::rule<Iterator, Tree::ValueAppExpr()> lambda_application;
+      karma::rule<Iterator, Tree::LambdaAppExpr()> lambda_application;
 
       karma::rule
       <

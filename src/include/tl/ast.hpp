@@ -275,8 +275,8 @@ namespace TransLucid
     class AtExpr;
     class PhiExpr;
     class LambdaExpr;
-    class NameAppExpr;
-    class ValueAppExpr;
+    class PhiAppExpr;
+    class LambdaAppExpr;
     class WhereExpr;
 
     // Not defined in ast.hpp
@@ -308,8 +308,8 @@ namespace TransLucid
       boost::recursive_wrapper<AtExpr>,
       boost::recursive_wrapper<PhiExpr>,
       boost::recursive_wrapper<LambdaExpr>,
-      boost::recursive_wrapper<NameAppExpr>,
-      boost::recursive_wrapper<ValueAppExpr>,
+      boost::recursive_wrapper<PhiAppExpr>,
+      boost::recursive_wrapper<LambdaAppExpr>,
       boost::recursive_wrapper<WhereExpr>
     > Expr;
 
@@ -616,6 +616,9 @@ namespace TransLucid
     //TODO: fix TreeToWSTree when I implement this
     struct PhiExpr
     {
+      u32string name;
+      Expr rhs;
+
       FunctionInfo info;
     };
 
@@ -623,16 +626,16 @@ namespace TransLucid
      * By value function application expression. An expression node
      * representing by value function application.
      */
-    struct ValueAppExpr
+    struct LambdaAppExpr
     {
-      ValueAppExpr() = default;
+      LambdaAppExpr() = default;
 
       /**
        * Construct a by value application expression.
        * @param lhs The left-hand-side expression.
        * @param rhs The right-hand-side expression.
        */
-      ValueAppExpr(const Expr& lhs, const Expr& rhs)
+      LambdaAppExpr(const Expr& lhs, const Expr& rhs)
       : lhs(lhs), rhs(rhs)
       {
       }
@@ -645,16 +648,16 @@ namespace TransLucid
      * Named function application expression. An expression node representing
      * named function application.
      */
-    struct NameAppExpr
+    struct PhiAppExpr
     {
-      NameAppExpr() = default;
+      PhiAppExpr() = default;
 
       /**
        * Construct a named application expression.
        * @param lhs The left-hand-side expression.
        * @param rhs The right-hand-side expression.
        */
-      NameAppExpr(const Expr& lhs, const Expr& rhs)
+      PhiAppExpr(const Expr& lhs, const Expr& rhs)
       : lhs(lhs), rhs(rhs)
       {
       }
@@ -704,8 +707,8 @@ namespace TransLucid
     PRINT_NODE(AtExpr)
     PRINT_NODE(PhiExpr)
     PRINT_NODE(LambdaExpr)
-    PRINT_NODE(NameAppExpr)
-    PRINT_NODE(ValueAppExpr)
+    PRINT_NODE(PhiAppExpr)
+    PRINT_NODE(LambdaAppExpr)
     PRINT_NODE(WhereExpr)
   }
 }

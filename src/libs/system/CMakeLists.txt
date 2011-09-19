@@ -13,7 +13,7 @@ eval_workshops.cpp expr_parser.cpp header.cpp
 hyperdatons/envhd.cpp
 internal_strings.cpp lexer.cpp lexer_util.cpp 
 library.cpp line_tokenizer.cpp parser.cpp
-range.cpp system.cpp translator.cpp tree_printer.cpp
+range.cpp rename.cpp system.cpp translator.cpp tree_printer.cpp
 tree_to_wstree.cpp tuple_parser.cpp types.cpp utility.cpp uuid.cpp
 workshop_builder.cpp
 )

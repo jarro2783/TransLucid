@@ -348,6 +348,7 @@ System::System()
   )
 , m_time(0)
 , m_uniqueVarIndex(0)
+, m_uniqueDimIndex(0)
 {
   //create the obj, const and fun ids
 

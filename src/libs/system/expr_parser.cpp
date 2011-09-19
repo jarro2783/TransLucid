@@ -368,7 +368,7 @@ namespace TransLucid
       >> *(
             tok.dot_ > primary_expr
             [
-              _a = construct<Tree::ValueAppExpr>(_a, _1)
+              _a = construct<Tree::LambdaAppExpr>(_a, _1)
             ]
           )
         )

@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/parser_api.hpp>
+#include <tl/rename.hpp>
 #include <tl/system.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/internal_strings.hpp>
@@ -37,7 +38,13 @@ TreeToWSTree::toWSTree(const Tree::Expr& expr)
 {
   m_Lout.clear();
   m_newVars.clear();
-  return boost::apply_visitor(*this, expr);
+
+  //rename everything first
+  RenameIdentifiers rename(*m_system);
+
+  Tree::Expr exprRenamed = rename.rename(expr);
+
+  return boost::apply_visitor(*this, exprRenamed);
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::nil& n)
@@ -272,33 +279,26 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   return Tree::LambdaExpr(e.name, boost::apply_visitor(*this, e.rhs));
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::NameAppExpr& e)
+Tree::Expr TreeToWSTree::operator()(const Tree::PhiAppExpr& e)
 {
-  return Tree::NameAppExpr(
+  return Tree::PhiAppExpr(
     boost::apply_visitor(*this, e.lhs),
     boost::apply_visitor(*this, e.rhs)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::ValueAppExpr& e)
+Tree::Expr TreeToWSTree::operator()(const Tree::LambdaAppExpr& e)
 {
-  return Tree::ValueAppExpr(
+  return Tree::LambdaAppExpr(
     boost::apply_visitor(*this, e.lhs),
     boost::apply_visitor(*this, e.rhs)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& whereExpr)
+Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
 {
-  //we need to do the where expression transformation and rename all
-  //variables at the same time
-  //for every dimension and variable declared, rename them in every 
-  //expression
-
-  Tree::WhereExpr e = renameWhereExpr(whereExpr);
+  //all the names are already unique
   Tree::WhereExpr w = e;
-
-  //now all of the names are unique
 
   std::vector<dimension_index> myLin;
   
@@ -346,7 +346,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& whereExpr)
   //visit child E
   Tree::Expr expr = boost::apply_visitor(*this, e.e);
 
-  //store L_in
+  //we have now fully computed the where clause's L_in
   w.Lin = myLin;
 
   //rewrite E to
@@ -365,8 +365,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& whereExpr)
   //generate a unique "which" for each dimension
   for (const auto& v : e.dims)
   {
-    //TODO actually generate a new one
-    int next = 0;
+    int next = m_system->nextDimIndex();
     w.whichDims.push_back(next);
     odometerDims.push_back
     (
@@ -384,12 +383,12 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& whereExpr)
     m_newVars.push_back
     (
       Parser::Equation(v.first, Tree::Expr(), Tree::Expr(), 
-        //replace this with the dimexpr
-        dimTuple
+        Tree::TupleExpr(dimTuple)
       )
     );
   }
 
+  //generate the E which sets L_in dimension to 0
   for (auto dim : m_Lin)
   {
     odometerDims.push_back(
@@ -402,8 +401,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& whereExpr)
       Tree::TupleExpr(odometerDims)
     );
 
-  //generate a new equation for every dim
-
   //we return the rewritten E and add the variables to the list of variables
   //to add to the system
 
@@ -415,23 +412,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& whereExpr)
   m_Lout.pop_back();
 
   return w;
-}
-
-Tree::WhereExpr 
-TreeToWSTree::renameWhereExpr(const Tree::WhereExpr& e)
-{
-  //generate a list of renames
-
-  std::unordered_map<u32string, u32string> renames;
-  for (const auto& var : e.vars)
-  {
-    size_t index = m_system->nextVarIndex();
-
-    std::ostringstream os;
-    os << index << "_uniquevar";
-
-    renames.insert(std::make_pair(std::get<0>(var), to_u32string(os.str())));
-  }
 }
 
 }
