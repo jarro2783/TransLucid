@@ -118,6 +118,14 @@ BOOST_FUSION_ADAPT_STRUCT
   (TransLucid::Tree::Expr, rhs)
 )
 
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::WhereExpr,
+  (TransLucid::Tree::Expr, e)
+  (TransLucid::Tree::WhereExpr::DimensionList, dims)
+  (std::vector<TransLucid::Parser::Equation>, vars)
+)
+
 namespace TransLucid
 {
   namespace Printer
@@ -237,6 +245,7 @@ namespace TransLucid
       karma::rule<Iterator, Tree::AtExpr()> at_expr;
       karma::rule<Iterator, Tree::LambdaExpr()> lambda_function;
       karma::rule<Iterator, Tree::LambdaAppExpr()> lambda_application;
+      karma::rule<Iterator, Tree::WhereExpr()> where;
 
       karma::rule
       <

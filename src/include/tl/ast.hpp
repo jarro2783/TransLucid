@@ -670,7 +670,8 @@ namespace TransLucid
     {
       Expr e;
 
-      std::vector<std::pair<u32string, Expr>> dims;
+      typedef std::vector<std::pair<u32string, Expr>> DimensionList;
+      DimensionList dims;
 
       //redefinition of Equation because otherwise the definition would be
       //circular
