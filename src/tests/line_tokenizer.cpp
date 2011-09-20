@@ -141,4 +141,20 @@ BOOST_AUTO_TEST_CASE( percent )
   BOOST_CHECK_EQUAL(n.second, TL::u32string());
 }
 
+BOOST_AUTO_TEST_CASE( where )
+{
+  std::string input = "x where var x = 5;; end;;";
+
+  TL::Parser::U32Iterator iter(
+    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.end())
+  );
+
+  TL::LineTokenizer tokenize(iter);
+
+  auto n = tokenize.next();
+  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
+  BOOST_CHECK_EQUAL(n.second, TL::to_u32string(input));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

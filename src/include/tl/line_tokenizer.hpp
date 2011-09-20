@@ -51,6 +51,8 @@ namespace TransLucid
     : m_current(begin)
     , m_state(State::READ_SCANNING)
     , m_first(true)
+    , m_whereDepth(0)
+    , m_readingIdent(false)
     {
     }
 
@@ -88,6 +90,10 @@ namespace TransLucid
     u32string m_line;
     State m_state;
     bool m_first;
+
+    int m_whereDepth;
+    bool m_readingIdent;
+    u32string m_currentIdent;
   };
 
   std::ostream&

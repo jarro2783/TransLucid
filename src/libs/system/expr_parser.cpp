@@ -262,11 +262,13 @@ namespace TransLucid
     Tree::Expr
     make_where_clause
     (
+      const Tree::Expr& e,
       const WhereSymbols& defs
     )
     {
       Tree::WhereExpr w;
 
+      w.e = e;
       w.dims = defs.first;
       w.vars = defs.second;
 
@@ -312,11 +314,15 @@ namespace TransLucid
       ;
 
       where_expr = if_expr[_a = _1] >> 
-      (  tok.where_
-      >> where_inside
-      >> tok.end_
-      ) [_val = ph::bind(&make_where_clause, _2)]
+      (
+        (  
+           tok.where_
+        >> where_inside
+        >> tok.end_
+        ) 
+        [_val = ph::bind(&make_where_clause, _a, _2)]
       | qi::eps[_val = _a]
+      )
       ;
 
       where_inside =

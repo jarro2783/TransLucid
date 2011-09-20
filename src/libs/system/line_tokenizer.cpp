@@ -38,6 +38,20 @@ is_space(char32_t c)
 {
   return c == ' ' || c == '\t' || c == '\n';
 }
+
+inline bool
+is_ident_begin(char32_t c)
+{
+  return (c >= 'A' && c <= 'Z')
+    || (c >= 'a' && c <= 'z')
+    || (c == '_');
+}
+
+inline bool
+is_ident_inside(char32_t c)
+{
+  return is_ident_begin(c) || (c >= '0' && c <= '9');
+}
  
 std::pair<LineType, u32string>
 LineTokenizer::next()
@@ -163,13 +177,43 @@ LineTokenizer::readOuter()
 
   while (!done && m_current != Parser::U32Iterator())
   {
+    if (m_readingIdent)
+    {
+      if (is_ident_inside(c))
+      {
+        m_currentIdent += c;
+      }
+      else if (c != '"' && c != '`')
+      {
+        if (m_currentIdent == U"where")
+        {
+          ++m_whereDepth;
+        }
+        else if (m_currentIdent == U"end")
+        {
+          --m_whereDepth;
+        }
+
+        m_readingIdent = false;
+      }
+    }
+    else
+    {
+      if (is_ident_begin(c))
+      {
+        m_currentIdent.clear();
+        m_currentIdent += c;
+        m_readingIdent = true;
+      }
+    }
+
     switch (c)
     {
       case ';':
       m_state = State::READ_SEMI;
       {
         c = nextChar();
-        if (c == ';')
+        if (c == ';' && m_whereDepth == 0)
         {
           done = true;
         }
@@ -185,6 +229,8 @@ LineTokenizer::readOuter()
       break;
 
       default:
+      
+
       break;
     }
 
