@@ -119,6 +119,42 @@ namespace TransLucid
     /** The phoenix function for creating an elsif list. */
     ph::function<make_elsifs_imp> make_elsifs;
 
+    struct pair_second_imp
+    {
+      template <typename Arg>
+      struct result
+      {
+        typedef typename Arg::second_type& type;
+      };
+
+      template <typename Arg>
+      typename Arg::second_type&
+      operator()(Arg& p) const
+      {
+        return p.second;
+      }
+    };
+
+    ph::function<pair_second_imp> pair_second;
+
+    struct pair_first_imp
+    {
+      template <typename Arg>
+      struct result
+      {
+        typedef typename Arg::first_type& type;
+      };
+
+      template <typename Arg>
+      typename Arg::first_type&
+      operator()(Arg& p) const
+      {
+        return p.first;
+      }
+    };
+
+    ph::function<pair_first_imp> pair_first;
+
     /**
      * Create an arg dimension name.
      * @param a The number to append to arg.
@@ -229,7 +265,12 @@ namespace TransLucid
       const WhereSymbols& defs
     )
     {
-      return Tree::Expr();
+      Tree::WhereExpr w;
+
+      w.dims = defs.first;
+      w.vars = defs.second;
+
+      return w;
     }
 
     void
@@ -241,6 +282,16 @@ namespace TransLucid
     )
     {
       dims.push_back(std::make_pair(name, expr));
+    }
+
+    void 
+    append_eqn
+    (
+      std::vector<Equation>& eqns,
+      std::pair<Equation, DeclType>& e
+    )
+    {
+      eqns.push_back(e.first);
     }
 
     /**
@@ -271,12 +322,19 @@ namespace TransLucid
       where_inside =
       *(
          (
-           (tok.dimension_ >> tok.arrow_ >> expr)
+           (tok.dimension_ >> tok.identifier_ >> tok.arrow_ >> expr)
            [
-             ph::bind(&append_dim, ph::ref(_val), _1, _3)
+             ph::bind(
+               &append_dim, 
+               pair_first(_val), 
+               _2, 
+               _4)
            ]
          |
-           (tok.var_)
+           (tok.var_ >> eqn)
+           [
+            ph::bind(&append_eqn, pair_second(_val), _2)
+           ]
          ) >> tok.dblsemi_
        )
       ;
@@ -298,7 +356,7 @@ namespace TransLucid
          >> tok.fi_
         )
         [
-          qi::_val = construct<Tree::IfExpr>(
+          _val = construct<Tree::IfExpr>(
             _2, _4, make_elsifs(_5), _7)
         ]
       | binary_op

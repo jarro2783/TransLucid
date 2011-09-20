@@ -126,15 +126,21 @@ BOOST_FUSION_ADAPT_STRUCT
   (std::vector<TransLucid::Parser::Equation>, vars)
 )
 
-template <size_t field>
+template <size_t N>
 struct get_tuple
 {
+  template <typename Arg>
+  struct result
+  {
+    typedef typename std::tuple_element<N, Arg>::type& type;
+  };
+
   template <typename Tuple>
   auto
-  operator()(const Tuple& t)
-  -> decltype(std::get<field>(t))
+  operator()(const Tuple& t) const
+  -> decltype(std::get<N>(t))&
   {
-    return std::get<field>(t);
+    return std::get<N>(t);
   }
 };
 
@@ -219,18 +225,14 @@ namespace TransLucid
 
         varlist = *(eqn);
 
-        #if 0
         eqn = literal("var") 
           << ustring [_1 = ph::function<get_tuple<0>>()(_val)]
-          #if 0
-          << expr [_1 = ph::at_c<1>(_val)]
+          << expr [_1 = ph::function<get_tuple<1>>()(_val)]
           << literal("&") 
-          << expr [_1 = ph::at_c<2>(_val)]
+          << expr [_1 = ph::function<get_tuple<2>>()(_val)]
           << literal(" = ") 
-          << expr [_1 = ph::at_c<3>(_val)]
-          #endif
+          << expr [_1 = ph::function<get_tuple<3>>()(_val)]
           ;
-        #endif
 
         // TODO: Missing unary
         expr %=

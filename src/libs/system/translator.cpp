@@ -50,6 +50,8 @@ namespace detail
     , m_line(m_lexer, m_equation)
     {
       m_expr.set_tuple(m_tuple);
+      m_expr.set_equation(m_equation);
+
       m_tuple.set_expr(m_expr);
 
       m_equation.set_expr(m_expr);
