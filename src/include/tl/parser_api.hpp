@@ -35,7 +35,7 @@ namespace TransLucid
 
     /**
      * A parsed equation.
-     * The tuple is defined as: name, | [], & bool, Expr, = or :=
+     * The tuple is defined as: name, [], & bool, Expr
      */
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     Equation;

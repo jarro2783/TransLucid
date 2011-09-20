@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     ("input,i", po::value<std::string>(), "input file")
     ("output,o", po::value<std::string>(), "output file")
     ("uuid", "print uuids")
-    ("verbose", "verbose output")
+    ("verbose,v", "verbose output")
     ("version", "show version")
   ;
 

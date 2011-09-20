@@ -126,6 +126,18 @@ BOOST_FUSION_ADAPT_STRUCT
   (std::vector<TransLucid::Parser::Equation>, vars)
 )
 
+template <size_t field>
+struct get_tuple
+{
+  template <typename Tuple>
+  auto
+  operator()(const Tuple& t)
+  -> decltype(std::get<field>(t))
+  {
+    return std::get<field>(t);
+  }
+};
+
 namespace TransLucid
 {
   namespace Printer
@@ -198,6 +210,28 @@ namespace TransLucid
         lambda_application = literal("(") << expr << literal(".") << expr 
           << literal(")");
 
+        where = expr << literal("where\n") << dimlist << varlist
+          << literal("end\n");
+
+        dimlist = *(oneDim);
+
+        oneDim = ustring << expr;
+
+        varlist = *(eqn);
+
+        #if 0
+        eqn = literal("var") 
+          << ustring [_1 = ph::function<get_tuple<0>>()(_val)]
+          #if 0
+          << expr [_1 = ph::at_c<1>(_val)]
+          << literal("&") 
+          << expr [_1 = ph::at_c<2>(_val)]
+          << literal(" = ") 
+          << expr [_1 = ph::at_c<3>(_val)]
+          #endif
+          ;
+        #endif
+
         // TODO: Missing unary
         expr %=
           nil
@@ -217,6 +251,7 @@ namespace TransLucid
         | at_expr
         | lambda_function
         | lambda_application
+        | where
         ;
       }
 
@@ -250,6 +285,24 @@ namespace TransLucid
       karma::rule
       <
         Iterator,
+        TransLucid::Tree::WhereExpr::DimensionList()
+      > dimlist;
+
+      karma::rule
+      <
+        Iterator,
+        std::pair<u32string, Tree::Expr>()
+      > oneDim;
+
+      karma::rule
+      <
+        Iterator,
+        std::vector<TransLucid::Parser::Equation>()
+      > varlist;
+
+      karma::rule
+      <
+        Iterator,
         Tree::TupleExpr::TuplePairs()
       > pairs;
 
@@ -258,6 +311,12 @@ namespace TransLucid
         Iterator,
         std::pair<Tree::Expr, Tree::Expr>()
       > one_pair;
+
+      karma::rule
+      <
+        Iterator,
+        Parser::Equation()
+      > eqn;
 
       std::map<Special, std::string> special_map;
     };

@@ -32,6 +32,12 @@ namespace TransLucid
 {
   namespace Parser
   {
+    typedef std::pair
+    <
+      std::vector<std::pair<u32string, Tree::Expr>>,
+      std::vector<Equation>
+    > WhereSymbols;
+
     template <typename Iterator>
     class ExprGrammar
     : public qi::grammar<Iterator, Tree::Expr()>
@@ -75,16 +81,18 @@ namespace TransLucid
         context_perturb
       ;
 
-      qi::rule<Iterator, Tree::Expr(),
-               qi::locals<Tree::Expr>>
-        lambda_application,
-        phi_application
-      ;
-
-      qi::rule<Iterator, Tree::Expr(), qi::locals<Tree::Expr>>
-        postfix_expr,
+      qi::rule
+      <
+        Iterator, 
+        Tree::Expr(),
+        qi::locals<Tree::Expr>
+      >
         at_expr,
-        binary_op
+        binary_op,
+        lambda_application,
+        phi_application,
+        postfix_expr,
+        where_expr
       ;
 
       qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>>
@@ -93,6 +101,10 @@ namespace TransLucid
 
       qi::rule<Iterator, Tree::Expr()>
         ident_constant
+      ;
+
+      qi::rule<Iterator, WhereSymbols()>
+        where_inside
       ;
 
       System::IdentifierLookup m_idents;

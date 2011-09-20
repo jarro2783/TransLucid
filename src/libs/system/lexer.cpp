@@ -30,7 +30,8 @@ namespace Lexer
 
 template <typename Lexer>
 lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
-: if_(L"if")
+: end_(L"end")
+, if_(L"if")
 , fi_(L"fi")
 , where_(L"where")
 , then_(L"then")
@@ -125,22 +126,23 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   this->self =
     spaces[lex::_pass = lex::pass_flags::pass_ignore]
   //multi character symbols
-  | if_
-  | fi_
-  | where_
-  | then_
-  | elsif_
-  | else_
-  | true_
-  | false_
-  | dblslash_
   | arrow_
-  | dblsemi_
-  //| dbldollar_
-  | dblpercent_
   | assign_
+  | dblpercent_
+  | dblsemi_
+  | dblslash_
+  | end_
+  | else_
+  | elsif_
+  | false_
+  | fi_
+  | if_
   | maps_
   | range_ [detail::handle_range()]
+  | then_
+  | true_
+  //| dbldollar_
+  | where_
 
   //constants
   | constantRAW_       [detail::build_constant()]

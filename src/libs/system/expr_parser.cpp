@@ -223,6 +223,26 @@ namespace TransLucid
       };
     }
 
+    Tree::Expr
+    make_where_clause
+    (
+      const WhereSymbols& defs
+    )
+    {
+      return Tree::Expr();
+    }
+
+    void
+    append_dim
+    (
+      std::vector<std::pair<u32string, Tree::Expr>>& dims,
+      const u32string& name,
+      const Tree::Expr& expr
+    )
+    {
+      dims.push_back(std::make_pair(name, expr));
+    }
+
     /**
      * Construct an expression grammar.
      * @param h The parser header to use.
@@ -237,7 +257,28 @@ namespace TransLucid
     {
       using namespace qi::labels;
 
-      expr %= if_expr
+      expr %= where_expr
+      ;
+
+      where_expr = if_expr[_a = _1] >> 
+      (  tok.where_
+      >> where_inside
+      >> tok.end_
+      ) [_val = ph::bind(&make_where_clause, _2)]
+      | qi::eps[_val = _a]
+      ;
+
+      where_inside =
+      *(
+         (
+           (tok.dimension_ >> tok.arrow_ >> expr)
+           [
+             ph::bind(&append_dim, ph::ref(_val), _1, _3)
+           ]
+         |
+           (tok.var_)
+         ) >> tok.dblsemi_
+       )
       ;
 
       if_expr =
