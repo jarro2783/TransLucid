@@ -56,6 +56,7 @@ TLText::TLText()
 : 
   m_verbose(false)
  ,m_uuids(false)
+ ,m_debug(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_time(0)
@@ -243,7 +244,7 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
           Parser::makeUTF32Iterator(line.second.end())
         );
 
-        auto result = m_system.parseLine(lineBegin, m_verbose);
+        auto result = m_system.parseLine(lineBegin, m_verbose, m_debug);
       }
       break;
 

@@ -50,6 +50,7 @@ namespace TransLucid
   constexpr int MAX_FUNCTION_PARAMETERS = 10;
 
   class Translator;
+  class TreeToWSTree;
 
   /**
    * @brief System base class.
@@ -157,7 +158,12 @@ namespace TransLucid
     );
 
     Constant
-    parseLine(Parser::U32Iterator& begin, bool verbose = false);
+    parseLine
+    (
+      Parser::U32Iterator& begin, 
+      bool verbose = false, 
+      bool debug = false
+    );
 
     //parses an expression, returns a tree of the expression as parsed by
     //the current definitions of the system
@@ -270,6 +276,9 @@ namespace TransLucid
     void
     setDefaultContext();
 
+    Tree::Expr
+    toWSTreePlusLin(const Tree::Expr& e, TreeToWSTree& tows);
+
     DefinitionMap m_equations;
     DefinitionMap m_assignments;
 
@@ -308,9 +317,13 @@ namespace TransLucid
     Context m_defaultk;
     size_t m_time;
     Translator *m_translator;
+    std::vector<dimension_index> m_Lin;
 
     size_t m_uniqueVarIndex;
     size_t m_uniqueDimIndex;
+
+    bool m_debug;
+    bool m_verbose;
 
     friend class detail::InputHDWS;
 

@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
     ("args", 
       po::value<std::vector<std::string>>()->multitoken(),
       "arguments to pass to TransLucid in the CLARGS variable")
+    ("debug,d", "debug mode")
     ("help,h", "show this message")
     ("input,i", po::value<std::string>(), "input file")
     ("output,o", po::value<std::string>(), "output file")
@@ -111,6 +112,11 @@ int main(int argc, char *argv[])
   try
   {
     TransLucid::TLText::TLText tltext;
+    
+    if (vm.count("debug"))
+    {
+      tltext.debug(true);
+    }
     
     if (vm.count("verbose"))
     {

@@ -86,6 +86,12 @@ namespace TransLucid
         m_uuids = u;
       }
 
+      void
+      debug(bool d = true)
+      {
+        m_debug = d;
+      }
+
       /**
        * Run the system. Starts the system, parses input and evaluates 
        * according to the semantics of tlcore. Doesn't return until a parse
@@ -123,6 +129,7 @@ namespace TransLucid
       private:
       bool m_verbose;
       bool m_uuids;
+      bool m_debug;
 
       std::istream* m_is;
       std::ostream* m_os;

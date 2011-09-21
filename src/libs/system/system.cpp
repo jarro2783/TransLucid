@@ -349,6 +349,7 @@ System::System()
 , m_time(0)
 , m_uniqueVarIndex(0)
 , m_uniqueDimIndex(0)
+, m_debug(false)
 {
   //create the obj, const and fun ids
 
@@ -515,16 +516,31 @@ System::lastExpression() const
 }
 
 Constant
-System::parseLine(Parser::U32Iterator& begin, bool verbose)
+System::parseLine
+(
+  Parser::U32Iterator& begin, 
+  bool verbose,
+  bool debug
+)
 {
   Parser::U32Iterator end;
+
+  //TODO this is a hack, implement debug and verbose properly
+  //some sort of output object might be good too
+  m_debug = debug;
 
   auto result = m_translator->parseLine(begin, m_defaultk);
 
   if (result.first)
   {
     detail::LineAdder adder(*this, verbose);
-    return boost::apply_visitor(adder, result.second);
+    Constant c = boost::apply_visitor(adder, result.second);
+
+    //this is the best way that we know for now, fix up the default context for
+    //the L_in dims that were added
+    setDefaultContext();
+
+    return c;
   }
 
   return Types::Special::create(SP_CONST); 
@@ -701,9 +717,24 @@ System::addDeclInternal
   TreeToWSTree tows(this);
 
   //simplify, turn into workshops
-  Tree::Expr guard   = tows.toWSTree(std::get<1>(eqn));
-  Tree::Expr boolean = tows.toWSTree(std::get<2>(eqn));
-  Tree::Expr expr    = tows.toWSTree(std::get<3>(eqn));
+  Tree::Expr guard   = toWSTreePlusLin(std::get<1>(eqn), tows);
+  Tree::Expr boolean = toWSTreePlusLin(std::get<2>(eqn), tows);
+  Tree::Expr expr    = toWSTreePlusLin(std::get<3>(eqn), tows);
+
+  if (m_debug)
+  {
+    //print everything
+    std::cout << "The rewritten expr" << std::endl; 
+    std::cout << 
+      Parser::printEquation
+      (std::make_tuple(std::get<0>(eqn), guard, boolean, expr)) 
+      << std::endl;
+
+    for (const auto& e : tows.newVars())
+    {
+      std::cout << Parser::printEquation(e) << std::endl;
+    }
+  }
 
   WorkshopBuilder compile(this);
 
@@ -799,6 +830,13 @@ System::setDefaultContext()
         {DIM_TIME, Types::Intmp::create(m_time)}
       }
   ));
+
+  for (auto d : m_Lin)
+  {
+    std::cerr << "putting dim: " << d << " in the default context" 
+      << std::endl;
+    m_defaultk.perturb(d, Types::Intmp::create(0));
+  }
 }
 
 template <typename T>
@@ -881,6 +919,17 @@ System::addInputHyperdaton
   {
     return Types::Special::create(SP_MULTIDEF); 
   }
+}
+
+Tree::Expr
+System::toWSTreePlusLin(const Tree::Expr& e, TreeToWSTree& tows)
+{
+  Tree::Expr wstree = tows.toWSTree(e);
+
+  //The L_in dims are set to 0 in the default context
+  m_Lin.insert(m_Lin.end(), tows.getLin().begin(), tows.getLin().end());
+
+  return wstree;
 }
 
 } //namespace TransLucid

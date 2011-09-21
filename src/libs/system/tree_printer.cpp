@@ -120,6 +120,13 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
+  TransLucid::Tree::BangOpExpr,
+  (TransLucid::Tree::Expr, name)
+  (std::vector<TransLucid::Tree::Expr>, args)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
   TransLucid::Tree::WhereExpr,
   (TransLucid::Tree::Expr, e)
   (TransLucid::Tree::WhereExpr::DimensionList, dims)
@@ -157,6 +164,21 @@ namespace TransLucid
     using boost::spirit::_1;
     using namespace phoenix;
 
+    u32string
+    print_dimension(const Tree::DimensionExpr& d)
+    {
+      if (d.text.empty())
+      {
+        std::ostringstream os;
+        os << "hiddendim_" << d.dim;
+        return utf8_to_utf32(os.str());
+      }
+      else
+      {
+        return d.text;
+      }
+    }
+
     template <typename Iterator>
     struct ExprPrinter : karma::grammar<Iterator, Tree::Expr()>
     {
@@ -184,7 +206,13 @@ namespace TransLucid
         [
           _1 = ph::bind(&utf32_to_utf8, construct<u32string>(1, _val))
         ];
-        ustring = karma::string[_1 = ph::bind(&utf32_to_utf8, _val)];
+
+        stringLiteral = karma::string[_1 = ph::bind(&utf32_to_utf8, _val)];
+
+        ustring = literal("\"") 
+          << karma::string[_1 = ph::bind(&utf32_to_utf8, _val)]
+          << literal("\"")
+        ;
 
         constant =
            karma::string[_1 = ph::bind(&utf32_to_utf8, ph::at_c<0>(_val))]
@@ -192,10 +220,12 @@ namespace TransLucid
         << karma::string[_1 = ph::bind(&utf32_to_utf8, ph::at_c<1>(_val))]
         << literal('>')
         ;
-        dimension = ustring[_1 = at_c<0>(_val)];
-        ident = ustring[_1 = at_c<0>(_val)];
 
-        binary_symbol = ustring[_1 = at_c<1>(_val)];
+        dimension = stringLiteral[_1 = ph::bind(print_dimension, _val)];
+
+        ident = stringLiteral[_1 = at_c<0>(_val)];
+
+        binary_symbol = stringLiteral[_1 = at_c<1>(_val)];
         binary %= ('(') << expr << binary_symbol << expr 
         << literal(')');
 
@@ -204,12 +234,12 @@ namespace TransLucid
         hash_expr = ("(#") << expr[_1 = at_c<0>(_val)] << (')');
         pairs %= one_pair % ", ";
 
-        one_pair %= expr << ':' << expr;
+        one_pair %= expr << literal(" <- ") << expr;
         tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
         at_expr = literal('(') << expr << literal('@') << expr << literal(')');
 
         lambda_function = karma::string(literal("(\\")) 
-          << ustring[_1 = ph::at_c<0>(_val)] 
+          << stringLiteral[_1 = ph::at_c<0>(_val)] 
           << literal(" -> ") << expr[_1 = ph::at_c<1>(_val)] 
           << literal(")");
 
@@ -221,12 +251,13 @@ namespace TransLucid
 
         dimlist = *(oneDim);
 
-        oneDim = ustring << expr;
+        oneDim = literal("dim ") << stringLiteral << literal(" <- ") 
+          << expr << literal(";;\n");
 
         varlist = *(eqn);
 
         eqn = literal("var ") 
-          << ustring [_1 = ph::function<get_tuple<0>>()(_val)]
+          << stringLiteral [_1 = ph::function<get_tuple<0>>()(_val)]
           << literal(" ")
           << expr [_1 = ph::function<get_tuple<1>>()(_val)]
           << literal(" & ") 
@@ -235,6 +266,9 @@ namespace TransLucid
           << expr [_1 = ph::function<get_tuple<3>>()(_val)]
           << literal(";;\n")
           ;
+
+        bangop = expr << literal("!(") << *(expr % literal(","))
+          << literal(")");
 
         // TODO: Missing unary
         expr %=
@@ -256,6 +290,7 @@ namespace TransLucid
         | lambda_function
         | lambda_application
         | where
+        | bangop
         ;
       }
 
@@ -285,6 +320,9 @@ namespace TransLucid
       karma::rule<Iterator, Tree::LambdaExpr()> lambda_function;
       karma::rule<Iterator, Tree::LambdaAppExpr()> lambda_application;
       karma::rule<Iterator, Tree::WhereExpr()> where;
+      karma::rule<Iterator, Tree::BangOpExpr()> bangop;
+
+      karma::rule<Iterator, u32string()> stringLiteral;
 
       karma::rule
       <

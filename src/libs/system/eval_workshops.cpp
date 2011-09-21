@@ -48,6 +48,11 @@ namespace TransLucid
 namespace Workshops
 {
 
+DimensionWS::DimensionWS(System& system, dimension_index dim)
+: m_value(Types::Dimension::create(dim))
+{
+}
+
 DimensionWS::DimensionWS(System& system, const std::u32string& name)
 : m_value(Types::Dimension::create(system.getDimensionIndex(name)))
 {

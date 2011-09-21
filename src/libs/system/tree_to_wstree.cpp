@@ -307,7 +307,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
   m_Lout.push_back(label);
 
   //L_in is all of the inner where clauses 
-  boost::apply_visitor(*this, e.e);
+  //boost::apply_visitor(*this, e.e);
 
   m_Lin.clear();
   for (const auto& evar : e.vars)
@@ -342,6 +342,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
 
   //visit child E
   Tree::Expr expr = boost::apply_visitor(*this, e.e);
+  myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
   //we have now fully computed the where clause's L_in
   w.Lin = myLin;
@@ -366,7 +367,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
     w.whichDims.push_back(next);
     odometerDims.push_back
     (
-      std::make_pair(Tree::DimensionExpr(v.first), mpz_class(next))
+      std::make_pair(Tree::DimensionExpr(v.first), v.second)
     );
 
     //generate the dimExpr
@@ -386,15 +387,34 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
   }
 
   //generate the E which sets L_in dimension to 0
-  for (auto dim : m_Lin)
+  for (auto dim : myLin)
   {
     odometerDims.push_back(
       std::make_pair(Tree::DimensionExpr(dim), mpz_class(0)));
   }
 
+  //increment our own dim
+  Tree::Expr incOwnRaw = Tree::BinaryOpExpr
+    (
+      Tree::BinaryOperator(Tree::ASSOC_LEFT, U"plus", U"+", 0),
+      Tree::HashExpr(Tree::DimensionExpr(label)),
+      mpz_class(1)
+    );
+
+  Tree::Expr incOwn = boost::apply_visitor(*this, incOwnRaw);
+
+  odometerDims.push_back
+  (
+    std::make_pair
+    (
+      Tree::DimensionExpr(label),
+      incOwn
+    )
+  );
+
   w.e = Tree::AtExpr
     (
-      e.e,
+      expr,
       Tree::TupleExpr(odometerDims)
     );
 

@@ -328,7 +328,7 @@ namespace TransLucid
       where_inside =
       *(
          (
-           (tok.dimension_ >> tok.identifier_ >> tok.arrow_ >> expr)
+           (tok.dimension_ >> tok.identifier_ >> tok.maps_ >> expr)
            [
              ph::bind(
                &append_dim, 

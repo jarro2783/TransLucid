@@ -73,6 +73,11 @@ namespace TransLucid
       return m_newVars;
     }
 
+    const std::vector<dimension_index>& getLin() const
+    {
+      return m_Lin;
+    }
+
     private:
 
     Tree::WhereExpr 

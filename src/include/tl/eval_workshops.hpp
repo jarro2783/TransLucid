@@ -75,6 +75,8 @@ namespace TransLucid
       public:
       DimensionWS(System& system, const std::u32string& name);
 
+      DimensionWS(System& system, dimension_index dim);
+
       Constant
       operator()(Context& k);
 

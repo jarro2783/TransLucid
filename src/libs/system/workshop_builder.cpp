@@ -94,7 +94,14 @@ WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::DimensionExpr& e)
 {
-  return new Workshops::DimensionWS(*m_system, e.text);
+  if (e.text.empty())
+  {
+    return new Workshops::DimensionWS(*m_system, e.dim);
+  }
+  else
+  {
+    return new Workshops::DimensionWS(*m_system, e.text);
+  }
 }
 
 WS*
