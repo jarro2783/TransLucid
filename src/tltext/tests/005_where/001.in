@@ -1,0 +1,7 @@
+var f = x + #d
+where
+  var x = 5;;
+  dim d <- 6;;
+end;;
+%%
+f;;
