@@ -251,7 +251,7 @@ utf32_to_utf8(const std::u32string& s) {
   //char out[buffer_size];
   //this is the maximum size that the string will be
   //we could probably do better
-  out.reset(new char[s.size() * 4]);
+  out.reset(new char[s.size() * 4 + 1]);
 
   //in = new char32_t[];
   //char32_t in[buffer_size];
@@ -317,7 +317,7 @@ utf8_to_utf32(const std::string& s)
   size_t inSize = s.size();
   size_t outSize = s.size() * sizeof(char32_t);
 
-  std::unique_ptr<char32_t[]> out(new char32_t[outSize]);
+  std::unique_ptr<char32_t[]> out(new char32_t[outSize + 1]);
   //char in[buffer_size];
   //memcpy(in, s.c_str(), s.size());
 

@@ -422,6 +422,7 @@ System::~System()
 void
 System::go()
 {
+  std::cout << "System is go!!!" << std::endl;
   for (const auto& ident : m_assignments)
   {
     auto hd = m_outputHDs.find(ident.first);
@@ -441,7 +442,7 @@ System::go()
     for (auto& assign : equations)
     {
       //std::cerr << "doing a demand" << std::endl;
-      const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
+      //const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
       const GuardWS& guard = assign.second.validContext();
 
       Tuple k = guard.evaluate(theContext);
@@ -465,8 +466,8 @@ System::go()
          )
       {
         ContextPerturber p1(theContext, k);
-        ContextPerturber p2(theContext, 
-          {{DIM_TIME, Types::Intmp::create(m_time)}});
+        //ContextPerturber p2(theContext, 
+        //  {{DIM_TIME, Types::Intmp::create(m_time)}});
 
         Constant v = assign.second(theContext);
         //std::cerr << "putting result" << std::endl;

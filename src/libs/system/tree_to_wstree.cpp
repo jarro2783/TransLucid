@@ -393,6 +393,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
       std::make_pair(Tree::DimensionExpr(dim), mpz_class(0)));
   }
 
+#if 0
   //increment our own dim
   Tree::Expr incOwnRaw = Tree::BinaryOpExpr
     (
@@ -411,6 +412,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
       incOwn
     )
   );
+#endif
 
   w.e = Tree::AtExpr
     (

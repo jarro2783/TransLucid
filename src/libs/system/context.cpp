@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 
 #include <algorithm>
+#include <iostream>
 
 namespace TransLucid
 {
@@ -47,6 +48,7 @@ Context::lookup(dimension_index dim) const
 {
   if (dim <= m_min || dim >= m_max)
   {
+    std::cerr << "undefined dim for " << dim << std::endl;
     return m_all;
   }
   else
@@ -55,6 +57,7 @@ Context::lookup(dimension_index dim) const
 
     if (s.empty())
     {
+      std::cerr << "undefined dim for " << dim << std::endl;
       return m_all;
     }
     else
