@@ -348,7 +348,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
   w.Lin = myLin;
 
   //rewrite E to
-  //E @ [d_i <- E_i, Lin_i <- 0]
+  //E @ [d_i <- E_i, Lin_i <- 0] @ [l <- #l + 1]
   //d_i is [which <- index_d, Lout_i <- #Lout_i]
   Tree::TupleExpr::TuplePairs odometerDims;
 
@@ -393,7 +393,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
       std::make_pair(Tree::DimensionExpr(dim), mpz_class(0)));
   }
 
-#if 0
   //increment our own dim
   Tree::Expr incOwnRaw = Tree::BinaryOpExpr
     (
@@ -404,6 +403,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
 
   Tree::Expr incOwn = boost::apply_visitor(*this, incOwnRaw);
 
+  #if 0
   odometerDims.push_back
   (
     std::make_pair
@@ -412,12 +412,12 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
       incOwn
     )
   );
-#endif
+  #endif
 
   w.e = Tree::AtExpr
     (
-      expr,
-      Tree::TupleExpr(odometerDims)
+      Tree::AtExpr(expr, Tree::TupleExpr(odometerDims)),
+      Tree::TupleExpr({{Tree::DimensionExpr(label), incOwn}})
     );
 
   //we return the rewritten E and add the variables to the list of variables
