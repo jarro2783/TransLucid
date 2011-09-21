@@ -422,7 +422,6 @@ System::~System()
 void
 System::go()
 {
-  std::cout << "System is go!!!" << std::endl;
   for (const auto& ident : m_assignments)
   {
     auto hd = m_outputHDs.find(ident.first);
@@ -834,8 +833,6 @@ System::setDefaultContext()
 
   for (auto d : m_Lin)
   {
-    std::cerr << "putting dim: " << d << " in the default context" 
-      << std::endl;
     m_defaultk.perturb(d, Types::Intmp::create(0));
   }
 }

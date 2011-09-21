@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/intmp.hpp>
 
 #include <vector>
+#include <iostream>
+#include <tl/output.hpp>
 
 namespace TransLucid
 {
