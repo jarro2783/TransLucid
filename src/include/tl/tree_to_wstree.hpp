@@ -68,6 +68,11 @@ namespace TransLucid
     Tree::Expr operator()(const Tree::LambdaAppExpr& e);
     Tree::Expr operator()(const Tree::WhereExpr& e);
 
+    const std::vector<Parser::Equation>& newVars() const
+    {
+      return m_newVars;
+    }
+
     private:
 
     Tree::WhereExpr 

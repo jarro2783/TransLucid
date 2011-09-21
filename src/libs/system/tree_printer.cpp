@@ -216,8 +216,8 @@ namespace TransLucid
         lambda_application = literal("(") << expr << literal(".") << expr 
           << literal(")");
 
-        where = expr << literal("where\n") << dimlist << varlist
-          << literal("end\n");
+        where = expr << literal(" where\n") << dimlist << varlist
+          << literal("end ");
 
         dimlist = *(oneDim);
 
@@ -225,13 +225,15 @@ namespace TransLucid
 
         varlist = *(eqn);
 
-        eqn = literal("var") 
+        eqn = literal("var ") 
           << ustring [_1 = ph::function<get_tuple<0>>()(_val)]
+          << literal(" ")
           << expr [_1 = ph::function<get_tuple<1>>()(_val)]
-          << literal("&") 
+          << literal(" & ") 
           << expr [_1 = ph::function<get_tuple<2>>()(_val)]
           << literal(" = ") 
           << expr [_1 = ph::function<get_tuple<3>>()(_val)]
+          << literal(";;\n")
           ;
 
         // TODO: Missing unary

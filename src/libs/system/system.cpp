@@ -715,6 +715,18 @@ System::addDeclInternal
     declarations
   );
 
+  //add all the new equations
+  for (const auto& e : tows.newVars())
+  {
+    addDeclInternal(
+      std::get<0>(e),
+      GuardWS(compile.build_workshops(std::get<1>(e)),
+        compile.build_workshops(std::get<2>(e))),
+      compile.build_workshops(std::get<3>(e)),
+      declarations
+    );
+  }
+
   return Types::UUID::create(u);
 }
 

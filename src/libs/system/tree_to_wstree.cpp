@@ -36,9 +36,6 @@ namespace TransLucid
 Tree::Expr
 TreeToWSTree::toWSTree(const Tree::Expr& expr)
 {
-  m_Lout.clear();
-  m_newVars.clear();
-
   //rename everything first
   RenameIdentifiers rename(*m_system);
 
