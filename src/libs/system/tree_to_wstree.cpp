@@ -268,11 +268,22 @@ Tree::Expr TreeToWSTree::operator()(const Tree::AtExpr& e)
 
 Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
 {
+  //generate a new dimension
+  //store our scope dimensions
+  //store the L_outs for the odometer
+  //add ourselves to the scope
+  //visit the child
+  //restore the scope
   return e;
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::LambdaExpr& e)
 {
+  //generate a new dimension
+  //store our scope dimensions
+  //add ourselves to the scope
+  //visit the child
+  //restore the scope
   return Tree::LambdaExpr(e.name, boost::apply_visitor(*this, e.rhs));
 }
 

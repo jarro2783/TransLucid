@@ -87,5 +87,11 @@ namespace TransLucid
     std::vector<dimension_index> m_Lin;
 
     std::vector<Parser::Equation> m_newVars;
+
+
+    //the function scopes
+    std::vector<dimension_index> m_namedScopeArgs;
+    std::vector<dimension_index> m_namedScopeOdometers;
+    std::vector<dimension_index> m_valueScopeArgs;
   };
 }
