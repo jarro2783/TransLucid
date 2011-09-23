@@ -584,9 +584,9 @@ namespace TransLucid
 
     struct FunctionInfo
     {
-      dimension_index myDim;
-      std::vector<dimension_index> lambda_scope;
-      std::vector<dimension_index> phi_scope;
+      std::vector<dimension_index> valueScopeArgs;
+      std::vector<dimension_index> namedScopeArgs;
+      std::vector<dimension_index> namedScopeOdometers;
     };
 
     /**
@@ -610,6 +610,7 @@ namespace TransLucid
       u32string name; /**<The bound parameter.*/
       Expr rhs; /**<The right-hand-side expression.*/
 
+      dimension_index argDim;
       FunctionInfo info;
     };
 
@@ -619,6 +620,8 @@ namespace TransLucid
       u32string name;
       Expr rhs;
 
+      dimension_index argDim;
+      dimension_index odometerDim;
       FunctionInfo info;
     };
 
@@ -664,6 +667,8 @@ namespace TransLucid
 
       Expr lhs; /**<The lhs expression.*/
       Expr rhs; /**<The rhs expression.*/
+
+      std::vector<dimension_index> Lall;
     };
 
     struct WhereExpr

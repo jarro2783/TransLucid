@@ -285,7 +285,19 @@ AtWS::operator()(Context& k)
 Constant
 LambdaAbstractionWS::operator()(Context& k)
 {
-  return Types::Function::create(LambdaFunctionType(m_name, m_dim, m_rhs));
+  return Types::ValueFunction::create
+  (
+    ValueFunctionType
+    (
+      m_name, 
+      m_argDim, 
+      m_info.valueScopeArgs, 
+      m_info.namedScopeArgs, 
+      m_info.namedScopeOdometers, 
+      m_rhs, 
+      k
+    )
+  );
 }
 
 Constant
@@ -296,15 +308,15 @@ LambdaApplicationWS::operator()(Context& k)
 
   Constant lhs = (*m_lhs)(k);
   //first make sure that it is a function
-  if (lhs.index() != TYPE_INDEX_FUNCTION)
+  if (lhs.index() != TYPE_INDEX_VALUE_FUNCTION)
   {
     return Types::Special::create(SP_TYPEERROR);
   }
 
   Constant rhs = (*m_rhs)(k);
-  const FunctionType& f = Types::Function::get(lhs);
+  const ValueFunctionType& f = Types::ValueFunction::get(lhs);
 
-  return f.applyLambda(k, rhs);
+  return f.apply(k, rhs);
 }
 
 } //namespace Workshops

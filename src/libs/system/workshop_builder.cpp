@@ -198,35 +198,17 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 {
-  throw "Lambda expressions not implemented";
-//TODO: we will get to this eventually
-#if 0
-  //generate a new dimension
-  tuple_t k = {{DIM_ID, generate_string(U"_uniquedim")}};
-  Intmp uniqueIndex = (*m_system)(Tuple(k)).first.value<Intmp>();
-  dimension_index index = uniqueIndex.value().get_ui();
+  WS* rhs = boost::apply_visitor(*this, e.rhs);
 
-  //generate a unique name alpha
-  k[DIM_ID] = generate_string(U"_unique");
-  Intmp nameNum = (*m_system)(Tuple(k)).first.value<Intmp>();
-  std::ostringstream os;
-  os << nameNum.value() << "_lambdaparam";
-  u32string uniqueName = to_u32string(os.str());
-
-  //rename name to alpha in the sub expression
-  Tree::Expr renamed = RenameIdentifier(e.name, uniqueName).rename(e.rhs);
-
-  //add alpha = #_uniquedim to the system
-  WS* hashUnique = new HashIndexWS(index);
-  tuple_t addContext = {{DIM_ID, generate_string(uniqueName)}};
-  //m_system->addExpr(Tuple(addContext), hashUnique);
-  m_system->addEquation(uniqueName, hashUnique);
-
-  //make a LambdaAbstractionWS
-  WS* rhs = boost::apply_visitor(*this, renamed);
-  return new Workshops::LambdaAbstractionWS(m_system, e.name, index, rhs);
-#endif
-  return 0;
+  return new Workshops::LambdaAbstractionWS
+  (
+    e.name,
+    e.argDim,
+    e.info.valueScopeArgs,
+    e.info.namedScopeArgs,
+    e.info.namedScopeOdometers,
+    rhs
+  );
 }
 
 WS*

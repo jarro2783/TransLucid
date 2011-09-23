@@ -66,11 +66,11 @@ namespace TransLucid
         &delete_ptr<u32string>
       };
 
-    TypeFunctions function_type_functions =
+    TypeFunctions value_function_type_functions =
       {
-        &Types::Function::equality,
-        &Types::Function::hash,
-        &delete_ptr<FunctionType>
+        &Types::ValueFunction::equality,
+        &Types::ValueFunction::hash,
+        &delete_ptr<ValueFunctionType>
       };
 
     TypeFunctions range_type_functions =
@@ -382,10 +382,10 @@ namespace TransLucid
     };
 
     template <>
-    struct clone<FunctionType>
+    struct clone<ValueFunctionType>
     {
-      FunctionType*
-      operator()(const FunctionType& v)
+      ValueFunctionType*
+      operator()(const ValueFunctionType& v)
       {
         return v.clone();
       }
@@ -501,19 +501,19 @@ namespace TransLucid
       }
     }
 
-    namespace Function
+    namespace ValueFunction
     {
       Constant
-      create(const FunctionType& f)
+      create(const ValueFunctionType& f)
       {
         return make_constant_pointer
-          (f, &function_type_functions, TYPE_INDEX_FUNCTION);
+          (f, &value_function_type_functions, TYPE_INDEX_VALUE_FUNCTION);
       }
 
-      const FunctionType&
+      const ValueFunctionType&
       get(const Constant& c)
       {
-        return get_constant_pointer<FunctionType>(c);
+        return get_constant_pointer<ValueFunctionType>(c);
       }
 
       size_t
@@ -826,10 +826,11 @@ FunctionType::~FunctionType()
 }
 
 Constant
-LambdaFunctionType::applyLambda(Context& k, const Constant& value) const
+ValueFunctionType::apply(Context& k, const Constant& value) const
 {
   //set m_dim = value in the context and evaluate the expr
   ContextPerturber p(k, {{m_dim, value}});
+  p.perturb(m_scopeDims);
   auto r = (*m_expr)(k);
 
   return r;

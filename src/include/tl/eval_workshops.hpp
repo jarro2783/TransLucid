@@ -454,21 +454,35 @@ namespace TransLucid
       WS* e1;
     };
 
+    struct FunctionInfo
+    {
+      std::vector<dimension_index> valueScopeArgs;
+      std::vector<dimension_index> namedScopeArgs;
+      std::vector<dimension_index> namedScopeOdometers;
+    };
+
     class LambdaAbstractionWS : public WS
     {
       public:
       LambdaAbstractionWS
       (
-        WS* system, 
         const u32string& name, 
         dimension_index dim, 
+        std::vector<dimension_index> valueScopeArgs,
+        std::vector<dimension_index> namedScopeArgs,
+        std::vector<dimension_index> namedScopeOdometers,
         WS* rhs
       )
-      : m_system(system)
-      , m_name(name)
-      , m_dim(dim)
+      : m_name(name)
+      , m_argDim(dim)
+      , m_info{valueScopeArgs, namedScopeArgs, namedScopeOdometers}
       , m_rhs(rhs)
       {
+      }
+
+      ~LambdaAbstractionWS()
+      {
+        delete m_rhs;
       }
 
       Constant
@@ -477,7 +491,8 @@ namespace TransLucid
       private:
       WS* m_system;
       u32string m_name;
-      dimension_index m_dim;
+      dimension_index m_argDim;
+      FunctionInfo m_info;
       WS* m_rhs;
     };
 

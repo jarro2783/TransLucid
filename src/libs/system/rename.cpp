@@ -245,7 +245,7 @@ Tree::Expr
 RenameIdentifiers::renameFunction(const T& f)
 {
   //generate a new name
-  u32string unique = generateUnique(U"uniquelambda");
+  u32string unique = generateUnique(U"uniquefn");
 
   //if the name shadows an existing name then store it
   u32string shadowed;
@@ -262,7 +262,9 @@ RenameIdentifiers::renameFunction(const T& f)
   }
 
   //rename
-  Tree::LambdaExpr l(f.name, boost::apply_visitor(*this, f.rhs));
+  T l(f);
+  l.name = unique;
+  l.rhs = boost::apply_visitor(*this, f.rhs);
 
   //restore the shadowed name
   if (!shadowed.empty())

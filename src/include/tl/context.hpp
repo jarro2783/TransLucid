@@ -117,6 +117,17 @@ namespace TransLucid
       }
     }
 
+    template <typename T>
+    void
+    perturb(const T& t)
+    {
+      for (const auto& v : t)
+      {
+        m_k.perturb(v.first, v.second);
+        m_dims.push_back(v.first);
+      }
+    }
+
     ContextPerturber
     (
       Context& k,

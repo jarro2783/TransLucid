@@ -42,22 +42,45 @@ namespace TransLucid
     hash() const = 0;
   };
 
-  class LambdaFunctionType : public FunctionType
+  class ValueFunctionType
   {
     public:
-    LambdaFunctionType(const u32string& name, dimension_index dim, WS* expr)
-    : m_name(name), m_dim(dim), m_expr(expr)
+    ValueFunctionType
+    (
+      const u32string& name, 
+      dimension_index argDim, 
+      const std::vector<dimension_index>& valueScope,
+      const std::vector<dimension_index>& namedScopeArgs,
+      const std::vector<dimension_index>& namedScopeOdometers,
+      WS* expr,
+      const Context& k
+    )
+    : m_name(name), m_dim(argDim), m_expr(expr)
     {
+      for (auto d : valueScope)
+      {
+        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      for (auto d : namedScopeArgs)
+      {
+        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      for (auto d : namedScopeOdometers)
+      {
+        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+      }
+    }
+
+    ValueFunctionType*
+    clone() const
+    {
+      return new ValueFunctionType(*this);
     }
 
     Constant
-    applyLambda(Context& k, const Constant& value) const;
-
-    LambdaFunctionType*
-    clone() const
-    {
-      return new LambdaFunctionType(*this);
-    }
+    apply(Context& k, const Constant& value) const;
 
     size_t
     hash() const
@@ -68,6 +91,7 @@ namespace TransLucid
     private:
     u32string m_name;
     dimension_index m_dim;
+    std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
     WS* m_expr;
   };
 
@@ -80,12 +104,12 @@ namespace TransLucid
 
   namespace Types
   {
-    namespace Function
+    namespace ValueFunction
     {
       Constant
-      create(const FunctionType& f);
+      create(const ValueFunctionType& f);
 
-      const FunctionType&
+      const ValueFunctionType&
       get(const Constant& c);
 
       bool

@@ -266,33 +266,88 @@ Tree::Expr TreeToWSTree::operator()(const Tree::AtExpr& e)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
-{
-  //generate a new dimension
-  //store our scope dimensions
-  //store the L_outs for the odometer
-  //add ourselves to the scope
-  //visit the child
-  //restore the scope
-  return e;
-}
-
 Tree::Expr TreeToWSTree::operator()(const Tree::LambdaExpr& e)
 {
-  //generate a new dimension
-  //store our scope dimensions
-  //add ourselves to the scope
-  //visit the child
-  //restore the scope
-  return Tree::LambdaExpr(e.name, boost::apply_visitor(*this, e.rhs));
+  //1. generate a new dimension
+  //2. store our scope dimensions
+  //3. add ourselves to the scope
+  //4. visit the child
+  //5. add a new equation param = #dim
+  //6. restore the scope
+
+  Tree::LambdaExpr expr = e;
+  expr.name = e.name;
+
+  //1. generate a new dimension
+  dimension_index argDim = m_system->nextDimensionIndex();
+
+  //2. store our scope dimensions and ourself
+  expr.info =
+  {
+    m_valueScopeArgs,
+    m_namedScopeArgs,
+    m_namedScopeOdometers
+  };
+  expr.argDim = argDim;
+
+  //3. add ourselves to the scope
+  m_valueScopeArgs.push_back(argDim);
+
+  //4. visit the child
+  expr.rhs = boost::apply_visitor(*this, e.rhs);
+
+  //5. add a new equation param = #dim
+  m_newVars.push_back
+  (
+    std::make_tuple
+    (
+      e.name,
+      Tree::Expr(),
+      Tree::Expr(),
+      Tree::HashExpr(Tree::DimensionExpr(argDim))
+    )
+  );
+
+  //6. restore the scope
+  m_valueScopeArgs.pop_back();
+
+  return expr;
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::PhiAppExpr& e)
+Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
 {
-  return Tree::PhiAppExpr(
-    boost::apply_visitor(*this, e.lhs),
-    boost::apply_visitor(*this, e.rhs)
-  );
+  //1. generate a new dimension
+  //2. store our scope dimensions and ourself
+  //3. add ourselves to the scope
+  //4. visit the child
+  //5. restore the scope
+
+  Tree::PhiExpr expr = e;
+
+  //1. generate new dimensions
+  dimension_index argDim = m_system->nextDimensionIndex();
+  dimension_index odometerDim = m_system->nextDimensionIndex();
+
+  //2. store our scope dimensions and ourself
+  expr.info =
+  {
+    m_valueScopeArgs,
+    m_namedScopeArgs,
+    m_namedScopeOdometers
+  };
+  expr.argDim = argDim;
+  expr.odometerDim = odometerDim;
+
+  //3. add ourselves to the scope
+  m_namedScopeArgs.push_back(argDim);
+
+  //4. visit the child
+  expr.rhs = boost::apply_visitor(*this, e.rhs);
+
+  //5. restore the scope
+  m_namedScopeArgs.pop_back();
+
+  return expr;
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::LambdaAppExpr& e)
@@ -301,6 +356,22 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LambdaAppExpr& e)
     boost::apply_visitor(*this, e.lhs),
     boost::apply_visitor(*this, e.rhs)
   );
+}
+
+Tree::Expr TreeToWSTree::operator()(const Tree::PhiAppExpr& e)
+{
+  //store the dims of L_all
+
+  Tree::PhiAppExpr expr
+  (
+    boost::apply_visitor(*this, e.lhs),
+    boost::apply_visitor(*this, e.rhs)
+  );
+
+  expr.Lall = m_Lout;
+  expr.Lall.insert(expr.Lall.end(), m_Lin.begin(), m_Lin.end());
+
+  return expr;
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
