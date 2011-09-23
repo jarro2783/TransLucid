@@ -452,20 +452,18 @@ namespace TransLucid
         | phi_application [_val = _1]
       ;
 
-      #if 0
       phi_application =
         ( 
          lambda_application[_a = _1]
       >> *(
-            lambda_application[_a = construct<Tree::ValueAppExpr>(_a, _1)]
+            lambda_application[_a = construct<Tree::PhiAppExpr>(_a, _1)]
           )
         )
         [
           _val = _a
         ]
       ;
-      #endif
-      phi_application %= lambda_application;
+      //phi_application %= lambda_application;
 
       lambda_application =
         (

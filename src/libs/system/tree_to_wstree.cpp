@@ -320,7 +320,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
   //2. store our scope dimensions and ourself
   //3. add ourselves to the scope
   //4. visit the child
-  //5. restore the scope
+  //5. add a new equation name = args @ [stuff]
+  //6. restore the scope
 
   Tree::PhiExpr expr = e;
 
@@ -340,12 +341,16 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
 
   //3. add ourselves to the scope
   m_namedScopeArgs.push_back(argDim);
+  m_namedScopeOdometers.push_back(odometerDim);
 
   //4. visit the child
   expr.rhs = boost::apply_visitor(*this, e.rhs);
 
-  //5. restore the scope
+  //5. add a new equation name = args @ [stuff]
+
+  //6. restore the scope
   m_namedScopeArgs.pop_back();
+  m_namedScopeOdometers.pop_back();
 
   return expr;
 }

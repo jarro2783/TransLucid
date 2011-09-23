@@ -214,17 +214,18 @@ WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::PhiExpr& e)
 {
-  throw "phi expressions not implemented";
-  //generate a new dimension gamma
+  WS* rhs = boost::apply_visitor(*this, e.rhs);
 
-  //generate a unique name alpha
-  
-  //tag e with j (just &e)
-
-  //add alpha | hd(#gamma) == j = e.rhs @ [gamma : tl(#gamma)]
-
-  //create a PhiAbstractionWS
-  return 0;
+  return new Workshops::NamedAbstractionWS
+  (
+    e.name,
+    e.argDim,
+    e.odometerDim,
+    e.info.valueScopeArgs,
+    e.info.namedScopeArgs,
+    e.info.namedScopeOdometers,
+    rhs
+  );
 }
 
 WS* 

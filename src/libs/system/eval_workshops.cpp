@@ -34,6 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/function.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
+#include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
@@ -317,6 +318,42 @@ LambdaApplicationWS::operator()(Context& k)
   const ValueFunctionType& f = Types::ValueFunction::get(lhs);
 
   return f.apply(k, rhs);
+}
+
+Constant
+NamedAbstractionWS::operator()(Context& k)
+{
+  return Types::NameFunction::create
+  (
+    NameFunctionType
+    (
+      m_name,
+      m_argDim,
+      m_odometerDim,
+      m_info.valueScopeArgs, 
+      m_info.namedScopeArgs, 
+      m_info.namedScopeOdometers, 
+      m_rhs, 
+      k
+    )
+  );
+}
+
+Constant
+NameApplicationWS::operator()(Context& k)
+{
+  Constant lhs = (*m_lhs)(k);
+
+  if (lhs.index() != TYPE_INDEX_NAME_FUNCTION)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+
+  //named application passes a pointer to the intension
+  Constant rhs = Types::Workshop::create(m_rhs);
+  const NameFunctionType& f = Types::NameFunction::get(lhs);
+
+  return f.apply(k, rhs, m_Lall);
 }
 
 } //namespace Workshops

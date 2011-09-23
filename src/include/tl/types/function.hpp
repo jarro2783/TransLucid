@@ -95,10 +95,65 @@ namespace TransLucid
     WS* m_expr;
   };
 
-  class PhiFunctionType : public FunctionType
+  class NameFunctionType
   {
+    public:
+    NameFunctionType
+    (
+      const u32string& name, 
+      dimension_index argDim, 
+      dimension_index odometerDim, 
+      const std::vector<dimension_index>& valueScope,
+      const std::vector<dimension_index>& namedScopeArgs,
+      const std::vector<dimension_index>& namedScopeOdometers,
+      WS* expr,
+      const Context& k
+    )
+    : m_name(name), m_argDim(argDim), m_odometerDim(odometerDim), m_expr(expr)
+    {
+      for (auto d : valueScope)
+      {
+        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      for (auto d : namedScopeArgs)
+      {
+        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      for (auto d : namedScopeOdometers)
+      {
+        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+      }
+    }
+
+    Constant
+    apply
+    (
+      Context& k, 
+      const Constant& c, 
+      std::vector<dimension_index>& Lall
+    ) const;
+
+    NameFunctionType*
+    clone() const
+    {
+      return new NameFunctionType(*this);
+    }
+
+    size_t
+    hash() const
+    {
+      return reinterpret_cast<size_t>(m_expr);
+    }
+
     private:
+    u32string m_name;
+    dimension_index m_argDim;
+    dimension_index m_odometerDim;
     WS* m_expr;
+
+    std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
   };
 
 
@@ -110,6 +165,21 @@ namespace TransLucid
       create(const ValueFunctionType& f);
 
       const ValueFunctionType&
+      get(const Constant& c);
+
+      bool
+      equality(const Constant& lhs, const Constant& rhs);
+
+      size_t
+      hash(const Constant& c);
+    }
+
+    namespace NameFunction
+    {
+      Constant
+      create(const NameFunctionType& f);
+
+      const NameFunctionType&
       get(const Constant& c);
 
       bool

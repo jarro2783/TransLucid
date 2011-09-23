@@ -37,6 +37,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/uuid.hpp>
+#include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
@@ -73,6 +74,13 @@ namespace TransLucid
         &delete_ptr<ValueFunctionType>
       };
 
+    TypeFunctions name_function_type_functions =
+      {
+        &Types::NameFunction::equality,
+        &Types::NameFunction::hash,
+        &delete_ptr<NameFunctionType>
+      };
+
     TypeFunctions range_type_functions =
       {
         &Types::Range::equality,
@@ -106,6 +114,13 @@ namespace TransLucid
         &Types::Hyperdatons::equality,
         &Types::Hyperdatons::hash,
         &delete_ptr<HD>
+      };
+
+    TypeFunctions workshop_type_functions =
+      {
+        &Types::Workshop::equality,
+        &Types::Workshop::hash,
+        &delete_ptr<WorkshopType>
       };
 
     //copied and pasted from types.hpp, this should match the strings below
@@ -382,6 +397,16 @@ namespace TransLucid
     };
 
     template <>
+    struct clone<NameFunctionType>
+    {
+      NameFunctionType*
+      operator()(const NameFunctionType& n)
+      {
+        return n.clone();
+      }
+    };
+
+    template <>
     struct clone<ValueFunctionType>
     {
       ValueFunctionType*
@@ -514,6 +539,34 @@ namespace TransLucid
       get(const Constant& c)
       {
         return get_constant_pointer<ValueFunctionType>(c);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return get(c).hash();
+      }
+
+      bool
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return lhs.data.ptr->data == rhs.data.ptr->data;
+      }
+    }
+
+    namespace NameFunction
+    {
+      Constant
+      create(const NameFunctionType& f)
+      {
+        return make_constant_pointer
+          (f, &name_function_type_functions, TYPE_INDEX_NAME_FUNCTION);
+      }
+
+      const NameFunctionType&
+      get(const Constant& c)
+      {
+        return get_constant_pointer<NameFunctionType>(c);
       }
 
       size_t
@@ -771,7 +824,38 @@ namespace TransLucid
       {
         return reinterpret_cast<size_t>(get(c));
       }
+    }
 
+    namespace Workshop
+    {
+      Constant
+      create(const WS* ws)
+      {
+        ConstantPointerValue* p =
+          new ConstantPointerValue(
+            &workshop_type_functions,
+            new WorkshopType(const_cast<WS*>(ws)));
+
+        return Constant(p, TYPE_INDEX_WS);
+      }
+
+      const WorkshopType&
+      get(const Constant& w)
+      {
+        return get_constant_pointer<WorkshopType>(w);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return reinterpret_cast<size_t>(get(c).ws());
+      }
+
+      bool
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs).ws() == get(rhs).ws();
+      }
     }
 
   }
@@ -834,6 +918,20 @@ ValueFunctionType::apply(Context& k, const Constant& value) const
   auto r = (*m_expr)(k);
 
   return r;
+}
+
+Constant
+NameFunctionType::apply
+(
+  Context& k, 
+  const Constant& c,
+  std::vector<dimension_index>& Lall
+) const
+{
+  //add to the list of our args
+  //pre: c is a workshop value
+
+  //add to the list of odometers
 }
 
 //everything that creates hyperdatons

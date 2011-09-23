@@ -513,6 +513,62 @@ namespace TransLucid
       WS* m_rhs;
     };
 
+    class NamedAbstractionWS : public WS
+    {
+      public:
+      NamedAbstractionWS
+      (
+        const u32string& name,
+        dimension_index argDim,
+        dimension_index odometerDim,
+        std::vector<dimension_index> valueScopeArgs,
+        std::vector<dimension_index> namedScopeArgs,
+        std::vector<dimension_index> namedScopeOdometers,
+        WS* rhs
+      )
+      : m_name(name)
+      , m_argDim(argDim)
+      , m_odometerDim(odometerDim)
+      , m_info{valueScopeArgs, namedScopeArgs, namedScopeOdometers}
+      , m_rhs(rhs)
+      {
+      }
+
+      ~NamedAbstractionWS()
+      {
+        delete m_rhs;
+      }
+
+      Constant
+      operator()(Context& k);
+
+      private:
+      u32string m_name;
+      dimension_index m_argDim;
+      dimension_index m_odometerDim;
+      FunctionInfo m_info;
+      WS* m_rhs;
+    };
+
+    class NameApplicationWS : public WS
+    {
+      public:
+      NameApplicationWS(WS* lhs, WS* rhs)
+      : m_lhs(lhs)
+      , m_rhs(rhs)
+      {
+      }
+
+      Constant
+      operator()(Context& k);
+
+      private:
+      WS* m_lhs;
+      WS* m_rhs;
+
+      std::vector<dimension_index> m_Lall;
+    };
+
   }
 
 }

@@ -668,6 +668,7 @@ namespace TransLucid
       Expr lhs; /**<The lhs expression.*/
       Expr rhs; /**<The rhs expression.*/
 
+      //the Lall of the rhs
       std::vector<dimension_index> Lall;
     };
 
