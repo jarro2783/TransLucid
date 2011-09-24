@@ -78,14 +78,14 @@ namespace TransLucid
       return m_Lin;
     }
 
-    const std::vector<dimension_index>& getScopeArgs() const
+    const std::vector<dimension_index>& getAllScopeArgs() const
     {
-      return m_namedScopeArgs;
+      return m_namedAllScopeArgs;
     }
 
-    const std::vector<dimension_index>& getScopeOdometer() const
+    const std::vector<dimension_index>& getAllScopeOdometer() const
     {
-      return m_namedScopeOdometers;
+      return m_namedAllScopeOdometers;
     }
 
     private:
@@ -102,5 +102,8 @@ namespace TransLucid
     std::vector<dimension_index> m_valueScopeArgs;
     std::vector<dimension_index> m_namedScopeArgs;
     std::vector<dimension_index> m_namedScopeOdometers;
+
+    std::vector<dimension_index> m_namedAllScopeArgs;
+    std::vector<dimension_index> m_namedAllScopeOdometers;
   };
 }

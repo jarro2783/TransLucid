@@ -345,6 +345,10 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
   m_namedScopeArgs.push_back(argDim);
   m_namedScopeOdometers.push_back(odometerDim);
 
+  //also the all scope
+  m_namedAllScopeArgs.push_back(argDim);
+  m_namedAllScopeOdometers.push_back(odometerDim);
+
   //4. visit the child
   expr.rhs = boost::apply_visitor(*this, e.rhs);
 

@@ -988,10 +988,10 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows)
   m_Lin.insert(m_Lin.end(), tows.getLin().begin(), tows.getLin().end());
 
   m_fnLists.insert(m_fnLists.end(), 
-    tows.getScopeArgs().begin(), tows.getScopeArgs().end());
+    tows.getAllScopeArgs().begin(), tows.getAllScopeArgs().end());
 
   m_fnLists.insert(m_fnLists.end(), 
-    tows.getScopeOdometer().begin(), tows.getScopeOdometer().end());
+    tows.getAllScopeOdometer().begin(), tows.getAllScopeOdometer().end());
 
   return wstree;
 }
