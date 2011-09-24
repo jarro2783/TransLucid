@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
  * Also annotates tree with labels.
  */
 
+#include <tl/fixed_indexes.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/rename.hpp>
 #include <tl/system.hpp>
@@ -336,6 +337,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
     m_namedScopeArgs,
     m_namedScopeOdometers
   };
+
   expr.argDim = argDim;
   expr.odometerDim = odometerDim;
 
@@ -347,6 +349,27 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
   expr.rhs = boost::apply_visitor(*this, e.rhs);
 
   //5. add a new equation name = args @ [stuff]
+  m_newVars.push_back(Parser::Equation
+  (
+    e.name,
+    Tree::Expr(),
+    Tree::Expr(),
+    Tree::AtExpr(
+      Tree::IdentExpr(U"args"),
+      Tree::TupleExpr(Tree::TupleExpr::TuplePairs
+      {
+        {
+          Tree::DimensionExpr(DIM_PI), 
+          Tree::DimensionExpr(odometerDim)
+        },
+        {
+          Tree::DimensionExpr(DIM_PSI),
+          Tree::DimensionExpr(argDim)
+        }
+      }
+      )
+    )
+  ));
 
   //6. restore the scope
   m_namedScopeArgs.pop_back();

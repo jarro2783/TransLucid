@@ -891,24 +891,6 @@ Special::StringValueInitialiser::StringValueInitialiser()
 namespace TransLucid
 {
 
-//the default for function application is that there was a type mismatch
-//concrete base classes will implement the correct functionality
-Constant
-FunctionType::applyLambda(Context& k, const Constant& value) const
-{
-  return Types::Special::create(SP_CONST);
-}
-
-Constant
-FunctionType::applyPhi(Context& k, WS* expr) const
-{
-  return Types::Special::create(SP_CONST);
-}
-
-FunctionType::~FunctionType()
-{
-}
-
 Constant
 ValueFunctionType::apply(Context& k, const Constant& value) const
 {
@@ -932,6 +914,22 @@ NameFunctionType::apply
   //pre: c is a workshop value
 
   //add to the list of odometers
+  tuple_t odometer;
+  for (auto d : Lall)
+  {
+    odometer.insert(std::make_pair(d, k.lookup(d)));
+  }
+
+  //argdim = cons(c, #argdim)
+  Tuple argList = makeList(c, k.lookup(m_argDim));
+
+  ContextPerturber(k, 
+  {
+    {m_argDim, Types::Tuple::create(argList)},
+    {m_odometerDim, Types::Tuple::create(Tuple(odometer))}
+  });
+
+  return (*m_expr)(k);
 }
 
 //everything that creates hyperdatons

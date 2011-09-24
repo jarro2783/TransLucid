@@ -28,11 +28,12 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/utility.hpp>
 #include <tl/equation.hpp>
+#include <tl/system.hpp>
 #include <tl/types.hpp>
 #include <tl/types/intmp.hpp>
-#include <tl/types/special.hpp>
 #include <tl/types/range.hpp>
-#include <tl/system.hpp>
+#include <tl/types/special.hpp>
+#include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
 
 #ifdef ICONV_CONVERT
@@ -392,6 +393,32 @@ lookup_context(System& system, const Constant& v, const Context& k)
     }
   }
 #endif
+}
+
+Tuple
+makeList(const Constant& c, const Constant& tail)
+{
+  tuple_t list
+  {
+    {DIM_TYPE, Types::String::create(U"list")},
+    {DIM_CONS, Types::String::create(U"cons")},
+    {DIM_ARG0, c},
+    {DIM_ARG1, tail}
+  };
+
+  return Tuple(list);
+}
+
+Constant
+listHead(const Constant& l)
+{
+  return Types::Tuple::get(l).find(DIM_ARG0)->second;
+}
+
+Constant
+listTail(const Constant& l)
+{
+  return Types::Tuple::get(l).find(DIM_ARG1)->second;
 }
 
 }

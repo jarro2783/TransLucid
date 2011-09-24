@@ -617,6 +617,13 @@ namespace TransLucid
     //TODO: fix TreeToWSTree when I implement this
     struct PhiExpr
     {
+      PhiExpr() = default;
+
+      PhiExpr(const u32string& name, const Expr& rhs)
+      : name(name), rhs(rhs)
+      {
+      }
+
       u32string name;
       Expr rhs;
 

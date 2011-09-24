@@ -78,6 +78,16 @@ namespace TransLucid
       return m_Lin;
     }
 
+    const std::vector<dimension_index>& getScopeArgs() const
+    {
+      return m_namedScopeArgs;
+    }
+
+    const std::vector<dimension_index>& getScopeOdometer() const
+    {
+      return m_namedScopeOdometers;
+    }
+
     private:
 
     Tree::WhereExpr 

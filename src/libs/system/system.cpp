@@ -57,6 +57,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/uuid.hpp>
+#include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
@@ -114,6 +115,45 @@ namespace
   )
   {
   }
+
+  class ArgsWorkshop : public WS
+  {
+    public:
+    ArgsWorkshop()
+    {
+    }
+
+    Constant
+    operator()(Context& k)
+    {
+      //this should always work, but it's a bit hacky
+
+      //head of ##\psi
+      Constant hashPsi = k.lookup(DIM_PSI);
+      Constant hashHashPsi = k.lookup(get_constant<dimension_index>(hashPsi));
+
+      Constant hashPi = k.lookup(DIM_PI);
+      Constant hashHashPi = k.lookup(get_constant<dimension_index>(hashPi));
+
+      //hashHashPsi will be a list of workshop objects
+
+      //expr is a workshop object
+      Constant expr = listHead(hashHashPsi);
+
+      ContextPerturber p(k,
+        {
+          {get_constant<dimension_index>(hashPsi), listTail(hashHashPsi)},
+          {get_constant<dimension_index>(hashPi), listTail(hashHashPi)}
+        }
+      );
+
+      p.perturb(Types::Tuple::get(hashHashPi));
+
+      WS* w = Types::Workshop::get(expr).ws();
+
+      return (*w)(k);
+    }
+  };
 }
 
 namespace detail
@@ -322,6 +362,10 @@ System::init_equations()
     U"PRINT",
     u32string(U"This type has no printer!")
   );
+
+  //args = case hd(##\psi) of E @ [#\pi <- tl(##\pi), #\psi <- tl(##\psi)]
+  //  @ hd(##\pi)
+  addEquation(U"args", GuardWS(), new ArgsWorkshop);
 }
 
 void 
@@ -383,6 +427,7 @@ System::System()
 
   m_translator = new Translator(*this);
 
+  //these are for the lexer
   init_dimensions
   (
     {
@@ -717,9 +762,9 @@ System::addDeclInternal
   TreeToWSTree tows(this);
 
   //simplify, turn into workshops
-  Tree::Expr guard   = toWSTreePlusLin(std::get<1>(eqn), tows);
-  Tree::Expr boolean = toWSTreePlusLin(std::get<2>(eqn), tows);
-  Tree::Expr expr    = toWSTreePlusLin(std::get<3>(eqn), tows);
+  Tree::Expr guard   = toWSTreePlusExtras(std::get<1>(eqn), tows);
+  Tree::Expr boolean = toWSTreePlusExtras(std::get<2>(eqn), tows);
+  Tree::Expr expr    = toWSTreePlusExtras(std::get<3>(eqn), tows);
 
   if (m_debug)
   {
@@ -831,9 +876,24 @@ System::setDefaultContext()
       }
   ));
 
+  //set the L_in dimensions to zero
   for (auto d : m_Lin)
   {
     m_defaultk.perturb(d, Types::Intmp::create(0));
+  }
+
+  //set the function list dimensions to nil
+  for (auto d : m_fnLists)
+  {
+    m_defaultk.perturb(d, Types::Tuple::create
+    (
+      tuple_t
+      {
+        {DIM_TYPE, Types::String::create(U"list")},
+        {DIM_CONS, Types::String::create(U"nil")}
+      }
+    )
+    );
   }
 }
 
@@ -920,12 +980,18 @@ System::addInputHyperdaton
 }
 
 Tree::Expr
-System::toWSTreePlusLin(const Tree::Expr& e, TreeToWSTree& tows)
+System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows)
 {
   Tree::Expr wstree = tows.toWSTree(e);
 
   //The L_in dims are set to 0 in the default context
   m_Lin.insert(m_Lin.end(), tows.getLin().begin(), tows.getLin().end());
+
+  m_fnLists.insert(m_fnLists.end(), 
+    tows.getScopeArgs().begin(), tows.getScopeArgs().end());
+
+  m_fnLists.insert(m_fnLists.end(), 
+    tows.getScopeOdometer().begin(), tows.getScopeOdometer().end());
 
   return wstree;
 }

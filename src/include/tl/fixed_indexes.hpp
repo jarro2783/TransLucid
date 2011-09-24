@@ -74,6 +74,15 @@ namespace TransLucid
     DIM_ONE,
     DIM_TWO,
 
+    //the constructor dim for data types
+    DIM_CONS,
+
+    //fix some defaults for arg0, arg1, arg2 because they are commonly
+    //used in code
+    DIM_ARG0,
+    DIM_ARG1,
+    DIM_ARG2,
+
     //the last one
     DIM_INDEX_LAST
   };

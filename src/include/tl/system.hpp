@@ -277,7 +277,7 @@ namespace TransLucid
     setDefaultContext();
 
     Tree::Expr
-    toWSTreePlusLin(const Tree::Expr& e, TreeToWSTree& tows);
+    toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows);
 
     DefinitionMap m_equations;
     DefinitionMap m_assignments;
@@ -318,6 +318,7 @@ namespace TransLucid
     size_t m_time;
     Translator *m_translator;
     std::vector<dimension_index> m_Lin;
+    std::vector<dimension_index> m_fnLists;
 
     size_t m_uniqueVarIndex;
     size_t m_uniqueDimIndex;

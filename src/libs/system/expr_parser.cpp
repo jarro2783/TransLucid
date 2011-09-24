@@ -532,7 +532,7 @@ namespace TransLucid
           //phi abstraction
           (tok.dblslash_ > tok.identifier_ > tok.arrow_ > expr)
           [
-            _val = construct<Tree::PhiExpr>()
+            _val = construct<Tree::PhiExpr>(_2, _4)
           ]
           //lambda abstraction
         | (tok.slash_ > tok.identifier_ > tok.arrow_ > expr)

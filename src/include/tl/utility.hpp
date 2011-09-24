@@ -164,6 +164,15 @@ namespace TransLucid
     private:
     dimension_index m_index;
   };
+
+  Tuple
+  makeList(const Constant& c, const Constant& tail);
+
+  Constant
+  listHead(const Constant& l);
+
+  Constant
+  listTail(const Constant& l);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

@@ -24,24 +24,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class FunctionType
-  {
-    public:
-    virtual ~FunctionType() = 0;
-
-    virtual Constant
-    applyLambda(Context& k, const Constant& value) const;
-
-    virtual Constant
-    applyPhi(Context& k, WS* expr) const;
-
-    virtual FunctionType*
-    clone() const = 0;
-
-    virtual size_t
-    hash() const = 0;
-  };
-
   class ValueFunctionType
   {
     public:
