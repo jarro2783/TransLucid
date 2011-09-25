@@ -120,6 +120,20 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
+  TransLucid::Tree::PhiExpr,
+  (TransLucid::u32string, name)
+  (TransLucid::Tree::Expr, rhs)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::PhiAppExpr,
+  (TransLucid::Tree::Expr, lhs)
+  (TransLucid::Tree::Expr, rhs)
+)
+
+BOOST_FUSION_ADAPT_STRUCT
+(
   TransLucid::Tree::BangOpExpr,
   (TransLucid::Tree::Expr, name)
   (std::vector<TransLucid::Tree::Expr>, args)
@@ -246,6 +260,14 @@ namespace TransLucid
         lambda_application = literal("(") << expr << literal(".") << expr 
           << literal(")");
 
+        name_function = karma::string(literal("(\\\\")) 
+          << stringLiteral[_1 = ph::at_c<0>(_val)] 
+          << literal(" -> ") << expr[_1 = ph::at_c<1>(_val)] 
+          << literal(")");
+
+        name_application = literal("((") << expr << literal(") (") << expr 
+          << literal("))");
+
         where = expr << literal(" where\n") << dimlist << varlist
           << literal("end ");
 
@@ -289,6 +311,8 @@ namespace TransLucid
         | at_expr
         | lambda_function
         | lambda_application
+        | name_function
+        | name_application
         | where
         | bangop
         ;
@@ -319,6 +343,8 @@ namespace TransLucid
       karma::rule<Iterator, Tree::AtExpr()> at_expr;
       karma::rule<Iterator, Tree::LambdaExpr()> lambda_function;
       karma::rule<Iterator, Tree::LambdaAppExpr()> lambda_application;
+      karma::rule<Iterator, Tree::PhiExpr()> name_function;
+      karma::rule<Iterator, Tree::PhiAppExpr()> name_application;
       karma::rule<Iterator, Tree::WhereExpr()> where;
       karma::rule<Iterator, Tree::BangOpExpr()> bangop;
 
