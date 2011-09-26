@@ -86,7 +86,7 @@ namespace TransLucid
         assignment_, dimension_, else_, elsif_, end_, false_, fi_, if_
       , in_, library_, out_, then_, true_, var_, where_
         //symbols
-      , arrow_, dblsemi_, dblslash_ //, dbldollar_
+      , arrow_, bang_, dblsemi_, dblslash_ //, dbldollar_
       , dblpercent_, assign_
       , maps_
         //white space

@@ -84,6 +84,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   integer_           = L"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))";
   character_         = L"'([^'\\\\]|\\\\.)+'";
 
+  bang_     = L'!';
   decl_     = L':';
   lbracket_ = L'[';
   rbracket_ = L']';
@@ -128,6 +129,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   //multi character symbols
   | arrow_
   | assign_
+  | bang_
   | dblpercent_
   | dblsemi_
   | dblslash_
