@@ -366,6 +366,7 @@ namespace TransLucid
          ]
       ;
 
+      #if 0
       at_expr =
          (  
           phi_application [_a = _1]
@@ -408,6 +409,60 @@ namespace TransLucid
           _val = _a
         ]
       ;
+      #endif
+
+      lambda_application =
+        (
+          tok.at_ > hash_expr
+          [
+            _a = construct<Tree::AtExpr>(_a, _1)
+          ]
+        )
+        |
+        (
+          tok.dot_ > hash_expr
+          [
+            _a = construct<Tree::LambdaAppExpr>(_a, _1)
+          ]
+        )
+      ;
+            
+      app_expr = 
+        (
+          hash_expr[_a = _1]
+        >>
+         *(
+            lambda_application[_val = _1]
+            |
+            (
+              hash_expr
+              [
+                _a = construct<Tree::PhiAppExpr>(_a, _1)
+              ]
+            )
+          )
+        )[_val = _a]
+      ;
+
+      #if 0
+            |
+            (
+              hash_expr[_a = construct<Tree::PhiAppExpr>(_a, _1)]
+            )
+            |
+            (
+              tok.dot_ > hash_expr
+              [
+                _a = construct<Tree::LambdaAppExpr>(_a, _1)
+              ]
+            )
+          )
+        )
+        [
+          _val = _a
+        ]
+      ;
+      #endif
 
       hash_expr =
         ( tok.hash_ > hash_expr [_val = construct<Tree::HashExpr>(_1)])

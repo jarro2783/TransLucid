@@ -106,7 +106,8 @@ namespace TransLucid
         lambda_application,
         phi_application,
         postfix_expr,
-        where_expr
+        where_expr,
+        app_expr
       ;
 
       qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>>
