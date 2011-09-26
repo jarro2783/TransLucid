@@ -237,7 +237,7 @@ Translator::parseLine
 
     if (!success)
     {
-      std::cerr << "Absolute rubbish was typed" << std::endl;
+      std::cerr << "Unable to parse line." << std::endl;
     }
   }
   catch (boost::spirit::qi::expectation_failure<Parser::iterator_t>& e)
