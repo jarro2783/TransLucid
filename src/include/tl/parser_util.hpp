@@ -35,6 +35,11 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_defs.hpp>
 #include <tl/parser_header.hpp>
 
+
+#ifdef BOOST_SPIRIT_DEBUG
+#include <tl/output.hpp>
+#endif
+
 namespace boost { namespace spirit { namespace traits
 {
   template <typename Enable>

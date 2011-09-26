@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/equation_parser.hpp>
+#include <tl/output.hpp>
 
 namespace TransLucid
 {

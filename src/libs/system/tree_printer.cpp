@@ -268,8 +268,8 @@ namespace TransLucid
         name_application = literal("((") << expr << literal(") (") << expr 
           << literal("))");
 
-        where = expr << literal(" where\n") << dimlist << varlist
-          << literal("end ");
+        where = literal("(") << expr << literal(" where\n") << dimlist 
+          << varlist << literal("end) ");
 
         dimlist = *(oneDim);
 

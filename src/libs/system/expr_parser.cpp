@@ -313,7 +313,7 @@ namespace TransLucid
       expr %= where_expr
       ;
 
-      where_expr = if_expr[_a = _1] >> 
+      where_expr = binary_op[_a = _1] >> 
       (
         (  
            tok.where_
@@ -345,37 +345,11 @@ namespace TransLucid
        )
       ;
 
-      if_expr =
-        (
-            tok.if_
-         >> if_expr
-         >> tok.then_
-         >> if_expr
-         >> *(
-                  tok.elsif_
-               >> if_expr
-               >> tok.then_
-               >> if_expr
-             )
-         >> tok.else_
-         >> if_expr
-         >> tok.fi_
-        )
-        [
-          _val = construct<Tree::IfExpr>(
-            _2, _4, make_elsifs(_5), _7)
-        ]
-      | binary_op
-        [
-          _val = _1
-        ]
-      ;
-
       binary_op =
-         prefix_expr [_a = _1]
+         at_expr [_a = _1]
       >> (
            *(   tok.binary_op_
-             >> prefix_expr
+             >> at_expr
             )
             [
               _a = ph::bind(&Tree::insert_binary_operator, 
@@ -392,8 +366,56 @@ namespace TransLucid
          ]
       ;
 
+      at_expr =
+         (  
+          phi_application [_a = _1]
+      >>  *(
+             tok.at_ > phi_application
+             [
+               _a = construct<Tree::AtExpr>(_a, _1)
+             ]
+           )
+         )
+         [
+           _val = _a
+         ]
+      ;
+
+      phi_application =
+        ( 
+         lambda_application[_a = _1]
+      >> *(
+            lambda_application[_a = construct<Tree::PhiAppExpr>(_a, _1)]
+          )
+        )
+        [
+          _val = _a
+        ]
+      ;
+      //phi_application %= lambda_application;
+
+      lambda_application =
+        (
+         hash_expr[_a = _1] 
+      >> *(
+            tok.dot_ > hash_expr
+            [
+              _a = construct<Tree::LambdaAppExpr>(_a, _1)
+            ]
+          )
+        )
+        [
+          _val = _a
+        ]
+      ;
+
+      hash_expr =
+        ( tok.hash_ > hash_expr [_val = construct<Tree::HashExpr>(_1)])
+        | prefix_expr [_val = _1]
+      ;
+
       prefix_expr =
-        ( tok.prefix_op_ > postfix_expr)
+        ( tok.prefix_op_ > prefix_expr)
         [
           _val = construct<Tree::UnaryOpExpr>
                  (  
@@ -411,7 +433,7 @@ namespace TransLucid
       ;
 
       postfix_expr =
-         at_expr [_a = _1]
+         if_expr [_a = _1]
       >> (
            ( tok.postfix_op_
              [
@@ -433,50 +455,31 @@ namespace TransLucid
             _val = _a
            ]
          )
-        //at_expr[_val = _1]
       ;
 
-      at_expr =
-         hash_expr [_a = _1]
-      >> (
-           (tok.at_ >> at_expr)
-             [
-               _val = construct<Tree::AtExpr>(_a, _2)
-             ]
-         | qi::eps [_val = _a]
-         )
-      ;
-
-      hash_expr =
-        ( tok.hash_ > hash_expr [_val = construct<Tree::HashExpr>(_1)])
-        | phi_application [_val = _1]
-      ;
-
-      phi_application =
-        ( 
-         lambda_application[_a = _1]
-      >> *(
-            lambda_application[_a = construct<Tree::PhiAppExpr>(_a, _1)]
-          )
-        )
-        [
-          _val = _a
-        ]
-      ;
-      //phi_application %= lambda_application;
-
-      lambda_application =
+      if_expr =
         (
-         primary_expr[_a = _1] 
-      >> *(
-            tok.dot_ > primary_expr
-            [
-              _a = construct<Tree::LambdaAppExpr>(_a, _1)
-            ]
-          )
+            tok.if_
+         >> expr
+         >> tok.then_
+         >> expr
+         >> *(
+                  tok.elsif_
+               >> expr
+               >> tok.then_
+               >> expr
+             )
+         >> tok.else_
+         >> expr
+         >> tok.fi_
         )
         [
-          _val = _a
+          _val = construct<Tree::IfExpr>(
+            _2, _4, make_elsifs(_5), _7)
+        ]
+      | primary_expr
+        [
+          _val = _1
         ]
       ;
 
