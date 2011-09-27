@@ -62,6 +62,18 @@ BOOST_FUSION_ADAPT_STRUCT
   (TransLucid::u32string, text)
 )
 
+typedef std::vector<std::pair<TransLucid::Tree::Expr, TransLucid::Tree::Expr>>
+  ExprPairVec;
+
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::IfExpr,
+  (TransLucid::Tree::Expr, condition)
+  (TransLucid::Tree::Expr, then)
+  (ExprPairVec, else_ifs)
+  (TransLucid::Tree::Expr, else_)
+)
+
 BOOST_FUSION_ADAPT_STRUCT
 (
   TransLucid::Tree::BinaryOperator,
@@ -193,11 +205,76 @@ namespace TransLucid
       }
     }
 
+    class ExprPrecedence
+    {
+      public:
+      ExprPrecedence(int a)
+      : m_a(a), m_b(0)
+      {
+      }
+
+      ExprPrecedence(int a, const mpz_class& b)
+      : m_a(a), m_b(b)
+      {
+      }
+
+      bool
+      operator<(const ExprPrecedence& rhs) const
+      {
+        return m_a < rhs.m_a || (m_a == rhs.m_a && m_b < rhs.m_b);
+      }
+
+      private:
+      int m_a;
+
+      //this allows an infinite number of precedences inside the same
+      //m_a precedence
+      //although more practically it allows binary operators to work
+      mpz_class m_b;
+    };
+
+    struct print_paren_impl
+    {
+      template <typename Arg0, typename Arg1, typename Arg2>
+      struct result
+      {
+        typedef std::string type;
+      };
+
+      std::string
+      operator()
+      (
+        const ExprPrecedence& parent, 
+        const ExprPrecedence& mine, 
+        char paren
+      ) const
+      {
+        if (mine < parent)
+        {
+          return std::string(0, paren);
+        }
+        return std::string();
+      }
+    };
+
+    ph::function<print_paren_impl> print_paren;
+
     template <typename Iterator>
     struct ExprPrinter : karma::grammar<Iterator, Tree::Expr()>
     {
+      enum Precedence
+      {
+        MINUS_INF,
+        WHERE_CLAUSE,
+        FN_ABSTRACTION,
+        BINARY_FN,
+        FN_APP,
+        PREFIX_FN,
+        POSTFIX_FN
+      };
+
       ExprPrinter()
-      : ExprPrinter::base_type(expr),
+      : ExprPrinter::base_type(expr_top),
       special_map
       {
         {SP_ERROR, "sperror"},
@@ -209,13 +286,23 @@ namespace TransLucid
         {SP_LOOP, "sploop"}
       }
       {
+        //to output, or not to output, that is the question
+        paren = karma::string
+        [
+          _1 = print_paren(_r1, _r2, _r3)
+        ];
+
+        //all the expressions
         nil = karma::omit[nildummy] << "nil";
+
         special = karma::string
         [
           _1 = ph::bind(&ExprPrinter<Iterator>::getSpecial, this, _val)
         ]
         ;
+
         integer = karma::stream;
+
         uchar   = karma::string
         [
           _1 = ph::bind(&utf32_to_utf8, construct<u32string>(1, _val))
@@ -239,11 +326,41 @@ namespace TransLucid
 
         ident = stringLiteral[_1 = at_c<0>(_val)];
 
-        binary_symbol = stringLiteral[_1 = at_c<1>(_val)];
-        binary %= ('(') << expr << binary_symbol << expr 
-        << literal(')');
+        if_expr = literal("if ") << expr(MINUS_INF) 
+          << literal(" then ") << expr(MINUS_INF)
+          << elsif_list
+          << literal(" else ") << expr(MINUS_INF) << literal(" fi ")
+        ;
 
-        paren_expr = literal('(') << expr << ')';
+        elsif_list %= *(one_elsif);
+
+        one_elsif = 
+          literal(" elsif ") 
+          << expr(MINUS_INF)
+          << literal(" then ") 
+          << expr(MINUS_INF)
+        ;
+
+        binary_symbol = stringLiteral[_1 = at_c<1>(_val)];
+
+        binary = 
+          paren
+          (
+            _r1, 
+            ph::construct<ExprPrecedence>(
+              BINARY_FN, ph::at_c<3>(ph::at_c<1>(_val))),
+            '('
+          )
+          << expr << binary_symbol << expr 
+          << paren
+          (
+            _r1,
+            ph::construct<ExprPrecedence>(BINARY_FN,
+              ph::at_c<3>(ph::at_c<1>(_val))),
+            ')'
+          );
+
+        paren_expr = literal('(') << expr(MINUS_INF) << ')';
 
         hash_expr = ("(#") << expr[_1 = at_c<0>(_val)] << (')');
         pairs %= one_pair % ", ";
@@ -305,7 +422,7 @@ namespace TransLucid
         | ident
         | paren_expr
         // | unary -- where is it?
-        | binary
+        | binary(_r1)
         | hash_expr
         | tuple
         | at_expr
@@ -315,7 +432,10 @@ namespace TransLucid
         | name_application
         | where
         | bangop
+        | if_expr
         ;
+
+        expr_top %= expr(MINUS_INF);
       }
 
       const std::string&
@@ -324,7 +444,8 @@ namespace TransLucid
         return special_map[v];
       }
 
-      karma::rule<Iterator, Tree::Expr()> expr;
+      karma::rule<Iterator, Tree::Expr()> expr_top;
+      karma::rule<Iterator, Tree::Expr(ExprPrecedence)> expr;
 
       karma::rule<Iterator, Tree::nil()> nil;
       karma::rule<Iterator, Tree::nil()> nildummy;
@@ -336,8 +457,9 @@ namespace TransLucid
       karma::rule<Iterator, Tree::DimensionExpr()> dimension;
       karma::rule<Iterator, Tree::IdentExpr()> ident;
       karma::rule<Iterator, Tree::ParenExpr()> paren_expr;
+      karma::rule<Iterator, Tree::IfExpr()> if_expr;
       karma::rule<Iterator, Tree::BinaryOperator()> binary_symbol;
-      karma::rule<Iterator, Tree::BinaryOpExpr()> binary;
+      karma::rule<Iterator, Tree::BinaryOpExpr(ExprPrecedence)> binary;
       karma::rule<Iterator, Tree::HashExpr()> hash_expr;
       karma::rule<Iterator, Tree::TupleExpr()> tuple;
       karma::rule<Iterator, Tree::AtExpr()> at_expr;
@@ -349,6 +471,24 @@ namespace TransLucid
       karma::rule<Iterator, Tree::BangOpExpr()> bangop;
 
       karma::rule<Iterator, u32string()> stringLiteral;
+
+      karma::rule
+      <
+        Iterator,
+        void(ExprPrecedence, ExprPrecedence, char)
+      > paren;
+
+      karma::rule
+      <
+        Iterator, 
+        std::vector<std::pair<Tree::Expr, Tree::Expr>>()
+      > elsif_list;
+
+      karma::rule
+      <
+        Iterator,
+        std::pair<Tree::Expr, Tree::Expr>()
+      > one_elsif;
 
       karma::rule
       <
