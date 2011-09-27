@@ -346,12 +346,13 @@ namespace TransLucid
         binary = 
           paren
           (
-            _r1, 
+            _r1,
             ph::construct<ExprPrecedence>(
               BINARY_FN, ph::at_c<3>(ph::at_c<1>(_val))),
             '('
           )
-          << expr << binary_symbol << expr 
+          //TODO fix this
+          << expr(BINARY_FN) << binary_symbol << expr(BINARY_FN)
           << paren
           (
             _r1,
@@ -362,51 +363,71 @@ namespace TransLucid
 
         paren_expr = literal('(') << expr(MINUS_INF) << ')';
 
-        hash_expr = ("(#") << expr[_1 = at_c<0>(_val)] << (')');
+        hash_expr = paren(_r1, PREFIX_FN, '(') << literal("#") << 
+          expr(PREFIX_FN)[_1 = at_c<0>(_val)] << 
+          paren(_r1, PREFIX_FN, ')')
+        ;
+
         pairs %= one_pair % ", ";
 
-        one_pair %= expr << literal(" <- ") << expr;
+        one_pair %= expr(MINUS_INF) << literal(" <- ") << expr(MINUS_INF);
         tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
-        at_expr = literal('(') << expr << literal('@') << expr << literal(')');
+
+        at_expr = paren(_r1, FN_APP, '(') 
+          << expr(FN_APP)
+          << literal(" @ ") 
+          << expr(FN_APP)
+          << paren(_r1, FN_APP, ')')
+        ;
 
         lambda_function = karma::string(literal("(\\")) 
           << stringLiteral[_1 = ph::at_c<0>(_val)] 
-          << literal(" -> ") << expr[_1 = ph::at_c<1>(_val)] 
+          << literal(" -> ") << expr(MINUS_INF)[_1 = ph::at_c<1>(_val)] 
           << literal(")");
 
-        lambda_application = literal("(") << expr << literal(".") << expr 
+        lambda_application = 
+          literal("(") << expr(FN_APP) << literal(".") << expr(FN_APP)
           << literal(")");
 
         name_function = karma::string(literal("(\\\\")) 
           << stringLiteral[_1 = ph::at_c<0>(_val)] 
-          << literal(" -> ") << expr[_1 = ph::at_c<1>(_val)] 
+          << literal(" -> ") << expr(MINUS_INF)[_1 = ph::at_c<1>(_val)] 
           << literal(")");
 
-        name_application = literal("((") << expr << literal(") (") << expr 
-          << literal("))");
+        name_application = 
+          paren(_r1, FN_APP, '(') <<
+          expr(FN_APP) << 
+          literal(" ") << 
+          expr(FN_APP) << 
+          paren(_r1, FN_APP, ')')
+        ;
 
-        where = literal("(") << expr << literal(" where\n") << dimlist 
-          << varlist << literal("end) ");
+        where = paren(_r1, WHERE_CLAUSE, '(') << expr(WHERE_CLAUSE) 
+          << literal(" where\n") << dimlist 
+          << varlist << literal("end")
+          << paren(_r1, WHERE_CLAUSE, ')')
+        ;
 
         dimlist = *(oneDim);
 
         oneDim = literal("dim ") << stringLiteral << literal(" <- ") 
-          << expr << literal(";;\n");
+          << expr(MINUS_INF) << literal(";;\n");
 
         varlist = *(eqn);
 
         eqn = literal("var ") 
           << stringLiteral [_1 = ph::function<get_tuple<0>>()(_val)]
           << literal(" ")
-          << expr [_1 = ph::function<get_tuple<1>>()(_val)]
+          << expr(MINUS_INF) [_1 = ph::function<get_tuple<1>>()(_val)]
           << literal(" & ") 
-          << expr [_1 = ph::function<get_tuple<2>>()(_val)]
+          << expr(MINUS_INF) [_1 = ph::function<get_tuple<2>>()(_val)]
           << literal(" = ") 
-          << expr [_1 = ph::function<get_tuple<3>>()(_val)]
+          << expr(MINUS_INF) [_1 = ph::function<get_tuple<3>>()(_val)]
           << literal(";;\n")
           ;
 
-        bangop = expr << literal("!(") << *(expr % literal(","))
+        bangop = expr(FN_APP) << 
+          literal("!(") << *(expr(FN_APP) % literal(","))
           << literal(")");
 
         // TODO: Missing unary
@@ -423,14 +444,14 @@ namespace TransLucid
         | paren_expr
         // | unary -- where is it?
         | binary(_r1)
-        | hash_expr
+        | hash_expr(_r1)
         | tuple
-        | at_expr
+        | at_expr(_r1)
         | lambda_function
         | lambda_application
         | name_function
-        | name_application
-        | where
+        | name_application(_r1)
+        | where(_r1)
         | bangop
         | if_expr
         ;
@@ -460,14 +481,14 @@ namespace TransLucid
       karma::rule<Iterator, Tree::IfExpr()> if_expr;
       karma::rule<Iterator, Tree::BinaryOperator()> binary_symbol;
       karma::rule<Iterator, Tree::BinaryOpExpr(ExprPrecedence)> binary;
-      karma::rule<Iterator, Tree::HashExpr()> hash_expr;
+      karma::rule<Iterator, Tree::HashExpr(ExprPrecedence)> hash_expr;
       karma::rule<Iterator, Tree::TupleExpr()> tuple;
-      karma::rule<Iterator, Tree::AtExpr()> at_expr;
+      karma::rule<Iterator, Tree::AtExpr(ExprPrecedence)> at_expr;
       karma::rule<Iterator, Tree::LambdaExpr()> lambda_function;
       karma::rule<Iterator, Tree::LambdaAppExpr()> lambda_application;
       karma::rule<Iterator, Tree::PhiExpr()> name_function;
-      karma::rule<Iterator, Tree::PhiAppExpr()> name_application;
-      karma::rule<Iterator, Tree::WhereExpr()> where;
+      karma::rule<Iterator, Tree::PhiAppExpr(ExprPrecedence)> name_application;
+      karma::rule<Iterator, Tree::WhereExpr(ExprPrecedence)> where;
       karma::rule<Iterator, Tree::BangOpExpr()> bangop;
 
       karma::rule<Iterator, u32string()> stringLiteral;
