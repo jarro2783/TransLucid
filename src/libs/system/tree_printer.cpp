@@ -380,14 +380,19 @@ namespace TransLucid
           << paren(_r1, FN_APP, ')')
         ;
 
-        lambda_function = karma::string(literal("(\\")) 
-          << stringLiteral[_1 = ph::at_c<0>(_val)] 
-          << literal(" -> ") << expr(MINUS_INF)[_1 = ph::at_c<1>(_val)] 
-          << literal(")");
+        lambda_function = 
+          paren(_r1, MINUS_INF, '(') <<
+          literal("\\") << stringLiteral[_1 = ph::at_c<0>(_val)] << 
+          literal(" -> ") << expr(MINUS_INF)[_1 = ph::at_c<1>(_val)] 
+          << paren(_r1, MINUS_INF, ')')
+        ;
 
         lambda_application = 
-          literal("(") << expr(FN_APP) << literal(".") << expr(FN_APP)
-          << literal(")");
+          paren(_r1, FN_APP, '(') 
+          << expr(FN_APP) 
+          << literal(".") 
+          << expr(FN_APP)
+          << paren(_r1, FN_APP, ')');
 
         name_function = karma::string(literal("(\\\\")) 
           << stringLiteral[_1 = ph::at_c<0>(_val)] 
@@ -447,8 +452,8 @@ namespace TransLucid
         | hash_expr(_r1)
         | tuple
         | at_expr(_r1)
-        | lambda_function
-        | lambda_application
+        | lambda_function(_r1)
+        | lambda_application(_r1)
         | name_function
         | name_application(_r1)
         | where(_r1)
@@ -484,8 +489,9 @@ namespace TransLucid
       karma::rule<Iterator, Tree::HashExpr(ExprPrecedence)> hash_expr;
       karma::rule<Iterator, Tree::TupleExpr()> tuple;
       karma::rule<Iterator, Tree::AtExpr(ExprPrecedence)> at_expr;
-      karma::rule<Iterator, Tree::LambdaExpr()> lambda_function;
-      karma::rule<Iterator, Tree::LambdaAppExpr()> lambda_application;
+      karma::rule<Iterator, Tree::LambdaExpr(ExprPrecedence)> lambda_function;
+      karma::rule<Iterator, Tree::LambdaAppExpr(ExprPrecedence)> 
+        lambda_application;
       karma::rule<Iterator, Tree::PhiExpr()> name_function;
       karma::rule<Iterator, Tree::PhiAppExpr(ExprPrecedence)> name_application;
       karma::rule<Iterator, Tree::WhereExpr(ExprPrecedence)> where;
