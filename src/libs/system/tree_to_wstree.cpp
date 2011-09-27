@@ -116,9 +116,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 {
   //(FN1 ! (#arg0)) @ [fnname <- e.op.op, arg0 <- T(e.e)]
 
-  //for now just get this working, we can optimise by only calculating the
-  //expr once, but how do I do that...
-  //
   Tree::DimensionExpr arg0(U"arg0");
 
   return 
@@ -127,7 +124,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
     Tree::BangOpExpr
     (
       Tree::IdentExpr(FN1_IDENT),
-      {Tree::HashExpr(arg0)}
+      Tree::HashExpr(arg0)
     ),
     Tree::TupleExpr
     (
@@ -137,21 +134,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
       }
     )
   );
-
-  #if 0
-  //UNOP @ [arg0 <- e.e, opname <- e.op.op]
-  return Tree::AtExpr
-  (
-    Tree::IdentExpr(U"UNOP"),
-    Tree::TupleExpr
-    (
-      {
-        {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.e)},
-        {Tree::DimensionExpr(U"opname"), e.op.op}
-      }
-    )
-  );
-  #endif
 }
 
 Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
@@ -165,7 +147,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
   Tree::DimensionExpr arg0(U"arg0");
   Tree::DimensionExpr arg1(U"arg1");
 
-  //optimise as above
   return 
   
   Tree::AtExpr
@@ -187,23 +168,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
       }
     )
   );
-
-
-  #if 0
-  //BINOP @ [arg0 <- e.lhs, arg1 <- e.rhs, opname <- e.op.op]
-  return Tree::AtExpr
-  (
-    Tree::IdentExpr(U"BINOP"),
-    Tree::TupleExpr
-    (
-      {
-        {Tree::DimensionExpr(U"arg0"), boost::apply_visitor(*this, e.lhs)},
-        {Tree::DimensionExpr(U"arg1"), boost::apply_visitor(*this, e.rhs)},
-        {Tree::DimensionExpr(U"opname"), e.op.op}
-      }
-    )
-  );
-  #endif
 }
 
 Tree::Expr
@@ -516,17 +480,6 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
     );
 
   Tree::Expr incOwn = boost::apply_visitor(*this, incOwnRaw);
-
-  #if 0
-  odometerDims.push_back
-  (
-    std::make_pair
-    (
-      Tree::DimensionExpr(label),
-      incOwn
-    )
-  );
-  #endif
 
   w.e = Tree::AtExpr
     (

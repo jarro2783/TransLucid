@@ -428,8 +428,14 @@ namespace TransLucid
        * @param name The expression that will return the name.
        * @param args A vector of the arguments.
        */
-      BangOpExpr(const Expr& name, std::vector<Expr> args)
+      BangOpExpr(const Expr& name, const std::vector<Expr>& args)
       : name(name), args(args)
+      {
+      }
+
+      BangOpExpr(const Expr& lhs, const Expr& rhs)
+      : name(lhs)
+      , args({rhs})
       {
       }
 

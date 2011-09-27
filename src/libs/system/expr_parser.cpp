@@ -444,16 +444,26 @@ namespace TransLucid
             _val = construct<Tree::LambdaAppExpr>(_r1, _1)
           ]
         )
-        #if 0
         |
         (
-          tok.bang_ > hash_expr
-          [
-            _val = construct<Tree::LambdaAppExpr>(_r1, _1)
-          ]
+          tok.bang_ > 
+          (
+            (
+              tok.lparen_ > expr_list > tok.rparen_
+            )
+            [
+              _val = construct<Tree::BangOpExpr>(_r1, _2)
+            ]
+          |
+            hash_expr
+            [
+              _val = construct<Tree::BangOpExpr>(_r1, _1)
+            ]
+          )
         )
-        #endif
       ;
+
+      expr_list %= expr % tok.comma_;
 
       #if 0
             |

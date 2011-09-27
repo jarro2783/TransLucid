@@ -115,6 +115,14 @@ namespace TransLucid
         token_app
       ;
 
+      qi::rule
+      <
+        Iterator,
+        std::vector<Tree::Expr>()
+      >
+        expr_list
+      ;
+
       qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>>
         primary_expr
       ;
