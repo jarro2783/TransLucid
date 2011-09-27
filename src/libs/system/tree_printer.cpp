@@ -361,7 +361,8 @@ namespace TransLucid
             ')'
           );
 
-        paren_expr = literal('(') << expr(MINUS_INF) << ')';
+        //paren_expr = literal('(') << expr(MINUS_INF) << ')';
+        paren_expr = expr(_r1);
 
         hash_expr = paren(_r1, PREFIX_FN, '(') << literal("#") << 
           expr(PREFIX_FN)[_1 = at_c<0>(_val)] << 
@@ -381,7 +382,7 @@ namespace TransLucid
         ;
 
         lambda_function = 
-          paren(_r1, MINUS_INF, '(') <<
+          paren(_r1, FN_ABSTRACTION, '(') <<
           literal("\\") << stringLiteral[_1 = ph::at_c<0>(_val)] << 
           literal(" -> ") << expr(MINUS_INF)[_1 = ph::at_c<1>(_val)] 
           << paren(_r1, MINUS_INF, ')')
@@ -394,10 +395,14 @@ namespace TransLucid
           << expr(FN_APP)
           << paren(_r1, FN_APP, ')');
 
-        name_function = karma::string(literal("(\\\\")) 
-          << stringLiteral[_1 = ph::at_c<0>(_val)] 
-          << literal(" -> ") << expr(MINUS_INF)[_1 = ph::at_c<1>(_val)] 
-          << literal(")");
+        name_function = 
+          paren(_r1, FN_ABSTRACTION, '(') <<
+          literal("\\\\") <<
+          stringLiteral[_1 = ph::at_c<0>(_val)] <<
+          literal(" -> ") << 
+          expr(FN_ABSTRACTION)[_1 = ph::at_c<1>(_val)] <<
+          paren(_r1, FN_ABSTRACTION, ')')
+        ;
 
         name_application = 
           paren(_r1, FN_APP, '(') <<
@@ -446,7 +451,7 @@ namespace TransLucid
         | constant
         | dimension
         | ident
-        | paren_expr
+        | paren_expr(_r1)
         // | unary -- where is it?
         | binary(_r1)
         | hash_expr(_r1)
@@ -454,7 +459,7 @@ namespace TransLucid
         | at_expr(_r1)
         | lambda_function(_r1)
         | lambda_application(_r1)
-        | name_function
+        | name_function(_r1)
         | name_application(_r1)
         | where(_r1)
         | bangop
@@ -482,7 +487,7 @@ namespace TransLucid
       karma::rule<Iterator, Tree::LiteralExpr()> constant;
       karma::rule<Iterator, Tree::DimensionExpr()> dimension;
       karma::rule<Iterator, Tree::IdentExpr()> ident;
-      karma::rule<Iterator, Tree::ParenExpr()> paren_expr;
+      karma::rule<Iterator, Tree::ParenExpr(ExprPrecedence)> paren_expr;
       karma::rule<Iterator, Tree::IfExpr()> if_expr;
       karma::rule<Iterator, Tree::BinaryOperator()> binary_symbol;
       karma::rule<Iterator, Tree::BinaryOpExpr(ExprPrecedence)> binary;
@@ -492,7 +497,7 @@ namespace TransLucid
       karma::rule<Iterator, Tree::LambdaExpr(ExprPrecedence)> lambda_function;
       karma::rule<Iterator, Tree::LambdaAppExpr(ExprPrecedence)> 
         lambda_application;
-      karma::rule<Iterator, Tree::PhiExpr()> name_function;
+      karma::rule<Iterator, Tree::PhiExpr(ExprPrecedence)> name_function;
       karma::rule<Iterator, Tree::PhiAppExpr(ExprPrecedence)> name_application;
       karma::rule<Iterator, Tree::WhereExpr(ExprPrecedence)> where;
       karma::rule<Iterator, Tree::BangOpExpr()> bangop;
