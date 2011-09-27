@@ -101,13 +101,18 @@ namespace TransLucid
         Tree::Expr(),
         qi::locals<Tree::Expr>
       >
-        at_expr,
         binary_op,
-        lambda_application,
-        phi_application,
         postfix_expr,
         where_expr,
         app_expr
+      ;
+
+      qi::rule
+      <
+        Iterator,
+        Tree::Expr(Tree::Expr)
+      >
+        token_app
       ;
 
       qi::rule<Iterator, Tree::Expr(), qi::locals<string_type>>

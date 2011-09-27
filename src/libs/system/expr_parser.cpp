@@ -346,10 +346,10 @@ namespace TransLucid
       ;
 
       binary_op =
-         at_expr [_a = _1]
+         app_expr [_a = _1]
       >> (
            *(   tok.binary_op_
-             >> at_expr
+             >> app_expr
             )
             [
               _a = ph::bind(&Tree::insert_binary_operator, 
@@ -411,28 +411,12 @@ namespace TransLucid
       ;
       #endif
 
-      lambda_application =
-        (
-          tok.at_ > hash_expr
-          [
-            _a = construct<Tree::AtExpr>(_a, _1)
-          ]
-        )
-        |
-        (
-          tok.dot_ > hash_expr
-          [
-            _a = construct<Tree::LambdaAppExpr>(_a, _1)
-          ]
-        )
-      ;
-            
       app_expr = 
         (
           hash_expr[_a = _1]
         >>
          *(
-            lambda_application[_val = _1]
+            token_app(_a)[_a = _1]
             |
             (
               hash_expr
@@ -442,6 +426,33 @@ namespace TransLucid
             )
           )
         )[_val = _a]
+      ;
+
+      //something, maybe a bug, means that I have to separate these cases
+      //from above which has no token delimeter.
+      token_app =
+        (
+          tok.at_ > hash_expr
+          [
+            _val = construct<Tree::AtExpr>(_r1, _1)
+          ]
+        )
+        |
+        (
+          tok.dot_ > hash_expr
+          [
+            _val = construct<Tree::LambdaAppExpr>(_r1, _1)
+          ]
+        )
+        #if 0
+        |
+        (
+          tok.bang_ > hash_expr
+          [
+            _val = construct<Tree::LambdaAppExpr>(_r1, _1)
+          ]
+        )
+        #endif
       ;
 
       #if 0
@@ -607,11 +618,13 @@ namespace TransLucid
       BOOST_SPIRIT_DEBUG_NODE(context_perturb);
       //BOOST_SPIRIT_DEBUG_NODE(end_delimiter);
       BOOST_SPIRIT_DEBUG_NODE(postfix_expr);
-      BOOST_SPIRIT_DEBUG_NODE(at_expr);
+      //BOOST_SPIRIT_DEBUG_NODE(at_expr);
       BOOST_SPIRIT_DEBUG_NODE(binary_op);
+      BOOST_SPIRIT_DEBUG_NODE(token_app);
+      BOOST_SPIRIT_DEBUG_NODE(app_expr);
       BOOST_SPIRIT_DEBUG_NODE(primary_expr);
-      BOOST_SPIRIT_DEBUG_NODE(phi_application);
-      BOOST_SPIRIT_DEBUG_NODE(lambda_application);
+      //BOOST_SPIRIT_DEBUG_NODE(phi_application);
+      //BOOST_SPIRIT_DEBUG_NODE(lambda_application);
 
       expr.name("expr");
 
