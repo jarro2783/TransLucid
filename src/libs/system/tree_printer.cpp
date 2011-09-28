@@ -259,20 +259,37 @@ namespace TransLucid
 
     ph::function<print_paren_impl> print_paren;
 
+    enum Precedence
+    {
+      MINUS_INF,
+      FN_ABSTRACTION,
+      WHERE_CLAUSE,
+      BINARY_FN,
+      FN_APP,
+      PREFIX_FN,
+      POSTFIX_FN
+    };
+
+    struct bin_prec_impl
+    {
+      template <typename Arg>
+      struct result
+      {
+        typedef ExprPrecedence type;
+      };
+
+      ExprPrecedence
+      operator()(const Tree::BinaryOpExpr& binop) const
+      {
+        return ExprPrecedence(BINARY_FN, binop.op.precedence);
+      }
+    };
+
+    ph::function<bin_prec_impl> bin_prec;
+
     template <typename Iterator>
     struct ExprPrinter : karma::grammar<Iterator, Tree::Expr()>
     {
-      enum Precedence
-      {
-        MINUS_INF,
-        WHERE_CLAUSE,
-        FN_ABSTRACTION,
-        BINARY_FN,
-        FN_APP,
-        PREFIX_FN,
-        POSTFIX_FN
-      };
-
       ExprPrinter()
       : ExprPrinter::base_type(expr_top),
       special_map
@@ -347,17 +364,15 @@ namespace TransLucid
           paren
           (
             _r1,
-            ph::construct<ExprPrecedence>(
-              BINARY_FN, ph::at_c<3>(ph::at_c<1>(_val))),
+            bin_prec(_val),
             '('
           )
           //TODO fix this
-          << expr(BINARY_FN) << binary_symbol << expr(BINARY_FN)
+          << expr(bin_prec(_val)) << binary_symbol << expr(bin_prec(_val))
           << paren
           (
             _r1,
-            ph::construct<ExprPrecedence>(BINARY_FN,
-              ph::at_c<3>(ph::at_c<1>(_val))),
+            bin_prec(_val),
             ')'
           );
 
@@ -381,10 +396,10 @@ namespace TransLucid
         ;
 
         lambda_function = 
-          paren(_r1, MINUS_INF, '(') <<
+          paren(_r1, FN_ABSTRACTION, '(') <<
           literal("\\") << stringLiteral[_1 = ph::at_c<0>(_val)] << 
-          literal(" -> ") << expr(MINUS_INF)[_1 = ph::at_c<1>(_val)] 
-          << paren(_r1, MINUS_INF, ')')
+          literal(" -> ") << expr(FN_ABSTRACTION)[_1 = ph::at_c<1>(_val)] 
+          << paren(_r1, FN_ABSTRACTION, ')')
         ;
 
         lambda_application = 
@@ -396,7 +411,7 @@ namespace TransLucid
 
         name_function = karma::string(literal("(\\\\")) 
           << stringLiteral[_1 = ph::at_c<0>(_val)] 
-          << literal(" -> ") << expr(MINUS_INF)[_1 = ph::at_c<1>(_val)] 
+          << literal(" -> ") << expr(FN_ABSTRACTION)[_1 = ph::at_c<1>(_val)] 
           << literal(")");
 
         name_application = 
