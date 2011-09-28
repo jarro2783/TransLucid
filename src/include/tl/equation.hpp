@@ -152,6 +152,9 @@ namespace TransLucid
     std::map<dimension_index, Constant> m_constDims;
     std::map<dimension_index, WS*> m_nonConstDims;
 
+    std::map<WS*, Constant> m_dimNonConst;
+    std::map<WS*, WS*> m_dimNonNon;
+
     mpz_class *m_timeStart;
     mpz_class *m_timeEnd;
   };

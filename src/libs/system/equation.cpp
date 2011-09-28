@@ -135,12 +135,13 @@ GuardWS::GuardWS(WS* g, WS* b)
 
     for (const auto& val : pairs)
     {
+      bool lhsConst = true;
+      bool rhsConst = true;
       Constant lhs = val.first->operator()(k);
 
       if (lhs.index() == TYPE_INDEX_SPECIAL)
       {
-        std::cerr << "special encountered in lhs of guard" << std::endl;
-        throw "special encountered in lhs of guard";
+        lhsConst = false;
       }
 
       dimension_index dimIndex = 
@@ -152,14 +153,33 @@ GuardWS::GuardWS(WS* g, WS* b)
 
       if (rhs.index() == TYPE_INDEX_SPECIAL)
       {
-        //std::cerr << "putting " << dimIndex << " in non const dims" 
-        //  << std::endl;
-        m_nonConstDims.insert(std::make_pair(dimIndex, val.second));
+        rhsConst = false;
+      }
+
+      //we'll work out whether both left-hand sides and right-hand sides
+      //are constant, and stick them in a container to evaluate the
+      //remainder later
+      if (lhsConst)
+      {
+        if (rhsConst)
+        {
+          m_constDims.insert(std::make_pair(dimIndex, rhs));
+        }
+        else
+        {
+          m_nonConstDims.insert(std::make_pair(dimIndex, val.second));
+        }
       }
       else
       {
-        //std::cerr << "putting " << dimIndex << " in const dims" << std::endl;
-        m_constDims.insert(std::make_pair(dimIndex, rhs));
+        if (rhsConst)
+        {
+          m_dimNonConst.insert(std::make_pair(val.first, rhs));
+        }
+        else
+        {
+          m_dimNonNon.insert(std::make_pair(val.first, val.second));
+        }
       }
     }
   }
