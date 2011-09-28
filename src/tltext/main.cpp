@@ -39,7 +39,7 @@ namespace
 std::unique_ptr<std::ifstream> openInput(const std::string& input)
 {
   std::unique_ptr<std::ifstream> is(new std::ifstream(input.c_str()));
-  if (!is->is_open())
+  if (is->fail())
   {
     throw "Could not open file";
   }
@@ -49,7 +49,7 @@ std::unique_ptr<std::ifstream> openInput(const std::string& input)
 std::unique_ptr<std::ofstream> openOutput(const std::string& output)
 {
   std::unique_ptr<std::ofstream> os(new std::ofstream(output.c_str()));
-  if (!os->is_open())
+  if (os->fail())
   {
     throw "Unable to open file";
   }

@@ -62,6 +62,7 @@ TLText::TLText()
  ,m_time(0)
  ,m_lastLibLoaded(0)
  ,m_argsHD(0)
+ ,m_envHD(0)
 {
   m_libtool.addSearchPath(to_u32string(std::string(PREFIX "/share/tl")));
 
