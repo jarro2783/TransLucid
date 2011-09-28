@@ -27,11 +27,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <boost/spirit/home/phoenix/bind/bind_function.hpp>
 #include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
 #include <boost/spirit/home/phoenix/object/construct.hpp>
-#include <boost/spirit/home/phoenix/object/dynamic_cast.hpp>
 #include <boost/spirit/home/phoenix/operator/comparison.hpp>
 #include <boost/spirit/home/phoenix/operator/self.hpp>
-#include <boost/spirit/home/phoenix/statement/sequence.hpp>
-#include <boost/spirit/home/phoenix/statement/if.hpp>
 
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
@@ -221,7 +218,7 @@ namespace TransLucid
       bool
       operator<(const ExprPrecedence& rhs) const
       {
-        return m_a < rhs.m_a || (m_a == rhs.m_a && m_b < rhs.m_b);
+        return (m_a < rhs.m_a) || (m_a == rhs.m_a && m_b < rhs.m_b);
       }
 
       private:
@@ -229,7 +226,7 @@ namespace TransLucid
 
       //this allows an infinite number of precedences inside the same
       //m_a precedence
-      //although more practically it allows binary operators to work
+      //although really it allows binary operators to work
       mpz_class m_b;
     };
 
@@ -251,7 +248,7 @@ namespace TransLucid
       {
         if (mine < parent)
         {
-          return std::string(0, paren);
+          return std::string(1, paren);
         }
         return std::string();
       }
@@ -268,6 +265,12 @@ namespace TransLucid
       FN_APP,
       PREFIX_FN,
       POSTFIX_FN
+    };
+
+    enum Subtree
+    {
+      SUBTREE_LEFT,
+      SUBTREE_RIGHT
     };
 
     struct bin_prec_impl
@@ -310,7 +313,8 @@ namespace TransLucid
         ];
 
         //all the expressions
-        nil = karma::omit[nildummy] << "nil";
+        nil = karma::skip[nildummy] << "nil";
+        nildummy = karma::skip[nildummy];
 
         special = karma::string
         [
@@ -367,7 +371,6 @@ namespace TransLucid
             bin_prec(_val),
             '('
           )
-          //TODO fix this
           << expr(bin_prec(_val)) << binary_symbol << expr(bin_prec(_val))
           << paren
           (
@@ -442,14 +445,49 @@ namespace TransLucid
 
         eqn = literal("var ") 
           << stringLiteral [_1 = ph::function<get_tuple<0>>()(_val)]
-          << literal(" ")
-          << expr(MINUS_INF) [_1 = ph::function<get_tuple<1>>()(_val)]
-          << literal(" & ") 
-          << expr(MINUS_INF) [_1 = ph::function<get_tuple<2>>()(_val)]
+          << guard[_1 = ph::function<get_tuple<1>>()(_val)]
+          << boolGuard[_1 = ph::function<get_tuple<2>>()(_val)]
+          #if 0
+          (
+            nildummy[_1 = ph::function<get_tuple<1>>()(_val)]
+            |
+            (
+              literal(" ")
+              << expr(MINUS_INF) [_1 = ph::function<get_tuple<1>>()(_val)]
+            )
+          )
+          <<
+          (
+            nildummy[_1 = ph::function<get_tuple<2>>()(_val)]
+            |
+            (
+              literal(" & ")
+              << expr(MINUS_INF) [_1 = ph::function<get_tuple<2>>()(_val)]
+            )
+          )
+          #endif
           << literal(" = ") 
           << expr(MINUS_INF) [_1 = ph::function<get_tuple<3>>()(_val)]
           << literal(";;\n")
-          ;
+        ;
+
+        guard = 
+          nildummy
+        |
+        (
+          literal(" ")
+          << expr(MINUS_INF)
+        )
+        ;
+
+        boolGuard =
+          nildummy
+        |
+        (
+          literal(" & ")
+          << expr(MINUS_INF)
+        )
+        ;
 
         bangop = expr(FN_APP) << 
           literal("!(") << *(expr(FN_APP) % literal(","))
@@ -516,6 +554,9 @@ namespace TransLucid
       karma::rule<Iterator, Tree::PhiAppExpr(ExprPrecedence)> name_application;
       karma::rule<Iterator, Tree::WhereExpr(ExprPrecedence)> where;
       karma::rule<Iterator, Tree::BangOpExpr()> bangop;
+
+      karma::rule<Iterator, Tree::Expr()> guard;
+      karma::rule<Iterator, Tree::Expr()> boolGuard;
 
       karma::rule<Iterator, u32string()> stringLiteral;
 
