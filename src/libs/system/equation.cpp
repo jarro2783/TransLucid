@@ -247,6 +247,14 @@ GuardWS::evaluate(Context& k) const
       t.insert(std::make_pair(nonConst.first, ord));
     }
 
+    for (const auto& nonConstConst : m_dimNonConst)
+    {
+    }
+
+    for (const auto& nonNon : m_dimNonNon)
+    {
+    }
+
     //still need to remove this magic
     #if 0
     if (v.index() == TYPE_INDEX_TUPLE)
