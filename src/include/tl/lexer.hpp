@@ -114,9 +114,9 @@ namespace TransLucid
         integer_
       ;
 
-      lex::token_def<value_wrapper<mpf_class>, lex_char_type>
-        real_
-      ;
+      //lex::token_def<value_wrapper<mpf_class>, lex_char_type>
+      //  real_
+      //;
 
       lex::token_def<value_wrapper<mpq_class>, lex_char_type>
         rational_

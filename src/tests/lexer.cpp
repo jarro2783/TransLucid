@@ -250,6 +250,7 @@ class Checker
     ++m_current;
   }
 
+#if 0
   void real(const value_wrapper<mpf_class>& f)
   {
     BOOST_TEST_MESSAGE("Testing float: " << f);
@@ -265,6 +266,7 @@ class Checker
 
     ++m_current;
   }
+#endif
 
   void constant(const std::pair<TL::u32string, TL::u32string>& c)
   {
@@ -338,7 +340,6 @@ struct checker_grammar
         | keyword  [ph::bind(&Checker::keyword, m_checker, _1)]
         | symbol   [ph::bind(&Checker::symbol, m_checker, _1)]
         | rational
-        | real
         | constant
         | tok.character_[ph::bind(&Checker::character, m_checker, _1)]
         | tok.binary_op_
@@ -364,7 +365,7 @@ struct checker_grammar
       ident    = tok.identifier_[ph::bind(&Checker::identifier, m_checker, _1)];
       integer  = tok.integer_   [ph::bind(&Checker::integer, m_checker, _1)];
       rational = tok.rational_  [ph::bind(&Checker::rational, m_checker, _1)];
-      real     = tok.real_      [ph::bind(&Checker::real, m_checker, _1)];
+      //real     = tok.real_      [ph::bind(&Checker::real, m_checker, _1)];
       constant = (tok.constantRAW_ | tok.constantINTERPRET_)
          [
            ph::bind(&Checker::constant, m_checker, _1)
@@ -410,7 +411,7 @@ struct checker_grammar
     , ident
     , integer
     , rational
-    , real
+    //, real
     , constant
 		;
 		qi::rule<Iterator, Keyword()>

@@ -110,7 +110,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   dblpercent_ = L"%%";
   assign_     = L":=";
 
-  real_     = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";
+  //real_     = L"(0\\.0)|~?({floatDEC}|{floatNONDEC})";
   rational_ = L"(0_1)|(~?)({ratDEC}|{ratNONDEC})";
 
   library_      = L"library";
@@ -153,7 +153,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
 
   //numbers
   | integer_ [detail::build_integer(m_errors)]
-  | real_    [detail::build_real()]
+  //| real_    [detail::build_real()]
   | rational_[detail::build_rational()]
 
   //type of line items
