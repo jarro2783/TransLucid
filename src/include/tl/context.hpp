@@ -73,7 +73,7 @@ namespace TransLucid
     {
       for (const auto& v : list)
       {
-        m_context[v].pop();
+        m_context[makeIndex(v)].pop();
       }
     }
 

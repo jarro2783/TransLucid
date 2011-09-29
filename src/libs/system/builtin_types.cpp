@@ -922,11 +922,13 @@ NameFunctionType::apply
 
   //argdim = cons(c, #argdim)
   Tuple argList = makeList(c, k.lookup(m_argDim));
+  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
+    k.lookup(m_odometerDim));
 
   ContextPerturber(k, 
   {
     {m_argDim, Types::Tuple::create(argList)},
-    {m_odometerDim, Types::Tuple::create(Tuple(odometer))}
+    {m_odometerDim, Types::Tuple::create(odometerList)}
   });
 
   return (*m_expr)(k);

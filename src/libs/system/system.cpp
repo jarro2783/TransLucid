@@ -130,28 +130,64 @@ namespace
 
       //head of ##\psi
       Constant hashPsi = k.lookup(DIM_PSI);
+
+      if (hashPsi.index() != TYPE_INDEX_DIMENSION)
+      {
+        throw "list dimension not a dimension";
+      }
+
       Constant hashHashPsi = k.lookup(get_constant<dimension_index>(hashPsi));
 
+      if (hashHashPsi.index() != TYPE_INDEX_TUPLE)
+      {
+        throw "list expected, type not a tuple";
+      }
+
       Constant hashPi = k.lookup(DIM_PI);
+
+      if (hashPi.index() != TYPE_INDEX_DIMENSION)
+      {
+        throw "list dimension not a dimension";
+      }
+
       Constant hashHashPi = k.lookup(get_constant<dimension_index>(hashPi));
+
+      if (hashHashPi.index() != TYPE_INDEX_TUPLE)
+      {
+        throw "list expected, type not a tuple";
+      }
 
       //hashHashPsi will be a list of workshop objects
 
       //expr is a workshop object
       Constant expr = listHead(hashHashPsi);
 
-      ContextPerturber p(k,
-        {
-          {get_constant<dimension_index>(hashPsi), listTail(hashHashPsi)},
-          {get_constant<dimension_index>(hashPi), listTail(hashHashPi)}
-        }
-      );
+      try
+      {
 
-      p.perturb(Types::Tuple::get(hashHashPi));
+        ContextPerturber p(k,
+          {
+            {get_constant<dimension_index>(hashPsi), listTail(hashHashPsi)},
+            {get_constant<dimension_index>(hashPi), listTail(hashHashPi)}
+          }
+        );
 
-      WS* w = Types::Workshop::get(expr).ws();
+        p.perturb(Types::Tuple::get(listHead(hashHashPi)));
 
-      return (*w)(k);
+        WS* w = Types::Workshop::get(expr).ws();
+
+        return (*w)(k);
+      
+      }
+      catch (...)
+      {
+        std::cerr << "caught exception in args lookup" << std::endl
+        << "#pi = " << get_constant<dimension_index>(hashPi) << std::endl
+        << "#psi = " << get_constant<dimension_index>(hashPsi) << std::endl;
+
+        throw;
+      }
+
     }
   };
 }

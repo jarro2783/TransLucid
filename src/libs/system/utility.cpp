@@ -418,6 +418,11 @@ listHead(const Constant& l)
 Constant
 listTail(const Constant& l)
 {
+  const Tuple& t = Types::Tuple::get(l);
+  if (t.find(DIM_ARG1) == t.end())
+  {
+    throw "list has no tail";
+  }
   return Types::Tuple::get(l).find(DIM_ARG1)->second;
 }
 

@@ -566,4 +566,13 @@ TEST_CASE( "context manipulation", "perturb and restore some contexts")
 
   CHECK(k.lookup(0) == v1);
   CHECK(k.lookup(1) == v2);
+
+  TL::Tuple t3(TL::tuple_t{
+    {-6, v1},
+    {-2, v2}
+  });
+
+  k.perturb(t3);
+  CHECK(k.lookup(-6) == v1);
+  CHECK(k.lookup(-2) == v2);
 }

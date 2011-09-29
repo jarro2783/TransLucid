@@ -328,7 +328,7 @@ namespace TransLucid
 
     size_t m_uniqueVarIndex;
     size_t m_uniqueDimIndex;
-    int m_hiddenDim;
+    dimension_index m_hiddenDim;
 
     bool m_debug;
     bool m_verbose;

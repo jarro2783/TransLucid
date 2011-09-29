@@ -101,7 +101,7 @@ Context::perturb(dimension_index d, const Constant& c)
   }
   else if (d <= m_min)
   {
-    std::fill_n(std::front_inserter(m_context), d - m_min + 1,
+    std::fill_n(std::front_inserter(m_context), m_min - d + 1,
       std::stack<Constant>());
     m_min = d - 1;
   }
