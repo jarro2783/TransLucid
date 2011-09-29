@@ -84,6 +84,12 @@ namespace TransLucid
       return m_dimTranslator.unique();
     }
 
+    dimension_index
+    nextHiddenDim()
+    {
+      return m_hiddenDim--;
+    }
+
     /**
      * Get the time.
      * @return The current time of the system.
@@ -322,6 +328,7 @@ namespace TransLucid
 
     size_t m_uniqueVarIndex;
     size_t m_uniqueDimIndex;
+    int m_hiddenDim;
 
     bool m_debug;
     bool m_verbose;

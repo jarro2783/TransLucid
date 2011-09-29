@@ -244,7 +244,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   expr.name = e.name;
 
   //1. generate a new dimension
-  dimension_index argDim = m_system->nextDimensionIndex();
+  dimension_index argDim = m_system->nextHiddenDim();
 
   //2. store our scope dimensions and ourself
   expr.info =
@@ -291,8 +291,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
   Tree::PhiExpr expr = e;
 
   //1. generate new dimensions
-  dimension_index argDim = m_system->nextDimensionIndex();
-  dimension_index odometerDim = m_system->nextDimensionIndex();
+  dimension_index argDim = m_system->nextHiddenDim();
+  dimension_index odometerDim = m_system->nextHiddenDim();
 
   //2. store our scope dimensions and ourself
   expr.info =
@@ -378,7 +378,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
   std::vector<dimension_index> myLin;
   
   //generate new label
-  dimension_index label = m_system->nextDimensionIndex();
+  dimension_index label = m_system->nextHiddenDim();
   w.myDim = label;
   //store L_out
   //visit children variables
@@ -441,7 +441,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
   //generate a unique "which" for each dimension
   for (const auto& v : e.dims)
   {
-    int next = m_system->nextDimIndex();
+    int next = m_system->nextHiddenDim();
     w.whichDims.push_back(next);
     odometerDims.push_back
     (
