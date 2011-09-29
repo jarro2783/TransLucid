@@ -81,10 +81,13 @@ GuardWS::GuardWS(const GuardWS& other)
 : m_guard(other.m_guard)
 , m_boolean(other.m_boolean)
 , m_dimensions(other.m_dimensions)
-, m_constDims(other.m_constDims)
-, m_nonConstDims(other.m_nonConstDims)
+, m_dimConstConst(other.m_dimConstConst)
+, m_dimConstNon(other.m_dimConstNon)
+, m_dimNonConst(other.m_dimNonConst)
+, m_dimNonNon(other.m_dimNonNon)
 , m_timeStart(0)
 , m_timeEnd(0)
+, m_system(other.m_system)
 {
   try
   {
@@ -107,7 +110,7 @@ GuardWS::GuardWS(const GuardWS& other)
 }
 
 GuardWS::GuardWS(WS* g, WS* b)
-: m_guard(g), m_boolean(b), m_timeStart(0), m_timeEnd(0)
+: m_guard(g), m_boolean(b), m_timeStart(0), m_timeEnd(0), m_system(nullptr)
 {
   if (b != 0)
   {
@@ -128,10 +131,12 @@ GuardWS::GuardWS(WS* g, WS* b)
   //some trickery to evaluate guards at compile time
   Workshops::TupleWS* t = dynamic_cast<Workshops::TupleWS*>(g);
 
+  //For now guards must be a literal tuple
   if (t != 0)
   {
     const auto& pairs = t->getElements();
     System& s = t->getSystem();
+    m_system = &s;
 
     for (const auto& val : pairs)
     {
@@ -163,11 +168,11 @@ GuardWS::GuardWS(WS* g, WS* b)
       {
         if (rhsConst)
         {
-          m_constDims.insert(std::make_pair(dimIndex, rhs));
+          m_dimConstConst.insert(std::make_pair(dimIndex, rhs));
         }
         else
         {
-          m_nonConstDims.insert(std::make_pair(dimIndex, val.second));
+          m_dimConstNon.insert(std::make_pair(dimIndex, val.second));
         }
       }
       else
@@ -238,21 +243,38 @@ GuardWS::evaluate(Context& k) const
   {
     //start with the const dimensions and evaluate the non-const ones
     //Constant v = (*m_guard)(k);
-    t.insert(m_constDims.begin(), m_constDims.end());
+    t.insert(m_dimConstConst.begin(), m_dimConstConst.end());
 
     //evaluate the ones left
-    for (const auto& nonConst : m_nonConstDims)
+    for (const auto& constNon : m_dimConstNon)
     {
-      Constant ord = nonConst.second->operator()(k);
-      t.insert(std::make_pair(nonConst.first, ord));
+      Constant ord = constNon.second->operator()(k);
+      t.insert(std::make_pair(constNon.first, ord));
     }
 
-    for (const auto& nonConstConst : m_dimNonConst)
+    for (const auto& nonConst : m_dimNonConst)
     {
+      Constant dim = nonConst.first->operator()(k);
+
+      dimension_index index =
+        dim.index() == TYPE_INDEX_DIMENSION 
+        ? get_constant<dimension_index>(dim)
+        : m_system->getDimensionIndex(dim);
+
+      t.insert(std::make_pair(index, nonConst.second));
     }
 
     for (const auto& nonNon : m_dimNonNon)
     {
+      Constant dim = nonNon.first->operator()(k);
+      Constant ord = nonNon.second->operator()(k);
+
+      dimension_index index =
+        dim.index() == TYPE_INDEX_DIMENSION 
+        ? get_constant<dimension_index>(dim)
+        : m_system->getDimensionIndex(dim);
+
+      t.insert(std::make_pair(index, ord));
     }
 
     //still need to remove this magic

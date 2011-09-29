@@ -65,12 +65,12 @@ namespace TransLucid
      * dimensions can still be added.
      **/
     GuardWS()
-    : m_timeStart(0), m_timeEnd(0)
+    : m_timeStart(0), m_timeEnd(0), m_system(0)
     {
     }
 
     GuardWS(const Tuple& t)
-    : m_timeStart(0), m_timeEnd(0)
+    : m_timeStart(0), m_timeEnd(0), m_system(0)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();
@@ -149,14 +149,16 @@ namespace TransLucid
     std::shared_ptr<WS> m_boolean;
     tuple_t m_dimensions;
 
-    std::map<dimension_index, Constant> m_constDims;
-    std::map<dimension_index, WS*> m_nonConstDims;
+    std::map<dimension_index, Constant> m_dimConstConst;
+    std::map<dimension_index, WS*> m_dimConstNon;
 
     std::map<WS*, Constant> m_dimNonConst;
     std::map<WS*, WS*> m_dimNonNon;
 
     mpz_class *m_timeStart;
     mpz_class *m_timeEnd;
+
+    System* m_system;
   };
 
   class VariableWS;
