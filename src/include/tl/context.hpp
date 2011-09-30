@@ -114,6 +114,7 @@ namespace TransLucid
       for (const auto& v : p)
       {
         m_k.perturb(v.first, v.second);
+        m_dims.push_back(v.first);
       }
     }
 
