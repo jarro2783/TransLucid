@@ -131,10 +131,10 @@ RenameIdentifiers::operator()(const Tree::WhereExpr& e)
   //something already to be renamed, remember it and then change it for step 3.
   //3. Rename E and inside variable definitions.
   //4. Restore the shadowed names.
-  Tree::WhereExpr w;
-  RenameRules shadowed;
 
   RenameRules newNames;
+  RenameRules shadowed;
+  Tree::WhereExpr w;
 
   //first rename in dims because their scope is outside the where
   for (const auto& dim : e.dims)
@@ -234,7 +234,10 @@ RenameIdentifiers::operator()(const Tree::WhereExpr& e)
   }
 
   //delete the dim names and var names, then reinsert the shadowed
-  m_rules.erase(newNames.begin(), newNames.end());
+  for (const auto& v : newNames)
+  {
+    m_rules.erase(v.first);
+  }
   m_rules.insert(shadowed.begin(), shadowed.end());
 
   return w;

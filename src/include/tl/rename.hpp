@@ -31,7 +31,9 @@ namespace TransLucid
     //for boost::apply_visitor
     typedef Tree::Expr result_type;
 
-    typedef std::unordered_map<u32string, u32string> RenameRules;
+    //a hashmap would be better, but we need to hold on to iterators
+    //while we're changing it and they can't be invalidated
+    typedef std::map<u32string, u32string> RenameRules;
 
     RenameIdentifiers(System& system);
     RenameIdentifiers(System& system, const RenameRules& startRules);
