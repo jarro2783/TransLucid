@@ -193,7 +193,7 @@ namespace TransLucid
       if (d.text.empty())
       {
         std::ostringstream os;
-        os << "hiddendim_" << d.dim;
+        os << "dim_" << d.dim;
         return utf8_to_utf32(os.str());
       }
       else

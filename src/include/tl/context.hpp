@@ -137,6 +137,10 @@ namespace TransLucid
     : m_k(k)
     {
       m_k.perturb(delta);
+      for (const auto& v : delta)
+      {
+        m_dims.push_back(v.first);
+      }
     }
 
     ~ContextPerturber()
