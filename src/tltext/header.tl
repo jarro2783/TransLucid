@@ -1,6 +1,5 @@
 //some necessary dimensions
 dim "slot";;
-dim "n";;
 dim "envvar";;
 
 //the basic operators

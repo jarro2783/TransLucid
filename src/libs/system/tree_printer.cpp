@@ -156,6 +156,13 @@ BOOST_FUSION_ADAPT_STRUCT
   (std::vector<TransLucid::Parser::Equation>, vars)
 )
 
+BOOST_FUSION_ADAPT_STRUCT
+(
+  TransLucid::Tree::UnaryOpExpr,
+  (TransLucid::Tree::UnaryOperator, op)
+  (TransLucid::Tree::Expr, e)
+)
+
 template <size_t N>
 struct get_tuple
 {
@@ -362,6 +369,10 @@ namespace TransLucid
           << expr(MINUS_INF)
         ;
 
+        unary = literal("unary not yet done\n") <<
+          expr(PREFIX_FN)[_1 = at_c<1>(_val)]
+        ;
+
         binary_symbol = stringLiteral[_1 = at_c<1>(_val)];
 
         binary = 
@@ -505,7 +516,7 @@ namespace TransLucid
         | dimension
         | ident
         | paren_expr(_r1)
-        // | unary -- where is it?
+        | unary(_r1)
         | binary(_r1)
         | hash_expr(_r1)
         | tuple
@@ -517,6 +528,7 @@ namespace TransLucid
         | where(_r1)
         | bangop
         | if_expr
+        | literal("printer not yet implemented\n")
         ;
 
         expr_top %= expr(MINUS_INF);
@@ -544,6 +556,7 @@ namespace TransLucid
       karma::rule<Iterator, Tree::IfExpr()> if_expr;
       karma::rule<Iterator, Tree::BinaryOperator()> binary_symbol;
       karma::rule<Iterator, Tree::BinaryOpExpr(ExprPrecedence)> binary;
+      karma::rule<Iterator, Tree::UnaryOpExpr(ExprPrecedence)> unary;
       karma::rule<Iterator, Tree::HashExpr(ExprPrecedence)> hash_expr;
       karma::rule<Iterator, Tree::TupleExpr()> tuple;
       karma::rule<Iterator, Tree::AtExpr(ExprPrecedence)> at_expr;
