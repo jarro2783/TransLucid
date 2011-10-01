@@ -398,7 +398,7 @@ namespace TransLucid
           paren(_r1, PREFIX_FN, ')')
         ;
 
-        pairs %= one_pair % ", ";
+        pairs %= -(one_pair % ", ");
 
         one_pair %= expr(MINUS_INF) << literal(" <- ") << expr(MINUS_INF);
         tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
