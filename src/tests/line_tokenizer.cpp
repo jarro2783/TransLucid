@@ -20,14 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>
 
-#define BOOST_TEST_MODULE LineTokenizer
-#include <boost/test/included/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
 namespace TL = TransLucid;
 
-BOOST_AUTO_TEST_SUITE( line_tokenizer_tests )
-
-BOOST_AUTO_TEST_CASE( empty )
+TEST_CASE ( "empty input", "empty input to line tokenizer" )
 {
   std::string input;
 
@@ -40,11 +38,11 @@ BOOST_AUTO_TEST_CASE( empty )
 
   auto n = tokenize.next();
 
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+  CHECK(n.first == TL::LineType::EMPTY);
+  CHECK(n.second == TL::u32string());
 }
 
-BOOST_AUTO_TEST_CASE( simple )
+TEST_CASE ( "simple", "simply line iterator tests" )
 {
   std::string input = "eqn a = 5;; assign y := 6;;";
 
@@ -56,15 +54,15 @@ BOOST_AUTO_TEST_CASE( simple )
   TL::LineTokenizer tokenize(iter);
 
   auto n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = 5;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"eqn a = 5;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"assign y := 6;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"assign y := 6;;"));
 }
 
-BOOST_AUTO_TEST_CASE( dollar )
+TEST_CASE( "dollar symbol", "line tokenizer $$" )
 {
   std::string input = "eqn a = b;;  $$";
 
@@ -77,19 +75,19 @@ BOOST_AUTO_TEST_CASE( dollar )
 
   auto n = tokenize.next();
 
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = b;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"eqn a = b;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_DOLLAR);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"$$"));
+  CHECK(n.first == TL::LineType::DOUBLE_DOLLAR);
+  CHECK(n.second == TL::u32string(U"$$"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+  CHECK(n.first == TL::LineType::EMPTY);
+  CHECK(n.second == TL::u32string());
 }
 
-BOOST_AUTO_TEST_CASE( extra_spaces )
+TEST_CASE( "white space", "line tokenizer white space" )
 {
   std::string input = "eqn a = b;;  $$  ";
 
@@ -101,19 +99,19 @@ BOOST_AUTO_TEST_CASE( extra_spaces )
   TL::LineTokenizer tokenize(iter);
 
   auto n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn a = b;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"eqn a = b;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_DOLLAR);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"$$"));
+  CHECK(n.first == TL::LineType::DOUBLE_DOLLAR);
+  CHECK(n.second == TL::u32string(U"$$"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+  CHECK(n.first == TL::LineType::EMPTY);
+  CHECK(n.second == TL::u32string());
 }
 
-BOOST_AUTO_TEST_CASE( percent )
+TEST_CASE( "%%", "line tokenizer %%" )
 {
   std::string input = "eqn x = 42;;\n%%\nx;;";
 
@@ -125,23 +123,23 @@ BOOST_AUTO_TEST_CASE( percent )
   TL::LineTokenizer tokenize(iter);
 
   auto n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"eqn x = 42;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"eqn x = 42;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::DOUBLE_PERCENT);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"%%"));
+  CHECK(n.first == TL::LineType::DOUBLE_PERCENT);
+  CHECK(n.second == TL::u32string(U"%%"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string(U"x;;"));
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == TL::u32string(U"x;;"));
 
   n = tokenize.next();
-  BOOST_CHECK_EQUAL(n.first, TL::LineType::EMPTY);
-  BOOST_CHECK_EQUAL(n.second, TL::u32string());
+  CHECK(n.first == TL::LineType::EMPTY);
+  CHECK(n.second == TL::u32string());
 }
 
-BOOST_AUTO_TEST_CASE( where )
+TEST_CASE( "where clause", "does a where clause with vars work" )
 {
   {
     std::string input = "x where var x = 5;; end;;";
@@ -154,8 +152,8 @@ BOOST_AUTO_TEST_CASE( where )
     TL::LineTokenizer tokenize(iter);
 
     auto n = tokenize.next();
-    BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-    BOOST_CHECK_EQUAL(n.second, TL::to_u32string(input));
+    CHECK(n.first == TL::LineType::LINE);
+    CHECK(n.second == TL::to_u32string(input));
   }
 
   {
@@ -174,10 +172,8 @@ end;;)";
     TL::LineTokenizer tokenize(iter);
 
     auto n = tokenize.next();
-    BOOST_CHECK_EQUAL(n.first, TL::LineType::LINE);
-    BOOST_CHECK_EQUAL(n.second, TL::to_u32string(input));
+    CHECK(n.first == TL::LineType::LINE);
+    CHECK(n.second == TL::to_u32string(input));
   }
 
 }
-
-BOOST_AUTO_TEST_SUITE_END()
