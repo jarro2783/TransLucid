@@ -41,13 +41,13 @@ namespace TransLucid
     /**
      * @brief Retrieves the value of a named dimension.
      **/
-    size_t
+    dimension_index
     lookup(const u32string& name);
 
     /**
      * @brief Retrieves the value of a typed value dimension.
      **/
-    size_t
+    dimension_index
     lookup(const Constant& value);
 
     /**
@@ -55,7 +55,7 @@ namespace TransLucid
      * The next index counter is incremented, and it isn't mapped to a name,
      * therefore, it is unique and hidden.
      */
-    size_t
+    dimension_index
     unique()
     {
       return m_nextIndex++;
@@ -63,7 +63,7 @@ namespace TransLucid
 
     private:
 
-    size_t m_nextIndex;
+    dimension_index m_nextIndex;
 
     ObjectRegistry<u32string, decltype(m_nextIndex)> m_named;
     ObjectRegistry<Constant, decltype(m_nextIndex)> m_constants;

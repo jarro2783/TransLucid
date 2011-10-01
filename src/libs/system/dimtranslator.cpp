@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/dimtranslator.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/types/intmp.hpp>
+#include <tl/types/tuple.hpp>
 
 #include <vector>
 #include <iostream>
@@ -55,13 +56,13 @@ DimensionTranslator::DimensionTranslator()
 {
 }
 
-size_t
+dimension_index
 DimensionTranslator::lookup(const u32string& name)
 {
   return m_named(name);
 }
 
-size_t
+dimension_index
 DimensionTranslator::lookup(const Constant& value)
 {
   if (value.index() == TYPE_INDEX_DIMENSION)
