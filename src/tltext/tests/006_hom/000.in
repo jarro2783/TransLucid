@@ -5,11 +5,15 @@ var fby = \d -> \\X -> \\Y -> if #d <= 0 then X else prev.d Y fi;;
 var index = \d -> #d + 1;;
 var prev = \d -> \\X -> X @ [d <- #d - 1];;
 
-var pow = \a -> f where
-  dim d <- a;;
+var pow = \n -> f where
+  dim d <- n;;
   var f = fby.d (\s -> 1) (\s -> s * f.s);;
 end;;
 
 %%
 
-pow . 3 . 3;;
+pow.0.5;;
+pow.0.6;;
+pow.1.3;;
+pow.2.3;;
+pow.3.3;;
