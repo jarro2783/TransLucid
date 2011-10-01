@@ -84,6 +84,7 @@ AC_SUBST(HAVE_DOT)
 AC_CONFIG_FILES([
                  translucid.pc
                  Makefile
+                 checks/Makefile
                  doc/Makefile
                  doc/Doxyfile
                  src/Makefile

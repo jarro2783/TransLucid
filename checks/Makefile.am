@@ -1,0 +1,1 @@
+EXTRA_DIST=gcc_min_version generate_gcc_min_version_check version.cpp.in
