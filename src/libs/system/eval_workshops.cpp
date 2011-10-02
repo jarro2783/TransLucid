@@ -29,6 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
 #include <tl/maxsharelist.hpp>
+#include <tl/output.hpp>
 #include <tl/system.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/function.hpp>

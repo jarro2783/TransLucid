@@ -1,5 +1,5 @@
-/* Core TransLucid application main file.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+/* tltext main file.
+   Copyright (C) 2011 Jarryd Beck
 
 This file is part of TransLucid.
 

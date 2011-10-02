@@ -374,6 +374,12 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiAppExpr& e)
   expr.Lall = m_Lout;
   expr.Lall.insert(expr.Lall.end(), m_Lin.begin(), m_Lin.end());
 
+  std::cerr << "phi application function has L_all:" << std::endl;
+  for (auto d : expr.Lall)
+  {
+    std::cerr << d << std::endl;
+  }
+
   return expr;
 }
 
@@ -387,6 +393,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
   //generate new label
   dimension_index label = m_system->nextHiddenDim();
   w.myDim = label;
+  std::cerr << "where clause has label " << label << std::endl;
+
   //store L_out
   //visit children variables
   m_Lout.push_back(label);
