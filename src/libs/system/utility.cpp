@@ -239,7 +239,7 @@ utf32_to_utf8(const std::u32string& s) {
   //{
   //  return std::string("string too big");
   //}
-  iconv_t id = iconv_open("UTF8", "UTF32LE");
+  iconv_t id = iconv_open("UTF-8", "UTF-32LE");
   if (id == (iconv_t)-1)
   {
     perror("unable to open iconv: ");
@@ -311,7 +311,7 @@ utf8_to_utf32(const std::string& s)
   //{
   //  return U"string too big";
   //}
-  Iconv id("UTF32LE", "UTF8");
+  Iconv id("UTF-32LE", "UTF-8");
 
   //we don't actually know how many characters the output will be
   //it is at most sizeof(char32_t) * input size

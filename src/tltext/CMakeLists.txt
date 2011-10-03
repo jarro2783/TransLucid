@@ -13,9 +13,11 @@ endif(COMMAND cmake_policy)
 
 link_directories(${Boost_LIBRARY_DIRS})
 add_executable(tltext main.cpp tltext.cpp demandhd.cpp)
-add_executable(wilfred wilfred.cpp tltext.cpp demandhd.cpp)
 target_link_libraries(tltext tlsystem ${Boost_LIBRARIES})
+
+add_executable(wilfred wilfred.cpp tltext.cpp demandhd.cpp)
 target_link_libraries(wilfred tlsystem)
+
 add_definitions(${TLCFLAGS})
 
 add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})

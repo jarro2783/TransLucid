@@ -5,7 +5,8 @@ endif(COMMAND cmake_policy)
 add_definitions(${TLCFLAGS} 
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
 -Wall)
-add_library(tlsystem SHARED 
+
+set (SYSTEM_SOURCES
 ast.cpp bestfit.cpp builtin_types.cpp charset.cpp
 context.cpp dimtranslator.cpp 
 equation.cpp equation_parser.cpp
@@ -17,6 +18,8 @@ range.cpp rename.cpp system.cpp translator.cpp tree_printer.cpp
 tree_to_wstree.cpp tuple_parser.cpp types.cpp utility.cpp uuid.cpp
 workshop_builder.cpp
 )
+
+add_library(tlsystem SHARED ${SYSTEM_SOURCES})
 
 target_link_libraries(tlsystem ltdl rt gmpxx)
 INSTALL(TARGETS tlsystem
