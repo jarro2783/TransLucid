@@ -20,6 +20,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>
 
+#include <boost/spirit/include/support_istream_iterator.hpp>
+
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -176,4 +178,27 @@ end;;)";
     CHECK(n.second == TL::to_u32string(input));
   }
 
+}
+
+TEST_CASE ("istringstream", "input in an istringstream")
+{
+  std::istringstream is("var f = 42;;\n%%\n5;;\nf;;");
+  is >> std::noskipws;
+
+  TL::Parser::U32Iterator begin(
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator(is)),
+    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
+  );
+
+  TL::LineTokenizer tok(begin);
+  auto n = tok.next();
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == U"var f = 42;;");
+
+  n = tok.next();
+  CHECK(n.first == TL::LineType::DOUBLE_PERCENT);
+
+  n = tok.next();
+  CHECK(n.first == TL::LineType::LINE);
+  CHECK(n.second == U"5;;");
 }
