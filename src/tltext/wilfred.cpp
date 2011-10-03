@@ -78,25 +78,47 @@ std::string unescape(const std::string& s)
   return result;
 }
 
-int main(int argc, char* argv[])
+void htmlHead()
 {
   std::cout << "Content-type: text/html\r\n\r\n";
+  std::cout << "<html><head><title>tl program</title></head><body>";
+}
 
+//converts newlines to <br /> and outputs the rest as is
+void htmlOut(const std::string& s)
+{
+  for (char c : s)
+  {
+    if (c == '\n')
+    {
+      std::cout << "<br />";
+    }
+    else
+    {
+      std::cout << c;
+    }
+  }
+}
+
+int main(int argc, char* argv[])
+{
   //get the input length
   char* lengthstr = getenv("CONTENT_LENGTH");
   if (lengthstr == nullptr)
   {
-    std::cout << "Empty input string" << std::endl;
+    //redirect to the input page and exit
+    std::cout << "Location: index.html\n\n";
     exit(1);
   }
+
+  htmlHead();
+
   int length = atoi(lengthstr) + 1;
 
   std::unique_ptr<char[]> inbuf(new char[length]);
   std::cin.get(inbuf.get(), length);
 
   std::istringstream input(inbuf.get());
-
-  std::cout << "<html><head><title>tl program</title></head><body>";
 
   std::cout << inbuf.get() << std::endl;
 
@@ -123,12 +145,17 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
+  std::ostringstream os;
+
   TransLucid::TLText::TLText tl;
 
   std::istringstream progstream(prog->second);
   tl.set_input(&progstream);
+  tl.set_output(&os);
 
   tl.run();
+
+  htmlOut(os.str());
 
   std::cout << "</body></html>" << std::endl;
 
