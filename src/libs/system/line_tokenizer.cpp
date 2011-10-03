@@ -36,7 +36,7 @@ namespace
 inline bool
 is_space(char32_t c)
 {
-  return c == ' ' || c == '\t' || c == '\n';
+  return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
 inline bool
