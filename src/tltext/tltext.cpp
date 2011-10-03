@@ -176,7 +176,7 @@ TLText::run()
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_USTRING)
         {
-          std::cout << get_constant_pointer<u32string>(c) << std::endl;
+          (*m_os) << get_constant_pointer<u32string>(c) << std::endl;
         }
         else
         {
@@ -297,7 +297,7 @@ TLText::processExpressions(LineTokenizer& tokenizer)
         {
           if (m_verbose)
           {
-            std::cout << print_expr_tree(expr.second) << std::endl;
+            (*m_os) << print_expr_tree(expr.second) << std::endl;
           }
           exprs.push_back(expr.second);
         }
