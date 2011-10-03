@@ -80,8 +80,14 @@ std::string unescape(const std::string& s)
 
 void htmlHead()
 {
-  std::cout << "Content-type: text/html\r\n\r\n";
-  std::cout << "<html><head><title>tl program</title></head><body>";
+  std::cout << "Content-type: text/html; charset=UTF-8\r\n\r\n";
+  std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
+  std::cout << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
+    " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" 
+    << std::endl;
+  std::cout 
+    << "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>" << std::endl 
+    << "<title>tl program</title></head><body>" << std::endl;
 }
 
 //converts newlines to <br /> and outputs the rest as is
@@ -107,7 +113,7 @@ int main(int argc, char* argv[])
   if (lengthstr == nullptr)
   {
     //redirect to the input page and exit
-    std::cout << "Location: index.html\n\n";
+    std::cout << "Location: ../index.html\n\n";
     exit(1);
   }
 
@@ -120,7 +126,7 @@ int main(int argc, char* argv[])
 
   std::istringstream input(inbuf.get());
 
-  std::cout << inbuf.get() << std::endl;
+  std::cout << "<p>" << inbuf.get() << "</p>" << std::endl;
 
   std::map<std::string, std::string> invars;
 
@@ -133,7 +139,7 @@ int main(int argc, char* argv[])
 
     invars.insert(std::make_pair(var, unescape(data)));
     std::cout << "<h1>" << var << "</h1>" 
-      << std::endl << unescape(data) << std::endl;
+      << std::endl << "<p>" << unescape(data) << "</p>" << std::endl;
   }
 
   std::cout << "<h1>Output</h1>" << std::endl;
@@ -155,7 +161,9 @@ int main(int argc, char* argv[])
 
   tl.run();
 
+  std::cout << "<p>";
   htmlOut(os.str());
+  std::cout << "</p>";
 
   std::cout << "</body></html>" << std::endl;
 
