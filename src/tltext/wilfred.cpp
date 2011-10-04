@@ -19,8 +19,11 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "tltext.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
+
+#include <signal.h>
+#include <sys/time.h>
 
 //This runs the main web app interface to tltext.
 //We are using the POST method for html.
@@ -28,6 +31,14 @@ along with TransLucid; see the file COPYING.  If not see
 //we'll set up tltext to read and write to and from
 //i/ostringstream
 //then output appropriately
+
+//the timeout handler function
+void
+timeoutHandler(int sig)
+{
+  std::cout << "CPU time limit exceeded" << std::endl;
+  exit(1);
+}
 
 // Parse character as hex digit.
 // Returns -1 on error.
@@ -139,7 +150,9 @@ int main(int argc, char* argv[])
 
     invars.insert(std::make_pair(var, unescape(data)));
     std::cout << "<h1>" << var << "</h1>" 
-      << std::endl << "<p>" << unescape(data) << "</p>" << std::endl;
+      << std::endl << "<p>" << std::endl;
+    htmlOut(unescape(data));
+    std::cout << "</p>" << std::endl;
   }
 
   std::cout << "<h1>Output</h1>" << std::endl;
@@ -158,6 +171,12 @@ int main(int argc, char* argv[])
   std::istringstream progstream(prog->second);
   tl.set_input(&progstream);
   tl.set_output(&os);
+  tl.set_error(&os);
+
+  //kill the program if it runs too long
+  signal(SIGVTALRM, timeoutHandler);
+  itimerval timer{{0, 0}, {5, 0}};
+  setitimer(ITIMER_VIRTUAL, &timer, 0);
 
   tl.run();
 
