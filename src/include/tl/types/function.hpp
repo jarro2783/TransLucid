@@ -138,6 +138,16 @@ namespace TransLucid
     std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
   };
 
+  class StaticFunctionType
+  {
+    public:
+    Constant
+    apply(const std::vector<Constant>& args);
+
+    private:
+    virtual Constant
+    applyFn(const std::vector<Constant>& args) = 0;
+  };
 
   namespace Types
   {
