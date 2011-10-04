@@ -117,72 +117,98 @@ void htmlOut(const std::string& s)
   }
 }
 
+std::string
+defaultProgram()
+{
+  std::string prog =
+    "var f = 42;;\n"
+    "%%\n"
+    "f;;\n"
+  ;
+
+  return prog;
+}
+
+void
+printForm(const std::string& program)
+{
+  std::cout <<
+    "<h1>Input Program</h1>"
+    "<form action=\"wilfred\" method=\"post\">\n"
+    "<p>\n"
+    "<textarea cols=\"80\" rows=\"30\" name=\"program\">\n"
+    << program <<
+    "</textarea>\n"
+    "<br />\n"
+    "<input type=\"submit\" />\n"
+    "</p>\n"
+    "</form>";
+}
+
 int main(int argc, char* argv[])
 {
+  htmlHead();
+
   //get the input length
   char* lengthstr = getenv("CONTENT_LENGTH");
   if (lengthstr == nullptr)
   {
-    //redirect to the input page and exit
-    std::cout << "Location: ../index.html\n\n";
-    exit(1);
+    std::cout << "<h1>Run TransLucid on the web</h1>" << std::endl;
+    printForm(defaultProgram());
   }
-
-  htmlHead();
-
-  int length = atoi(lengthstr) + 1;
-
-  std::unique_ptr<char[]> inbuf(new char[length]);
-  std::cin.get(inbuf.get(), length);
-
-  std::istringstream input(inbuf.get());
-
-  std::cout << "<p>" << inbuf.get() << "</p>" << std::endl;
-
-  std::map<std::string, std::string> invars;
-
-  while (!input.eof())
+  else
   {
-    std::string var;
-    std::string data;
-    std::getline(input, var, '=');
-    std::getline(input, data, '&');
 
-    invars.insert(std::make_pair(var, unescape(data)));
-    std::cout << "<h1>" << var << "</h1>" 
-      << std::endl << "<p>" << std::endl;
-    htmlOut(unescape(data));
-    std::cout << "</p>" << std::endl;
+    int length = atoi(lengthstr) + 1;
+
+    std::unique_ptr<char[]> inbuf(new char[length]);
+    std::cin.get(inbuf.get(), length);
+
+    std::istringstream input(inbuf.get());
+
+    std::map<std::string, std::string> invars;
+
+    while (!input.eof())
+    {
+      std::string var;
+      std::string data;
+      std::getline(input, var, '=');
+      std::getline(input, data, '&');
+
+      invars.insert(std::make_pair(var, unescape(data)));
+    }
+
+    auto prog = invars.find("program");
+    if (prog == invars.end())
+    {
+      std::cout << "No program specified" << std::endl;
+      exit(1);
+    }
+
+    std::cout << "<h1>Output</h1>" << std::endl;
+
+    std::ostringstream os;
+
+    TransLucid::TLText::TLText tl;
+
+    std::istringstream progstream(prog->second);
+    tl.set_input(&progstream);
+    tl.set_output(&os);
+    tl.set_error(&os);
+
+    //kill the program if it runs too long
+    signal(SIGVTALRM, timeoutHandler);
+    itimerval timer{{0, 0}, {5, 0}};
+    setitimer(ITIMER_VIRTUAL, &timer, 0);
+
+    tl.run();
+
+    std::cout << "<p>";
+    htmlOut(os.str());
+    std::cout << "</p>";
+
+    printForm(prog->second);
   }
-
-  std::cout << "<h1>Output</h1>" << std::endl;
-
-  auto prog = invars.find("program");
-  if (prog == invars.end())
-  {
-    std::cout << "No program specified" << std::endl;
-    exit(1);
-  }
-
-  std::ostringstream os;
-
-  TransLucid::TLText::TLText tl;
-
-  std::istringstream progstream(prog->second);
-  tl.set_input(&progstream);
-  tl.set_output(&os);
-  tl.set_error(&os);
-
-  //kill the program if it runs too long
-  signal(SIGVTALRM, timeoutHandler);
-  itimerval timer{{0, 0}, {5, 0}};
-  setitimer(ITIMER_VIRTUAL, &timer, 0);
-
-  tl.run();
-
-  std::cout << "<p>";
-  htmlOut(os.str());
-  std::cout << "</p>";
 
   std::cout << "</body></html>" << std::endl;
 
