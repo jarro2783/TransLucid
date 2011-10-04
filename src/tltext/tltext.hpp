@@ -120,6 +120,16 @@ namespace TransLucid
         m_os = os;
       }
 
+      /**
+       * Set the error output stream. Sets the stream to use for error output.
+       * @param os The error output stream.
+       */
+      void
+      set_error(std::ostream* os)
+      {
+        m_error = os;
+      }
+
       void
       set_clargs(const std::vector<std::string>& args)
       {
@@ -133,6 +143,7 @@ namespace TransLucid
 
       std::istream* m_is;
       std::ostream* m_os;
+      std::ostream* m_error;
 
       System m_system;
       ExprList m_exprs;

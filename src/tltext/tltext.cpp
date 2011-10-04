@@ -59,6 +59,7 @@ TLText::TLText()
  ,m_debug(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
+ ,m_error(&std::cerr)
  ,m_time(0)
  ,m_lastLibLoaded(0)
  ,m_argsHD(0)
@@ -112,7 +113,7 @@ TLText::run()
     }
   }
 
-  std::cerr << "TLText..." << std::endl;
+  *m_error << "TLText..." << std::endl;
   *m_is >> std::noskipws;
 
   Parser::U32Iterator begin(
@@ -180,8 +181,8 @@ TLText::run()
         }
         else
         {
-          std::cerr << "Error: PRINT didn't return a string" << std::endl;
-          std::cerr << "Type index: " << c.index() << std::endl;
+          *m_error << "Error: PRINT didn't return a string" << std::endl;
+          *m_error << "Type index: " << c.index() << std::endl;
         }
 
         #if 0
