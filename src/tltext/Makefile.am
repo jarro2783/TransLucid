@@ -1,4 +1,4 @@
-bin_PROGRAMS = tltext
+bin_PROGRAMS = tltext wilfred
 
 tltext_LDFLAGS = -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -8,7 +8,14 @@ tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -DPREFIX=\"$(prefix)\" \
 -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
 
-tltext_SOURCES = main.cpp tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp
+wilfred_LDFLAGS = $(tltext_LDFLAGS)
+wilfred_CPPFLAGS = $(tltext_CPPFLAGS)
+
+TLTEXT_SHARED_SOURCES = tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp
+
+tltext_SOURCES = main.cpp $(TLTEXT_SHARED_SOURCES)
+
+wilfred_SOURCES= wilfred.cpp $(TLTEXT_SHARED_SOURCES)
 
 TESTS_ENVIRONMENT = TLTEXT=$(top_builddir)/src/tltext/tltext \
   TESTDIR=$(top_srcdir)/src/tltext/tests \
