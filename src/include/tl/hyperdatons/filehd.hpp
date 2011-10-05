@@ -38,7 +38,7 @@ namespace TransLucid
 
       mpz_class left(0);
       //this is 2^63 - 1
-      mpz_class right(9223372036854775807);
+      mpz_class right("9223372036854775807");
       Range r(&left, &right); 
 
       m_variance = tuple_t{{DIM_ZERO,Types::Range::create(r)}};
