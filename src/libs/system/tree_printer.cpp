@@ -194,6 +194,20 @@ namespace TransLucid
     using boost::spirit::_1;
     using namespace phoenix;
 
+    enum class Subtree
+    {
+      LEFT,
+      NONE,
+      RIGHT
+    };
+
+    enum class Assoc
+    {
+      LEFT,
+      NON,
+      RIGHT
+    };
+
     u32string
     print_dimension(const Tree::DimensionExpr& d)
     {
@@ -239,7 +253,14 @@ namespace TransLucid
 
     struct print_paren_impl
     {
-      template <typename Arg0, typename Arg1, typename Arg2>
+      template 
+      <
+        typename Arg0, 
+        typename Arg1, 
+        typename Arg2, 
+        typename Arg3 = void(),
+        typename Arg4 = void()
+      >
       struct result
       {
         typedef std::string type;
@@ -248,16 +269,39 @@ namespace TransLucid
       std::string
       operator()
       (
-        const ExprPrecedence& parent, 
-        const ExprPrecedence& mine, 
+        const ExprPrecedence& parent,
+        const ExprPrecedence& mine,
+        Assoc assoc,
+        Subtree sub,
         char paren
       ) const
       {
+        #ifdef DEBUG
+        return std::string(1, paren);
+        #else
         if (mine < parent)
         {
           return std::string(1, paren);
         }
+        else if (!(parent < mine))
+        {
+          //they must be equal
+          //print if different subtrees
+          if (assoc == Assoc::LEFT && sub == Subtree::RIGHT)
+          {
+            return std::string(1, paren);
+          }
+          else if (assoc == Assoc::RIGHT && sub == Subtree::LEFT)
+          {
+            return std::string(1, paren);
+          }
+          else if (assoc == Assoc::NON && sub != Subtree::NONE)
+          {
+            return std::string(1, paren);
+          }
+        }
         return std::string();
+        #endif
       }
     };
 
@@ -272,12 +316,6 @@ namespace TransLucid
       FN_APP,
       PREFIX_FN,
       POSTFIX_FN
-    };
-
-    enum Subtree
-    {
-      SUBTREE_LEFT,
-      SUBTREE_RIGHT
     };
 
     struct bin_prec_impl
@@ -296,6 +334,43 @@ namespace TransLucid
     };
 
     ph::function<bin_prec_impl> bin_prec;
+
+    struct bin_assoc_impl
+    {
+      template <typename Arg>
+      struct result
+      {
+        typedef Assoc type;
+      };
+
+      Assoc
+      operator()(const Tree::BinaryOpExpr& binop) const
+      {
+        Assoc a = Assoc::NON;
+
+        switch(binop.op.assoc)
+        {
+          case Tree::ASSOC_LEFT:
+          a = Assoc::LEFT;
+          break;
+
+          case Tree::ASSOC_RIGHT:
+          a = Assoc::RIGHT;
+          break;
+
+          case Tree::ASSOC_NON:
+          a = Assoc::NON;
+          break;
+
+          default:
+          break;
+        }
+
+        return a;
+      }
+    };
+
+    ph::function<bin_assoc_impl> bin_assoc;
 
     template <typename Iterator>
     struct ExprPrinter : karma::grammar<Iterator, Tree::Expr()>
@@ -316,7 +391,7 @@ namespace TransLucid
         //to output, or not to output, that is the question
         paren = karma::string
         [
-          _1 = print_paren(_r1, _r2, _r3)
+          _1 = print_paren(_r1, _r2, _r3, _r4, _r5)
         ];
 
         //all the expressions
@@ -354,23 +429,27 @@ namespace TransLucid
 
         ident = stringLiteral[_1 = at_c<0>(_val)];
 
-        if_expr = literal("if ") << expr(MINUS_INF) 
-          << literal(" then ") << expr(MINUS_INF)
+        if_expr = literal("if ") 
+          << expr(MINUS_INF, Assoc::NON, Subtree::NONE) 
+          << literal(" then ") 
+          << expr(MINUS_INF, Assoc::NON, Subtree::NONE)
           << elsif_list
-          << literal(" else ") << expr(MINUS_INF) << literal(" fi ")
+          << literal(" else ") 
+          << expr(MINUS_INF, Assoc::NON, Subtree::NONE) 
+          << literal(" fi ")
         ;
 
         elsif_list %= *(one_elsif);
 
         one_elsif = 
           literal(" elsif ") 
-          << expr(MINUS_INF)
+          << expr(MINUS_INF, Assoc::NON, Subtree::NONE)
           << literal(" then ") 
-          << expr(MINUS_INF)
+          << expr(MINUS_INF, Assoc::NON, Subtree::NONE)
         ;
 
         unary = literal("unary not yet done\n") <<
-          expr(PREFIX_FN)[_1 = at_c<1>(_val)]
+          expr(PREFIX_FN, Assoc::LEFT, Subtree::RIGHT)[_1 = at_c<1>(_val)]
         ;
 
         binary_symbol = stringLiteral[_1 = at_c<1>(_val)];
@@ -380,77 +459,119 @@ namespace TransLucid
           (
             _r1,
             bin_prec(_val),
+            _r2,
+            _r3,
             '('
           )
-          << expr(bin_prec(_val)) << binary_symbol << expr(bin_prec(_val))
+          << expr
+             (
+               bin_prec(_val), 
+               bin_assoc(_val),
+               Subtree::LEFT
+             )
+          << binary_symbol 
+          << expr
+             (
+               bin_prec(_val), 
+               bin_assoc(_val),
+               Subtree::RIGHT
+             )
           << paren
           (
             _r1,
             bin_prec(_val),
+            _r2,
+            _r3,
             ')'
           );
 
         //paren_expr = literal('(') << expr(MINUS_INF) << ')';
-        paren_expr = expr(_r1);
+        paren_expr = expr(_r1, _r2, _r3);
 
-        hash_expr = paren(_r1, PREFIX_FN, '(') << literal("#") << 
-          expr(PREFIX_FN)[_1 = at_c<0>(_val)] << 
-          paren(_r1, PREFIX_FN, ')')
+        hash_expr = 
+          paren(_r1, PREFIX_FN, _r2, _r3, '(') << 
+          literal("#") 
+          << expr
+          (
+            PREFIX_FN, 
+            Assoc::RIGHT,
+            Subtree::RIGHT
+          )[_1 = at_c<0>(_val)] 
+          << paren(_r1, PREFIX_FN, _r2, _r3, ')')
         ;
 
         pairs %= -(one_pair % ", ");
 
-        one_pair %= expr(MINUS_INF) << literal(" <- ") << expr(MINUS_INF);
+        one_pair %= 
+          expr(MINUS_INF, Assoc::NON, Subtree::NONE)
+          << literal(" <- ") 
+          << expr(MINUS_INF, Assoc::NON, Subtree::NONE)
+        ;
+
         tuple = literal('[') << pairs[_1 = ph::at_c<0>(_val)] << literal(']');
 
-        at_expr = paren(_r1, FN_APP, '(') 
-          << expr(FN_APP)
+        at_expr = paren(_r1, FN_APP, _r2, _r3, '(') 
+          << expr(FN_APP, Assoc::LEFT, Subtree::LEFT)
           << literal(" @ ") 
-          << expr(FN_APP)
-          << paren(_r1, FN_APP, ')')
+          << expr(FN_APP, Assoc::LEFT, Subtree::RIGHT)
+          << paren(_r1, FN_APP, _r2, _r3, ')')
         ;
 
         lambda_function = 
-          paren(_r1, FN_ABSTRACTION, '(') <<
+          paren(_r1, FN_ABSTRACTION, _r2, _r3, '(') 
+          <<
           literal("\\") << stringLiteral[_1 = ph::at_c<0>(_val)] << 
-          literal(" -> ") << expr(FN_ABSTRACTION)[_1 = ph::at_c<1>(_val)] 
-          << paren(_r1, FN_ABSTRACTION, ')')
+          literal(" -> ") 
+          << expr
+             (
+               FN_ABSTRACTION, 
+               Assoc::RIGHT, 
+               Subtree::RIGHT
+             )[_1 = ph::at_c<1>(_val)] 
+          << paren(_r1, FN_ABSTRACTION, _r2, _r3, ')')
         ;
 
         lambda_application = 
-          paren(_r1, FN_APP, '(') 
-          << expr(FN_APP) 
+          paren(_r1, FN_APP, _r2, _r3, '(') 
+          << expr(FN_APP, Assoc::LEFT, Subtree::LEFT) 
           << literal(".") 
-          << expr(FN_APP)
-          << paren(_r1, FN_APP, ')');
+          << expr(FN_APP, Assoc::LEFT, Subtree::RIGHT)
+          << paren(_r1, FN_APP, _r2, _r3, ')');
 
         name_function = 
-          paren(_r1, FN_ABSTRACTION, '(') <<
-          literal("\\\\") <<
-          stringLiteral[_1 = ph::at_c<0>(_val)] <<
-          literal(" -> ") << 
-          expr(FN_ABSTRACTION)[_1 = ph::at_c<1>(_val)] <<
-          paren(_r1, FN_ABSTRACTION, ')')
+          paren(_r1, FN_ABSTRACTION, _r2, _r3, '(')
+          << literal("\\\\")
+          << stringLiteral[_1 = ph::at_c<0>(_val)]
+          << literal(" -> ") 
+          << expr
+             (
+               FN_ABSTRACTION, 
+               Assoc::RIGHT, 
+               Subtree::RIGHT
+             )[_1 = ph::at_c<1>(_val)] 
+          << paren(_r1, FN_ABSTRACTION, _r2, _r3, ')')
         ;
 
         name_application = 
-          paren(_r1, FN_APP, '(') <<
-          expr(FN_APP) << 
+          paren(_r1, FN_APP, _r2, _r3, '(') <<
+          expr(FN_APP, Assoc::LEFT, Subtree::LEFT) << 
           literal(" ") << 
-          expr(FN_APP) << 
-          paren(_r1, FN_APP, ')')
+          expr(FN_APP, Assoc::LEFT, Subtree::RIGHT) << 
+          paren(_r1, FN_APP, _r2, _r3, ')')
         ;
 
-        where = paren(_r1, WHERE_CLAUSE, '(') << expr(WHERE_CLAUSE) 
+        where = 
+          paren(_r1, WHERE_CLAUSE, _r2, _r3, '(')
+          << expr(WHERE_CLAUSE, Assoc::NON, Subtree::NONE)
           << literal(" where\n") << dimlist 
           << varlist << literal("end")
-          << paren(_r1, WHERE_CLAUSE, ')')
+          << paren(_r1, WHERE_CLAUSE, _r2, _r3, ')')
         ;
 
         dimlist = *(oneDim);
 
         oneDim = literal("dim ") << stringLiteral << literal(" <- ") 
-          << expr(MINUS_INF) << literal(";;\n");
+          << expr(MINUS_INF, Assoc::LEFT, Subtree::RIGHT) << literal(";;\n");
 
         varlist = *(eqn);
 
@@ -478,7 +599,7 @@ namespace TransLucid
           )
           #endif
           << literal(" = ") 
-          << expr(MINUS_INF) [_1 = ph::function<get_tuple<3>>()(_val)]
+          << expr(MINUS_INF, Assoc::LEFT, Subtree::RIGHT) [_1 = ph::function<get_tuple<3>>()(_val)]
           << literal(";;\n")
         ;
 
@@ -487,7 +608,7 @@ namespace TransLucid
         |
         (
           literal(" ")
-          << expr(MINUS_INF)
+          << expr(MINUS_INF, Assoc::LEFT, Subtree::RIGHT)
         )
         ;
 
@@ -496,12 +617,12 @@ namespace TransLucid
         |
         (
           literal(" & ")
-          << expr(MINUS_INF)
+          << expr(MINUS_INF, Assoc::LEFT, Subtree::RIGHT)
         )
         ;
 
-        bangop = expr(FN_APP) << 
-          literal("!(") << *(expr(FN_APP) % literal(","))
+        bangop = expr(FN_APP, Assoc::LEFT, Subtree::RIGHT) << 
+          literal("!(") << *(expr(FN_APP, Assoc::LEFT, Subtree::RIGHT) % literal(","))
           << literal(")");
 
         // TODO: Missing unary
@@ -515,23 +636,23 @@ namespace TransLucid
         | constant
         | dimension
         | ident
-        | paren_expr(_r1)
+        | paren_expr(_r1, _r2, _r3)
         | unary(_r1)
-        | binary(_r1)
-        | hash_expr(_r1)
+        | binary(_r1, _r2, _r3)
+        | hash_expr(_r1, _r2, _r3)
         | tuple
-        | at_expr(_r1)
-        | lambda_function(_r1)
-        | lambda_application(_r1)
-        | name_function(_r1)
-        | name_application(_r1)
-        | where(_r1)
+        | at_expr(_r1, _r2, _r3)
+        | lambda_function(_r1, _r2, _r3)
+        | lambda_application(_r1, _r2, _r3)
+        | name_function(_r1, _r2, _r3)
+        | name_application(_r1, _r2, _r3)
+        | where(_r1, _r2, _r3)
         | bangop
         | if_expr
         | literal("printer not yet implemented\n")
         ;
 
-        expr_top %= expr(MINUS_INF);
+        expr_top %= expr(MINUS_INF, Assoc::NON, Subtree::NONE);
       }
 
       const std::string&
@@ -541,7 +662,10 @@ namespace TransLucid
       }
 
       karma::rule<Iterator, Tree::Expr()> expr_top;
-      karma::rule<Iterator, Tree::Expr(ExprPrecedence)> expr;
+      karma::rule<
+        Iterator, 
+        Tree::Expr(ExprPrecedence, Assoc, Subtree)
+      > expr;
 
       karma::rule<Iterator, Tree::nil()> nil;
       karma::rule<Iterator, Tree::nil()> nildummy;
@@ -552,20 +676,59 @@ namespace TransLucid
       karma::rule<Iterator, Tree::LiteralExpr()> constant;
       karma::rule<Iterator, Tree::DimensionExpr()> dimension;
       karma::rule<Iterator, Tree::IdentExpr()> ident;
-      karma::rule<Iterator, Tree::ParenExpr(ExprPrecedence)> paren_expr;
+
+      karma::rule<
+        Iterator, 
+        Tree::ParenExpr(ExprPrecedence, Assoc, Subtree)
+      > paren_expr;
+
       karma::rule<Iterator, Tree::IfExpr()> if_expr;
       karma::rule<Iterator, Tree::BinaryOperator()> binary_symbol;
-      karma::rule<Iterator, Tree::BinaryOpExpr(ExprPrecedence)> binary;
+
+      karma::rule<
+        Iterator, 
+        Tree::BinaryOpExpr(ExprPrecedence, Assoc, Subtree)
+      > binary;
+
       karma::rule<Iterator, Tree::UnaryOpExpr(ExprPrecedence)> unary;
-      karma::rule<Iterator, Tree::HashExpr(ExprPrecedence)> hash_expr;
+
+      karma::rule<
+        Iterator, 
+        Tree::HashExpr(ExprPrecedence, Assoc, Subtree)
+      > hash_expr;
+
       karma::rule<Iterator, Tree::TupleExpr()> tuple;
-      karma::rule<Iterator, Tree::AtExpr(ExprPrecedence)> at_expr;
-      karma::rule<Iterator, Tree::LambdaExpr(ExprPrecedence)> lambda_function;
-      karma::rule<Iterator, Tree::LambdaAppExpr(ExprPrecedence)> 
-        lambda_application;
-      karma::rule<Iterator, Tree::PhiExpr(ExprPrecedence)> name_function;
-      karma::rule<Iterator, Tree::PhiAppExpr(ExprPrecedence)> name_application;
-      karma::rule<Iterator, Tree::WhereExpr(ExprPrecedence)> where;
+
+      karma::rule<
+        Iterator, 
+        Tree::AtExpr(ExprPrecedence, Assoc, Subtree)
+      > at_expr;
+
+      karma::rule<
+        Iterator, 
+        Tree::LambdaExpr(ExprPrecedence, Assoc, Subtree)
+      > lambda_function;
+
+      karma::rule<
+        Iterator, 
+        Tree::LambdaAppExpr(ExprPrecedence, Assoc, Subtree)
+      > lambda_application;
+
+      karma::rule<
+        Iterator,
+        Tree::PhiExpr(ExprPrecedence, Assoc, Subtree)
+      > name_function;
+
+      karma::rule<
+        Iterator,
+        Tree::PhiAppExpr(ExprPrecedence, Assoc, Subtree)
+      > name_application;
+
+      karma::rule<
+        Iterator, 
+        Tree::WhereExpr(ExprPrecedence, Assoc, Subtree)
+      > where;
+
       karma::rule<Iterator, Tree::BangOpExpr()> bangop;
 
       karma::rule<Iterator, Tree::Expr()> guard;
@@ -576,7 +739,7 @@ namespace TransLucid
       karma::rule
       <
         Iterator,
-        void(ExprPrecedence, ExprPrecedence, char)
+        void(ExprPrecedence, ExprPrecedence, Assoc, Subtree, char)
       > paren;
 
       karma::rule
