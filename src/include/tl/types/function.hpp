@@ -24,6 +24,22 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  class BaseFunctionType
+  {
+    public:
+    BaseFunctionType
+    (
+    )
+    {
+    }
+
+    BaseFunctionType*
+    clone() const
+    {
+      return new BaseFunctionType(*this);
+    }
+  };
+
   class ValueFunctionType
   {
     public:

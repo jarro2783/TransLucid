@@ -329,6 +329,10 @@ namespace TransLucid
       BangCaller<MAX_FUNCTION_PARAMETERS> m_caller;
     };
 
+    class BangOpSingleWS : public WS
+    {
+    };
+
     class IfWS : public WS
     {
       public:
