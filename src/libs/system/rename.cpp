@@ -261,7 +261,8 @@ RenameIdentifiers::renameFunction(const T& f)
   }
   else
   {
-    iter = m_rules.insert(std::make_pair(f.name, unique)).first;
+    //there is no point storing the iterator, it might go away
+    m_rules.insert(std::make_pair(f.name, unique)).first;
   }
 
   //rename
@@ -272,11 +273,12 @@ RenameIdentifiers::renameFunction(const T& f)
   //restore the shadowed name
   if (!shadowed.empty())
   {
-    iter->second = shadowed;
+    //reinsert into the map
+    m_rules.find(f.name)->second = shadowed;
   }
   else
   {
-    m_rules.erase(iter);
+    m_rules.erase(f.name);
   }
 
   return l;
