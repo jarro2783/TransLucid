@@ -342,6 +342,8 @@ namespace TransLucid
         m_else(else_)
       {}
 
+      ~IfWS();
+
       Constant
       operator()(Context& k);
 
@@ -349,7 +351,6 @@ namespace TransLucid
       //WS* m_system;
       WS* m_condition;
       WS* m_then;
-      std::list<WS*> m_elsifs;
       std::vector<std::pair<WS*, WS*>> m_elsifs_2;
       WS* m_else;
     };
@@ -505,6 +506,12 @@ namespace TransLucid
       {
       }
 
+      ~LambdaApplicationWS()
+      {
+        delete m_lhs;
+        delete m_rhs;
+      }
+
       Constant
       operator()(Context& k);
 
@@ -557,6 +564,12 @@ namespace TransLucid
       : m_lhs(lhs)
       , m_rhs(rhs)
       {
+      }
+
+      ~NameApplicationWS()
+      {
+        delete m_lhs;
+        delete m_rhs;
       }
 
       Constant

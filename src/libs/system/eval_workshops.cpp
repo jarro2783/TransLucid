@@ -60,6 +60,19 @@ DimensionWS::DimensionWS(System& system, const std::u32string& name)
 {
 }
 
+IfWS::~IfWS()
+{
+  delete m_condition;
+  delete m_then;
+  delete m_else;
+
+  for (auto p : m_elsifs_2)
+  {
+    delete p.first;
+    delete p.second;
+  }
+}
+
 Constant
 BoolConstWS::operator()(Context& k)
 {
@@ -138,11 +151,9 @@ IfWS::operator()(Context& k)
     else
     {
       //run the elsifs and else
-      std::list<WS*>::const_iterator iter = m_elsifs.begin();
-      while (iter != m_elsifs.end())
+      for (const auto& p : m_elsifs_2)
       {
-        //std::auto_ptr<ValueV> cond(makeValue((*iter)->visit(this, d)));
-        Constant cond = (*iter)->operator()(k);
+        Constant cond = p.second->operator()(k);
 
         type_index index = cond.index();
 
@@ -153,18 +164,15 @@ IfWS::operator()(Context& k)
         else if (index == TYPE_INDEX_BOOL)
         {
           bool bcond = get_constant<bool>(cond);
-          ++iter;
           if (bcond)
           {
-            return (*iter)->operator()(k);
+            return p.second->operator()(k);
           }
         }
         else
         {
           return Types::Special::create(SP_TYPEERROR);
         }
-
-        ++iter;
       }
 
       return (*m_else)(k);

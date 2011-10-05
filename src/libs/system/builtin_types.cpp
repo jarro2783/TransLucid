@@ -989,7 +989,7 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
     U"LITERAL",
     Tree::TupleExpr({{Tree::DimensionExpr(U"typename"), U"type"}}),
     Tree::Expr(),
-    Tree::BangOpExpr(U"construct_type",
+    Tree::BangAppExpr(U"construct_type",
       {
         Tree::HashExpr(Tree::DimensionExpr(U"text")),
       }
@@ -1004,7 +1004,7 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
       U"LITERAL",
       Tree::TupleExpr({{Tree::DimensionExpr(type_name_dim), t}}),
       Tree::Expr(),
-      Tree::BangOpExpr(U"construct_" + t,
+      Tree::BangAppExpr(U"construct_" + t,
           Tree::HashExpr(Tree::DimensionExpr(U"text"))
       )
     ));
@@ -1052,7 +1052,7 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
       PRINT_IDENT,
       Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(t)}}),
       Tree::Expr(),
-      Tree::BangOpExpr(U"print_" + t,
+      Tree::BangAppExpr(U"print_" + t,
           Tree::HashExpr(Tree::DimensionExpr(U"arg0"))
       )
     ));

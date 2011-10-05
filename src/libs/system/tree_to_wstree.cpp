@@ -52,37 +52,44 @@ TreeToWSTree::toWSTree(const Tree::Expr& expr)
   return boost::apply_visitor(*this, exprRenamed);
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::nil& n)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::nil& n)
 {
   return n;
 }
 
-Tree::Expr TreeToWSTree::operator()(bool b)
+Tree::Expr
+TreeToWSTree::operator()(bool b)
 {
   return b;
 }
 
-Tree::Expr TreeToWSTree::operator()(Special s)
+Tree::Expr
+TreeToWSTree::operator()(Special s)
 {
   return s;
 }
 
-Tree::Expr TreeToWSTree::operator()(const mpz_class& i)
+Tree::Expr
+TreeToWSTree::operator()(const mpz_class& i)
 {
   return i;
 }
 
-Tree::Expr TreeToWSTree::operator()(char32_t c)
+Tree::Expr
+TreeToWSTree::operator()(char32_t c)
 {
   return c;
 }
 
-Tree::Expr TreeToWSTree::operator()(const u32string& s)
+Tree::Expr
+TreeToWSTree::operator()(const u32string& s)
 {
   return s;
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::LiteralExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::LiteralExpr& e)
 {
   //LITERAL @ [type : e.type, text : e.text]
   #if 0
@@ -104,22 +111,26 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LiteralExpr& e)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::DimensionExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::DimensionExpr& e)
 {
   return e;
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::IdentExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::IdentExpr& e)
 {
   return e;
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::ParenExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::ParenExpr& e)
 {
   return boost::apply_visitor(*this, e.e);
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 {
   //(FN1 ! (#arg0)) @ [fnname <- e.op.op, arg0 <- T(e.e)]
 
@@ -128,7 +139,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
   return 
   Tree::AtExpr
   (
-    Tree::BangOpExpr
+    Tree::BangAppExpr
     (
       Tree::IdentExpr(FN1_IDENT),
       Tree::HashExpr(arg0)
@@ -143,7 +154,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 {
   //(FN2 ! (#arg0, #arg1))
   //  @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)]
@@ -158,7 +170,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
   
   Tree::AtExpr
   (
-    Tree::BangOpExpr
+    Tree::BangAppExpr
     (
       Tree::IdentExpr(FN2_IDENT),
       {
@@ -178,7 +190,7 @@ Tree::Expr TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 }
 
 Tree::Expr
-TreeToWSTree::operator()(const Tree::BangOpExpr& e)
+TreeToWSTree::operator()(const Tree::BangAppExpr& e)
 {
   Tree::Expr name = boost::apply_visitor(*this, e.name);
   std::vector<Tree::Expr> args;
@@ -188,10 +200,11 @@ TreeToWSTree::operator()(const Tree::BangOpExpr& e)
     args.push_back(boost::apply_visitor(*this, expr));
   }
 
-  return Tree::BangOpExpr(name, args);
+  return Tree::BangAppExpr(name, args);
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::IfExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::IfExpr& e)
 {
   //do the elseifs
   std::vector<std::pair<Tree::Expr, Tree::Expr>> else_ifs;
@@ -211,12 +224,14 @@ Tree::Expr TreeToWSTree::operator()(const Tree::IfExpr& e)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::HashExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::HashExpr& e)
 {
   return Tree::HashExpr(boost::apply_visitor(*this, e.e));
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::TupleExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::TupleExpr& e)
 {
   std::vector<std::pair<Tree::Expr, Tree::Expr>> tuple;
   for (auto p : e.pairs)
@@ -230,7 +245,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::TupleExpr& e)
   return Tree::TupleExpr(tuple);
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::AtExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::AtExpr& e)
 {
   return Tree::AtExpr(
     boost::apply_visitor(*this, e.lhs),
@@ -238,7 +254,14 @@ Tree::Expr TreeToWSTree::operator()(const Tree::AtExpr& e)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::LambdaExpr& e)
+Tree::Expr 
+TreeToWSTree::operator()(const Tree::BangExpr& e)
+{
+  return e;
+}
+
+Tree::Expr 
+TreeToWSTree::operator()(const Tree::LambdaExpr& e)
 {
   //1. generate a new dimension
   //2. store our scope dimensions
@@ -286,7 +309,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   return expr;
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::PhiExpr& e)
 {
   //1. generate a new dimension
   //2. store our scope dimensions and ourself
@@ -353,7 +377,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiExpr& e)
   return expr;
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::LambdaAppExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::LambdaAppExpr& e)
 {
   return Tree::LambdaAppExpr(
     boost::apply_visitor(*this, e.lhs),
@@ -361,7 +386,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::LambdaAppExpr& e)
   );
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::PhiAppExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::PhiAppExpr& e)
 {
   //store the dims of L_all
 
@@ -377,7 +403,8 @@ Tree::Expr TreeToWSTree::operator()(const Tree::PhiAppExpr& e)
   return expr;
 }
 
-Tree::Expr TreeToWSTree::operator()(const Tree::WhereExpr& e)
+Tree::Expr
+TreeToWSTree::operator()(const Tree::WhereExpr& e)
 {
   //all the names are already unique
   Tree::WhereExpr w = e;

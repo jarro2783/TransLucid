@@ -132,7 +132,7 @@ WorkshopBuilder::operator()(const Tree::BinaryOpExpr& e)
 }
 
 WS*
-WorkshopBuilder::operator()(const Tree::BangOpExpr& e)
+WorkshopBuilder::operator()(const Tree::BangAppExpr& e)
 {
   WS* name = boost::apply_visitor(*this, e.name);
   std::vector<WS*> args;
@@ -193,6 +193,12 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
   WS* rhs = boost::apply_visitor(*this, e.rhs);
 
   return new Workshops::AtWS(lhs, rhs);
+}
+
+WS*
+WorkshopBuilder::operator()(const Tree::BangExpr& e)
+{
+  return 0;
 }
 
 WS*

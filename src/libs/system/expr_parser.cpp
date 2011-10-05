@@ -452,12 +452,12 @@ namespace TransLucid
               tok.lparen_ > expr_list > tok.rparen_
             )
             [
-              _val = construct<Tree::BangOpExpr>(_r1, _2)
+              _val = construct<Tree::BangAppExpr>(_r1, _2)
             ]
           |
             hash_expr
             [
-              _val = construct<Tree::BangOpExpr>(_r1, _1)
+              _val = construct<Tree::BangAppExpr>(_r1, _1)
             ]
           )
         )
