@@ -143,7 +143,7 @@ BOOST_FUSION_ADAPT_STRUCT
 
 BOOST_FUSION_ADAPT_STRUCT
 (
-  TransLucid::Tree::BangOpExpr,
+  TransLucid::Tree::BangAppExpr,
   (TransLucid::Tree::Expr, name)
   (std::vector<TransLucid::Tree::Expr>, args)
 )
@@ -729,7 +729,7 @@ namespace TransLucid
         Tree::WhereExpr(ExprPrecedence, Assoc, Subtree)
       > where;
 
-      karma::rule<Iterator, Tree::BangOpExpr()> bangop;
+      karma::rule<Iterator, Tree::BangAppExpr()> bangop;
 
       karma::rule<Iterator, Tree::Expr()> guard;
       karma::rule<Iterator, Tree::Expr()> boolGuard;

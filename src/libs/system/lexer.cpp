@@ -100,8 +100,8 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   comma_    = L',';
   dollar_   = L"\\$";
 
+  bang_abstract_ = LR"(\\b)";
   maps_       = L"<-";
-  //dblslash_   = L"\\\\\\\\";
   dblslash_   = LR"(\\\\)";
   range_      = LR"(\.\.)";
   arrow_      = L"->";
@@ -130,6 +130,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   | arrow_
   | assign_
   | bang_
+  | bang_abstract_
   | dblpercent_
   | dblsemi_
   | dblslash_

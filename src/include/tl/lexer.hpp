@@ -87,6 +87,7 @@ namespace TransLucid
       , in_, library_, out_, then_, true_, var_, where_
         //symbols
       , arrow_, bang_, dblsemi_, dblslash_ //, dbldollar_
+      , bang_abstract_
       , dblpercent_, assign_
       , maps_
         //white space

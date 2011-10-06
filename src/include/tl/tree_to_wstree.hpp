@@ -57,15 +57,16 @@ namespace TransLucid
     Tree::Expr operator()(const Tree::ParenExpr& e);
     Tree::Expr operator()(const Tree::UnaryOpExpr& e);
     Tree::Expr operator()(const Tree::BinaryOpExpr& e);
-    Tree::Expr operator()(const Tree::BangOpExpr& e);
     Tree::Expr operator()(const Tree::IfExpr& e);
     Tree::Expr operator()(const Tree::HashExpr& e);
     Tree::Expr operator()(const Tree::TupleExpr& e);
     Tree::Expr operator()(const Tree::AtExpr& e);
-    Tree::Expr operator()(const Tree::PhiExpr& e);
+    Tree::Expr operator()(const Tree::BangExpr& e);
     Tree::Expr operator()(const Tree::LambdaExpr& e);
-    Tree::Expr operator()(const Tree::PhiAppExpr& e);
+    Tree::Expr operator()(const Tree::PhiExpr& e);
+    Tree::Expr operator()(const Tree::BangAppExpr& e);
     Tree::Expr operator()(const Tree::LambdaAppExpr& e);
+    Tree::Expr operator()(const Tree::PhiAppExpr& e);
     Tree::Expr operator()(const Tree::WhereExpr& e);
 
     const std::vector<Parser::Equation>& newVars() const

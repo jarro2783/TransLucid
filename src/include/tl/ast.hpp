@@ -268,15 +268,16 @@ namespace TransLucid
     class ParenExpr;
     class UnaryOpExpr;
     class BinaryOpExpr;
-    class BangOpExpr;
     class HashExpr;
     class TupleExpr;
     class IfExpr;
     class AtExpr;
-    class PhiExpr;
+    class BangExpr;
     class LambdaExpr;
-    class PhiAppExpr;
+    class PhiExpr;
+    class BangAppExpr;
     class LambdaAppExpr;
+    class PhiAppExpr;
     class WhereExpr;
 
     // Not defined in ast.hpp
@@ -301,15 +302,16 @@ namespace TransLucid
       boost::recursive_wrapper<ParenExpr>,
       boost::recursive_wrapper<UnaryOpExpr>,
       boost::recursive_wrapper<BinaryOpExpr>,
-      boost::recursive_wrapper<BangOpExpr>,
       boost::recursive_wrapper<IfExpr>,
       boost::recursive_wrapper<HashExpr>,
       boost::recursive_wrapper<TupleExpr>,
       boost::recursive_wrapper<AtExpr>,
-      boost::recursive_wrapper<PhiExpr>,
+      boost::recursive_wrapper<BangExpr>,
       boost::recursive_wrapper<LambdaExpr>,
-      boost::recursive_wrapper<PhiAppExpr>,
+      boost::recursive_wrapper<PhiExpr>,
+      boost::recursive_wrapper<BangAppExpr>,
       boost::recursive_wrapper<LambdaAppExpr>,
+      boost::recursive_wrapper<PhiAppExpr>,
       boost::recursive_wrapper<WhereExpr>
     > Expr;
 
@@ -419,21 +421,21 @@ namespace TransLucid
      * in the host environment. It is strict and there is no partial
      * application.
      */
-    struct BangOpExpr
+    struct BangAppExpr
     {
-      BangOpExpr() = default;
+      BangAppExpr() = default;
 
       /**
        * Construct a bang operation node.
        * @param name The expression that will return the name.
        * @param args A vector of the arguments.
        */
-      BangOpExpr(const Expr& name, const std::vector<Expr>& args)
+      BangAppExpr(const Expr& name, const std::vector<Expr>& args)
       : name(name), args(args)
       {
       }
 
-      BangOpExpr(const Expr& lhs, const Expr& rhs)
+      BangAppExpr(const Expr& lhs, const Expr& rhs)
       : name(lhs)
       , args({rhs})
       {
@@ -595,6 +597,22 @@ namespace TransLucid
       std::vector<dimension_index> namedScopeOdometers;
     };
 
+    struct BangExpr
+    {
+      BangExpr() = default;
+
+      BangExpr(const u32string& name, const Expr& rhs)
+      : name(name), rhs(rhs)
+      {
+      }
+
+      u32string name;
+      Expr rhs;
+
+      dimension_index argDim;
+      FunctionInfo info;
+    };
+
     /**
      * A lambda expression. An expression node representing a lambda 
      * expression which creates an unnamed function.
@@ -720,15 +738,16 @@ namespace TransLucid
     PRINT_NODE(ParenExpr)
     PRINT_NODE(UnaryOpExpr)
     PRINT_NODE(BinaryOpExpr)
-    PRINT_NODE(BangOpExpr)
     PRINT_NODE(IfExpr)
     PRINT_NODE(HashExpr)
     PRINT_NODE(TupleExpr)
     PRINT_NODE(AtExpr)
-    PRINT_NODE(PhiExpr)
+    PRINT_NODE(BangExpr)
     PRINT_NODE(LambdaExpr)
-    PRINT_NODE(PhiAppExpr)
+    PRINT_NODE(PhiExpr)
+    PRINT_NODE(BangAppExpr)
     PRINT_NODE(LambdaAppExpr)
+    PRINT_NODE(PhiAppExpr)
     PRINT_NODE(WhereExpr)
   }
 }
