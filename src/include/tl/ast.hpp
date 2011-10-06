@@ -608,6 +608,9 @@ namespace TransLucid
 
       u32string name;
       Expr rhs;
+
+      dimension_index argDim;
+      FunctionInfo info;
     };
 
     /**

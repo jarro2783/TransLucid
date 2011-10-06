@@ -257,7 +257,51 @@ TreeToWSTree::operator()(const Tree::AtExpr& e)
 Tree::Expr 
 TreeToWSTree::operator()(const Tree::BangExpr& e)
 {
-  return e;
+  //exactly the same as for lambda expressions
+
+  //1. generate a new dimension
+  //2. store our scope dimensions
+  //3. add ourselves to the scope
+  //4. visit the child
+  //5. add a new equation param = #dim
+  //6. restore the scope
+
+  Tree::BangExpr expr = e;
+
+  //1. generate a new dimension
+  dimension_index argDim = m_system->nextHiddenDim();
+
+  //2. store our scope dimensions and ourself
+  expr.info =
+  {
+    m_valueScopeArgs,
+    m_namedScopeArgs,
+    m_namedScopeOdometers
+  };
+  expr.argDim = argDim;
+
+  //3. add ourselves to the scope
+  m_valueScopeArgs.push_back(argDim);
+
+  //4. visit the child
+  expr.rhs = boost::apply_visitor(*this, e.rhs);
+
+  //5. add a new equation param = #dim
+  m_newVars.push_back
+  (
+    std::make_tuple
+    (
+      e.name,
+      Tree::Expr(),
+      Tree::Expr(),
+      Tree::HashExpr(Tree::DimensionExpr(argDim))
+    )
+  );
+
+  //6. restore the scope
+  m_valueScopeArgs.pop_back();
+
+  return expr;
 }
 
 Tree::Expr 
@@ -271,7 +315,6 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   //6. restore the scope
 
   Tree::LambdaExpr expr = e;
-  expr.name = e.name;
 
   //1. generate a new dimension
   dimension_index argDim = m_system->nextHiddenDim();

@@ -618,6 +618,10 @@ namespace TransLucid
           [
             _val = construct<Tree::LambdaExpr>(_2, _4)
           ]
+        | (tok.bang_abstract_ > tok.identifier_ > tok.arrow_ > expr)
+          [
+            _val = construct<Tree::BangExpr>(_2, _4)
+          ]
       ;
 
       //BOOST_SPIRIT_DEBUG_NODE(if_expr);
