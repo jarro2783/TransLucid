@@ -33,10 +33,45 @@ namespace TransLucid
     {
     }
 
+    virtual ~BaseFunctionType() = default;
+
     BaseFunctionType*
     clone() const
     {
-      return new BaseFunctionType(*this);
+      return cloneSelf();
+    }
+
+    //we ignore the context
+    Constant
+    apply(const Constant& c) const
+    {
+      return applyFn(c);
+    }
+
+    private:
+    virtual Constant
+    applyFn(const Constant& c) const = 0;
+
+    virtual BaseFunctionType*
+    cloneSelf() const = 0;
+  };
+
+  class BaseFunctionAbstraction : public BaseFunctionType
+  {
+    public:
+    BaseFunctionAbstraction
+    (
+      const Context& k
+    );
+
+    private:
+    Constant
+    applyFn(const Constant& c) const;
+
+    BaseFunctionAbstraction*
+    cloneSelf() const
+    {
+      return new BaseFunctionAbstraction(*this);
     }
   };
 
@@ -47,25 +82,13 @@ namespace TransLucid
     (
       const u32string& name, 
       dimension_index argDim, 
-      const std::vector<dimension_index>& valueScope,
-      const std::vector<dimension_index>& namedScopeArgs,
-      const std::vector<dimension_index>& namedScopeOdometers,
+      const std::vector<dimension_index>& scope,
       WS* expr,
       const Context& k
     )
     : m_name(name), m_dim(argDim), m_expr(expr)
     {
-      for (auto d : valueScope)
-      {
-        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
-      }
-
-      for (auto d : namedScopeArgs)
-      {
-        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
-      }
-
-      for (auto d : namedScopeOdometers)
+      for (auto d : scope)
       {
         m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
       }
@@ -101,25 +124,13 @@ namespace TransLucid
       const u32string& name, 
       dimension_index argDim, 
       dimension_index odometerDim, 
-      const std::vector<dimension_index>& valueScope,
-      const std::vector<dimension_index>& namedScopeArgs,
-      const std::vector<dimension_index>& namedScopeOdometers,
+      const std::vector<dimension_index>& scope,
       WS* expr,
       const Context& k
     )
     : m_name(name), m_argDim(argDim), m_odometerDim(odometerDim), m_expr(expr)
     {
-      for (auto d : valueScope)
-      {
-        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
-      }
-
-      for (auto d : namedScopeArgs)
-      {
-        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
-      }
-
-      for (auto d : namedScopeOdometers)
+      for (auto d : scope)
       {
         m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
       }
@@ -154,19 +165,23 @@ namespace TransLucid
     std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
   };
 
-  class StaticFunctionType
-  {
-    public:
-    Constant
-    apply(const std::vector<Constant>& args);
-
-    private:
-    virtual Constant
-    applyFn(const std::vector<Constant>& args) = 0;
-  };
-
   namespace Types
   {
+    namespace BaseFunction
+    {
+      Constant
+      create(const BaseFunctionType& f);
+
+      const BaseFunctionType&
+      get(const Constant& c);
+
+      bool
+      equality(const Constant& lhs, const Constant& rhs);
+
+      size_t
+      hash(const Constant& c);
+    }
+    
     namespace ValueFunction
     {
       Constant

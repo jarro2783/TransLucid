@@ -293,6 +293,22 @@ AtWS::operator()(Context& k)
 }
 
 Constant
+BaseAbstractionWS::operator()(Context& k)
+{
+  return Types::BaseFunction::create
+  (
+    BaseFunctionAbstraction
+    (
+      //m_name, 
+      //m_argDim, 
+      //m_scope,
+      //m_rhs, 
+      k
+    )
+  );
+}
+
+Constant
 LambdaAbstractionWS::operator()(Context& k)
 {
   return Types::ValueFunction::create
@@ -301,9 +317,7 @@ LambdaAbstractionWS::operator()(Context& k)
     (
       m_name, 
       m_argDim, 
-      m_info.valueScopeArgs, 
-      m_info.namedScopeArgs, 
-      m_info.namedScopeOdometers, 
+      m_scope,
       m_rhs, 
       k
     )
@@ -339,9 +353,7 @@ NamedAbstractionWS::operator()(Context& k)
       m_name,
       m_argDim,
       m_odometerDim,
-      m_info.valueScopeArgs, 
-      m_info.namedScopeArgs, 
-      m_info.namedScopeOdometers, 
+      m_scope,
       m_rhs, 
       k
     )

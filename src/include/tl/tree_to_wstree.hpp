@@ -104,6 +104,9 @@ namespace TransLucid
     std::vector<dimension_index> m_namedScopeArgs;
     std::vector<dimension_index> m_namedScopeOdometers;
 
+    //we actually only need one scope stack
+    std::vector<dimension_index> m_scope;
+
     std::vector<dimension_index> m_namedAllScopeArgs;
     std::vector<dimension_index> m_namedAllScopeOdometers;
   };

@@ -590,13 +590,6 @@ namespace TransLucid
        */
     };
 
-    struct FunctionInfo
-    {
-      std::vector<dimension_index> valueScopeArgs;
-      std::vector<dimension_index> namedScopeArgs;
-      std::vector<dimension_index> namedScopeOdometers;
-    };
-
     struct BangExpr
     {
       BangExpr() = default;
@@ -610,7 +603,7 @@ namespace TransLucid
       Expr rhs;
 
       dimension_index argDim;
-      FunctionInfo info;
+      std::vector<dimension_index> scope;
     };
 
     /**
@@ -635,7 +628,7 @@ namespace TransLucid
       Expr rhs; /**<The right-hand-side expression.*/
 
       dimension_index argDim;
-      FunctionInfo info;
+      std::vector<dimension_index> scope;
     };
 
     //TODO: fix TreeToWSTree when I implement this
@@ -653,7 +646,7 @@ namespace TransLucid
 
       dimension_index argDim;
       dimension_index odometerDim;
-      FunctionInfo info;
+      std::vector<dimension_index> scope;
     };
 
     /**

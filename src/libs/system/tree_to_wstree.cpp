@@ -272,16 +272,12 @@ TreeToWSTree::operator()(const Tree::BangExpr& e)
   dimension_index argDim = m_system->nextHiddenDim();
 
   //2. store our scope dimensions and ourself
-  expr.info =
-  {
-    m_valueScopeArgs,
-    m_namedScopeArgs,
-    m_namedScopeOdometers
-  };
   expr.argDim = argDim;
+  expr.scope = m_scope;
 
   //3. add ourselves to the scope
   m_valueScopeArgs.push_back(argDim);
+  m_scope.push_back(argDim);
 
   //4. visit the child
   expr.rhs = boost::apply_visitor(*this, e.rhs);
@@ -299,7 +295,7 @@ TreeToWSTree::operator()(const Tree::BangExpr& e)
   );
 
   //6. restore the scope
-  m_valueScopeArgs.pop_back();
+  m_scope.pop_back();
 
   return expr;
 }
@@ -320,16 +316,11 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   dimension_index argDim = m_system->nextHiddenDim();
 
   //2. store our scope dimensions and ourself
-  expr.info =
-  {
-    m_valueScopeArgs,
-    m_namedScopeArgs,
-    m_namedScopeOdometers
-  };
+  expr.scope = m_scope;
   expr.argDim = argDim;
 
   //3. add ourselves to the scope
-  m_valueScopeArgs.push_back(argDim);
+  m_scope.push_back(argDim);
 
   //4. visit the child
   expr.rhs = boost::apply_visitor(*this, e.rhs);
@@ -347,7 +338,7 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   );
 
   //6. restore the scope
-  m_valueScopeArgs.pop_back();
+  m_scope.pop_back();
 
   return expr;
 }
@@ -369,19 +360,14 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   dimension_index odometerDim = m_system->nextHiddenDim();
 
   //2. store our scope dimensions and ourself
-  expr.info =
-  {
-    m_valueScopeArgs,
-    m_namedScopeArgs,
-    m_namedScopeOdometers
-  };
+  expr.scope = m_scope;
 
   expr.argDim = argDim;
   expr.odometerDim = odometerDim;
 
   //3. add ourselves to the scope
-  m_namedScopeArgs.push_back(argDim);
-  m_namedScopeOdometers.push_back(odometerDim);
+  m_scope.push_back(argDim);
+  m_scope.push_back(odometerDim);
 
   //also the all scope
   m_namedAllScopeArgs.push_back(argDim);
@@ -414,8 +400,9 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   ));
 
   //6. restore the scope
-  m_namedScopeArgs.pop_back();
-  m_namedScopeOdometers.pop_back();
+  //we have two things to restore, the odometer and the arg
+  m_scope.pop_back();
+  m_scope.pop_back();
 
   return expr;
 }

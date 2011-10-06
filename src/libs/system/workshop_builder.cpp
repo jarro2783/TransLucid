@@ -198,7 +198,15 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::BangExpr& e)
 {
-  return 0;
+  WS* rhs = boost::apply_visitor(*this, e.rhs);
+
+  return new Workshops::BaseAbstractionWS
+  (
+    e.name,
+    e.argDim,
+    e.scope,
+    rhs
+  );
 }
 
 WS*
@@ -210,9 +218,7 @@ WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
   (
     e.name,
     e.argDim,
-    e.info.valueScopeArgs,
-    e.info.namedScopeArgs,
-    e.info.namedScopeOdometers,
+    e.scope,
     rhs
   );
 }
@@ -227,9 +233,7 @@ WorkshopBuilder::operator()(const Tree::PhiExpr& e)
     e.name,
     e.argDim,
     e.odometerDim,
-    e.info.valueScopeArgs,
-    e.info.namedScopeArgs,
-    e.info.namedScopeOdometers,
+    e.scope,
     rhs
   );
 }

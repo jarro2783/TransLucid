@@ -379,24 +379,6 @@ namespace TransLucid
       WS* m_e;
     };
 
-#if 0
-    //TODO: What is this?
-    class PairWS : public WS
-    {
-      public:
-      PairWS(WS* lhs, WS* rhs)
-      : m_lhs(lhs), m_rhs(rhs)
-      {}
-
-      TaggedConstant
-      operator()(const Tuple& k);
-
-      private:
-      WS* m_lhs;
-      WS* m_rhs;
-    };
-#endif
-
     class TupleWS : public WS
     {
       public:
@@ -459,11 +441,36 @@ namespace TransLucid
       WS* e1;
     };
 
-    struct FunctionInfo
+    class BaseAbstractionWS : public WS
     {
-      std::vector<dimension_index> valueScopeArgs;
-      std::vector<dimension_index> namedScopeArgs;
-      std::vector<dimension_index> namedScopeOdometers;
+      public:
+      BaseAbstractionWS
+      (
+        const u32string& name,
+        dimension_index dim,
+        std::vector<dimension_index> scope,
+        WS* rhs
+      )
+      : m_name(name)
+      , m_argDim(dim)
+      , m_scope(scope)
+      , m_rhs(rhs)
+      {
+      }
+
+      ~BaseAbstractionWS()
+      {
+        delete m_rhs;
+      }
+
+      Constant
+      operator()(Context& k);
+
+      private:
+      u32string m_name;
+      dimension_index m_argDim;
+      std::vector<dimension_index> m_scope;
+      WS* m_rhs;
     };
 
     class LambdaAbstractionWS : public WS
@@ -473,14 +480,12 @@ namespace TransLucid
       (
         const u32string& name, 
         dimension_index dim, 
-        std::vector<dimension_index> valueScopeArgs,
-        std::vector<dimension_index> namedScopeArgs,
-        std::vector<dimension_index> namedScopeOdometers,
+        std::vector<dimension_index> scope,
         WS* rhs
       )
       : m_name(name)
       , m_argDim(dim)
-      , m_info{valueScopeArgs, namedScopeArgs, namedScopeOdometers}
+      , m_scope(scope)
       , m_rhs(rhs)
       {
       }
@@ -497,7 +502,7 @@ namespace TransLucid
       WS* m_system;
       u32string m_name;
       dimension_index m_argDim;
-      FunctionInfo m_info;
+      std::vector<dimension_index> m_scope;
       WS* m_rhs;
     };
 
@@ -532,15 +537,13 @@ namespace TransLucid
         const u32string& name,
         dimension_index argDim,
         dimension_index odometerDim,
-        std::vector<dimension_index> valueScopeArgs,
-        std::vector<dimension_index> namedScopeArgs,
-        std::vector<dimension_index> namedScopeOdometers,
+        std::vector<dimension_index> scope,
         WS* rhs
       )
       : m_name(name)
       , m_argDim(argDim)
       , m_odometerDim(odometerDim)
-      , m_info{valueScopeArgs, namedScopeArgs, namedScopeOdometers}
+      , m_scope(scope)
       , m_rhs(rhs)
       {
       }
@@ -557,7 +560,7 @@ namespace TransLucid
       u32string m_name;
       dimension_index m_argDim;
       dimension_index m_odometerDim;
-      FunctionInfo m_info;
+      std::vector<dimension_index> m_scope;
       WS* m_rhs;
     };
 
