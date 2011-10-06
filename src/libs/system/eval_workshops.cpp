@@ -118,15 +118,20 @@ BangOpWS::operator()(Context& k)
   //evaluate name expr
   Constant name = (*m_name)(k);
 
-  if (name.index() != TYPE_INDEX_USTRING)
-  {
-    return Types::Special::create(SP_UNDEF);
-  }
-  else
+  if (name.index() == TYPE_INDEX_USTRING)
   {
     //evaluate all the args in context k and pass them as the parameters
     //to the function
     return m_caller(get_constant_pointer<u32string>(name), m_args, k);
+  }
+  else if (name.index() == TYPE_INDEX_BASE_FUNCTION && m_args.size() == 1)
+  {
+    Constant arg = (*m_args[0])(k);
+    return Types::BaseFunction::get(name).apply(arg);
+  }
+  else
+  {
+    return Types::Special::create(SP_UNDEF);
   }
 }
 
@@ -300,9 +305,9 @@ BaseAbstractionWS::operator()(Context& k)
     BaseFunctionAbstraction
     (
       //m_name, 
-      //m_argDim, 
-      //m_scope,
-      //m_rhs, 
+      m_argDim, 
+      m_scope,
+      m_rhs, 
       k
     )
   );

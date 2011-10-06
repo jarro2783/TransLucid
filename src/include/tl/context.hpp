@@ -111,6 +111,15 @@ namespace TransLucid
     )
     : m_k(k)
     {
+      perturb(p);
+    }
+
+    void
+    perturb
+    (
+      const std::initializer_list<std::pair<dimension_index, Constant>>& p
+    )
+    {
       for (const auto& v : p)
       {
         m_k.perturb(v.first, v.second);

@@ -67,6 +67,13 @@ namespace TransLucid
         &delete_ptr<u32string>
       };
 
+    TypeFunctions base_function_type_functions =
+      {
+        &Types::BaseFunction::equality,
+        &Types::BaseFunction::hash,
+        &delete_ptr<BaseFunctionType>
+      };
+
     TypeFunctions value_function_type_functions =
       {
         &Types::ValueFunction::equality,
@@ -397,6 +404,16 @@ namespace TransLucid
     };
 
     template <>
+    struct clone<BaseFunctionType>
+    {
+      BaseFunctionType*
+      operator()(const BaseFunctionType& b)
+      {
+        return b.clone();
+      }
+    };
+
+    template <>
     struct clone<NameFunctionType>
     {
       NameFunctionType*
@@ -523,6 +540,34 @@ namespace TransLucid
       create(type_index t)
       {
         return Constant(t, TYPE_INDEX_TYPE);
+      }
+    }
+    
+    namespace BaseFunction
+    {
+      Constant
+      create(const BaseFunctionType& f)
+      {
+        return make_constant_pointer
+          (f, &base_function_type_functions, TYPE_INDEX_BASE_FUNCTION);
+      }
+
+      const BaseFunctionType&
+      get(const Constant& c)
+      {
+        return get_constant_pointer<BaseFunctionType>(c);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return get(c).hash();
+      }
+
+      bool
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return lhs.data.ptr->data == rhs.data.ptr->data;
       }
     }
 
@@ -890,6 +935,17 @@ Special::StringValueInitialiser::StringValueInitialiser()
 
 namespace TransLucid
 {
+
+Constant
+BaseFunctionAbstraction::applyFn(const Constant& c) const
+{
+  Context newk;
+  ContextPerturber p(newk, m_k);
+  p.perturb(m_scope);
+  p.perturb({{m_dim, c}});
+
+  return (*m_expr)(newk);
+}
 
 Constant
 ValueFunctionType::apply(Context& k, const Constant& value) const

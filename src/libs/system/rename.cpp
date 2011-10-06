@@ -291,6 +291,12 @@ RenameIdentifiers::operator()(const Tree::PhiExpr& e)
 }
 
 Tree::Expr
+RenameIdentifiers::operator()(const Tree::BangExpr& e)
+{
+  return renameFunction(e);
+}
+
+Tree::Expr
 RenameIdentifiers::operator()(const Tree::LambdaExpr& e)
 {
   return renameFunction(e);
@@ -305,6 +311,20 @@ RenameIdentifiers::renameFunApp(const T& app)
     boost::apply_visitor(*this, app.lhs),
     boost::apply_visitor(*this, app.rhs)
   );
+}
+
+Tree::Expr
+RenameIdentifiers::operator()(const Tree::BangAppExpr& e)
+{
+  //this would be better with temporaries
+  Tree::Expr lhs = boost::apply_visitor(*this, e.name);
+  std::vector<Tree::Expr> args;
+  for (auto expr : e.args)
+  {
+    args.push_back(boost::apply_visitor(*this, expr));
+  }
+
+  return Tree::BangAppExpr(lhs, args);
 }
 
 Tree::Expr

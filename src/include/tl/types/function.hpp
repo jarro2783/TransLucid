@@ -48,6 +48,12 @@ namespace TransLucid
       return applyFn(c);
     }
 
+    size_t
+    hash() const
+    {
+      return reinterpret_cast<size_t>(this);
+    }
+
     private:
     virtual Constant
     applyFn(const Constant& c) const = 0;
@@ -61,8 +67,20 @@ namespace TransLucid
     public:
     BaseFunctionAbstraction
     (
+      dimension_index argDim,
+      const std::vector<dimension_index>& scope,
+      WS* expr,
       const Context& k
-    );
+    )
+    : m_dim(argDim)
+    , m_expr(expr)
+    , m_k(k)
+    {
+      for (auto d : scope)
+      {
+        m_scope.push_back(std::make_pair(d, k.lookup(d)));
+      }
+    }
 
     private:
     Constant
@@ -73,6 +91,11 @@ namespace TransLucid
     {
       return new BaseFunctionAbstraction(*this);
     }
+
+    dimension_index m_dim;
+    std::vector<std::pair<dimension_index, Constant>> m_scope;
+    WS* m_expr;
+    Tuple m_k;
   };
 
   class ValueFunctionType
