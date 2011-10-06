@@ -1,30 +1,9 @@
-We have provided a patch for boost to remove the warnings. It is in the
-file src/boost_1_47_0-nowarnings.patch.
+For generic GNU style software, see the INSTALL file. 
 
-To apply the patch:
-cd $BOOST_SOURCE_ROOT
-patch -p1 < $TRANSLUCID_SOURCE/src/boost_1_47_0-nowarnings.patch
+For specific installation instructions for this software,
+see the INSTALL-tl file.
 
-Then recompile and reinstall boost.
+It is also possible to compile this software using cmake.
+To do this, type:
 
-Note that this can probably also be applied to the headers after being
-installed with no problems.
-
-
-== Bugs in GCC ==
-
-Currently there is a bug in GCC which causes our code to bomb when compiled
-with -O2 or -O3. Compiling with -O1 or -O0 works. It is probably better with
--O1 as it is faster and inlines templates.
-
-This bug appears to be in every version of GCC since at least 4.7.0.
-
-If someone can fix it, please do so.
-It might be related to this bug:
-  http://gcc.gnu.org/bugzilla/show_bug.cgi?id=49538
-Which was supposedly fixed. The problem did actually go away for a while, but
-then it came back when our code changed a bit more.
-
-
-For autoconf: configure CXXFLAGS=-O1
-For cmake: cmake -DCMAKE_CXXFLAGS=-O1
+  cmake -DCMAKE_CXXFLAGS=-O1

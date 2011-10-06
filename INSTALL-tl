@@ -1,0 +1,302 @@
+Installing TransLucid on a Linux or Unix machine
+
+===================================================================
+
+Prerequisites
+
+Installing TransLucid may take a while, because of prerequisites,
+listed below.  Depending on the state of your system, you may not
+need to build all of these.  For the purposes of discussion, we
+assume that the version numbers referred to in the instructions
+below are the ones we are using.
+
+- GMP 4.3.2 or higher, we are using 5.0.2.
+- MPFR 2.4.2 or higher, we are using 3.0.1.
+- MPC 0.8.1 or higher, we are using 0.9.
+- GCC 4.7.0 or higher, we are using 4.7.0.
+- ICU 3 or higher, we are using 4_8_1.
+- MPI 1.0.x or higher, we are using 1.5.4.
+- BOOST 1_47_0 or higher, we are using 1_47_0.
+- TransLucid, latest version.
+
+===================================================================
+
+Summary
+
+This is the full build sequence.  If you already have some of these
+prerequisites, then you will not need to build everything.
+
+- Install, in this order, GMP, MPFR and MPC. 
+- Set PATH and LD_LIBRARY_PATH variables.
+- Install GCC.
+- Ensure ICU and MPI are installed.
+- Download TransLucid.
+- Install BOOST.
+- Install TransLucid.
+
+===================================================================
+
+Detailed Instructions
+
+TransLucid needs to be compiled with a C++ compiler which supports
+C++11, the new C++ standard.  We use GCC version 4.7.0, which
+provides a partial implementation of this standard.  Since this
+version of GCC is still experimental, you will need to install
+it explicitly on your system; before this can be done, you will
+need to compile updated versions of GMP, MPFR and MPC.
+
+The compilation and running of TransLucid also uses a number of
+the BOOST libraries.  You will probably need to install a recent
+version of BOOST on your system; before this can be done, you will
+need to ensure you have recent versions of ICU and MPI.
+
+Given that there are many packages to install, we recommend
+creating a directory called "soft".  Under this directory, there
+should be a "downloads" subdirectory to store the downloads, a
+"src" subdirectory to do the compilations, and an "install"
+subdirectory to place the generated binaries, header files and
+libraries.  The instructions given below assume this setup, which
+will make it easier to maintain, clean, remove, update and find
+the installed packages.  All sequences of instructions assume that
+you are starting in the soft directory.
+
+If you follow this advice, then all of the installation directories
+specified after --prefix in the instructions given below will be
+this "install" directory.  This directory will also need to be
+added to the PATH and LD_LIBRARY_PATH environment variables.
+
+Specifically, in the instructions below:
+
+- $SOFT is the full path of the soft directory.
+- $SRC is the $SOFT/src directory.
+- $DOWNLOADS is the $SOFT/downloads directory.
+- $PREFIX is the $SOFT/install directory.
+
+-------------------------------------------------------------------
+
+GMP
+
+GMP, or the GNU Multiple Precision Arithmetic Library, can be
+downloaded from
+
+    http://gmplib.org/
+
+as a distribution tarball ($DOWNLOADS/gmp-5.0.2.tar.bz2).  For
+detailed installation instructions, read the INSTALL file in the
+root directory of the source. Here is the short version:
+
+    cd $SRC
+    tar xjf $DOWNLOADS/gmp-5.0.2.tar.bz2
+    cd gmp-5.0.2
+    ./configure --prefix="$PREFIX" \
+                --enable-cxx
+    make
+    make check
+    make install 
+
+-------------------------------------------------------------------
+
+MPFR
+
+MPFR is a GNU C library for multiple-precision floating-point
+computations with correct rounding.  For it to be built, GMP must
+also be built.  MPFR can be downloaded from
+
+    http://www.mpfr.org/
+
+as a distribution tarball ($DOWNLOADS/mpfr-3.0.1.tar.bz2).  For
+detailed installation instructions, read the INSTALL file in the
+root directory of the source.  Here is a short version:
+
+    cd $SRC
+    tar xjf $DOWNLOADS/mpfr-3.0.1.tar.bz2  
+    cd mpfr-3.0.1
+    ./configure --prefix="$PREFIX" \
+                --with-gmp="$PREFIX"
+    make
+    make check
+    make install 
+
+-------------------------------------------------------------------
+
+MPC
+
+MPC is a C library for the arithmetic of complex numbers with
+arbitrarily high precision and correct rounding of the result.
+For it to be built, GMP and MPFR must also be built.  MPC can
+be downloaded from
+
+    http://www.multiprecision.org/index.php?prog=mpc&page=download
+
+as a distribution tarball ($DOWNLOADS/mpc-0.9.tar.gz).  For
+detailed installation instructions, read the INSTALL file in the
+root directory of the source.  Here is a short version of the
+instructions:
+
+    cd $SRC
+    tar xzf $DOWNLOADS/mpc-0.9.tar.gz
+    cd mpc-0.9
+    ./configure --prefix="$PREFIX" \
+                --with-gmp="$PREFIX" \
+                --with-mpfr="$PREFIX"
+    make
+    make check
+    make install 
+
+-------------------------------------------------------------------
+
+Setting the PATH and LD_LIBRARY_PATH variables
+
+From here on, the PATH and LD_LIBRARY_PATH environment variables
+must be set so that the already-built libraries and executables
+can be found:
+
+    export PATH="$PREFIX"/bin:$PATH
+    export LD_LIBRARY_PATH="$PREFIX"/lib:$LD_LIBRARY_PATH
+
+-------------------------------------------------------------------
+
+GCC
+
+TransLucid requires GNU GCC version 4.7.0 or higher.  This is not
+an official release and it needs to be checked out from the SVN
+repository or the GIT mirror.  For the instructions below, we
+assume the use of SVN.  Detailed instructions for checking out
+from SVN can be found at
+
+    http://gcc.gnu.org/svn.html
+
+The latest revision that we have verified for use with TransLucid
+is 179497.  The following checkout command
+
+    cd $SRC
+    svn checkout -r 179497 svn://gcc.gnu.org/svn/gcc/trunk gcc-svn
+
+will place the source in gcc-svn.  Please note that GCC needs to
+be built in a different directory.  Here are the building instructions:
+
+    cd $SRC
+    mkdir gcc-build-latest
+    cd gcc-build-latest
+    `pwd`/../gcc-svn/configure \
+          --prefix="$PREFIX" \
+          --with-gmp="$PREFIX" \
+          --with-mpfr="$PREFIX" \
+          --with-mpc="$PREFIX" \
+          --disable-multilib \
+          --enable-languages=c,c++
+    make 
+    make install
+
+-------------------------------------------------------------------
+
+ICU
+
+TransLucid requires BOOST to be compiled with ICU, which is a
+collection of libraries providing Unicode and Globalization
+support for software applications.  ICU can be downloaded from
+
+    http://site.icu-project.org/download
+
+as a distribution tarball ($DOWNLOADS/icu4c-4_8_1-src.tgz).
+For detailed installation instructions, read the INSTALL file
+in the root directory of the source.  Here is a short version
+of the instructions:
+
+    cd $SRC
+    tar xzf $DOWNLOADS/icu4c-4_8_1-src.tgz
+    cd icu/source
+    ./configure --prefix="$PREFIX"
+    make
+    make install 
+
+-------------------------------------------------------------------
+
+MPI
+
+TransLucid requires BOOST to be compiled with MPI, which is a
+collection of Standard MPI (Message Passing Interface) runtime
+programs.  BOOST needs the MPI header files to compile correctly.
+MPI can be downloaded from
+
+    http://www.open-mpi.org/software/ompi/v1.5/
+
+as a distribution tarball (downloads/openmpi-1.5.4.tar.bz2).
+For detailed installation instructions, read the INSTALL file
+in the root directory of the source.  Here is a short version
+of the instructions:
+
+    cd $SRC
+    tar xjf $DOWNLOADS/openmpi-1.5.4.tar.bz2
+    cd openmpi-1.5.4
+    ./configure --prefix="$PREFIX"
+    make
+    make install 
+
+-------------------------------------------------------------------
+
+Downloading TransLucid
+
+Before BOOST can be compiled, the TransLucid source must be
+downloaded.  TransLucid's source code is hosted on sourceforge.net
+in a git repository.  To get the source:
+
+    cd $SRC
+    git clone \
+        git://translucid.git.sourceforge.net/gitroot/translucid/translucid \
+        translucid-git
+
+This creates a new directory, translucid-git, and clones the
+source there.  (Note that if you already downloaded TransLucid
+from sourceforge yourself, you would know this first step, as
+you did it already!)
+
+-------------------------------------------------------------------
+
+BOOST
+
+BOOST provides free peer-reviewed portable C++ source libraries
+and the emphasis is on creating libraries that work well with the
+C++ Standard Library.  It can be downloaded from
+
+    http://www.boost.org/
+
+as a distribution tarball ($DOWNLOADS/boost_1_47_0.tar.bz2).
+Detailed installation instructions can be found at
+
+    http://www.boost.org/doc/libs/1_47_0/more/getting_started/index.html
+
+The BOOST distribution must be informed that you wish the MPI code
+compiled in.  Furthermore, some BOOST code produces warnings when
+compiling TransLucid. We have provided a patch to BOOST to remove
+these warnings.  Here is the complete instruction sequence:
+
+    cd $SRC
+    tar xjf $DOWNLOADS/boost_1_47_0.tar.bz2 
+    cd boost_1_47_0
+    echo "using mpi ;" >> tools/build/v2/user-config.jam
+    patch -p1 < $SRC/translucid-git/src/boost_1_47_0-nowarnings.patch
+    ./bootstrap.sh --with-icu --prefix="$PREFIX"
+    ./bjam install
+
+-------------------------------------------------------------------
+
+Building TransLucid
+
+Then to build TransLucid:
+
+    cd $SRC
+    cd translucid-git
+    ./bootstrap.sh
+    ./configure --prefix="$PREFIX" \
+                --with-boost="$PREFIX" \
+                --disable-static \
+                CXXFLAGS=-O1
+    make
+    make install
+
+The --disable-static flag will make it compile faster.  The -O1
+(i.e., "dash capital-O one") flag is needed as there seems to be
+a bug in GCC: if TransLucid is compiled using -O2 or -O3, the
+generated code crashes on execution. 
+
