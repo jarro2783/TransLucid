@@ -40,8 +40,66 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iconv.h>
 #endif
 
+//the subset functions are subseteq
+
 namespace TransLucid
 {
+
+namespace
+{
+  //is a a subset of b
+  typedef bool (*IsSubsetFn)(const Constant& a, const Constant& b);  
+
+  //returns a function that determines if the parameter is a subset of
+  //the particular type that it handles
+  typedef IsSubsetFn (*IsSubsetOf)(const Constant&);
+
+  bool
+  issubset_false(const Constant&, const Constant& b)
+  {
+    return false;
+  }
+
+  IsSubsetFn 
+  subset_of_tuple(const Constant& c)
+  {
+    if (c.index() != TYPE_INDEX_TUPLE)
+    {
+      return &issubset_false;
+    }
+    else
+    {
+      return &tuple_subset_tuple;
+    }
+  }
+
+  class TypeComparators
+  {
+    public:
+
+    TypeComparators()
+    {
+      m_funs = new IsSubsetOf[NUM_FUNS];
+      
+      //first set these to zero in case I miss one, and I will get a nice
+      //SEGFAULT
+      std::fill(m_funs, m_funs + NUM_FUNS, nullptr);
+
+      m_funs[TYPE_INDEX_TUPLE] = &subset_of_tuple;
+    }
+
+    ~TypeComparators()
+    {
+      delete [] m_funs;
+    }
+
+    private:
+    static const int NUM_FUNS = TYPE_INDEX_RANGE + 1;
+    IsSubsetOf* m_funs;
+  };
+
+  static TypeComparators typeCompare;
+}
 
 //these should go in bestfit.cpp
 bool
@@ -72,6 +130,10 @@ tupleApplicable(const Tuple& def, const Context& k)
 bool
 valueRefines(const Constant& a, const Constant& b)
 {
+  //this is implemented by creating a matrix of function pointers
+  //which is as big as the largest type index that we need to consider
+
+
   //std::cerr << "== value refines ==" << std::endl;
   //std::cerr << a << " r " << b << std::endl;
   //if b is a range, a has to be a range and within or equal,
