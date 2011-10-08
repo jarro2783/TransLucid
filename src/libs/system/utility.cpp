@@ -60,6 +60,11 @@ namespace
     return false;
   }
 
+  bool
+  tuple_subset_tuple(const Constant& sub, const Constant& super)
+  {
+  }
+
   IsSubsetFn 
   subset_of_tuple(const Constant& c)
   {
