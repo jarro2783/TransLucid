@@ -54,15 +54,49 @@ namespace
   //the particular type that it handles
   typedef IsSubsetFn (*IsSubsetOf)(const Constant&);
 
+  //several things are immediately false
   bool
-  issubset_false(const Constant&, const Constant& b)
+  issubset_false(const Constant&, const Constant&)
   {
     return false;
   }
 
   bool
+  constants_equal(const Constant& a, const Constant& b)
+  {
+    return a == b;
+  }
+
+  //there are several types that can only be compared with something
+  //of the same type, instead of writing the code several times for
+  //each, we will use templates.
+  //In that case, constant equality works fine.
+  template <type_index T>
+  IsSubsetFn
+  isSubsetAtomic(const Constant& c)
+  {
+    if (c.index() != T)
+    {
+      return &issubset_false;
+    }
+    else
+    {
+      return &constants_equal;
+    }
+  }
+
+  //TODO: work out tuples and tuple sets
+  //this currently returns false if the two are equal
+  //we probably want it to be true, but in some cases we want it to
+  //be false, so we have to work out what it all means
+  bool
   tuple_subset_tuple(const Constant& sub, const Constant& super)
   {
+    return tupleRefines
+    (
+      Types::Tuple::get(sub),
+      Types::Tuple::get(super)
+    );
   }
 
   IsSubsetFn 
@@ -78,24 +112,74 @@ namespace
     }
   }
 
+  IsSubsetFn
+  subset_of_range(const Constant& c)
+  {
+    //at the moment we can only do ranges of integers
+    if (c.index() != TYPE_INDEX_INTMP)
+    {
+      return &issubset_false;
+    }
+    else
+    {
+      //lambda functions to the rescue
+      return [] (const Constant& a, const Constant& b)
+        {
+          //a is an int, b is a range
+          return Types::Range::get(b).within(Types::Intmp::get(a));
+        }
+      ;
+    }
+  }
+
+  IsSubsetFn
+  subset_of_type(const Constant& c)
+  {
+    return [] (const Constant& a, const Constant& b)
+      {
+        //b is a type, a is anything
+        return (a.index() == get_constant<type_index>(b));
+      }
+    ;
+  }
+
   class TypeComparators
   {
     public:
 
     TypeComparators()
     {
-      m_funs = new IsSubsetOf[NUM_FUNS];
-      
-      //first set these to zero in case I miss one, and I will get a nice
-      //SEGFAULT
-      std::fill(m_funs, m_funs + NUM_FUNS, nullptr);
-
-      m_funs[TYPE_INDEX_TUPLE] = &subset_of_tuple;
+      m_funs = new IsSubsetOf[NUM_FUNS]
+        {
+          &isSubsetAtomic<TYPE_INDEX_ERROR>,
+          &isSubsetAtomic<TYPE_INDEX_BOOL>,
+          &isSubsetAtomic<TYPE_INDEX_SPECIAL>,
+          &isSubsetAtomic<TYPE_INDEX_INTMP>,
+          &isSubsetAtomic<TYPE_INDEX_UCHAR>,
+          &isSubsetAtomic<TYPE_INDEX_USTRING>,
+          &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
+          &subset_of_tuple,
+          &subset_of_type,
+          &subset_of_range
+        };
     }
 
     ~TypeComparators()
     {
       delete [] m_funs;
+    }
+
+    IsSubsetOf
+    getComparator(type_index t)
+    {
+      if (t < NUM_FUNS)
+      {
+        return m_funs[t];
+      }
+      else
+      {
+        return nullptr;
+      }
     }
 
     private:
@@ -143,6 +227,18 @@ valueRefines(const Constant& a, const Constant& b)
   //std::cerr << a << " r " << b << std::endl;
   //if b is a range, a has to be a range and within or equal,
   //or an int and inside, otherwise they have to be equal
+
+  IsSubsetOf f = typeCompare.getComparator(b.index());
+  if (f != 0)
+  {
+    IsSubsetFn sub = f(a);
+    return sub(a, b);
+  }
+  else
+  {
+    //there is no comparator, just check if they are equal
+    return a == b;
+  }
 
   //three cases, range, type, anything else
 
@@ -269,7 +365,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
     return true;
   }
 
-  //if we get here then a is either equal to be or refines it
+  //if we get here then a is either equal to b or refines it
   //if not equal then the variable equal would have been changed somewhere
   //std::cerr << (!equal ? "yes" : "no") << std::endl;
   return !equal;

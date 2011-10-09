@@ -7,13 +7,13 @@ var prev = \d -> \\X -> X @ [d <- #d - 1];;
 
 var pow = \n -> f where
   dim d <- n;;
-  var f = fby.d (\s -> 1) (\s -> s * f.s);;
+  var f = fby.d (\b s -> 1) (\b s -> s * f!s);;
 end;;
 
 %%
 
-pow.0.5;;
-pow.0.6;;
-pow.1.3;;
-pow.2.3;;
-pow.3.3;;
+pow.0!5;;
+pow.0!6;;
+pow.1!3;;
+pow.2!3;;
+pow.3!3;;
