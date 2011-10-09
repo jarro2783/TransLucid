@@ -65,30 +65,30 @@ if test "0$ac_cv_sizeof_wchar_t" -lt "4"; then
    AC_MSG_ERROR([Sizeof wchar_t < 4, your system is braindead, I refuse to work])
 fi
 
-# Do we build wilfred
-AC_ARG_ENABLE([wilfred],
-  AS_HELP_STRING([--enable-wilfred], [Whether to build the Web server or not, 
+# Do we build tlweb
+AC_ARG_ENABLE([tlweb],
+  AS_HELP_STRING([--enable-tlweb], [Whether to build the Web server or not, 
   defaults to no. 
   Set to static or dynamic depending on whether you want the Web server built
   as a static executable or dynamically linked, defaults to dynamic.]),
-  [if test "x$enable_wilfred" = xyes; then
-    enable_wilfred=dynamic
+  [if test "x$enable_tlweb" = xyes; then
+    enable_tlweb=dynamic
   fi
-  if test "x$enable_wilfred" != xstatic && test "x$enable_wilfred" != xdynamic; 
+  if test "x$enable_tlweb" != xstatic && test "x$enable_tlweb" != xdynamic; 
   then
-    AC_MSG_FAILURE([--enable-wilfred must be given with static or dynamic])
+    AC_MSG_FAILURE([--enable-tlweb must be given with static or dynamic])
   fi
   ],
-  [enable_wilfred=no]
+  [enable_tlweb=no]
 )
 
-# check that if wilfred is static, that disable static is not set
-if test "x$enable_wilfred" == "xstatic" && test "x$enable_static" = xno; then
-  AC_MSG_FAILURE([--enable-wilfred=static and --enable-static=no])
+# check that if tlweb is static, that disable static is not set
+if test "x$enable_tlweb" == "xstatic" && test "x$enable_static" = xno; then
+  AC_MSG_FAILURE([--enable-tlweb=static and --enable-static=no])
 fi
 
-AM_CONDITIONAL([WANT_WILFRED], [test "x$enable_wilfred" != xno])
-AM_CONDITIONAL([WILFRED_STATIC], [test "x$enable_wilfred" = xstatic])
+AM_CONDITIONAL([WANT_TLWEB], [test "x$enable_tlweb" != xno])
+AM_CONDITIONAL([TLWEB_STATIC], [test "x$enable_tlweb" = xstatic])
 
 # Check if we can build documentation
 DX_INIT_DOXYGEN([TransLucid], [doc])

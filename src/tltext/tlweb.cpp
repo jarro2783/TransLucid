@@ -134,7 +134,7 @@ printForm(const std::string& program)
 {
   std::cout <<
     "<h1>Input Program</h1>"
-    "<form action=\"wilfred\" method=\"post\">\n"
+    "<form action=\"tlweb\" method=\"post\">\n"
     "<p>\n"
     "<textarea cols=\"80\" rows=\"30\" name=\"program\">\n"
     << program <<

@@ -1,7 +1,7 @@
 bin_PROGRAMS = tltext
 
-if WANT_WILFRED
-  bin_PROGRAMS += wilfred
+if WANT_TLWEB
+  bin_PROGRAMS += tlweb
 endif
 
 TLTEXT_LIBS = $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -13,18 +13,18 @@ tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -DPREFIX=\"$(prefix)\" \
 -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
 
-if WILFRED_STATIC
-  WILFRED_STATIC_FLAGS = -all-static
+if TLWEB_STATIC
+  TLWEB_STATIC_FLAGS = -all-static
 endif
 
-wilfred_LDFLAGS = $(TLTEXT_LIBS) $(WILFRED_STATIC_FLAGS)
-wilfred_CPPFLAGS = $(tltext_CPPFLAGS)
+tlweb_LDFLAGS = $(TLTEXT_LIBS) $(TLWEB_STATIC_FLAGS)
+tlweb_CPPFLAGS = $(tltext_CPPFLAGS)
 
 TLTEXT_SHARED_SOURCES = tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp
 
 tltext_SOURCES = main.cpp $(TLTEXT_SHARED_SOURCES)
 
-wilfred_SOURCES= wilfred.cpp $(TLTEXT_SHARED_SOURCES)
+tlweb_SOURCES= tlweb.cpp $(TLTEXT_SHARED_SOURCES)
 
 TESTS_ENVIRONMENT = TLTEXT=$(top_builddir)/src/tltext/tltext \
   TESTDIR=$(top_srcdir)/src/tltext/tests \

@@ -621,8 +621,9 @@ namespace TransLucid
         )
         ;
 
-        bangop = expr(FN_APP, Assoc::LEFT, Subtree::RIGHT) << 
-          literal("!(") << *(expr(FN_APP, Assoc::LEFT, Subtree::RIGHT) % literal(","))
+        bangop = expr(FN_APP, Assoc::LEFT, Subtree::RIGHT) 
+          << literal("!(") 
+          << *(expr(FN_APP, Assoc::LEFT, Subtree::RIGHT) % literal(","))
           << literal(")");
 
         // TODO: Missing unary
