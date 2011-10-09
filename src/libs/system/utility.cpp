@@ -92,11 +92,17 @@ namespace
   bool
   tuple_subset_tuple(const Constant& sub, const Constant& super)
   {
-    return tupleRefines
+    //std::cerr << "tuple subset in bestfit :)" << std::endl;
+    //bool r = 
+    return 
+    tupleRefines
     (
       Types::Tuple::get(sub),
       Types::Tuple::get(super)
     );
+
+    //std::cerr << "refines = " << r << std::endl;
+    //return r;
   }
 
   IsSubsetFn 
@@ -324,7 +330,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
     }
 
     //extra dimension in a
-    if (d1 > d2)
+    if (d2 > d1)
     {
       ++it1;
       //a is more specific if the rest passes
@@ -336,6 +342,9 @@ tupleRefines(const Tuple& a, const Tuple& b)
     if (!valueRefines(it1->second, it2->second))
     {
       //std::cerr << "no by not refines" << std::endl;
+      //std::cerr << it1->first << ", " << it2->first << std::endl;
+      //std::cerr << it1->second.index() << ", " << it2->second.index() 
+      //  << std::endl;
       return false;
     }
     //if they both refine each other they are equal
@@ -344,7 +353,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
       //the a value is contained in the b value, so a is more
       //specific as long as the rest passes
       equal = false;
-      //std::cerr << "not equal by value" << std::endl;
+      std::cerr << "not equal by value" << std::endl;
     }
     ++it1;
     ++it2;
