@@ -58,8 +58,6 @@ TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing -DBOOST_SPIRIT_UNICODE \
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_CFLAGS)
 
-# Checks for header files.
-
 # Checks for typedefs, structures, and compiler characteristics.
 
 AC_CHECK_SIZEOF([wchar_t],,[#include <wchar.h>])
@@ -67,7 +65,30 @@ if test "0$ac_cv_sizeof_wchar_t" -lt "4"; then
    AC_MSG_ERROR([Sizeof wchar_t < 4, your system is braindead, I refuse to work])
 fi
 
-# Checks for library functions.
+# Do we build wilfred
+AC_ARG_ENABLE([wilfred],
+  AS_HELP_STRING([--enable-wilfred], [Whether to build the Web server or not, 
+  defaults to no. 
+  Set to static or dynamic depending on whether you want the Web server built
+  as a static executable or dynamically linked, defaults to dynamic.]),
+  [if test "x$enable_wilfred" = xyes; then
+    enable_wilfred=dynamic
+  fi
+  if test "x$enable_wilfred" != xstatic && test "x$enable_wilfred" != xdynamic; 
+  then
+    AC_MSG_FAILURE([--enable-wilfred must be given with static or dynamic])
+  fi
+  ],
+  [enable_wilfred=no]
+)
+
+# check that if wilfred is static, that disable static is not set
+if test "x$enable_wilfred" == "xstatic" && test "x$enable_static" = xno; then
+  AC_MSG_FAILURE([--enable-wilfred=static and --enable-static=no])
+fi
+
+AM_CONDITIONAL([WANT_WILFRED], [test "x$enable_wilfred" != xno])
+AM_CONDITIONAL([WILFRED_STATIC], [test "x$enable_wilfred" = xstatic])
 
 # Check if we can build documentation
 DX_INIT_DOXYGEN([TransLucid], [doc])

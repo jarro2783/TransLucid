@@ -1,4 +1,8 @@
-bin_PROGRAMS = tltext wilfred
+bin_PROGRAMS = tltext
+
+if WANT_WILFRED
+  bin_PROGRAMS += wilfred
+endif
 
 TLTEXT_LIBS = $(top_builddir)/src/libs/system/libtlsystem.la \
 $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(TL_LDFLAGS) -lltdl
@@ -9,7 +13,11 @@ tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -DPREFIX=\"$(prefix)\" \
 -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
 
-wilfred_LDFLAGS = $(TLTEXT_LIBS) -all-static
+if WILFRED_STATIC
+  WILFRED_STATIC_FLAGS = -all-static
+endif
+
+wilfred_LDFLAGS = $(TLTEXT_LIBS) $(WILFRED_STATIC_FLAGS)
 wilfred_CPPFLAGS = $(tltext_CPPFLAGS)
 
 TLTEXT_SHARED_SOURCES = tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp
