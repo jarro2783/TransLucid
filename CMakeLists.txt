@@ -52,6 +52,13 @@ if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
+# do we build tlweb
+#option (ENABLE_TLWEB "Build the tlweb application" OFF)
+
+if (${ENABLE_TLWEB} EQUAL "STATIC")
+  set(BUILD_STATIC_SYSTEM ON)
+endif()
+
 # look for documentation requirements
 find_program(DOXYGEN doxygen)
 find_program(DOT dot)

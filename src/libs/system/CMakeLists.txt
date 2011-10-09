@@ -21,6 +21,12 @@ workshop_builder.cpp
 
 add_library(tlsystem SHARED ${SYSTEM_SOURCES})
 
+if (BUILD_STATIC_SYSTEM)
+  add_library(tlsystem-static STATIC ${SYSTEM_SOURCES})
+  set_target_properties(tlsystem-static PROPERTIES OUTPUT_NAME "tlsystem")
+  set_target_properties(tlsystem-static PROPERTIES PREFIX "lib")
+endif()
+
 target_link_libraries(tlsystem ltdl rt gmpxx)
 INSTALL(TARGETS tlsystem
    LIBRARY DESTINATION lib
