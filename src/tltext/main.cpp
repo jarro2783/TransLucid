@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    TransLucid::TLText::TLText tltext;
+    TransLucid::TLText::TLText tltext("TLText...");
     
     if (vm.count("debug"))
     {

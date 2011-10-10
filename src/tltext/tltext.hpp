@@ -62,7 +62,7 @@ namespace TransLucid
       /**
        * Construct the evaluator.
        */
-      TLText();
+      TLText(const std::string& initOut);
 
       ~TLText();
 
@@ -144,6 +144,8 @@ namespace TransLucid
       std::istream* m_is;
       std::ostream* m_os;
       std::ostream* m_error;
+
+      std::string m_initialOut;
 
       System m_system;
       ExprList m_exprs;

@@ -52,7 +52,7 @@ namespace TransLucid
 namespace TLText
 {
 
-TLText::TLText()
+TLText::TLText(const std::string& initOut)
 : 
   m_verbose(false)
  ,m_uuids(false)
@@ -60,6 +60,7 @@ TLText::TLText()
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_error(&std::cerr)
+ ,m_initialOut(initOut)
  ,m_time(0)
  ,m_lastLibLoaded(0)
  ,m_argsHD(0)
@@ -113,7 +114,7 @@ TLText::run()
     }
   }
 
-  *m_error << "TLText..." << std::endl;
+  *m_error << m_initialOut << std::endl;
   *m_is >> std::noskipws;
 
   Parser::U32Iterator begin(

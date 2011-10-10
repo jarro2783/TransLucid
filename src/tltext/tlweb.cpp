@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 
     std::ostringstream os;
 
-    TransLucid::TLText::TLText tl;
+    TransLucid::TLText::TLText tl("TLWeb...");
 
     std::istringstream progstream(prog->second);
     tl.set_input(&progstream);
