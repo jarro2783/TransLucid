@@ -129,6 +129,22 @@ BangOpWS::operator()(Context& k)
     Constant arg = (*m_args[0])(k);
     return Types::BaseFunction::get(name).apply(arg);
   }
+  else if (name.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
+  {
+    //look up the appropriate dimension in the tuple
+    Constant rhs = (*m_args[0])(k);
+    dimension_index dim = m_system.getDimensionIndex(rhs);
+    const Tuple& lhs = Types::Tuple::get(name);
+    auto iter = lhs.find(dim);
+    if (iter == lhs.end())
+    {
+      return Types::Special::create(SP_DIMENSION);
+    }
+    else
+    {
+      return iter->second;
+    }
+  }
   else
   {
     return Types::Special::create(SP_UNDEF);
