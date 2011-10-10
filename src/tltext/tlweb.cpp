@@ -98,7 +98,7 @@ void htmlHead()
     << std::endl;
   std::cout 
     << "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>" << std::endl 
-    << "<title>tl program</title></head><body>" << std::endl;
+    << "<title>TLWeb</title></head><body>" << std::endl;
 }
 
 //converts newlines to <br /> and outputs the rest as is
@@ -133,7 +133,7 @@ void
 printForm(const std::string& program)
 {
   std::cout <<
-    "<h1>Input Program</h1>"
+    "<h1>Input program</h1>"
     "<form action=\"tlweb\" method=\"post\">\n"
     "<p>\n"
     "<textarea cols=\"80\" rows=\"30\" name=\"program\">\n"
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
   char* lengthstr = getenv("CONTENT_LENGTH");
   if (lengthstr == nullptr)
   {
-    std::cout << "<h1>Run TransLucid on the web</h1>" << std::endl;
+    std::cout << "<h1>Run TransLucid on the Web</h1>" << std::endl;
     printForm(defaultProgram());
   }
   else
