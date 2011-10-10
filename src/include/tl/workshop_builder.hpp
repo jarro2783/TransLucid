@@ -50,6 +50,7 @@ namespace TransLucid
     WS* operator()(const mpz_class& i);
     WS* operator()(char32_t c);
     WS* operator()(const u32string& s);
+    WS* operator()(const Tree::HashSymbol& e);
     WS* operator()(const Tree::LiteralExpr& e);
     WS* operator()(const Tree::DimensionExpr& e);
     WS* operator()(const Tree::IdentExpr& e);

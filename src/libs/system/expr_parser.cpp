@@ -485,9 +485,12 @@ namespace TransLucid
       ;
       #endif
 
-      hash_expr =
+      hash_expr %=
+      #if 0
         ( tok.hash_ > hash_expr [_val = construct<Tree::HashExpr>(_1)])
         | prefix_expr [_val = _1]
+      #endif
+        prefix_expr
       ;
 
       prefix_expr =
@@ -572,6 +575,7 @@ namespace TransLucid
         ]
 //        | delimiters
       | function_abstraction [_val = _1]
+      | tok.hash_ [_val = construct<Tree::HashSymbol>()]
       ;
 
       ident_constant = 

@@ -41,9 +41,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <sstream>
 
-//TODO: work out what looking up an identifier is
-//TODO: what do we do with VariableOpWS
-
 namespace TransLucid
 {
 
@@ -71,6 +68,12 @@ IfWS::~IfWS()
     delete p.first;
     delete p.second;
   }
+}
+
+Constant
+HashSymbolWS::operator()(Context& k)
+{
+  return Types::Tuple::create(Tuple(k));
 }
 
 Constant

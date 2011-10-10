@@ -70,6 +70,14 @@ namespace TransLucid
       WS* m_e;
     };
 
+    class HashSymbolWS : public WS
+    {
+      public:
+
+      Constant
+      operator()(Context& k);
+    };
+
     class DimensionWS : public WS
     {
       public:

@@ -124,6 +124,12 @@ TreeToWSTree::operator()(const Tree::IdentExpr& e)
 }
 
 Tree::Expr
+TreeToWSTree::operator()(const Tree::HashSymbol& e)
+{
+  return e;
+}
+
+Tree::Expr
 TreeToWSTree::operator()(const Tree::ParenExpr& e)
 {
   return boost::apply_visitor(*this, e.e);
@@ -192,15 +198,24 @@ TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 Tree::Expr
 TreeToWSTree::operator()(const Tree::BangAppExpr& e)
 {
-  Tree::Expr name = boost::apply_visitor(*this, e.name);
-  std::vector<Tree::Expr> args;
-
-  for (auto expr : e.args)
+  //first check if it is #!E
+  if (boost::get<Tree::HashSymbol>(&e.name) != nullptr)
   {
-    args.push_back(boost::apply_visitor(*this, expr));
+    Tree::Expr rhs = boost::apply_visitor(*this, e.args.at(0));
+    return Tree::HashExpr(rhs);
   }
+  else
+  {
+    Tree::Expr name = boost::apply_visitor(*this, e.name);
+    std::vector<Tree::Expr> args;
 
-  return Tree::BangAppExpr(name, args);
+    for (auto expr : e.args)
+    {
+      args.push_back(boost::apply_visitor(*this, expr));
+    }
+
+    return Tree::BangAppExpr(name, args);
+  }
 }
 
 Tree::Expr

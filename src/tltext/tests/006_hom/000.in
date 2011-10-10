@@ -1,9 +1,9 @@
 // lambda lucid
 // a stream of powers
 
-var fby = \d -> \\X -> \\Y -> if #d <= 0 then X else prev.d Y fi;;
-var index = \d -> #d + 1;;
-var prev = \d -> \\X -> X @ [d <- #d - 1];;
+var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
+var index = \d -> #!d + 1;;
+var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 
 var pow = \n -> f where
   dim d <- n;;

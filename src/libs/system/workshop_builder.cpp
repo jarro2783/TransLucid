@@ -85,6 +85,12 @@ WorkshopBuilder::operator()(const u32string& s)
 }
 
 WS*
+WorkshopBuilder::operator()(const Tree::HashSymbol& s)
+{
+  return new Workshops::HashSymbolWS();
+}
+
+WS*
 WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 {
   //return new Workshops::TypedValueWS(m_system, e.type, e.text);

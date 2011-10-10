@@ -265,6 +265,10 @@ namespace TransLucid
       u32string text; /**< The name of the identifier.*/
     };
 
+    struct HashSymbol
+    {
+    };
+
     class ParenExpr;
     class UnaryOpExpr;
     class BinaryOpExpr;
@@ -299,6 +303,7 @@ namespace TransLucid
       LiteralExpr,
       DimensionExpr,
       IdentExpr,
+      HashSymbol,
       boost::recursive_wrapper<ParenExpr>,
       boost::recursive_wrapper<UnaryOpExpr>,
       boost::recursive_wrapper<BinaryOpExpr>,
