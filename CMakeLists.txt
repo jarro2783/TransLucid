@@ -55,8 +55,8 @@ endif()
 # do we build tlweb
 #option (ENABLE_TLWEB "Build the tlweb application" OFF)
 
-if (DEFINED ENABLE_TLWEB)
-  if (${ENABLE_TLWEB} EQUAL "STATIC")
+if (ENABLE_TLWEB)
+  if (${ENABLE_TLWEB} STREQUAL "static")
     set(BUILD_STATIC_SYSTEM ON)
   endif()
 endif()

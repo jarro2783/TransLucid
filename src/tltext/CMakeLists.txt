@@ -16,10 +16,10 @@ add_executable(tltext main.cpp tltext.cpp demandhd.cpp)
 target_link_libraries(tltext tlsystem ${Boost_LIBRARIES})
 
 
-if (DEFINED ENABLE_TLWEB)
+if (ENABLE_TLWEB)
   add_executable(tlweb tlweb.cpp tltext.cpp demandhd.cpp)
-  if(${ENABLE_TLWEB} EQUAL "STATIC")
-    target_link_libraries(tlweb tlsystem-static -static)
+  if(${ENABLE_TLWEB} STREQUAL "static")
+    target_link_libraries(tlweb tlsystem-static -static gmpxx gmp ltdl dl)
   else()
     target_link_libraries(tlweb tlsystem)
   endif()
