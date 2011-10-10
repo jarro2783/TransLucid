@@ -398,6 +398,8 @@ namespace TransLucid
         nil = karma::skip[nildummy] << "nil";
         nildummy = karma::skip[nildummy];
 
+        hash_symbol = karma::skip[hash_symbol] << literal("#");
+
         special = karma::string
         [
           _1 = ph::bind(&ExprPrinter<Iterator>::getSpecial, this, _val)
@@ -630,6 +632,7 @@ namespace TransLucid
         expr %=
           nil
         | karma::bool_
+        | hash_symbol
         | integer
         | special
         | uchar
@@ -670,6 +673,7 @@ namespace TransLucid
 
       karma::rule<Iterator, Tree::nil()> nil;
       karma::rule<Iterator, Tree::nil()> nildummy;
+      karma::rule<Iterator, Tree::HashSymbol()> hash_symbol;
       karma::rule<Iterator, Special()> special;
       karma::rule<Iterator, mpz_class()> integer;
       karma::rule<Iterator, u32string()> ustring;

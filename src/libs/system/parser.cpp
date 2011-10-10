@@ -78,7 +78,7 @@ printEquation(const Equation& e)
   {
     //Printer::karma::generate(outit, print_grammar, guard);
     generated = print_expr_tree(guard);
-    result += " | " + generated;
+    result += " " + generated;
   }
 
   const Tree::Expr& boolean = std::get<2>(e);
@@ -87,7 +87,7 @@ printEquation(const Equation& e)
     //generated.clear();
     //Printer::karma::generate(outit, print_grammar, boolean);
     generated = print_expr_tree(boolean);
-    result += " & " + generated;
+    result += " | " + generated;
   }
 
   result += " = ";
