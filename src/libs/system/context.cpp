@@ -43,6 +43,17 @@ Context::Context()
 {
 }
 
+//TODO a more specialised implementation of this
+Context::Context(const Tuple& k)
+: m_min(DEFAULT_MIN), m_max(DEFAULT_MAX),
+ m_all(Types::Special::create(SP_DIMENSION))
+{
+  for (auto v : k)
+  {
+    perturb(v.first, v.second);
+  }
+}
+
 const Constant&
 Context::lookup(dimension_index dim) const
 {

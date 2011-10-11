@@ -105,6 +105,8 @@ namespace
 
   //for every context in ctxts that is valid in k,
   //output the result of computation compute to out
+  //at the moment we only know how to enumerate ranges, this could
+  //become richer as we work out the type system better
   void
   enumerateContextSet
   (
@@ -114,6 +116,67 @@ namespace
     OutputHD* out
   )
   {
+    //all the ranges in order
+    std::vector<Range> limits;
+
+    //the current value of each range dimension
+    std::vector<std::pair<dimension_index, mpz_class>> current;
+
+    //the context to evaluate in
+    Context evalContext(k);
+
+    //determine which dimensions are ranges
+    for (const auto& v : ctxts)
+    {
+      if (v.second.index() == TYPE_INDEX_RANGE)
+      {
+        const Range& r = Types::Range::get(v.second);
+
+        if (r.lower() == nullptr || r.upper() == nullptr)
+        {
+          throw "Infinite bounds in demand";
+        }
+
+        limits.push_back(r);
+        current.push_back(std::make_pair(v.first, *r.lower()));
+      }
+      else
+      {
+        //if not a range then store it permanantly
+        evalContext.perturb(v.first, v.second);
+      }
+    }
+
+    //by doing it this way, even if there is no range, we still evaluate
+    //everything once
+    bool finished = false;
+    while (!finished)
+    {
+      //evaluate all the stuff if applicable
+      
+      //then we increment the counters at the end
+      auto limitIter = limits.begin();
+      auto currentIter = current.begin();
+      while (currentIter != current.end())
+      {
+        ++currentIter->second;
+        if (!limitIter->within(currentIter->second))
+        {
+          currentIter->second = *limitIter->lower();
+          ++currentIter;
+          ++limitIter;
+        }
+        else
+        {
+          break;
+        }
+      }
+      
+      if (currentIter == current.end())
+      {
+        finished = true;
+      }
+    }
   }
 
   class ArgsWorkshop : public WS

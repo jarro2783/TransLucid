@@ -39,6 +39,7 @@ namespace TransLucid
     public:
 
     Context();
+    Context(const Tuple& k);
 
     operator Tuple() const;
 

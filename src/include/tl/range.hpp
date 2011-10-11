@@ -101,6 +101,18 @@ namespace TransLucid
       return false;
     }
 
+    const mpz_class*
+    lower() const
+    {
+      return m_lower;
+    }
+
+    const mpz_class*
+    upper() const
+    {
+      return m_upper;
+    }
+
     private:
     const mpz_class* m_lower;
     const mpz_class* m_upper;
