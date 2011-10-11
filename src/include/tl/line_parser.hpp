@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/fusion/include/std_pair.hpp>
 
 #include <tl/equation_parser.hpp>
 
@@ -75,7 +77,13 @@ namespace TransLucid
             _val = ph::bind(&makeUnaryOp, _1, _2)
           ])
         | (tok.in_ > g_equation)
+          [
+            _val = ph::construct<InputDecl>(ph::at_c<0>(_2))
+          ]
         | (tok.out_ > g_equation)
+          [
+            _val = ph::construct<OutputDecl>(ph::at_c<0>(_2))
+          ]
         )
 
         > tok.dblsemi_

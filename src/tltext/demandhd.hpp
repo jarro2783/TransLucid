@@ -47,6 +47,9 @@ namespace TransLucid
       Tuple
       variance() const;
 
+      void
+      commit();
+
       private:
 
       std::vector<Constant> m_results;

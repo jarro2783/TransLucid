@@ -64,10 +64,20 @@ namespace TransLucid
 
     struct OutputDecl
     {
+      OutputDecl(const Equation& e)
+      : eqn(e)
+      {}
+
+      Equation eqn;
     };
 
     struct InputDecl
     {
+      InputDecl(const Equation& e)
+      : eqn(e)
+      {}
+
+      Equation eqn;
     };
 
     typedef boost::variant

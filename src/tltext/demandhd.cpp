@@ -72,6 +72,12 @@ DemandHD::variance() const
   return Tuple(v);
 }
 
+void
+DemandHD::commit()
+{
+  //nothing to commit in the demand HD
+}
+
 } //namespace TLText
 
 } //namespace TransLucid

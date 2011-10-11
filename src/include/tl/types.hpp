@@ -22,8 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types_fwd.hpp>
 
-//#include <boost/functional/hash.hpp>
-
 #include <map>
 #include <memory>
 #include <cstdint>
@@ -124,7 +122,8 @@ namespace TransLucid
     TYPE_FIELD_UI64,
     TYPE_FIELD_F32,
     TYPE_FIELD_F64,
-    TYPE_FIELD_PTR
+    TYPE_FIELD_PTR,
+    TYPE_FIELD_VPTR
   };
 
   /**
@@ -135,10 +134,11 @@ namespace TransLucid
     public:
 
     Constant()
+    : data{{nullptr}, 0, TYPE_FIELD_ERROR}
     {
-      data.ptr = nullptr;
-      data.index = 0;
-      data.field = TYPE_FIELD_ERROR;
+      //data.ptr = nullptr;
+      //data.index = 0;
+      //data.field = TYPE_FIELD_ERROR;
     }
 
     ~Constant()
@@ -234,6 +234,8 @@ namespace TransLucid
     {
       union
       {
+        ConstantPointerValue* ptr;
+
         Special     sp;
         bool        tv; //truth value
         char32_t    ch;
@@ -248,7 +250,7 @@ namespace TransLucid
         float       f32;
         double      f64;
 
-        ConstantPointerValue* ptr;
+        void* vptr;
       };
 
       type_index index;

@@ -81,6 +81,9 @@ namespace TransLucid
 
     virtual void
     put(const Tuple& k, const Constant& c) = 0;
+
+    virtual void
+    commit() = 0;
   };
 
   class IOHD : public InputHD, public OutputHD

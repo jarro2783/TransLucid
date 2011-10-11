@@ -280,16 +280,18 @@ namespace detail
     }
 
     Constant
-    operator()(const Parser::OutputDecl& lib)
+    operator()(const Parser::OutputDecl& out)
     {
       //output hd declaration
       return Constant();
     }
 
     Constant
-    operator()(const Parser::InputDecl& lib)
+    operator()(const Parser::InputDecl& in)
     {
       //input hd declaration
+      Constant hd = compile_and_evaluate(std::get<3>(in.eqn), m_system);
+      Constant variance = compile_and_evaluate(std::get<1>(in.eqn), m_system);
       return Constant();
     }
 

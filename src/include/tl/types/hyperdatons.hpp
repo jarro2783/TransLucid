@@ -33,6 +33,12 @@ namespace TransLucid
 
       size_t
       hash(const Constant& c);
+
+      OutputHD*
+      getOut(const Constant& c);
+
+      InputHD*
+      getIn(const Constant& c);
     }
   }
 }

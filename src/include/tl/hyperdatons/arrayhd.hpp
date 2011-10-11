@@ -84,6 +84,9 @@ namespace TransLucid
     public:
     typedef boost::multi_array<T, N> type;
 
+    void
+    commit() {}
+
     type& get_array()
     {
       return m_array;

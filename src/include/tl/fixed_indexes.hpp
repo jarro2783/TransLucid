@@ -1,6 +1,6 @@
 /* Predefined type and dimension indexes which must exist
    for the system to work.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -48,6 +48,9 @@ namespace TransLucid
     TYPE_INDEX_NAME_FUNCTION,
     TYPE_INDEX_UUID,
     TYPE_INDEX_WS,
+    TYPE_INDEX_INHD,
+    TYPE_INDEX_IOHD,
+    TYPE_INDEX_OUTHD,
 
     //the last one
     TYPE_INDEX_LAST
