@@ -115,6 +115,20 @@ namespace TransLucid
       perturb(p);
     }
 
+    ContextPerturber(Context& k)
+    : m_k(k)
+    {}
+
+    void perturb
+    (
+      dimension_index dim,
+      const Constant& c
+    )
+    {
+      m_k.perturb(dim, c);
+      m_dims.push_back(dim);
+    }
+
     void
     perturb
     (

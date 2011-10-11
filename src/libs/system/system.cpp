@@ -116,6 +116,8 @@ namespace
     OutputHD* out
   )
   {
+    Tuple variance = out->variance();
+
     //all the ranges in order
     std::vector<Range> limits;
 
@@ -134,6 +136,8 @@ namespace
 
         if (r.lower() == nullptr || r.upper() == nullptr)
         {
+          std::cerr << "Error: infinite bounds in demand, dimension " <<
+            v.first << std::endl;
           throw "Infinite bounds in demand";
         }
 
@@ -149,10 +153,19 @@ namespace
 
     //by doing it this way, even if there is no range, we still evaluate
     //everything once
-    bool finished = false;
-    while (!finished)
+    while (true)
     {
+      ContextPerturber p(evalContext);
+      for (const auto& v : current)
+      {
+        p.perturb(v.first, Types::Intmp::create(v.second));
+      }
+
       //evaluate all the stuff if applicable
+      if (tupleApplicable(variance, evalContext))
+      {
+        out->put(evalContext, compute(evalContext));
+      }
       
       //then we increment the counters at the end
       auto limitIter = limits.begin();
@@ -174,7 +187,7 @@ namespace
       
       if (currentIter == current.end())
       {
-        finished = true;
+        break;
       }
     }
   }
@@ -587,44 +600,15 @@ System::go()
     auto equations = ident.second->equations();
     for (auto& assign : equations)
     {
-      //std::cerr << "doing a demand" << std::endl;
-      //const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
+      const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
       const GuardWS& guard = assign.second.validContext();
 
-      Tuple k = guard.evaluate(theContext);
+      Tuple ctxts = guard.evaluate(theContext);
 
-      auto time = k.find(DIM_TIME);
+      ContextPerturber p(theContext, constraint);
 
-      #if 0
-      //constraints could have ranges, so we need to enumerate them
-      enumerateContextSet(constraint, k, assign.second, hd->second);
-
-      enumerateContextSet(constraint, k,
-      [hd&, assign&] (const Tuple& k) -> void
-      {
-      #endif
-
-      //We have to check if the assignment is valid for the constraint
-      if (//tupleApplicable(constraint, k) &&
-           (time == k.end() ||
-            get_constant_pointer<mpz_class>(time->second) == m_time
-           )
-         )
-      {
-        ContextPerturber p1(theContext, k);
-        //ContextPerturber p2(theContext, 
-        //  {{DIM_TIME, Types::Intmp::create(m_time)}});
-
-        Constant v = assign.second(theContext);
-        //std::cerr << "putting result" << std::endl;
-        hd->second->put(k, v);
-      }
-
-      #if 0
-      }
-      
-      );
-      #endif
+      //the demand could have ranges, so we need to enumerate them
+      enumerateContextSet(ctxts, theContext, assign.second, hd->second);
     }
   }
 
