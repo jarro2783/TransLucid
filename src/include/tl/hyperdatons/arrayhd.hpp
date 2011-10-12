@@ -148,6 +148,30 @@ namespace TransLucid
     {
     }
 
+    Constant
+    get(const Tuple& index) const
+    {
+      std::vector<int> vecIndex;
+      for (auto d : m_dimensionOrder)
+      {
+        auto iter = index.find(d);
+        if (iter == index.end())
+        {
+          //this should never happen
+          throw "Invalid index in ArrayHD get: " __FILE__ ": " 
+            STRING_(__LINE__);
+        }
+        else
+        {
+          //the preconditions of get are guaranteed by bestfitting
+          vecIndex.push_back(
+            get_constant_pointer<mpz_class>(iter->second).get_ui());
+        }
+      }
+
+      return m_create(m_array(vecIndex));
+    }
+
     template <typename... Location>
     //auto
     typename std::result_of<array_get(type, Location...)>::type
@@ -185,30 +209,6 @@ namespace TransLucid
       }
 
       m_array(vecIndex) = m_get_func(v);
-    }
-
-    Constant
-    get(const Tuple& index) const
-    {
-      std::vector<int> vecIndex;
-      for (auto d : m_dimensionOrder)
-      {
-        auto iter = index.find(d);
-        if (iter == index.end())
-        {
-          //this should never happen
-          throw "Invalid index in ArrayHD get: " __FILE__ ": " 
-            STRING_(__LINE__);
-        }
-        else
-        {
-          //the preconditions of get are guaranteed by bestfitting
-          vecIndex.push_back(
-            get_constant_pointer<mpz_class>(iter->second).get_ui());
-        }
-      }
-
-      return m_create(m_array(vecIndex));
     }
 
     auto

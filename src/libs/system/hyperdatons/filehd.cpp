@@ -67,12 +67,24 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 
   m_array = new ArrayNHD<mpz_class, 2>
   (
-    {maxWidth, height},
+    {height, maxWidth},
     {Types::Dimension::create(DIM_ARG0), Types::Dimension::create(DIM_ARG1)},
     s,
     static_cast<Constant(*)(const mpz_class&)>(&Types::Intmp::create),
     &Types::Intmp::get
   );
+
+  size_t i = 0, j;
+  for (auto outer = inArray.begin(); outer != inArray.end(); ++outer)
+  {
+    j = 0;
+    for (auto inner = outer->begin(); inner != outer->end(); ++inner)
+    {
+      (*m_array)[i][j] = *inner;
+      ++j;
+    }
+    ++i;
+  }
 }
 
 Constant
@@ -110,13 +122,14 @@ FileArrayInFn::applyFn(const Constant& arg) const
 Tuple
 FileArrayInHD::variance() const
 {
-  return Tuple();
+  return m_array->variance();
 }
 
 Constant
 FileArrayInHD::get(const Tuple& k) const
 {
-  return Types::Intmp::create(1);
+  //TODO check this out with SFINAE problem
+  return static_cast<InputHD*>(m_array)->get(k);
 }
 
 }
