@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/types_util.hpp>
+#include <tl/types/function.hpp>
 
 #include <fstream>
 
@@ -79,5 +80,38 @@ namespace TransLucid
 
   class FileIOHD : public IOHD
   {
+  };
+
+  class FileArrayInFn : public BaseFunctionType
+  {
+    private:
+
+    Constant
+    applyFn(const Constant& arg) const;
+
+    Constant
+    applyFn(const std::vector<Constant>& args) const;
+
+    BaseFunctionType*
+    cloneSelf() const
+    {
+      return new FileArrayInFn(*this);
+    }
+  };
+
+  class FileArrayInHD : public InputHD
+  {
+    public:
+
+    FileArrayInHD()
+    : InputHD(0)
+    {
+    }
+
+    Tuple
+    variance() const;
+
+    Constant
+    get(const Tuple& k) const;
   };
 }

@@ -12,6 +12,7 @@ context.cpp dimtranslator.cpp
 equation.cpp equation_parser.cpp
 eval_workshops.cpp expr_parser.cpp header.cpp 
 hyperdatons/envhd.cpp
+hyperdatons/filehd.cpp
 internal_strings.cpp lexer.cpp lexer_util.cpp 
 library.cpp line_tokenizer.cpp parser.cpp
 range.cpp rename.cpp system.cpp translator.cpp tree_printer.cpp

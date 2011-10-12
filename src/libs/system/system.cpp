@@ -54,6 +54,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <tl/translator.hpp>
 #include <tl/tree_to_wstree.hpp>
+#include <tl/types/hyperdatons.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/uuid.hpp>
@@ -367,8 +368,26 @@ namespace detail
     {
       //input hd declaration
       Constant hd = compile_and_evaluate(std::get<3>(in.eqn), m_system);
-      Constant variance = compile_and_evaluate(std::get<1>(in.eqn), m_system);
-      return Constant();
+
+      if (hd.index() != TYPE_INDEX_INHD)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      Constant uuid = m_system.addInputHyperdaton
+      (
+        std::get<0>(in.eqn),
+        dynamic_cast<InputHD*>(Types::Hyperdatons::get(hd))
+      );
+
+      hd.data.ptr->release();
+
+      if (boost::get<Tree::nil>(&std::get<1>(in.eqn)) == nullptr)
+      {
+        m_system.addInputDeclaration(std::get<0>(in.eqn), std::get<1>(in.eqn));
+      }
+
+      return uuid;
     }
 
     private:

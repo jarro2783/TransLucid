@@ -25,6 +25,9 @@ namespace TransLucid
   {
     namespace Hyperdatons
     {
+      HD*
+      get(const Constant& h);
+
       Constant
       create(const HD* hd, type_index index);
 

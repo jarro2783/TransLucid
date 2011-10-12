@@ -21,6 +21,9 @@ along with TransLucid; see the file COPYING.  If not see
 #define TYPES_FUNCTION_HPP_INCLUDED
 
 #include <tl/types.hpp>
+#include <tl/context.hpp>
+
+#include <vector>
 
 namespace TransLucid
 {
@@ -48,6 +51,12 @@ namespace TransLucid
       return applyFn(c);
     }
 
+    Constant
+    apply(const std::vector<Constant>& args) const
+    {
+      return applyFn(args);
+    }
+
     size_t
     hash() const
     {
@@ -57,6 +66,9 @@ namespace TransLucid
     private:
     virtual Constant
     applyFn(const Constant& c) const = 0;
+
+    virtual Constant
+    applyFn(const std::vector<Constant>& args) const = 0;
 
     virtual BaseFunctionType*
     cloneSelf() const = 0;
@@ -85,6 +97,13 @@ namespace TransLucid
     private:
     Constant
     applyFn(const Constant& c) const;
+
+    Constant
+    applyFn(const std::vector<Constant>& args) const
+    {
+      //TODO fix this
+      return Constant();
+    }
 
     BaseFunctionAbstraction*
     cloneSelf() const

@@ -101,6 +101,14 @@ namespace TransLucid
     {
     }
 
+    void
+    release()
+    {
+      refCount = 0;
+      functions = nullptr;
+      data = nullptr;
+    }
+
     int refCount;
     TypeFunctions* functions;
     void* data;
@@ -262,12 +270,22 @@ namespace TransLucid
     void
     removeReference()
     {
-      --data.ptr->refCount;
-
-      if (data.ptr->refCount == 0)
+      //it might have already been released
+      if (data.ptr->refCount != 0)
       {
-        (*data.ptr->functions->destroy)(data.ptr->data);
-        delete data.ptr;
+        --data.ptr->refCount;
+
+        if (data.ptr->refCount == 0)
+        {
+          (*data.ptr->functions->destroy)(data.ptr->data);
+          delete data.ptr;
+          data.ptr = nullptr;
+        }
+      }
+      else
+      {
+        //lose our reference
+        data.ptr = nullptr;
       }
     }
 

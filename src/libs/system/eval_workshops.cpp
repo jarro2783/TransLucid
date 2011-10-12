@@ -127,10 +127,22 @@ BangOpWS::operator()(Context& k)
     //to the function
     return m_caller(get_constant_pointer<u32string>(name), m_args, k);
   }
-  else if (name.index() == TYPE_INDEX_BASE_FUNCTION && m_args.size() == 1)
+  else if (name.index() == TYPE_INDEX_BASE_FUNCTION)
   {
-    Constant arg = (*m_args[0])(k);
-    return Types::BaseFunction::get(name).apply(arg);
+    if (m_args.size() == 1)
+    {
+      Constant arg = (*m_args[0])(k);
+      return Types::BaseFunction::get(name).apply(arg);
+    }
+    else
+    {
+      std::vector<Constant> args;
+      for (auto ws : m_args)
+      {
+        args.push_back((*ws)(k));
+      }
+      return Types::BaseFunction::get(name).apply(args);
+    }
   }
   else if (name.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
   {

@@ -60,6 +60,16 @@ namespace TransLucid
 {
   namespace 
   {
+    class FileInCreateWS : public WS
+    {
+      public:
+      Constant
+      operator()(Context& k)
+      {
+        return Types::BaseFunction::create(FileArrayInFn());
+      }
+    };
+
     TypeFunctions string_type_functions =
       {
         &Types::String::equality,
@@ -842,10 +852,10 @@ namespace TransLucid
 
     namespace Hyperdatons
     {
-      const HD*
+      HD*
       get(const Constant& h)
       {
-        return &get_constant_pointer<HD>(h);
+        return const_cast<HD*>(&get_constant_pointer<HD>(h));
       }
 
       Constant
@@ -868,6 +878,12 @@ namespace TransLucid
       hash(const Constant& c)
       {
         return reinterpret_cast<size_t>(get(c));
+      }
+
+      InputHD*
+      getIn(const Constant& h)
+      {
+        return reinterpret_cast<InputHD*>(h.data.vptr);
       }
     }
 
@@ -996,6 +1012,7 @@ NameFunctionType::apply
 void
 add_file_io(System& s)
 {
+  //don't know about this stuff
   type_index in, out, io;
 
   in = s.getTypeIndex(U"inhd");
@@ -1007,6 +1024,10 @@ add_file_io(System& s)
       FileOpener(in, out, io)
     )
   );
+  //don't know about above
+
+  //the array-file hd
+  s.addEquation(U"file_array_in_hd", new FileInCreateWS);
 
   //file [arg0 : string, arg1 : intmp] = "openfile"!(#arg0, #arg1);;
   //ifile [arg0 : string] = file @ [arg1 <- 1];;
