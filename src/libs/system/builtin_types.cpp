@@ -77,6 +77,22 @@ namespace TransLucid
       System& m_system;
     };
 
+    class FileOutCreateWS : public WS
+    {
+      public:
+      FileOutCreateWS(System& s)
+      : m_system(s)
+      {}
+
+      Constant
+      operator()(Context& k)
+      {
+      }
+
+      private:
+      System& m_system;
+    };
+
     TypeFunctions string_type_functions =
       {
         &Types::String::equality,
@@ -1035,6 +1051,7 @@ add_file_io(System& s)
 
   //the array-file hd
   s.addEquation(U"file_array_in_hd", new FileInCreateWS(s));
+  s.addEquation(U"file_array_out_hd", new FileOutCreateWS(s));
 
   //file [arg0 : string, arg1 : intmp] = "openfile"!(#arg0, #arg1);;
   //ifile [arg0 : string] = file @ [arg1 <- 1];;

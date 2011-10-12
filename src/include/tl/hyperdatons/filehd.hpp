@@ -108,6 +108,21 @@ namespace TransLucid
     System& m_system;
   };
 
+  class FileArrayOutFn : public BaseFunctionType
+  {
+    public:
+    FileArrayOutFn(System& system)
+    : m_system(system)
+    {}
+
+    private:
+
+    Constant
+    applyFn(const Constant& arg) const;
+
+    System& m_system;
+  };
+
   class FileArrayInHD : public InputHD
   {
     public:
