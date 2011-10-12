@@ -63,11 +63,18 @@ namespace TransLucid
     class FileInCreateWS : public WS
     {
       public:
+      FileInCreateWS(System& s)
+      : m_system(s)
+      {}
+
       Constant
       operator()(Context& k)
       {
-        return Types::BaseFunction::create(FileArrayInFn());
+        return Types::BaseFunction::create(FileArrayInFn(m_system));
       }
+
+      private:
+      System& m_system;
     };
 
     TypeFunctions string_type_functions =
@@ -1027,7 +1034,7 @@ add_file_io(System& s)
   //don't know about above
 
   //the array-file hd
-  s.addEquation(U"file_array_in_hd", new FileInCreateWS);
+  s.addEquation(U"file_array_in_hd", new FileInCreateWS(s));
 
   //file [arg0 : string, arg1 : intmp] = "openfile"!(#arg0, #arg1);;
   //ifile [arg0 : string] = file @ [arg1 <- 1];;

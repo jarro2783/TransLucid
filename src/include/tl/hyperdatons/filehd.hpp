@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/charset.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/hyperdatons/arrayhd.hpp>
 #include <tl/types_util.hpp>
 #include <tl/types/function.hpp>
 
@@ -84,6 +85,12 @@ namespace TransLucid
 
   class FileArrayInFn : public BaseFunctionType
   {
+    public:
+    FileArrayInFn(System& system)
+    : m_system(system)
+    {
+    }
+
     private:
 
     Constant
@@ -97,21 +104,23 @@ namespace TransLucid
     {
       return new FileArrayInFn(*this);
     }
+
+    System& m_system;
   };
 
   class FileArrayInHD : public InputHD
   {
     public:
 
-    FileArrayInHD()
-    : InputHD(0)
-    {
-    }
+    FileArrayInHD(const u32string& file, System& system);
 
     Tuple
     variance() const;
 
     Constant
     get(const Tuple& k) const;
+
+    private:
+    ArrayNHD<mpz_class, 2>* m_array;
   };
 }
