@@ -118,6 +118,48 @@ FileArrayInFn::applyFn(const Constant& arg) const
   }
 }
 
+Constant
+FileArrayOutFn::applyFn(const std::vector<Constant>& args) const
+{  
+  if 
+  (
+    args.size() == 3 && 
+    args[0].index() == TYPE_INDEX_USTRING &&
+    args[1].index() == TYPE_INDEX_INTMP &&
+    args[2].index() == TYPE_INDEX_INTMP
+  )
+  {
+    try
+    {
+      return Types::Hyperdatons::create
+      (
+        new FileArrayOutHD
+        (
+          Types::String::get(args[0]), 
+          Types::Intmp::get(args[1]),
+          Types::Intmp::get(args[2]),
+          m_system
+        ),
+        TYPE_INDEX_OUTHD
+      );
+    }
+    catch(...)
+    {
+      return Types::Special::create(SP_CONST);
+    }
+  }
+  else
+  {
+    return Types::Special::create(SP_CONST);
+  }
+}
+
+Constant
+FileArrayOutFn::applyFn(const Constant& arg) const
+{
+  return Constant();
+}
+
 //for now we will just fill it with some random data to see what happens
 Tuple
 FileArrayInHD::variance() const
@@ -129,7 +171,64 @@ Constant
 FileArrayInHD::get(const Tuple& k) const
 {
   //TODO check this out with SFINAE problem
-  return static_cast<InputHD*>(m_array)->get(k);
+  //return static_cast<InputHD*>(m_array)->get(k);
+  return m_array->get(k);
+}
+
+
+FileArrayOutHD::FileArrayOutHD
+(
+  const u32string& file, 
+  const mpz_class& height,
+  const mpz_class& width,
+  System& system
+)
+: OutputHD(1), m_height(height.get_ui()), m_width(width.get_ui())
+{
+  m_file.open(utf32_to_utf8(file));
+
+  if (!m_file.is_open())
+  {
+    throw "Could not open output file";
+  }
+
+  m_array = new ArrayNHD<mpz_class, 2>
+  (
+    {m_height, m_width},
+    {Types::Dimension::create(DIM_ARG0), Types::Dimension::create(DIM_ARG1)},
+    system,
+    static_cast<Constant(*)(const mpz_class&)>(&Types::Intmp::create),
+    &Types::Intmp::get
+  );
+}
+
+Tuple
+FileArrayOutHD::variance() const
+{
+  return m_array->variance();
+}
+
+void
+FileArrayOutHD::commit()
+{
+  //write to file
+  for (size_t i = 0; i != m_height; ++i)
+  {
+    for (size_t j = 0; j != m_width; ++j)
+    {
+      m_file << (*m_array)[i][j] << " ";
+    }
+    m_file << std::endl;
+  }
+}
+
+void
+FileArrayOutHD::put(const Tuple& t, const Constant& c)
+{
+  if (c.index() == TYPE_INDEX_INTMP)
+  {
+    m_array->put(t, c);
+  }
 }
 
 }

@@ -117,8 +117,17 @@ namespace TransLucid
 
     private:
 
+    FileArrayOutFn*
+    cloneSelf() const
+    {
+      return new FileArrayOutFn(*this);
+    }
+
     Constant
     applyFn(const Constant& arg) const;
+
+    Constant
+    applyFn(const std::vector<Constant>& args) const;
 
     System& m_system;
   };
@@ -137,5 +146,34 @@ namespace TransLucid
 
     private:
     ArrayNHD<mpz_class, 2>* m_array;
+  };
+
+  class FileArrayOutHD : public OutputHD
+  {
+    public:
+
+    FileArrayOutHD
+    (
+      const u32string& file, 
+      const mpz_class& height,
+      const mpz_class& width,
+      System& system
+    );
+
+    Tuple
+    variance() const;
+
+    void
+    commit();
+
+    void
+    put(const Tuple& t, const Constant& c);
+
+    private:
+    size_t m_height;
+    size_t m_width;
+
+    ArrayNHD<mpz_class, 2>* m_array;
+    std::ofstream m_file;
   };
 }

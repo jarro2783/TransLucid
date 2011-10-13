@@ -87,6 +87,7 @@ namespace TransLucid
       Constant
       operator()(Context& k)
       {
+        return Types::BaseFunction::create(FileArrayOutFn(m_system));
       }
 
       private:

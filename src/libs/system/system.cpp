@@ -328,12 +328,12 @@ namespace detail
     Constant
     operator()(const std::pair<Parser::Equation, Parser::DeclType>& eqn)
     {
+      if (m_verbose)
+      {
+        std::cout << Parser::printEquation(eqn.first) << std::endl;
+      }
       if (eqn.second == Parser::DECL_DEF)
       {
-        if (m_verbose)
-        {
-          std::cout << Parser::printEquation(eqn.first) << std::endl;
-        }
         return m_system.addEquation(eqn.first);
       }
       else
@@ -360,7 +360,29 @@ namespace detail
     operator()(const Parser::OutputDecl& out)
     {
       //output hd declaration
-      return Constant();
+      Constant hd = compile_and_evaluate(std::get<3>(out.eqn), m_system);
+
+      if (hd.index() != TYPE_INDEX_OUTHD)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      Constant uuid = m_system.addOutputHyperdaton
+      (
+        std::get<0>(out.eqn),
+        dynamic_cast<OutputHD*>(Types::Hyperdatons::get(hd))
+      );
+
+      hd.data.ptr->release();
+
+      if (boost::get<Tree::nil>(&std::get<1>(out.eqn)) == nullptr)
+      {
+        m_system.addOutputDeclaration(
+          std::get<0>(out.eqn), std::get<1>(out.eqn));
+      }
+
+      return uuid;
+
     }
 
     Constant
@@ -629,6 +651,12 @@ System::go()
       //the demand could have ranges, so we need to enumerate them
       enumerateContextSet(ctxts, theContext, assign.second, hd->second);
     }
+  }
+
+  //commit all of the hyperdatons
+  for (auto outHD : m_outputHDs)
+  {
+    outHD.second->commit();
   }
 
   ++m_time;

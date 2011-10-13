@@ -52,8 +52,8 @@ namespace TransLucid
     //typename std::result_of<array_get(Array, Location...)>::type
     auto
     operator()(const Array& a, First f, Location... loc)
-    //  -> decltype(operator()(a[f], loc...))
-      -> typename std::result_of<array_get(decltype(a[f]), Location...)>::type
+      -> decltype(operator()(a[f], loc...))
+    //  -> typename std::result_of<array_get(decltype(a[f]), Location...)>::type
     {
       return operator()(a[f], loc...);
     }
@@ -173,10 +173,10 @@ namespace TransLucid
     }
 
     template <typename... Location>
-    //auto
-    typename std::result_of<array_get(type, Location...)>::type
+    auto
+    //typename std::result_of<array_get(type, Location...)>::type
     get(Location... loc) const
-    //  -> decltype(array_get(m_array, loc...))
+      -> decltype(array_get()(m_array, loc...))
     {
       //return array_get(m_array, loc...);
       return array_get()(m_array, loc...);
