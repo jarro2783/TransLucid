@@ -51,19 +51,29 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 
     std::istringstream linestream(line);
     std::vector<mpz_class> lineArray;
+
+
+    mpz_class v;
+    linestream >> v;
     while (linestream)
     {
-      mpz_class v;
-      linestream >> v;
       lineArray.push_back(v);
+      linestream >> v;
     }
+
     if (lineArray.size() > maxWidth)
     {
       maxWidth = lineArray.size();
     }
-    inArray.push_back(lineArray);
+    if (lineArray.size() != 0)
+    {
+      inArray.push_back(lineArray);
+    }
   }
   height = inArray.size();
+
+  std::cerr << "read in: " << height << " x " << maxWidth << " array" <<
+    std::endl;
 
   m_array = new ArrayNHD<mpz_class, 2>
   (
