@@ -36,7 +36,8 @@ namespace TransLucid
     {
     }
 
-    virtual ~BaseFunctionType() = default;
+    //virtual ~BaseFunctionType() = default;
+    virtual ~BaseFunctionType() throw() {}
 
     BaseFunctionType*
     clone() const
@@ -93,6 +94,8 @@ namespace TransLucid
         m_scope.push_back(std::make_pair(d, k.lookup(d)));
       }
     }
+
+    ~BaseFunctionAbstraction() throw() {}
 
     private:
     Constant

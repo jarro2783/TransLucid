@@ -63,7 +63,8 @@ namespace TransLucid
       this->init(lt);
     }
 
-    virtual ~InputHD() = default;
+    //virtual ~InputHD() = default;
+    virtual ~InputHD() {}
 
     virtual Constant
     get(const Tuple& k) const = 0;
