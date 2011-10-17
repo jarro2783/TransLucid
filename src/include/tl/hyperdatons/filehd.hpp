@@ -75,14 +75,6 @@ namespace TransLucid
     Tuple m_variance;
   };
 
-  class FileOutputHD : public OutputHD
-  {
-  };
-
-  class FileIOHD : public IOHD
-  {
-  };
-
   class FileArrayInFn : public BaseFunctionType
   {
     public:
@@ -90,6 +82,8 @@ namespace TransLucid
     : m_system(system)
     {
     }
+
+    ~FileArrayInFn() throw() {}
 
     private:
 
@@ -115,6 +109,8 @@ namespace TransLucid
     : m_system(system)
     {}
 
+    ~FileArrayOutFn() throw() {}
+
     private:
 
     FileArrayOutFn*
@@ -138,6 +134,8 @@ namespace TransLucid
 
     FileArrayInHD(const u32string& file, System& system);
 
+    ~FileArrayInHD() throw() {}
+
     Tuple
     variance() const;
 
@@ -159,6 +157,8 @@ namespace TransLucid
       const mpz_class& width,
       System& system
     );
+
+    ~FileArrayOutHD() throw() {}
 
     Tuple
     variance() const;

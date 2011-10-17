@@ -35,6 +35,8 @@ namespace TransLucid
 
       DemandHD(DimensionRegistry& dims);
 
+      ~DemandHD() throw() {}
+
       void
       put(const Tuple& k, const Constant& c);
 
