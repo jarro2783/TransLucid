@@ -49,11 +49,11 @@ namespace TransLucid
     ~FileInputHD() throw() {}
 
     Constant
-    get(const Tuple& index) const
+    get(const Context& index) const
     {
       //bestfitting will guarantee that the index is valid
       uint64_t i = get_constant_pointer<mpz_class>
-        (index.find(DIM_ZERO)->second).get_ui();
+        (index.lookup(DIM_ZERO)).get_ui();
 
       m_stream.seekg(i);
 
@@ -140,7 +140,7 @@ namespace TransLucid
     variance() const;
 
     Constant
-    get(const Tuple& k) const;
+    get(const Context& k) const;
 
     private:
     ArrayNHD<mpz_class, 2>* m_array;
@@ -167,7 +167,7 @@ namespace TransLucid
     commit();
 
     void
-    put(const Tuple& t, const Constant& c);
+    put(const Context& t, const Constant& c);
 
     private:
     size_t m_height;

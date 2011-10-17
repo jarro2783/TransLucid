@@ -100,16 +100,20 @@ namespace TransLucid
      **/
     operator bool() const
     {
-       return m_guard != 0 || m_dimensions.size() != 0 || m_boolean != 0;
+       return 
+          m_guard != 0 
+       || m_boolean != 0
+       || m_dimConstConst.size() != 0
+       || m_dimConstNon.size() != 0
+       || m_dimNonConst.size() != 0
+       || m_dimNonNon.size() != 0
+       ;
     }
 
     /**
      * @brief Evaluate the guard.
      *
-     * Returns a tuple of the dimensions and the evaluated AST,
-     * this includes all the system imposed dimensions.
-     * @throw InvalidGuard when the user has specified a system imposed
-     * dimension.
+     * Returns a tuple of the dimensions and the evaluated AST.
      **/
     Tuple
     evaluate(Context& k) const;
@@ -123,7 +127,7 @@ namespace TransLucid
     void
     addDimension(size_t dim, const Constant& v)
     {
-       m_dimensions[dim] = v;
+       m_dimConstConst[dim] = v;
     }
 
     WS*
@@ -147,13 +151,16 @@ namespace TransLucid
     private:
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
-    tuple_t m_dimensions;
+
+    Tuple m_tupleConstDims;
 
     std::map<dimension_index, Constant> m_dimConstConst;
     std::map<dimension_index, WS*> m_dimConstNon;
 
     std::map<WS*, Constant> m_dimNonConst;
     std::map<WS*, WS*> m_dimNonNon;
+
+    bool m_onlyConst;
 
     mpz_class *m_timeStart;
     mpz_class *m_timeEnd;

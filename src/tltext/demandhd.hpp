@@ -38,7 +38,7 @@ namespace TransLucid
       ~DemandHD() throw() {}
 
       void
-      put(const Tuple& k, const Constant& c);
+      put(const Context& k, const Constant& c);
 
       const Constant&
       operator()(size_t i)

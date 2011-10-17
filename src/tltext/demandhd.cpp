@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/fixed_indexes.hpp>
 #include <tl/range.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types_util.hpp>
@@ -36,17 +37,17 @@ DemandHD::DemandHD(DimensionRegistry& dims)
 }
 
 void
-DemandHD::put(const Tuple& k, const Constant& c)
+DemandHD::put(const Context& k, const Constant& c)
 {
-  auto iter = k.find(m_slot);
+  const Constant& v = k.lookup(m_slot);
 
-  if (iter == k.end())
+  if (v.index() != TYPE_INDEX_INTMP)
   {
-    //error
+    //error, shouldn't happen, just ignore
   }
   else
   {
-    size_t slot = get_constant_pointer<mpz_class>(iter->second).get_ui();
+    size_t slot = get_constant_pointer<mpz_class>(v).get_ui();
 
     if (m_results.size() <= slot)
     {

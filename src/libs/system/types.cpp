@@ -33,6 +33,8 @@ namespace TransLucid
 namespace 
 {
 
+std::shared_ptr<tuple_t> sharedEmpty(new tuple_t);
+
 template <typename T>
 bool
 equality(const Constant& lhs, const Constant& rhs)
@@ -94,7 +96,7 @@ constant_equality(const Constant& lhs, const Constant& rhs)
 }
 
 Tuple::Tuple()
-: m_value(new tuple_t)
+: m_value(sharedEmpty)
 {
 }
 

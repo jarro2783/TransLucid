@@ -178,10 +178,8 @@ FileArrayInHD::variance() const
 }
 
 Constant
-FileArrayInHD::get(const Tuple& k) const
+FileArrayInHD::get(const Context& k) const
 {
-  //TODO check this out with SFINAE problem
-  //return static_cast<InputHD*>(m_array)->get(k);
   return m_array->get(k);
 }
 
@@ -233,7 +231,7 @@ FileArrayOutHD::commit()
 }
 
 void
-FileArrayOutHD::put(const Tuple& t, const Constant& c)
+FileArrayOutHD::put(const Context& t, const Constant& c)
 {
   if (c.index() == TYPE_INDEX_INTMP)
   {

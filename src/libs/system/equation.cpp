@@ -80,11 +80,12 @@ VariableWS::~VariableWS()
 GuardWS::GuardWS(const GuardWS& other)
 : m_guard(other.m_guard)
 , m_boolean(other.m_boolean)
-, m_dimensions(other.m_dimensions)
+, m_tupleConstDims(other.m_tupleConstDims)
 , m_dimConstConst(other.m_dimConstConst)
 , m_dimConstNon(other.m_dimConstNon)
 , m_dimNonConst(other.m_dimNonConst)
 , m_dimNonNon(other.m_dimNonNon)
+, m_onlyConst(other.m_onlyConst)
 , m_timeStart(0)
 , m_timeEnd(0)
 , m_system(other.m_system)
@@ -110,7 +111,8 @@ GuardWS::GuardWS(const GuardWS& other)
 }
 
 GuardWS::GuardWS(WS* g, WS* b)
-: m_guard(g), m_boolean(b), m_timeStart(0), m_timeEnd(0), m_system(nullptr)
+: m_guard(g), m_boolean(b), m_onlyConst(false),
+  m_timeStart(0), m_timeEnd(0), m_system(nullptr)
 {
   if (b != 0)
   {
@@ -187,6 +189,13 @@ GuardWS::GuardWS(WS* g, WS* b)
         }
       }
     }
+
+    if (m_dimConstNon.size() == 0 && m_dimNonConst.size() == 0
+        && m_dimNonNon.size() == 0)
+    {
+      m_onlyConst = true;
+    }
+    m_tupleConstDims = m_dimConstConst;
   }
   else
   {
@@ -208,9 +217,17 @@ GuardWS::operator=(const GuardWS& rhs)
     m_guard = rhs.m_guard;
     m_boolean = rhs.m_boolean;
 
+    m_tupleConstDims = rhs.m_tupleConstDims;
+
+    m_dimConstConst = rhs.m_dimConstConst;
+    m_dimConstNon = rhs.m_dimConstNon;
+    m_dimNonConst = rhs.m_dimNonConst;
+    m_dimNonNon = rhs.m_dimNonNon;
+
+    m_onlyConst = rhs.m_onlyConst;
+
     try 
     {
-      m_dimensions = rhs.m_dimensions;
       if (rhs.m_timeStart)
       {
         m_timeStart = new mpz_class(*rhs.m_timeStart);
@@ -237,13 +254,18 @@ GuardWS::operator=(const GuardWS& rhs)
 Tuple
 GuardWS::evaluate(Context& k) const
 {
-  tuple_t t = m_dimensions;
+  if (m_onlyConst)
+  {
+    return m_tupleConstDims;
+  }
+
+  tuple_t t = m_dimConstConst;
 
   if (m_guard)
   {
     //start with the const dimensions and evaluate the non-const ones
     //Constant v = (*m_guard)(k);
-    t.insert(m_dimConstConst.begin(), m_dimConstConst.end());
+    //t.insert(m_dimConstConst.begin(), m_dimConstConst.end());
 
     //evaluate the ones left
     for (const auto& constNon : m_dimConstNon)

@@ -35,7 +35,7 @@ namespace TransLucid
     );
 
     Constant
-    get(const Tuple& k) const;
+    get(const Context& k) const;
 
     Tuple
     variance() const;

@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/charset.hpp>
+#include <tl/fixed_indexes.hpp>
 #include <tl/hyperdatons/envhd.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/string.hpp>
@@ -44,12 +45,12 @@ EnvHD::EnvHD
 }
 
 Constant
-EnvHD::get(const Tuple& index) const
+EnvHD::get(const Context& index) const
 {
-  auto iter = index.find(m_dimVariable);
-  if (iter != index.end())
+  const Constant& v = index.lookup(m_dimVariable);
+  if (v.index() == TYPE_INDEX_USTRING)
   {
-    const u32string& s = get_constant_pointer<u32string>(iter->second);
+    const u32string& s = get_constant_pointer<u32string>(v);
     char* c = getenv(std::string(s.begin(), s.end()).c_str());
 
     return Types::String::create(chars_to_u32string(c));

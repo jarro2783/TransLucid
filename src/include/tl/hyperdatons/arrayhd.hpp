@@ -149,13 +149,13 @@ namespace TransLucid
     }
 
     Constant
-    get(const Tuple& index) const
+    get(const Context& index) const
     {
       std::vector<int> vecIndex;
       for (auto d : m_dimensionOrder)
       {
-        auto iter = index.find(d);
-        if (iter == index.end())
+        const Constant& val = index.lookup(d);
+        if (val.index() != TYPE_INDEX_INTMP)
         {
           //this should never happen
           throw "Invalid index in ArrayHD get: " __FILE__ ": " 
@@ -165,7 +165,7 @@ namespace TransLucid
         {
           //the preconditions of get are guaranteed by bestfitting
           vecIndex.push_back(
-            get_constant_pointer<mpz_class>(iter->second).get_ui());
+            get_constant_pointer<mpz_class>(val).get_ui());
         }
       }
 
@@ -183,28 +183,21 @@ namespace TransLucid
     }
 
     void
-    put (const Tuple& index, const Constant& v) //override
+    put (const Context& index, const Constant& v) //override
     {
       //pull out the relevant variables of the tuple and access the array
       std::vector<int> vecIndex;
       for (auto d : m_dimensionOrder)
       {
-        auto iter = index.find(d);
-        if (iter == index.end())
+        const Constant& cindex = index.lookup(d);
+        if (cindex.index() == TYPE_INDEX_INTMP)
         {
-          return;
+          vecIndex.push_back(
+            get_constant_pointer<mpz_class>(cindex).get_ui());
         }
         else
         {
-          if (iter->second.index() == TYPE_INDEX_INTMP)
-          {
-            vecIndex.push_back(
-              get_constant_pointer<mpz_class>(iter->second).get_ui());
-          }
-          else
-          {
-            return;
-          }
+          return;
         }
       }
 

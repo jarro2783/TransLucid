@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PHYSICAL_WSS_HPP_INCLUDED
 #define PHYSICAL_WSS_HPP_INCLUDED
 
+#include <tl/context.hpp>
 #include <tl/range.hpp>
 #include <tl/registries.hpp>
 #include <tl/types/intmp.hpp>
@@ -67,7 +68,7 @@ namespace TransLucid
     virtual ~InputHD() {}
 
     virtual Constant
-    get(const Tuple& k) const = 0;
+    get(const Context& k) const = 0;
   };
 
   class OutputHD : public virtual HD
@@ -82,7 +83,7 @@ namespace TransLucid
     virtual ~OutputHD() throw() {}
 
     virtual void
-    put(const Tuple& k, const Constant& c) = 0;
+    put(const Context& k, const Constant& c) = 0;
 
     virtual void
     commit() = 0;
@@ -109,6 +110,7 @@ namespace TransLucid
   }
   #endif
 
+  #if 0
   template <size_t... Limits>
   class ArrayHD : public IOHD
   {
@@ -143,13 +145,13 @@ namespace TransLucid
     }
 
     Constant
-    get(const Tuple& k) const
+    get(const Context& k) const
     {
       return Constant(Wrapper(*m_data), index);
     }
 
     void
-    put(const Tuple& k, const Constant& c)
+    put(const Context& k, const Constant& c)
     {
       try
       {
@@ -192,7 +194,7 @@ namespace TransLucid
     }
 
     Constant
-    get(const Tuple& k) const
+    get(const Context& k) const
     {
       return Constant(Wrapper(*m_data), index);
     }
@@ -316,6 +318,7 @@ namespace TransLucid
     T* m_data;
     size_t m_end0, m_end1, m_end2, m_end3;
   };
+  #endif
 }
 
 #endif
