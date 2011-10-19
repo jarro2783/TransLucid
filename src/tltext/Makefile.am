@@ -20,10 +20,10 @@ endif
 tlweb_LDFLAGS = $(TLTEXT_LIBS) $(TLWEB_STATIC_FLAGS)
 tlweb_CPPFLAGS = $(tltext_CPPFLAGS)
 
-if WEB_SEPARATE_PREFIX
-  tlweb_CPPFLAGS += -DWEBPREFIX=\"$(WEBPREFIX)\"
+if WEB_SEPARATE_DATA
+  tlweb_CPPFLAGS += -DHEADERDIR=\"$(WEBHEADER)\"
 else
-  tlweb_CPPFLAGS += -DWEBPREFIX=\"$(prefix)\"
+  tlweb_CPPFLAGS += -DHEADERDIR=\"$(datadir)/tl/tltext\"
 endif
 
 TLTEXT_SHARED_SOURCES = tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp

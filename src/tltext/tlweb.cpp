@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     itimerval timer{{0, 0}, {5, 0}};
     setitimer(ITIMER_VIRTUAL, &timer, 0);
 
-    tl.add_header(WEBPREFIX "/share/tl/tltext/header.tl");
+    tl.add_header(HEADERDIR "/header.tl");
 
     tl.run();
 
