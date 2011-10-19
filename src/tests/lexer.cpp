@@ -37,8 +37,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <ostream>
 
-#define BOOST_TEST_MODULE lexer
-#include <boost/test/included/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
 namespace TL = TransLucid;
 namespace lex = TL::Lexer::lex;
@@ -110,8 +110,6 @@ namespace
   }
 }
 
-BOOST_AUTO_TEST_SUITE( lexer_tests )
-
 enum Keyword
 {
   KEYWORD_IF,
@@ -173,79 +171,78 @@ class Checker
   //when we clean up the checker we must have lexed everything
   ~Checker()
   {
-    BOOST_CHECK(m_current == m_tokens.end());
+    CHECK(m_current == m_tokens.end());
   }
 
   void
   error(const TL::u32string& message)
   {
-    BOOST_TEST_MESSAGE("should not have reached here: " << message);
-    BOOST_REQUIRE(false);
+    FAIL("should not have reached here: " << message);
   }
 
 	void identifier(const TL::u32string& ws)
 	{
-    BOOST_TEST_MESSAGE("Testing identifier: " << ws);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    INFO("Testing identifier: " << ws);
+    REQUIRE(m_current != m_tokens.end());
 
     const TL::u32string* wsp = boost::get<TL::u32string>(&*m_current);
 
     //if this fails the type of the token is wrong
-    BOOST_REQUIRE(wsp != 0);
-    BOOST_CHECK(*wsp == ws);
+    REQUIRE(wsp != 0);
+    CHECK(*wsp == ws);
 
     ++m_current;
 	}
 
 	void integer(const value_wrapper<mpz_class>& i)
 	{
-    BOOST_TEST_MESSAGE("Testing integer: " << i);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    INFO("Testing integer: " << i);
+    REQUIRE(m_current != m_tokens.end());
 
     const value_wrapper<mpz_class>* ip = 
       boost::get<value_wrapper<mpz_class>>(&*m_current);
     //if this fails the type of the token is wrong
-    BOOST_REQUIRE(ip != 0);
-    BOOST_CHECK_EQUAL(*ip, i);
+    REQUIRE(ip != 0);
+    CHECK(*ip == i);
 
     ++m_current;
 	}
 
 	void keyword(Keyword t)
 	{
-    BOOST_TEST_MESSAGE("Testing keyword: " << t);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    INFO("Testing keyword: " << t);
+    REQUIRE(m_current != m_tokens.end());
 
     const Keyword* tp = boost::get<Keyword>(&*m_current);
     //if this fails the type of the token is wrong
-    BOOST_REQUIRE(tp != 0);
-    BOOST_CHECK_EQUAL(*tp, t);
+    REQUIRE(tp != 0);
+    CHECK(*tp == t);
 
     ++m_current;
 	}
 
   void symbol(Token s)
   {
-    BOOST_TEST_MESSAGE("Testing symbol: " << s);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    INFO("Testing symbol: " << s);
+    REQUIRE(m_current != m_tokens.end());
 
     const Token* sp = boost::get<Token>(&*m_current);
     //if this fails the type of the token is wrong
-    BOOST_REQUIRE(sp != 0);
-    BOOST_CHECK_EQUAL(*sp, s);
+    REQUIRE(sp != 0);
+    CHECK(*sp == s);
     ++m_current;
   }
 
   void rational(const value_wrapper<mpq_class>& q)
   {
-    BOOST_TEST_MESSAGE("Testing rational: " << q);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    INFO("Testing rational: " << q);
+    REQUIRE(m_current != m_tokens.end());
 
     const value_wrapper<mpq_class>* qp = 
       boost::get<value_wrapper<mpq_class>>(&*m_current);
     //if this fails the type of the token is wrong
-    BOOST_REQUIRE(qp != 0);
-    BOOST_CHECK_EQUAL(*qp, q);
+    REQUIRE(qp != 0);
+    CHECK(*qp == q);
 
     ++m_current;
   }
@@ -254,15 +251,15 @@ class Checker
   void real(const value_wrapper<mpf_class>& f)
   {
     BOOST_TEST_MESSAGE("Testing float: " << f);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    REQUIRE(m_current != m_tokens.end());
     
     const value_wrapper<mpf_class>* fp = 
       boost::get<value_wrapper<mpf_class>>(&*m_current);
 
     //if this fails the type of the token is wrong
-    BOOST_REQUIRE(fp != 0);
-    //BOOST_CHECK_CLOSE(*fp, f, 0.001);
-    BOOST_CHECK_EQUAL(*fp, f);
+    REQUIRE(fp != 0);
+    //CHECK_CLOSE(*fp, f, 0.001);
+    CHECK_EQUAL(*fp, f);
 
     ++m_current;
   }
@@ -270,41 +267,41 @@ class Checker
 
   void constant(const std::pair<TL::u32string, TL::u32string>& c)
   {
-    BOOST_TEST_MESSAGE("Testing constant: " << c);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    INFO("Testing constant: " << c);
+    REQUIRE(m_current != m_tokens.end());
 
     auto cp = boost::get<std::pair<TL::u32string, TL::u32string>>(&*m_current);
 
-    BOOST_REQUIRE(cp != nullptr);
-    BOOST_CHECK(cp->first == c.first);
-    BOOST_CHECK(cp->second == c.second);
+    REQUIRE(cp != nullptr);
+    CHECK(cp->first == c.first);
+    CHECK(cp->second == c.second);
     ++m_current;
   }
 
   void character(char32_t c)
   {
-    BOOST_TEST_MESSAGE("Testing character: " << c);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    INFO("Testing character: " << c);
+    REQUIRE(m_current != m_tokens.end());
 
     auto cp = boost::get<char32_t>(&*m_current);
 
-    BOOST_REQUIRE(cp != nullptr);
-    BOOST_CHECK(c == *cp);
+    REQUIRE(cp != nullptr);
+    CHECK(c == *cp);
     ++m_current;
   }
 
   void
   op(const TL::u32string& text, TL::Lexer::OpTokens type)
   {
-    BOOST_TEST_MESSAGE("Testing op: " << text);
-    BOOST_REQUIRE(m_current != m_tokens.end());
+    INFO("Testing op: " << text);
+    REQUIRE(m_current != m_tokens.end());
 
     auto opval = boost::get<std::pair<TL::u32string, TL::Lexer::OpTokens>>
       (&*m_current);
 
-    BOOST_REQUIRE(opval != nullptr);
-    BOOST_CHECK(opval->first == text);
-    BOOST_CHECK(opval->second == type);
+    REQUIRE(opval != nullptr);
+    CHECK(opval->first == text);
+    CHECK(opval->second == type);
     ++m_current;
   }
 
@@ -474,11 +471,11 @@ bool check_utf8(const std::string& input, Checker& checker)
     && errors.count() == 0;
 }
 
-BOOST_AUTO_TEST_CASE ( identifiers )
+TEST_CASE ( "identifiers", "check that identifiers are lexed" )
 {
   TL::u32string input1 = U"ident";
   Checker checker1({U"ident"});
-  BOOST_CHECK(check(input1, checker1));
+  CHECK(check(input1, checker1));
 
   TL::u32string input2 
     = U"ifififif0a9fifi testing hello world a a_b a5 b abc34_";
@@ -496,10 +493,10 @@ BOOST_AUTO_TEST_CASE ( identifiers )
     })
   ;
 
-  BOOST_CHECK(check(input2, checker2) == true);
+  CHECK(check(input2, checker2) == true);
 }
 
-BOOST_AUTO_TEST_CASE ( keywords )
+TEST_CASE ( "keywords", "check that the keywords are recognised" )
 {
   TL::u32string input = U"if fi where then elsif true false";
   Checker checker({
@@ -515,9 +512,9 @@ BOOST_AUTO_TEST_CASE ( keywords )
   check(input, checker);
 }
 
-BOOST_AUTO_TEST_CASE ( constants )
+TEST_CASE ( "constants", "check the built in constants" )
 {
-  BOOST_TEST_MESSAGE("test case: constants");
+  INFO("test case: constants");
   TL::u32string input = U"`hello` 'a' '\\U00000041' '\\u0041' '\\xC2\\xA2'"
                         U"\"text\\u00E4\\xC2\\xA2\"";
   Checker checker({
@@ -532,9 +529,9 @@ BOOST_AUTO_TEST_CASE ( constants )
   check(input, checker);
 }
 
-BOOST_AUTO_TEST_CASE ( integers )
+TEST_CASE ( "integers", "check the integers" )
 {
-  BOOST_TEST_MESSAGE("test case: integers");
+  INFO("test case: integers");
   TL::u32string input = U"0 1 10 50 100 021 02101 0A25 0GA 0aZJ 011 01111"
                         U" ~1 ~0Gab ~15 ~0111 ~1000"
   ;
@@ -565,10 +562,10 @@ BOOST_AUTO_TEST_CASE ( integers )
 
   TL::u32string invalid = U"0AFB";
   Checker check_invalid({mpz_class(0)});
-  BOOST_CHECK(check(invalid, check_invalid) == false);
+  CHECK(check(invalid, check_invalid) == false);
 }
 
-BOOST_AUTO_TEST_CASE ( rationals )
+TEST_CASE ( "rationals", "check the rational numbers" )
 {
   TL::u32string input = U"0_1 123_124 0GA_3 ~3_2";
   std::list<mpq_class> values
@@ -584,7 +581,7 @@ BOOST_AUTO_TEST_CASE ( rationals )
 }
 
 #if 0
-BOOST_AUTO_TEST_CASE ( floats )
+TEST_CASE ( floats )
 {
   TL::u32string input = U"0.0 1.0 5.25 0GA.BC ~3.4 1.1^10 12.123456^20#500 "
     U"0G1.123456789123456789123456789123456789123456789123456789123456789"
@@ -607,7 +604,7 @@ BOOST_AUTO_TEST_CASE ( floats )
 }
 #endif
 
-BOOST_AUTO_TEST_CASE ( symbols )
+TEST_CASE ( "symbols", "check all the symbols" )
 {
   TL::u32string input = UR"*(: [ ] . = & # @ \ \\ .. ( ) -> | ;; \\\ %% <-)*";
   Checker checker({
@@ -636,7 +633,7 @@ BOOST_AUTO_TEST_CASE ( symbols )
   check(input, checker);
 }
 
-BOOST_AUTO_TEST_CASE ( mixed )
+TEST_CASE ( "mixed", "random test" )
 {
   TL::u32string input = U"intmp @ 10 (hello if) cats [1 <- 5]";
   Checker checker({
@@ -658,9 +655,9 @@ BOOST_AUTO_TEST_CASE ( mixed )
   check(input, checker);
 }
 
-BOOST_AUTO_TEST_CASE ( operators )
+TEST_CASE ( "operators", "check arbitrary operators" )
 {
-  BOOST_TEST_MESSAGE("testing the operator symbol");
+  INFO("testing the operator symbol");
   TL::u32string input = U"4 % 5 - +";
   Checker checker({
     mpz_class(4),
@@ -673,9 +670,9 @@ BOOST_AUTO_TEST_CASE ( operators )
   check(input, checker);
 }
 
-BOOST_AUTO_TEST_CASE ( utf8 )
+TEST_CASE ( "utf8", "utf8 input stream" )
 {
-  BOOST_TEST_MESSAGE("testing utf8 input stream");
+  INFO("testing utf8 input stream");
   std::string input = "%% 45 4 600";
   Checker checker({
     TOKEN_DBL_PERCENT,
@@ -683,12 +680,12 @@ BOOST_AUTO_TEST_CASE ( utf8 )
     mpz_class(4),
     mpz_class(600)
   });
-  BOOST_CHECK(check_utf8(input, checker));
+  CHECK(check_utf8(input, checker));
 }
 
-BOOST_AUTO_TEST_CASE ( comments )
+TEST_CASE ( "comments", "check that comments work" )
 {
-  BOOST_TEST_MESSAGE("testing comments");
+  INFO("testing comments");
 
   std::string input = 
   R"(
@@ -713,5 +710,3 @@ BOOST_AUTO_TEST_CASE ( comments )
 
   check_utf8(input, checker);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
