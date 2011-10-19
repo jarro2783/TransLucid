@@ -72,6 +72,7 @@ endif()
 INCLUDE_DIRECTORIES(src/include ${CMAKE_BINARY_DIR})
 
 set(PREFIX \"${CMAKE_INSTALL_PREFIX}\")
+set(HEADERDIR \"${CMAKE_INSTALL_PREFIX}/share/tl/tltext\")
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
 add_subdirectory(src)
