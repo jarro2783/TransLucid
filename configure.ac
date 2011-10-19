@@ -87,8 +87,17 @@ if test "x$enable_tlweb" == "xstatic" && test "x$enable_static" = xno; then
   AC_MSG_FAILURE([--enable-tlweb=static and --enable-static=no])
 fi
 
+AC_ARG_ENABLE([webprefix],
+  AS_HELP_STRING([--webprefix=WEBPREFIX], [Set where to install the web
+  server]),
+  [WEBPREFIX=$enable_webprefix],
+  )
+
+AC_SUBST(WEBPREFIX)
+
 AM_CONDITIONAL([WANT_TLWEB], [test "x$enable_tlweb" != xno])
 AM_CONDITIONAL([TLWEB_STATIC], [test "x$enable_tlweb" = xstatic])
+AM_CONDITIONAL([WEB_SEPARATE_PREFIX], [test "x$WEBPREFIX" != "x"])
 
 # Check if we can build documentation
 DX_INIT_DOXYGEN([TransLucid], [doc])

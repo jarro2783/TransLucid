@@ -20,6 +20,12 @@ endif
 tlweb_LDFLAGS = $(TLTEXT_LIBS) $(TLWEB_STATIC_FLAGS)
 tlweb_CPPFLAGS = $(tltext_CPPFLAGS)
 
+if WEB_SEPARATE_PREFIX
+  tlweb_CPPFLAGS += -DWEBPREFIX=\"$(WEBPREFIX)\"
+else
+  tlweb_CPPFLAGS += -DWEBPREFIX=\"$(prefix)\"
+endif
+
 TLTEXT_SHARED_SOURCES = tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp
 
 tltext_SOURCES = main.cpp $(TLTEXT_SHARED_SOURCES)

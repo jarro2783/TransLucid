@@ -130,11 +130,22 @@ namespace TransLucid
         m_error = os;
       }
 
+      /**
+       * Set the command line arguments.
+       * @param args The command line arguments.
+       */
       void
       set_clargs(const std::vector<std::string>& args)
       {
         m_clargs = args;
       }
+
+      /**
+       * Add a header file. Adds a header file to load up before starting.
+       * @param header The header to load.
+       */
+      void
+      add_header(const std::string& header);
 
       private:
       bool m_verbose;

@@ -71,8 +71,6 @@ TLText::TLText(const std::string& initOut)
   m_demands = new DemandHD(m_system);
 
   m_system.addOutputHyperdaton(U"demand", m_demands);
-
-  m_headers.push_back(PREFIX "/share/tl/tltext/header.tl");
 }
 
 TLText::~TLText()
@@ -80,6 +78,12 @@ TLText::~TLText()
   delete m_demands;
   delete m_argsHD;
   delete m_envHD;
+}
+
+void
+TLText::add_header(const std::string& header)
+{
+  m_headers.push_back(header);
 }
 
 void

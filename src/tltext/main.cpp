@@ -146,6 +146,8 @@ int main(int argc, char *argv[])
     {
       tltext.set_clargs(vm["args"].as<std::vector<std::string>>());
     }
+    
+    tltext.add_header(PREFIX "/share/tl/tltext/header.tl");
 
     tltext.run();
   }
