@@ -204,6 +204,7 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
   {
     WS* result = new 
       Workshops::AtTupleWS(lhs, tuplerhs->getElements(), *m_system);
+    tuplerhs->releaseElements();
     delete tuplerhs;
 
     return result;

@@ -47,6 +47,75 @@ namespace TransLucid
 namespace Workshops
 {
 
+namespace
+{
+
+  template <typename Iter, typename Transform>
+  class tuple_transform_iterator : 
+    public std::iterator
+  <
+    std::random_access_iterator_tag,
+    std::pair<dimension_index, Constant>,
+    typename std::iterator_traits<Iter>::difference_type
+  >
+  {
+    typedef std::iterator
+    <
+      std::random_access_iterator_tag,
+      std::pair<dimension_index, Constant>,
+      typename std::iterator_traits<Iter>::difference_type
+    > base;
+
+    public:
+    tuple_transform_iterator(Iter iter, Transform t) 
+    : m_iter(iter) 
+    , m_transform(t)
+    {}
+
+    tuple_transform_iterator&
+    operator++()
+    {
+      ++m_iter;
+      return *this;
+    }
+
+    typename base::value_type
+    operator*() const
+    {
+      return m_transform(*m_iter);
+    }
+
+    typename base::difference_type
+    operator-(const tuple_transform_iterator& rhs)
+    {
+      return m_iter - rhs.m_iter;
+    }
+
+    bool
+    operator!=(const tuple_transform_iterator& rhs) const
+    {
+      return !(*this == rhs);
+    }
+
+    bool operator==(const tuple_transform_iterator& rhs) const
+    {
+      return this->m_iter == rhs.m_iter;
+    }
+
+    private:
+    Iter m_iter;
+    Transform m_transform;
+  };
+
+  template <typename Iter, typename Transform>
+  tuple_transform_iterator<Iter, Transform>
+  make_tuple_transform_iterator(Iter iter, Transform t)
+  {
+    return tuple_transform_iterator<Iter, Transform>(iter, t);
+  }
+
+}
+
 DimensionWS::DimensionWS(System& system, dimension_index dim)
 : m_value(Types::Dimension::create(dim))
 {
@@ -416,6 +485,36 @@ NameApplicationWS::operator()(Context& k)
 Constant
 AtTupleWS::operator()(Context& k)
 {
+  //evaluate the tuple into a vector of fixed size
+  //do some magic to initialise the vector with iterators that do the
+  //evaluation all at once so that we only need one allocation
+
+  auto evalTuple = [this, &k] (const std::pair<WS*, WS*>& entry)
+    -> std::pair<dimension_index, Constant>
+  {
+    Constant lhs = (*entry.first)(k);
+    Constant rhs = (*entry.second)(k);
+
+    if (lhs.index() == TYPE_INDEX_DIMENSION)
+    {
+      return std::make_pair(get_constant<dimension_index>(lhs), rhs);
+    }
+    else
+    {
+      return std::make_pair(this->m_system.getDimensionIndex(lhs), rhs);
+    }
+
+  }
+  ;
+
+  std::vector<std::pair<dimension_index, Constant>> tuple
+  (
+    make_tuple_transform_iterator(m_tuple.begin(), evalTuple),
+    make_tuple_transform_iterator(m_tuple.end(), evalTuple)
+  );
+  
+  ContextPerturber p(k, tuple);
+  return (*m_e2)(k);
 }
 
 } //namespace Workshops

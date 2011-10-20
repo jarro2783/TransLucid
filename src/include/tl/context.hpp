@@ -119,6 +119,17 @@ namespace TransLucid
     : m_k(k)
     {}
 
+    template <typename T>
+    ContextPerturber
+    (
+      Context& k,
+      const T& t
+    )
+    : m_k(k)
+    {
+      perturb(t);
+    }
+
     void perturb
     (
       dimension_index dim,
