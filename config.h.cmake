@@ -2,5 +2,6 @@
 #define CONFIG_H
 
 #cmakedefine PREFIX @PREFIX@
+#cmakedefine HEADERDIR @HEADERDIR@
 
 #endif

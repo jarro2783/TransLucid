@@ -25,6 +25,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <signal.h>
 #include <sys/time.h>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 //This runs the main web app interface to tltext.
 //We are using the POST method for html.
 
