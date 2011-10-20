@@ -300,9 +300,21 @@ namespace TransLucid
       BangFunc m_funcs[N+1];
     };
 
+    /**
+     * A bang operation workshop. Evaluates a host function.
+     */
     class BangOpWS : public WS
     {
       public:
+      /**
+       * Create a bang operation workshop.
+       * @param system The system that we are evaluating in.
+       * @param name The workshop that evaluates to the name of the function.
+       * @param args The arguments to the function.
+       * @return The result of evaluating the bang expression.
+       * @todo Change name to @a e because it should evaluate to an abstraction
+       * now.
+       */
       BangOpWS
       (
         System& system, 
@@ -326,6 +338,14 @@ namespace TransLucid
         }
       }
 
+      /**
+       * Evaluate the bang application. The expression either evaluates to a
+       * name or a bang abstraction. It looks up the function in the system if
+       * it evaluates to a name.
+       * @todo It shouldn't evaluate to a name anymore.
+       * @param k The current context.
+       * @return The result of evaluating the host function.
+       */
       Constant
       operator()(Context& k);
 
@@ -341,10 +361,21 @@ namespace TransLucid
     {
     };
 
+    /**
+     * An if expression workshop.
+     */
     class IfWS : public WS
     {
       public:
 
+      /**
+       * Create the if expression.
+       * @param condition The condition.
+       * @param then Evaluate then if the condition is true.
+       * @param elsifs Look through these and evaluate the first one that is
+       * true if the condition is false.
+       * @param else_ Evaluate else_ if everything else is false.
+       */
       IfWS(WS* condition, WS* then,
         const std::vector<std::pair<WS*, WS*>>& elsifs,
         WS* else_)
@@ -356,6 +387,13 @@ namespace TransLucid
 
       ~IfWS();
 
+      /**
+       * Evaluates the if expression.
+       * @param k The current context.
+       * @return The result of the first expression whose condition evaluates
+       * to true, the result of the else if none. A special if a condition
+       * doesn't evaluate to a boolean.
+       */
       Constant
       operator()(Context& k);
 
@@ -367,9 +405,18 @@ namespace TransLucid
       WS* m_else;
     };
 
+    /**
+     * The hash workshop. When the code @b #!E appears, it is translated to a
+     * HashWS. Looks up the evaluation of E in the current context.
+     */
     class HashWS : public WS
     {
       public:
+      /**
+       * Creates a hash workshop.
+       * @param system The system that we are working with.
+       * @param e The expression to evaluate and lookup the result of.
+       */
       HashWS(System& system, WS* e)
       : m_system(system), m_e(e)
       {}
@@ -379,6 +426,13 @@ namespace TransLucid
         delete m_e;
       }
 
+      /**
+       * Evaluate a hash expression. Evaluates @a e and looks up the result in
+       * the current context.
+       * @param k The current context.
+       * @return The result of looking up the result of @a e in the current
+       * context.
+       */
       Constant
       operator()(Context& k);
 
@@ -387,10 +441,18 @@ namespace TransLucid
       WS* m_e;
     };
 
+    /**
+     * A tuple creation workshop.
+     */
     class TupleWS : public WS
     {
       public:
 
+      /**
+       * Creates the workshop.
+       * @param system The system that we are working with.
+       * @param elements The pairs of tuple elements.
+       */
       TupleWS(System& system,
                  const std::list<std::pair<WS*, WS*>>& elements)
       : m_system(system), m_elements(elements)
@@ -405,6 +467,12 @@ namespace TransLucid
         }
       }
 
+      /**
+       * Evaluates the tuple. Creates a physical tuple object.
+       * @param k The current context.
+       * @return The created tuple or the highest valued special if one of the
+       * dimensions evaluates to a special.
+       */
       Constant
       operator()(Context& k);
 
@@ -413,6 +481,10 @@ namespace TransLucid
       std::list<std::pair<WS*, WS*>> m_elements;
 
       public:
+      /**
+       * Gets the pairs in a tuple.
+       * @return A list of the pairs.
+       */
       auto
       getElements() const ->
       const decltype(m_elements)&
@@ -420,6 +492,16 @@ namespace TransLucid
         return m_elements;
       }
 
+      void
+      releaseElements()
+      {
+        m_elements.clear();
+      }
+
+      /**
+       * Get the system that the tuple workshop was created with.
+       * @return The system.
+       */
       System&
       getSystem()
       {
@@ -427,10 +509,18 @@ namespace TransLucid
       }
     };
 
+    /**
+     * An at expression workshop. Evaluates an at expression.
+     */
     class AtWS : public WS
     {
       public:
 
+      /**
+       * Creates the at expression workshop.
+       * @param e1 The tuple to change the context to.
+       * @param e2 The expression to evaluate in the changed context.
+       */
       AtWS(WS* e2, WS* e1)
       : e2(e2), e1(e1)
       {}
@@ -441,6 +531,13 @@ namespace TransLucid
         delete e2;
       }
 
+      /**
+       * Evaluates the at expression. First evaluates e1, if it is a tuple,
+       * evaluates e2 in the changed context.
+       * @param k The current context.
+       * @return The result. The special @c spconst if e1 does not evaluate to 
+       * a tuple.
+       */
       Constant
       operator()(Context& k);
 
@@ -449,9 +546,20 @@ namespace TransLucid
       WS* e1;
     };
 
+    /**
+     * A base function abstraction workshop.
+     * Creates a base function abstraction.
+     */
     class BaseAbstractionWS : public WS
     {
       public:
+      /**
+       * Creates the workshop.
+       * @param name The argument name.
+       * @param dim The argument dimension.
+       * @param scope The functions that the abstraction is in the scope of.
+       * @param rhs The function definition.
+       */
       BaseAbstractionWS
       (
         const u32string& name,
@@ -471,6 +579,13 @@ namespace TransLucid
         delete m_rhs;
       }
 
+      /**
+       * Evaluates the abstraction.
+       * Creates a base abstraction object. The whole context is
+       * bound.
+       * @param k The current context.
+       * @return The base abstraction.
+       */
       Constant
       operator()(Context& k);
 
@@ -481,9 +596,21 @@ namespace TransLucid
       WS* m_rhs;
     };
 
+    /**
+     * A call-by-value abstraction workshop.
+     * Creates a call-by-value abstraction.
+     */
     class LambdaAbstractionWS : public WS
     {
       public:
+      /**
+       * Creates the workshop.
+       * @param name The paramater name.
+       * @param dim The abstraction's argument dimension.
+       * @param scope The dimensions of the functions that it is in the scope
+       * of.
+       * @param rhs The function definition.
+       */
       LambdaAbstractionWS
       (
         const u32string& name, 
@@ -503,6 +630,12 @@ namespace TransLucid
         delete m_rhs;
       }
 
+      /**
+       * Evaluates the abstraction.
+       * Creates a call-by-value abstraction.
+       * @param k The current context.
+       * @return The call-by-value abstraction.
+       */
       Constant
       operator()(Context& k);
 
@@ -514,9 +647,18 @@ namespace TransLucid
       WS* m_rhs;
     };
 
+    /*
+     * A call-by-value application workshop.
+     * Applies an argument to a call-by-value function.
+     */
     class LambdaApplicationWS : public WS
     {
       public:
+      /**
+       * Creates the workshop.
+       * @param lhs The lhs argument.
+       * @param rhs The rhs argument.
+       */
       LambdaApplicationWS(WS* lhs, WS* rhs)
       : m_lhs(lhs)
       , m_rhs(rhs)
@@ -529,6 +671,14 @@ namespace TransLucid
         delete m_rhs;
       }
 
+      /**
+       * Evaluates the application. If the lhs evaluates to a call-by-value
+       * abstraction, the rhs is evaluated and the abstraction applied to it. 
+       * @param k The current context.
+       * @return The result of evaluating the function with the supplied
+       * argument. If lhs does not evaluate to a call-by-value abstraction,
+       * then @c spconst.
+       */
       Constant
       operator()(Context& k);
 
@@ -537,9 +687,21 @@ namespace TransLucid
       WS* m_rhs;
     };
 
+    /**
+     * A workshop which creates a call-by-name abstraction.
+     */
     class NamedAbstractionWS : public WS
     {
       public:
+      /**
+       * Creates the call-by-name abstraction.
+       * @param name The paramater name.
+       * @param argDim The abstraction's argument dimension.
+       * @param odometerDim The abstraction's odometer dimension.
+       * @param scope The dimensions of the functions that it is in the scope
+       * of.
+       * @param rhs The definition of the function.
+       */
       NamedAbstractionWS
       (
         const u32string& name,
@@ -561,6 +723,11 @@ namespace TransLucid
         delete m_rhs;
       }
 
+      /**
+       * Evaluates a call-by-name abstraction.
+       * Returns an abstraction object.
+       * @param k The current context.
+       */
       Constant
       operator()(Context& k);
 
@@ -572,9 +739,18 @@ namespace TransLucid
       WS* m_rhs;
     };
 
+    /**
+     * The call-by-name application workshop. Evaluates a call by name
+     * function application.
+     */
     class NameApplicationWS : public WS
     {
       public:
+      /**
+       * Constructs a call by name application workshop.
+       * @param lhs The lhs argument.
+       * @param rhs The rhs argument.
+       */
       NameApplicationWS(WS* lhs, WS* rhs)
       : m_lhs(lhs)
       , m_rhs(rhs)
@@ -587,6 +763,12 @@ namespace TransLucid
         delete m_rhs;
       }
 
+      /**
+       * Evaluates a call by name application. If the lhs evaluates to a call
+       * by name abstraction, it evaluates the abstraction passing the rhs as
+       * an intension.
+       * @param k The current context.
+       */
       Constant
       operator()(Context& k);
 
