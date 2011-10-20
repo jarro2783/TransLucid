@@ -779,6 +779,42 @@ namespace TransLucid
       std::vector<dimension_index> m_Lall;
     };
 
+    /**
+     * Evaluates an at expression when the rhs is a tuple expression. This
+     * allows us to make an optimisation by not building tuples all the time.
+     */
+    class AtTupleWS : public WS
+    {
+      public:
+      template <typename T>
+      AtTupleWS
+      (
+        WS* e2,
+        const T& pairs,
+        System& system
+      )
+      : m_e2(e2)
+      , m_tuple(pairs.begin(), pairs.end())
+      , m_system(system)
+      {
+      }
+
+      /**
+       * Evaluate @a e2 after changing the context to @a e1. This is done more
+       * efficiently than building a tuple, it is done by evaluating the
+       * context change in place.
+       * @param k The current context.
+       * @return The result of @a e2 in the context perturbed by @e1.
+       */
+      Constant
+      operator()(Context& k);
+
+      private:
+      WS* m_e2;
+      std::vector<std::pair<WS*, WS*>> m_tuple;
+      System& m_system;
+    };
+
   }
 
 }

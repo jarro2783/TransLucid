@@ -413,6 +413,11 @@ NameApplicationWS::operator()(Context& k)
   return f.apply(k, rhs, m_Lall);
 }
 
+Constant
+AtTupleWS::operator()(Context& k)
+{
+}
+
 } //namespace Workshops
 
 } //namespace TransLucid

@@ -198,7 +198,20 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
   WS* lhs = boost::apply_visitor(*this, e.lhs);
   WS* rhs = boost::apply_visitor(*this, e.rhs);
 
-  return new Workshops::AtWS(lhs, rhs);
+  //if the rhs is a tuple, then we can do better
+  Workshops::TupleWS* tuplerhs = dynamic_cast<Workshops::TupleWS*>(rhs);
+  if (tuplerhs != nullptr)
+  {
+    WS* result = new 
+      Workshops::AtTupleWS(lhs, tuplerhs->getElements(), *m_system);
+    delete tuplerhs;
+
+    return result;
+  }
+  else
+  {
+    return new Workshops::AtWS(lhs, rhs);
+  }
 }
 
 WS*
