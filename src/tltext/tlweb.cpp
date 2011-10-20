@@ -136,7 +136,7 @@ defaultProgram()
 void
 printForm(const std::string& program)
 {
-  char* url = getenv("URL");
+  char* url = getenv("SCRIPT_NAME");
 
   std::string action = url != nullptr ? url : "tlweb" ;
   std::cout <<
