@@ -132,9 +132,14 @@ defaultProgram()
 void
 printForm(const std::string& program)
 {
+  char* url = getenv("URL");
+
+  std::string action = url != nullptr ? url : "tlweb" ;
   std::cout <<
     "<h1>Input program</h1>"
-    "<form action=\"tlweb\" method=\"post\">\n"
+    "<form action=\""
+    << action << 
+    "\" method=\"post\">\n"
     "<p>\n"
     "<textarea cols=\"80\" rows=\"30\" name=\"program\">\n"
     << program <<
