@@ -64,8 +64,8 @@ namespace TransLucid
       this->init(lt);
     }
 
-    //virtual ~InputHD() = default;
-    virtual ~InputHD() {}
+    virtual ~InputHD() = default;
+    //virtual ~InputHD() {}
 
     virtual Constant
     get(const Context& k) const = 0;
@@ -79,8 +79,8 @@ namespace TransLucid
       this->init(lt);
     }
 
-    //virtual ~OutputHD() = default;
-    virtual ~OutputHD() throw() {}
+    virtual ~OutputHD() = default;
+    //virtual ~OutputHD() throw() {}
 
     virtual void
     put(const Context& k, const Constant& c) = 0;
@@ -97,7 +97,9 @@ namespace TransLucid
     {
     }
 
-    virtual ~IOHD() throw() {}
+    //virtual ~IOHD() throw() {}
+
+    virtual ~IOHD() = default;
   };
 
   #if 0
