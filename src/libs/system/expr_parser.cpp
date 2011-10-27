@@ -263,12 +263,14 @@ namespace TransLucid
     make_where_clause
     (
       const Tree::Expr& e,
+      const u32string& name,
       const WhereSymbols& defs
     )
     {
       Tree::WhereExpr w;
 
       w.e = e;
+      w.name = name;
       w.dims = defs.first;
       w.vars = defs.second;
 
@@ -320,7 +322,7 @@ namespace TransLucid
         >> where_inside
         >> tok.end_
         ) 
-        [_val = ph::bind(&make_where_clause, _a, _2)]
+        [_val = ph::bind(&make_where_clause, _a, _1, _2)]
       | qi::eps[_val = _a]
       )
       ;
@@ -613,19 +615,31 @@ namespace TransLucid
 
       function_abstraction = 
           //phi abstraction
-          (tok.dblslash_ > tok.identifier_ > tok.arrow_ > expr)
+          (tok.dblslash_ > 
+            tok.identifier_ > -brace_expr_list > tok.arrow_ > expr)
           [
-            _val = construct<Tree::PhiExpr>(_2, _4)
+            _val = construct<Tree::PhiExpr>(_2, _3, _5)
           ]
           //lambda abstraction
         | (tok.slash_ > tok.identifier_ > tok.arrow_ > expr)
           [
             _val = construct<Tree::LambdaExpr>(_2, _4)
           ]
+        //no bang abstractions
+        #if 0
         | (tok.bang_abstract_ > tok.identifier_ > tok.arrow_ > expr)
           [
             _val = construct<Tree::BangExpr>(_2, _4)
           ]
+        #endif
+      ;
+
+      brace_expr_list = 
+      (
+         tok.obrace_ 
+      >> -expr_list[_val = _1]
+      >  tok.cbrace_
+      )
       ;
 
       //BOOST_SPIRIT_DEBUG_NODE(if_expr);

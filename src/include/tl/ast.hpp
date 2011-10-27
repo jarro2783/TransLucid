@@ -641,12 +641,14 @@ namespace TransLucid
     {
       PhiExpr() = default;
 
-      PhiExpr(const u32string& name, const Expr& rhs)
-      : name(name), rhs(rhs)
+      template <typename Binds>
+      PhiExpr(const u32string& name, const Binds& binds, const Expr& rhs)
+      : name(name), binds(binds), rhs(rhs)
       {
       }
 
       u32string name;
+      std::vector<Expr> binds;
       Expr rhs;
 
       dimension_index argDim;
@@ -704,6 +706,8 @@ namespace TransLucid
     struct WhereExpr
     {
       Expr e;
+
+      u32string name;
 
       typedef std::vector<std::pair<u32string, Expr>> DimensionList;
       DimensionList dims;

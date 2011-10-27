@@ -84,7 +84,7 @@ namespace TransLucid
       lex::token_def<lex::unused_type, lex_char_type> 
         //keywords
         assignment_, dimension_, else_, elsif_, end_, false_, fi_, if_
-      , in_, library_, out_, then_, true_, var_, where_
+      , in_, library_, out_, then_, true_, var_
         //symbols
       , arrow_, bang_, dblsemi_, dblslash_ //, dbldollar_
       , bang_abstract_
@@ -94,7 +94,7 @@ namespace TransLucid
       , spaces
       //single characters
       , decl_, lbracket_, rbracket_, dot_, def_, and_, hash_, at_, slash_
-      , lparen_, rparen_, pipe_, comma_, dollar_
+      , lparen_, rparen_, pipe_, comma_, dollar_, obrace_, cbrace_
       ;
 
       lex::token_def<Tree::InfixAssoc, lex_char_type>
@@ -108,7 +108,7 @@ namespace TransLucid
       lex::token_def<u32string, lex_char_type>
         identifier_, operator_, range_
         //fake tokens for operators
-        , binary_op_, prefix_op_, postfix_op_
+        , binary_op_, prefix_op_, postfix_op_, where_
       ;
 
       lex::token_def<value_wrapper<mpz_class>, lex_char_type> 

@@ -38,7 +38,6 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
 , if_(L"if")
 , then_(L"then")
 , true_(L"true")
-, where_(L"where")
 , spaces(L"([ \\r\\n\\t])|(\\/\\/([^\\n]*)\\n)")
 //, spaces(L"[ \\n\\t]")
 , binary_op_(L".", OpTokens::TOK_BINARY_OP)
@@ -78,6 +77,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
     L"\\\"([^\\\"\\\\]|\\\\.)*\\\"");
   this->self.add_pattern(L"stringRAW", L"`[^`]*`");
 
+  where_             = L"where(_{IDENT})?";
   identifier_        = L"{IDENT}";
   constantRAW_       = L"{IDENT}?{stringRAW}";
   constantINTERPRET_ = L"{IDENT}?{stringINTERPRET}";
@@ -99,6 +99,8 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   pipe_     = L'|';
   comma_    = L',';
   dollar_   = L"\\$";
+  obrace_   = L"\\{";
+  cbrace_   = L"\\}";
 
   bang_abstract_ = LR"(\\b)";
   maps_       = L"<-";
@@ -145,7 +147,7 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   | then_
   | true_
   //| dbldollar_
-  | where_
+  | where_ [detail::build_where()]
 
   //constants
   | constantRAW_       [detail::build_constant()]
@@ -184,6 +186,8 @@ lex_tl_tokens<Lexer>::lex_tl_tokens(Parser::Errors& errors, System& system)
   | dollar_
   
   | identifier_
+  //the parser should not much operator_, instead it should match
+  //binary_op_, prefix_op_ and postfix_op_
   | operator_ 
     [
       //detail::handle_operator<decltype(binary_op_)>(m_identifiers, binary_op_)

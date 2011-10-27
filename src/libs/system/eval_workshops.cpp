@@ -489,6 +489,10 @@ AtTupleWS::operator()(Context& k)
   //do some magic to initialise the vector with iterators that do the
   //evaluation all at once so that we only need one allocation
 
+  //this doesn't work when there are nested tuples
+  //there must be some way to avoid all those memory allocations
+  //static std::vector<std::pair<dimension_index, Constant>> tuple;
+
   auto evalTuple = [this, &k] (const std::pair<WS*, WS*>& entry)
     -> std::pair<dimension_index, Constant>
   {
@@ -506,6 +510,17 @@ AtTupleWS::operator()(Context& k)
 
   }
   ;
+
+  #if 0
+  tuple.clear();
+
+  std::copy
+  (
+    make_tuple_transform_iterator(m_tuple.begin(), evalTuple),
+    make_tuple_transform_iterator(m_tuple.end(), evalTuple),
+    std::back_inserter(tuple)
+  );
+  #endif
 
   std::vector<std::pair<dimension_index, Constant>> tuple
   (

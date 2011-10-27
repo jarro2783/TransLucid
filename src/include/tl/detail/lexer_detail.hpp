@@ -55,6 +55,45 @@ namespace TransLucid
     namespace detail
     {
       /**
+       * Builds a where token.
+       * The where token is where_(optional identifier). If the identifier
+       * is not there then the token type is empty.
+       */
+      struct build_where
+      {
+        /**
+         * Builds the where token.
+         * @param start The begin iterator.
+         * @param end The end iterator.
+         * @param matched The pass flags.
+         * @param id Something.
+         * @param ctx The lexer context.
+         */
+        template <typename Iterator, typename Idtype, typename Context>
+        void
+        operator()
+        (
+          Iterator& start, 
+          Iterator& end, 
+          lex::pass_flags& matched,
+          Idtype& id,
+          Context& ctx
+        ) const
+        {
+          u32string text(start, end);
+
+          if (text.size() > 5)
+          {
+            ctx.set_value(text.substr(6, text.size()));
+          }
+          else
+          {
+            ctx.set_value(u32string());
+          }
+        }
+      };
+
+      /**
        * Builds a rational value.
        * The lex function class which builds an mpq_class from a string.
        */

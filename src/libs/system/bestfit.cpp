@@ -23,6 +23,8 @@ namespace TransLucid
 {
 
 //TODO finish this
+//the choice of how to best fit will very much depend on properties of the
+//system
 TaggedConstant CompileBestFit::operator()(const Tuple& k)
 {
   BestFit* b = 0;
