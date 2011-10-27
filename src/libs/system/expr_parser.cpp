@@ -616,15 +616,18 @@ namespace TransLucid
       function_abstraction = 
           //phi abstraction
           (tok.dblslash_ > 
-            tok.identifier_ > -brace_expr_list > tok.arrow_ > expr)
+            //-(brace_expr_list[_a = _1]) > 
+            tok.identifier_ > tok.arrow_ > expr)
           [
-            _val = construct<Tree::PhiExpr>(_2, _3, _5)
+            _val = construct<Tree::PhiExpr>(_2, _4)
           ]
+        #if 0
           //lambda abstraction
         | (tok.slash_ > tok.identifier_ > tok.arrow_ > expr)
           [
             _val = construct<Tree::LambdaExpr>(_2, _4)
           ]
+        #endif
         //no bang abstractions
         #if 0
         | (tok.bang_abstract_ > tok.identifier_ > tok.arrow_ > expr)
@@ -634,7 +637,7 @@ namespace TransLucid
         #endif
       ;
 
-      brace_expr_list = 
+      brace_expr_list =
       (
          tok.obrace_ 
       >> -expr_list[_val = _1]

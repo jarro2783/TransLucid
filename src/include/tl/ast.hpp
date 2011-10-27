@@ -641,14 +641,13 @@ namespace TransLucid
     {
       PhiExpr() = default;
 
-      template <typename Binds>
-      PhiExpr(const u32string& name, const Binds& binds, const Expr& rhs)
-      : name(name), binds(binds), rhs(rhs)
+      PhiExpr(const u32string& name, const Expr& rhs)
+      : name(name), rhs(rhs)
       {
       }
 
       u32string name;
-      std::vector<Expr> binds;
+      //std::vector<Expr> binds;
       Expr rhs;
 
       dimension_index argDim;
