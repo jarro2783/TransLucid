@@ -637,14 +637,6 @@ namespace TransLucid
         #endif
       ;
 
-      brace_expr_list =
-      (
-         tok.obrace_ 
-      >> -expr_list[_val = _1]
-      >  tok.cbrace_
-      )
-      ;
-
       //BOOST_SPIRIT_DEBUG_NODE(if_expr);
       BOOST_SPIRIT_DEBUG_NODE(expr);
       BOOST_SPIRIT_DEBUG_NODE(boolean);

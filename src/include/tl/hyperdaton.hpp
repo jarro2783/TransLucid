@@ -34,6 +34,7 @@ namespace TransLucid
   class HD 
   {
     public:
+    //virtual ~HD() = default;
     virtual ~HD() {};
 
     size_t
@@ -64,8 +65,8 @@ namespace TransLucid
       this->init(lt);
     }
 
-    virtual ~InputHD() = default;
-    //virtual ~InputHD() {}
+    //virtual ~InputHD() = default;
+    virtual ~InputHD() {}
 
     virtual Constant
     get(const Context& k) const = 0;
@@ -79,8 +80,8 @@ namespace TransLucid
       this->init(lt);
     }
 
-    virtual ~OutputHD() = default;
-    //virtual ~OutputHD() throw() {}
+    //virtual ~OutputHD() = default;
+    virtual ~OutputHD() {}
 
     virtual void
     put(const Context& k, const Constant& c) = 0;
@@ -97,9 +98,8 @@ namespace TransLucid
     {
     }
 
-    //virtual ~IOHD() throw() {}
-
-    virtual ~IOHD() = default;
+    virtual ~IOHD() {}
+    //virtual ~IOHD() = default;
   };
 
   #if 0

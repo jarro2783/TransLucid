@@ -113,7 +113,10 @@ namespace TransLucid
       m_variance = variance;
     }
 
-    ~ArrayNHD() = default;
+    //~ArrayNHD() = default;
+    ~ArrayNHD() throw()
+    {
+    }
 
     Constant
     get(const Context& index) const

@@ -135,14 +135,6 @@ namespace TransLucid
         where_inside
       ;
 
-      qi::rule
-      <
-        Iterator, 
-        std::vector<Tree::Expr>()
-      >
-        brace_expr_list
-      ;
-
       System::IdentifierLookup m_idents;
       dimension_index m_dimName;
       dimension_index m_symbolDim;

@@ -16,6 +16,7 @@ add_executable(line_tokenizer line_tokenizer.cpp)
 
 add_executable(system system.cpp)
 add_executable(lexer lexer.cpp)
+add_executable(variant variant.cpp)
 
 add_definitions(${TLCFLAGS})
 
@@ -26,3 +27,4 @@ add_definitions(${TLCFLAGS})
 add_test(system ./system)
 add_test(line_tokenizer ./line_tokenizer)
 add_test(lexer ./lexer)
+add_test(variant ./variant)
