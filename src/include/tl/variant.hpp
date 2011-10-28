@@ -23,13 +23,33 @@ along with TransLucid; see the file COPYING.  If not see
  * boost::variant, but replaces it with C++11 features.
  */
 
+#include <type_traits>
+
 namespace TransLucid
 {
-  template <typename... Types>
+  template <typename First, typename... Types>
   class Variant
   {
     public:
 
     Variant();
+
+    ~Variant();
+
+    template <typename T>
+    Variant(const T& t);
+
+    Variant(const Variant& rhs);
+
+    Variant(Variant&& rhs);
+
+    int which() {return m_which;}
+
+    private:
+
+    //TODO implement with alignas when it is implemented in gcc
+    //char m_storage[]; //max of size + alignof for each of Types...
+
+    int m_which;
   };
 }
