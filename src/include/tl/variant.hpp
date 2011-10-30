@@ -120,9 +120,16 @@ namespace TransLucid
     visit_impl(Visitor& visitor, int which, int current, 
                VoidPtrCV storage)
     {
+      typedef typename std::conditional
+      <
+        std::is_const<VoidPtrCV>::value,
+        First,
+        const First
+      >::type ConstType;
+      //TODO constness here
       if (which == current)
       {
-        return visitor(*reinterpret_cast<First*>(storage));
+        return visitor(*reinterpret_cast<ConstType*>(storage));
       }
       return visit_impl<Visitor, VoidPtrCV, Types...>
         (visitor, which, current + 1, storage);
@@ -133,12 +140,6 @@ namespace TransLucid
   class Variant
   {
     private:
-
-    struct fake_void
-    {
-    };
-
-    //static constexpr alignment = 
 
     template <typename T>
     struct Sizeof
@@ -160,6 +161,26 @@ namespace TransLucid
         First,
         Types...
       >::value;
+
+    struct constructor
+    {
+      typedef void result_type;
+
+      constructor(Variant& self)
+      : m_self(self)
+      {
+      }
+
+      template <typename T>
+      void
+      operator()(const T& rhs)
+      {
+        m_self.construct(rhs);
+      }
+
+      private:
+      Variant& m_self;
+    };
 
     struct destroyer
     {
@@ -198,7 +219,10 @@ namespace TransLucid
       //std::cerr << "using which = " << m_which << std::endl;
     }
 
-    Variant(const Variant& rhs);
+    Variant(const Variant& rhs)
+    {
+      rhs.apply_visitor(constructor(*this));
+    }
 
     Variant(Variant&& rhs);
 
@@ -213,6 +237,14 @@ namespace TransLucid
     apply_visitor(Visitor visitor)
     {
       return detail::visit_impl<Visitor, void*, First, Types...>(
+        visitor, m_which, 0, m_storage);
+    }
+
+    template <typename Visitor>
+    typename Visitor::result_type
+    apply_visitor(Visitor visitor) const
+    {
+      return detail::visit_impl<Visitor, const void*, First, Types...>(
         visitor, m_which, 0, m_storage);
     }
 

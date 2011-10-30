@@ -36,7 +36,10 @@ struct Visitor
 
 TEST_CASE ( "basic variant", "does the variant basic functionality work" )
 {
-  TransLucid::Variant <int, A, B> a(A{4});
+  typedef TransLucid::Variant <int, A, B> var;
+  var a(A{4});
 
   CHECK(a.apply_visitor(Visitor()) == 4);
+
+  var b = a;
 }
