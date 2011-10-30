@@ -23,16 +23,45 @@ along with TransLucid; see the file COPYING.  If not see
  * boost::variant, but replaces it with C++11 features.
  */
 
+#include <new>
 #include <type_traits>
+#include <utility>
+
+#include <tl/mpl.hpp>
 
 namespace TransLucid
 {
   template <typename First, typename... Types>
   class Variant
   {
+    private:
+
+    //static constexpr alignment = 
+
+    template <typename T>
+    struct SizeofPlusAlignof
+    {
+      static constexpr size_t value = sizeof(T) + alignof(T);
+    };
+
+    //size = max of (size + alignment) of each thing
+    static constexpr size_t size = 
+      max
+      <
+        SizeofPlusAlignof,
+        First,
+        Types...
+      >::value;
+
     public:
 
-    Variant();
+    Variant()
+    {
+      //try to construct First
+      //if this fails then First is not default constructible
+      construct(First());
+      indicate_which(0);
+    }
 
     ~Variant();
 
@@ -43,13 +72,30 @@ namespace TransLucid
 
     Variant(Variant&& rhs);
 
+    Variant& operator=(const Variant& rhs);
+
+    Variant& operator=(Variant&& rhs);
+
     int which() {return m_which;}
 
     private:
 
     //TODO implement with alignas when it is implemented in gcc
-    //char m_storage[]; //max of size + alignof for each of Types...
+    union
+    {
+      char m_storage[size]; //max of size + alignof for each of Types...
+      int m_align; //the type with the max alignment
+    };
 
     int m_which;
+
+    void indicate_which(int which) {m_which = which;}
+
+    template <typename T>
+    void
+    construct(T t)
+    {
+      new(m_storage) T(std::forward(t));
+    }
   };
 }
