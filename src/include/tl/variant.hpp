@@ -23,35 +23,155 @@ along with TransLucid; see the file COPYING.  If not see
  * boost::variant, but replaces it with C++11 features.
  */
 
+#include <cassert>
+#include <functional>
 #include <new>
 #include <type_traits>
 #include <utility>
+
+//#include <iostream>
 
 #include <tl/mpl.hpp>
 
 namespace TransLucid
 {
+  namespace detail
+  {
+    //none of what is left in Types should be convertible to Wanted
+    template <size_t N, typename Wanted, typename... Types>
+    struct none_convertible;
+
+    template <size_t N, typename Wanted, typename Next, typename... Types>
+    struct none_convertible<N, Wanted, Next, Types...>
+    {
+      private:
+      //if you get an error here it means that a type that your variant was
+      //constructed with is not unambiguously convertible to one of the 
+      //types in the variant
+      typedef 
+      std::enable_if
+      <
+        !std::is_convertible<Wanted, Next>::value,
+        none_convertible<N, Wanted, Types...>
+      > m_next;
+
+      public:
+      static constexpr size_t value = m_next::type::value;
+    };
+
+    template <size_t N, typename Wanted>
+    struct none_convertible<N, Wanted>
+    {
+      typedef Wanted type;
+      static constexpr size_t value = N;
+    };
+
+    template <size_t N, typename Wanted, typename... Types>
+    struct find_convertible;
+
+    template <size_t N, typename Wanted, typename Current, typename... Types>
+    struct find_convertible<N, Wanted, Current, Types...>
+    {
+      static constexpr size_t value =
+        std::conditional
+        <
+          std::is_convertible<Wanted, Current>::value,
+          none_convertible<N, Wanted, Types...>,
+          find_convertible<N+1, Wanted, Types...>
+        >::type::value;
+    };
+
+    #if 0
+    template <size_t N, typename Wanted>
+    struct find_convertible<N, Wanted>
+    {
+      static_assert(false, "Type not convertible");
+    };
+    #endif
+
+    //determines which out of Types... Wanted is convertible to
+    template <typename Wanted, typename... Types>
+    struct get_which
+    {
+      static constexpr size_t value = 
+        find_convertible<0, Wanted, Types...>::value;
+    };
+
+    template
+    <
+      typename Visitor,
+      typename VoidPtrCV
+    >
+    typename Visitor::result_type
+    visit_impl(Visitor& visitor, int which, int current, VoidPtrCV storage)
+    {
+      //if your program fails here, then the visitor broke
+      assert(false);
+    }
+
+    template 
+    <
+      typename Visitor, 
+      typename VoidPtrCV,
+      typename First, 
+      typename... Types
+    >
+    typename Visitor::result_type
+    visit_impl(Visitor& visitor, int which, int current, 
+               VoidPtrCV storage)
+    {
+      if (which == current)
+      {
+        return visitor(*reinterpret_cast<First*>(storage));
+      }
+      return visit_impl<Visitor, VoidPtrCV, Types...>
+        (visitor, which, current + 1, storage);
+    }
+  }
+
   template <typename First, typename... Types>
   class Variant
   {
     private:
 
+    struct fake_void
+    {
+    };
+
     //static constexpr alignment = 
 
     template <typename T>
-    struct SizeofPlusAlignof
+    struct Sizeof
     {
-      static constexpr size_t value = sizeof(T) + alignof(T);
+      static constexpr size_t value = sizeof(T);
     };
 
-    //size = max of (size + alignment) of each thing
-    static constexpr size_t size = 
+    template <typename T>
+    struct Alignof
+    {
+      static constexpr size_t value = alignof(T);
+    };
+
+    //size = max of size of each thing
+    static constexpr size_t m_size = 
       max
       <
-        SizeofPlusAlignof,
+        Sizeof,
         First,
         Types...
       >::value;
+
+    struct destroyer
+    {
+      typedef void result_type;
+
+      template <typename T>
+      void
+      operator()(T& t)
+      {
+        t.~T();
+      }
+    };
 
     public:
 
@@ -63,10 +183,20 @@ namespace TransLucid
       indicate_which(0);
     }
 
-    ~Variant();
+    ~Variant()
+    {
+      apply_visitor(destroyer());
+    }
 
     template <typename T>
-    Variant(const T& t);
+    Variant(T t)
+    {
+      //compile error here means that T is not unambiguously convertible to
+      //any of the types in (First, Types...)
+      indicate_which(detail::get_which<T, First, Types...>::value);
+      construct(std::forward<T>(t));
+      //std::cerr << "using which = " << m_which << std::endl;
+    }
 
     Variant(const Variant& rhs);
 
@@ -78,24 +208,35 @@ namespace TransLucid
 
     int which() {return m_which;}
 
+    template <typename Visitor>
+    typename Visitor::result_type
+    apply_visitor(Visitor visitor)
+    {
+      return detail::visit_impl<Visitor, void*, First, Types...>(
+        visitor, m_which, 0, m_storage);
+    }
+
     private:
 
     //TODO implement with alignas when it is implemented in gcc
     union
     {
-      char m_storage[size]; //max of size + alignof for each of Types...
-      int m_align; //the type with the max alignment
+      char m_storage[m_size]; //max of size + alignof for each of Types...
+      //the type with the max alignment
+      typename max<Alignof, First, Types...>::type m_align; 
     };
 
     int m_which;
+
+    static std::function<void(void*)> m_handlers[1 + sizeof...(Types)];
 
     void indicate_which(int which) {m_which = which;}
 
     template <typename T>
     void
-    construct(T t)
+    construct(T&& t)
     {
-      new(m_storage) T(std::forward(t));
+      new(m_storage) T(std::forward<T>(t));
     }
   };
 }
