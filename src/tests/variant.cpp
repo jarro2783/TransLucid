@@ -3,14 +3,16 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-struct A
+struct Sum
 {
-  int x;
+  int a;
+  int b;
 };
 
-struct B
+struct Multiply
 {
-  int y;
+  int a;
+  int b;
 };
 
 struct Visitor
@@ -18,14 +20,14 @@ struct Visitor
   typedef int result_type;
 
   int
-  operator()(const A& a)
+  operator()(const Sum& s)
   {
-    return a.x;
+    return s.a + s.b;
   }
 
-  int operator()(const B& b)
+  int operator()(const Multiply& m)
   {
-    return b.y;
+    return m.a * m.b;
   }
 
   int operator()(int i)
@@ -34,12 +36,29 @@ struct Visitor
   }
 };
 
+typedef TransLucid::Variant <int, Sum, Multiply> var;
+
 TEST_CASE ( "basic variant", "does the variant basic functionality work" )
 {
-  typedef TransLucid::Variant <int, A, B> var;
-  var a(A{4});
+  var a(Sum{2,2});
 
   CHECK(a.apply_visitor(Visitor()) == 4);
 
   var b = a;
+  CHECK(b.apply_visitor(Visitor()) == 4);
+
+  var c;
+  c = b;
+  CHECK(c.apply_visitor(Visitor()) == 4);
+}
+
+TEST_CASE ("variant move semantics", 
+  "variant with all the move operators")
+{
+  var a{var{Sum{5,10}}};  
+
+  CHECK(a.apply_visitor(Visitor()) == 15);
+
+  a = var{Multiply{3,4}};
+  CHECK(a.apply_visitor(Visitor()) == 12);
 }

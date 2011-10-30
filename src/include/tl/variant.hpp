@@ -182,6 +182,88 @@ namespace TransLucid
       Variant& m_self;
     };
 
+    struct move_constructor
+    {
+      typedef void result_type;
+      
+      move_constructor(Variant& self)
+      : m_self(self)
+      {
+      }
+
+      template <typename T>
+      void
+      operator()(T& rhs)
+      {
+        m_self.construct(std::move(rhs));
+      }
+
+      private:
+      Variant& m_self;
+    };
+
+    struct assigner
+    {
+      typedef void result_type;
+
+      assigner(Variant& self, int rhs_which)
+      : m_self(self), m_rhs_which(rhs_which)
+      {
+      }
+
+      template <typename Rhs>
+      void
+      operator()(const Rhs& rhs)
+      {
+        if (m_self.which() == m_rhs_which)
+        {
+          //the types are the same, so just assign into the lhs
+          *reinterpret_cast<Rhs*>(m_self.address()) = rhs;
+        }
+        else
+        {
+          Rhs tmp(rhs);
+          m_self.destroy(); //nothrow
+          m_self.construct(std::move(tmp)); //nothrow (please)
+        }
+      }
+
+      private:
+      Variant& m_self;
+      int m_rhs_which;
+    };
+    
+    struct move_assigner
+    {
+      typedef void result_type;
+
+      move_assigner(Variant& self, int rhs_which)
+      : m_self(self), m_rhs_which(rhs_which)
+      {
+      }
+
+      template <typename Rhs>
+      void
+      operator()(Rhs& rhs)
+      {
+        typedef typename std::remove_const<Rhs>::type RhsNoConst;
+        if (m_self.which() == m_rhs_which)
+        {
+          //the types are the same, so just assign into the lhs
+          *reinterpret_cast<RhsNoConst*>(m_self.address()) = std::move(rhs);
+        }
+        else
+        {
+          m_self.destroy(); //nothrow
+          m_self.construct(std::move(rhs)); //nothrow (please)
+        }
+      }
+
+      private:
+      Variant& m_self;
+      int m_rhs_which;
+    };
+
     struct destroyer
     {
       typedef void result_type;
@@ -206,7 +288,7 @@ namespace TransLucid
 
     ~Variant()
     {
-      apply_visitor(destroyer());
+      destroy();
     }
 
     template <typename T>
@@ -222,15 +304,36 @@ namespace TransLucid
     Variant(const Variant& rhs)
     {
       rhs.apply_visitor(constructor(*this));
+      indicate_which(rhs.which());
     }
 
-    Variant(Variant&& rhs);
+    Variant(Variant&& rhs)
+    {
+      rhs.apply_visitor(move_constructor(*this));
+      indicate_which(rhs.which());
+    }
 
-    Variant& operator=(const Variant& rhs);
+    Variant& operator=(const Variant& rhs)
+    {
+      if (this != &rhs)
+      {
+        rhs.apply_visitor(assigner(*this, rhs.which()));
+        indicate_which(rhs.which());
+      }
+      return *this;
+    }
 
-    Variant& operator=(Variant&& rhs);
+    Variant& operator=(Variant&& rhs)
+    {
+      if (this != &rhs)
+      {
+        rhs.apply_visitor(move_assigner(*this, rhs.which()));
+        indicate_which(rhs.which());
+      }
+      return *this;
+    }
 
-    int which() {return m_which;}
+    int which() const {return m_which;}
 
     template <typename Visitor>
     typename Visitor::result_type
@@ -251,6 +354,7 @@ namespace TransLucid
     private:
 
     //TODO implement with alignas when it is implemented in gcc
+    //alignas(max<Alignof, First, Types...>::value) char[m_size];
     union
     {
       char m_storage[m_size]; //max of size + alignof for each of Types...
@@ -264,11 +368,21 @@ namespace TransLucid
 
     void indicate_which(int which) {m_which = which;}
 
+    void* address() {return m_storage;}
+    const void* address() const {return m_storage;}
+
+    void
+    destroy()
+    {
+      apply_visitor(destroyer());
+    }
+
     template <typename T>
     void
     construct(T&& t)
     {
-      new(m_storage) T(std::forward<T>(t));
+      typedef typename std::remove_reference<T>::type type;
+      new(m_storage) type(std::forward<T>(t));
     }
   };
 }
