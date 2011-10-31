@@ -76,4 +76,12 @@ TEST_CASE( "variant get", "the variant get function")
 
   const var b{Sum{6,7}};
   CHECK((TransLucid::get<Sum>(b) == Sum{6,7}));
+
+  Sum* ap = TransLucid::get<Sum>(&a);
+  REQUIRE(ap != 0);
+  CHECK((*ap == Sum{5,6}));
+
+  const Sum* bp = TransLucid::get<Sum>(&b);
+  REQUIRE(bp != 0);
+  CHECK((*bp == Sum{6,7}));
 }
