@@ -63,13 +63,16 @@ namespace TransLucid
         typename std::enable_if<std::is_convertible<U, T>::value, U>::type
     >
     recursive_wrapper(U&& u)
-    : m_t(new T(std::move(u))) { }
+    : m_t(new T(std::forward<U>(u))) { }
 
     recursive_wrapper(const recursive_wrapper& rhs)
     : m_t(new T(rhs.get())) { }
 
     recursive_wrapper(recursive_wrapper&& rhs)
-    : m_t(new T(rhs.get())) { }
+    : m_t(rhs.m_t)
+    {
+      rhs.m_t = 0;
+    }
 
     recursive_wrapper&
     operator=(const recursive_wrapper& rhs)
@@ -83,6 +86,7 @@ namespace TransLucid
     {
       delete m_t;
       m_t = rhs.m_t;
+      rhs.m_t = 0;
     }
 
     recursive_wrapper&
@@ -105,11 +109,14 @@ namespace TransLucid
 
     template <typename U>
     void
-    assign(U&& t)
+    assign(U&& u)
     {
-      *m_t = std::forward(t);
+      *m_t = std::forward<U>(u);
     }
   };
+
+  struct true_ {};
+  struct false_ {};
 
   namespace detail
   {
@@ -136,6 +143,7 @@ namespace TransLucid
 
       public:
       static constexpr size_t value = m_next::type::value;
+      typedef typename m_next::type::type type;
     };
 
     template <size_t N, typename Wanted>
@@ -151,13 +159,15 @@ namespace TransLucid
     template <size_t N, typename Wanted, typename Current, typename... Types>
     struct find_convertible<N, Wanted, Current, Types...>
     {
-      static constexpr size_t value =
-        std::conditional
+      typedef
+        typename std::conditional
         <
           std::is_convertible<Wanted, Current>::value,
-          none_convertible<N, Wanted, Types...>,
+          none_convertible<N, Current, Types...>,
           find_convertible<N+1, Wanted, Types...>
-        >::type::value;
+        >::type our_type;
+      static constexpr size_t value = our_type::value;
+      typedef typename our_type::type type;
     };
 
     #if 0
@@ -172,38 +182,41 @@ namespace TransLucid
     template <typename Wanted, typename... Types>
     struct get_which
     {
-      static constexpr size_t value = 
-        find_convertible<0, Wanted, Types...>::value;
+      typedef find_convertible<0, Wanted, Types...> our_type;
+      static constexpr size_t value = our_type::value;
+      typedef typename our_type::type type;
     };
 
-    template <typename T>
+    template <typename T, typename Internal>
     T&
-    get_value(T& t)
+    get_value(T& t, const Internal&)
     {
       return t;
     }
 
     template <typename T>
     T&
-    get_value(recursive_wrapper<T>& t)
+    get_value(recursive_wrapper<T>& t, const false_&)
     {
       return t.get();
     }
 
     template <typename T>
     const T&
-    get_value(const recursive_wrapper<T>& t)
+    get_value(const recursive_wrapper<T>& t, const false_&)
     {
       return t.get();
     }
 
     template
     <
+      typename Internal,
       typename Visitor,
       typename VoidPtrCV
     >
     typename Visitor::result_type
-    visit_impl(Visitor& visitor, int which, int current, VoidPtrCV storage)
+    visit_impl(Visitor& visitor, int which, int current, VoidPtrCV storage,
+      Internal internal)
     {
       //if your program fails here, then the visitor broke
       assert(false);
@@ -211,6 +224,7 @@ namespace TransLucid
 
     template 
     <
+      typename Internal,
       typename Visitor, 
       typename VoidPtrCV,
       typename First, 
@@ -218,7 +232,7 @@ namespace TransLucid
     >
     typename Visitor::result_type
     visit_impl(Visitor& visitor, int which, int current, 
-               VoidPtrCV storage)
+               VoidPtrCV storage, Internal internal = Internal())
     {
       typedef typename std::conditional
       <
@@ -229,10 +243,11 @@ namespace TransLucid
 
       if (which == current)
       {
-        return visitor(get_value(*reinterpret_cast<ConstType*>(storage)));
+        return visitor(get_value(*reinterpret_cast<ConstType*>(storage), 
+          internal));
       }
-      return visit_impl<Visitor, VoidPtrCV, Types...>
-        (visitor, which, current + 1, storage);
+      return visit_impl<Internal, Visitor, VoidPtrCV, Types...>
+        (visitor, which, current + 1, storage, internal);
     }
   }
 
@@ -391,9 +406,10 @@ namespace TransLucid
       destroy();
     }
 
-    //enable_if here is a hack to work around either a compiler bug or some
-    //very annoying behaviour
-    //if T is Variant then we want the Variant&& constructor
+    //enable_if disables this function if we are constructing with a Variant.
+    //Unfortunately, this becomes Variant(Variant&) which is a better match
+    //than Variant(const Variant& rhs), so it is chosen. Therefore, we disable
+    //it.
     template 
     <
       typename T, 
@@ -413,24 +429,33 @@ namespace TransLucid
        static_assert(
           !std::is_same<Variant<First, Types...>&, T>::value, 
           "why is Variant(T&&) instantiated with a Variant?");
-      //typedef typename T::hello what;
-      typedef typename std::remove_reference<T>::type type;
+
       //compile error here means that T is not unambiguously convertible to
       //any of the types in (First, Types...)
-      indicate_which(detail::get_which<type, First, Types...>::value);
-      construct(std::forward<T>(t));
-      //construct(t);
+      typedef typename std::remove_reference<T>::type type;
+      typedef detail::get_which<type, First, Types...> which_type;
+
+      indicate_which(which_type::value);
+      construct(typename which_type::type(std::forward<T>(t)));
     }
+
+    #if 0
+    Variant(Variant& rhs)
+    {
+      rhs.apply_visitor_internal(constructor(*this));
+      indicate_which(rhs.which());
+    }
+    #endif
 
     Variant(const Variant& rhs)
     {
-      rhs.apply_visitor(constructor(*this));
+      rhs.apply_visitor_internal(constructor(*this));
       indicate_which(rhs.which());
     }
 
     Variant(Variant&& rhs)
     {
-      rhs.apply_visitor(move_constructor(*this));
+      rhs.apply_visitor_internal(move_constructor(*this));
       indicate_which(rhs.which());
     }
 
@@ -438,7 +463,7 @@ namespace TransLucid
     {
       if (this != &rhs)
       {
-        rhs.apply_visitor(assigner(*this, rhs.which()));
+        rhs.apply_visitor_internal(assigner(*this, rhs.which()));
         indicate_which(rhs.which());
       }
       return *this;
@@ -448,7 +473,7 @@ namespace TransLucid
     {
       if (this != &rhs)
       {
-        rhs.apply_visitor(move_assigner(*this, rhs.which()));
+        rhs.apply_visitor_internal(move_assigner(*this, rhs.which()));
         indicate_which(rhs.which());
       }
       return *this;
@@ -456,19 +481,26 @@ namespace TransLucid
 
     int which() const {return m_which;}
 
-    template <typename Visitor>
+    template <typename Visitor, typename Internal = false_>
     typename Visitor::result_type
     apply_visitor(Visitor visitor)
     {
-      return detail::visit_impl<Visitor, void*, First, Types...>(
+      return detail::visit_impl<Internal, Visitor, void*, First, Types...>(
         visitor, m_which, 0, m_storage);
     }
 
-    template <typename Visitor>
+    template <typename Visitor, typename Internal = false_>
     typename Visitor::result_type
     apply_visitor(Visitor visitor) const
     {
-      return detail::visit_impl<Visitor, const void*, First, Types...>(
+      return detail::visit_impl
+        <
+          Internal, 
+          Visitor, 
+          const void*, 
+          First, 
+          Types...
+        >(
         visitor, m_which, 0, m_storage);
     }
 
@@ -492,10 +524,24 @@ namespace TransLucid
     void* address() {return m_storage;}
     const void* address() const {return m_storage;}
 
+    template <typename Visitor>
+    typename Visitor::result_type
+    apply_visitor_internal(Visitor visitor)
+    {
+      return apply_visitor<Visitor, true_>(visitor);
+    }
+
+    template <typename Visitor>
+    typename Visitor::result_type
+    apply_visitor_internal(Visitor visitor) const
+    {
+      return apply_visitor<Visitor, true_>(visitor);
+    }
+
     void
     destroy()
     {
-      apply_visitor(destroyer());
+      apply_visitor_internal(destroyer());
     }
 
     template <typename T>

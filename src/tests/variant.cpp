@@ -102,12 +102,13 @@ class Link
 
 TEST_CASE( "recursive_wrapper", "the variant with recursive wrapper" )
 {
-  static_assert(std::is_convertible<Link, 
-    TransLucid::recursive_wrapper<Link>>::value, "what the?");
   Link l{"hello",AST{1}};
   TransLucid::recursive_wrapper<Link> lr(l);
   //TransLucid::recursive_wrapper<Link> bad(5);
   AST a(l);
   AST seven(1);
   AST b{Link{"goodbye",seven}};
+
+  const auto& stored = TransLucid::get<Link>(b);
+  CHECK(stored.x == "goodbye");
 }
