@@ -85,3 +85,29 @@ TEST_CASE( "variant get", "the variant get function")
   REQUIRE(bp != 0);
   CHECK((*bp == Sum{6,7}));
 }
+
+class Link;
+
+typedef TransLucid::Variant <int, TransLucid::recursive_wrapper<Link>> AST;
+
+class Link
+{
+  public:
+  Link(const std::string& a, const AST& b)
+  : x(a), y(b) {}
+
+  std::string x;
+  AST y;
+};
+
+TEST_CASE( "recursive_wrapper", "the variant with recursive wrapper" )
+{
+  static_assert(std::is_convertible<Link, 
+    TransLucid::recursive_wrapper<Link>>::value, "what the?");
+  Link l{"hello",AST{1}};
+  TransLucid::recursive_wrapper<Link> lr(l);
+  //TransLucid::recursive_wrapper<Link> bad(5);
+  AST a(l);
+  AST seven(1);
+  AST b{Link{"goodbye",seven}};
+}

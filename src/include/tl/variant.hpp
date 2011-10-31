@@ -35,6 +35,82 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  template <typename T>
+  class recursive_wrapper
+  {
+    public:
+    ~recursive_wrapper()
+    {
+      delete m_t;
+    }
+
+    template 
+    <
+      typename U,
+      typename Dummy = 
+        typename std::enable_if<std::is_convertible<U, T>::value, U>::type
+    >
+    recursive_wrapper(
+      const U& u)
+    : m_t(new T(u))
+    {
+    }
+
+    template 
+    <
+      typename U,
+      typename Dummy =
+        typename std::enable_if<std::is_convertible<U, T>::value, U>::type
+    >
+    recursive_wrapper(U&& u)
+    : m_t(new T(std::move(u))) { }
+
+    recursive_wrapper(const recursive_wrapper& rhs)
+    : m_t(new T(rhs.get())) { }
+
+    recursive_wrapper(recursive_wrapper&& rhs)
+    : m_t(new T(rhs.get())) { }
+
+    recursive_wrapper&
+    operator=(const recursive_wrapper& rhs)
+    {
+      assign(rhs);
+      return *this;
+    }
+
+    recursive_wrapper&
+    operator=(recursive_wrapper&& rhs)
+    {
+      delete m_t;
+      m_t = rhs.m_t;
+    }
+
+    recursive_wrapper&
+    operator=(const T& t)
+    {
+      assign(t);
+    }
+
+    recursive_wrapper&
+    operator=(T&& t)
+    {
+      assign(std::move(t));
+    }
+
+    T& get() { return *m_t; }
+    const T& get() const { return *m_t; }
+
+    private:
+    T* m_t;
+
+    template <typename U>
+    void
+    assign(U&& t)
+    {
+      *m_t = std::forward(t);
+    }
+  };
+
   namespace detail
   {
     //none of what is left in Types should be convertible to Wanted
@@ -54,6 +130,9 @@ namespace TransLucid
         !std::is_convertible<Wanted, Next>::value,
         none_convertible<N, Wanted, Types...>
       > m_next;
+
+      static_assert(!std::is_convertible<Wanted, Next>::value,
+        "Type is not unambiguously convertible");
 
       public:
       static constexpr size_t value = m_next::type::value;
@@ -85,7 +164,7 @@ namespace TransLucid
     template <size_t N, typename Wanted>
     struct find_convertible<N, Wanted>
     {
-      static_assert(false, "Type not convertible");
+      static constexpr size_t value = N;
     };
     #endif
 
@@ -96,6 +175,27 @@ namespace TransLucid
       static constexpr size_t value = 
         find_convertible<0, Wanted, Types...>::value;
     };
+
+    template <typename T>
+    T&
+    get_value(T& t)
+    {
+      return t;
+    }
+
+    template <typename T>
+    T&
+    get_value(recursive_wrapper<T>& t)
+    {
+      return t.get();
+    }
+
+    template <typename T>
+    const T&
+    get_value(const recursive_wrapper<T>& t)
+    {
+      return t.get();
+    }
 
     template
     <
@@ -129,7 +229,7 @@ namespace TransLucid
 
       if (which == current)
       {
-        return visitor(*reinterpret_cast<ConstType*>(storage));
+        return visitor(get_value(*reinterpret_cast<ConstType*>(storage)));
       }
       return visit_impl<Visitor, VoidPtrCV, Types...>
         (visitor, which, current + 1, storage);
@@ -291,14 +391,35 @@ namespace TransLucid
       destroy();
     }
 
-    template <typename T>
-    Variant(T t)
+    //enable_if here is a hack to work around either a compiler bug or some
+    //very annoying behaviour
+    //if T is Variant then we want the Variant&& constructor
+    template 
+    <
+      typename T, 
+      typename Dummy = 
+       typename std::enable_if
+        <
+          !std::is_same
+          <
+            typename std::remove_reference<Variant<First, Types...>>::type,
+            typename std::remove_reference<T>::type
+          >::value,
+          T
+        >::type
+    >
+    Variant(T&& t)
     {
+       static_assert(
+          !std::is_same<Variant<First, Types...>&, T>::value, 
+          "why is Variant(T&&) instantiated with a Variant?");
+      //typedef typename T::hello what;
+      typedef typename std::remove_reference<T>::type type;
       //compile error here means that T is not unambiguously convertible to
       //any of the types in (First, Types...)
-      indicate_which(detail::get_which<T, First, Types...>::value);
+      indicate_which(detail::get_which<type, First, Types...>::value);
       construct(std::forward<T>(t));
-      //std::cerr << "using which = " << m_which << std::endl;
+      //construct(t);
     }
 
     Variant(const Variant& rhs)
