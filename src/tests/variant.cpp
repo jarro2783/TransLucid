@@ -7,6 +7,12 @@ struct Sum
 {
   int a;
   int b;
+
+  bool
+  operator==(const Sum& rhs) const
+  {
+    return a == rhs.a && b == rhs.b;
+  }
 };
 
 struct Multiply
@@ -36,7 +42,7 @@ struct Visitor
   }
 };
 
-typedef TransLucid::Variant <int, Sum, Multiply> var;
+typedef TransLucid::Variant <Sum, Multiply> var;
 
 TEST_CASE ( "basic variant", "does the variant basic functionality work" )
 {
@@ -61,4 +67,13 @@ TEST_CASE ("variant move semantics",
 
   a = var{Multiply{3,4}};
   CHECK(a.apply_visitor(Visitor()) == 12);
+}
+
+TEST_CASE( "variant get", "the variant get function")
+{
+  var a{Sum{5,6}};
+  CHECK((TransLucid::get<Sum>(a) == Sum{5,6}));
+
+  const var b{Sum{6,7}};
+  CHECK((TransLucid::get<Sum>(b) == Sum{6,7}));
 }

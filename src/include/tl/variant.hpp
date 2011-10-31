@@ -122,11 +122,11 @@ namespace TransLucid
     {
       typedef typename std::conditional
       <
-        std::is_const<VoidPtrCV>::value,
-        First,
-        const First
+        std::is_const<typename std::remove_pointer<VoidPtrCV>::type>::value,
+        const First,
+        First
       >::type ConstType;
-      //TODO constness here
+
       if (which == current)
       {
         return visitor(*reinterpret_cast<ConstType*>(storage));
@@ -385,4 +385,66 @@ namespace TransLucid
       new(m_storage) type(std::forward<T>(t));
     }
   };
+
+  struct bad_get : public std::exception
+  {
+    virtual const char* what() const throw()
+    {
+      return "TransLucid::bad_get";
+    }
+  };
+
+  template <typename T>
+  struct get_visitor
+  {
+    typedef T* result_type;
+
+    result_type
+    operator()(T& val) const
+    {
+      //typedef typename T::hello h;
+      return &val;
+    }
+
+    template <typename U>
+    result_type
+    operator()(const U& u) const
+    {
+      return nullptr;
+    }
+  };
+
+  template <typename T, typename First, typename... Types>
+  T*
+  get(Variant<First, Types...>* var)
+  {
+    return var->apply_visitor(get_visitor<T>());
+  }
+
+  template <typename T, typename First, typename... Types>
+  const T*
+  get(const Variant<First, Types...>* var)
+  {
+    return var->apply_visitor(get_visitor<const T>());
+  }
+
+  template <typename T, typename First, typename... Types>
+  T&
+  get (Variant<First, Types...>& var)
+  {
+    T* t = var.apply_visitor(get_visitor<T>());
+    if (t == nullptr){throw bad_get();}
+
+    return *t;
+  }
+
+  template <typename T, typename First, typename... Types>
+  const T&
+  get (const Variant<First, Types...>& var)
+  {
+    const T* t = var.apply_visitor(get_visitor<const T>());
+    if (t == nullptr) {throw bad_get();}
+
+    return *t;
+  }
 }
