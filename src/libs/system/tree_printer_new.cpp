@@ -176,6 +176,8 @@ class TreePrinterNew
   void
   operator()(char32_t c)
   {
+    u32string s(1, c);
+    m_os << s;
   }
 
   void
@@ -313,6 +315,30 @@ class TreePrinterNew
 
   void
   operator()(const TreeNew::IfExpr& ife)
+  {
+    m_os << "if ";
+    parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
+    apply_visitor(*this, ife.condition);
+    m_os << " then ";
+    apply_visitor(*this, ife.then);
+
+    for (const auto& elsif : ife.else_ifs)
+    {
+      m_os << " elsif ";
+      apply_visitor(*this, elsif.first);
+      m_os << " then ";
+      apply_visitor(*this, elsif.second);
+    }
+
+    m_os << " else ";
+    apply_visitor(*this, ife.else_);
+    m_os << " fi";
+
+    parenPop();
+  }
+
+  void
+  operator()(const TreeNew::HashExpr& h)
   {
   }
 };
