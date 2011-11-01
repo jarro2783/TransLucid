@@ -87,18 +87,21 @@ namespace TransLucid
       delete m_t;
       m_t = rhs.m_t;
       rhs.m_t = 0;
+      return *this;
     }
 
     recursive_wrapper&
     operator=(const T& t)
     {
       assign(t);
+      return *this;
     }
 
     recursive_wrapper&
     operator=(T&& t)
     {
       assign(std::move(t));
+      return *this;
     }
 
     T& get() { return *m_t; }

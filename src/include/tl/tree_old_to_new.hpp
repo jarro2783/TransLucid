@@ -1,6 +1,8 @@
 #include <tl/ast.hpp>
 #include <tl/ast-new.hpp>
 
+#include <algorithm>
+
 namespace TransLucid
 {
   class TreeOldToNew
@@ -151,14 +153,132 @@ namespace TransLucid
       return TreeNew::HashExpr(boost::apply_visitor(*this, e.e));
     }
 
-    TreeNew::Expr operator()(const Tree::TupleExpr& e);
-    TreeNew::Expr operator()(const Tree::AtExpr& e);
-    TreeNew::Expr operator()(const Tree::BangExpr& e);
-    TreeNew::Expr operator()(const Tree::LambdaExpr& e);
-    TreeNew::Expr operator()(const Tree::PhiExpr& e);
-    TreeNew::Expr operator()(const Tree::BangAppExpr& e);
-    TreeNew::Expr operator()(const Tree::LambdaAppExpr& e);
-    TreeNew::Expr operator()(const Tree::PhiAppExpr& e);
-    TreeNew::Expr operator()(const Tree::WhereExpr& e);
+    TreeNew::Expr operator()(const Tree::TupleExpr& e)
+    {
+      TreeNew::TupleExpr::TuplePairs pairs;
+
+      std::transform(e.pairs.begin(), e.pairs.end(), std::back_inserter(pairs),
+        [this] (const decltype(e.pairs)::value_type& p)
+        {
+          return std::make_pair
+          (
+            boost::apply_visitor(*this, p.first),
+            boost::apply_visitor(*this, p.second)
+          );
+        }
+      );
+
+      return TreeNew::TupleExpr(pairs);
+    }
+
+    TreeNew::Expr operator()(const Tree::AtExpr& e)
+    {
+      return TreeNew::AtExpr
+      (
+        boost::apply_visitor(*this, e.lhs),
+        boost::apply_visitor(*this, e.rhs)
+      );
+    }
+
+    TreeNew::Expr operator()(const Tree::BangExpr& e)
+    {
+      TreeNew::BangExpr newbang(e.name, boost::apply_visitor(*this, e.rhs));
+      newbang.argDim = e.argDim;
+      newbang.scope = e.scope;
+
+      return newbang;
+    }
+
+    TreeNew::Expr operator()(const Tree::LambdaExpr& e)
+    {
+      TreeNew::LambdaExpr lamb(e.name, boost::apply_visitor(*this, e.rhs));
+      lamb.argDim = e.argDim;
+      lamb.scope = e.scope;
+
+      return lamb;
+    }
+
+    TreeNew::Expr operator()(const Tree::PhiExpr& e)
+    {
+      TreeNew::PhiExpr phi(e.name, boost::apply_visitor(*this, e.rhs));
+      phi.argDim = e.argDim;
+      phi.odometerDim = e.odometerDim;
+      phi.scope = e.scope;
+
+      return phi;
+    }
+
+    TreeNew::Expr operator()(const Tree::BangAppExpr& e)
+    {
+      std::vector<TreeNew::Expr> args;
+      std::transform(e.args.begin(), e.args.end(), std::back_inserter(args),
+        [this] (const Tree::Expr& old)
+        {
+          return boost::apply_visitor(*this, old);
+        }
+      );
+
+      return TreeNew::BangAppExpr(
+        boost::apply_visitor(*this, e.name),
+        args);
+    }
+
+    TreeNew::Expr operator()(const Tree::LambdaAppExpr& e)
+    {
+      return TreeNew::LambdaAppExpr
+      (
+        boost::apply_visitor(*this, e.lhs),
+        boost::apply_visitor(*this, e.rhs)
+      );
+    }
+
+    TreeNew::Expr operator()(const Tree::PhiAppExpr& e)
+    {
+      TreeNew::PhiAppExpr phiapp(
+        boost::apply_visitor(*this, e.lhs),
+        boost::apply_visitor(*this, e.rhs)
+      );
+
+      phiapp.Lall = e.Lall;
+
+      return phiapp;
+    }
+
+    TreeNew::Expr operator()(const Tree::WhereExpr& e)
+    {
+      TreeNew::WhereExpr where;
+      where.e = boost::apply_visitor(*this, e.e);
+      where.name = e.name;
+
+      std::transform(e.dims.begin(), e.dims.end(), 
+        std::back_inserter(where.dims),
+        [this] (const decltype(e.dims)::value_type& p)
+        {
+          return std::make_pair(p.first, 
+            boost::apply_visitor(*this, p.second));
+        }
+      );
+      
+      std::transform(e.vars.begin(), e.vars.end(), 
+        std::back_inserter(where.vars),
+        [this] (const decltype(e.vars)::value_type& eqn)
+        {
+          return std::make_tuple
+          (
+            std::get<0>(eqn),
+            boost::apply_visitor(*this, std::get<1>(eqn)),
+            boost::apply_visitor(*this, std::get<2>(eqn)),
+            boost::apply_visitor(*this, std::get<3>(eqn))
+          );
+        }
+      );
+
+      where.myDim = e.myDim;
+      where.Lin = e.Lin;
+      where.Lout = e.Lout;
+      where.whichDims = e.whichDims;
+
+      return where;
+    }
   };
 }
