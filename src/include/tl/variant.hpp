@@ -224,7 +224,7 @@ namespace TransLucid
 
       template <typename T>
       void
-      operator()(const T& rhs)
+      operator()(const T& rhs) const
       {
         m_self.construct(rhs);
       }
@@ -244,7 +244,7 @@ namespace TransLucid
 
       template <typename T>
       void
-      operator()(T& rhs)
+      operator()(T& rhs) const
       {
         m_self.construct(std::move(rhs));
       }
@@ -264,7 +264,7 @@ namespace TransLucid
 
       template <typename Rhs>
       void
-      operator()(const Rhs& rhs)
+      operator()(const Rhs& rhs) const
       {
         if (m_self.which() == m_rhs_which)
         {
@@ -295,7 +295,7 @@ namespace TransLucid
 
       template <typename Rhs>
       void
-      operator()(Rhs& rhs)
+      operator()(Rhs& rhs) const
       {
         typedef typename std::remove_const<Rhs>::type RhsNoConst;
         if (m_self.which() == m_rhs_which)
@@ -321,7 +321,7 @@ namespace TransLucid
 
       template <typename T>
       void
-      operator()(T& t)
+      operator()(T& t) const
       {
         t.~T();
       }
@@ -420,13 +420,15 @@ namespace TransLucid
 
     Variant(const Variant& rhs)
     {
-      rhs.apply_visitor_internal(constructor(*this));
+      constructor c(*this);
+      rhs.apply_visitor_internal(c);
       indicate_which(rhs.which());
     }
 
     Variant(Variant&& rhs)
     {
-      rhs.apply_visitor_internal(move_constructor(*this));
+      move_constructor mc(*this);
+      rhs.apply_visitor_internal(mc);
       indicate_which(rhs.which());
     }
 
@@ -434,7 +436,8 @@ namespace TransLucid
     {
       if (this != &rhs)
       {
-        rhs.apply_visitor_internal(assigner(*this, rhs.which()));
+        assigner a(*this, rhs.which());
+        rhs.apply_visitor_internal(a);
         indicate_which(rhs.which());
       }
       return *this;
@@ -444,7 +447,8 @@ namespace TransLucid
     {
       if (this != &rhs)
       {
-        rhs.apply_visitor_internal(move_assigner(*this, rhs.which()));
+        move_assigner ma(*this, rhs.which());
+        rhs.apply_visitor_internal(ma);
         indicate_which(rhs.which());
       }
       return *this;
@@ -454,7 +458,7 @@ namespace TransLucid
 
     template <typename Visitor, typename Internal = false_>
     typename Visitor::result_type
-    apply_visitor(Visitor visitor)
+    apply_visitor(Visitor& visitor)
     {
       return detail::visit_impl<Internal, Visitor, void*, First, Types...>(
         visitor, m_which, 0, m_storage);
@@ -462,7 +466,7 @@ namespace TransLucid
 
     template <typename Visitor, typename Internal = false_>
     typename Visitor::result_type
-    apply_visitor(Visitor visitor) const
+    apply_visitor(Visitor& visitor) const
     {
       return detail::visit_impl
         <
@@ -471,8 +475,7 @@ namespace TransLucid
           const void*, 
           First, 
           Types...
-        >(
-        visitor, m_which, 0, m_storage);
+        >(visitor, m_which, 0, m_storage);
     }
 
     private:
@@ -497,14 +500,14 @@ namespace TransLucid
 
     template <typename Visitor>
     typename Visitor::result_type
-    apply_visitor_internal(Visitor visitor)
+    apply_visitor_internal(Visitor& visitor)
     {
       return apply_visitor<Visitor, true_>(visitor);
     }
 
     template <typename Visitor>
     typename Visitor::result_type
-    apply_visitor_internal(Visitor visitor) const
+    apply_visitor_internal(Visitor& visitor) const
     {
       return apply_visitor<Visitor, true_>(visitor);
     }
@@ -512,7 +515,8 @@ namespace TransLucid
     void
     destroy()
     {
-      apply_visitor_internal(destroyer());
+      destroyer d;
+      apply_visitor_internal(d);
     }
 
     template <typename T>
@@ -552,25 +556,39 @@ namespace TransLucid
     }
   };
 
+  template <typename Visitor, typename Visitable>
+  typename Visitor::result_type
+  apply_visitor(Visitor& visitor, Visitable& visitable)
+  {
+    return visitable.apply_visitor(visitor);
+  }
+
+  template <typename Visitor, typename Visitable>
+  typename Visitor::result_type
+  apply_visitor(const Visitor& visitor, Visitable& visitable)
+  {
+    return visitable.apply_visitor(visitor);
+  }
+
   template <typename T, typename First, typename... Types>
   T*
   get(Variant<First, Types...>* var)
   {
-    return var->apply_visitor(get_visitor<T>());
+    return apply_visitor(get_visitor<T>(), *var);
   }
 
   template <typename T, typename First, typename... Types>
   const T*
   get(const Variant<First, Types...>* var)
   {
-    return var->apply_visitor(get_visitor<const T>());
+    return apply_visitor(get_visitor<const T>(), *var);
   }
 
   template <typename T, typename First, typename... Types>
   T&
   get (Variant<First, Types...>& var)
   {
-    T* t = var.apply_visitor(get_visitor<T>());
+    T* t = apply_visitor(get_visitor<T>(), var);
     if (t == nullptr){throw bad_get();}
 
     return *t;
@@ -580,9 +598,10 @@ namespace TransLucid
   const T&
   get (const Variant<First, Types...>& var)
   {
-    const T* t = var.apply_visitor(get_visitor<const T>());
+    const T* t = apply_visitor(get_visitor<const T>(), var);
     if (t == nullptr) {throw bad_get();}
 
     return *t;
   }
+
 }

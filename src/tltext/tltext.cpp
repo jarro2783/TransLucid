@@ -303,7 +303,7 @@ TLText::processExpressions(LineTokenizer& tokenizer)
         {
           if (m_verbose)
           {
-            (*m_os) << print_expr_tree(expr.second) << std::endl;
+            (*m_os) << print_expr_tree_new(expr.second) << std::endl;
           }
           exprs.push_back(expr.second);
         }
