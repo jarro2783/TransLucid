@@ -10,6 +10,14 @@ namespace TransLucid
 
 class TreePrinterNew
 {
+  public:
+
+  //you should only ever use this class through here
+  //everything else needs to be public so that the visitor works,
+  //but DO NOT use the visitor directly
+  //I cannot be responsible for what happens if you do
+  std::string printTree(const TreeNew::Expr& e);
+
   private:
   std::ostringstream m_os;
 
@@ -41,12 +49,12 @@ class TreePrinterNew
   class ExprPrecedence
   {
     public:
-    ExprPrecedence(int a)
+    ExprPrecedence(Precedence a)
     : m_a(a), m_b(0)
     {
     }
 
-    ExprPrecedence(int a, const mpz_class& b)
+    ExprPrecedence(Precedence a, const mpz_class& b)
     : m_a(a), m_b(b)
     {
     }
@@ -58,7 +66,7 @@ class TreePrinterNew
     }
 
     private:
-    int m_a;
+    Precedence m_a;
 
     //this allows an infinite number of precedences inside the same
     //m_a precedence
@@ -72,6 +80,66 @@ class TreePrinterNew
   std::stack<ExprPrecedence> m_precedence;
   std::stack<Assoc> m_assoc;
   std::stack<Subtree> m_subtree;
+
+  void
+  parenPush(ExprPrecedence p, Assoc a, Subtree s)
+  {
+    m_precedence.push(p);
+    m_assoc.push(a);
+    m_subtree.push(s);
+  }
+
+  void 
+  parenPop()
+  {
+    m_precedence.pop();
+    m_assoc.pop();
+    m_subtree.pop();
+  }
+
+  void
+  do_paren_print
+  (
+    const ExprPrecedence& parent,
+    const ExprPrecedence& mine,
+    Assoc assoc,
+    Subtree sub,
+    char paren
+  )
+  {
+    #ifdef DEBUG
+    m_os << paren;
+    #else
+    if (mine < parent)
+    {
+      m_os << paren;
+    }
+    else if (!(parent < mine))
+    {
+      //they must be equal
+      //print if different subtrees
+      if (assoc == Assoc::LEFT && sub == Subtree::RIGHT)
+      {
+        m_os << paren;
+      }
+      else if (assoc == Assoc::RIGHT && sub == Subtree::LEFT)
+      {
+        m_os << paren;
+      }
+      else if (assoc == Assoc::NON && sub != Subtree::NONE)
+      {
+        m_os << paren;
+      }
+    }
+    #endif
+  }
+
+  void
+  pp(char c, const ExprPrecedence& mine)
+  {
+    do_paren_print(m_precedence.top(), 
+      mine, m_assoc.top(), m_subtree.top(), c);
+  }
 
   public:
   typedef void result_type;
@@ -97,6 +165,12 @@ class TreePrinterNew
   void
   operator()(Special s)
   {
+  }
+
+  void
+  operator()(const mpz_class& z)
+  {
+    m_os << z;
   }
 
   void
@@ -154,10 +228,91 @@ class TreePrinterNew
   void
   operator()(const TreeNew::UnaryOpExpr& u)
   {
+    Precedence precedence;
+    Assoc assoc;
+    Subtree subtree;
+    if (u.op.type == TreeNew::UNARY_PREFIX)
+    {
+      precedence = Precedence::PREFIX_FN;
+      assoc = Assoc::RIGHT;
+      subtree = Subtree::RIGHT;
+
+      m_os << u.op.symbol;
+    }
+    else
+    {
+      precedence = Precedence::POSTFIX_FN;
+      assoc = Assoc::LEFT;
+      subtree = Subtree::LEFT;
+    }
+
+    pp('(', precedence);
+    parenPush(precedence, assoc, subtree);
+
+    apply_visitor(*this, u.e);
+
+    parenPop();
+    pp(')', precedence);
+
+    if (u.op.type == TreeNew::UNARY_POSTFIX)
+    {
+      m_os << u.op.symbol;
+    }
+  }
+
+  ExprPrecedence
+  build_binop_precedence(const TreeNew::BinaryOpExpr& binop) const
+  {
+    return ExprPrecedence(Precedence::BINARY_FN, binop.op.precedence);
+  }
+
+  Assoc
+  binop_assoc(const TreeNew::BinaryOpExpr& binop) const
+  {
+    Assoc a = Assoc::NON;
+
+    switch(binop.op.assoc)
+    {
+      case Tree::ASSOC_LEFT:
+      a = Assoc::LEFT;
+      break;
+
+      case Tree::ASSOC_RIGHT:
+      a = Assoc::RIGHT;
+      break;
+
+      case Tree::ASSOC_NON:
+      a = Assoc::NON;
+      break;
+
+      default:
+      break;
+    }
+
+    return a;
   }
 
   void
   operator()(const TreeNew::BinaryOpExpr& u)
+  {
+    auto prec = build_binop_precedence(u);
+    auto assoc = binop_assoc(u);
+
+    pp('(', prec);
+    parenPush(prec, assoc, Subtree::LEFT);
+    apply_visitor(*this, u.lhs);
+    parenPop();
+
+    m_os << " " << u.op.symbol << " ";
+
+    parenPush(prec, assoc, Subtree::RIGHT);
+    apply_visitor(*this, u.rhs);
+    parenPop();
+    pp(')', prec);
+  }
+
+  void
+  operator()(const TreeNew::IfExpr& ife)
   {
   }
 };
@@ -168,8 +323,17 @@ std::string print_expr_tree_new(const Tree::Expr& expr)
   TreeNew::Expr newe = boost::apply_visitor(convert, expr);
 
   TreePrinterNew print;
-  newe.apply_visitor(print);
-  return print.get_string();
+  return print.printTree(newe);
+}
+
+std::string 
+TreePrinterNew::printTree(const TreeNew::Expr& e)
+{
+  m_os.clear();
+  parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
+  apply_visitor(*this, e);
+  parenPop();
+  return m_os.str();
 }
 
 }
