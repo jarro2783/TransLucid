@@ -6,6 +6,7 @@ namespace TransLucid
 
 class TreePrinterNew
 {
+  public:
   typedef std::string result_type;
 
   template <typename T>
@@ -15,9 +16,13 @@ class TreePrinterNew
   }
 };
 
-std::string print_expr_tree_new(const TreeNew::Expr& expr)
+std::string print_expr_tree_new(const Tree::Expr& expr)
 {
-  
+  TreeOldToNew convert;
+  TreeNew::Expr newe = boost::apply_visitor(convert, expr);
+
+  TreePrinterNew print;
+  return newe.apply_visitor(print);
 }
 
 }
