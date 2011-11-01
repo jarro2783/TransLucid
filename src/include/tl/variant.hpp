@@ -120,73 +120,6 @@ namespace TransLucid
 
   namespace detail
   {
-    //none of what is left in Types should be convertible to Wanted
-    template <size_t N, typename Wanted, typename... Types>
-    struct none_convertible;
-
-    template <size_t N, typename Wanted, typename Next, typename... Types>
-    struct none_convertible<N, Wanted, Next, Types...>
-    {
-      private:
-      //if you get an error here it means that a type that your variant was
-      //constructed with is not unambiguously convertible to one of the 
-      //types in the variant
-      typedef 
-      std::enable_if
-      <
-        !std::is_convertible<Wanted, Next>::value,
-        none_convertible<N, Wanted, Types...>
-      > m_next;
-
-      static_assert(!std::is_convertible<Wanted, Next>::value,
-        "Type is not unambiguously convertible");
-
-      public:
-      static constexpr size_t value = m_next::type::value;
-      typedef typename m_next::type::type type;
-    };
-
-    template <size_t N, typename Wanted>
-    struct none_convertible<N, Wanted>
-    {
-      typedef Wanted type;
-      static constexpr size_t value = N;
-    };
-
-    template <size_t N, typename Wanted, typename... Types>
-    struct find_convertible;
-
-    template <size_t N, typename Wanted, typename Current, typename... Types>
-    struct find_convertible<N, Wanted, Current, Types...>
-    {
-      typedef
-        typename std::conditional
-        <
-          std::is_convertible<Wanted, Current>::value,
-          none_convertible<N, Current, Types...>,
-          find_convertible<N+1, Wanted, Types...>
-        >::type our_type;
-      static constexpr size_t value = our_type::value;
-      typedef typename our_type::type type;
-    };
-
-    #if 0
-    template <size_t N, typename Wanted>
-    struct find_convertible<N, Wanted>
-    {
-      static constexpr size_t value = N;
-    };
-    #endif
-
-    //determines which out of Types... Wanted is convertible to
-    template <typename Wanted, typename... Types>
-    struct get_which
-    {
-      typedef find_convertible<0, Wanted, Types...> our_type;
-      static constexpr size_t value = our_type::value;
-      typedef typename our_type::type type;
-    };
-
     template <typename T, typename Internal>
     T&
     get_value(T& t, const Internal&)
@@ -391,6 +324,38 @@ namespace TransLucid
       }
     };
 
+    template <size_t Which, typename... MyTypes>
+    struct initialiser;
+
+    template <size_t Which, typename Current, typename... MyTypes>
+    struct initialiser<Which, Current, MyTypes...> 
+      : public initialiser<Which+1, MyTypes...>
+    {
+      typedef initialiser<Which+1, MyTypes...> base;
+      using base::initialise;
+
+      static void 
+      initialise(Variant& v, Current&& current)
+      {
+        v.construct(std::forward<Current>(current));
+        v.indicate_which(Which);
+      }
+
+      static void
+      initialise(Variant& v, const Current& current)
+      {
+        v.construct(current);
+        v.indicate_which(Which);
+      }
+    };
+
+    template <size_t Which>
+    struct initialiser<Which>
+    {
+      //this should never match
+      void initialise();
+    };
+
     public:
 
     Variant()
@@ -432,11 +397,14 @@ namespace TransLucid
 
       //compile error here means that T is not unambiguously convertible to
       //any of the types in (First, Types...)
+      #if 0
       typedef typename std::remove_reference<T>::type type;
       typedef detail::get_which<type, First, Types...> which_type;
 
       indicate_which(which_type::value);
       construct(typename which_type::type(std::forward<T>(t)));
+      #endif
+      initialiser<0, First, Types...>::initialise(*this, std::forward<T>(t));
     }
 
     #if 0
