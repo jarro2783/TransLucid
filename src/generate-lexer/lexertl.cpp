@@ -27,7 +27,7 @@ namespace TransLucid
 {
   namespace Lexertl
   {
-    class Lexer
+    class GenerateLexer
     {
       typedef lexertl::basic_rules<char32_t> lexrules;
       lexrules m_rules;
@@ -38,7 +38,7 @@ namespace TransLucid
       typedef lexertl::basic_generator<lexrules, lexstate> generator;
 
       public:
-      Lexer()
+      GenerateLexer()
       {
         //macros
         //m_rules.add_macro(U"IDENT", U"[A-Za-z][_A-Za-z0-9]*");
@@ -116,11 +116,11 @@ namespace TransLucid
           false, std::cout);
       }
     };
-
-    void
-    make_lexer()
-    {
-      Lexer lex;
-    }
   }
+}
+
+int main()
+{
+  TransLucid::Lexertl::GenerateLexer lex;
+  return 0;
 }

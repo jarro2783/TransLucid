@@ -70,7 +70,15 @@ namespace TransLucid
       TOKEN_WHERE
     };
 
-    void
-    make_lexer();
+    class Lexer
+    {
+      public:
+      Lexer()
+      {
+      }
+
+      private:
+      //lexertl::basic_match_result<position_iter, int> results;
+    };
   }
 }

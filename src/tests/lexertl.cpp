@@ -21,6 +21,5 @@ along with TransLucid; see the file COPYING.  If not see
 
 int main()
 {
-  TransLucid::Lexertl::make_lexer();
   return 0;
 }
