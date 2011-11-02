@@ -25,7 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  namespace Lexertl
+  namespace Parser
   {
     class GenerateLexer
     {
@@ -121,6 +121,6 @@ namespace TransLucid
 
 int main()
 {
-  TransLucid::Lexertl::GenerateLexer lex;
+  TransLucid::Parser::GenerateLexer lex;
   return 0;
 }

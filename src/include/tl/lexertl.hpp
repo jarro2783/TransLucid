@@ -19,7 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  namespace Lexertl
+  namespace Parser
   {
     enum Token
     {
@@ -76,6 +76,10 @@ namespace TransLucid
       Lexer()
       {
       }
+
+      //get the next token
+      void
+      next();
 
       private:
       //lexertl::basic_match_result<position_iter, int> results;

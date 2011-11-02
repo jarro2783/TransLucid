@@ -756,6 +756,10 @@ namespace TransLucid
       return UTF32Iterator<T>(iter);
     }
 
+    class PositionIterator
+    {
+    };
+
   } //namespace Parser
 } //namespace TransLucid
 
