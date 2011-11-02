@@ -112,8 +112,8 @@ namespace TransLucid
         generator::build(m_rules, m_state_machine);
         m_state_machine.minimise();
 
-        lexertl::table_based_cpp::generate_cpp("tllexer", m_state_machine, 
-          false, std::cout);
+        lexertl::table_based_cpp::generate_cpp("translucid_lex", 
+          m_state_machine, false, std::cout);
       }
     };
   }

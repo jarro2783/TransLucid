@@ -17,6 +17,12 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+//#include <cstring>
+#include "lexertl/lookup.hpp"
+#include <tl/parser_iterator.hpp>
+#include <tl/variant.hpp>
+#include <gmpxx.h>
+
 namespace TransLucid
 {
   namespace Parser
@@ -73,16 +79,21 @@ namespace TransLucid
     class Lexer
     {
       public:
+      typedef Variant
+      <
+        mpz_class
+      > TokenValue;
+
       Lexer()
       {
       }
 
       //get the next token
-      void
+      std::pair<Token, TokenValue>
       next();
 
       private:
-      //lexertl::basic_match_result<position_iter, int> results;
+      lexertl::basic_match_results<PositionIterator, int> results;
     };
   }
 }

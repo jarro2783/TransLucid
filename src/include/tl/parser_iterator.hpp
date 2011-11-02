@@ -756,8 +756,10 @@ namespace TransLucid
       return UTF32Iterator<T>(iter);
     }
 
-    class PositionIterator
+    class PositionIterator : 
+      public std::iterator<std::bidirectional_iterator_tag, char32_t>
     {
+      public:
     };
 
   } //namespace Parser
