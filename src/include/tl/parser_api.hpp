@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define PARSER_API_HPP_INCLUDED
 
 #include <tl/ast.hpp>
+#include <tl/ast-new.hpp>
 #include <tl/types.hpp>
 
 namespace TransLucid
@@ -99,6 +100,16 @@ namespace TransLucid
      */
     std::string
     printEquation(const Equation& e);
+
+    std::string
+    printEquationNew(
+      const std::tuple
+      <
+        u32string, 
+        TreeNew::Expr, 
+        TreeNew::Expr, 
+        TreeNew::Expr
+      >& e);
 
     class Header;
 

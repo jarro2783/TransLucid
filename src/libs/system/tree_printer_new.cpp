@@ -1,6 +1,7 @@
 #include <tl/tree_printer.hpp>
 #include <tl/tree_old_to_new.hpp>
 #include <tl/output.hpp>
+#include <tl/parser_api.hpp>
 
 #include <sstream>
 #include <stack>
@@ -16,6 +17,7 @@ class TreePrinterNew
   //everything else needs to be public so that the visitor works,
   //but DO NOT use the visitor directly
   //I cannot be responsible for what happens if you do
+  //of course since this class is only used internall, you knew all that right
   std::string printTree(const TreeNew::Expr& e);
 
   private:
@@ -340,16 +342,147 @@ class TreePrinterNew
   void
   operator()(const TreeNew::HashExpr& h)
   {
+    m_os << "#!";
+
+    parenPush(Precedence::FN_APP, Assoc::LEFT, Subtree::RIGHT);
+
+    apply_visitor(*this, h.e);
+
+    parenPop();
+  }
+
+  template <typename Pair>
+  void
+  print_tuple_pair(const Pair& p)
+  {
+    apply_visitor(*this, p.first);
+    m_os << " : ";
+    apply_visitor(*this, p.second);
+  }
+
+  void
+  operator()(const TreeNew::TupleExpr& t)
+  {
+    parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
+    m_os << "[";
+
+    auto iter = t.pairs.begin();
+    if (iter != t.pairs.end())
+    {
+      print_tuple_pair(*iter);
+    }
+
+    while (iter != t.pairs.end())
+    {
+      m_os << ", ";
+      print_tuple_pair(*iter);
+      ++iter;
+    }
+    m_os << "]";
+    parenPop();
+  }
+
+  void
+  operator()(const TreeNew::AtExpr& a)
+  {
+    pp('(', Precedence::FN_APP);
+    parenPush(Precedence::FN_APP, Assoc::LEFT, Subtree::LEFT);
+    apply_visitor(*this, a.lhs);
+    parenPop();
+
+    m_os << " @ ";
+
+    parenPush(Precedence::FN_APP, Assoc::LEFT, Subtree::RIGHT);
+    apply_visitor(*this, a.rhs);
+    parenPop();
+    pp(')', Precedence::FN_APP);
+  }
+
+  template <typename Fn>
+  void
+  print_fn_abstraction(const Fn& f, const u32string& symbol)
+  {
+    pp('(', Precedence::FN_ABSTRACTION);
+    m_os << symbol << f.name << " -> ";
+    parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
+    apply_visitor(*this, f.rhs);
+    parenPop();
+    pp(')', Precedence::FN_ABSTRACTION);
+  }
+
+  void
+  operator()(const TreeNew::LambdaExpr& l)
+  {
+    print_fn_abstraction(l, U"\\");
+  }
+
+  void
+  operator()(const TreeNew::PhiExpr& p)
+  {
+    print_fn_abstraction(p, U"\\\\");
+  }
+
+  template <typename App>
+  void
+  print_fn_application(const App& a, char separator)
+  {
+    pp('(', Precedence::FN_APP);
+
+    parenPush(Precedence::FN_APP, Assoc::LEFT, Subtree::LEFT);
+    apply_visitor(*this, a.lhs);
+    parenPop();
+
+    m_os << separator;
+
+    parenPush(Precedence::FN_APP, Assoc::LEFT, Subtree::RIGHT);
+    apply_visitor(*this, a.rhs);
+    parenPop();
+
+    pp(')', Precedence::FN_APP);
+  }
+
+  void
+  operator()(const TreeNew::LambdaAppExpr& l)
+  {
+    print_fn_application(l, '.');
+  }
+
+  void
+  operator()(const TreeNew::PhiAppExpr& l)
+  {
+    print_fn_application(l, ' ');
+  }
+
+  void
+  operator()(const TreeNew::WhereExpr& w)
+  {
+    pp('(', Precedence::WHERE_CLAUSE);
+
+    apply_visitor(*this, w.e);
+
+    m_os << " where" << std::endl;
+
+    for (const auto& v : w.vars)
+    {
+      std::string var = Parser::printEquationNew(v);
+    }
+
+    pp(')', Precedence::WHERE_CLAUSE);
   }
 };
+
+std::string print_expr_tree_new(const TreeNew::Expr& expr)
+{
+  TreePrinterNew print;
+  return print.printTree(expr);
+}
 
 std::string print_expr_tree_new(const Tree::Expr& expr)
 {
   TreeOldToNew convert;
   TreeNew::Expr newe = boost::apply_visitor(convert, expr);
 
-  TreePrinterNew print;
-  return print.printTree(newe);
+  return print_expr_tree_new(newe);
 }
 
 std::string 

@@ -1,3 +1,4 @@
+#if 0
 /* Prints a Tree::Expr
    Copyright (C) 2011 Jarryd Beck and John Plaice
 
@@ -810,3 +811,4 @@ namespace TransLucid
     return generated;
   }
 }
+#endif
