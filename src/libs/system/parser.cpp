@@ -73,20 +73,20 @@ printEquation(const Equation& e)
   const Tree::Expr& guard = std::get<1>(e);
   if (boost::get<Tree::nil>(&guard) == 0)
   {
-    generated = print_expr_tree_new(guard);
+    generated = print_expr_tree(guard);
     result += " " + generated;
   }
 
   const Tree::Expr& boolean = std::get<2>(e);
   if (boost::get<Tree::nil>(&boolean) == 0)
   {
-    generated = print_expr_tree_new(boolean);
+    generated = print_expr_tree(boolean);
     result += " | " + generated;
   }
 
   result += " = ";
 
-  generated = print_expr_tree_new(std::get<3>(e));
+  generated = print_expr_tree(std::get<3>(e));
   result += generated;
 
   return result;
@@ -109,20 +109,20 @@ printEquationNew(
   const TreeNew::Expr& guard = std::get<1>(e);
   if (get<TreeNew::nil>(&guard) == 0)
   {
-    generated = print_expr_tree_new(guard);
+    generated = print_expr_tree(guard);
     result += " " + generated;
   }
 
   const TreeNew::Expr& boolean = std::get<2>(e);
   if (get<TreeNew::nil>(&boolean) == 0)
   {
-    generated = print_expr_tree_new(boolean);
+    generated = print_expr_tree(boolean);
     result += " | " + generated;
   }
 
   result += " = ";
 
-  generated = print_expr_tree_new(std::get<3>(e));
+  generated = print_expr_tree(std::get<3>(e));
   result += generated;
 
   return result;
