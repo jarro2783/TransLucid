@@ -18,10 +18,13 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 /**
- * @file system.hpp
+ * @file variant.hpp
  * A tagged union. This effectively has the same functionality as
  * boost::variant, but replaces it with C++11 features.
  */
+
+#ifndef TL_VARIANT_HPP_INCLUDED
+#define TL_VARIANT_HPP_INCLUDED
 
 #include <cassert>
 #include <functional>
@@ -605,3 +608,5 @@ namespace TransLucid
   }
 
 }
+
+#endif

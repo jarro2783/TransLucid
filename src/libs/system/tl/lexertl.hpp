@@ -17,63 +17,32 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-//#include <cstring>
 #include "lexertl/lookup.hpp"
 #include <tl/parser_iterator.hpp>
 #include <tl/variant.hpp>
 #include <gmpxx.h>
+#include "tl/lexer_tokens.hpp"
 
 namespace TransLucid
 {
   namespace Parser
   {
-    enum Token
+    class Position
     {
-      TOKEN_AND = 1,
-      TOKEN_ASSIGN, //assign
-      TOKEN_ASSIGNTO, //:=
-      TOKEN_AT,
-      TOKEN_BANG,
-      TOKEN_CONSTANT_RAW,
-      TOKEN_CONSTANT_INTERPRETED,
-      TOKEN_COLON,
-      TOKEN_COMMA,
-      TOKEN_DBLPERCENT,
-      TOKEN_DBLSEMI,
-      TOKEN_DBLSLASH,
-      TOKEN_DIM,
-      TOKEN_DOLLAR,
-      TOKEN_DOT,
-      TOKEN_ELSE,
-      TOKEN_ELSIF,
-      TOKEN_END,
-      TOKEN_EQUALS,
-      TOKEN_FALSE,
-      TOKEN_FI,
-      TOKEN_HASH,
-      TOKEN_IF,
-      TOKEN_ID,
-      TOKEN_IN,
-      TOKEN_INFIXBIN,
-      TOKEN_INTEGER,
-      TOKEN_LARROW,
-      TOKEN_LBRACE,
-      TOKEN_LPAREN,
-      TOKEN_LSQUARE,
-      TOKEN_OUT,
-      TOKEN_PIPE,
-      TOKEN_RANGE,
-      TOKEN_RARROW,
-      TOKEN_RBRACE,
-      TOKEN_RPAREN,
-      TOKEN_RSQUARE,
-      TOKEN_SLASH,
-      TOKEN_THEN,
-      TOKEN_TRUE,
-      TOKEN_UCHAR,
-      TOKEN_UNARY,
-      TOKEN_VAR,
-      TOKEN_WHERE
+      u32string m_file;
+      int m_line;
+      int m_character;
+
+      U32Iterator m_begin;
+      U32Iterator m_end;
+    };
+
+    class Token
+    {
+      public:
+
+      private:
+      Position m_pos;
     };
 
     class Lexer
