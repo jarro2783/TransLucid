@@ -1,5 +1,5 @@
 // parser.hpp
-// Copyright (c) 2005-2010 Ben Hanson (http://www.benhanson.net/)
+// Copyright (c) 2005-2011 Ben Hanson (http://www.benhanson.net/)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file licence_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -96,13 +96,11 @@ public:
 
         _token_stack->push (static_cast<token *>(0));
         _token_stack->top () = rhs_token_.release ();
-        // VC++ 6 hack
         rhs_token_.reset (new token);
         tokeniser::next (re_state_, rhs_token_.get ());
 
         do
         {
-            // VC++ 6 hack:
             lhs_token_ = _token_stack->top ();
             action_ = lhs_token_->precedence (rhs_token_->_type);
 
@@ -112,7 +110,6 @@ public:
             case '=':
                 _token_stack->push (static_cast<token *>(0));
                 _token_stack->top () = rhs_token_.release ();
-                // VC++ 6 hack:
                 rhs_token_.reset (new token);
                 tokeniser::next (re_state_, rhs_token_.get ());
                 break;

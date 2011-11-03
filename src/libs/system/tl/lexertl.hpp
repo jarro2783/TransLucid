@@ -79,21 +79,26 @@ namespace TransLucid
     class Lexer
     {
       public:
+      struct nil {};
+
       typedef Variant
       <
-        mpz_class
+        nil,
+        char32_t,
+        u32string,
+        mpz_class,
+        std::pair<u32string, u32string>
       > TokenValue;
 
-      Lexer()
-      {
-      }
+      Lexer();
 
       //get the next token
       std::pair<Token, TokenValue>
       next();
 
       private:
-      lexertl::basic_match_results<PositionIterator, int> results;
+      typedef PositionIterator<U32Iterator> iterator;
+      lexertl::basic_match_results<iterator, size_t> results;
     };
   }
 }

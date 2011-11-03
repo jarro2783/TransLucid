@@ -1,5 +1,5 @@
 // equivset.hpp
-// Copyright (c) 2005-2010 Ben Hanson (http://www.benhanson.net/)
+// Copyright (c) 2005-2011 Ben Hanson (http://www.benhanson.net/)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file licence_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,29 +24,23 @@ struct basic_equivset
     typedef std::vector<node *> node_vector;
 
     index_vector _index_vector;
-    bool _greedy;
     id_type _id;
+    bool _greedy;
     node_vector _followpos;
 
     basic_equivset () :
-        _greedy (true),
-        _id (0)
+        _id (0),
+        _greedy (true)
     {
     }
 
-   basic_equivset (const index_set &index_set_, const bool greedy_,
-        const id_type id_, const node_vector &followpos_) :
-        _greedy (greedy_),
+    basic_equivset (const index_set &index_set_, const id_type id_,
+        const bool greedy_, const node_vector &followpos_) :
+        _index_vector (index_set_.begin (), index_set_.end ()),
         _id (id_),
+        _greedy (greedy_),
         _followpos (followpos_)
     {
-        typename index_set::const_iterator iter_ = index_set_.begin ();
-        typename index_set::const_iterator end_ = index_set_.end ();
-
-        for (; iter_ != end_; ++iter_)
-        {
-            _index_vector.push_back (*iter_);
-        }
     }
 
     bool empty () const

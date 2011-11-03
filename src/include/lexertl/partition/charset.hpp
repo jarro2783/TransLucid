@@ -1,5 +1,5 @@
 // charset.hpp
-// Copyright (c) 2005-2010 Ben Hanson (http://www.benhanson.net/)
+// Copyright (c) 2005-2011 Ben Hanson (http://www.benhanson.net/)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file licence_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,8 @@
 #ifndef LEXERTL_CHARSET_HPP
 #define LEXERTL_CHARSET_HPP
 
+#include <algorithm>
+#include <iterator>
 #include <set>
 #include "../size_t.hpp"
 #include "../string_token.hpp"
@@ -45,21 +47,10 @@ struct basic_charset
 
         if (!overlap_._token.empty ())
         {
-            typename index_set::const_iterator iter_ = _index_set.begin ();
-            typename index_set::const_iterator end_ = _index_set.end ();
-
-            for (; iter_ != end_; ++iter_)
-            {
-                overlap_._index_set.insert (*iter_);
-            }
-
-            iter_ = rhs_._index_set.begin ();
-            end_ = rhs_._index_set.end ();
-
-            for (; iter_ != end_; ++iter_)
-            {
-                overlap_._index_set.insert (*iter_);
-            }
+            std::merge (_index_set.begin (), _index_set.end (),
+                rhs_._index_set.begin (), rhs_._index_set.end (),
+                std::inserter (overlap_._index_set,
+                overlap_._index_set.end ()));
 
             if (_token.empty ())
             {

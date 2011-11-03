@@ -756,6 +756,7 @@ namespace TransLucid
       return UTF32Iterator<T>(iter);
     }
 
+    template <typename T>
     class PositionIterator : 
       public std::iterator<std::bidirectional_iterator_tag, char32_t>
     {

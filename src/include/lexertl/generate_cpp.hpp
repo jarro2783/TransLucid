@@ -1,5 +1,5 @@
 // generate_cpp.hpp
-// Copyright (c) 2005-2009 Ben Hanson (http://www.benhanson.net/)
+// Copyright (c) 2005-2011 Ben Hanson (http://www.benhanson.net/)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file licence_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -312,29 +312,33 @@ public:
         os_ << "        if (*ptr_)\n";
         os_ << "        {\n";
         os_ << "            end_state_ = true;\n";
-        os_ << "            pop_ = (";
 
-        if (pointers_)
+        if (internals_._features & recursive_bit)
         {
-            // Done this way for GCC:
-            os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
+          os_ << "            pop_ = (";
+
+          if (pointers_)
+          {
+              // Done this way for GCC:
+              os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
+          }
+
+          os_ << "*ptr_";
+
+          if (pointers_)
+          {
+              os_ << ')';
+          }
+
+          os_ <<" & " << pop_dfa_bit;
+
+          if (pointers_)
+          {
+              os_ << ')';
+          }
+
+          os_ << ") != 0;\n";
         }
-
-        os_ << "*ptr_";
-
-        if (pointers_)
-        {
-            os_ << ')';
-        }
-
-        os_ <<" & " << pop_dfa_bit;
-
-        if (pointers_)
-        {
-            os_ << ')';
-        }
-        
-        os_ << ") != 0;\n";
         os_ << "            id_ = ";
 
         if (pointers_)
@@ -456,6 +460,33 @@ public:
             os_ << "            if (*ptr_)\n";
             os_ << "            {\n";
             os_ << "                end_state_ = true;\n";
+
+            if (internals_._features & recursive_bit)
+            {
+              os_ << "                pop_ = (";
+
+              if (pointers_)
+              {
+                  // Done this way for GCC:
+                  os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
+              }
+
+              os_ << "*ptr_";
+
+              if (pointers_)
+              {
+                  os_ << ')';
+              }
+
+              os_ <<" & " << pop_dfa_bit;
+
+              if (pointers_)
+              {
+                  os_ << ')';
+              }
+
+              os_ << ") != 0;\n";
+            }
             os_ << "                id_ = ";
 
             if (pointers_)
@@ -491,13 +522,22 @@ public:
 
             if (internals_._features & recursive_bit)
             {
-                os_ << "\n                if (push_dfa_ != "
-                    "results_.npos ())\n";
-                os_ << "                {\n";
-                os_ << "                    results_.stack.push (typename "
-                    "results::id_type_pair\n";
-                os_ << "                        (push_dfa_, id_));\n";
-                os_ << "                }\n\n";
+                os_ << "                push_dfa_ = ";
+
+                if (pointers_)
+                {
+                    // Done this way for GCC:
+                    os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
+                }
+
+                os_ << "*(ptr_ + " << push_dfa_index << ')';
+
+                if (pointers_)
+                {
+                    os_ << "))";
+                }
+
+                os_ << ";\n";
             }
 
             if (internals_._dfa->size () > 1)
@@ -518,16 +558,6 @@ public:
                 }
 
                 os_ << ";\n";
-            }
-
-            if (internals_._features & recursive_bit)
-            {
-                os_ << "\n                if (pop_)\n";
-                os_ << "                {\n";
-                os_ << "                    start_state_ = "
-                    "results_.stack.top ().first;\n";
-                os_ << "                    results_.stack.pop ();\n";
-                os_ << "                }\n\n";
             }
 
             if (internals_._features & bol_bit)
@@ -923,14 +953,15 @@ protected:
         if (!pointers_)
         {
             os_ << "\n            ";
+            output_tabs (additional_tabs_, os_);
         }
 
-        output_tabs (additional_tabs_, os_);
         os_ << "[static_cast<typename results::index_type>";
 
         if (pointers_)
         {
             os_ << "\n            ";
+            output_tabs (additional_tabs_, os_);
         }
 
         os_ << "(prev_char_)]]";

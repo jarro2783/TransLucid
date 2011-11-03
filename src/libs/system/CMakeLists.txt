@@ -3,8 +3,12 @@ if (COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 add_definitions(${TLCFLAGS} 
+  -I${CMAKE_CURRENT_BINARY_DIR}
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
 -Wall)
+
+add_custom_target(generate_static_lexer DEPENDS 
+  ${CMAKE_CURRENT_BINARY_DIR}/tl/static_lexer.hpp)
 
 set (SYSTEM_SOURCES
 ast.cpp ast-new.cpp bestfit.cpp builtin_types.cpp charset.cpp
@@ -13,7 +17,7 @@ equation.cpp equation_parser.cpp
 eval_workshops.cpp expr_parser.cpp header.cpp 
 hyperdatons/envhd.cpp
 hyperdatons/filehd.cpp
-internal_strings.cpp lexer.cpp lexer_util.cpp 
+internal_strings.cpp lexer.cpp lexertl.cpp lexer_util.cpp 
 library.cpp line_tokenizer.cpp parser.cpp
 range.cpp rename.cpp system.cpp translator.cpp tree_printer.cpp
 tree_to_wstree.cpp tuple_parser.cpp types.cpp utility.cpp uuid.cpp
@@ -21,6 +25,16 @@ workshop_builder.cpp
 )
 
 add_library(tlsystem SHARED ${SYSTEM_SOURCES})
+
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tl/static_lexer.hpp
+  COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/tl
+  COMMAND ${CMAKE_BINARY_DIR}/src/generate-lexer/generate-lexer >
+    ${CMAKE_CURRENT_BINARY_DIR}/tl/static_lexer.hpp
+  DEPENDS ${CMAKE_BINARY_DIR}/src/generate-lexer/generate-lexer
+  )
+
+add_dependencies(tlsystem generate_static_lexer)
 
 if (BUILD_STATIC_SYSTEM)
   add_library(tlsystem-static STATIC ${SYSTEM_SOURCES})

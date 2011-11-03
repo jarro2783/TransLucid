@@ -1,5 +1,5 @@
 // generator.hpp
-// Copyright (c) 2005-2010 Ben Hanson (http://www.benhanson.net/)
+// Copyright (c) 2005-2011 Ben Hanson (http://www.benhanson.net/)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file licence_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -427,22 +427,14 @@ protected:
                     {
                         delete *l_iter_;
                         *l_iter_ = overlap_.release ();
-
-                        // VC++ 6 Hack:
-                        charset_ptr temp_overlap_ (new charset);
-
-                        overlap_ = temp_overlap_;
+                        overlap_.reset (new charset);
                         ++iter_;
                     }
                     else if (r_->empty ())
                     {
                         delete r_.release ();
                         r_ = overlap_;
-
-                        // VC++ 6 Hack:
-                        charset_ptr temp_overlap_ (new charset);
-
-                        overlap_ = temp_overlap_;
+                        overlap_.reset (new charset);
                         break;
                     }
                     else
@@ -450,11 +442,7 @@ protected:
                         iter_ = lhs_->insert (++iter_,
                             static_cast<charset *>(0));
                         *iter_ = overlap_.release ();
-
-                        // VC++ 6 Hack:
-                        charset_ptr temp_overlap_ (new charset);
-
-                        overlap_ = temp_overlap_;
+                        overlap_.reset (new charset);
                         ++iter_;
                         end_ = lhs_->end ();
                     }
@@ -692,22 +680,14 @@ protected:
                     {
                         delete *l_iter_;
                         *l_iter_ = overlap_.release ();
-
-                        // VC++ 6 Hack:
-                        equivset_ptr temp_overlap_ (new equivset);
-
-                        overlap_ = temp_overlap_;
+                        overlap_.reset (new equivset);
                         ++iter_;
                     }
                     else if (r_->empty ())
                     {
                         delete r_.release ();
                         r_ = overlap_;
-
-                        // VC++ 6 Hack:
-                        equivset_ptr temp_overlap_ (new equivset);
-
-                        overlap_ = temp_overlap_;
+                        overlap_.reset (new equivset);
                         break;
                     }
                     else
@@ -715,11 +695,7 @@ protected:
                         iter_ = lhs_->insert (++iter_,
                             static_cast<equivset *>(0));
                         *iter_ = overlap_.release ();
-
-                        // VC++ 6 Hack:
-                        equivset_ptr temp_overlap_ (new equivset);
-
-                        overlap_ = temp_overlap_;
+                        overlap_.reset (new equivset);
                         ++iter_;
                         end_ = lhs_->end ();
                     }
@@ -761,12 +737,12 @@ protected:
 
                         index_set_.insert (token_);
                         list_->back () = new equivset (index_set_,
-                            node_->greedy (), token_, node_->followpos ());
+                            token_, node_->greedy (), node_->followpos ());
                     }
                     else
                     {
                         list_->back () = new equivset (set_mapping_[token_],
-                            node_->greedy (), token_, node_->followpos ());
+                            token_, node_->greedy (), node_->followpos ());
                     }
                 }
             }

@@ -1,5 +1,5 @@
 // string_token.hpp
-// Copyright (c) 2005-2010 Ben Hanson (http://www.benhanson.net/)
+// Copyright (c) 2005-2011 Ben Hanson (http://www.benhanson.net/)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file licence_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -83,9 +83,9 @@ struct basic_string_token
         return size_ > static_cast<std::size_t>(char_traits::max_val ()) / 2;
     }
 
-    void swap (basic_string_token &lhs_, basic_string_token &rhs_)
+    void swap (basic_string_token &rhs_)
     {
-        std::swap (lhs_._ranges, rhs_._ranges);
+        _ranges.swap (rhs_._ranges);
     }
 
     void insert (const basic_string_token &rhs_)
@@ -165,7 +165,7 @@ struct basic_string_token
             }
 
             // Code minimisation: this always applies unless we have already
-            // exited the loop, or continue executed.
+            // exited the loop, or "continue" executed.
             iter_ = _ranges.erase (iter_);
             end_ = _ranges.end ();
         }
@@ -210,7 +210,7 @@ struct basic_string_token
             temp_.insert (range (next_, max_));
         }
 
-        swap (*this, temp_);
+        swap (temp_);
     }
 
     void intersect (basic_string_token &rhs_, basic_string_token &overlap_)

@@ -1,5 +1,5 @@
 // tokeniser_state.hpp
-// Copyright (c) 2005-2010 Ben Hanson (http://www.benhanson.net/)
+// Copyright (c) 2005-2011 Ben Hanson (http://www.benhanson.net/)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file licence_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +21,7 @@ struct basic_re_tokeniser_state
 {
     typedef ch_type char_type;
     typedef typename basic_char_traits<char_type>::index_type index_type;
+
     const char_type * const _start;
     const char_type * const _end;
     const char_type *_curr;
@@ -55,7 +56,9 @@ struct basic_re_tokeniser_state
         _end = rhs_._end;
         _curr = rhs_._curr;
         _flags = rhs_._flags;
+        _flags_stack = rhs_._flags_stack;
         _locale = rhs_._locale;
+        _macro = rhs_._macro;
         _paren_count = rhs_._paren_count;
         _in_string = rhs_._in_string;
         _eol_id = rhs_._eol_id;
