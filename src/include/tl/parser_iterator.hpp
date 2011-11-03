@@ -762,7 +762,12 @@ namespace TransLucid
     {
       public:
       PositionIterator() = default;
-      PositionIterator(const T& iter) : m_iter(iter) {}
+      PositionIterator(const T& iter) 
+      : m_iter(iter), m_line(0), m_char(0) {}
+
+      PositionIterator(const T& iter, int line, int c) 
+      : m_iter(iter), m_line(line), m_char(c)
+      {}
 
       bool
       operator==(const PositionIterator& rhs) const
@@ -780,6 +785,18 @@ namespace TransLucid
       operator++()
       {
         ++m_iter;
+
+        char32_t c = *m_iter;
+        if (c == '\n')
+        {
+          m_char = 0;
+          ++m_line;
+        }
+        else
+        {
+          ++m_char;
+        }
+
         return *this;
       }
 
@@ -797,8 +814,23 @@ namespace TransLucid
         return *m_iter;
       }
 
+      int
+      getLine() const
+      {
+        return m_line;
+      }
+
+      int
+      getChar() const
+      {
+        return m_char;
+      }
+
       private:
       T m_iter;
+
+      int m_line;
+      int m_char;
     };
 
   } //namespace Parser

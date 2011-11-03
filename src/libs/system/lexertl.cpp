@@ -37,21 +37,41 @@ namespace
     public:
     ValueBuilder()
     {
+      for (int i = 0; i != TOKEN_LAST; ++i)
+      {
+        m_functions[i] = &buildEmpty;
+      }
+
+      m_functions[TOKEN_INTEGER] = &buildInteger;
     }
 
+    template <typename Begin>
     TokenValue
     operator()
     (
       size_t index, 
-      iterator begin,
+      Begin&& begin,
       const iterator& end
     )
     {
+      return (*m_functions[index])(std::forward<Begin>(begin), end);
     }
 
     private:
-    typedef iterator (*build_func)(iterator begin, const iterator& end);
+    typedef TokenValue (*build_func)(iterator begin, const iterator& end);
     build_func m_functions[TOKEN_LAST];
+
+    static TokenValue
+    buildEmpty(iterator begin, const iterator& end)
+    {
+      return nil();
+    }
+
+    static TokenValue
+    buildInteger(iterator begin, const iterator& end)
+    {
+    }
+
   };
 
   static ValueBuilder build_value;
