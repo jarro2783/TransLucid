@@ -62,12 +62,12 @@ namespace TransLucid
       Lexer();
 
       //get the next token
-      std::pair<Token, TokenValue>
+      Token
       next();
 
       private:
       typedef PositionIterator<U32Iterator> iterator;
-      lexertl::basic_match_results<iterator, size_t> results;
+      lexertl::basic_match_results<iterator, size_t> m_results;
     };
   }
 }

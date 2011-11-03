@@ -21,7 +21,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include "lexertl/generate_cpp.hpp"
 #include "lexertl/rules.hpp"
 #include "lexertl/state_machine.hpp"
-#include "tl/lexertl.hpp"
 #include "tl/lexer_tokens.hpp"
 
 namespace TransLucid
@@ -106,6 +105,7 @@ namespace TransLucid
         m_rules.add(U"var", TOKEN_VAR);
         m_rules.add(U"where(_{IDENT})?", TOKEN_WHERE);
         m_rules.add(U"([ \\r\\n\\t])|(\\/\\/([^\\n]*)\\n)", 200);
+        m_rules.add(UR"(\/\/[^\n]*\n)", m_state_machine.skip());
         //, spaces(U"[ \\n\\t]")
         //, binary_op_(U".", OpTokens::TOK_BINARY_OP)
         //, prefix_op_(U".", OpTokens::TOK_PREFIX_OP)

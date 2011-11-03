@@ -35,7 +35,8 @@ add_custom_command(
   DEPENDS ${CMAKE_BINARY_DIR}/src/generate-lexer/generate-lexer
   )
 
-add_dependencies(tlsystem generate_static_lexer)
+set_property(SOURCE lexertl.cpp APPEND PROPERTY OBJECT_DEPENDS
+  ${CMAKE_BINARY_DIR}/src/libs/system/tl/static_lexer.hpp)
 
 if (BUILD_STATIC_SYSTEM)
   add_library(tlsystem-static STATIC ${SYSTEM_SOURCES})

@@ -178,22 +178,26 @@ public:
         }
 
         os_ << ";\n";
-        os_ << "    id_type push_dfa_ = ";
 
-        if (pointers_)
+        if (internals_._features & recursive_bit)
         {
-            // Done this way for GCC:
-            os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
+          os_ << "    id_type push_dfa_ = ";
+
+          if (pointers_)
+          {
+              // Done this way for GCC:
+              os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
+          }
+
+          os_ << "*(ptr_ + " << push_dfa_index << ")";
+
+          if (pointers_)
+          {
+              os_ << "))";
+          }
+
+          os_ << ";\n";
         }
-
-        os_ << "*(ptr_ + " << push_dfa_index << ")";
-
-        if (pointers_)
-        {
-            os_ << "))";
-        }
-
-        os_ << ";\n";
 
         if (internals_._dfa->size () > 1)
         {
@@ -900,13 +904,13 @@ protected:
         else
         {
             // We want numbers regardless of id_type.
-            os_ << static_cast<std::size_t>(*ptr_++);
+            os_ << static_cast<std::size_t>(*ptr_++) << "U";
 
             for (id_type alphabet_ = 1; alphabet_ < dfa_alphabet_;
                 ++alphabet_, ++ptr_)
             {
                 // We want numbers regardless of id_type.
-                os_ << ", " << static_cast<std::size_t>(*ptr_);
+                os_ << ", " << static_cast<std::size_t>(*ptr_) << "U";
             }
         }
     }

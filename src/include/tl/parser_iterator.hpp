@@ -761,6 +761,44 @@ namespace TransLucid
       public std::iterator<std::bidirectional_iterator_tag, char32_t>
     {
       public:
+      PositionIterator() = default;
+      PositionIterator(const T& iter) : m_iter(iter) {}
+
+      bool
+      operator==(const PositionIterator& rhs) const
+      {
+        return m_iter == rhs.m_iter;
+      }
+
+      bool 
+      operator!=(const PositionIterator& rhs) const
+      {
+        return !(*this == rhs);
+      }
+
+      PositionIterator&
+      operator++()
+      {
+        ++m_iter;
+        return *this;
+      }
+
+      PositionIterator
+      operator++(int)
+      {
+        PositionIterator old(*this);
+        ++(*this);
+        return old;
+      }
+
+      char32_t
+      operator*()
+      {
+        return *m_iter;
+      }
+
+      private:
+      T m_iter;
     };
 
   } //namespace Parser

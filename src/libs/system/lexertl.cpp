@@ -19,7 +19,24 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "lexertl/lookup.hpp"
 #include "tl/static_lexer.hpp"
+#include "tl/lexertl.hpp"
 
 namespace TransLucid
 {
+
+namespace Parser
+{
+
+Lexer::Lexer()
+{
+}
+
+Token
+Lexer::next()
+{
+  translucid_lex(m_results);
+}
+
+}
+
 }
