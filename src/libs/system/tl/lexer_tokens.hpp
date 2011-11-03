@@ -26,7 +26,8 @@ namespace TransLucid
   {
     enum TokenType
     {
-      TOKEN_AND = 1,
+      TOKEN_FIRST, //a nothing token, indicates the first
+      TOKEN_AND,
       TOKEN_ASSIGN, //assign
       TOKEN_ASSIGNTO, //:=
       TOKEN_AT,
@@ -70,7 +71,8 @@ namespace TransLucid
       TOKEN_UCHAR,
       TOKEN_UNARY,
       TOKEN_VAR,
-      TOKEN_WHERE
+      TOKEN_WHERE,
+      TOKEN_LAST //nothing, one past the last
     };
   }
 }

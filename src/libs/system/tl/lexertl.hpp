@@ -45,19 +45,20 @@ namespace TransLucid
       Position m_pos;
     };
 
+    struct nil {};
+
+    typedef Variant
+    <
+      nil,
+      char32_t,
+      u32string,
+      mpz_class,
+      std::pair<u32string, u32string>
+    > TokenValue;
+
     class Lexer
     {
       public:
-      struct nil {};
-
-      typedef Variant
-      <
-        nil,
-        char32_t,
-        u32string,
-        mpz_class,
-        std::pair<u32string, u32string>
-      > TokenValue;
 
       Lexer();
 

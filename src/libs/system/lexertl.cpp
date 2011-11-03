@@ -27,6 +27,36 @@ namespace TransLucid
 namespace Parser
 {
 
+namespace
+{
+  class ValueBuilder
+  {
+    private:
+    typedef PositionIterator<U32Iterator> iterator;
+
+    public:
+    ValueBuilder()
+    {
+    }
+
+    TokenValue
+    operator()
+    (
+      size_t index, 
+      iterator begin,
+      const iterator& end
+    )
+    {
+    }
+
+    private:
+    typedef iterator (*build_func)(iterator begin, const iterator& end);
+    build_func m_functions[TOKEN_LAST];
+  };
+
+  static ValueBuilder build_value;
+}
+
 Lexer::Lexer()
 {
 }
@@ -35,6 +65,17 @@ Token
 Lexer::next()
 {
   translucid_lex(m_results);
+
+  size_t id = m_results.id;
+
+  if (id <= TOKEN_FIRST || id >= TOKEN_LAST)
+  {
+    //TODO error handling
+    throw "Invalid token";
+  }
+
+  //build up the token
+  TokenValue tokVal = build_value(id, m_results.start, m_results.end);
 }
 
 }
