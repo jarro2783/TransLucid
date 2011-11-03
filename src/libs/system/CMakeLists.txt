@@ -4,6 +4,7 @@ endif(COMMAND cmake_policy)
 
 add_definitions(${TLCFLAGS} 
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
+-I${CMAKE_SOURCE_DIR}/src/libs/system/
 -Wall)
 
 set (SYSTEM_SOURCES
@@ -14,7 +15,7 @@ eval_workshops.cpp expr_parser.cpp header.cpp
 hyperdatons/envhd.cpp
 hyperdatons/filehd.cpp
 internal_strings.cpp lexer.cpp lexer_util.cpp 
-library.cpp line_tokenizer.cpp parser.cpp
+library.cpp line_tokenizer.cpp parser.cpp parser-new.cpp
 range.cpp rename.cpp system.cpp translator.cpp tree_printer.cpp
 tree_to_wstree.cpp tuple_parser.cpp types.cpp utility.cpp uuid.cpp
 workshop_builder.cpp

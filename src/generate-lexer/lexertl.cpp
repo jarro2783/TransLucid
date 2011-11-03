@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include "tl/lexertl.hpp"
 #include "lexertl/generator.hpp"
 #include "lexertl/generate_cpp.hpp"
 #include "lexertl/rules.hpp"
 #include "lexertl/state_machine.hpp"
+#include "tl/lexer_tokens.hpp"
 
 namespace TransLucid
 {

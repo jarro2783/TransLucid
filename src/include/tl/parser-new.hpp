@@ -1,5 +1,5 @@
-/* Lexer using lexertl.
-   Copyright (C) 2011 Jarryd Beck
+/* The parser.
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -17,52 +17,33 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include "lexertl/lookup.hpp"
-#include <tl/parser_iterator.hpp>
-#include <tl/variant.hpp>
-#include <gmpxx.h>
-#include "tl/lexer_tokens.hpp"
+#include "tl/lexertl.hpp"
+#include <tl/ast-new.hpp>
 
 namespace TransLucid
 {
   namespace Parser
   {
-    class Position
-    {
-      u32string m_file;
-      int m_line;
-      int m_character;
-
-      U32Iterator m_begin;
-      U32Iterator m_end;
-    };
-
-    class Token
+    class Parser
     {
       public:
+      Parser();
+      
+      TreeNew::Expr
+      parse_expr();
+
+      void
+      parse_equation();
 
       private:
-      Position m_pos;
-    };
+      //all the parse functions
+      TreeNew::Expr
+      parse_where();
 
-    class Lexer
-    {
-      public:
-      typedef Variant
-      <
-        mpz_class
-      > TokenValue;
+      TreeNew::Expr
+      parse_if();
 
-      Lexer()
-      {
-      }
-
-      //get the next token
-      std::pair<Token, TokenValue>
-      next();
-
-      private:
-      lexertl::basic_match_results<PositionIterator, int> results;
+      Lexer m_lex;
     };
   }
 }
