@@ -765,8 +765,18 @@ namespace TransLucid
       PositionIterator(const T& iter) 
       : m_iter(iter), m_line(0), m_char(0) {}
 
-      PositionIterator(const T& iter, int line, int c) 
-      : m_iter(iter), m_line(line), m_char(c)
+      template <typename String>
+      PositionIterator
+      (
+        const T& iter, 
+        String&& file,
+        int line, 
+        int c
+      ) 
+      : m_iter(iter)
+      , m_file(std::forward<String>(file))
+      , m_line(line)
+      , m_char(c)
       {}
 
       bool
@@ -826,9 +836,22 @@ namespace TransLucid
         return m_char;
       }
 
+      const u32string&
+      getFile() const
+      {
+        return m_file;
+      }
+
+      const T&
+      getIterator() const
+      {
+        return m_iter;
+      }
+
       private:
       T m_iter;
 
+      u32string m_file;
       int m_line;
       int m_char;
     };

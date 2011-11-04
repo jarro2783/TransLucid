@@ -66,6 +66,7 @@ namespace TransLucid
     DIM_TEXT,
     DIM_NAME,
     DIM_VALUE,
+    DIM_SYMBOL,
 
     //the two global dims for phi functions
     DIM_PI,

@@ -228,5 +228,13 @@ build_escaped_characters<Parser::U32Iterator>
   Parser::U32Iterator& begin,
   const Parser::U32Iterator& end
 );
- 
+
+template 
+std::pair<bool, u32string>
+build_escaped_characters<Parser::PositionIterator<Parser::U32Iterator>>
+(
+  Parser::PositionIterator<Parser::U32Iterator>& begin,
+  const Parser::PositionIterator<Parser::U32Iterator>& end
+);
+
 } }

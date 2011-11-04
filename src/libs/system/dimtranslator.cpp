@@ -38,6 +38,7 @@ DimensionTranslator::DimensionTranslator()
    {U"name", DIM_NAME},
    {U"id", DIM_ID},
    {U"value", DIM_VALUE},
+   {U"symbol", DIM_SYMBOL},
    {U"time", DIM_TIME},
    {U"all", DIM_ALL},
    {U"cons", DIM_CONS},

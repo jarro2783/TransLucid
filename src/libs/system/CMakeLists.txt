@@ -14,14 +14,15 @@ add_custom_target(generate_static_lexer DEPENDS
 set (SYSTEM_SOURCES
 ast.cpp ast-new.cpp bestfit.cpp builtin_types.cpp charset.cpp
 context.cpp dimtranslator.cpp 
-equation.cpp equation_parser.cpp
-eval_workshops.cpp expr_parser.cpp header.cpp 
+equation.cpp
+eval_workshops.cpp header.cpp 
 hyperdatons/envhd.cpp
 hyperdatons/filehd.cpp
-internal_strings.cpp lexer.cpp lexertl.cpp lexer_util.cpp 
+internal_strings.cpp lexertl.cpp lexer_util.cpp 
 library.cpp line_tokenizer.cpp parser.cpp parser-new.cpp
-range.cpp rename.cpp system.cpp translator.cpp tree_printer.cpp
-tree_to_wstree.cpp tuple_parser.cpp types.cpp utility.cpp uuid.cpp
+range.cpp rename.cpp system.cpp #translator.cpp 
+tree_printer.cpp
+tree_to_wstree.cpp types.cpp utility.cpp uuid.cpp
 workshop_builder.cpp
 )
 

@@ -581,7 +581,7 @@ System::System()
 
   setDefaultContext();
 
-  m_translator = new Translator(*this);
+  //m_translator = new Translator(*this);
 
   //these are for the lexer
   init_dimensions
@@ -606,7 +606,7 @@ System::System()
 
 System::~System()
 {
-  delete m_translator;
+  //delete m_translator;
 
   //delete the equations
   for (auto& v : m_assignments)
@@ -672,25 +672,25 @@ System::addEquation(const u32string& name, const GuardWS& guard, WS* e)
 bool
 System::parse_header(const u32string& s)
 {
-  return m_translator->parse_header(s);
+  //return m_translator->parse_header(s);
 }
 
 void
 System::loadLibrary(const u32string& s)
 {
-  m_translator->loadLibrary(s);
+  //m_translator->loadLibrary(s);
 }
 
 Parser::Header&
 System::header()
 {
-  return m_translator->header();
+  //return m_translator->header();
 }
 
 const Tree::Expr&
 System::lastExpression() const
 {
-  return m_translator->lastExpression();
+  //return m_translator->lastExpression();
 }
 
 Constant
@@ -701,6 +701,7 @@ System::parseLine
   bool debug
 )
 {
+  #if 0
   Parser::U32Iterator end;
 
   //TODO this is a hack, implement debug and verbose properly
@@ -720,6 +721,7 @@ System::parseLine
 
     return c;
   }
+  #endif
 
   return Types::Special::create(SP_CONST); 
 }
@@ -966,7 +968,7 @@ System::getDimensionIndex(const Constant& c)
 std::pair<bool, Tree::Expr>
 System::parseExpression(Parser::U32Iterator& iter)
 {
-  return m_translator->parseExpr(iter, m_defaultk);
+  //return m_translator->parseExpr(iter, m_defaultk);
 }
 
 Constant

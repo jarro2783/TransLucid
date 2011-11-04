@@ -72,6 +72,11 @@ namespace TransLucid
       TOKEN_UNARY,
       TOKEN_VAR,
       TOKEN_WHERE,
+
+      TOKEN_PREFIX_OP,
+      TOKEN_BINARY_OP,
+      TOKEN_POSTFIX_OP,
+
       TOKEN_LAST //nothing, one past the last
     };
   }
