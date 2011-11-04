@@ -64,6 +64,26 @@ namespace TransLucid
         m_rules.add_macro(U"stringRAW", U"`[^`]*`");
         
         //the rules
+        m_rules.add(U"dim", TOKEN_DIM);
+        m_rules.add(U"else", TOKEN_ELSE);
+        m_rules.add(U"elsif", TOKEN_ELSIF);
+        m_rules.add(U"end", TOKEN_END);
+        m_rules.add(U"false", TOKEN_FALSE);
+        m_rules.add(U"fi", TOKEN_FI);
+        m_rules.add(U"if", TOKEN_IF);
+        m_rules.add(U"in", TOKEN_IN);
+        m_rules.add(U"infix[lrnpm]", TOKEN_INFIXBIN);
+        m_rules.add(U"out", TOKEN_OUT);
+        m_rules.add(U"then", TOKEN_THEN);
+        m_rules.add(U"true", TOKEN_TRUE);
+        m_rules.add(U"(prefix)|(postfix)", TOKEN_UNARY);
+        m_rules.add(U"var", TOKEN_VAR);
+        m_rules.add(U"where(_{IDENT})?", TOKEN_WHERE);
+
+        m_rules.add(U"{IDENT}?{stringRAW}", TOKEN_CONSTANT_RAW);
+        m_rules.add(U"{IDENT}?{stringINTERPRET}", TOKEN_CONSTANT_INTERPRETED);
+        m_rules.add(U"'([^'\\\\]|\\\\.)+'", TOKEN_UCHAR);
+
         m_rules.add(U"&", TOKEN_AND);
         m_rules.add(U"!", TOKEN_BANG);
         m_rules.add(U":", TOKEN_COLON);
@@ -71,26 +91,14 @@ namespace TransLucid
         m_rules.add(U"%%", TOKEN_DBLPERCENT);
         m_rules.add(U";;", TOKEN_DBLSEMI);
         m_rules.add(UR"(\\\\)", TOKEN_DBLSLASH);
-        m_rules.add(U"dim", TOKEN_DIM);
         m_rules.add(U"\\$", TOKEN_DOLLAR);
         m_rules.add(U"\\.", TOKEN_DOT);
-        m_rules.add(U"else", TOKEN_ELSE);
-        m_rules.add(U"elsif", TOKEN_ELSIF);
-        m_rules.add(U"end", TOKEN_END);
         m_rules.add(U"=", TOKEN_EQUALS);
-        m_rules.add(U"false", TOKEN_FALSE);
-        m_rules.add(U"fi", TOKEN_FI);
         m_rules.add(U"#", TOKEN_HASH);
-        m_rules.add(U"{IDENT}", TOKEN_ID);
-        m_rules.add(U"if", TOKEN_IF);
-        m_rules.add(U"in", TOKEN_IN);
-        m_rules.add(U"infix[lrnpm]", TOKEN_INFIXBIN);
-        m_rules.add(U"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))", TOKEN_INTEGER);
         m_rules.add(U"<-", TOKEN_LARROW);
         m_rules.add(U"\\{", TOKEN_LBRACE);
         m_rules.add(U"\\(", TOKEN_LPAREN);
         m_rules.add(U"\\[", TOKEN_LSQUARE);
-        m_rules.add(U"out", TOKEN_OUT);
         m_rules.add(U"\\|", TOKEN_PIPE);
         m_rules.add(UR"(\.\.)", TOKEN_RANGE);
         m_rules.add(U"->", TOKEN_RARROW);
@@ -98,14 +106,12 @@ namespace TransLucid
         m_rules.add(U"\\)", TOKEN_RPAREN);
         m_rules.add(U"\\]", TOKEN_RSQUARE);
         m_rules.add(UR"(\\)", TOKEN_SLASH);
-        m_rules.add(U"then", TOKEN_THEN);
-        m_rules.add(U"true", TOKEN_TRUE);
-        m_rules.add(UR"('.')", TOKEN_UCHAR);
-        m_rules.add(U"(prefix)|(postfix)", TOKEN_UNARY);
-        m_rules.add(U"var", TOKEN_VAR);
-        m_rules.add(U"where(_{IDENT})?", TOKEN_WHERE);
-        m_rules.add(U"([ \\r\\n\\t])|(\\/\\/([^\\n]*)\\n)", 200);
-        m_rules.add(UR"(\/\/[^\n]*\n)", m_state_machine.skip());
+
+        m_rules.add(U"{IDENT}", TOKEN_ID);
+        m_rules.add(U"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))", TOKEN_INTEGER);
+
+        m_rules.add(U"([ \\r\\n\\t])|(\\/\\/([^\\n]*)\\n)", 
+          m_state_machine.skip());
         //, spaces(U"[ \\n\\t]")
         //, binary_op_(U".", OpTokens::TOK_BINARY_OP)
         //, prefix_op_(U".", OpTokens::TOK_PREFIX_OP)

@@ -778,6 +778,17 @@ namespace TransLucid
       , m_line(line)
       , m_char(c)
       {}
+      
+      template <typename String>
+      PositionIterator
+      (
+        const T& iter, 
+        String&& file
+      )
+      : m_iter(iter), m_file(std::forward<String>(file))
+      {
+      }
+
 
       bool
       operator==(const PositionIterator& rhs) const
