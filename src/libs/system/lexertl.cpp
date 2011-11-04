@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/context.hpp>
 #include <tl/lexer_util.hpp>
+#include <tl/output.hpp>
 #include <tl/system.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
@@ -60,6 +61,7 @@ namespace
       m_functions[TOKEN_RANGE] = &buildRange;
       m_functions[TOKEN_INFIXBIN] = &buildInfixDecl;
       m_functions[TOKEN_UNARY] = &buildUnaryDecl;
+      m_functions[TOKEN_OPERATOR] = &buildOperator;
     }
 
     template <typename Begin>
@@ -486,22 +488,38 @@ Lexer::next
 
   translucid_lex(results);
 
+  const iterator& match = results.start;
+
   int id = results.id;
+
+  if (id == 0)
+  {
+    return Token(Position(), TokenValue(), 0);
+  }
 
   if (id <= TOKEN_FIRST || id >= TOKEN_LAST)
   {
+    std::cerr << match.getLine() << ":" << match.getChar() 
+      << ": invalid token: " << id << std::endl;
     //TODO error handling
     throw "Invalid token";
   }
-
-  //build up the token
-  TokenValue tokVal = build_value(id, results.start, results.end,
-    id, context, idents);
+  
+  TokenValue tokVal;
+  try
+  {
+    //build up the token
+    tokVal = build_value(id, results.start, results.end,
+      id, context, idents);
+  }
+  catch(...)
+  {
+    //if there is an invalid token then deal with it
+    id = 0;
+  }
 
   //set the next iterator position
   begin = results.end;
-
-  const iterator& match = results.start;
 
   return Token
   (

@@ -98,7 +98,6 @@ enum Token
   TOKEN_RBRACE,
   TOKEN_DOT,
   TOKEN_EQUALS,
-  TOKEN_AMPERSAND,
   TOKEN_HASH,
   TOKEN_AT,
   TOKEN_SLASH,
@@ -317,10 +316,6 @@ parse
       switch(tok.getType())
       {
         //symbols
-        case TL::Parser::TOKEN_AND:
-        checker.symbol(TOKEN_AMPERSAND);
-        break;
-
         case TL::Parser::TOKEN_ASSIGNTO: //:=
         checker.symbol(TOKEN_COLONEQUALS);
         break;
@@ -648,11 +643,12 @@ TEST_CASE ( "integers", "check the integers" )
 
   check(input, checker);
 
-  TL::u32string invalid = U"0AFB";
-  Checker check_invalid({mpz_class(0)});
-  CHECK(check(invalid, check_invalid) == false);
+  //TL::u32string invalid = U"0AFB";
+  //Checker check_invalid({mpz_class(0)});
+  //CHECK(check(invalid, check_invalid) == false);
 }
 
+#if 0
 TEST_CASE ( "rationals", "check the rational numbers" )
 {
   TL::u32string input = U"0_1 123_124 0GA_3 ~3_2";
@@ -668,7 +664,6 @@ TEST_CASE ( "rationals", "check the rational numbers" )
   check(input, checker);
 }
 
-#if 0
 TEST_CASE ( floats )
 {
   TL::u32string input = U"0.0 1.0 5.25 0GA.BC ~3.4 1.1^10 12.123456^20#500 "
@@ -694,14 +689,14 @@ TEST_CASE ( floats )
 
 TEST_CASE ( "symbols", "check all the symbols" )
 {
-  TL::u32string input = UR"*(: [ ] . = & # @ \ \\ .. ( ) -> | ;; \\\ %% <-)*";
+  TL::u32string input = UR"*(: [ ] . = # @ \ \\ .. ( ) -> | ;; \\\ %% <-)*";
+  //TL::u32string input = UR"*(: [ ] . = # @ ( ) -> | ;; %% <-)*";
   Checker checker({
     TOKEN_COLON,
     TOKEN_LSQUARE,
     TOKEN_RSQUARE,
     TOKEN_DOT,
     TOKEN_EQUALS,
-    TOKEN_AMPERSAND,
     TOKEN_HASH,
     TOKEN_AT,
     TOKEN_SLASH,

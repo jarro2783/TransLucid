@@ -58,6 +58,7 @@ namespace TransLucid
       TOKEN_LBRACE,
       TOKEN_LPAREN,
       TOKEN_LSQUARE,
+      TOKEN_OPERATOR, //don't match this, it's converted to the right op
       TOKEN_OUT,
       TOKEN_PIPE,
       TOKEN_RANGE,

@@ -33,6 +33,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <gmpxx.h>
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 namespace TransLucid
 {
   /** 

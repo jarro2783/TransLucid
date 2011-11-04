@@ -84,14 +84,13 @@ namespace TransLucid
         m_rules.add(U"{IDENT}?{stringINTERPRET}", TOKEN_CONSTANT_INTERPRETED);
         m_rules.add(U"'([^'\\\\]|\\\\.)+'", TOKEN_UCHAR);
 
-        m_rules.add(U"&", TOKEN_AND);
+        m_rules.add(U"@", TOKEN_AT);
         m_rules.add(U"!", TOKEN_BANG);
         m_rules.add(U":", TOKEN_COLON);
         m_rules.add(U",", TOKEN_COMMA);
         m_rules.add(U"%%", TOKEN_DBLPERCENT);
         m_rules.add(U";;", TOKEN_DBLSEMI);
         m_rules.add(UR"(\\\\)", TOKEN_DBLSLASH);
-        m_rules.add(U"\\$", TOKEN_DOLLAR);
         m_rules.add(U"\\.", TOKEN_DOT);
         m_rules.add(U"=", TOKEN_EQUALS);
         m_rules.add(U"#", TOKEN_HASH);
@@ -112,6 +111,8 @@ namespace TransLucid
 
         m_rules.add(U"([ \\r\\n\\t])|(\\/\\/([^\\n]*)\\n)", 
           m_state_machine.skip());
+        
+        m_rules.add(UR"**([\+!\$%\^&\|\*\-_\?\/<>=]+)**", TOKEN_OPERATOR);
         //, spaces(U"[ \\n\\t]")
         //, binary_op_(U".", OpTokens::TOK_BINARY_OP)
         //, prefix_op_(U".", OpTokens::TOK_PREFIX_OP)
