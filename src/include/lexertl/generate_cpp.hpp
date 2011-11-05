@@ -178,26 +178,22 @@ public:
         }
 
         os_ << ";\n";
+        os_ << "    id_type push_dfa_ = ";
 
-        if (internals_._features & recursive_bit)
+        if (pointers_)
         {
-          os_ << "    id_type push_dfa_ = ";
-
-          if (pointers_)
-          {
-              // Done this way for GCC:
-              os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
-          }
-
-          os_ << "*(ptr_ + " << push_dfa_index << ")";
-
-          if (pointers_)
-          {
-              os_ << "))";
-          }
-
-          os_ << ";\n";
+            // Done this way for GCC:
+            os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
         }
+
+        os_ << "*(ptr_ + " << push_dfa_index << ")";
+
+        if (pointers_)
+        {
+            os_ << "))";
+        }
+
+        os_ << ";\n";
 
         if (internals_._dfa->size () > 1)
         {
@@ -317,32 +313,34 @@ public:
         os_ << "        {\n";
         os_ << "            end_state_ = true;\n";
 
+
         if (internals_._features & recursive_bit)
         {
-          os_ << "            pop_ = (";
+            os_ << "            pop_ = (";
 
-          if (pointers_)
-          {
-              // Done this way for GCC:
-              os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
-          }
+            if (pointers_)
+            {
+                // Done this way for GCC:
+                os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
+            }
 
-          os_ << "*ptr_";
+            os_ << "*ptr_";
 
-          if (pointers_)
-          {
-              os_ << ')';
-          }
+            if (pointers_)
+            {
+                os_ << ')';
+            }
 
-          os_ <<" & " << pop_dfa_bit;
+            os_ <<" & " << pop_dfa_bit;
 
-          if (pointers_)
-          {
-              os_ << ')';
-          }
+            if (pointers_)
+            {
+                os_ << ')';
+            }
 
-          os_ << ") != 0;\n";
+            os_ << ") != 0;\n";
         }
+
         os_ << "            id_ = ";
 
         if (pointers_)
@@ -465,32 +463,34 @@ public:
             os_ << "            {\n";
             os_ << "                end_state_ = true;\n";
 
+
             if (internals_._features & recursive_bit)
             {
-              os_ << "                pop_ = (";
+                os_ << "                pop_ = (";
 
-              if (pointers_)
-              {
-                  // Done this way for GCC:
-                  os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
-              }
+                if (pointers_)
+                {
+                    // Done this way for GCC:
+                    os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
+                }
 
-              os_ << "*ptr_";
+                os_ << "*ptr_";
 
-              if (pointers_)
-              {
-                  os_ << ')';
-              }
+                if (pointers_)
+                {
+                    os_ << ')';
+                }
 
-              os_ <<" & " << pop_dfa_bit;
+                os_ <<" & " << pop_dfa_bit;
 
-              if (pointers_)
-              {
-                  os_ << ')';
-              }
+                if (pointers_)
+                {
+                    os_ << ')';
+                }
 
-              os_ << ") != 0;\n";
+                os_ << ") != 0;\n";
             }
+
             os_ << "                id_ = ";
 
             if (pointers_)
@@ -610,8 +610,7 @@ public:
         if (internals_._features & skip_bit)
         {
             // We want a number regardless of id_type.
-            os_ << "\n        if (id_ == " <<
-                static_cast<std::size_t>(sm_.skip ()) << ") goto skip;\n";
+            os_ << "\n        if (id_ == results_.skip ()) goto skip;\n";
         }
 
         if (internals_._features & again_bit)
@@ -904,13 +903,13 @@ protected:
         else
         {
             // We want numbers regardless of id_type.
-            os_ << static_cast<std::size_t>(*ptr_++) << "U";
+            os_ << static_cast<std::size_t>(*ptr_++);
 
             for (id_type alphabet_ = 1; alphabet_ < dfa_alphabet_;
                 ++alphabet_, ++ptr_)
             {
                 // We want numbers regardless of id_type.
-                os_ << ", " << static_cast<std::size_t>(*ptr_) << "U";
+                os_ << ", " << static_cast<std::size_t>(*ptr_);
             }
         }
     }

@@ -7,6 +7,8 @@
 #define LEXERTL_STATE_MACHINE_HPP
 
 #include "compile_assert.hpp"
+// memcmp()
+#include <cstring>
 #include <deque>
 #include "internals.hpp"
 #include <map>

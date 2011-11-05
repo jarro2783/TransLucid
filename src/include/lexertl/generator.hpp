@@ -10,8 +10,6 @@
 #include "bool.hpp"
 #include "partition/charset.hpp"
 #include "char_traits.hpp"
-// memcmp()
-#include <cstring>
 #include "partition/equivset.hpp"
 #include <memory>
 #include "parser/parser.hpp"

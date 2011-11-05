@@ -80,6 +80,11 @@ struct basic_match_results
     {
         return static_cast<id_type>(~0);
     }
+
+    static id_type skip ()
+    {
+        return static_cast<id_type>(~1);
+    }
 };
 
 template<typename iter, typename id_type = std::size_t>
