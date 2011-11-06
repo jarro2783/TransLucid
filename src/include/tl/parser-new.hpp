@@ -66,7 +66,7 @@ namespace TransLucid
 
       void
       expect(LexerIterator& begin, const LexerIterator& end, 
-        TreeNew::Expr& result,
+        TreeNew::Expr& result, const std::u32string& message,
         bool (Parser::*parser)
           (LexerIterator&, const LexerIterator&, TreeNew::Expr&)
       );
@@ -77,6 +77,19 @@ namespace TransLucid
 
     class ParseError : public std::exception
     {
+      public:
+      ParseError(const std::string& message)
+      : m_message(message)
+      {}
+
+      const char*
+      what() const throw()
+      {
+        return m_message.c_str();
+      }
+
+      protected:
+      std::string m_message;
     };
 
     class ExpectedToken : public ParseError
@@ -92,8 +105,12 @@ namespace TransLucid
 
       private:
       size_t m_token;
+    };
 
-      std::string m_message;
+    class ExpectedExpr : public ParseError
+    {
+      public:
+      ExpectedExpr(const u32string& text);
     };
   }
 }

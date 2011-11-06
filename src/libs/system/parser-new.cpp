@@ -31,8 +31,13 @@ namespace Parser
 {
 
 ExpectedToken::ExpectedToken(size_t token, const u32string& text)
-: m_token(token)
-, m_message(utf32_to_utf8(U"expected `" + text))
+: ParseError(utf32_to_utf8(U"expected `" + text + U"`"))
+, m_token(token)
+{
+}
+
+ExpectedExpr::ExpectedExpr(const u32string& text)
+: ParseError(utf32_to_utf8(U"expected " + text))
 {
 }
 
@@ -91,8 +96,7 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
     while (t == TOKEN_BINARY_OP)
     {
       TreeNew::Expr rhs;
-      //parse_app_expr(current, end, rhs);
-      expect(current, end, rhs, &Parser::parse_app_expr);
+      expect(current, end, rhs, U"expr", &Parser::parse_app_expr);
       t = nextToken(current);
     }
     begin = current;
@@ -120,11 +124,20 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end, size_t token,
 
 void
 Parser::expect(LexerIterator& begin, const LexerIterator& end, 
-  TreeNew::Expr& result,
+  TreeNew::Expr& result, const std::u32string& message,
   bool (Parser::*parser)(LexerIterator&, const LexerIterator&, TreeNew::Expr&)
 )
 {
-  bool success = (this->*parser)(begin, end, result);
+  LexerIterator current = begin;
+  bool success = (this->*parser)(current, end, result);
+
+  if (!success)
+  {
+    throw ExpectedExpr(message);
+  }
+
+  begin = current;
+  ++begin;
 }
 
 Token
