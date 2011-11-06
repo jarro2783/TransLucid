@@ -92,7 +92,7 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
     {
       TreeNew::Expr rhs;
       //parse_app_expr(current, end, rhs);
-      expect(begin, end, rhs, &Parser::parse_app_expr);
+      expect(current, end, rhs, &Parser::parse_app_expr);
       t = nextToken(current);
     }
     begin = current;
@@ -121,7 +121,7 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end, size_t token,
 void
 Parser::expect(LexerIterator& begin, const LexerIterator& end, 
   TreeNew::Expr& result,
-  bool (Parser::*parser)(LexerIterator&, const LexerIterator, TreeNew::Expr&)
+  bool (Parser::*parser)(LexerIterator&, const LexerIterator&, TreeNew::Expr&)
 )
 {
   bool success = (this->*parser)(begin, end, result);

@@ -68,7 +68,7 @@ namespace TransLucid
       expect(LexerIterator& begin, const LexerIterator& end, 
         TreeNew::Expr& result,
         bool (Parser::*parser)
-          (LexerIterator&, const LexerIterator, TreeNew::Expr&)
+          (LexerIterator&, const LexerIterator&, TreeNew::Expr&)
       );
 
       Context& m_context;
