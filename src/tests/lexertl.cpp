@@ -59,13 +59,6 @@ namespace
     return theSystem;
   }
 
-  TL::Parser::Lexer&
-  getLexer()
-  {
-    static TL::Parser::Lexer lexer;
-
-    return lexer;
-  }
 }
 
 enum Keyword
@@ -302,13 +295,11 @@ parse
   Checker& checker
 )
 {
-  TL::Parser::Lexer lex;
-
   bool success = true;
 
   while (begin != end && success)
   {
-    auto tok = lex.next(begin, end, context, idents);
+    auto tok = TL::Parser::nextToken(begin, end, context, idents);
 
     try
     {

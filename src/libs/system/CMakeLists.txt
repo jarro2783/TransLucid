@@ -5,8 +5,9 @@ endif(COMMAND cmake_policy)
 add_definitions(${TLCFLAGS} 
   -I${CMAKE_CURRENT_BINARY_DIR}
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
--I${CMAKE_SOURCE_DIR}/src/libs/system/
 -Wall)
+
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/system/)
 
 add_custom_target(generate_static_lexer DEPENDS 
   ${CMAKE_CURRENT_BINARY_DIR}/tl/static_lexer.hpp)

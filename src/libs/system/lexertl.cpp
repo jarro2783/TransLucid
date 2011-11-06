@@ -41,9 +41,6 @@ namespace
 {
   class ValueBuilder
   {
-    private:
-    typedef PositionIterator<U32Iterator> iterator;
-
     public:
     ValueBuilder()
     {
@@ -70,7 +67,7 @@ namespace
     (
       size_t index, 
       Begin&& begin,
-      const iterator& end,
+      const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -83,8 +80,8 @@ namespace
     private:
     typedef TokenValue (*build_func)
     (
-      iterator begin, 
-      const iterator& end,
+      StreamPosIterator begin, 
+      const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -93,7 +90,7 @@ namespace
     build_func m_functions[TOKEN_LAST];
 
     static TokenValue
-    buildRange(iterator begin, const iterator& end,
+    buildRange(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -104,7 +101,7 @@ namespace
     }
 
     static TokenValue
-    buildEmpty(iterator begin, const iterator& end,
+    buildEmpty(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -114,7 +111,7 @@ namespace
     }
 
     static TokenValue
-    buildString(iterator begin, const iterator& end,
+    buildString(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -124,7 +121,7 @@ namespace
     }
 
     static TokenValue
-    buildChar(iterator begin, const iterator& end,
+    buildChar(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -133,7 +130,7 @@ namespace
       char32_t value = 0;
       bool error = false;
 
-      iterator current = begin;
+      StreamPosIterator current = begin;
 
       //must start with a '
       if (*current == '\'')
@@ -185,7 +182,7 @@ namespace
     }
 
     static TokenValue
-    buildConstant(iterator begin, const iterator& end,
+    buildConstant(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -194,7 +191,7 @@ namespace
       u32string type, value;
       bool error = false;
 
-      iterator current = begin;
+      StreamPosIterator current = begin;
       while (current != end && *current != '"' && *current != '`')
       {
         type += *current;
@@ -254,7 +251,7 @@ namespace
     }
 
     static TokenValue
-    buildInteger(iterator begin, const iterator& end,
+    buildInteger(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -262,7 +259,7 @@ namespace
     {
       try
       {
-        iterator next = begin;
+        StreamPosIterator next = begin;
         ++next;
         mpz_class attr;
         if (next == end && *begin == U'0')
@@ -273,7 +270,7 @@ namespace
         {
           //check for negative
           bool negative = false;
-          iterator current = begin;
+          StreamPosIterator current = begin;
           if (*current == U'~')
           {
             negative = true;
@@ -336,7 +333,7 @@ namespace
     }
 
     static TokenValue
-    buildWhere(iterator begin, const iterator& end,
+    buildWhere(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -355,7 +352,7 @@ namespace
     }
 
     static TokenValue
-    buildOperator(iterator begin, const iterator& end,
+    buildOperator(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -410,7 +407,7 @@ namespace
     }
     
     static TokenValue
-    buildInfixDecl(iterator begin, const iterator& end,
+    buildInfixDecl(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -451,7 +448,7 @@ namespace
     }
     
     static TokenValue
-    buildUnaryDecl(iterator begin, const iterator& end,
+    buildUnaryDecl(StreamPosIterator begin, const StreamPosIterator& end,
       int& id,
       Context& context,
       System::IdentifierLookup& idents
@@ -476,19 +473,19 @@ namespace
 }
 
 Token
-Lexer::next
+nextToken
 (
-  iterator& begin, 
-  const iterator& end,
+  StreamPosIterator& begin, 
+  const StreamPosIterator& end,
   Context& context,
   System::IdentifierLookup& idents
 )
 {
-  lexertl::basic_match_results<iterator, size_t> results(begin, end);
+  lexertl::basic_match_results<StreamPosIterator, size_t> results(begin, end);
 
   translucid_lex(results);
 
-  const iterator& match = results.start;
+  const StreamPosIterator& match = results.start;
 
   int id = results.id;
 
@@ -518,7 +515,7 @@ Lexer::next
     id = 0;
   }
 
-  //set the next iterator position
+  //set the next StreamPosIterator position
   begin = results.end;
 
   return Token

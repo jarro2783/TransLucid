@@ -19,6 +19,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "tl/lexertl.hpp"
 #include <tl/ast-new.hpp>
+#include <tl/context.hpp>
+#include <tl/system.hpp>
 
 namespace TransLucid
 {
@@ -27,10 +29,10 @@ namespace TransLucid
     class Parser
     {
       public:
-      Parser();
+      Parser(System& system, Context& context);
       
       TreeNew::Expr
-      parse_expr();
+      parse_expr(LexerIterator& begin, const LexerIterator& end);
 
       void
       parse_equation();
@@ -38,12 +40,13 @@ namespace TransLucid
       private:
       //all the parse functions
       TreeNew::Expr
-      parse_where();
+      parse_where(LexerIterator& begin, const LexerIterator& end);
 
       TreeNew::Expr
       parse_if();
 
-      Lexer m_lex;
+      Context& m_context;
+      System::IdentifierLookup m_idents;
     };
   }
 }

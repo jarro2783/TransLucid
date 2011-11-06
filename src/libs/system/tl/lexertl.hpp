@@ -25,11 +25,15 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast-new.hpp>
 #include <tl/context.hpp>
+#include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
 #include <tl/variant.hpp>
 
 #include <gmpxx.h>
+
+#include <list>
+#include <memory>
 
 namespace TransLucid
 {
@@ -93,22 +97,66 @@ namespace TransLucid
       int m_type;
     };
 
-    class Lexer
+    //get the next token
+    Token
+    nextToken
+    (
+      StreamPosIterator& begin, 
+      const StreamPosIterator& end,
+      Context& context,
+      System::IdentifierLookup& idents
+    );
+
+    class LexerIterator
     {
-      public:
-      typedef PositionIterator<U32Iterator> iterator;
-
-      Lexer() = default;
-
-      //get the next token
-      Token
-      next
+      LexerIterator
       (
-        iterator& begin, 
-        const iterator& end,
+        StreamPosIterator& begin,
+        const StreamPosIterator& end,
         Context& context,
         System::IdentifierLookup& idents
-      );
+      )
+      : m_stream(new std::list<Token>)
+      , m_next(begin), m_end(end), m_context(context), m_idents(idents)
+      {
+      }
+
+      LexerIterator(const LexerIterator& rhs) = default;
+
+      LexerIterator&
+      operator++()
+      {
+        //the iterator will always point to something valid in the list
+        ++m_pos;
+
+        //if we were at the end however, get the next token and insert it
+        //into the list
+        if (m_pos == m_stream->end())
+        {
+          m_pos = m_stream->insert(m_pos, 
+            nextToken(m_next, m_end, m_context, m_idents));
+        }
+
+        return *this;
+      }
+
+      const Token&
+      operator*() const
+      {
+        return *m_pos;
+      }
+
+      private:
+      typedef std::list<Token> TokenStream;
+      typedef std::shared_ptr<TokenStream> TokenStreamPtr;
+
+      TokenStreamPtr m_stream;
+      TokenStream::iterator m_pos;
+
+      StreamPosIterator& m_next;
+      const StreamPosIterator& m_end;
+      Context& m_context;
+      System::IdentifierLookup& m_idents;
     };
   }
 }

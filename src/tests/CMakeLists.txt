@@ -5,7 +5,9 @@ set(LIBDIR ${CMAKE_BINARY_DIR}/src/libs/int)
 set(BINDIR .)
 
 link_libraries(tlsystem ${TLLIBS} ${Boost_LIBRARIES})
+add_definitions(${TLCFLAGS})
 
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/system)
 #add_executable(expressions expressions.cpp)
 #add_executable(equations equations.cpp)
 #add_executable(printing printing.cpp)
@@ -18,8 +20,6 @@ add_executable(system system.cpp)
 #add_executable(lexer lexer.cpp)
 add_executable(variant variant.cpp)
 add_executable(lexertl lexertl.cpp)
-
-add_definitions(${TLCFLAGS} -I${CMAKE_SOURCE_DIR}/src/libs/system)
 
 #add_test(iterator ./iterator)
 #add_test(expressions ${RUN} ${LIBDIR} ./expressions)

@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/ast-new.hpp>
+#include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
 
 namespace TransLucid
@@ -227,11 +228,12 @@ namespace TransLucid
 
     std::ostream&
     operator<<(std::ostream& os, const std::pair<Equation, DeclType>& p);
+
+    typedef PositionIterator<U32Iterator> StreamPosIterator;
   }
 
   typedef std::pair<Parser::Equation, TranslatedEquation> PTEquation;
   typedef std::vector<PTEquation> PTEquationVector;
-
 }
 
 #endif

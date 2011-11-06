@@ -22,4 +22,25 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+namespace Parser
+{
+
+Parser::Parser(System& system, Context& context)
+: m_context(context), m_idents(system.lookupIdentifiers())
+{
+}
+
+TreeNew::Expr
+Parser::parse_expr(LexerIterator& begin, const LexerIterator& end)
+{
+  return parse_where(begin, end);
+}
+
+TreeNew::Expr
+Parser::parse_where(LexerIterator& begin, const LexerIterator& end)
+{
+}
+
+}
+      
 }
