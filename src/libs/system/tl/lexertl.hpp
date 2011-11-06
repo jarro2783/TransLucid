@@ -73,6 +73,18 @@ namespace TransLucid
       {
       }
 
+      bool
+      operator==(int id) const
+      {
+        return id == m_type;
+      }
+
+      bool
+      operator!=(int id) const
+      {
+        return operator==(id);
+      }
+
       const Position&
       getPosition() const
       {
@@ -109,6 +121,8 @@ namespace TransLucid
 
     class LexerIterator
     {
+      public:
+
       LexerIterator
       (
         StreamPosIterator& begin,
@@ -117,7 +131,7 @@ namespace TransLucid
         System::IdentifierLookup& idents
       )
       : m_stream(new std::list<Token>)
-      , m_next(begin), m_end(end), m_context(context), m_idents(idents)
+      , m_next(&begin), m_end(&end), m_context(&context), m_idents(&idents)
       {
       }
 
@@ -133,8 +147,13 @@ namespace TransLucid
         //into the list
         if (m_pos == m_stream->end())
         {
-          m_pos = m_stream->insert(m_pos, 
-            nextToken(m_next, m_end, m_context, m_idents));
+          Token t = nextToken(*m_next, *m_end, *m_context, *m_idents);
+
+          if (t != 0)
+          {
+            m_pos = m_stream->insert(m_pos, t);
+          }
+          //otherwise leave the stream at end
         }
 
         return *this;
@@ -143,20 +162,56 @@ namespace TransLucid
       const Token&
       operator*() const
       {
-        return *m_pos;
+        if (m_pos != m_stream->end())
+        {
+          return *m_pos;
+        }
+        else
+        {
+          return m_endToken;
+        }
+      }
+
+      bool
+      operator==(const LexerIterator& rhs) const
+      {
+        return m_stream.get() == rhs.m_stream.get()
+          && m_pos == rhs.m_pos
+        ;
+      }
+
+      bool
+      operator!=(const LexerIterator& rhs) const
+      {
+        return operator==(rhs);
+      }
+
+      LexerIterator
+      makeEnd() const
+      {
+        return LexerIterator(m_stream);
       }
 
       private:
       typedef std::list<Token> TokenStream;
       typedef std::shared_ptr<TokenStream> TokenStreamPtr;
 
+      //makes an end iterator, we still need to point to a stream
+      LexerIterator(const TokenStreamPtr& s)
+      : m_stream(s), m_pos(m_stream->end()), m_next(0), m_end(0), m_context(0)
+      , m_idents(0)
+      {
+      }
+
       TokenStreamPtr m_stream;
       TokenStream::iterator m_pos;
 
-      StreamPosIterator& m_next;
-      const StreamPosIterator& m_end;
-      Context& m_context;
-      System::IdentifierLookup& m_idents;
+      StreamPosIterator* m_next;
+      const StreamPosIterator* m_end;
+      Context* m_context;
+      System::IdentifierLookup* m_idents;
+
+      static Token m_endToken;
     };
   }
 }

@@ -37,6 +37,8 @@ namespace TransLucid
 namespace Parser
 {
 
+Token LexerIterator::m_endToken(Position(), TokenValue(), 0);
+
 namespace
 {
   class ValueBuilder
@@ -68,7 +70,7 @@ namespace
       size_t index, 
       Begin&& begin,
       const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -82,7 +84,7 @@ namespace
     (
       StreamPosIterator begin, 
       const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     );
@@ -91,7 +93,7 @@ namespace
 
     static TokenValue
     buildRange(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -102,7 +104,7 @@ namespace
 
     static TokenValue
     buildEmpty(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -112,7 +114,7 @@ namespace
 
     static TokenValue
     buildString(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -122,7 +124,7 @@ namespace
 
     static TokenValue
     buildChar(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -183,7 +185,7 @@ namespace
 
     static TokenValue
     buildConstant(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -252,7 +254,7 @@ namespace
 
     static TokenValue
     buildInteger(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -334,7 +336,7 @@ namespace
 
     static TokenValue
     buildWhere(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -353,7 +355,7 @@ namespace
 
     static TokenValue
     buildOperator(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -408,7 +410,7 @@ namespace
     
     static TokenValue
     buildInfixDecl(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -449,7 +451,7 @@ namespace
     
     static TokenValue
     buildUnaryDecl(StreamPosIterator begin, const StreamPosIterator& end,
-      int& id,
+      size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
@@ -487,9 +489,9 @@ nextToken
 
   const StreamPosIterator& match = results.start;
 
-  int id = results.id;
+  size_t id = results.id;
 
-  if (id == 0)
+  if (id == results.npos())
   {
     return Token(Position(), TokenValue(), 0);
   }
