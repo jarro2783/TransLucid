@@ -80,7 +80,7 @@ namespace TransLucid
     recursive_wrapper&
     operator=(const recursive_wrapper& rhs)
     {
-      assign(rhs);
+      assign(rhs.get());
       return *this;
     }
 
