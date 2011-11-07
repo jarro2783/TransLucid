@@ -123,7 +123,6 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
   TreeNew::Expr app;
   bool success = parse_app_expr(current, end, app);
   
-
   if (success)
   {
     Token t = nextToken(current);
@@ -134,6 +133,7 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
       t = nextToken(current);
     }
     begin = current;
+    result = app;
   }
 
   return success;
@@ -172,6 +172,7 @@ Parser::parse_app_expr(LexerIterator& begin, const LexerIterator& end,
         }
       }
     }
+    result = lhs;
     begin = current;
   }
 

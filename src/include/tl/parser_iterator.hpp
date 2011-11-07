@@ -786,6 +786,7 @@ namespace TransLucid
         String&& file
       )
       : m_iter(iter), m_file(std::forward<String>(file))
+      , m_line(0), m_char(0)
       {
       }
 
