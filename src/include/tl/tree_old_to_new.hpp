@@ -191,7 +191,8 @@ namespace TransLucid
 
     TreeNew::Expr operator()(const Tree::LambdaExpr& e)
     {
-      TreeNew::LambdaExpr lamb(e.name, boost::apply_visitor(*this, e.rhs));
+      TreeNew::LambdaExpr lamb(std::vector<TreeNew::Expr>(),
+        e.name, boost::apply_visitor(*this, e.rhs));
       lamb.argDim = e.argDim;
       lamb.scope = e.scope;
 
@@ -200,7 +201,8 @@ namespace TransLucid
 
     TreeNew::Expr operator()(const Tree::PhiExpr& e)
     {
-      TreeNew::PhiExpr phi(e.name, boost::apply_visitor(*this, e.rhs));
+      TreeNew::PhiExpr phi(std::vector<TreeNew::Expr>(),
+        e.name, boost::apply_visitor(*this, e.rhs));
       phi.argDim = e.argDim;
       phi.odometerDim = e.odometerDim;
       phi.scope = e.scope;

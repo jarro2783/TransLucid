@@ -358,15 +358,24 @@ namespace TransLucid
     struct IdentifierLookup
     {
       IdentifierLookup(DefinitionMap& identifiers)
-      : m_identifiers(identifiers)
+      : m_identifiers(&identifiers)
       {
+      }
+
+      IdentifierLookup()
+      : m_identifiers(0)
+      {}
+      
+      operator bool() const
+      {
+        return m_identifiers != nullptr;
       }
 
       WS*
       lookup(const u32string& name) const
       {
-        auto r = m_identifiers.find(name);
-        if (r != m_identifiers.end())
+        auto r = m_identifiers->find(name);
+        if (r != m_identifiers->end())
         {
           return r->second;
         }
@@ -377,7 +386,7 @@ namespace TransLucid
       }
 
       private:
-      DefinitionMap& m_identifiers;
+      DefinitionMap* m_identifiers;
     };
 
     IdentifierLookup lookupIdentifiers()

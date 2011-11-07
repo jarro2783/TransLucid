@@ -31,7 +31,7 @@ namespace TransLucid
     class Parser
     {
       public:
-      Parser(System& system, Context& context);
+      Parser(System& system);
       
       bool
       parse_expr(LexerIterator& begin, const LexerIterator& end,
@@ -74,6 +74,11 @@ namespace TransLucid
       parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
         TreeNew::Expr& result);
 
+      void
+      parse_function(LexerIterator& begin, const LexerIterator& end,
+        TreeNew::Expr& result,
+        size_t type);
+
       Token
       nextToken(LexerIterator& begin);
 
@@ -90,7 +95,6 @@ namespace TransLucid
           (LexerIterator&, const LexerIterator&, TreeNew::Expr&)
       );
 
-      Context& m_context;
       System::IdentifierLookup m_idents;
     };
 

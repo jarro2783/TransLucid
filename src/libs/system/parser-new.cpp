@@ -20,9 +20,13 @@ along with TransLucid; see the file COPYING.  If not see
 // == The expression parser ==
 // Every parse function must leave the iterator untouched if it didn't match,
 // and one past the last token of what it matched if it did match
+// every function called shall have the iterator at the place to start
 
 #include <tl/parser-new.hpp>
 #include <tl/charset.hpp>
+
+#define XSTRING(x) STRING(x)
+#define STRING(x) #x
 
 namespace TransLucid
 {
@@ -41,9 +45,39 @@ ExpectedExpr::ExpectedExpr(const u32string& text)
 {
 }
 
-Parser::Parser(System& system, Context& context)
-: m_context(context), m_idents(system.lookupIdentifiers())
+Parser::Parser(System& system)
+: m_idents(system.lookupIdentifiers())
 {
+}
+
+/**
+ * Construct a constant with a type.
+ * When the type is ustring or uchar, it constructs the actual ustring
+ * or uchar. Otherwise it constructs a Tree::LiteralExpr.
+ */
+inline TreeNew::Expr
+construct_typed_constant(const LexerIterator& token)
+{
+  auto& val = get<std::pair<u32string, u32string>>(token->getValue());
+
+  const std::u32string& type = val.first;
+  const std::u32string& value = val.second;
+  if (type == U"ustring") {
+    if (!validate_ustring(value)) {
+      //TODO error handling
+      //throw ParseError(U"Invalid character in ustring");
+    }
+    return value;
+  } else if (type == U"uchar") {
+    char32_t v = value[0];
+    if (!validate_uchar(v)) {
+      //TODO error handling
+      //throw ParseError(U"Invalid character");
+    }
+    return v;
+  } else {
+    return TreeNew::LiteralExpr(type, value);
+  }
 }
 
 bool
@@ -324,8 +358,126 @@ bool
 Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
   TreeNew::Expr& result)
 {
+  bool success = true;
+  switch(begin->getType())
+  {
+    case TOKEN_INTEGER:
+    result = get<mpz_class>(begin->getValue());
+    ++begin;
+    break;
+
+    case TOKEN_TRUE:
+    result = true;
+    ++begin;
+    break;
+
+    case TOKEN_FALSE:
+    result = false;
+    ++begin;
+    break;
+
+    case TOKEN_ID:
+    result = TreeNew::IdentExpr(get<u32string>(begin->getValue()));
+    ++begin;
+    break;
+
+    case TOKEN_CONSTANT_RAW:
+    case TOKEN_CONSTANT_INTERPRETED:
+    result = construct_typed_constant(begin);
+    break;
+
+    case TOKEN_LSQUARE:
+    //a tuple
+    break;
+
+    case TOKEN_LPAREN:
+    {
+      LexerIterator current = begin;
+      TreeNew::Expr e;
+      expect(current, end, e, U"expr", &Parser::parse_expr);
+      expect(current, end, U")", TOKEN_RPAREN);
+      result = e;
+      begin = current;
+    }
+    break;
+
+    case TOKEN_SLASH:
+    {
+      LexerIterator current = begin;
+      ++current;
+      parse_function(current, end, result, TOKEN_SLASH);
+    }
+    break;
+
+    case TOKEN_DBLSLASH:
+    {
+      LexerIterator current = begin;
+      ++current;
+      parse_function(current, end, result, TOKEN_SLASH);
+    }
+    break;
+
+    case TOKEN_HASH:
+    result = TreeNew::HashSymbol();
+    break;
+  }
+
+  return success;
 }
 
+void
+Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
+  TreeNew::Expr& result,
+  size_t type)
+{
+  LexerIterator current = begin;
+
+  //parse the dimension capture list
+  std::vector<TreeNew::Expr> captures;
+  if (*current == TOKEN_LBRACE)
+  {
+    bool parsingList = true;
+
+    while (parsingList)
+    {
+      TreeNew::Expr e;
+      expect(current, end, e, U"expr", &Parser::parse_expr);
+
+      captures.push_back(std::move(e));
+
+      if (*current != TOKEN_COMMA) { parsingList = false; }
+    }
+
+    expect(current, end, U"}", TOKEN_RBRACE);
+  }
+
+  expect(current, end, U"identifier", TOKEN_ID);
+  u32string name = get<u32string>(current->getValue());
+
+  ++current;
+  expect(current, end, U"->", TOKEN_RARROW);
+
+  TreeNew::Expr rhs;
+  expect(current, end, rhs, U"expr", &Parser::parse_expr);
+
+  if (type == TOKEN_SLASH)
+  {
+    result = TreeNew::LambdaExpr(
+      std::move(captures), std::move(name), std::move(rhs));
+  }
+  else if (type == TOKEN_DBLSLASH)
+  {
+    result = TreeNew::PhiExpr(
+      std::move(captures), std::move(name), std::move(rhs));
+  }
+  else
+  {
+    throw "internal compiler error at: " __FILE__ ":" XSTRING(__LINE__);
+  }
+
+  //once it has all worked we can move along the iterator
+  begin = current;
+}
 
 void
 Parser::expect(LexerIterator& begin, const LexerIterator& end, 

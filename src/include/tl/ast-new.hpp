@@ -623,11 +623,17 @@ namespace TransLucid
        * @param name The parameter to bind.
        * @param rhs The right-hand-side expression.
        */
-      LambdaExpr(const u32string& name, const Expr& rhs)
-      : name(name), rhs(rhs)
+      LambdaExpr
+      (
+        const std::vector<Expr>& captures, 
+        const u32string& name, 
+        const Expr& rhs
+      )
+      : captures(captures), name(name), rhs(rhs)
       {
       }
 
+      std::vector<Expr> captures;
       u32string name; /**<The bound parameter.*/
       Expr rhs; /**<The right-hand-side expression.*/
 
@@ -640,11 +646,13 @@ namespace TransLucid
     {
       PhiExpr() = default;
 
-      PhiExpr(const u32string& name, const Expr& rhs)
-      : name(name), rhs(rhs)
+      PhiExpr(const std::vector<Expr>& captures,
+        const u32string& name, const Expr& rhs)
+      : captures(captures), name(name), rhs(rhs)
       {
       }
 
+      std::vector<Expr> captures;
       u32string name;
       //std::vector<Expr> binds;
       Expr rhs;
