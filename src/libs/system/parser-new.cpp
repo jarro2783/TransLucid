@@ -260,6 +260,7 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
   if (*begin == TOKEN_PREFIX_OP)
   {
     LexerIterator current = begin;
+    ++current;
     TreeNew::Expr rhs;
     expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
 
@@ -303,9 +304,9 @@ bool
 Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
   TreeNew::Expr& result)
 {
-  LexerIterator current = begin;
-  if (*current == TOKEN_IF)
+  if (*begin == TOKEN_IF)
   {
+    LexerIterator current = begin;
     ++current;
 
     TreeNew::Expr cond;
@@ -362,6 +363,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
   switch(begin->getType())
   {
     case TOKEN_INTEGER:
+    std::cerr << "parsing integer" << std::endl;
     result = get<mpz_class>(begin->getValue());
     ++begin;
     break;
@@ -406,6 +408,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
       LexerIterator current = begin;
       ++current;
       parse_function(current, end, result, TOKEN_SLASH);
+      begin = current;
     }
     break;
 
@@ -414,12 +417,17 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
       LexerIterator current = begin;
       ++current;
       parse_function(current, end, result, TOKEN_SLASH);
+      begin = current;
     }
     break;
 
     case TOKEN_HASH:
     result = TreeNew::HashSymbol();
+    ++begin;
     break;
+
+    default:
+    success = false;
   }
 
   return success;

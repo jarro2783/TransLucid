@@ -493,28 +493,35 @@ nextToken
 
   if (id == results.npos())
   {
+    //TODO this should be a parse error
     return Token(Position(), TokenValue(), 0);
   }
 
-  if (id <= TOKEN_FIRST || id >= TOKEN_LAST)
+  //0 is EOF
+  if (id < TOKEN_FIRST || id >= TOKEN_LAST)
   {
     std::cerr << match.getLine() << ":" << match.getChar() 
       << ": invalid token: " << id << std::endl;
     //TODO error handling
     throw "Invalid token";
   }
-  
+
   TokenValue tokVal;
-  try
+
+  if (id != 0)
   {
-    //build up the token
-    tokVal = build_value(id, results.start, results.end,
-      id, context, idents);
-  }
-  catch(...)
-  {
-    //if there is an invalid token then deal with it
-    id = 0;
+    
+    try
+    {
+      //build up the token
+      tokVal = build_value(id, results.start, results.end,
+        id, context, idents);
+    }
+    catch(...)
+    {
+      //if there is an invalid token then deal with it
+      id = 0;
+    }
   }
 
   //set the next StreamPosIterator position

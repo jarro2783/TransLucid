@@ -82,7 +82,7 @@ namespace TransLucid
       bool
       operator!=(int id) const
       {
-        return operator==(id);
+        return !operator==(id);
       }
 
       const Position&
@@ -133,6 +133,9 @@ namespace TransLucid
       : m_stream(new std::list<Token>)
       , m_next(&begin), m_end(&end), m_context(&context), m_idents(idents)
       {
+        //initialise position to the end, then try to read something
+        m_pos = m_stream->end();
+        readOne();
       }
 
       LexerIterator(const LexerIterator& rhs) = default;
@@ -147,13 +150,7 @@ namespace TransLucid
         //into the list
         if (m_pos == m_stream->end())
         {
-          Token t = nextToken(*m_next, *m_end, *m_context, m_idents);
-
-          if (t != 0)
-          {
-            m_pos = m_stream->insert(m_pos, t);
-          }
-          //otherwise leave the stream at end
+          readOne();
         }
 
         return *this;
@@ -189,7 +186,7 @@ namespace TransLucid
       bool
       operator!=(const LexerIterator& rhs) const
       {
-        return operator==(rhs);
+        return !operator==(rhs);
       }
 
       LexerIterator
@@ -206,6 +203,18 @@ namespace TransLucid
       LexerIterator(const TokenStreamPtr& s)
       : m_stream(s), m_pos(m_stream->end()), m_next(0), m_end(0), m_context(0)
       {
+      }
+
+      void
+      readOne()
+      {
+        Token t = nextToken(*m_next, *m_end, *m_context, m_idents);
+
+        if (t != 0)
+        {
+          m_pos = m_stream->insert(m_pos, t);
+        }
+        //otherwise leave the stream at end
       }
 
       TokenStreamPtr m_stream;

@@ -33,7 +33,7 @@ add_custom_command(
   COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/tl
   COMMAND ${CMAKE_BINARY_DIR}/src/generate-lexer/generate-lexer >
     ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp ||
-    rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp
+    (rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp && false)
   DEPENDS ${CMAKE_BINARY_DIR}/src/generate-lexer/generate-lexer
   )
 

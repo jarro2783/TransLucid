@@ -363,7 +363,7 @@ namespace TransLucid
       }
 
       IdentifierLookup()
-      : m_identifiers(0)
+      : m_identifiers(nullptr)
       {}
       
       operator bool() const

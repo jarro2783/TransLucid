@@ -747,12 +747,13 @@ TEST_CASE ( "operators", "check arbitrary operators" )
 TEST_CASE ( "utf8", "utf8 input stream" )
 {
   INFO("testing utf8 input stream");
-  std::string input = "%% 45 4 600";
+  std::string input = u8"%% 45 4 600 ξα";
   Checker checker({
     TOKEN_DBL_PERCENT,
     mpz_class(45),
     mpz_class(4),
-    mpz_class(600)
+    mpz_class(600),
+    TL::u32string(U"ξα")
   });
   CHECK(check_utf8(input, checker));
 }
