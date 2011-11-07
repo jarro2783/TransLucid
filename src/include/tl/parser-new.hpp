@@ -55,6 +55,14 @@ namespace TransLucid
         TreeNew::Expr& result);
 
       bool
+      parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
+        TreeNew::Expr& result);
+
+      bool
+      parse_token_app(LexerIterator& begin, const LexerIterator& end,
+        TreeNew::Expr& result);
+
+      bool
       parse_if();
 
       Token

@@ -17,9 +17,14 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifndef TL_UUID_HPP_INCLUDED
+#define TL_UUID_HPP_INCLUDED
+
 #include <boost/uuid/uuid.hpp>
 
 namespace TransLucid
 {
   typedef boost::uuids::uuid uuid;
 }
+
+#endif

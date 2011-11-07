@@ -109,6 +109,118 @@ bool
 Parser::parse_app_expr(LexerIterator& begin, const LexerIterator& end,
   TreeNew::Expr& result)
 {
+  LexerIterator current = begin;
+
+  TreeNew::Expr lhs;
+  bool success = parse_prefix_expr(current, end, lhs);
+
+  if (success)
+  {
+    bool parsingApp = true;
+    Token next = nextToken(current);
+
+    while (parsingApp)
+    {
+      //this one will modify the lhs and make a binary app expr from it
+      if (!parse_token_app(current, end, lhs))
+      {
+        LexerIterator exprCurrent = begin;
+        TreeNew::Expr rhs;
+        bool parsedExpr = parse_prefix_expr(exprCurrent, end, rhs);
+
+        if (!parsedExpr)
+        {
+          parsingApp = false;
+        }
+        else
+        {
+          //named application
+        }
+      }
+    }
+  }
+
+  return success;
+}
+
+bool
+Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
+  TreeNew::Expr& result)
+{
+  LexerIterator current = begin;
+  bool success = true;
+  switch (current->getType())
+  {
+    case TOKEN_AT:
+    {
+      TreeNew::Expr rhs;
+      ++current;
+      expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
+      //build at expr
+      result = TreeNew::AtExpr(result, rhs);
+    }
+    break;
+
+    case TOKEN_DOT:
+    {
+      TreeNew::Expr rhs;
+      ++current;
+      expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
+      //value application
+      result = TreeNew::LambdaAppExpr(result, rhs);
+    }
+    break;
+
+    case TOKEN_BANG:
+    {
+      TreeNew::Expr rhs;
+      ++current;
+
+      if (current->getType() == TOKEN_LPAREN)
+      {
+        ++current;
+        //parse expression list
+        LexerIterator listIter = current;
+        std::vector<TreeNew::Expr> exprList;
+        TreeNew::Expr element;
+
+        bool makingList = true;
+        while (makingList)
+        {
+          expect(listIter, end, element, U"expr", &Parser::parse_expr);
+          exprList.push_back(std::move(element));
+
+          if (listIter->getType() != TOKEN_COMMA) { makingList = false; }
+        }
+
+        expect(current, end, TOKEN_RPAREN, U")");
+
+        //build a host function with a list of arguments
+        result = TreeNew::BangAppExpr(result, exprList);
+      }
+      else
+      {
+        expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
+        //host function application with one argument
+        result = TreeNew::BangAppExpr(result, rhs);
+      }
+    }
+    break;
+
+    default:
+    //fail
+    success = false;
+    break;
+  }
+
+  if (success) { begin = current; }
+  return success;
+}
+
+bool
+Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
+  TreeNew::Expr& result)
+{
 }
 
 void

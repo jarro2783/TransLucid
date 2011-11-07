@@ -172,6 +172,12 @@ namespace TransLucid
         }
       }
 
+      const Token*
+      operator->() const
+      {
+        return &operator*();
+      }
+
       bool
       operator==(const LexerIterator& rhs) const
       {
