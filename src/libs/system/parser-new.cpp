@@ -69,7 +69,7 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
     if (w == TOKEN_WHERE)
     {
       ++current;
-      expect(current, end, TOKEN_END, U"end");
+      expect(current, end, U"end", TOKEN_END);
     }
     else
     {
@@ -117,16 +117,15 @@ Parser::parse_app_expr(LexerIterator& begin, const LexerIterator& end,
   if (success)
   {
     bool parsingApp = true;
-    Token next = nextToken(current);
+    Token next = *current;
 
     while (parsingApp)
     {
       //this one will modify the lhs and make a binary app expr from it
       if (!parse_token_app(current, end, lhs))
       {
-        LexerIterator exprCurrent = begin;
         TreeNew::Expr rhs;
-        bool parsedExpr = parse_prefix_expr(exprCurrent, end, rhs);
+        bool parsedExpr = parse_prefix_expr(current, end, rhs);
 
         if (!parsedExpr)
         {
@@ -135,9 +134,11 @@ Parser::parse_app_expr(LexerIterator& begin, const LexerIterator& end,
         else
         {
           //named application
+          lhs = TreeNew::PhiAppExpr(lhs, rhs);
         }
       }
     }
+    begin = current;
   }
 
   return success;
@@ -193,7 +194,8 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
           if (listIter->getType() != TOKEN_COMMA) { makingList = false; }
         }
 
-        expect(current, end, TOKEN_RPAREN, U")");
+        expect(current, end, U")", TOKEN_RPAREN);
+        ++current;
 
         //build a host function with a list of arguments
         result = TreeNew::BangAppExpr(result, exprList);
@@ -221,14 +223,119 @@ bool
 Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
   TreeNew::Expr& result)
 {
+  if (*begin == TOKEN_PREFIX_OP)
+  {
+    LexerIterator current = begin;
+    TreeNew::Expr rhs;
+    expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
+
+    //TODO build prefix op
+
+    begin = current;
+    return true;
+  }
+  else
+  {
+    return parse_postfix_expr(begin, end, result);
+  }
 }
 
+bool
+Parser::parse_postfix_expr(LexerIterator& begin, const LexerIterator& end,
+  TreeNew::Expr& result)
+{
+  LexerIterator current = begin;
+  TreeNew::Expr lhs;
+
+  bool success = parse_if_expr(current, end, lhs);
+
+  if (success)
+  {
+    if (*current == TOKEN_POSTFIX_OP)
+    {
+      //TODO build postfix op
+    }
+    else
+    {
+      result = lhs;
+      begin = current;
+    }
+  }
+
+  return success;
+}
+
+bool
+Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
+  TreeNew::Expr& result)
+{
+  LexerIterator current = begin;
+  if (*current == TOKEN_IF)
+  {
+    ++current;
+
+    TreeNew::Expr cond;
+    expect(current, end, cond, U"expr", &Parser::parse_expr);
+
+    expect(current, end, U"then", TOKEN_THEN);
+    ++current;
+
+    TreeNew::Expr action;
+    expect(current, end, action, U"expr", &Parser::parse_expr);
+    
+    //then some elsifs
+    std::vector<std::pair<TreeNew::Expr, TreeNew::Expr>> elsifs;
+    while (*current == TOKEN_ELSIF)
+    {
+      ++current;
+
+      TreeNew::Expr econd;
+      expect(current, end, econd, U"expr", &Parser::parse_expr); 
+
+      expect(current, end, U"then", TOKEN_THEN);
+      ++current;
+
+      TreeNew::Expr ethen;
+      expect(current, end, ethen, U"expr", &Parser::parse_expr); 
+
+      elsifs.push_back(std::make_pair(econd, ethen));
+    }
+
+    expect(current, end, U"else", TOKEN_ELSE);
+    ++current;
+
+    TreeNew::Expr elseexpr;
+    expect(current, end, elseexpr, U"expr", &Parser::parse_expr);
+
+    expect(current, end, U"fi", TOKEN_FI);
+
+    result = TreeNew::IfExpr(cond, action, elsifs, elseexpr);
+
+    begin = current;
+    return true;
+  }
+  else
+  {
+    return parse_primary_expr(begin, end, result);
+  }
+}
+
+bool
+Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
+  TreeNew::Expr& result)
+{
+}
+
+
 void
-Parser::expect(LexerIterator& begin, const LexerIterator& end, size_t token,
-  const u32string& message)
+Parser::expect(LexerIterator& begin, const LexerIterator& end, 
+  const u32string& message,
+  size_t token
+)
 {
   if (begin == end || *begin != token)
   {
+    throw ExpectedToken(token, message);
   }
 
   ++begin;

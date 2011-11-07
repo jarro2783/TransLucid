@@ -55,22 +55,33 @@ namespace TransLucid
         TreeNew::Expr& result);
 
       bool
-      parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
-
-      bool
       parse_token_app(LexerIterator& begin, const LexerIterator& end,
         TreeNew::Expr& result);
 
       bool
-      parse_if();
+      parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
+        TreeNew::Expr& result);
+
+      bool
+      parse_postfix_expr(LexerIterator& begin, const LexerIterator& end,
+        TreeNew::Expr& result);
+
+      bool
+      parse_if_expr(LexerIterator& begin, const LexerIterator& end,
+        TreeNew::Expr& result);
+
+      bool
+      parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
+        TreeNew::Expr& result);
 
       Token
       nextToken(LexerIterator& begin);
 
       void
-      expect(LexerIterator& begin, const LexerIterator& end, size_t token,
-        const u32string& message);
+      expect(LexerIterator& begin, const LexerIterator& end, 
+        const u32string& message,
+        size_t token
+      );
 
       void
       expect(LexerIterator& begin, const LexerIterator& end, 
