@@ -20,11 +20,32 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_UUID_HPP_INCLUDED
 #define TL_UUID_HPP_INCLUDED
 
+#define BOOST_UUID_NO_TYPE_TRAITS
+
 #include <boost/uuid/uuid.hpp>
 
 namespace TransLucid
 {
   typedef boost::uuids::uuid uuid;
+
+  uuid
+  generate_uuid();
+
+  uuid
+  generate_nil_uuid();
+
+  namespace detail
+  {
+    template <>
+    struct clone<uuid>
+    {
+      uuid*
+      operator()(const uuid& u)
+      {
+        return new uuid(u);
+      }
+    };
+  }
 }
 
 #endif

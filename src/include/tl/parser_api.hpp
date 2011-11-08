@@ -24,6 +24,11 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
 
+/**
+ * @file parser_api.hpp
+ * The definitions needed to use the parser.
+ */
+
 namespace TransLucid
 {
   namespace Parser

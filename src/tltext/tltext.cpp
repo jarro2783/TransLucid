@@ -17,15 +17,13 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/expr_parser.hpp>
-#include <tl/equation_parser.hpp>
 #include <tl/hyperdatons/arrayhd.hpp>
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/dimension.hpp>
+#include <tl/types/string.hpp>
 #include <tl/types_util.hpp>
-#include <tl/tuple_parser.hpp>
 #include <tl/system.hpp>
 
 #include <iterator>

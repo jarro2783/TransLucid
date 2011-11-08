@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TYPES_UUID_HPP_INCLUDED
 
 #include <tl/types.hpp>
+#include <tl/uuid.hpp>
 
 namespace TransLucid
 {

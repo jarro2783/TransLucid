@@ -30,26 +30,19 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/tuple.hpp>
 #include <tl/utility.hpp>
 
-#include <boost/uuid/uuid_generators.hpp>
-
 #include <vector>
 
 namespace TransLucid
 {
 
-namespace
-{
-boost::uuids::basic_random_generator<boost::mt19937> uuid_generator;
-}
-
 EquationWS::EquationWS(const u32string& name, const GuardWS& valid, WS* h)
 : m_name(name), m_validContext(valid), m_h(h),
-  m_id(uuid_generator())
+  m_id(generate_uuid())
 {
 }
 
 EquationWS::EquationWS()
-: m_h(0), m_id(boost::uuids::nil_generator()())
+: m_h(0), m_id(generate_nil_uuid())
 {
 }
 

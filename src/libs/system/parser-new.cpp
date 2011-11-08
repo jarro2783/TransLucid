@@ -22,6 +22,11 @@ along with TransLucid; see the file COPYING.  If not see
 // and one past the last token of what it matched if it did match
 // every function called shall have the iterator at the place to start
 
+/**
+ * @file parser-new.cpp
+ * The parser.
+ */
+
 #include <tl/charset.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/output.hpp>

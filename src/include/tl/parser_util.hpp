@@ -27,26 +27,13 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <unordered_map>
 
-#include <gmpxx.h>
 #include <tl/types.hpp>
 #include <tl/utility.hpp>
 #include <tl/charset.hpp>
 #include <tl/ast.hpp>
-#include <tl/parser_defs.hpp>
+//#include <tl/parser_defs.hpp>
 #include <tl/parser_header.hpp>
-
-
-#ifdef BOOST_SPIRIT_DEBUG
-#include <tl/output.hpp>
-#endif
-
-namespace boost { namespace spirit { namespace traits
-{
-  template <typename Enable>
-  struct is_container<mpz_class, Enable>
-  : mpl::false_
-  {};
-}}}
+#include <tl/system.hpp>
 
 namespace TransLucid
 {
@@ -70,19 +57,4 @@ namespace TransLucid
     );
   }
 }
-
-#ifdef BOOST_SPIRIT_DEBUG
-namespace std
-{
-  inline
-  ostream&
-  operator<<(ostream& os, 
-    const pair<TransLucid::u32string, TransLucid::u32string>& p)
-  {
-    os << "pair: \"" << p.first << "\", \"" << p.second << "\"";
-    return os;
-  }
-}
-#endif
-
 #endif // PARSER_UTIL_HPP_INCLUDED

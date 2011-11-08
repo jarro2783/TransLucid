@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/**
+ * @file filehd.cpp
+ * File hyperdaton implementation.
+ */
+
 #include <tl/hyperdatons/filehd.hpp>
 #include <tl/system.hpp>
 #include <tl/types/hyperdatons.hpp>
@@ -237,6 +242,131 @@ FileArrayOutHD::put(const Context& t, const Constant& c)
   {
     m_array->put(t, c);
   }
+}
+
+class FileInCreateWS : public WS
+{
+  public:
+  FileInCreateWS(System& s)
+  : m_system(s)
+  {}
+
+  Constant
+  operator()(Context& k)
+  {
+    return Types::BaseFunction::create(FileArrayInFn(m_system));
+  }
+
+  private:
+  System& m_system;
+};
+
+class FileOutCreateWS : public WS
+{
+  public:
+  FileOutCreateWS(System& s)
+  : m_system(s)
+  {}
+
+  Constant
+  operator()(Context& k)
+  {
+    return Types::BaseFunction::create(FileArrayOutFn(m_system));
+  }
+
+  private:
+  System& m_system;
+};
+
+//the following functions will create the appropriate file hyperdaton
+//which contains an appropriate fstream object and then wrap it up
+//as a constant
+inline Constant
+open_input_file(type_index ti, const u32string& file)
+{
+  FileInputHD* in = new FileInputHD(file);
+
+  return Types::Hyperdatons::create(in, ti);
+}
+
+inline Constant
+open_output_file(type_index ti, const u32string& file)
+{
+  //TODO implement me
+  return Types::Special::create(SP_ERROR);
+}
+
+inline Constant
+open_io_file(type_index ti, const u32string& file)
+{
+  //TODO implement me
+  return Types::Special::create(SP_ERROR);
+}
+
+struct FileOpener
+{
+  FileOpener(type_index in, type_index out, type_index io)
+  : m_in(in), m_out(out), m_io(io)
+  {
+  }
+
+  Constant
+  operator()(const Constant& file, const Constant& mode)
+  {
+    if (mode.index() != TYPE_INDEX_INTMP || 
+        file.index() != TYPE_INDEX_USTRING)
+    {
+      return Types::Special::create(SP_TYPEERROR);
+    }
+
+    const mpz_class& intmode = get_constant_pointer<mpz_class>(mode);
+    const u32string& sfile = get_constant_pointer<u32string>(file);
+
+    switch (intmode.get_ui())
+    {
+      case 1:
+      //input
+      return open_input_file(m_in, sfile);
+      break;
+
+      case 2:
+      //output
+      return open_output_file(m_out, sfile);
+      break;
+
+      case 3:
+      //io
+      return open_io_file(m_out, sfile);
+      break;
+
+      default:
+      return Types::Special::create(SP_DIMENSION);
+    }
+  }
+
+  type_index m_in, m_out, m_io;
+};
+
+
+void
+init_file_hds(System& s)
+{
+  //don't know about this stuff
+  type_index in, out, io;
+
+  in = s.getTypeIndex(U"inhd");
+  out = s.getTypeIndex(U"outhd");
+  io = s.getTypeIndex(U"iohd");
+
+  s.registerFunction(U"fileopen", 
+    make_function_type<2>::type(
+      FileOpener(in, out, io)
+    )
+  );
+  //don't know about above
+
+  s.addEquation(U"file_array_in_hd", new FileInCreateWS(s));
+  s.addEquation(U"file_array_out_hd", new FileOutCreateWS(s));
 }
 
 }

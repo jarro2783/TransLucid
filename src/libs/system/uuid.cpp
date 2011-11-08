@@ -18,7 +18,24 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <iostream>
+#include <tl/fixed_indexes.hpp>
+#include <tl/types/uuid.hpp>
+#include <tl/types_util.hpp>
 #include <tl/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+
+namespace std
+{
+  template <>
+  struct hash<boost::uuids::uuid>
+  {
+    size_t
+    operator()(const boost::uuids::uuid& u) const
+    {
+      return boost::uuids::hash_value(u);
+    }
+  };
+}
 
 namespace boost
 {
@@ -32,6 +49,64 @@ namespace boost
         os << std::hex << i;
       }
       return os;
+    }
+  }
+}
+
+namespace TransLucid
+{
+  namespace
+  {
+    boost::uuids::basic_random_generator<boost::mt19937> uuid_generator;
+
+    TypeFunctions uuid_type_functions =
+      {
+        &Types::UUID::equality,
+        &Types::UUID::hash,
+        &delete_ptr<uuid>
+      };
+  }
+
+  uuid
+  generate_uuid()
+  {
+    return uuid_generator();
+  }
+
+  uuid
+  generate_nil_uuid()
+  {
+    return boost::uuids::nil_generator()();
+  }
+
+  namespace Types
+  {
+    namespace UUID
+    {
+      Constant
+      create(const uuid& i)
+      {
+        return make_constant_pointer
+          (i, &uuid_type_functions, TYPE_INDEX_UUID);
+      }
+
+      const uuid&
+      get(const Constant& u)
+      {
+        return get_constant_pointer<uuid>(u);
+      }
+
+      bool 
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return std::hash<uuid>()(get(c));
+      }
     }
   }
 }

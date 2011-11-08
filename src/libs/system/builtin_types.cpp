@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
-#include <tl/hyperdatons/filehd.hpp>
+//#include <tl/hyperdatons/filehd.hpp>
 #include <tl/internal_strings.hpp>
 #include <tl/output.hpp>
 #include <tl/system.hpp>
@@ -36,7 +36,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/range.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
-#include <tl/types/uuid.hpp>
 #include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
@@ -58,42 +57,11 @@ namespace std
 
 namespace TransLucid
 {
+  void
+  init_file_hds(System& s);
+
   namespace 
   {
-    class FileInCreateWS : public WS
-    {
-      public:
-      FileInCreateWS(System& s)
-      : m_system(s)
-      {}
-
-      Constant
-      operator()(Context& k)
-      {
-        return Types::BaseFunction::create(FileArrayInFn(m_system));
-      }
-
-      private:
-      System& m_system;
-    };
-
-    class FileOutCreateWS : public WS
-    {
-      public:
-      FileOutCreateWS(System& s)
-      : m_system(s)
-      {}
-
-      Constant
-      operator()(Context& k)
-      {
-        return Types::BaseFunction::create(FileArrayOutFn(m_system));
-      }
-
-      private:
-      System& m_system;
-    };
-
     TypeFunctions string_type_functions =
       {
         &Types::String::equality,
@@ -141,13 +109,6 @@ namespace TransLucid
         &Types::Intmp::equality,
         &Types::Intmp::hash,
         &delete_ptr<mpz_class>
-      };
-
-    TypeFunctions uuid_type_functions =
-      {
-        &Types::UUID::equality,
-        &Types::UUID::hash,
-        &delete_ptr<uuid>
       };
 
     TypeFunctions hyperdaton_type_functions =
@@ -353,76 +314,6 @@ namespace TransLucid
         get_constant_pointer<u32string>(b))
       ;
     }
-
-    //the following functions will create the appropriate file hyperdaton
-    //which contains an appropriate fstream object and then wrap it up
-    //as a constant
-    inline Constant
-    open_input_file(type_index ti, const u32string& file)
-    {
-      FileInputHD* in = new FileInputHD(file);
-
-      return Types::Hyperdatons::create(in, ti);
-    }
-
-    inline Constant
-    open_output_file(type_index ti, const u32string& file)
-    {
-      //TODO implement me
-      return Types::Special::create(SP_ERROR);
-    }
-
-    inline Constant
-    open_io_file(type_index ti, const u32string& file)
-    {
-      //TODO implement me
-      return Types::Special::create(SP_ERROR);
-    }
-
-    struct FileOpener
-    {
-      FileOpener(type_index in, type_index out, type_index io)
-      : m_in(in), m_out(out), m_io(io)
-      {
-      }
-
-      Constant
-      operator()(const Constant& file, const Constant& mode)
-      {
-        if (mode.index() != TYPE_INDEX_INTMP || 
-            file.index() != TYPE_INDEX_USTRING)
-        {
-          return Types::Special::create(SP_TYPEERROR);
-        }
-
-        const mpz_class& intmode = get_constant_pointer<mpz_class>(mode);
-        const u32string& sfile = get_constant_pointer<u32string>(file);
-
-        switch (intmode.get_ui())
-        {
-          case 1:
-          //input
-          return open_input_file(m_in, sfile);
-          break;
-
-          case 2:
-          //output
-          return open_output_file(m_out, sfile);
-          break;
-
-          case 3:
-          //io
-          return open_io_file(m_out, sfile);
-          break;
-
-          default:
-          return Types::Special::create(SP_DIMENSION);
-        }
-      }
-
-      type_index m_in, m_out, m_io;
-    };
-
   }
 
   namespace detail
@@ -484,16 +375,6 @@ namespace TransLucid
       operator()(const mpz_class& i)
       {
         return new mpz_class(i);
-      }
-    };
-
-    template <>
-    struct clone<uuid>
-    {
-      uuid*
-      operator()(const uuid& u)
-      {
-        return new uuid(u);
       }
     };
 
@@ -746,34 +627,6 @@ namespace TransLucid
       hash(const Constant& c)
       {
         return get(c).hash();
-      }
-    }
-
-    namespace UUID
-    {
-      Constant
-      create(const uuid& i)
-      {
-        return make_constant_pointer
-          (i, &uuid_type_functions, TYPE_INDEX_UUID);
-      }
-
-      const uuid&
-      get(const Constant& u)
-      {
-        return get_constant_pointer<uuid>(u);
-      }
-
-      bool 
-      equality(const Constant& lhs, const Constant& rhs)
-      {
-        return get(lhs) == get(rhs);
-      }
-
-      size_t
-      hash(const Constant& c)
-      {
-        return boost::hash<uuid>()(get(c));
       }
     }
 
@@ -1036,28 +889,7 @@ NameFunctionType::apply
 void
 add_file_io(System& s)
 {
-  //don't know about this stuff
-  type_index in, out, io;
-
-  in = s.getTypeIndex(U"inhd");
-  out = s.getTypeIndex(U"outhd");
-  io = s.getTypeIndex(U"iohd");
-
-  s.registerFunction(U"fileopen", 
-    make_function_type<2>::type(
-      FileOpener(in, out, io)
-    )
-  );
-  //don't know about above
-
-  //the array-file hd
-  s.addEquation(U"file_array_in_hd", new FileInCreateWS(s));
-  s.addEquation(U"file_array_out_hd", new FileOutCreateWS(s));
-
-  //file [arg0 : string, arg1 : intmp] = "openfile"!(#arg0, #arg1);;
-  //ifile [arg0 : string] = file @ [arg1 <- 1];;
-  //ofile [arg0 : string] = file @ [arg1 <- 2];;
-  //iofile [arg0 : string] = file @ [arg1 <- 3];;
+  init_file_hds(s);
 }
 
 inline
