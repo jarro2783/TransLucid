@@ -22,8 +22,12 @@ along with TransLucid; see the file COPYING.  If not see
 // and one past the last token of what it matched if it did match
 // every function called shall have the iterator at the place to start
 
-#include <tl/parser-new.hpp>
 #include <tl/charset.hpp>
+#include <tl/fixed_indexes.hpp>
+#include <tl/output.hpp>
+#include <tl/parser-new.hpp>
+#include <tl/types/string.hpp>
+#include <tl/types_util.hpp>
 
 #define XSTRING(x) STRING(x)
 #define STRING(x) #x
@@ -46,8 +50,77 @@ ExpectedExpr::ExpectedExpr(const u32string& text)
 }
 
 Parser::Parser(System& system)
-: m_idents(system.lookupIdentifiers())
+: m_idents(system.lookupIdentifiers()), m_context(system.getDefaultContext())
 {
+}
+
+/**
+ * Finds a binary operator from a string.
+ *
+ * Tries to match the string @a s with an existing binary operator.
+ * If it doesn't exist, then it uses the default error operator and
+ * flags the parser that there was a problem.
+ * @param s The text of the operator.
+ * @param h The parser header.
+ * @return The binary operator instance.
+ * @todo Implement the error flagging.
+ */
+inline TreeNew::BinaryOperator
+find_binary_operator
+(
+  const u32string& symbol, 
+  const System::IdentifierLookup& idents,
+  dimension_index symbolDim,
+  Context& k
+)
+{
+  //lookup ATL_SYMBOL, ASSOC, PREC
+
+  //std::cerr << "looking up symbol " << symbol << std::endl;
+
+  ContextPerturber p(k, {{symbolDim, Types::String::create(symbol)}});
+  WS* atlWS = idents.lookup(U"ATL_SYMBOL");
+  Constant atl = (*atlWS)(k);
+
+  WS* assocWS = idents.lookup(U"ASSOC");
+  Constant assoc = (*assocWS)(k);
+
+  WS* precWS = idents.lookup(U"PREC");
+  Constant prec = (*precWS)(k);
+
+  const u32string& assocName = get_constant_pointer<u32string>(assoc);
+
+  TreeNew::InfixAssoc ia = TreeNew::ASSOC_LEFT;
+  if (assocName == U"LEFT")
+  {
+    ia = TreeNew::ASSOC_LEFT;
+  }
+  else if (assocName == U"RIGHT")
+  {
+    ia = TreeNew::ASSOC_RIGHT;
+  }
+  else if (assocName == U"NON")
+  {
+    ia = TreeNew::ASSOC_NON;
+  }
+
+  #if 0
+  std::cerr << "retrieved op" << std::endl
+            << "  symbol: " << symbol << std::endl
+            << "  op    : " << get_constant_pointer<u32string>(atl)
+            << std::endl
+            << "  assoc : " << assocName << std::endl
+            << "  prec  : " << get_constant_pointer<mpz_class>(prec)
+            << std::endl;
+  #endif
+
+  return TreeNew::BinaryOperator
+  {
+    ia,
+    get_constant_pointer<u32string>(atl),
+    symbol,
+    get_constant_pointer<mpz_class>(prec)
+  };
 }
 
 /**
@@ -98,10 +171,11 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
 
   if (success)
   {
-    Token w = *begin;
+    Token w = *current;
 
     if (w == TOKEN_WHERE)
     {
+      //TODO parse all of where clause
       ++current;
       expect(current, end, U"end", TOKEN_END);
     }
@@ -125,12 +199,27 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
   
   if (success)
   {
-    Token t = nextToken(current);
+    Token t = *current;
     while (t == TOKEN_BINARY_OP)
     {
+      //TODO build binary op
       TreeNew::Expr rhs;
       expect(current, end, rhs, U"expr", &Parser::parse_app_expr);
-      t = nextToken(current);
+
+      app = TreeNew::insert_binary_operator
+      (
+        find_binary_operator
+        (
+          get<u32string>(t.getValue()),
+          m_idents,
+          DIM_SYMBOL,
+          m_context
+        ),
+        app, 
+        rhs
+      );
+
+      t = *current;
     }
     begin = current;
     result = app;
@@ -230,7 +319,6 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
         }
 
         expect(current, end, U")", TOKEN_RPAREN);
-        ++current;
 
         //build a host function with a list of arguments
         result = TreeNew::BangAppExpr(result, exprList);
@@ -314,7 +402,6 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
     expect(current, end, cond, U"expr", &Parser::parse_expr);
 
     expect(current, end, U"then", TOKEN_THEN);
-    ++current;
 
     TreeNew::Expr action;
     expect(current, end, action, U"expr", &Parser::parse_expr);
@@ -329,7 +416,6 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
       expect(current, end, econd, U"expr", &Parser::parse_expr); 
 
       expect(current, end, U"then", TOKEN_THEN);
-      ++current;
 
       TreeNew::Expr ethen;
       expect(current, end, ethen, U"expr", &Parser::parse_expr); 
@@ -338,7 +424,6 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
     }
 
     expect(current, end, U"else", TOKEN_ELSE);
-    ++current;
 
     TreeNew::Expr elseexpr;
     expect(current, end, elseexpr, U"expr", &Parser::parse_expr);
@@ -364,7 +449,6 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
   switch(begin->getType())
   {
     case TOKEN_INTEGER:
-    std::cerr << "parsing integer" << std::endl;
     result = get<mpz_class>(begin->getValue());
     ++begin;
     break;
@@ -387,10 +471,11 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     case TOKEN_CONSTANT_RAW:
     case TOKEN_CONSTANT_INTERPRETED:
     result = construct_typed_constant(begin);
+    ++begin;
     break;
 
     case TOKEN_LSQUARE:
-    //a tuple
+    //TODO a tuple
     break;
 
     case TOKEN_LPAREN:
@@ -463,7 +548,6 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
   expect(current, end, U"identifier", TOKEN_ID);
   u32string name = get<u32string>(current->getValue());
 
-  ++current;
   expect(current, end, U"->", TOKEN_RARROW);
 
   TreeNew::Expr rhs;
@@ -517,7 +601,6 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
   }
 
   begin = current;
-  ++begin;
 }
 
 Token

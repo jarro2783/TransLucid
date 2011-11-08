@@ -62,17 +62,24 @@ void test2()
     s.lookupIdentifiers()
   );
 
+  TL::Parser::LexerIterator other = begin;
+
   TL::Parser::LexerIterator end = begin.makeEnd();
 
   CHECK(begin->getType() == TL::Parser::TOKEN_INTEGER);
   ++begin;
   CHECK(*begin == 0);
+
+  CHECK(begin == end);
+
+  ++other;
+  CHECK(other == end);
 }
 
 #ifndef DISABLE_CATCH
 TEST_CASE( "expr parser", "basic expression parser tests" )
 #else
-void test1()
+void test3()
 #endif
 {
   TL::System s;
@@ -108,13 +115,47 @@ void test1()
   CHECK(success);
   CHECK(begin == end);
   CHECK(TL::get<mpz_class>(result) == 42);
+
+  //function application
+  std::string input2("f.d A B");
+
+  TL::Parser::StreamPosIterator rawbegin2
+  (
+    TL::Parser::U32Iterator(
+      TL::Parser::makeUTF8Iterator(input2.begin()),
+      TL::Parser::makeUTF8Iterator(input2.end())
+    ),
+    U"f.d A B"
+  );
+
+  TL::Parser::LexerIterator begin2
+  {
+    rawbegin2,
+    rawend,
+    s.getDefaultContext(),
+    s.lookupIdentifiers()
+  };
+  TL::Parser::LexerIterator end2 = begin2.makeEnd();
+
+  CHECK(p.parse_expr(begin2, end2, result));
+  CHECK(print_expr_tree(result) == "f.d A B");
+
+  TL::TreeNew::PhiAppExpr* appB = TL::get<TL::TreeNew::PhiAppExpr>(&result);
+  REQUIRE(appB != 0);
+
+  TL::TreeNew::PhiAppExpr* appA = TL::get<TL::TreeNew::PhiAppExpr>(&appB->lhs);
+  REQUIRE(appA != 0);
+
+  TL::TreeNew::LambdaAppExpr* appd = TL::get<TL::TreeNew::LambdaAppExpr>
+    (&appA->lhs);
+  REQUIRE(appd != 0);
 }
 
 #ifdef DISABLE_CATCH
 int main()
 {
-  test1();
   test2();
+  test3();
   return 0;
 }
 #endif

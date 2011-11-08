@@ -354,12 +354,12 @@ namespace TransLucid
              >> app_expr
             )
             [
-              _a = ph::bind(&Tree::insert_binary_operator, 
-                     ph::bind(&find_binary_operator, 
+              _a = ph::bind(&Tree::insert_binary_operator,
+                     ph::bind(&find_binary_operator,
                        _1,
                        ph::ref(m_idents),
                        m_symbolDim,
-                       ph::ref(m_context)), 
+                       ph::ref(m_context)),
                      _a, _2)
             ]
          )

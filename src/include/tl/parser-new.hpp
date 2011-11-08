@@ -96,6 +96,7 @@ namespace TransLucid
       );
 
       System::IdentifierLookup m_idents;
+      Context& m_context;
     };
 
     class ParseError : public std::exception

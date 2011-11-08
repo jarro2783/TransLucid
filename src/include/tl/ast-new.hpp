@@ -731,6 +731,23 @@ namespace TransLucid
       std::vector<size_t> whichDims;
     };
 
+    /**
+     * Creates a binary operation from the op and the left and right hand
+     * sides. Inserts one into the tree of the other depending on the
+     * precedence and associativity to create the correct tree for evaluation.
+     * @param info The binary operation.
+     * @param lhs The left hand side expression.
+     * @param rhs The right hand side expression.
+     * @return The resulting operation.
+     */
+    Expr
+    insert_binary_operator
+    (
+      const BinaryOperator& info,
+      Expr& lhs,
+      Expr& rhs
+    );
+
     #ifdef DEBUG
     #define PRINT_NODE(n) \
     inline \
