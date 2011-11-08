@@ -28,8 +28,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/eval_workshops.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
-#include <tl/maxsharelist.hpp>
-#include <tl/output.hpp>
 #include <tl/system.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/function.hpp>
@@ -38,8 +36,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
-
-#include <sstream>
 
 namespace TransLucid
 {
