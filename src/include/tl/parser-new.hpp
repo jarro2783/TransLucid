@@ -41,6 +41,11 @@ namespace TransLucid
       parse_equation();
 
       private:
+      enum TupleSeparator
+      {
+        SEPARATOR_COLON,
+        SEPARATOR_ARROW
+      };
       //all the parse functions
       bool
       parse_where(LexerIterator& begin, const LexerIterator& end,
@@ -79,6 +84,10 @@ namespace TransLucid
         Tree::Expr& result,
         size_t type);
 
+      bool 
+      parse_tuple(LexerIterator& begin, const LexerIterator& end,
+        Tree::Expr& result, TupleSeparator sep);
+
       Token
       nextToken(LexerIterator& begin);
 
@@ -88,11 +97,13 @@ namespace TransLucid
         size_t token
       );
 
+      template <typename... T>
       void
       expect(LexerIterator& begin, const LexerIterator& end, 
         Tree::Expr& result, const std::u32string& message,
         bool (Parser::*parser)
-          (LexerIterator&, const LexerIterator&, Tree::Expr&)
+          (LexerIterator&, const LexerIterator&, Tree::Expr&, T...),
+        T&&... args
       );
 
       System::IdentifierLookup m_idents;

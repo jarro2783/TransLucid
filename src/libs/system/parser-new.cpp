@@ -73,6 +73,41 @@ Parser::Parser(System& system)
 {
 }
 
+void
+Parser::expect(LexerIterator& begin, const LexerIterator& end, 
+  const u32string& message,
+  size_t token
+)
+{
+  if (begin == end || *begin != token)
+  {
+    throw ExpectedToken(begin, token, message);
+  }
+
+  ++begin;
+}
+
+template <typename... T>
+void
+Parser::expect(LexerIterator& begin, const LexerIterator& end, 
+  Tree::Expr& result, const std::u32string& message,
+  bool (Parser::*parser)
+    (LexerIterator&, const LexerIterator&, Tree::Expr&, T...),
+  T&&... args
+)
+{
+  LexerIterator current = begin;
+  bool success = (this->*parser)(current, end, result, 
+    std::forward<T>(args)...);
+
+  if (!success)
+  {
+    throw ExpectedExpr(begin, message);
+  }
+
+  begin = current;
+}
+
 /**
  * Finds a binary operator from a string.
  *
@@ -495,7 +530,15 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     break;
 
     case TOKEN_LSQUARE:
-    //TODO a tuple
+    {
+      LexerIterator current = begin;
+      Tree::Expr tuple;
+
+      expect(current, begin, tuple, U"tuple", 
+        &Parser::parse_tuple, SEPARATOR_ARROW);
+
+      begin = current;
+    }
     break;
 
     case TOKEN_LPAREN:
@@ -593,35 +636,33 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
   begin = current;
 }
 
-void
-Parser::expect(LexerIterator& begin, const LexerIterator& end, 
-  const u32string& message,
-  size_t token
-)
+bool 
+Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
+  Tree::Expr& result, TupleSeparator sep)
 {
-  if (begin == end || *begin != token)
-  {
-    throw ExpectedToken(begin, token, message);
-  }
+  if (*begin != TOKEN_LSQUARE) { return false; }
 
-  ++begin;
-}
-
-void
-Parser::expect(LexerIterator& begin, const LexerIterator& end, 
-  Tree::Expr& result, const std::u32string& message,
-  bool (Parser::*parser)(LexerIterator&, const LexerIterator&, Tree::Expr&)
-)
-{
   LexerIterator current = begin;
-  bool success = (this->*parser)(current, end, result);
 
-  if (!success)
+  size_t tok = sep == SEPARATOR_COLON ? TOKEN_COLON : TOKEN_LARROW;
+
+  bool parsingTuple = true;
+  while (parsingTuple)
   {
-    throw ExpectedExpr(begin, message);
+    Tree::Expr lhs;
+    Tree::Expr rhs;
+    expect(current, end, lhs, U"expr", &Parser::parse_expr);
+    expect(current, end, U"<-", tok);
+    expect(current, end, rhs, U"expr", &Parser::parse_expr);
+
+    if (*current != TOKEN_COMMA) { parsingTuple = false; }
+    ++current;
   }
+
+  expect(current, end, U"]", TOKEN_RSQUARE);
 
   begin = current;
+  return true;
 }
 
 Token
