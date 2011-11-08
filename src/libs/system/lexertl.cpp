@@ -54,7 +54,7 @@ namespace
       m_functions[TOKEN_INTEGER] = &buildInteger;
       m_functions[TOKEN_CONSTANT_RAW] = &buildConstant;
       m_functions[TOKEN_CONSTANT_INTERPRETED] = &buildConstant;
-      m_functions[TOKEN_ID] = &buildString;
+      m_functions[TOKEN_ID] = &buildIdentifier;
       m_functions[TOKEN_UCHAR] = &buildChar;
       m_functions[TOKEN_WHERE] = &buildWhere;
       m_functions[TOKEN_RANGE] = &buildRange;
@@ -113,13 +113,33 @@ namespace
     }
 
     static TokenValue
-    buildString(StreamPosIterator begin, const StreamPosIterator& end,
+    buildIdentifier(StreamPosIterator begin, const StreamPosIterator& end,
       size_t& id,
       Context& context,
       System::IdentifierLookup& idents
     )
     {
-      return u32string(begin, end);
+      u32string ident(begin, end);
+      //lookup ID_TYPE
+      WS* lookup = idents.lookup(U"ID_TYPE");
+
+      if (lookup)
+      {
+        ContextPerturber p(context, {{DIM_ARG0, Types::String::create(ident)}});
+        Constant c = (*lookup)(context);
+
+        const u32string& type = get_constant_pointer<u32string>(c);
+
+        if (type == U"DIM")
+        {
+          id = TOKEN_DIM_IDENTIFIER;
+        }
+        else if (type == U"DECLID")
+        {
+          id = TOKEN_DECLID;
+        }
+      }
+
     }
 
     static TokenValue
