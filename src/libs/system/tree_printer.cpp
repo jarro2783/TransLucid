@@ -18,7 +18,7 @@ class TreePrinterNew
   //but DO NOT use the visitor directly
   //I cannot be responsible for what happens if you do
   //of course since this class is only used internall, you knew all that right
-  std::string printTree(const TreeNew::Expr& e);
+  std::string printTree(const Tree::Expr& e);
 
   private:
   std::ostringstream m_os;
@@ -191,14 +191,14 @@ class TreePrinterNew
   }
 
   void 
-  operator()(const TreeNew::LiteralExpr& l)
+  operator()(const Tree::LiteralExpr& l)
   {
     m_os << l.type;
     operator()(l.text);
   }
 
   void
-  operator()(const TreeNew::DimensionExpr& d)
+  operator()(const Tree::DimensionExpr& d)
   {
     if (d.text.size() == 0)
     {
@@ -211,31 +211,31 @@ class TreePrinterNew
   }
 
   void
-  operator()(const TreeNew::IdentExpr& ident)
+  operator()(const Tree::IdentExpr& ident)
   {
     m_os << ident.text;
   }
 
   void
-  operator()(const TreeNew::HashSymbol&)
+  operator()(const Tree::HashSymbol&)
   {
     m_os << "#";
   }
 
   void
-  operator()(const TreeNew::ParenExpr& p)
+  operator()(const Tree::ParenExpr& p)
   {
     //pass on the paren info without modification
     apply_visitor(*this, p.e);
   }
 
   void
-  operator()(const TreeNew::UnaryOpExpr& u)
+  operator()(const Tree::UnaryOpExpr& u)
   {
     Precedence precedence;
     Assoc assoc;
     Subtree subtree;
-    if (u.op.type == TreeNew::UNARY_PREFIX)
+    if (u.op.type == Tree::UNARY_PREFIX)
     {
       precedence = Precedence::PREFIX_FN;
       assoc = Assoc::RIGHT;
@@ -258,20 +258,20 @@ class TreePrinterNew
     parenPop();
     pp(')', precedence);
 
-    if (u.op.type == TreeNew::UNARY_POSTFIX)
+    if (u.op.type == Tree::UNARY_POSTFIX)
     {
       m_os << u.op.symbol;
     }
   }
 
   ExprPrecedence
-  build_binop_precedence(const TreeNew::BinaryOpExpr& binop) const
+  build_binop_precedence(const Tree::BinaryOpExpr& binop) const
   {
     return ExprPrecedence(Precedence::BINARY_FN, binop.op.precedence);
   }
 
   Assoc
-  binop_assoc(const TreeNew::BinaryOpExpr& binop) const
+  binop_assoc(const Tree::BinaryOpExpr& binop) const
   {
     Assoc a = Assoc::NON;
 
@@ -297,7 +297,7 @@ class TreePrinterNew
   }
 
   void
-  operator()(const TreeNew::BinaryOpExpr& u)
+  operator()(const Tree::BinaryOpExpr& u)
   {
     auto prec = build_binop_precedence(u);
     auto assoc = binop_assoc(u);
@@ -316,7 +316,7 @@ class TreePrinterNew
   }
 
   void
-  operator()(const TreeNew::IfExpr& ife)
+  operator()(const Tree::IfExpr& ife)
   {
     m_os << "if ";
     parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
@@ -340,7 +340,7 @@ class TreePrinterNew
   }
 
   void
-  operator()(const TreeNew::HashExpr& h)
+  operator()(const Tree::HashExpr& h)
   {
     m_os << "#!";
 
@@ -361,7 +361,7 @@ class TreePrinterNew
   }
 
   void
-  operator()(const TreeNew::TupleExpr& t)
+  operator()(const Tree::TupleExpr& t)
   {
     parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
     m_os << "[";
@@ -383,7 +383,7 @@ class TreePrinterNew
   }
 
   void
-  operator()(const TreeNew::AtExpr& a)
+  operator()(const Tree::AtExpr& a)
   {
     pp('(', Precedence::FN_APP);
     parenPush(Precedence::FN_APP, Assoc::LEFT, Subtree::LEFT);
@@ -411,13 +411,13 @@ class TreePrinterNew
   }
 
   void
-  operator()(const TreeNew::LambdaExpr& l)
+  operator()(const Tree::LambdaExpr& l)
   {
     print_fn_abstraction(l, U"\\");
   }
 
   void
-  operator()(const TreeNew::PhiExpr& p)
+  operator()(const Tree::PhiExpr& p)
   {
     print_fn_abstraction(p, U"\\\\");
   }
@@ -442,19 +442,19 @@ class TreePrinterNew
   }
 
   void
-  operator()(const TreeNew::LambdaAppExpr& l)
+  operator()(const Tree::LambdaAppExpr& l)
   {
     print_fn_application(l, '.');
   }
 
   void
-  operator()(const TreeNew::PhiAppExpr& l)
+  operator()(const Tree::PhiAppExpr& l)
   {
     print_fn_application(l, ' ');
   }
 
   void
-  operator()(const TreeNew::WhereExpr& w)
+  operator()(const Tree::WhereExpr& w)
   {
     pp('(', Precedence::WHERE_CLAUSE);
 
@@ -471,7 +471,7 @@ class TreePrinterNew
   }
 };
 
-std::string print_expr_tree(const TreeNew::Expr& expr)
+std::string print_expr_tree(const Tree::Expr& expr)
 {
   TreePrinterNew print;
   return print.printTree(expr);
@@ -480,13 +480,13 @@ std::string print_expr_tree(const TreeNew::Expr& expr)
 std::string print_expr_tree(const Tree::Expr& expr)
 {
   TreeOldToNew convert;
-  TreeNew::Expr newe = boost::apply_visitor(convert, expr);
+  Tree::Expr newe = boost::apply_visitor(convert, expr);
 
   return print_expr_tree(newe);
 }
 
 std::string 
-TreePrinterNew::printTree(const TreeNew::Expr& e)
+TreePrinterNew::printTree(const Tree::Expr& e)
 {
   m_os.clear();
   parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);

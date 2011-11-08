@@ -106,9 +106,9 @@ namespace TransLucid
       const std::tuple
       <
         u32string, 
-        TreeNew::Expr, 
-        TreeNew::Expr, 
-        TreeNew::Expr
+        Tree::Expr, 
+        Tree::Expr, 
+        Tree::Expr
       >& e);
 
     class Header;

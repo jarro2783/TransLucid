@@ -8,118 +8,118 @@ namespace TransLucid
   class TreeOldToNew
   {
     public:
-    typedef TreeNew::Expr result_type;
+    typedef Tree::Expr result_type;
 
-    TreeNew::Expr operator()(const Tree::nil& n)
+    Tree::Expr operator()(const Tree::nil& n)
     {
-      return TreeNew::nil();
+      return Tree::nil();
     }
 
-    TreeNew::Expr operator()(bool b)
+    Tree::Expr operator()(bool b)
     {
       return b;
     }
 
-    TreeNew::Expr operator()(Special s)
+    Tree::Expr operator()(Special s)
     {
       return s;
     }
 
-    TreeNew::Expr operator()(const mpz_class& i)
+    Tree::Expr operator()(const mpz_class& i)
     {
       return i;
     }
 
-    TreeNew::Expr operator()(char32_t c)
+    Tree::Expr operator()(char32_t c)
     {
       return c;
     }
 
-    TreeNew::Expr operator()(const u32string& s)
+    Tree::Expr operator()(const u32string& s)
     {
       return s;
     }
 
-    TreeNew::Expr operator()(const Tree::HashSymbol& e)
+    Tree::Expr operator()(const Tree::HashSymbol& e)
     {
-      return TreeNew::HashSymbol();
+      return Tree::HashSymbol();
     }
 
-    TreeNew::Expr operator()(const Tree::LiteralExpr& e)
+    Tree::Expr operator()(const Tree::LiteralExpr& e)
     {
-      return TreeNew::LiteralExpr(e.type, e.text);
+      return Tree::LiteralExpr(e.type, e.text);
     }
 
-    TreeNew::Expr operator()(const Tree::DimensionExpr& e)
+    Tree::Expr operator()(const Tree::DimensionExpr& e)
     {
-      TreeNew::DimensionExpr dim;
+      Tree::DimensionExpr dim;
       dim.text = e.text;
       dim.dim = e.dim;
       return dim;
     }
 
-    TreeNew::Expr operator()(const Tree::IdentExpr& e)
+    Tree::Expr operator()(const Tree::IdentExpr& e)
     {
-      return TreeNew::IdentExpr(e.text);
+      return Tree::IdentExpr(e.text);
     }
 
-    TreeNew::Expr operator()(const Tree::ParenExpr& e)
+    Tree::Expr operator()(const Tree::ParenExpr& e)
     {
-      return TreeNew::ParenExpr(boost::apply_visitor(*this, e.e));
+      return Tree::ParenExpr(boost::apply_visitor(*this, e.e));
     }
 
-    TreeNew::Expr operator()(const Tree::UnaryOpExpr& e)
+    Tree::Expr operator()(const Tree::UnaryOpExpr& e)
     {
-      TreeNew::UnaryType type = TreeNew::UNARY_PREFIX;
+      Tree::UnaryType type = Tree::UNARY_PREFIX;
       switch(e.op.type)
       {
         case Tree::UNARY_PREFIX:
-        type = TreeNew::UNARY_PREFIX;
+        type = Tree::UNARY_PREFIX;
         break;
 
         case Tree::UNARY_POSTFIX:
-        type = TreeNew::UNARY_POSTFIX;
+        type = Tree::UNARY_POSTFIX;
         break;
       }
 
-      return TreeNew::UnaryOpExpr
+      return Tree::UnaryOpExpr
       (
-        TreeNew::UnaryOperator(e.op.op, e.op.symbol, type),
+        Tree::UnaryOperator(e.op.op, e.op.symbol, type),
         boost::apply_visitor(*this, e.e)
       );
     }
 
-    TreeNew::Expr operator()(const Tree::BinaryOpExpr& e)
+    Tree::Expr operator()(const Tree::BinaryOpExpr& e)
     {
       const Tree::BinaryOperator& oldop = e.op;
-      TreeNew::InfixAssoc assoc = TreeNew::ASSOC_LEFT;
+      Tree::InfixAssoc assoc = Tree::ASSOC_LEFT;
       switch(oldop.assoc)
       {
         case Tree::ASSOC_LEFT:
-        assoc = TreeNew::ASSOC_LEFT;
+        assoc = Tree::ASSOC_LEFT;
         break;
 
         case Tree::ASSOC_RIGHT:
-        assoc = TreeNew::ASSOC_RIGHT;
+        assoc = Tree::ASSOC_RIGHT;
         break;
 
         case Tree::ASSOC_NON:
-        assoc = TreeNew::ASSOC_NON;
+        assoc = Tree::ASSOC_NON;
         break;
 
         case Tree::ASSOC_VARIABLE:
-        assoc = TreeNew::ASSOC_VARIABLE;
+        assoc = Tree::ASSOC_VARIABLE;
         break;
 
         case Tree::ASSOC_COMPARISON:
-        assoc = TreeNew::ASSOC_COMPARISON;
+        assoc = Tree::ASSOC_COMPARISON;
         break;
       }
 
-      TreeNew::BinaryOperator newop(
+      Tree::BinaryOperator newop(
         assoc, oldop.op, oldop.symbol, oldop.precedence);
 
-      return TreeNew::BinaryOpExpr
+      return Tree::BinaryOpExpr
       (
         newop, 
         boost::apply_visitor(*this, e.lhs), 
@@ -127,9 +127,9 @@ namespace TransLucid
       );
     }
 
-    TreeNew::Expr operator()(const Tree::IfExpr& e)
+    Tree::Expr operator()(const Tree::IfExpr& e)
     {
-      std::vector<std::pair<TreeNew::Expr, TreeNew::Expr>> else_ifs;
+      std::vector<std::pair<Tree::Expr, Tree::Expr>> else_ifs;
 
       for (const auto p : e.else_ifs)
       {
@@ -139,7 +139,7 @@ namespace TransLucid
         ));
       }
 
-      return TreeNew::IfExpr
+      return Tree::IfExpr
       (
         boost::apply_visitor(*this, e.condition),
         boost::apply_visitor(*this, e.then),
@@ -148,14 +148,14 @@ namespace TransLucid
       );
     }
 
-    TreeNew::Expr operator()(const Tree::HashExpr& e)
+    Tree::Expr operator()(const Tree::HashExpr& e)
     {
-      return TreeNew::HashExpr(boost::apply_visitor(*this, e.e));
+      return Tree::HashExpr(boost::apply_visitor(*this, e.e));
     }
 
-    TreeNew::Expr operator()(const Tree::TupleExpr& e)
+    Tree::Expr operator()(const Tree::TupleExpr& e)
     {
-      TreeNew::TupleExpr::TuplePairs pairs;
+      Tree::TupleExpr::TuplePairs pairs;
 
       std::transform(e.pairs.begin(), e.pairs.end(), std::back_inserter(pairs),
         [this] (const decltype(e.pairs)::value_type& p)
@@ -168,30 +168,30 @@ namespace TransLucid
         }
       );
 
-      return TreeNew::TupleExpr(pairs);
+      return Tree::TupleExpr(pairs);
     }
 
-    TreeNew::Expr operator()(const Tree::AtExpr& e)
+    Tree::Expr operator()(const Tree::AtExpr& e)
     {
-      return TreeNew::AtExpr
+      return Tree::AtExpr
       (
         boost::apply_visitor(*this, e.lhs),
         boost::apply_visitor(*this, e.rhs)
       );
     }
 
-    TreeNew::Expr operator()(const Tree::BangExpr& e)
+    Tree::Expr operator()(const Tree::BangExpr& e)
     {
-      TreeNew::BangExpr newbang(e.name, boost::apply_visitor(*this, e.rhs));
+      Tree::BangExpr newbang(e.name, boost::apply_visitor(*this, e.rhs));
       newbang.argDim = e.argDim;
       newbang.scope = e.scope;
 
       return newbang;
     }
 
-    TreeNew::Expr operator()(const Tree::LambdaExpr& e)
+    Tree::Expr operator()(const Tree::LambdaExpr& e)
     {
-      TreeNew::LambdaExpr lamb(std::vector<TreeNew::Expr>(),
+      Tree::LambdaExpr lamb(std::vector<Tree::Expr>(),
         e.name, boost::apply_visitor(*this, e.rhs));
       lamb.argDim = e.argDim;
       lamb.scope = e.scope;
@@ -199,9 +199,9 @@ namespace TransLucid
       return lamb;
     }
 
-    TreeNew::Expr operator()(const Tree::PhiExpr& e)
+    Tree::Expr operator()(const Tree::PhiExpr& e)
     {
-      TreeNew::PhiExpr phi(std::vector<TreeNew::Expr>(),
+      Tree::PhiExpr phi(std::vector<Tree::Expr>(),
         e.name, boost::apply_visitor(*this, e.rhs));
       phi.argDim = e.argDim;
       phi.odometerDim = e.odometerDim;
@@ -210,9 +210,9 @@ namespace TransLucid
       return phi;
     }
 
-    TreeNew::Expr operator()(const Tree::BangAppExpr& e)
+    Tree::Expr operator()(const Tree::BangAppExpr& e)
     {
-      std::vector<TreeNew::Expr> args;
+      std::vector<Tree::Expr> args;
       std::transform(e.args.begin(), e.args.end(), std::back_inserter(args),
         [this] (const Tree::Expr& old)
         {
@@ -220,23 +220,23 @@ namespace TransLucid
         }
       );
 
-      return TreeNew::BangAppExpr(
+      return Tree::BangAppExpr(
         boost::apply_visitor(*this, e.name),
         args);
     }
 
-    TreeNew::Expr operator()(const Tree::LambdaAppExpr& e)
+    Tree::Expr operator()(const Tree::LambdaAppExpr& e)
     {
-      return TreeNew::LambdaAppExpr
+      return Tree::LambdaAppExpr
       (
         boost::apply_visitor(*this, e.lhs),
         boost::apply_visitor(*this, e.rhs)
       );
     }
 
-    TreeNew::Expr operator()(const Tree::PhiAppExpr& e)
+    Tree::Expr operator()(const Tree::PhiAppExpr& e)
     {
-      TreeNew::PhiAppExpr phiapp(
+      Tree::PhiAppExpr phiapp(
         boost::apply_visitor(*this, e.lhs),
         boost::apply_visitor(*this, e.rhs)
       );
@@ -246,9 +246,9 @@ namespace TransLucid
       return phiapp;
     }
 
-    TreeNew::Expr operator()(const Tree::WhereExpr& e)
+    Tree::Expr operator()(const Tree::WhereExpr& e)
     {
-      TreeNew::WhereExpr where;
+      Tree::WhereExpr where;
       where.e = boost::apply_visitor(*this, e.e);
       where.name = e.name;
 

@@ -35,7 +35,7 @@ namespace TransLucid
       
       bool
       parse_expr(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       void
       parse_equation();
@@ -44,39 +44,39 @@ namespace TransLucid
       //all the parse functions
       bool
       parse_where(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       bool
       parse_binary_op(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       bool
       parse_app_expr(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       bool
       parse_token_app(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       bool
       parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       bool
       parse_postfix_expr(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       bool
       parse_if_expr(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       bool
       parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result);
+        Tree::Expr& result);
 
       void
       parse_function(LexerIterator& begin, const LexerIterator& end,
-        TreeNew::Expr& result,
+        Tree::Expr& result,
         size_t type);
 
       Token
@@ -90,9 +90,9 @@ namespace TransLucid
 
       void
       expect(LexerIterator& begin, const LexerIterator& end, 
-        TreeNew::Expr& result, const std::u32string& message,
+        Tree::Expr& result, const std::u32string& message,
         bool (Parser::*parser)
-          (LexerIterator&, const LexerIterator&, TreeNew::Expr&)
+          (LexerIterator&, const LexerIterator&, Tree::Expr&)
       );
 
       System::IdentifierLookup m_idents;

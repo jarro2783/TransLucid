@@ -97,24 +97,24 @@ printEquationNew(
   const std::tuple
   <
     u32string, 
-    TreeNew::Expr, 
-    TreeNew::Expr, 
-    TreeNew::Expr
+    Tree::Expr, 
+    Tree::Expr, 
+    Tree::Expr
   >& e)
 {
   std::string generated;
 
   std::string result = utf32_to_utf8(to_u32string(std::get<0>(e)));
 
-  const TreeNew::Expr& guard = std::get<1>(e);
-  if (get<TreeNew::nil>(&guard) == 0)
+  const Tree::Expr& guard = std::get<1>(e);
+  if (get<Tree::nil>(&guard) == 0)
   {
     generated = print_expr_tree(guard);
     result += " " + generated;
   }
 
-  const TreeNew::Expr& boolean = std::get<2>(e);
-  if (get<TreeNew::nil>(&boolean) == 0)
+  const Tree::Expr& boolean = std::get<2>(e);
+  if (get<Tree::nil>(&boolean) == 0)
   {
     generated = print_expr_tree(boolean);
     result += " | " + generated;

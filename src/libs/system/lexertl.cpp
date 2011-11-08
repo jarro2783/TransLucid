@@ -418,28 +418,28 @@ namespace
       //strings will be of the form infix{l,m,n,p,r}
       TransLucid::u32string s(begin, end);
       char32_t c = s.at(s.length()-1);
-      TransLucid::TreeNew::InfixAssoc attr;
+      TransLucid::Tree::InfixAssoc attr;
 
       switch(c)
       {
         case 'l':
-        attr = TransLucid::TreeNew::ASSOC_LEFT;
+        attr = TransLucid::Tree::ASSOC_LEFT;
         break;
 
         case 'r':
-        attr = TransLucid::TreeNew::ASSOC_RIGHT;
+        attr = TransLucid::Tree::ASSOC_RIGHT;
         break;
 
         case 'n':
-        attr = TransLucid::TreeNew::ASSOC_NON;
+        attr = TransLucid::Tree::ASSOC_NON;
         break;
 
         case 'p':
-        attr = TransLucid::TreeNew::ASSOC_COMPARISON;
+        attr = TransLucid::Tree::ASSOC_COMPARISON;
         break;
 
         case 'm':
-        attr = TransLucid::TreeNew::ASSOC_VARIABLE;
+        attr = TransLucid::Tree::ASSOC_VARIABLE;
         break;
 
         default:
@@ -456,15 +456,15 @@ namespace
       System::IdentifierLookup& idents
     )
     {
-      TreeNew::UnaryType attr;
+      Tree::UnaryType attr;
       TransLucid::u32string s(begin, end);
       if (s == U"prefix")
       {
-        attr = TransLucid::TreeNew::UNARY_PREFIX;
+        attr = TransLucid::Tree::UNARY_PREFIX;
       }
       else
       {
-        attr = TransLucid::TreeNew::UNARY_POSTFIX;
+        attr = TransLucid::Tree::UNARY_POSTFIX;
       }
       return attr;
     }

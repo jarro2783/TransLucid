@@ -65,7 +65,7 @@ Parser::Parser(System& system)
  * @return The binary operator instance.
  * @todo Implement the error flagging.
  */
-inline TreeNew::BinaryOperator
+inline Tree::BinaryOperator
 find_binary_operator
 (
   const u32string& symbol, 
@@ -90,18 +90,18 @@ find_binary_operator
 
   const u32string& assocName = get_constant_pointer<u32string>(assoc);
 
-  TreeNew::InfixAssoc ia = TreeNew::ASSOC_LEFT;
+  Tree::InfixAssoc ia = Tree::ASSOC_LEFT;
   if (assocName == U"LEFT")
   {
-    ia = TreeNew::ASSOC_LEFT;
+    ia = Tree::ASSOC_LEFT;
   }
   else if (assocName == U"RIGHT")
   {
-    ia = TreeNew::ASSOC_RIGHT;
+    ia = Tree::ASSOC_RIGHT;
   }
   else if (assocName == U"NON")
   {
-    ia = TreeNew::ASSOC_NON;
+    ia = Tree::ASSOC_NON;
   }
 
   #if 0
@@ -114,7 +114,7 @@ find_binary_operator
             << std::endl;
   #endif
 
-  return TreeNew::BinaryOperator
+  return Tree::BinaryOperator
   {
     ia,
     get_constant_pointer<u32string>(atl),
@@ -128,7 +128,7 @@ find_binary_operator
  * When the type is ustring or uchar, it constructs the actual ustring
  * or uchar. Otherwise it constructs a Tree::LiteralExpr.
  */
-inline TreeNew::Expr
+inline Tree::Expr
 construct_typed_constant(const LexerIterator& token)
 {
   auto& val = get<std::pair<u32string, u32string>>(token->getValue());
@@ -149,24 +149,24 @@ construct_typed_constant(const LexerIterator& token)
     }
     return v;
   } else {
-    return TreeNew::LiteralExpr(type, value);
+    return Tree::LiteralExpr(type, value);
   }
 }
 
 bool
 Parser::parse_expr(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   return parse_where(begin, end, result);
 }
 
 bool
 Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   LexerIterator current = begin;
   //binary expression
-  TreeNew::Expr binary_expr;
+  Tree::Expr binary_expr;
   bool success = parse_binary_op(current, end, binary_expr);
 
   if (success)
@@ -191,10 +191,10 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   LexerIterator current = begin;
-  TreeNew::Expr app;
+  Tree::Expr app;
   bool success = parse_app_expr(current, end, app);
   
   if (success)
@@ -203,10 +203,10 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
     while (t == TOKEN_BINARY_OP)
     {
       //TODO build binary op
-      TreeNew::Expr rhs;
+      Tree::Expr rhs;
       expect(current, end, rhs, U"expr", &Parser::parse_app_expr);
 
-      app = TreeNew::insert_binary_operator
+      app = Tree::insert_binary_operator
       (
         find_binary_operator
         (
@@ -230,11 +230,11 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_app_expr(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   LexerIterator current = begin;
 
-  TreeNew::Expr lhs;
+  Tree::Expr lhs;
   bool success = parse_prefix_expr(current, end, lhs);
 
   if (success)
@@ -247,7 +247,7 @@ Parser::parse_app_expr(LexerIterator& begin, const LexerIterator& end,
       //this one will modify the lhs and make a binary app expr from it
       if (!parse_token_app(current, end, lhs))
       {
-        TreeNew::Expr rhs;
+        Tree::Expr rhs;
         bool parsedExpr = parse_prefix_expr(current, end, rhs);
 
         if (!parsedExpr)
@@ -257,7 +257,7 @@ Parser::parse_app_expr(LexerIterator& begin, const LexerIterator& end,
         else
         {
           //named application
-          lhs = TreeNew::PhiAppExpr(lhs, rhs);
+          lhs = Tree::PhiAppExpr(lhs, rhs);
         }
       }
     }
@@ -270,7 +270,7 @@ Parser::parse_app_expr(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   LexerIterator current = begin;
   bool success = true;
@@ -278,27 +278,27 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
   {
     case TOKEN_AT:
     {
-      TreeNew::Expr rhs;
+      Tree::Expr rhs;
       ++current;
       expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
       //build at expr
-      result = TreeNew::AtExpr(result, rhs);
+      result = Tree::AtExpr(result, rhs);
     }
     break;
 
     case TOKEN_DOT:
     {
-      TreeNew::Expr rhs;
+      Tree::Expr rhs;
       ++current;
       expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
       //value application
-      result = TreeNew::LambdaAppExpr(result, rhs);
+      result = Tree::LambdaAppExpr(result, rhs);
     }
     break;
 
     case TOKEN_BANG:
     {
-      TreeNew::Expr rhs;
+      Tree::Expr rhs;
       ++current;
 
       if (current->getType() == TOKEN_LPAREN)
@@ -306,8 +306,8 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
         ++current;
         //parse expression list
         LexerIterator listIter = current;
-        std::vector<TreeNew::Expr> exprList;
-        TreeNew::Expr element;
+        std::vector<Tree::Expr> exprList;
+        Tree::Expr element;
 
         bool makingList = true;
         while (makingList)
@@ -321,13 +321,13 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
         expect(current, end, U")", TOKEN_RPAREN);
 
         //build a host function with a list of arguments
-        result = TreeNew::BangAppExpr(result, exprList);
+        result = Tree::BangAppExpr(result, exprList);
       }
       else
       {
         expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
         //host function application with one argument
-        result = TreeNew::BangAppExpr(result, rhs);
+        result = Tree::BangAppExpr(result, rhs);
       }
     }
     break;
@@ -344,13 +344,13 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   if (*begin == TOKEN_PREFIX_OP)
   {
     LexerIterator current = begin;
     ++current;
-    TreeNew::Expr rhs;
+    Tree::Expr rhs;
     expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
 
     //TODO build prefix op
@@ -366,10 +366,10 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_postfix_expr(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   LexerIterator current = begin;
-  TreeNew::Expr lhs;
+  Tree::Expr lhs;
 
   bool success = parse_if_expr(current, end, lhs);
 
@@ -391,33 +391,33 @@ Parser::parse_postfix_expr(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   if (*begin == TOKEN_IF)
   {
     LexerIterator current = begin;
     ++current;
 
-    TreeNew::Expr cond;
+    Tree::Expr cond;
     expect(current, end, cond, U"expr", &Parser::parse_expr);
 
     expect(current, end, U"then", TOKEN_THEN);
 
-    TreeNew::Expr action;
+    Tree::Expr action;
     expect(current, end, action, U"expr", &Parser::parse_expr);
     
     //then some elsifs
-    std::vector<std::pair<TreeNew::Expr, TreeNew::Expr>> elsifs;
+    std::vector<std::pair<Tree::Expr, Tree::Expr>> elsifs;
     while (*current == TOKEN_ELSIF)
     {
       ++current;
 
-      TreeNew::Expr econd;
+      Tree::Expr econd;
       expect(current, end, econd, U"expr", &Parser::parse_expr); 
 
       expect(current, end, U"then", TOKEN_THEN);
 
-      TreeNew::Expr ethen;
+      Tree::Expr ethen;
       expect(current, end, ethen, U"expr", &Parser::parse_expr); 
 
       elsifs.push_back(std::make_pair(econd, ethen));
@@ -425,12 +425,12 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
 
     expect(current, end, U"else", TOKEN_ELSE);
 
-    TreeNew::Expr elseexpr;
+    Tree::Expr elseexpr;
     expect(current, end, elseexpr, U"expr", &Parser::parse_expr);
 
     expect(current, end, U"fi", TOKEN_FI);
 
-    result = TreeNew::IfExpr(cond, action, elsifs, elseexpr);
+    result = Tree::IfExpr(cond, action, elsifs, elseexpr);
 
     begin = current;
     return true;
@@ -443,7 +443,7 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result)
+  Tree::Expr& result)
 {
   bool success = true;
   switch(begin->getType())
@@ -464,7 +464,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     break;
 
     case TOKEN_ID:
-    result = TreeNew::IdentExpr(get<u32string>(begin->getValue()));
+    result = Tree::IdentExpr(get<u32string>(begin->getValue()));
     ++begin;
     break;
 
@@ -481,7 +481,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     case TOKEN_LPAREN:
     {
       LexerIterator current = begin;
-      TreeNew::Expr e;
+      Tree::Expr e;
       expect(current, end, e, U"expr", &Parser::parse_expr);
       expect(current, end, U")", TOKEN_RPAREN);
       result = e;
@@ -508,7 +508,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     break;
 
     case TOKEN_HASH:
-    result = TreeNew::HashSymbol();
+    result = Tree::HashSymbol();
     ++begin;
     break;
 
@@ -521,20 +521,20 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
 
 void
 Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
-  TreeNew::Expr& result,
+  Tree::Expr& result,
   size_t type)
 {
   LexerIterator current = begin;
 
   //parse the dimension capture list
-  std::vector<TreeNew::Expr> captures;
+  std::vector<Tree::Expr> captures;
   if (*current == TOKEN_LBRACE)
   {
     bool parsingList = true;
 
     while (parsingList)
     {
-      TreeNew::Expr e;
+      Tree::Expr e;
       expect(current, end, e, U"expr", &Parser::parse_expr);
 
       captures.push_back(std::move(e));
@@ -550,17 +550,17 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
 
   expect(current, end, U"->", TOKEN_RARROW);
 
-  TreeNew::Expr rhs;
+  Tree::Expr rhs;
   expect(current, end, rhs, U"expr", &Parser::parse_expr);
 
   if (type == TOKEN_SLASH)
   {
-    result = TreeNew::LambdaExpr(
+    result = Tree::LambdaExpr(
       std::move(captures), std::move(name), std::move(rhs));
   }
   else if (type == TOKEN_DBLSLASH)
   {
-    result = TreeNew::PhiExpr(
+    result = Tree::PhiExpr(
       std::move(captures), std::move(name), std::move(rhs));
   }
   else
@@ -588,8 +588,8 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
 
 void
 Parser::expect(LexerIterator& begin, const LexerIterator& end, 
-  TreeNew::Expr& result, const std::u32string& message,
-  bool (Parser::*parser)(LexerIterator&, const LexerIterator&, TreeNew::Expr&)
+  Tree::Expr& result, const std::u32string& message,
+  bool (Parser::*parser)(LexerIterator&, const LexerIterator&, Tree::Expr&)
 )
 {
   LexerIterator current = begin;

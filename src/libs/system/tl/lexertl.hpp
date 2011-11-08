@@ -55,8 +55,8 @@ namespace TransLucid
     <
       nil,
       char32_t,
-      TreeNew::InfixAssoc,
-      TreeNew::UnaryType,
+      Tree::InfixAssoc,
+      Tree::UnaryType,
       u32string,
       mpz_class,
       std::pair<u32string, u32string>

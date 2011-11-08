@@ -109,7 +109,7 @@ void test3()
 
   TL::Parser::LexerIterator end = begin.makeEnd();
 
-  TL::TreeNew::Expr result;
+  TL::Tree::Expr result;
   bool success = p.parse_expr(begin, end, result);
 
   CHECK(success);
@@ -140,13 +140,13 @@ void test3()
   CHECK(p.parse_expr(begin2, end2, result));
   CHECK(print_expr_tree(result) == "f.d A B");
 
-  TL::TreeNew::PhiAppExpr* appB = TL::get<TL::TreeNew::PhiAppExpr>(&result);
+  TL::Tree::PhiAppExpr* appB = TL::get<TL::Tree::PhiAppExpr>(&result);
   REQUIRE(appB != 0);
 
-  TL::TreeNew::PhiAppExpr* appA = TL::get<TL::TreeNew::PhiAppExpr>(&appB->lhs);
+  TL::Tree::PhiAppExpr* appA = TL::get<TL::Tree::PhiAppExpr>(&appB->lhs);
   REQUIRE(appA != 0);
 
-  TL::TreeNew::LambdaAppExpr* appd = TL::get<TL::TreeNew::LambdaAppExpr>
+  TL::Tree::LambdaAppExpr* appd = TL::get<TL::Tree::LambdaAppExpr>
     (&appA->lhs);
   REQUIRE(appd != 0);
 }

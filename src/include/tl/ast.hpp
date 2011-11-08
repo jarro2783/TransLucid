@@ -43,7 +43,7 @@ namespace TransLucid
    * Abstract syntax tree. Contains all of the classes, types and functions
    * related to the abstract syntax tree.
    */
-  namespace TreeNew
+  namespace Tree
   {
     /** 
      * Type of unary operator. Symbols for the two types of unary operators.

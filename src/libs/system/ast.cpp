@@ -27,7 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-namespace TreeNew
+namespace Tree
 {
 
 Expr
@@ -38,14 +38,14 @@ insert_binary_operator
   Expr& rhs
 )
 {
-  TreeNew::BinaryOpExpr* binop = get<TreeNew::BinaryOpExpr>(&lhs);
+  Tree::BinaryOpExpr* binop = get<Tree::BinaryOpExpr>(&lhs);
   if (binop == 0)
   {
-    return TreeNew::BinaryOpExpr(op, lhs, rhs);
+    return Tree::BinaryOpExpr(op, lhs, rhs);
   }
   if (binop->op.precedence > op.precedence)
   {
-    return TreeNew::BinaryOpExpr(op, lhs, rhs);
+    return Tree::BinaryOpExpr(op, lhs, rhs);
   }
   if (binop->op.precedence < op.precedence)
   {
@@ -66,7 +66,7 @@ insert_binary_operator
   }
   if (binop->op.assoc == ASSOC_LEFT)
   {
-    return TreeNew::BinaryOpExpr(op, lhs, rhs);
+    return Tree::BinaryOpExpr(op, lhs, rhs);
   }
   if (binop->op.assoc == ASSOC_RIGHT)
   {
@@ -97,6 +97,6 @@ BinaryOpExpr::add_leaf(Expr& e)
   rhs = e;
 }
 
-} //namespace TreeNew
+} //namespace Tree
 
 } //namespace TransLucid
