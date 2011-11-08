@@ -108,6 +108,28 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
   begin = current;
 }
 
+inline Tree::UnaryOperator
+find_unary_operator
+(
+  const u32string& symbol,
+  const System::IdentifierLookup& idents,
+  dimension_index symbolDim,
+  Context& k,
+  Tree::UnaryType type
+)
+{
+  //lookup ATL_SYMBOL
+
+  ContextPerturber p(k, {{symbolDim, Types::String::create(symbol)}});
+
+  WS* atlWS = idents.lookup(U"ATL_SYMBOL");
+  Constant atl = (*atlWS)(k);
+
+  return Tree::UnaryOperator
+    {get_constant_pointer<u32string>(atl), symbol, type};
+}
+
+
 /**
  * Finds a binary operator from a string.
  *
@@ -408,7 +430,11 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
     Tree::Expr rhs;
     expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
 
-    //TODO build prefix op
+    auto op = find_unary_operator(
+      get<u32string>(begin->getValue()), 
+      m_idents, DIM_SYMBOL, m_context, 
+      Tree::UNARY_PREFIX);
+    result = Tree::UnaryOpExpr(op, rhs);
 
     begin = current;
     return true;
@@ -432,13 +458,18 @@ Parser::parse_postfix_expr(LexerIterator& begin, const LexerIterator& end,
   {
     if (*current == TOKEN_POSTFIX_OP)
     {
-      //TODO build postfix op
+      auto op = find_unary_operator(
+        get<u32string>(current->getValue()), 
+        m_idents, DIM_SYMBOL, m_context, 
+        Tree::UNARY_POSTFIX);
+      result = Tree::UnaryOpExpr(op, lhs);
+      ++current;
     }
     else
     {
       result = lhs;
-      begin = current;
     }
+    begin = current;
   }
 
   return success;
@@ -537,6 +568,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
       expect(current, begin, tuple, U"tuple", 
         &Parser::parse_tuple, SEPARATOR_ARROW);
 
+      result = tuple;
       begin = current;
     }
     break;
