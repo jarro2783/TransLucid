@@ -29,6 +29,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/types_util.hpp>
 
+#include <sstream>
+
 #define XSTRING(x) STRING(x)
 #define STRING(x) #x
 
@@ -38,14 +40,26 @@ namespace TransLucid
 namespace Parser
 {
 
-ExpectedToken::ExpectedToken(size_t token, const u32string& text)
-: ParseError(utf32_to_utf8(U"expected `" + text + U"`"))
+u32string
+build_position_message(const LexerIterator& iter)
+{
+  const Position& pos = iter.getPos();
+  std::ostringstream os;
+  os << "At " << pos.file << ":" << pos.line << ":" << pos.character
+     << ": ";
+  return utf8_to_utf32(os.str());
+}
+
+ExpectedToken::ExpectedToken(const LexerIterator& pos, 
+  size_t token, const u32string& text)
+: ParseError(utf32_to_utf8(build_position_message(pos) + 
+             U"expected `" + text + U"`"))
 , m_token(token)
 {
 }
 
-ExpectedExpr::ExpectedExpr(const u32string& text)
-: ParseError(utf32_to_utf8(U"expected " + text))
+ExpectedExpr::ExpectedExpr(const LexerIterator& pos, const u32string& text)
+: ParseError(utf32_to_utf8(build_position_message(pos) + U"expected " + text))
 {
 }
 
@@ -204,7 +218,8 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
     {
       //TODO build binary op
       Tree::Expr rhs;
-      expect(current, end, rhs, U"expr", &Parser::parse_app_expr);
+      ++current;
+      expect(current, end, rhs, U"app_expr", &Parser::parse_app_expr);
 
       app = Tree::insert_binary_operator
       (
@@ -280,7 +295,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
     {
       Tree::Expr rhs;
       ++current;
-      expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
+      expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
       //build at expr
       result = Tree::AtExpr(result, rhs);
     }
@@ -290,7 +305,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
     {
       Tree::Expr rhs;
       ++current;
-      expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
+      expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
       //value application
       result = Tree::LambdaAppExpr(result, rhs);
     }
@@ -325,7 +340,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
       }
       else
       {
-        expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
+        expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
         //host function application with one argument
         result = Tree::BangAppExpr(result, rhs);
       }
@@ -351,7 +366,7 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
     LexerIterator current = begin;
     ++current;
     Tree::Expr rhs;
-    expect(current, end, rhs, U"expr", &Parser::parse_prefix_expr);
+    expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
 
     //TODO build prefix op
 
@@ -481,6 +496,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     case TOKEN_LPAREN:
     {
       LexerIterator current = begin;
+      ++current;
       Tree::Expr e;
       expect(current, end, e, U"expr", &Parser::parse_expr);
       expect(current, end, U")", TOKEN_RPAREN);
@@ -580,7 +596,7 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
 {
   if (begin == end || *begin != token)
   {
-    throw ExpectedToken(token, message);
+    throw ExpectedToken(begin, token, message);
   }
 
   ++begin;
@@ -597,7 +613,7 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
 
   if (!success)
   {
-    throw ExpectedExpr(message);
+    throw ExpectedExpr(begin, message);
   }
 
   begin = current;

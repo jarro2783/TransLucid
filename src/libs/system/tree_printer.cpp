@@ -1,5 +1,4 @@
 #include <tl/tree_printer.hpp>
-#include <tl/tree_old_to_new.hpp>
 #include <tl/output.hpp>
 #include <tl/parser_api.hpp>
 
@@ -475,14 +474,6 @@ std::string print_expr_tree(const Tree::Expr& expr)
 {
   TreePrinterNew print;
   return print.printTree(expr);
-}
-
-std::string print_expr_tree(const Tree::Expr& expr)
-{
-  TreeOldToNew convert;
-  Tree::Expr newe = boost::apply_visitor(convert, expr);
-
-  return print_expr_tree(newe);
 }
 
 std::string 

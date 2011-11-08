@@ -45,7 +45,7 @@ WorkshopBuilder::~WorkshopBuilder()
 WS*
 WorkshopBuilder::build_workshops(const Tree::Expr& e)
 {
-  return boost::apply_visitor(*this, e);
+  return apply_visitor(*this, e);
 }
 
 WS*
@@ -119,7 +119,7 @@ WorkshopBuilder::operator()(const Tree::IdentExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::ParenExpr& e)
 {
-  return boost::apply_visitor(*this, e.e);
+  return apply_visitor(*this, e.e);
 }
 
 WS*
@@ -140,12 +140,12 @@ WorkshopBuilder::operator()(const Tree::BinaryOpExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::BangAppExpr& e)
 {
-  WS* name = boost::apply_visitor(*this, e.name);
+  WS* name = apply_visitor(*this, e.name);
   std::vector<WS*> args;
 
   for (auto& expr : e.args)
   {
-    args.push_back(boost::apply_visitor(*this, expr));
+    args.push_back(apply_visitor(*this, expr));
   }
 
   return new Workshops::BangOpWS(*m_system, name, args);
@@ -154,9 +154,9 @@ WorkshopBuilder::operator()(const Tree::BangAppExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::IfExpr& e)
 {
-  WS* condition = boost::apply_visitor(*this, e.condition);
-  WS* then = boost::apply_visitor(*this, e.then);
-  WS* else_ = boost::apply_visitor(*this, e.else_);
+  WS* condition = apply_visitor(*this, e.condition);
+  WS* then = apply_visitor(*this, e.then);
+  WS* else_ = apply_visitor(*this, e.else_);
 
   std::vector<std::pair<WS*, WS*>> else_ifs;
 
@@ -164,8 +164,8 @@ WorkshopBuilder::operator()(const Tree::IfExpr& e)
   {
     else_ifs.push_back(std::make_pair
     (
-      boost::apply_visitor(*this, v.first),
-      boost::apply_visitor(*this, v.second)
+      apply_visitor(*this, v.first),
+      apply_visitor(*this, v.second)
     ));
   }
 
@@ -175,7 +175,7 @@ WorkshopBuilder::operator()(const Tree::IfExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::HashExpr& e)
 {
-  WS* expr = boost::apply_visitor(*this, e.e);
+  WS* expr = apply_visitor(*this, e.e);
   return new Workshops::HashWS(*m_system, expr);
 }
 
@@ -185,8 +185,8 @@ WorkshopBuilder::operator()(const Tree::TupleExpr& e)
   std::list<std::pair<WS*, WS*>> elements;
   for(auto& v : e.pairs)
   {
-    WS* lhs = boost::apply_visitor(*this, v.first);
-    WS* rhs = boost::apply_visitor(*this, v.second);
+    WS* lhs = apply_visitor(*this, v.first);
+    WS* rhs = apply_visitor(*this, v.second);
     elements.push_back(std::make_pair(lhs, rhs));
   }
   return new Workshops::TupleWS(*m_system, elements);
@@ -195,8 +195,8 @@ WorkshopBuilder::operator()(const Tree::TupleExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::AtExpr& e)
 {
-  WS* lhs = boost::apply_visitor(*this, e.lhs);
-  WS* rhs = boost::apply_visitor(*this, e.rhs);
+  WS* lhs = apply_visitor(*this, e.lhs);
+  WS* rhs = apply_visitor(*this, e.rhs);
 
   //if the rhs is a tuple, then we can do better
   Workshops::TupleWS* tuplerhs = dynamic_cast<Workshops::TupleWS*>(rhs);
@@ -218,7 +218,7 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::BangExpr& e)
 {
-  WS* rhs = boost::apply_visitor(*this, e.rhs);
+  WS* rhs = apply_visitor(*this, e.rhs);
 
   return new Workshops::BaseAbstractionWS
   (
@@ -232,7 +232,7 @@ WorkshopBuilder::operator()(const Tree::BangExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 {
-  WS* rhs = boost::apply_visitor(*this, e.rhs);
+  WS* rhs = apply_visitor(*this, e.rhs);
 
   return new Workshops::LambdaAbstractionWS
   (
@@ -246,7 +246,7 @@ WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::PhiExpr& e)
 {
-  WS* rhs = boost::apply_visitor(*this, e.rhs);
+  WS* rhs = apply_visitor(*this, e.rhs);
 
   return new Workshops::NamedAbstractionWS
   (
@@ -262,16 +262,16 @@ WS*
 WorkshopBuilder::operator()(const Tree::LambdaAppExpr& e)
 {
   //create a LambdaApplicationWS with the compiled sub expression
-  WS* lhs = boost::apply_visitor(*this, e.lhs);
-  WS* rhs = boost::apply_visitor(*this, e.rhs);
+  WS* lhs = apply_visitor(*this, e.lhs);
+  WS* rhs = apply_visitor(*this, e.rhs);
   return new Workshops::LambdaApplicationWS(lhs, rhs);
 }
 
 WS* 
 WorkshopBuilder::operator()(const Tree::PhiAppExpr& e)
 {
-  WS* lhs = boost::apply_visitor(*this, e.lhs);
-  WS* rhs = boost::apply_visitor(*this, e.rhs);
+  WS* lhs = apply_visitor(*this, e.lhs);
+  WS* rhs = apply_visitor(*this, e.rhs);
   return new Workshops::NameApplicationWS(lhs, rhs);
 }
 
@@ -281,7 +281,7 @@ WorkshopBuilder::operator()(const Tree::WhereExpr& e)
   //the where expression must already be annotated and transformed
   //which means that we can simply translate the expression
 
-  return boost::apply_visitor(*this, e.e);
+  return apply_visitor(*this, e.e);
 }
 
 } //namespace TransLucid

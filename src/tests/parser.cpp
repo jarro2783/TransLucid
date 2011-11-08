@@ -149,6 +149,65 @@ void test3()
   TL::Tree::LambdaAppExpr* appd = TL::get<TL::Tree::LambdaAppExpr>
     (&appA->lhs);
   REQUIRE(appd != 0);
+
+  s.addBinaryOperator(TL::Tree::BinaryOperator
+    (
+      TL::Tree::ASSOC_LEFT, U"plus", U"+", 200
+    )
+  );
+
+  s.addBinaryOperator(TL::Tree::BinaryOperator
+    (
+      TL::Tree::ASSOC_LEFT, U"times", U"*", 400
+    )
+  );
+
+  std::string input3("5 + 6 + 7");
+
+  TL::Parser::StreamPosIterator rawbegin3
+  (
+    TL::Parser::U32Iterator(
+      TL::Parser::makeUTF8Iterator(input3.begin()),
+      TL::Parser::makeUTF8Iterator(input3.end())
+    ),
+    U"5 + 6 + 7"
+  );
+
+  TL::Parser::LexerIterator begin3
+  {
+    rawbegin3,
+    rawend,
+    s.getDefaultContext(),
+    s.lookupIdentifiers()
+  };
+  TL::Parser::LexerIterator end3 = begin3.makeEnd();
+  CHECK(p.parse_expr(begin3, end3, result));
+
+  CHECK(print_expr_tree(result) == "5 + 6 + 7");
+
+
+  std::string input4("5 * (6 + 7)");
+
+  TL::Parser::StreamPosIterator rawbegin4
+  (
+    TL::Parser::U32Iterator(
+      TL::Parser::makeUTF8Iterator(input4.begin()),
+      TL::Parser::makeUTF8Iterator(input4.end())
+    ),
+    U"5 * (6 + 7)"
+  );
+
+  TL::Parser::LexerIterator begin4
+  {
+    rawbegin4,
+    rawend,
+    s.getDefaultContext(),
+    s.lookupIdentifiers()
+  };
+  TL::Parser::LexerIterator end4 = begin4.makeEnd();
+  CHECK(p.parse_expr(begin4, end4, result));
+
+  CHECK(print_expr_tree(result) == "5 * (6 + 7)");
 }
 
 #ifdef DISABLE_CATCH

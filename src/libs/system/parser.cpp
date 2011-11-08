@@ -71,14 +71,14 @@ printEquation(const Equation& e)
   std::string result = utf32_to_utf8(to_u32string(std::get<0>(e)));
 
   const Tree::Expr& guard = std::get<1>(e);
-  if (boost::get<Tree::nil>(&guard) == 0)
+  if (get<Tree::nil>(&guard) == 0)
   {
     generated = print_expr_tree(guard);
     result += " " + generated;
   }
 
   const Tree::Expr& boolean = std::get<2>(e);
-  if (boost::get<Tree::nil>(&boolean) == 0)
+  if (get<Tree::nil>(&boolean) == 0)
   {
     generated = print_expr_tree(boolean);
     result += " | " + generated;

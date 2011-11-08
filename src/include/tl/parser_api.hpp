@@ -81,7 +81,7 @@ namespace TransLucid
       Equation eqn;
     };
 
-    typedef boost::variant
+    typedef Variant
     <
       std::pair<Equation, DeclType>,
       Tree::UnaryOperator,

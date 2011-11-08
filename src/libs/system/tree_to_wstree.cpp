@@ -49,7 +49,7 @@ TreeToWSTree::toWSTree(const Tree::Expr& expr)
 
   Tree::Expr exprRenamed = rename.rename(expr);
 
-  return boost::apply_visitor(*this, exprRenamed);
+  return apply_visitor(*this, exprRenamed);
 }
 
 Tree::Expr
@@ -132,7 +132,7 @@ TreeToWSTree::operator()(const Tree::HashSymbol& e)
 Tree::Expr
 TreeToWSTree::operator()(const Tree::ParenExpr& e)
 {
-  return boost::apply_visitor(*this, e.e);
+  return apply_visitor(*this, e.e);
 }
 
 Tree::Expr
@@ -154,7 +154,7 @@ TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
     (
       {
         {Tree::DimensionExpr(fnname_dim), e.op.op},
-        {arg0, boost::apply_visitor(*this, e.e)}
+        {arg0, apply_visitor(*this, e.e)}
       }
     )
   );
@@ -166,8 +166,8 @@ TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
   //(FN2 ! (#arg0, #arg1))
   //  @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)]
 
-  Tree::Expr elhs = boost::apply_visitor(*this, e.lhs);
-  Tree::Expr erhs = boost::apply_visitor(*this, e.rhs);
+  Tree::Expr elhs = apply_visitor(*this, e.lhs);
+  Tree::Expr erhs = apply_visitor(*this, e.rhs);
 
   Tree::DimensionExpr arg0(U"arg0");
   Tree::DimensionExpr arg1(U"arg1");
@@ -199,19 +199,19 @@ Tree::Expr
 TreeToWSTree::operator()(const Tree::BangAppExpr& e)
 {
   //first check if it is #!E
-  if (boost::get<Tree::HashSymbol>(&e.name) != nullptr)
+  if (get<Tree::HashSymbol>(&e.name) != nullptr)
   {
-    Tree::Expr rhs = boost::apply_visitor(*this, e.args.at(0));
+    Tree::Expr rhs = apply_visitor(*this, e.args.at(0));
     return Tree::HashExpr(rhs);
   }
   else
   {
-    Tree::Expr name = boost::apply_visitor(*this, e.name);
+    Tree::Expr name = apply_visitor(*this, e.name);
     std::vector<Tree::Expr> args;
 
     for (auto expr : e.args)
     {
-      args.push_back(boost::apply_visitor(*this, expr));
+      args.push_back(apply_visitor(*this, expr));
     }
 
     return Tree::BangAppExpr(name, args);
@@ -226,23 +226,23 @@ TreeToWSTree::operator()(const Tree::IfExpr& e)
   for (auto p : e.else_ifs)
   {
     else_ifs.push_back(std::make_pair(
-      boost::apply_visitor(*this, p.first),
-      boost::apply_visitor(*this, p.second)
+      apply_visitor(*this, p.first),
+      apply_visitor(*this, p.second)
     ));
   }
 
   return Tree::IfExpr(
-    boost::apply_visitor(*this, e.condition),
-    boost::apply_visitor(*this, e.then),
+    apply_visitor(*this, e.condition),
+    apply_visitor(*this, e.then),
     else_ifs,
-    boost::apply_visitor(*this, e.else_)
+    apply_visitor(*this, e.else_)
   );
 }
 
 Tree::Expr
 TreeToWSTree::operator()(const Tree::HashExpr& e)
 {
-  return Tree::HashExpr(boost::apply_visitor(*this, e.e));
+  return Tree::HashExpr(apply_visitor(*this, e.e));
 }
 
 Tree::Expr
@@ -252,8 +252,8 @@ TreeToWSTree::operator()(const Tree::TupleExpr& e)
   for (auto p : e.pairs)
   {
     tuple.push_back(std::make_pair(
-      boost::apply_visitor(*this, p.first),
-      boost::apply_visitor(*this, p.second)
+      apply_visitor(*this, p.first),
+      apply_visitor(*this, p.second)
     ));
   }
 
@@ -264,8 +264,8 @@ Tree::Expr
 TreeToWSTree::operator()(const Tree::AtExpr& e)
 {
   return Tree::AtExpr(
-    boost::apply_visitor(*this, e.lhs),
-    boost::apply_visitor(*this, e.rhs)
+    apply_visitor(*this, e.lhs),
+    apply_visitor(*this, e.rhs)
   );
 }
 
@@ -295,7 +295,7 @@ TreeToWSTree::operator()(const Tree::BangExpr& e)
   m_scope.push_back(argDim);
 
   //4. visit the child
-  expr.rhs = boost::apply_visitor(*this, e.rhs);
+  expr.rhs = apply_visitor(*this, e.rhs);
 
   //5. add a new equation param = #dim
   m_newVars.push_back
@@ -338,7 +338,7 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   m_scope.push_back(argDim);
 
   //4. visit the child
-  expr.rhs = boost::apply_visitor(*this, e.rhs);
+  expr.rhs = apply_visitor(*this, e.rhs);
 
   //5. add a new equation param = #dim
   m_newVars.push_back
@@ -389,7 +389,7 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   m_namedAllScopeOdometers.push_back(odometerDim);
 
   //4. visit the child
-  expr.rhs = boost::apply_visitor(*this, e.rhs);
+  expr.rhs = apply_visitor(*this, e.rhs);
 
   //5. add a new equation name = args @ [stuff]
   m_newVars.push_back(Parser::Equation
@@ -426,8 +426,8 @@ Tree::Expr
 TreeToWSTree::operator()(const Tree::LambdaAppExpr& e)
 {
   return Tree::LambdaAppExpr(
-    boost::apply_visitor(*this, e.lhs),
-    boost::apply_visitor(*this, e.rhs)
+    apply_visitor(*this, e.lhs),
+    apply_visitor(*this, e.rhs)
   );
 }
 
@@ -438,8 +438,8 @@ TreeToWSTree::operator()(const Tree::PhiAppExpr& e)
 
   Tree::PhiAppExpr expr
   (
-    boost::apply_visitor(*this, e.lhs),
-    boost::apply_visitor(*this, e.rhs)
+    apply_visitor(*this, e.lhs),
+    apply_visitor(*this, e.rhs)
   );
 
   expr.Lall = m_Lout;
@@ -465,24 +465,24 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
   m_Lout.push_back(label);
 
   //L_in is all of the inner where clauses 
-  //boost::apply_visitor(*this, e.e);
+  //apply_visitor(*this, e.e);
 
   m_Lin.clear();
   for (const auto& evar : e.vars)
   {
     //expr
     m_Lin.clear();
-    Tree::Expr varExpr = boost::apply_visitor(*this, std::get<3>(evar));
+    Tree::Expr varExpr = apply_visitor(*this, std::get<3>(evar));
     myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
     //guard
     m_Lin.clear();
-    Tree::Expr guardExpr = boost::apply_visitor(*this, std::get<1>(evar));
+    Tree::Expr guardExpr = apply_visitor(*this, std::get<1>(evar));
     myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
     //boolean
     m_Lin.clear();
-    Tree::Expr booleanExpr = boost::apply_visitor(*this, std::get<2>(evar));;
+    Tree::Expr booleanExpr = apply_visitor(*this, std::get<2>(evar));;
     myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
     m_newVars.push_back
@@ -499,7 +499,7 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
   }
 
   //visit child E
-  Tree::Expr expr = boost::apply_visitor(*this, e.e);
+  Tree::Expr expr = apply_visitor(*this, e.e);
   myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
   //we have now fully computed the where clause's L_in
@@ -559,7 +559,7 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
       mpz_class(1)
     );
 
-  Tree::Expr incOwn = boost::apply_visitor(*this, incOwnRaw);
+  Tree::Expr incOwn = apply_visitor(*this, incOwnRaw);
 
   w.e = Tree::AtExpr
     (

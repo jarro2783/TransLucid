@@ -93,7 +93,7 @@ namespace TransLucid
     Tree::Expr
     rename(const Tree::Expr& e)
     {
-      return boost::apply_visitor(*this, e);
+      return apply_visitor(*this, e);
     }
 
     std::vector<std::pair<Tree::Expr, Tree::Expr>>

@@ -57,13 +57,13 @@ RenameIdentifiers::operator()(const Tree::IdentExpr& e)
 Tree::Expr
 RenameIdentifiers::operator()(const Tree::ParenExpr& e)
 {
-  return Tree::ParenExpr(boost::apply_visitor(*this, e.e));
+  return Tree::ParenExpr(apply_visitor(*this, e.e));
 }
 
 Tree::Expr
 RenameIdentifiers::operator()(const Tree::UnaryOpExpr& e)
 {
-  return Tree::UnaryOpExpr(e.op, boost::apply_visitor(*this, e.e));
+  return Tree::UnaryOpExpr(e.op, apply_visitor(*this, e.e));
 }
 
 Tree::Expr
@@ -72,8 +72,8 @@ RenameIdentifiers::operator()(const Tree::BinaryOpExpr& e)
   return Tree::BinaryOpExpr
   (
     e.op,
-    boost::apply_visitor(*this, e.lhs),
-    boost::apply_visitor(*this, e.rhs)
+    apply_visitor(*this, e.lhs),
+    apply_visitor(*this, e.rhs)
   );
 }
 
@@ -82,17 +82,17 @@ RenameIdentifiers::operator()(const Tree::IfExpr& e)
 {
   return Tree::IfExpr
   (
-    boost::apply_visitor(*this, e.condition),
-    boost::apply_visitor(*this, e.then),
+    apply_visitor(*this, e.condition),
+    apply_visitor(*this, e.then),
     rename_list(e.else_ifs),
-    boost::apply_visitor(*this, e.else_)
+    apply_visitor(*this, e.else_)
   );
 }
 
 Tree::Expr
 RenameIdentifiers::operator()(const Tree::HashExpr& e)
 {
-  return Tree::HashExpr(boost::apply_visitor(*this, e.e));
+  return Tree::HashExpr(apply_visitor(*this, e.e));
 }
 
 Tree::Expr
@@ -104,8 +104,8 @@ RenameIdentifiers::operator()(const Tree::TupleExpr& e)
   {
     renamed.push_back(std::make_pair
     (
-      boost::apply_visitor(*this, iter->first),
-      boost::apply_visitor(*this, iter->second)
+      apply_visitor(*this, iter->first),
+      apply_visitor(*this, iter->second)
     ));
   }
 
@@ -117,8 +117,8 @@ RenameIdentifiers::operator()(const Tree::AtExpr& e)
 {
   return Tree::AtExpr
   (
-    boost::apply_visitor(*this, e.lhs),
-    boost::apply_visitor(*this, e.rhs)
+    apply_visitor(*this, e.lhs),
+    apply_visitor(*this, e.rhs)
   );
 }
 
@@ -159,7 +159,7 @@ RenameIdentifiers::operator()(const Tree::WhereExpr& e)
 
     w.dims.push_back
     (
-      std::make_pair(uniqueDim, boost::apply_visitor(*this, dim.second))
+      std::make_pair(uniqueDim, apply_visitor(*this, dim.second))
     );
   }
 
@@ -217,15 +217,15 @@ RenameIdentifiers::operator()(const Tree::WhereExpr& e)
   //then do some renaming
 
   //rename expr
-  w.e = boost::apply_visitor(*this, e.e);
+  w.e = apply_visitor(*this, e.e);
   
   //rename the vars
   for (const auto& var : e.vars)
   {
     //rename inside every subexpr of a variable
-    Tree::Expr guard = boost::apply_visitor(*this, std::get<1>(var));
-    Tree::Expr boolean = boost::apply_visitor(*this, std::get<2>(var));
-    Tree::Expr expr = boost::apply_visitor(*this, std::get<3>(var));
+    Tree::Expr guard = apply_visitor(*this, std::get<1>(var));
+    Tree::Expr boolean = apply_visitor(*this, std::get<2>(var));
+    Tree::Expr expr = apply_visitor(*this, std::get<3>(var));
 
     w.vars.push_back
     (
@@ -268,7 +268,7 @@ RenameIdentifiers::renameFunction(const T& f)
   //rename
   T l(f);
   l.name = unique;
-  l.rhs = boost::apply_visitor(*this, f.rhs);
+  l.rhs = apply_visitor(*this, f.rhs);
 
   //restore the shadowed name
   if (!shadowed.empty())
@@ -308,8 +308,8 @@ RenameIdentifiers::renameFunApp(const T& app)
 {
   return T
   (
-    boost::apply_visitor(*this, app.lhs),
-    boost::apply_visitor(*this, app.rhs)
+    apply_visitor(*this, app.lhs),
+    apply_visitor(*this, app.rhs)
   );
 }
 
@@ -317,11 +317,11 @@ Tree::Expr
 RenameIdentifiers::operator()(const Tree::BangAppExpr& e)
 {
   //this would be better with temporaries
-  Tree::Expr lhs = boost::apply_visitor(*this, e.name);
+  Tree::Expr lhs = apply_visitor(*this, e.name);
   std::vector<Tree::Expr> args;
   for (auto expr : e.args)
   {
-    args.push_back(boost::apply_visitor(*this, expr));
+    args.push_back(apply_visitor(*this, expr));
   }
 
   return Tree::BangAppExpr(lhs, args);
@@ -351,8 +351,8 @@ RenameIdentifiers::rename_list
   {
     renamed.push_back(std::make_pair
       (
-        boost::apply_visitor(*this, iter->first),
-        boost::apply_visitor(*this, iter->second)
+        apply_visitor(*this, iter->first),
+        apply_visitor(*this, iter->second)
       )
     );
   }

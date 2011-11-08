@@ -375,7 +375,7 @@ namespace detail
 
       hd.data.ptr->release();
 
-      if (boost::get<Tree::nil>(&std::get<1>(out.eqn)) == nullptr)
+      if (get<Tree::nil>(&std::get<1>(out.eqn)) == nullptr)
       {
         m_system.addOutputDeclaration(
           std::get<0>(out.eqn), std::get<1>(out.eqn));
@@ -404,7 +404,7 @@ namespace detail
 
       hd.data.ptr->release();
 
-      if (boost::get<Tree::nil>(&std::get<1>(in.eqn)) == nullptr)
+      if (get<Tree::nil>(&std::get<1>(in.eqn)) == nullptr)
       {
         m_system.addInputDeclaration(std::get<0>(in.eqn), std::get<1>(in.eqn));
       }

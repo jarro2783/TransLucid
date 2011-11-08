@@ -12,7 +12,7 @@ add_custom_target(generate_static_lexer DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp)
 
 set (SYSTEM_SOURCES
-ast.cpp ast-new.cpp bestfit.cpp builtin_types.cpp charset.cpp
+ast.cpp bestfit.cpp builtin_types.cpp charset.cpp
 context.cpp dimtranslator.cpp 
 equation.cpp
 eval_workshops.cpp header.cpp 

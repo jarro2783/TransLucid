@@ -119,7 +119,8 @@ namespace TransLucid
     class ExpectedToken : public ParseError
     {
       public:
-      ExpectedToken(size_t token, const u32string& text);
+      ExpectedToken(const LexerIterator& pos, 
+        size_t token, const u32string& text);
 
       size_t
       id() const
@@ -134,7 +135,7 @@ namespace TransLucid
     class ExpectedExpr : public ParseError
     {
       public:
-      ExpectedExpr(const u32string& text);
+      ExpectedExpr(const LexerIterator& pos, const u32string& text);
     };
   }
 }

@@ -195,6 +195,12 @@ namespace TransLucid
         return LexerIterator(m_stream);
       }
 
+      const Position&
+      getPos() const
+      {
+        return m_pos->getPosition();
+      }
+
       private:
       typedef std::list<Token> TokenStream;
       typedef std::shared_ptr<TokenStream> TokenStreamPtr;
