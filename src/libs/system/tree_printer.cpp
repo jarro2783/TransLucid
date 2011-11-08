@@ -463,7 +463,7 @@ class TreePrinterNew
 
     for (const auto& v : w.vars)
     {
-      std::string var = Parser::printEquationNew(v);
+      std::string var = Parser::printEquation(v);
     }
 
     pp(')', Precedence::WHERE_CLAUSE);

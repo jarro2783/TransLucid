@@ -20,13 +20,13 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_HPP_INCLUDED
 #define TYPES_HPP_INCLUDED
 
-#include <tl/types_fwd.hpp>
-
 #include <map>
 #include <memory>
 #include <cstdint>
 #include <cstring>
 #include <string>
+
+#include <tl/types_fwd.hpp>
 
 /**
  * @file types.hpp

@@ -24,6 +24,16 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <boost/uuid/uuid.hpp>
 
+namespace std
+{
+  template <>
+  struct hash<boost::uuids::uuid>
+  {
+    size_t
+    operator()(const boost::uuids::uuid& u) const;
+  };
+}
+
 namespace TransLucid
 {
   typedef boost::uuids::uuid uuid;

@@ -20,6 +20,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_LEXERTL_HPP_INCLUDED
 #define TL_LEXERTL_HPP_INCLUDED
 
+#include <list>
+#include <memory>
+
+#include <gmpxx.h>
+
 #include "lexertl/lookup.hpp"
 #include "tl/lexer_tokens.hpp"
 
@@ -29,11 +34,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
 #include <tl/variant.hpp>
-
-#include <gmpxx.h>
-
-#include <list>
-#include <memory>
 
 namespace TransLucid
 {

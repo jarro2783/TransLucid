@@ -26,16 +26,16 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef AST_NEW_HPP_INCLUDED
 #define AST_NEW_HPP_INCLUDED
 
-#include <tl/types.hpp>
-#include <tl/variant.hpp>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <vector>
 
 #include <gmpxx.h>
 
-#ifdef DEBUG
-#include <iostream>
-#endif
+#include <tl/types.hpp>
+#include <tl/variant.hpp>
 
 namespace TransLucid
 {

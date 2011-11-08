@@ -25,6 +25,9 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef SYSTEM_HPP_INCLUDED
 #define SYSTEM_HPP_INCLUDED
 
+#include <unordered_set>
+#include <unordered_map>
+
 #include <tl/types.hpp>
 #include <tl/dimtranslator.hpp>
 #include <tl/equation.hpp>
@@ -33,11 +36,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
-
-#include <unordered_set>
-#include <unordered_map>
-
-#include <boost/functional/hash.hpp>
 
 namespace TransLucid
 {
@@ -201,7 +199,7 @@ namespace TransLucid
     typedef std::unordered_map<u32string, InputHD*> InputHDMap;
 
     //uuid to string
-    typedef std::unordered_map<uuid, u32string, boost::hash<uuid>> 
+    typedef std::unordered_map<uuid, u32string>
       UUIDStringMap;
 
     // OPTYPE, ATL_SYMBOL
@@ -211,14 +209,14 @@ namespace TransLucid
     typedef std::tuple<uuid, uuid, uuid, uuid> BinaryUUIDs;
 
     //set of uuids
-    typedef std::unordered_set<uuid, boost::hash<uuid>> UUIDHashSet;
+    typedef std::unordered_set<uuid> UUIDHashSet;
 
     //uuids of set of uuids of unary operator equations
-    typedef std::unordered_map<uuid, UnaryUUIDs, boost::hash<uuid>> 
+    typedef std::unordered_map<uuid, UnaryUUIDs> 
       UnaryUUIDSet;
 
     //uuids of set of uuids of binary operator equations
-    typedef std::unordered_map<uuid, BinaryUUIDs, boost::hash<uuid>>
+    typedef std::unordered_map<uuid, BinaryUUIDs>
       BinaryUUIDSet;
 
     //initialises the type indexes

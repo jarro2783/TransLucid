@@ -26,15 +26,12 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace std
 {
-  template <>
-  struct hash<boost::uuids::uuid>
+  size_t
+  hash<boost::uuids::uuid>::
+  operator()(const boost::uuids::uuid& u) const
   {
-    size_t
-    operator()(const boost::uuids::uuid& u) const
-    {
-      return boost::uuids::hash_value(u);
-    }
-  };
+    return boost::uuids::hash_value(u);
+  }
 }
 
 namespace boost

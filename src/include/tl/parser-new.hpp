@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <exception>
+
 #include "tl/lexertl.hpp"
 #include <tl/ast.hpp>
 #include <tl/context.hpp>
 #include <tl/system.hpp>
-
-#include <exception>
 
 namespace TransLucid
 {
@@ -37,8 +37,9 @@ namespace TransLucid
       parse_expr(LexerIterator& begin, const LexerIterator& end,
         Tree::Expr& result);
 
-      void
-      parse_equation();
+      bool
+      parse_line(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
 
       private:
       enum TupleSeparator
@@ -106,6 +107,7 @@ namespace TransLucid
         T&&... args
       );
 
+      System& m_system;
       System::IdentifierLookup m_idents;
       Context& m_context;
     };

@@ -35,8 +35,10 @@ namespace TransLucid
   {
     enum DeclType
     {
-      DECL_DEF,
-      DECL_ASSIGN
+      DECL_VARIABLE,
+      DECL_ASSIGNMENT,
+      DECL_OUTPUT,
+      DECL_INPUT
     };
 
     /**
@@ -45,6 +47,22 @@ namespace TransLucid
      */
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     Equation;
+
+    template <size_t N>
+    struct Declaration
+    {
+      template <typename Eqn>
+      Declaration(Eqn&& e)
+      : eqn(std::forward<Eqn>(e))
+      {}
+
+      Equation eqn;
+    };
+
+    typedef Declaration<DECL_VARIABLE> Variable;
+    typedef Declaration<DECL_ASSIGNMENT> Assignment;
+    typedef Declaration<DECL_OUTPUT> OutputDecl;
+    typedef Declaration<DECL_INPUT> InputDecl;
 
     struct DimensionDecl
     {
@@ -68,27 +86,10 @@ namespace TransLucid
       u32string lib;
     };
 
-    struct OutputDecl
-    {
-      OutputDecl(const Equation& e)
-      : eqn(e)
-      {}
-
-      Equation eqn;
-    };
-
-    struct InputDecl
-    {
-      InputDecl(const Equation& e)
-      : eqn(e)
-      {}
-
-      Equation eqn;
-    };
-
     typedef Variant
     <
-      std::pair<Equation, DeclType>,
+      Variable,
+      Assignment,
       Tree::UnaryOperator,
       Tree::BinaryOperator,
       DimensionDecl,
@@ -106,29 +107,7 @@ namespace TransLucid
     std::string
     printEquation(const Equation& e);
 
-    std::string
-    printEquationNew(
-      const std::tuple
-      <
-        u32string, 
-        Tree::Expr, 
-        Tree::Expr, 
-        Tree::Expr
-      >& e);
-
     class Header;
-
-    template <typename Iterator>
-    class ExprGrammar;
-
-    template <typename Iterator>
-    class EquationGrammar;
-
-    template <typename Iterator>
-    class TupleGrammar;
-
-    template <typename Iterator>
-    class HeaderGrammar;
 
     /**
      * Errors during parsing.

@@ -22,9 +22,11 @@ along with TransLucid; see the file COPYING.  If not see
  * The implementation file for the basic types.
  */
 
+#include <iostream>
+
 #include <tl/types.hpp>
 #include <tl/range.hpp>
-#include <tl/system.hpp>
+//#include <tl/system.hpp>
 #include <tl/exception.hpp>
 
 namespace TransLucid

@@ -313,6 +313,7 @@ namespace detail
 
     typedef Constant result_type;
 
+    #if 0
     Constant
     operator()(const Tree::BinaryOperator& binop)
     {
@@ -411,6 +412,7 @@ namespace detail
 
       return uuid;
     }
+    #endif
 
     private:
     System& m_system;

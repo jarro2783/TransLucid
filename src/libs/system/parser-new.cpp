@@ -27,14 +27,14 @@ along with TransLucid; see the file COPYING.  If not see
  * The parser.
  */
 
+#include <sstream>
+
 #include <tl/charset.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/output.hpp>
 #include <tl/parser-new.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types_util.hpp>
-
-#include <sstream>
 
 #define XSTRING(x) STRING(x)
 #define STRING(x) #x
@@ -69,7 +69,8 @@ ExpectedExpr::ExpectedExpr(const LexerIterator& pos, const u32string& text)
 }
 
 Parser::Parser(System& system)
-: m_idents(system.lookupIdentifiers()), m_context(system.getDefaultContext())
+: m_system(system)
+, m_idents(system.lookupIdentifiers()), m_context(system.getDefaultContext())
 {
 }
 
@@ -695,6 +696,23 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
 
   begin = current;
   return true;
+}
+
+bool
+Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin == TOKEN_ID)
+  {
+    u32string id = get<u32string>(begin->getValue());
+
+    
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 Token
