@@ -19,7 +19,7 @@ SUBDIRS=detail types hyperdatons
 
 includesdir = $(prefix)/include/tl
 
-includes_HEADERS = ast.hpp ast-new.hpp bestfit.hpp builtin_types.hpp \
+includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp \
   cache.hpp \
   charset.hpp constws.hpp container.hpp context.hpp \
   dimtranslator.hpp equation.hpp equation_parser.hpp exception.hpp \

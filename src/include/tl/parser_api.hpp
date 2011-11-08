@@ -21,7 +21,6 @@ along with TransLucid; see the file COPYING.  If not see
 #define PARSER_API_HPP_INCLUDED
 
 #include <tl/ast.hpp>
-#include <tl/ast-new.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
 

@@ -21,12 +21,10 @@ along with TransLucid; see the file COPYING.  If not see
 #define TREE_PRINTER_HPP_INCLUDED
 
 #include <tl/ast.hpp>
-#include <tl/ast-new.hpp>
 
 namespace TransLucid
 {
   std::string print_expr_tree(const Tree::Expr& expr);
-  std::string print_expr_tree(const TreeNew::Expr& expr);
 }
 
 #endif // TREE_PRINTER_HPP_INCLUDED

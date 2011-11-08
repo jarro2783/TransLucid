@@ -18,7 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include "tl/lexertl.hpp"
-#include <tl/ast-new.hpp>
+#include <tl/ast.hpp>
 #include <tl/context.hpp>
 #include <tl/system.hpp>
 

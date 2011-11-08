@@ -1,5 +1,5 @@
 /* Abstract syntax tree.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -23,15 +23,19 @@ along with TransLucid; see the file COPYING.  If not see
  * Contains everything needed to build and traverse an abstract syntax tree.
  */
 
-#ifndef AST_HPP_INCLUDED
-#define AST_HPP_INCLUDED
+#ifndef AST_NEW_HPP_INCLUDED
+#define AST_NEW_HPP_INCLUDED
 
 #include <tl/types.hpp>
+#include <tl/variant.hpp>
 
 #include <vector>
 
 #include <gmpxx.h>
-#include <boost/variant.hpp>
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 namespace TransLucid
 {
@@ -39,7 +43,7 @@ namespace TransLucid
    * Abstract syntax tree. Contains all of the classes, types and functions
    * related to the abstract syntax tree.
    */
-  namespace Tree
+  namespace TreeNew
   {
     /** 
      * Type of unary operator. Symbols for the two types of unary operators.
@@ -292,7 +296,7 @@ namespace TransLucid
      * Abstract syntax tree node. A single expression node in the 
      * abstract syntax tree which is created by the parser.
      */
-    typedef boost::variant
+    typedef Variant
     <
       nil,
       bool,
@@ -304,20 +308,20 @@ namespace TransLucid
       DimensionExpr,
       IdentExpr,
       HashSymbol,
-      boost::recursive_wrapper<ParenExpr>,
-      boost::recursive_wrapper<UnaryOpExpr>,
-      boost::recursive_wrapper<BinaryOpExpr>,
-      boost::recursive_wrapper<IfExpr>,
-      boost::recursive_wrapper<HashExpr>,
-      boost::recursive_wrapper<TupleExpr>,
-      boost::recursive_wrapper<AtExpr>,
-      boost::recursive_wrapper<BangExpr>,
-      boost::recursive_wrapper<LambdaExpr>,
-      boost::recursive_wrapper<PhiExpr>,
-      boost::recursive_wrapper<BangAppExpr>,
-      boost::recursive_wrapper<LambdaAppExpr>,
-      boost::recursive_wrapper<PhiAppExpr>,
-      boost::recursive_wrapper<WhereExpr>
+      recursive_wrapper<ParenExpr>,
+      recursive_wrapper<UnaryOpExpr>,
+      recursive_wrapper<BinaryOpExpr>,
+      recursive_wrapper<IfExpr>,
+      recursive_wrapper<HashExpr>,
+      recursive_wrapper<TupleExpr>,
+      recursive_wrapper<AtExpr>,
+      recursive_wrapper<BangExpr>,
+      recursive_wrapper<LambdaExpr>,
+      recursive_wrapper<PhiExpr>,
+      recursive_wrapper<BangAppExpr>,
+      recursive_wrapper<LambdaAppExpr>,
+      recursive_wrapper<PhiAppExpr>,
+      recursive_wrapper<WhereExpr>
     > Expr;
 
     /**
@@ -588,11 +592,6 @@ namespace TransLucid
        * The right hand side expression.
        */
       Expr rhs;
-      
-      /**
-       * Absolute context change. True if this node is an absolute context
-       * change node, false if it is a relative context change node.
-       */
     };
 
     struct BangExpr
@@ -624,11 +623,17 @@ namespace TransLucid
        * @param name The parameter to bind.
        * @param rhs The right-hand-side expression.
        */
-      LambdaExpr(const u32string& name, const Expr& rhs)
-      : name(name), rhs(rhs)
+      LambdaExpr
+      (
+        const std::vector<Expr>& captures, 
+        const u32string& name, 
+        const Expr& rhs
+      )
+      : captures(captures), name(name), rhs(rhs)
       {
       }
 
+      std::vector<Expr> captures;
       u32string name; /**<The bound parameter.*/
       Expr rhs; /**<The right-hand-side expression.*/
 
@@ -641,11 +646,13 @@ namespace TransLucid
     {
       PhiExpr() = default;
 
-      PhiExpr(const u32string& name, const Expr& rhs)
-      : name(name), rhs(rhs)
+      PhiExpr(const std::vector<Expr>& captures,
+        const u32string& name, const Expr& rhs)
+      : captures(captures), name(name), rhs(rhs)
       {
       }
 
+      std::vector<Expr> captures;
       u32string name;
       //std::vector<Expr> binds;
       Expr rhs;
@@ -724,6 +731,24 @@ namespace TransLucid
       std::vector<size_t> whichDims;
     };
 
+    /**
+     * Creates a binary operation from the op and the left and right hand
+     * sides. Inserts one into the tree of the other depending on the
+     * precedence and associativity to create the correct tree for evaluation.
+     * @param info The binary operation.
+     * @param lhs The left hand side expression.
+     * @param rhs The right hand side expression.
+     * @return The resulting operation.
+     */
+    Expr
+    insert_binary_operator
+    (
+      const BinaryOperator& info,
+      Expr& lhs,
+      Expr& rhs
+    );
+
+    #ifdef DEBUG
     #define PRINT_NODE(n) \
     inline \
     std::ostream& operator<<(std::ostream& os, const n &) \
@@ -751,7 +776,8 @@ namespace TransLucid
     PRINT_NODE(LambdaAppExpr)
     PRINT_NODE(PhiAppExpr)
     PRINT_NODE(WhereExpr)
+    #endif
   }
 }
 
-#endif // AST_HPP_INCLUDED
+#endif // AST_NEW_HPP_INCLUDED

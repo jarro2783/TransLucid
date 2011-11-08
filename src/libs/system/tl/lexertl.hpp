@@ -23,7 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include "lexertl/lookup.hpp"
 #include "tl/lexer_tokens.hpp"
 
-#include <tl/ast-new.hpp>
+#include <tl/ast.hpp>
 #include <tl/context.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
