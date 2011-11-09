@@ -1,6 +1,6 @@
 //some necessary dimensions
-dim "slot";;
-dim "envvar";;
+dim slot;;
+dim envvar;;
 
 //the basic operators
 infixl "+" "plus" 100;;

@@ -198,7 +198,8 @@ namespace TransLucid
       const Position&
       getPos() const
       {
-        return m_pos->getPosition();
+        //TODO we probably want a proper end pos for each stream
+        return operator*().getPosition();
       }
 
       private:

@@ -70,10 +70,8 @@ namespace TransLucid
         m_rules.add(U"false", TOKEN_FALSE);
         m_rules.add(U"fi", TOKEN_FI);
         m_rules.add(U"if", TOKEN_IF);
-        m_rules.add(U"infix[lrnpm]", TOKEN_INFIXBIN);
         m_rules.add(U"then", TOKEN_THEN);
         m_rules.add(U"true", TOKEN_TRUE);
-        m_rules.add(U"(prefix)|(postfix)", TOKEN_UNARY);
         m_rules.add(U"where(_{IDENT})?", TOKEN_WHERE);
 
         m_rules.add(U"{IDENT}?{stringRAW}", TOKEN_CONSTANT_RAW);

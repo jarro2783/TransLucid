@@ -285,8 +285,6 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
           Line line;
           if (parse_line(current, end, line))
           {
-            expect(current, end, U";;", TOKEN_DBLSEMI);
-
             //for now just check if it's a var or dim and do the appropriate
             Variable* v = get<Variable>(&line);
             DimensionDecl* d = get<DimensionDecl>(&line);
@@ -737,6 +735,7 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
   if (*begin != TOKEN_LSQUARE) { return false; }
 
   LexerIterator current = begin;
+  ++current;
 
   size_t tok = sep == SEPARATOR_COLON ? TOKEN_COLON : TOKEN_LARROW;
 
@@ -750,7 +749,7 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
     expect(current, end, rhs, U"expr", &Parser::parse_expr);
 
     if (*current != TOKEN_COMMA) { parsingTuple = false; }
-    ++current;
+    else { ++current; }
   }
 
   expect(current, end, U"]", TOKEN_RSQUARE);
@@ -776,7 +775,11 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
     if (iter == decls->end())
     {
       //TODO I don't know how to parse this thing
+      std::cerr << "unknown line declaration" << std::endl;
+      throw "unknown line declaration";
     }
+
+    ++current;
 
     iter->second(current, end, result);
 
@@ -794,13 +797,11 @@ Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
   LexerIterator current = begin;
-  //a name and an optional initialiser
-  if (*current != TOKEN_ID)
-  {
-    return false;
-  }
 
-  u32string name = get<u32string>(current->getValue());
+  expect(current, end, U"identifier", TOKEN_ID);
+  //a name and an optional initialiser
+
+  u32string name = get<u32string>(begin->getValue());
 
   Tree::Expr init;
   if (*current == TOKEN_LARROW)
@@ -808,6 +809,8 @@ Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
     ++current;
     expect(current, end, init, U"expr", &Parser::parse_expr);
   }
+
+  begin = current;
 
   result = DimensionDecl(name, init);
 
