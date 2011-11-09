@@ -299,15 +299,20 @@ TLText::processExpressions(LineTokenizer& tokenizer)
           Parser::makeUTF32Iterator(line.second.begin()),
           Parser::makeUTF32Iterator(line.second.end())
         );
+        Parser::U32Iterator lineEnd;
 
-        auto expr = m_system.parseExpression(lineBegin);
-        if (expr.first)
+        Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
+          0, 0);
+        Parser::StreamPosIterator posend;
+
+        Tree::Expr expr;
+        if (m_system.parseExpression(posbegin, posend, expr))
         {
           if (m_verbose)
           {
-            (*m_os) << print_expr_tree(expr.second) << std::endl;
+            (*m_os) << print_expr_tree(expr) << std::endl;
           }
-          exprs.push_back(expr.second);
+          exprs.push_back(expr);
         }
       }
       break;

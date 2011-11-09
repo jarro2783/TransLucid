@@ -29,9 +29,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_util.hpp>
 #include <tl/parser_api.hpp>
 
-//#include <algorithm>
-//#include <iterator>
-
 namespace TransLucid
 {
 

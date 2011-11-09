@@ -322,11 +322,21 @@ namespace detail
     Constant
     operator()(const Parser::Variable& var)
     {
+      if (m_verbose)
+      {
+        std::cout << Parser::printEquation(var.eqn) << std::endl;
+      }
+      return m_system.addEquation(var.eqn);
     }
 
     Constant
     operator()(const Parser::Assignment& assign)
     {
+      if (m_verbose)
+      {
+        std::cout << Parser::printEquation(assign.eqn) << std::endl;
+      }
+      return m_system.addAssignment(assign.eqn);
     }
 
     #if 0
@@ -510,13 +520,32 @@ addInitEqn(System& s, const u32string& name, Arg&& e)
 }
 
 void
+addDecl(System& s, const u32string& name, const u32string& value)
+{
+  s.addEquation(Parser::Equation(
+    U"ID_TYPE",
+    Tree::TupleExpr(
+        {{Tree::DimensionExpr(DIM_ARG0), name}}),
+    Tree::Expr(),
+    value
+    ));
+}
+
+void
 System::init_equations()
 {
-  //add DIM=false default equation
+  //types of identifiers
   addInitEqn(*this,
     U"ID_TYPE",
-    U"ID"
+    u32string(U"ID")
   );
+
+  //var, dim, assign, in, out
+  addDecl(*this, U"var", U"DECLID");
+  addDecl(*this, U"dim", U"DECLID");
+  addDecl(*this, U"assign", U"DECLID");
+  addDecl(*this, U"in", U"DECLID");
+  addDecl(*this, U"out", U"DECLID");
 
   //add PRINT="this type has no printer"
   addInitEqn(*this,
@@ -555,7 +584,7 @@ System::System()
 , m_uniqueVarIndex(0)
 , m_uniqueDimIndex(0)
 , m_hiddenDim(-1)
-, m_debug(false)
+, m_debug(true)
 {
   //create the obj, const and fun ids
 
@@ -948,10 +977,15 @@ System::getDimensionIndex(const Constant& c)
   return m_dimTranslator.lookup(c);
 }
 
-std::pair<bool, Tree::Expr>
-System::parseExpression(Parser::U32Iterator& iter)
+bool
+System::parseExpression(Parser::StreamPosIterator& iter, 
+  Parser::StreamPosIterator& end,
+  Tree::Expr& expr)
 {
-  //return m_translator->parseExpr(iter, m_defaultk);
+  Parser::LexerIterator lexit(iter, end, m_defaultk, lookupIdentifiers());
+  auto lexend = lexit.makeEnd();
+
+  return m_parser->parse_expr(lexit, lexend, expr);
 }
 
 Constant

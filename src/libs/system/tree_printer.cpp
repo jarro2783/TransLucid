@@ -371,6 +371,8 @@ class TreePrinterNew
       print_tuple_pair(*iter);
     }
 
+    ++iter;
+
     while (iter != t.pairs.end())
     {
       m_os << ", ";

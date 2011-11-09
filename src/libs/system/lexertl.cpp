@@ -136,6 +136,9 @@ namespace
 
         const u32string& type = get_constant_pointer<u32string>(c);
 
+        std::cerr << "the type of identifier: " << ident << " is " << type
+          << std::endl;
+
         if (type == U"DIM")
         {
           id = TOKEN_DIM_IDENTIFIER;
@@ -144,6 +147,10 @@ namespace
         {
           id = TOKEN_DECLID;
         }
+      }
+      else
+      {
+        std::cerr << "Could not lookup ID_TYPE" << std::endl;
       }
 
       return ident;

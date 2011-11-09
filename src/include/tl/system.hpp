@@ -177,8 +177,10 @@ namespace TransLucid
 
     //parses an expression, returns a tree of the expression as parsed by
     //the current definitions of the system
-    std::pair<bool, Tree::Expr>
-    parseExpression(Parser::U32Iterator& iter);
+    bool
+    parseExpression(Parser::StreamPosIterator& begin, 
+      Parser::StreamPosIterator& end,
+      Tree::Expr& expr);
 
     //bool
     //parse_header(const u32string& s);
