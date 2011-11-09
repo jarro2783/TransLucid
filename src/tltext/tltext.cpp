@@ -249,7 +249,11 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
           Parser::makeUTF32Iterator(line.second.end())
         );
 
-        auto result = m_system.parseLine(lineBegin, m_verbose, m_debug);
+        Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
+          0,0);
+        Parser::StreamPosIterator posend;
+
+        auto result = m_system.parseLine(posbegin, posend, m_verbose, m_debug);
       }
       break;
 

@@ -45,6 +45,11 @@ namespace TransLucid
     class InputHDWS;
   }
 
+  namespace Parser
+  {
+    class Parser;
+  }
+
   constexpr int MAX_FUNCTION_PARAMETERS = 10;
 
   class Translator;
@@ -164,7 +169,8 @@ namespace TransLucid
     Constant
     parseLine
     (
-      Parser::U32Iterator& begin, 
+      Parser::StreamPosIterator& begin, 
+      const Parser::StreamPosIterator& end,
       bool verbose = false, 
       bool debug = false
     );
@@ -174,8 +180,8 @@ namespace TransLucid
     std::pair<bool, Tree::Expr>
     parseExpression(Parser::U32Iterator& iter);
 
-    bool
-    parse_header(const u32string& s);
+    //bool
+    //parse_header(const u32string& s);
 
     void
     loadLibrary(const u32string& s);
@@ -320,7 +326,7 @@ namespace TransLucid
 
     Context m_defaultk;
     size_t m_time;
-    Translator *m_translator;
+    //Translator *m_translator;
     std::vector<dimension_index> m_Lin;
     std::vector<dimension_index> m_fnLists;
 
@@ -330,6 +336,8 @@ namespace TransLucid
 
     bool m_debug;
     bool m_verbose;
+
+    Parser::Parser* m_parser;
 
     friend class detail::InputHDWS;
 

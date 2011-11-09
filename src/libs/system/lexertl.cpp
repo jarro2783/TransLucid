@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include "tl/lexertl.hpp"
 
 #include <tl/context.hpp>
+#include <tl/fixed_indexes.hpp>
 #include <tl/lexer_util.hpp>
 #include <tl/output.hpp>
 #include <tl/system.hpp>
@@ -127,6 +128,11 @@ namespace
       {
         ContextPerturber p(context, {{DIM_ARG0, Types::String::create(ident)}});
         Constant c = (*lookup)(context);
+        
+        if (c.index() != TYPE_INDEX_USTRING)
+        {
+          throw "internal compiler error at: " __FILE__ ":" XSTRING(__LINE__);
+        }
 
         const u32string& type = get_constant_pointer<u32string>(c);
 

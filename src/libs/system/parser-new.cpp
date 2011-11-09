@@ -793,8 +793,25 @@ bool
 Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
-  //TODO
-  return false;
+  LexerIterator current = begin;
+  //a name and an optional initialiser
+  if (*current != TOKEN_ID)
+  {
+    return false;
+  }
+
+  u32string name = get<u32string>(current->getValue());
+
+  Tree::Expr init;
+  if (*current == TOKEN_LARROW)
+  {
+    ++current;
+    expect(current, end, init, U"expr", &Parser::parse_expr);
+  }
+
+  result = DimensionDecl(name, init);
+
+  return true;
 }
 
 bool
@@ -863,12 +880,12 @@ bool
 Parser::parse_out_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
-  Line var_result;
-  bool success = parse_var_decl(begin, end, var_result);
+  Equation eqn;
+  bool success = parse_equation_decl(begin, end, eqn, TOKEN_EQUALS, U"=");
 
   if (success)
   {
-    result = OutputDecl(get<Variable>(var_result).eqn);
+    result = OutputDecl(eqn);
   }
 
   return success;
@@ -878,12 +895,12 @@ bool
 Parser::parse_in_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
-  Line var_result;
-  bool success = parse_var_decl(begin, end, var_result);
+  Equation eqn;
+  bool success = parse_equation_decl(begin, end, eqn, TOKEN_EQUALS, U"=");
 
   if (success)
   {
-    result = InputDecl(get<Variable>(var_result).eqn);
+    result = InputDecl(eqn);
   }
 
   return success;

@@ -74,6 +74,11 @@ namespace TransLucid
       : dim(d)
       {}
 
+      template <typename Expression>
+      DimensionDecl(const u32string& d, Expression&& expr)
+      : dim(d), initialise(std::forward<Expression>(expr))
+      {}
+
       u32string dim;
       Tree::Expr initialise;
     };

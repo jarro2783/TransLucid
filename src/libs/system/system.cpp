@@ -44,12 +44,16 @@ along with TransLucid; see the file COPYING.  If not see
 //the appropriate addDeclInternal, they pass m_equations and m_assignments
 //respectively.
 
+#include <algorithm>
+#include <unordered_map>
+#include <initializer_list>
 
 #include <tl/builtin_types.hpp>
 #include <tl/constws.hpp>
 #include <tl/context.hpp>
 #include <tl/function_registry.hpp>
 #include <tl/output.hpp>
+#include <tl/parser-new.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
 #include <tl/translator.hpp>
@@ -62,21 +66,11 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
-#include <algorithm>
-#include <unordered_map>
-#include <initializer_list>
-
-#include <boost/uuid/uuid_generators.hpp>
-
 namespace TransLucid
 {
 
 namespace
 {
-  //the uuid generator
-  boost::uuids::basic_random_generator<boost::mt19937>
-  uuid_generator;
-
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {
@@ -313,7 +307,6 @@ namespace detail
 
     typedef Constant result_type;
 
-    #if 0
     Constant
     operator()(const Tree::BinaryOperator& binop)
     {
@@ -326,6 +319,17 @@ namespace detail
       return m_system.addUnaryOperator(unop);
     }
 
+    Constant
+    operator()(const Parser::Variable& var)
+    {
+    }
+
+    Constant
+    operator()(const Parser::Assignment& assign)
+    {
+    }
+
+    #if 0
     Constant
     operator()(const std::pair<Parser::Equation, Parser::DeclType>& eqn)
     {
@@ -342,6 +346,7 @@ namespace detail
         return m_system.addAssignment(eqn.first);
       }
     }
+    #endif
 
     Constant
     operator()(const Parser::DimensionDecl& dim)
@@ -412,7 +417,6 @@ namespace detail
 
       return uuid;
     }
-    #endif
 
     private:
     System& m_system;
@@ -555,35 +559,10 @@ System::System()
 {
   //create the obj, const and fun ids
 
-  //we need dimensions and unique to do anything
-  #if 0
-  addEquation(U"DIMENSION_NAMED_INDEX", GuardWS(),
-                      new DimensionsStringWS(m_dimTranslator));
-  addEquation(U"DIMENSION_VALUE_INDEX", GuardWS(),
-                      new DimensionsTypedWS(m_dimTranslator));
-  addEquation
-  (
-    U"_unique", GuardWS(),
-    new UniqueWS(std::max
-    (
-      static_cast<int>(TYPE_INDEX_LAST),
-      static_cast<int>(DIM_INDEX_LAST)
-    ))
-  );
-
-  addEquation
-  (
-    U"_uniquedim", GuardWS(),
-    new UniqueDimensionWS(m_dimTranslator)
-  );
-  #endif
-
-  //add this
-  //addEquation(U"this", GuardWS(), this);
-
   setDefaultContext();
 
   //m_translator = new Translator(*this);
+  m_parser = new Parser::Parser(*this);
 
   //these are for the lexer
   init_dimensions
@@ -609,6 +588,7 @@ System::System()
 System::~System()
 {
   //delete m_translator;
+  delete m_parser;
 
   //delete the equations
   for (auto& v : m_assignments)
@@ -671,11 +651,11 @@ System::addEquation(const u32string& name, const GuardWS& guard, WS* e)
   return addDeclInternal(name, guard, e, m_equations);
 }
 
-bool
-System::parse_header(const u32string& s)
-{
+//bool
+//System::parse_header(const u32string& s)
+//{
   //return m_translator->parse_header(s);
-}
+//}
 
 void
 System::loadLibrary(const u32string& s)
@@ -698,24 +678,26 @@ System::lastExpression() const
 Constant
 System::parseLine
 (
-  Parser::U32Iterator& begin, 
+  Parser::StreamPosIterator& begin, 
+  const Parser::StreamPosIterator& end,
   bool verbose,
   bool debug
 )
 {
-  #if 0
-  Parser::U32Iterator end;
-
   //TODO this is a hack, implement debug and verbose properly
   //some sort of output object might be good too
   m_debug = debug;
 
-  auto result = m_translator->parseLine(begin, m_defaultk);
+  Parser::Line line;
 
-  if (result.first)
+  Parser::LexerIterator lexit(begin, end, m_defaultk, lookupIdentifiers());
+  Parser::LexerIterator lexend = lexit.makeEnd();
+  bool success = m_parser->parse_line(lexit, lexend, line);
+
+  if (success)
   {
     detail::LineAdder adder(*this, verbose);
-    Constant c = boost::apply_visitor(adder, result.second);
+    Constant c = apply_visitor(adder, line);
 
     //this is the best way that we know for now, fix up the default context for
     //the L_in dims that were added
@@ -723,7 +705,6 @@ System::parseLine
 
     return c;
   }
-  #endif
 
   return Types::Special::create(SP_CONST); 
 }
@@ -777,7 +758,7 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     return Types::Special::create(SP_CONST);
   }
 
-  uuid u = uuid_generator();
+  uuid u = generate_uuid();
 
   m_unop_uuids.insert(std::make_pair(u,
     UnaryUUIDs
@@ -826,7 +807,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
     return Types::Special::create(SP_CONST);
   }
 
-  uuid u = uuid_generator();
+  uuid u = generate_uuid();
 
   m_binop_uuids.insert(std::make_pair(u, 
     BinaryUUIDs
@@ -986,7 +967,7 @@ System::addOutputHyperdaton
   if (i == m_outputHDs.end())
   {
     m_outputHDs.insert(std::make_pair(name, hd));
-    uuid u = uuid_generator();
+    uuid u = generate_uuid();
     m_outputUUIDs.insert(std::make_pair(u, name));
 
     //add the constraint
@@ -1097,7 +1078,7 @@ System::addInputHyperdaton
   if (i == m_inputHDs.end())
   {
     m_inputHDs.insert(std::make_pair(name, hd));
-    uuid u = uuid_generator();
+    uuid u = generate_uuid();
     //m_outputUUIDs.insert(std::make_pair(u, name));
 
     //add the constraint
