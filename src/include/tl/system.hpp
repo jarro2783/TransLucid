@@ -28,8 +28,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_set>
 #include <unordered_map>
 
-#include <tl/types.hpp>
 #include <tl/dimtranslator.hpp>
+#include <tl/types.hpp>
 #include <tl/equation.hpp>
 #include <tl/function_registry.hpp>
 #include <tl/hyperdaton.hpp>

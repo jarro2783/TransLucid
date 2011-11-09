@@ -28,7 +28,6 @@ namespace TransLucid
     {
       TOKEN_FIRST, //a nothing token, indicates the first
       TOKEN_AND,
-      TOKEN_ASSIGN, //assign
       TOKEN_ASSIGNTO, //:=
       TOKEN_AT,
       TOKEN_BANG,
@@ -40,7 +39,6 @@ namespace TransLucid
       TOKEN_DBLSEMI,
       TOKEN_DBLSLASH,
       TOKEN_DECLID,
-      TOKEN_DIM,
       TOKEN_DIM_IDENTIFIER,
       TOKEN_DOLLAR,
       TOKEN_DOT,
@@ -53,7 +51,6 @@ namespace TransLucid
       TOKEN_HASH,
       TOKEN_IF,
       TOKEN_ID,
-      TOKEN_IN,
       TOKEN_INFIXBIN,
       TOKEN_INTEGER,
       TOKEN_LARROW,
@@ -61,7 +58,6 @@ namespace TransLucid
       TOKEN_LPAREN,
       TOKEN_LSQUARE,
       TOKEN_OPERATOR, //don't match this, it's converted to the right op
-      TOKEN_OUT,
       TOKEN_PIPE,
       TOKEN_RANGE,
       TOKEN_RARROW,
@@ -73,7 +69,6 @@ namespace TransLucid
       TOKEN_TRUE,
       TOKEN_UCHAR,
       TOKEN_UNARY,
-      TOKEN_VAR,
       TOKEN_WHERE,
 
       TOKEN_PREFIX_OP,

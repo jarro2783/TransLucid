@@ -64,20 +64,16 @@ namespace TransLucid
         m_rules.add_macro(U"stringRAW", U"`[^`]*`");
         
         //the rules
-        m_rules.add(U"dim", TOKEN_DIM);
         m_rules.add(U"else", TOKEN_ELSE);
         m_rules.add(U"elsif", TOKEN_ELSIF);
         m_rules.add(U"end", TOKEN_END);
         m_rules.add(U"false", TOKEN_FALSE);
         m_rules.add(U"fi", TOKEN_FI);
         m_rules.add(U"if", TOKEN_IF);
-        m_rules.add(U"in", TOKEN_IN);
         m_rules.add(U"infix[lrnpm]", TOKEN_INFIXBIN);
-        m_rules.add(U"out", TOKEN_OUT);
         m_rules.add(U"then", TOKEN_THEN);
         m_rules.add(U"true", TOKEN_TRUE);
         m_rules.add(U"(prefix)|(postfix)", TOKEN_UNARY);
-        m_rules.add(U"var", TOKEN_VAR);
         m_rules.add(U"where(_{IDENT})?", TOKEN_WHERE);
 
         m_rules.add(U"{IDENT}?{stringRAW}", TOKEN_CONSTANT_RAW);

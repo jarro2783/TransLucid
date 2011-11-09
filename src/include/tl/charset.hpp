@@ -20,9 +20,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef CHARSET_HPP_INCLUDED
 #define CHARSET_HPP_INCLUDED
 
-#include <tl/types.hpp>
-#include <iconv.h>
 #include <string>
+
+#include <tl/types.hpp>
+
+#include <iconv.h>
 
 /**
  * @file charset.hpp

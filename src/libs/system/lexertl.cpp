@@ -140,6 +140,7 @@ namespace
         }
       }
 
+      return ident;
     }
 
     static TokenValue

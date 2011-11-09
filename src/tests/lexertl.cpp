@@ -394,14 +394,6 @@ parse
         break;
 
         //keywords
-        case TL::Parser::TOKEN_ASSIGN: //assign
-        checker.keyword(KEYWORD_ASSIGN);
-        break;
-
-        case TL::Parser::TOKEN_DIM:
-        checker.keyword(KEYWORD_DIM);
-        break;
-
         case TL::Parser::TOKEN_FI:
         checker.keyword(KEYWORD_FI);
         break;
@@ -410,20 +402,8 @@ parse
         checker.keyword(KEYWORD_IF);
         break;
 
-        case TL::Parser::TOKEN_IN:
-        checker.keyword(KEYWORD_IN);
-        break;
-
         case TL::Parser::TOKEN_THEN:
         checker.keyword(KEYWORD_THEN);
-        break;
-
-        case TL::Parser::TOKEN_OUT:
-        checker.keyword(KEYWORD_OUT);
-        break;
-
-        case TL::Parser::TOKEN_VAR:
-        checker.keyword(KEYWORD_VAR);
         break;
 
         case TL::Parser::TOKEN_ELSE:

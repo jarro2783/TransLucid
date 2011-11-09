@@ -39,7 +39,7 @@ insert_binary_operator
 )
 {
   Tree::BinaryOpExpr* binop = get<Tree::BinaryOpExpr>(&lhs);
-  if (binop == 0)
+  if (binop == nullptr)
   {
     return Tree::BinaryOpExpr(op, lhs, rhs);
   }

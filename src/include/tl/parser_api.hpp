@@ -51,6 +51,8 @@ namespace TransLucid
     template <size_t N>
     struct Declaration
     {
+      Declaration() = default;
+
       template <typename Eqn>
       Declaration(Eqn&& e)
       : eqn(std::forward<Eqn>(e))
@@ -73,6 +75,7 @@ namespace TransLucid
       {}
 
       u32string dim;
+      Tree::Expr initialise;
     };
 
     struct LibraryDecl

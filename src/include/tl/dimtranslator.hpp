@@ -20,9 +20,10 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef DIMTRANSLATOR_HPP_INCLUDED
 #define DIMTRANSLATOR_HPP_INCLUDED
 
+#include <unordered_map>
+
 #include <tl/object_registry.hpp>
 #include <tl/types.hpp>
-#include <unordered_map>
 
 namespace TransLucid
 {

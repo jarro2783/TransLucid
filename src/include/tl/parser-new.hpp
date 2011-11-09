@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <exception>
+#include <unordered_map>
 
 #include "tl/lexertl.hpp"
 #include <tl/ast.hpp>
@@ -89,6 +90,35 @@ namespace TransLucid
       parse_tuple(LexerIterator& begin, const LexerIterator& end,
         Tree::Expr& result, TupleSeparator sep);
 
+      bool
+      parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
+        Equation& result, size_t separator_symbol, 
+        const u32string& separator_text);
+
+      bool
+      parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
+      parse_assign_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
+      parse_var_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
+      parse_out_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
+      parse_in_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
+      parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
+        Equation& result);
+
       Token
       nextToken(LexerIterator& begin);
 
@@ -110,6 +140,19 @@ namespace TransLucid
       System& m_system;
       System::IdentifierLookup m_idents;
       Context& m_context;
+
+      //the decl parsers
+      typedef 
+      std::unordered_map
+      <
+        u32string, 
+        std::function<bool(LexerIterator&, const LexerIterator, Line&)>
+      > DeclParsers;
+
+      DeclParsers m_where_decls;
+      DeclParsers m_top_decls;
+
+      std::stack<DeclParsers*> m_which_decl;
     };
 
     class ParseError : public std::exception

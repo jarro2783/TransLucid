@@ -495,13 +495,13 @@ addEqn(System& s, Args... args)
 
 template <typename Arg>
 void
-addInitEqn(System& s, const u32string& name, const Arg& e)
+addInitEqn(System& s, const u32string& name, Arg&& e)
 {
   s.addEquation(Parser::Equation(
     name,
     Tree::Expr(),
     Tree::Expr(),
-    e
+    std::forward<Arg>(e)
   ));
 }
 
@@ -510,8 +510,8 @@ System::init_equations()
 {
   //add DIM=false default equation
   addInitEqn(*this,
-    U"DIM", 
-    false
+    U"ID_TYPE",
+    U"ID"
   );
 
   //add PRINT="this type has no printer"

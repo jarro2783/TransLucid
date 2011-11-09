@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
  * The parser.
  */
 
+#include <functional>
 #include <sstream>
 
 #include <tl/charset.hpp>
@@ -68,10 +69,30 @@ ExpectedExpr::ExpectedExpr(const LexerIterator& pos, const u32string& text)
 {
 }
 
+template <typename Decls, typename DeclName, typename Obj, typename Fn>
+void
+add_decl_parser(Decls&& decls, DeclName&& d, Obj&& obj, Fn&& f)
+{
+  using namespace std::placeholders;
+  decls.insert(std::make_pair(d,
+    std::bind(std::mem_fn(f), obj, _1, _2, _3)));
+}
+
 Parser::Parser(System& system)
 : m_system(system)
 , m_idents(system.lookupIdentifiers()), m_context(system.getDefaultContext())
 {
+  //start with top level declarations
+  m_which_decl.push(&m_top_decls);
+
+  add_decl_parser(m_where_decls, U"dim", this, &Parser::parse_dim_decl);
+  add_decl_parser(m_where_decls, U"var", this, &Parser::parse_var_decl);
+
+  add_decl_parser(m_top_decls, U"dim", this, &Parser::parse_dim_decl);
+  add_decl_parser(m_top_decls, U"var", this, &Parser::parse_var_decl);
+  add_decl_parser(m_top_decls, U"assign", this, &Parser::parse_assign_decl);
+  add_decl_parser(m_top_decls, U"in", this, &Parser::parse_in_decl);
+  add_decl_parser(m_top_decls, U"out", this, &Parser::parse_out_decl);
 }
 
 void
@@ -253,7 +274,47 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
     if (w == TOKEN_WHERE)
     {
       //TODO parse all of where clause
-      ++current;
+      m_which_decl.push(&m_where_decls);
+
+      try
+      {
+        Tree::WhereExpr where;
+        bool parsingWhere = true;
+        while (parsingWhere)
+        {
+          Line line;
+          if (parse_line(current, end, line))
+          {
+            expect(current, end, U";;", TOKEN_DBLSEMI);
+
+            //for now just check if it's a var or dim and do the appropriate
+            Variable* v = get<Variable>(&line);
+            DimensionDecl* d = get<DimensionDecl>(&line);
+            if (v != 0)
+            {
+              where.vars.push_back(v->eqn);
+            }
+            else if (d != 0)
+            {
+              where.dims.push_back(std::make_pair(d->dim, d->initialise));
+            }
+            else
+            {
+              //just in case
+              throw 
+                "internal compiler error at: " __FILE__ ":" XSTRING(__LINE__);
+            }
+          }
+        }
+      }
+      catch(...)
+      {
+        //in case an expectation throws we should clear up the decl stack
+        m_which_decl.pop();
+        throw;
+      }
+      m_which_decl.pop();
+
       expect(current, end, U"end", TOKEN_END);
     }
     else
@@ -702,17 +763,130 @@ bool
 Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
-  if (*begin == TOKEN_ID)
+  if (*begin == TOKEN_DECLID)
   {
+    //get the decl parsers to use
+    DeclParsers* decls = m_which_decl.top();
+
+    LexerIterator current = begin;
     u32string id = get<u32string>(begin->getValue());
 
-    
+    auto iter = decls->find(id);
+
+    if (iter == decls->end())
+    {
+      //TODO I don't know how to parse this thing
+    }
+
+    iter->second(current, end, result);
+
+    expect(current, end, U";;", TOKEN_DBLSEMI);
     return true;
   }
   else
   {
     return false;
   }
+}
+
+bool
+Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  //TODO
+  return false;
+}
+
+bool
+Parser::parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
+  Equation& result, size_t separator_symbol, const u32string& separator_text)
+{
+  LexerIterator current = begin;
+  if (*current != TOKEN_ID)
+  {
+    //this is probably the only way this can fail, after this the beasty that
+    //we are parsing should be a var
+    return false;
+  }
+
+  const u32string& name = get<u32string>(current->getValue());
+  ++current;
+
+  Tree::Expr tuple;
+  parse_tuple(current, end, tuple, SEPARATOR_COLON);
+  
+  Tree::Expr boolean;
+  if (*current == TOKEN_PIPE)
+  {
+    ++current;
+    expect(current, end, boolean, U"expr", &Parser::parse_expr);
+  }
+
+  expect(current, end, separator_text, separator_symbol);
+
+  Tree::Expr expr;
+  expect(current, end, expr, U"expr", &Parser::parse_expr);
+
+  result = Equation(name, tuple, boolean, expr);
+
+  begin = current;
+  return true;
+}
+
+bool
+Parser::parse_var_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  Equation eqn;
+  if (parse_equation_decl(begin, end, eqn, TOKEN_EQUALS, U"="))
+  {
+    result = Variable(std::move(eqn));
+    return true;
+  }
+  return false;
+}
+
+bool
+Parser::parse_assign_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  Equation eqn;
+  if (parse_equation_decl(begin, end, eqn, TOKEN_ASSIGNTO, U":="))
+  {
+    result = Assignment(std::move(eqn));
+    return true;
+  }
+  return false;
+}
+
+bool
+Parser::parse_out_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  Line var_result;
+  bool success = parse_var_decl(begin, end, var_result);
+
+  if (success)
+  {
+    result = OutputDecl(get<Variable>(var_result).eqn);
+  }
+
+  return success;
+}
+
+bool
+Parser::parse_in_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  Line var_result;
+  bool success = parse_var_decl(begin, end, var_result);
+
+  if (success)
+  {
+    result = InputDecl(get<Variable>(var_result).eqn);
+  }
+
+  return success;
 }
 
 Token

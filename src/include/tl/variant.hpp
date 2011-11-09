@@ -74,7 +74,7 @@ namespace TransLucid
     recursive_wrapper(recursive_wrapper&& rhs)
     : m_t(rhs.m_t)
     {
-      rhs.m_t = 0;
+      rhs.m_t = nullptr;
     }
 
     recursive_wrapper&
@@ -89,7 +89,7 @@ namespace TransLucid
     {
       delete m_t;
       m_t = rhs.m_t;
-      rhs.m_t = 0;
+      rhs.m_t = nullptr;
       return *this;
     }
 
