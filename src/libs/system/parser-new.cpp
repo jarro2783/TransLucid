@@ -46,6 +46,26 @@ namespace TransLucid
 namespace Parser
 {
 
+namespace
+{
+
+template <typename Fn, typename... Args>
+auto
+call_fn(Fn&& f, Args&&... args)
+  -> decltype(f(args...))
+{
+  return f(args...);
+}
+
+template <typename Ret, typename T, typename...Args>
+Ret
+call_fn(Ret (T::*f)(Args...), T* t, Args&&... args)
+{
+  return (t->*f)(args...);
+}
+
+}
+
 u32string
 build_position_message(const LexerIterator& iter)
 {
@@ -93,6 +113,11 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"assign", this, &Parser::parse_assign_decl);
   add_decl_parser(m_top_decls, U"in", this, &Parser::parse_in_decl);
   add_decl_parser(m_top_decls, U"out", this, &Parser::parse_out_decl);
+  add_decl_parser(m_top_decls, U"infixl", this, &Parser::parse_infix_decl);
+  add_decl_parser(m_top_decls, U"infixr", this, &Parser::parse_infix_decl);
+  add_decl_parser(m_top_decls, U"infixn", this, &Parser::parse_infix_decl);
+  add_decl_parser(m_top_decls, U"postfix", this, &Parser::parse_unary_decl);
+  add_decl_parser(m_top_decls, U"prefix", this, &Parser::parse_unary_decl);
 }
 
 void
@@ -109,18 +134,18 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
   ++begin;
 }
 
-template <typename... T>
+
+template <typename Result, typename Fn, typename... Args>
 void
 Parser::expect(LexerIterator& begin, const LexerIterator& end, 
-  Tree::Expr& result, const std::u32string& message,
-  bool (Parser::*parser)
-    (LexerIterator&, const LexerIterator&, Tree::Expr&, T...),
-  T&&... args
+  Result&& result, const std::u32string& message,
+  Fn f,
+  Args&&... args
 )
 {
   LexerIterator current = begin;
-  bool success = (this->*parser)(current, end, result, 
-    std::forward<T>(args)...);
+  bool success = call_fn(f, this, current, end, std::forward<Result>(result),
+    std::forward<Args>(args)...);
 
   if (!success)
   {
@@ -781,7 +806,7 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
 
     ++current;
 
-    iter->second(current, end, result);
+    expect(current, end, result, U"line: '" + id + U"'", iter->second);
 
     expect(current, end, U";;", TOKEN_DBLSEMI);
     return true;
@@ -907,6 +932,20 @@ Parser::parse_in_decl(LexerIterator& begin, const LexerIterator& end,
   }
 
   return success;
+}
+
+bool
+Parser::parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
+  Equation& result)
+{
+  return false;
+}
+
+bool
+Parser::parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
+  Equation& result)
+{
+  return false;
 }
 
 Token

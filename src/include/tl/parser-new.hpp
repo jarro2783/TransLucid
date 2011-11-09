@@ -119,6 +119,14 @@ namespace TransLucid
       parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
         Equation& result);
 
+      bool
+      parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
+        Equation& result);
+
+      bool
+      parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
+        Equation& result);
+
       Token
       nextToken(LexerIterator& begin);
 
@@ -128,6 +136,7 @@ namespace TransLucid
         size_t token
       );
 
+#if 0
       template <typename... T>
       void
       expect(LexerIterator& begin, const LexerIterator& end, 
@@ -135,6 +144,15 @@ namespace TransLucid
         bool (Parser::*parser)
           (LexerIterator&, const LexerIterator&, Tree::Expr&, T...),
         T&&... args
+      );
+#endif
+
+      template <typename Result, typename Fn, typename... Args>
+      void
+      expect(LexerIterator& begin, const LexerIterator& end, 
+        Result&& result, const std::u32string& message,
+        Fn f,
+        Args&&... args
       );
 
       System& m_system;
