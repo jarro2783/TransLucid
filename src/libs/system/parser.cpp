@@ -33,7 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/charset.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/output.hpp>
-#include <tl/parser-new.hpp>
+#include <tl/parser.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types_util.hpp>
 

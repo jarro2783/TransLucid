@@ -17,27 +17,15 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#undef DISABLE_CATCH
-
-#include "tl/parser-new.hpp"
+#include "tl/parser.hpp"
 #include <tl/tree_printer.hpp>
 
-#ifndef DISABLE_CATCH
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#endif
-
-#ifdef DISABLE_CATCH
-#define CHECK(x)
-#endif
 
 namespace TL = TransLucid;
 
-#ifndef DISABLE_CATCH
 TEST_CASE( "lexer iterator", "the lexer token stream iterator" )
-#else
-void test2()
-#endif
 {
   TL::System s;
 
@@ -76,11 +64,7 @@ void test2()
   CHECK(other == end);
 }
 
-#ifndef DISABLE_CATCH
 TEST_CASE( "expr parser", "basic expression parser tests" )
-#else
-void test3()
-#endif
 {
   TL::System s;
 
@@ -209,12 +193,3 @@ void test3()
 
   CHECK(TL::Printer::print_expr_tree(result) == "5 * (6 + 7)");
 }
-
-#ifdef DISABLE_CATCH
-int main()
-{
-  test2();
-  test3();
-  return 0;
-}
-#endif

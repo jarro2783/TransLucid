@@ -53,7 +53,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/context.hpp>
 #include <tl/function_registry.hpp>
 #include <tl/output.hpp>
-#include <tl/parser-new.hpp>
+#include <tl/parser.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
 #include <tl/tree_to_wstree.hpp>
