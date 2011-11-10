@@ -32,10 +32,10 @@ add_library(tlsystem SHARED ${SYSTEM_SOURCES})
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp
-  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/generate-lexer/generate-lexer >
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/lex/generate-lexer >
     ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp ||
     (rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp && false)
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generate-lexer/generate-lexer
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/lex/generate-lexer
   )
 
 set_property(SOURCE lexertl.cpp APPEND PROPERTY OBJECT_DEPENDS
