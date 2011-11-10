@@ -122,6 +122,7 @@ AC_CONFIG_FILES([
                  src/include/tl/detail/Makefile
                  src/include/tl/hyperdatons/Makefile
                  src/include/tl/types/Makefile
+                 src/libs/system/generate-lexer/Makefile
                  src/libs/Makefile
                  src/libs/system/Makefile
                  src/tests/Makefile

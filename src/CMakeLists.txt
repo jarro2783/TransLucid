@@ -16,7 +16,6 @@
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
 
-add_subdirectory(generate-lexer)
 add_subdirectory(libs)
 add_subdirectory(basic)
 add_subdirectory(tests)

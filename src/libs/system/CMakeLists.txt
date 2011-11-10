@@ -1,3 +1,5 @@
+add_subdirectory(generate-lexer)
+
 if (COMMAND cmake_policy)
    cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
@@ -31,10 +33,10 @@ add_library(tlsystem SHARED ${SYSTEM_SOURCES})
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp
   COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/tl
-  COMMAND ${CMAKE_BINARY_DIR}/src/generate-lexer/generate-lexer >
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/generate-lexer/generate-lexer >
     ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp ||
     (rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp && false)
-  DEPENDS ${CMAKE_BINARY_DIR}/src/generate-lexer/generate-lexer
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generate-lexer/generate-lexer
   )
 
 set_property(SOURCE lexertl.cpp APPEND PROPERTY OBJECT_DEPENDS

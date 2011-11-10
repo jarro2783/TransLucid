@@ -15,7 +15,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
-EXTRA_DIST = CMakeLists.txt
+
+SUBDIRS = generate-lexer
+
+EXTRA_DIST = CMakeLists.txt tl/static_lexer.hpp
 
 lib_LTLIBRARIES = libtlsystem.la
 
@@ -33,10 +36,17 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   line_tokenizer.cpp parser.cpp range.cpp rename.cpp \
   system.cpp tree_printer.cpp tree_to_wstree.cpp \
   types.cpp \
-  utility.cpp uuid.cpp workshop_builder.cpp
+  utility.cpp uuid.cpp workshop_builder.cpp tl/static_lexer.hpp
 
 libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
 
 systemdatadir = $(pkgdatadir)
 dist_systemdata_DATA = system_header.tl
+
+BUILT_SOURCES=tl/static_lexer.hpp
+MAINTAINERCLEANFILES=$(BUILT_SOURCES)
+
+tl/static_lexer.hpp:
+	$(abs_top_builddir)/src/libs/system/generate-lexer/generate_lexer > \
+	  $(abs_top_srcdir)/src/libs/system/tl/static_lexer.hpp
