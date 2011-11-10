@@ -1,4 +1,4 @@
-add_subdirectory(generate-lexer)
+add_subdirectory(lex)
 
 if (COMMAND cmake_policy)
    cmake_policy(SET CMP0005 NEW)
@@ -11,7 +11,7 @@ add_definitions(${TLCFLAGS}
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/system/)
 
 add_custom_target(generate_static_lexer DEPENDS 
-  ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp)
 
 set (SYSTEM_SOURCES
 ast.cpp bestfit.cpp builtin_types.cpp charset.cpp
@@ -31,16 +31,15 @@ workshop_builder.cpp
 add_library(tlsystem SHARED ${SYSTEM_SOURCES})
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp
-  COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/tl
+  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/generate-lexer/generate-lexer >
-    ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp ||
-    (rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/tl/static_lexer.hpp && false)
+    ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp ||
+    (rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp && false)
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generate-lexer/generate-lexer
   )
 
 set_property(SOURCE lexertl.cpp APPEND PROPERTY OBJECT_DEPENDS
-  ${CMAKE_SOURCE_DIR}/src/libs/system/tl/static_lexer.hpp)
+  ${CMAKE_SOURCE_DIR}/src/libs/system/lex/static_lexer.hpp)
 
 if (BUILD_STATIC_SYSTEM)
   add_library(tlsystem-static STATIC ${SYSTEM_SOURCES})

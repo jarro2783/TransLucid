@@ -138,7 +138,7 @@ void test3()
   TL::Parser::LexerIterator end2 = begin2.makeEnd();
 
   CHECK(p.parse_expr(begin2, end2, result));
-  CHECK(print_expr_tree(result) == "f.d A B");
+  CHECK(TL::Printer::print_expr_tree(result) == "f.d A B");
 
   TL::Tree::PhiAppExpr* appB = TL::get<TL::Tree::PhiAppExpr>(&result);
   REQUIRE(appB != 0);
@@ -183,7 +183,7 @@ void test3()
   TL::Parser::LexerIterator end3 = begin3.makeEnd();
   CHECK(p.parse_expr(begin3, end3, result));
 
-  CHECK(print_expr_tree(result) == "5 + 6 + 7");
+  CHECK(TL::Printer::print_expr_tree(result) == "5 + 6 + 7");
 
 
   std::string input4("5 * (6 + 7)");
@@ -207,7 +207,7 @@ void test3()
   TL::Parser::LexerIterator end4 = begin4.makeEnd();
   CHECK(p.parse_expr(begin4, end4, result));
 
-  CHECK(print_expr_tree(result) == "5 * (6 + 7)");
+  CHECK(TL::Printer::print_expr_tree(result) == "5 * (6 + 7)");
 }
 
 #ifdef DISABLE_CATCH
