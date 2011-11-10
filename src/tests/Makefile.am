@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt runtest runbinary.sh
 
-check_PROGRAMS = lexertl system_test variant parser line_tokenizer
+check_PROGRAMS = variant parser system_test 
 
 AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -27,11 +27,9 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/include \
 -I$(top_srcdir)/src/libs/system \
 -DSHAREDIR=\"$(pkgdatadir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
 
-lexertl_SOURCES = lexertl.cpp
 system_test_SOURCES = system.cpp
 variant_SOURCES = variant.cpp
 parser_SOURCES = parser.cpp
-line_tokenizer_SOURCES = line_tokenizer.cpp
 
 TESTS_ENVIRONMENT = LIBRARY_PATH=$(top_builddir)/src/libs/int \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh $(SHELL) -x
