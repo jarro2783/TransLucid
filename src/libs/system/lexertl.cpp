@@ -18,7 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include "lexertl/lookup.hpp"
-#include "tl/static_lexer.hpp"
+#include "lex/static_lexer.hpp"
 #include "tl/lexertl.hpp"
 
 #include <tl/context.hpp>
