@@ -182,17 +182,8 @@ namespace TransLucid
       Parser::StreamPosIterator& end,
       Tree::Expr& expr);
 
-    //bool
-    //parse_header(const u32string& s);
-
     void
     loadLibrary(const u32string& s);
-
-    Parser::Header&
-    header();
-
-    const Tree::Expr&
-    lastExpression() const;
 
     void
     go();

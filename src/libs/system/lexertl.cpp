@@ -532,7 +532,7 @@ nextToken
   }
 
   //0 is EOF
-  if (id < TOKEN_FIRST || id >= TOKEN_LAST)
+  if (id < TOKEN_EOF || id >= TOKEN_LAST)
   {
     std::cerr << match.getLine() << ":" << match.getChar() 
       << ": invalid token: " << id << std::endl;

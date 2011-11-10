@@ -106,15 +106,6 @@ namespace TransLucid
       InputDecl
     > Line;
 
-    /**
-     * Prints an equation.
-     * Prints to a string.
-     * @param e The parsed equation.
-     * @return A string representing the equation.
-     */
-    std::string
-    printEquation(const Equation& e);
-
     class Header;
 
     /**

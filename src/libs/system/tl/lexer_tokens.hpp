@@ -26,7 +26,7 @@ namespace TransLucid
   {
     enum TokenType
     {
-      TOKEN_FIRST, //a nothing token, indicates the first
+      TOKEN_EOF = 0, //end of file is 0 according to lexertl
       TOKEN_AND,
       TOKEN_ASSIGNTO, //:=
       TOKEN_AT,

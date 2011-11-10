@@ -56,13 +56,14 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser-new.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
-#include <tl/translator.hpp>
 #include <tl/tree_to_wstree.hpp>
+#include <tl/tree_printer.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/uuid.hpp>
 #include <tl/types/workshop.hpp>
+#include <tl/workshop_builder.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
@@ -324,7 +325,7 @@ namespace detail
     {
       if (m_verbose)
       {
-        std::cout << Parser::printEquation(var.eqn) << std::endl;
+        std::cout << Printer::printEquation(var.eqn) << std::endl;
       }
       return m_system.addEquation(var.eqn);
     }
@@ -334,7 +335,7 @@ namespace detail
     {
       if (m_verbose)
       {
-        std::cout << Parser::printEquation(assign.eqn) << std::endl;
+        std::cout << Printer::printEquation(assign.eqn) << std::endl;
       }
       return m_system.addAssignment(assign.eqn);
     }
@@ -687,28 +688,10 @@ System::addEquation(const u32string& name, const GuardWS& guard, WS* e)
   return addDeclInternal(name, guard, e, m_equations);
 }
 
-//bool
-//System::parse_header(const u32string& s)
-//{
-  //return m_translator->parse_header(s);
-//}
-
 void
 System::loadLibrary(const u32string& s)
 {
   //m_translator->loadLibrary(s);
-}
-
-Parser::Header&
-System::header()
-{
-  //return m_translator->header();
-}
-
-const Tree::Expr&
-System::lastExpression() const
-{
-  //return m_translator->lastExpression();
 }
 
 Constant
@@ -925,13 +908,13 @@ System::addDeclInternal
     //print everything
     std::cout << "The rewritten expr" << std::endl; 
     std::cout << 
-      Parser::printEquation
+      Printer::printEquation
       (std::make_tuple(std::get<0>(eqn), guard, boolean, expr)) 
       << std::endl;
 
     for (const auto& e : tows.newVars())
     {
-      std::cout << Parser::printEquation(e) << std::endl;
+      std::cout << Printer::printEquation(e) << std::endl;
     }
   }
 

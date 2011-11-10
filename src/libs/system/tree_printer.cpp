@@ -465,7 +465,7 @@ class TreePrinterNew
 
     for (const auto& v : w.vars)
     {
-      std::string var = Parser::printEquation(v);
+      std::string var = Printer::printEquation(v);
     }
 
     pp(')', Precedence::WHERE_CLAUSE);
@@ -486,6 +486,40 @@ TreePrinterNew::printTree(const Tree::Expr& e)
   apply_visitor(*this, e);
   parenPop();
   return m_os.str();
+}
+
+namespace Printer
+{
+
+std::string
+printEquation(const Parser::Equation& e)
+{
+  std::string generated;
+
+  std::string result = utf32_to_utf8(to_u32string(std::get<0>(e)));
+
+  const Tree::Expr& guard = std::get<1>(e);
+  if (get<Tree::nil>(&guard) == 0)
+  {
+    generated = print_expr_tree(guard);
+    result += " " + generated;
+  }
+
+  const Tree::Expr& boolean = std::get<2>(e);
+  if (get<Tree::nil>(&boolean) == 0)
+  {
+    generated = print_expr_tree(boolean);
+    result += " | " + generated;
+  }
+
+  result += " = ";
+
+  generated = print_expr_tree(std::get<3>(e));
+  result += generated;
+
+  return result;
+}
+
 }
 
 }

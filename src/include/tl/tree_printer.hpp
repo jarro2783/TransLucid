@@ -21,10 +21,17 @@ along with TransLucid; see the file COPYING.  If not see
 #define TREE_PRINTER_HPP_INCLUDED
 
 #include <tl/ast.hpp>
+#include <tl/parser_api.hpp>
 
 namespace TransLucid
 {
   std::string print_expr_tree(const Tree::Expr& expr);
+
+  namespace Printer
+  {
+    std::string
+    printEquation(const Parser::Equation& e);
+  }
 }
 
 #endif // TREE_PRINTER_HPP_INCLUDED

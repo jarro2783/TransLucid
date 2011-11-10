@@ -81,6 +81,7 @@ enum Keyword
 
 enum Token
 {
+  TOKEN_EOF,
   TOKEN_BANG,
   TOKEN_COLONEQUALS,
   TOKEN_COLON,
@@ -306,6 +307,10 @@ parse
     
       switch(tok.getType())
       {
+        case TL::Parser::TOKEN_EOF:
+        checker.symbol(TOKEN_EOF);
+        break;
+
         //symbols
         case TL::Parser::TOKEN_ASSIGNTO: //:=
         checker.symbol(TOKEN_COLONEQUALS);
@@ -429,8 +434,7 @@ parse
         break;
 
         //constants
-        case TL::Parser::TOKEN_CONSTANT_RAW:
-        case TL::Parser::TOKEN_CONSTANT_INTERPRETED:
+        case TL::Parser::TOKEN_CONSTANT:
         checker.constant(TL::get<std::pair<TL::u32string, TL::u32string>>
           (tok.getValue()));
         break;
@@ -745,22 +749,21 @@ TEST_CASE ( "comments", "check that comments work" )
   std::string input = 
   R"(
     //comment
-    var y = 6;; //more comments
-    var z = 5;;
+    y = 6;; //more comments
+    z = 5;;
     //end comment
   )";
 
   Checker checker({
-    KEYWORD_VAR,
     U"y",
     TOKEN_EQUALS,
     mpz_class(6),
     TOKEN_DOUBLE_SEMI,
-    KEYWORD_VAR,
     U"z",
     TOKEN_EQUALS,
     mpz_class(5),
-    TOKEN_DOUBLE_SEMI
+    TOKEN_DOUBLE_SEMI,
+    TOKEN_EOF
   });
 
   check_utf8(input, checker);
