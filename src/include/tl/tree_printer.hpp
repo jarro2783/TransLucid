@@ -25,10 +25,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  std::string print_expr_tree(const Tree::Expr& expr);
-
   namespace Printer
   {
+    std::string print_expr_tree(const Tree::Expr& expr);
+
     std::string
     printEquation(const Parser::Equation& e);
   }

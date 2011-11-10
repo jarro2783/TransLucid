@@ -8,6 +8,9 @@
 namespace TransLucid
 {
 
+namespace Printer
+{
+
 class TreePrinterNew
 {
   public:
@@ -487,9 +490,6 @@ TreePrinterNew::printTree(const Tree::Expr& e)
   parenPop();
   return m_os.str();
 }
-
-namespace Printer
-{
 
 std::string
 printEquation(const Parser::Equation& e)
