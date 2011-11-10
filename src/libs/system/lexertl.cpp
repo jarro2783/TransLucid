@@ -136,9 +136,6 @@ namespace
 
         const u32string& type = get_constant_pointer<u32string>(c);
 
-        std::cerr << "the type of identifier: " << ident << " is " << type
-          << std::endl;
-
         if (type == U"DIM")
         {
           id = TOKEN_DIM_IDENTIFIER;
@@ -283,6 +280,7 @@ namespace
         throw "invalid constant literal";
       }
 
+      id = TOKEN_CONSTANT;
       return std::make_pair(type, value);
     }
 
@@ -403,7 +401,7 @@ namespace
       if (ws == nullptr)
       {
         //TODO fix this
-        throw "operator doesn't exist";
+        throw "no OPTYPE variable in the system";
       }
 
       std::u32string text = u32string(begin, end);
@@ -438,6 +436,8 @@ namespace
       }
       else
       {
+        //TODO fix this
+        std::cerr << "invalid operator type" << std::endl;
         throw "invalid operator type";
       }
     }

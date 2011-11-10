@@ -121,14 +121,25 @@ namespace TransLucid
 
       bool
       parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
-        Equation& result);
+        Line& result);
 
       bool
       parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
-        Equation& result);
+        Line& result);
+
+      //checks that begin is a ustring"stuff" and puts stuff in result
+      bool
+      is_string_constant(LexerIterator& begin, const LexerIterator& end,
+        u32string& result);
 
       Token
       nextToken(LexerIterator& begin);
+
+      void
+      expect_no_advance(LexerIterator& begin, const LexerIterator& end, 
+        const u32string& message,
+        size_t token
+      );
 
       void
       expect(LexerIterator& begin, const LexerIterator& end, 

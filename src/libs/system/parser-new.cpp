@@ -57,6 +57,16 @@ call_fn(Fn&& f, Args&&... args)
   return f(args...);
 }
 
+//bit of a hack, but this one throws away the object in the hope that
+//the call works
+template <typename Fn, typename T, typename... Args>
+auto
+call_fn(Fn&& f, T* object, Args&&... args)
+  -> decltype(f(args...))
+{
+  return f(args...);
+}
+
 template <typename Ret, typename T, typename...Args>
 Ret
 call_fn(Ret (T::*f)(Args...), T* t, Args&&... args)
@@ -121,7 +131,7 @@ Parser::Parser(System& system)
 }
 
 void
-Parser::expect(LexerIterator& begin, const LexerIterator& end, 
+Parser::expect_no_advance(LexerIterator& begin, const LexerIterator& end, 
   const u32string& message,
   size_t token
 )
@@ -130,6 +140,15 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
   {
     throw ExpectedToken(begin, token, message);
   }
+}
+
+void
+Parser::expect(LexerIterator& begin, const LexerIterator& end, 
+  const u32string& message,
+  size_t token
+)
+{
+  expect_no_advance(begin, end, message, token);
 
   ++begin;
 }
@@ -634,13 +653,17 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     ++begin;
     break;
 
+    case TOKEN_DIM_IDENTIFIER:
+    result = Tree::DimensionExpr(get<u32string>(begin->getValue()));
+    ++begin;
+    break;
+
     case TOKEN_ID:
     result = Tree::IdentExpr(get<u32string>(begin->getValue()));
     ++begin;
     break;
 
-    case TOKEN_CONSTANT_RAW:
-    case TOKEN_CONSTANT_INTERPRETED:
+    case TOKEN_CONSTANT:
     result = construct_typed_constant(begin);
     ++begin;
     break;
@@ -764,6 +787,7 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
 
   size_t tok = sep == SEPARATOR_COLON ? TOKEN_COLON : TOKEN_LARROW;
 
+  Tree::TupleExpr::TuplePairs pairs;
   bool parsingTuple = true;
   while (parsingTuple)
   {
@@ -773,12 +797,15 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
     expect(current, end, U"<-", tok);
     expect(current, end, rhs, U"expr", &Parser::parse_expr);
 
+    pairs.push_back(std::make_pair(lhs, rhs));
+
     if (*current != TOKEN_COMMA) { parsingTuple = false; }
     else { ++current; }
   }
 
   expect(current, end, U"]", TOKEN_RSQUARE);
 
+  result = Tree::TupleExpr(pairs);
   begin = current;
   return true;
 }
@@ -792,7 +819,6 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
     //get the decl parsers to use
     DeclParsers* decls = m_which_decl.top();
 
-    LexerIterator current = begin;
     u32string id = get<u32string>(begin->getValue());
 
     auto iter = decls->find(id);
@@ -804,11 +830,13 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
       throw "unknown line declaration";
     }
 
-    ++current;
+    LexerIterator current = begin;
 
     expect(current, end, result, U"line: '" + id + U"'", iter->second);
 
     expect(current, end, U";;", TOKEN_DBLSEMI);
+
+    begin = current;
     return true;
   }
   else
@@ -822,6 +850,14 @@ Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
   LexerIterator current = begin;
+
+  if (*current != TOKEN_DECLID || 
+      get<u32string>(current->getValue()) != U"dim")
+  {
+    return false;
+  }
+
+  ++current;
 
   expect(current, end, U"identifier", TOKEN_ID);
   //a name and an optional initialiser
@@ -882,9 +918,18 @@ bool
 Parser::parse_var_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
-  Equation eqn;
-  if (parse_equation_decl(begin, end, eqn, TOKEN_EQUALS, U"="))
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"var")
   {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  Equation eqn;
+  if (parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"="))
+  {
+    begin = current;
     result = Variable(std::move(eqn));
     return true;
   }
@@ -895,9 +940,18 @@ bool
 Parser::parse_assign_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"assign")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
   Equation eqn;
   if (parse_equation_decl(begin, end, eqn, TOKEN_ASSIGNTO, U":="))
   {
+    begin = current;
     result = Assignment(std::move(eqn));
     return true;
   }
@@ -908,6 +962,14 @@ bool
 Parser::parse_out_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"out")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
   Equation eqn;
   bool success = parse_equation_decl(begin, end, eqn, TOKEN_EQUALS, U"=");
 
@@ -923,6 +985,14 @@ bool
 Parser::parse_in_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"in")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
   Equation eqn;
   bool success = parse_equation_decl(begin, end, eqn, TOKEN_EQUALS, U"=");
 
@@ -936,14 +1006,85 @@ Parser::parse_in_decl(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
-  Equation& result)
+  Line& result)
 {
-  return false;
+  if (*begin != TOKEN_DECLID)
+  {
+    return false;
+  }
+
+  const u32string& decl = get<u32string>(begin->getValue());
+
+  //infix[lrnpm] has length 6
+  if (decl.size() != 6 || decl.substr(0, 4) == U"infix")
+  {
+    return false;
+  }
+
+  char32_t type = decl[5];
+  Tree::InfixAssoc assoc;
+
+  switch(type)
+  {
+    case 'l':
+    assoc = Tree::ASSOC_LEFT;
+    break;
+    case 'r':
+    assoc = Tree::ASSOC_RIGHT;
+    break;
+
+    default:
+    throw 
+      "internal compiler error at: " __FILE__ ":" XSTRING(__LINE__);
+    break;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  u32string symbol;
+  expect(current, end, symbol, U"constant", &Parser::is_string_constant);
+
+  u32string name;
+  expect(current, end, name, U"constant", &Parser::is_string_constant);
+
+  expect_no_advance(current, end, U"integer", TOKEN_INTEGER);
+
+  mpz_class precedence = get<mpz_class>(current->getValue());
+  ++current;
+
+  result = Tree::BinaryOperator(assoc, name, symbol, precedence);
+
+  begin = current;
+
+  return true;
+}
+
+bool
+Parser::is_string_constant(LexerIterator& begin, const LexerIterator& end,
+  u32string& result)
+{
+  if (*begin != TOKEN_CONSTANT)
+  {
+    return false;
+  }
+
+  auto value = get<std::pair<u32string, u32string>>(begin->getValue());
+
+  if (value.first != U"ustring")
+  {
+    return false;
+  }
+
+  result = value.second;
+  ++begin;
+
+  return true;
 }
 
 bool
 Parser::parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
-  Equation& result)
+  Line& result)
 {
   return false;
 }

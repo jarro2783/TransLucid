@@ -421,6 +421,7 @@ VariableWS::operator()(Context& k)
        i != applicable.end(); ++i)
   {
     bool best = true;
+    //TODO && best in condition
     for (applicable_list::const_iterator j = applicable.begin();
          j != applicable.end(); ++j)
     {
@@ -462,6 +463,7 @@ VariableWS::operator()(Context& k)
   }
   else
   {
+    std::cerr << "multidef for " << m_name << std::endl;
     return Types::Special::create(SP_MULTIDEF);
   }
 }

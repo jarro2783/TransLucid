@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/tuple.hpp>
+#include <tl/output.hpp>
 
 #include <vector>
 

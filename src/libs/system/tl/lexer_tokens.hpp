@@ -31,7 +31,8 @@ namespace TransLucid
       TOKEN_ASSIGNTO, //:=
       TOKEN_AT,
       TOKEN_BANG,
-      TOKEN_CONSTANT_RAW,
+      TOKEN_CONSTANT,
+      TOKEN_CONSTANT_RAW, //these two are not matched, use TOKEN_CONSTANT
       TOKEN_CONSTANT_INTERPRETED,
       TOKEN_COLON,
       TOKEN_COMMA,

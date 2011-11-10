@@ -446,7 +446,7 @@ System::addSymbolInfo
 {
   return addEquation(Parser::Equation(
     eqn,
-    Tree::TupleExpr({{Tree::DimensionExpr(U"symbol"), s}}),
+    Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), s}}),
     Tree::Expr(),
     value
   ));
@@ -546,6 +546,13 @@ System::init_equations()
   addDecl(*this, U"assign", U"DECLID");
   addDecl(*this, U"in", U"DECLID");
   addDecl(*this, U"out", U"DECLID");
+  addDecl(*this, U"infixl", U"DECLID");
+  addDecl(*this, U"infixr", U"DECLID");
+  addDecl(*this, U"infixn", U"DECLID");
+
+  addDecl(*this, U"arg0", U"DIM");
+  addDecl(*this, U"arg1", U"DIM");
+  addDecl(*this, U"arg2", U"DIM");
 
   //add PRINT="this type has no printer"
   addInitEqn(*this,
@@ -584,7 +591,7 @@ System::System()
 , m_uniqueVarIndex(0)
 , m_uniqueDimIndex(0)
 , m_hiddenDim(-1)
-, m_debug(true)
+, m_debug(false)
 {
   //create the obj, const and fun ids
 
