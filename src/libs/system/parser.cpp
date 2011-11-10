@@ -322,6 +322,8 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
 
       try
       {
+        ++current;
+
         Tree::WhereExpr where;
         bool parsingWhere = true;
         while (parsingWhere)
@@ -346,6 +348,10 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
               throw 
                 "internal compiler error at: " __FILE__ ":" XSTRING(__LINE__);
             }
+          }
+          else
+          {
+            parsingWhere = false;
           }
         }
       }
