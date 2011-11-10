@@ -22,7 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/ast.hpp>
-#include <tl/exception.hpp>
 
 namespace TransLucid
 {
@@ -56,13 +55,14 @@ insert_binary_operator
   if (binop->op.assoc != op.assoc)
   {
     //error, mixed associativity of same precedence
-    throw ParseError(U"Mixed associativity of same precedence");
+    //TODO parse errors
+    throw U"Mixed associativity of same precedence";
   }
   if (binop->op.assoc == ASSOC_NON)
   {
     //error multiple non assoc operators
     throw
-      ParseError(U"Multiple non associative operators of the same precedence");
+      U"Multiple non associative operators of the same precedence";
   }
   if (binop->op.assoc == ASSOC_LEFT)
   {
@@ -77,7 +77,7 @@ insert_binary_operator
   if (binop->op != op)
   {
     //error multiple variadic operators
-    throw ParseError(U"Multiple variadic operators of the same precedence");
+    throw U"Multiple variadic operators of the same precedence";
   }
   //we have the same operator
   binop->add_leaf(rhs);

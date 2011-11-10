@@ -34,7 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <gmpxx.h>
 
-#include <tl/types.hpp>
+#include <tl/types_basic.hpp>
 #include <tl/variant.hpp>
 
 namespace TransLucid

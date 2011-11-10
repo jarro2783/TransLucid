@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <string>
 
 #include <tl/types_fwd.hpp>
+#include <tl/types_basic.hpp>
 
 /**
  * @file types.hpp
@@ -47,29 +48,9 @@ namespace TransLucid
 
   class WS;
 
-  //class GuardWS;
-
-  typedef uint16_t type_index;
-  typedef std::u32string u32string;
-
   typedef std::tuple<u32string, WS*, WS*, WS*> TranslatedEquation;
 
   class Tuple;
-
-  enum Special
-  {
-    SP_ERROR, /**<Error value. Should never have this value, having a special
-    of this value means an error occured somewhere.*/
-    SP_ACCESS, /**<Access error. Something requested could not be accessed.*/
-    SP_TYPEERROR,
-    SP_DIMENSION,
-    SP_ARITH,
-    SP_UNDEF,
-    SP_CONST,
-    SP_MULTIDEF,
-    SP_LOOP,
-    SPECIAL_LAST //the number of specials, not an actual special value
-  };
 
   template <typename T>
   void
@@ -310,7 +291,6 @@ namespace TransLucid
   }
   #endif
 
-  typedef int32_t dimension_index;
   /**
    * The underlying data structure of a tuple.
    **/
