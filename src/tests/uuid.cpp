@@ -174,7 +174,7 @@ operator<<(std::ostream& os, const uuid& id)
 
 typedef uuid_random_generator<std::mt19937> random_generator;
 
-void collision_test(int n)
+int collision_test(int n)
 {
   random_generator gen;
 
@@ -228,6 +228,8 @@ void collision_test(int n)
   {
     std::cout << id << std::endl;
   }
+
+  return collisions == 0 ? 0 : 1;
 }
 
 void
@@ -262,7 +264,7 @@ int main(int argc, char* argv[])
 
   if (argv[1] == std::string("--collision-test"))
   {
-    collision_test(std::atoi(argv[2]));
+    return collision_test(std::atoi(argv[2]));
   }
   else if (argv[1] == std::string("--generate"))
   {

@@ -22,6 +22,9 @@ along with TransLucid; see the file COPYING.  If not see
  * Rewrites expression trees.
  */
 
+#ifndef TL_TREE_TO_WSTREE
+#define TL_TREE_TO_WSTREE
+
 #include <tl/ast.hpp>
 
 namespace TransLucid
@@ -112,3 +115,5 @@ namespace TransLucid
     std::vector<dimension_index> m_namedAllScopeOdometers;
   };
 }
+
+#endif

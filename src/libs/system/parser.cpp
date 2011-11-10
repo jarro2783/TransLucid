@@ -27,6 +27,8 @@ along with TransLucid; see the file COPYING.  If not see
  * The parser.
  */
 
+#include <tl/system.hpp>
+
 #include <functional>
 #include <sstream>
 

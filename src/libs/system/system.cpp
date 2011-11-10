@@ -55,7 +55,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 #include <tl/parser.hpp>
 #include <tl/parser_iterator.hpp>
-#include <tl/system.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/hyperdatons.hpp>

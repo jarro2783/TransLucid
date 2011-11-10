@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt runtest runbinary.sh
 
-check_PROGRAMS = variant parser system_test 
+check_PROGRAMS = variant parser system_test uuid
 
 AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \

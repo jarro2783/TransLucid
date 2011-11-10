@@ -115,8 +115,8 @@ namespace TransLucid
 
     //this is currently causing an ICE in GCC
     //swap the lines around to see, I can't reproduce it at the moment
-    //~ArrayNHD() = default;
-    ~ArrayNHD() throw() { }
+    ~ArrayNHD() = default;
+    //~ArrayNHD() throw() { }
 
     Constant
     get(const Context& index) const
