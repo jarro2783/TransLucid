@@ -30,7 +30,7 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   eval_workshops.cpp header.cpp \
   hyperdatons/envhd.cpp hyperdatons/filehd.cpp \
   internal_strings.cpp lexertl.cpp lexer_util.cpp library.cpp \
-  line_tokenizer.cpp parser-new.cpp range.cpp rename.cpp \
+  line_tokenizer.cpp parser.cpp range.cpp rename.cpp \
   system.cpp tree_printer.cpp tree_to_wstree.cpp \
   types.cpp \
   utility.cpp uuid.cpp workshop_builder.cpp
