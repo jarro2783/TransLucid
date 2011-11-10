@@ -353,7 +353,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
       //the a value is contained in the b value, so a is more
       //specific as long as the rest passes
       equal = false;
-      std::cerr << "not equal by value" << std::endl;
+      //std::cerr << "not equal by value" << std::endl;
     }
     ++it1;
     ++it2;

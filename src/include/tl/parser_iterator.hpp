@@ -20,7 +20,10 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef PARSER_ITERATOR_HPP_INCLUDED
 #define PARSER_ITERATOR_HPP_INCLUDED
 
+#ifdef ITERATOR_DEBUG
 #include <iostream>
+#endif
+
 #include <iterator>
 #include <memory>
 #include <typeinfo>
@@ -378,7 +381,7 @@ namespace TransLucid
           else
           {
             //invalid character
-            std::cerr << "warning: invalid initial unicode byte" << std::endl;
+            //std::cerr << "warning: invalid initial unicode byte" << std::endl;
           }
 
           //std::cerr << "reading " << toRead << "bytes" << std::endl;
@@ -390,7 +393,7 @@ namespace TransLucid
             if ((c & 0xC0) != 0x80)
             {
               //invalid character
-              std::cerr << "warning: invalid unicode byte" << std::endl;
+              //std::cerr << "warning: invalid unicode byte" << std::endl;
             }
             m_value |= ((0x3F & c) << nextShift);
             nextShift -= 6;

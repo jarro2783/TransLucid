@@ -24,7 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
-#include <tl/output.hpp>
+//#include <tl/output.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/rename.hpp>
 #include <tl/system.hpp>

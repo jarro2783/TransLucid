@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define BOOST_UUID_NO_TYPE_TRAITS
 
 #include <boost/uuid/uuid.hpp>
+#include <tl/detail/types_detail.hpp>
 
 namespace std
 {
