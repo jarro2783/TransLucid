@@ -320,11 +320,11 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
       //TODO parse all of where clause
       m_which_decl.push(&m_where_decls);
 
+      Tree::WhereExpr where;
       try
       {
         ++current;
 
-        Tree::WhereExpr where;
         bool parsingWhere = true;
         while (parsingWhere)
         {
@@ -364,6 +364,9 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
       m_which_decl.pop();
 
       expect(current, end, U"end", TOKEN_END);
+
+      where.e = binary_expr;
+      result = where;
     }
     else
     {
