@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 
 #include <ltdl.h>
+#include <unistd.h>
 
 #define WD_LENGTH 1000
 

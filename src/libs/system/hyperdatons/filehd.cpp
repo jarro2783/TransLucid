@@ -281,6 +281,7 @@ class FileOutCreateWS : public WS
 //the following functions will create the appropriate file hyperdaton
 //which contains an appropriate fstream object and then wrap it up
 //as a constant
+#if 0
 inline Constant
 open_input_file(type_index ti, const u32string& file)
 {
@@ -346,23 +347,25 @@ struct FileOpener
 
   type_index m_in, m_out, m_io;
 };
+#endif
 
 
 void
 init_file_hds(System& s)
 {
   //don't know about this stuff
-  type_index in, out, io;
+  //this is probably the old wrong stuff
+  //type_index in, out, io;
 
-  in = s.getTypeIndex(U"inhd");
-  out = s.getTypeIndex(U"outhd");
-  io = s.getTypeIndex(U"iohd");
+  //in = s.getTypeIndex(U"inhd");
+  //out = s.getTypeIndex(U"outhd");
+  //io = s.getTypeIndex(U"iohd");
 
-  s.registerFunction(U"fileopen", 
-    make_function_type<2>::type(
-      FileOpener(in, out, io)
-    )
-  );
+  //s.registerFunction(U"fileopen", 
+  //  make_function_type<2>::type(
+  //    FileOpener(in, out, io)
+  //  )
+  //);
   //don't know about above
 
   s.addEquation(U"file_array_in_hd", new FileInCreateWS(s));

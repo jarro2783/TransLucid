@@ -28,20 +28,12 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_OUTPUT_HPP_INCLUDED
 
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 #include <tl/charset.hpp>
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
-
-namespace boost
-{
-  namespace uuids
-  {
-    std::ostream&
-    operator<<(std::ostream& os, const uuid& id);
-  }
-}
 
 namespace std
 {
@@ -57,6 +49,21 @@ namespace std
   {
     u32string u32s(s.begin(), s.end());
     os << u32s;
+    return os;
+  }
+}
+
+namespace TransLucid
+{
+  inline
+  std::ostream&
+  operator<<(std::ostream& os, const uuid& id)
+  {
+    os << std::setfill('0');
+    for (auto it = id.begin(); it != id.end(); ++it)
+    {
+      os << std::setw(2) << std::hex << static_cast<size_t>(*it);
+    }
     return os;
   }
 }

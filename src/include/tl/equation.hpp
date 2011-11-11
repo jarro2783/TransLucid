@@ -223,7 +223,7 @@ namespace TransLucid
     u32string m_name;
     GuardWS m_validContext;
     std::shared_ptr<WS> m_h;
-    boost::uuids::uuid m_id;
+    uuid m_id;
   };
 
   //represents all definitions of a variable, is responsible for

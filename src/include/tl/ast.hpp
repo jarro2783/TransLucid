@@ -461,36 +461,6 @@ namespace TransLucid
     {
       IfExpr() = default;
 
-      /**
-       * Constructs an if expression.
-       * @param c The condition expression.
-       * @param t The then expression.
-       * @param eif A list of elsifs.
-       * @param e The else expression.
-       */
-      #if 0
-      template <typename List>
-      IfExpr
-      (
-        const Expr& c,
-        const Expr& t,
-        const List& eif,
-        const Expr& e
-      )
-      : condition(c),
-        then(t),
-        else_(e)
-      {
-        using boost::fusion::at_c;
-
-        for(auto& v : eif)
-        {
-          else_ifs.push_back(std::make_pair(at_c<0>(v), at_c<1>(v)));
-        }
-      }
-      #endif
-
-      //when we already have a vector
       IfExpr
       (
         const Expr& c,

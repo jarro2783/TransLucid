@@ -20,24 +20,55 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_UUID_HPP_INCLUDED
 #define TL_UUID_HPP_INCLUDED
 
-#define BOOST_UUID_NO_TYPE_TRAITS
-
-#include <boost/uuid/uuid.hpp>
 #include <tl/detail/types_detail.hpp>
-
-namespace std
-{
-  template <>
-  struct hash<boost::uuids::uuid>
-  {
-    size_t
-    operator()(const boost::uuids::uuid& u) const;
-  };
-}
 
 namespace TransLucid
 {
-  typedef boost::uuids::uuid uuid;
+  class uuid
+  {
+    static const size_t static_size = 16;
+    public:
+    typedef uint8_t* iterator;
+    typedef const uint8_t* const_iterator;
+
+    iterator begin() { return data; }
+    iterator end() { return data + static_size; }
+    const_iterator begin() const { return data; }
+    const_iterator end() const { return data + static_size; }
+
+    constexpr size_t size() { return static_size; }
+
+    private:
+    uint8_t data[static_size];
+  };
+
+  inline bool operator==(const uuid& lhs, const uuid& rhs)
+  {
+    return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+  }
+
+  inline bool operator<(const uuid& lhs, const uuid& rhs)
+  {
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), 
+      rhs.end());
+  }
+
+  inline bool operator!=(const uuid& lhs, const uuid& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  inline std::size_t hash_value(uuid const& u) /* throw() */
+  {
+    std::size_t seed = 0;
+    for(uuid::const_iterator i=u.begin(); i != u.end(); ++i)
+    {
+      seed ^= static_cast<std::size_t>(*i) + 
+        0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+
+    return seed;
+  }
 
   uuid
   generate_uuid();
@@ -58,5 +89,15 @@ namespace TransLucid
     };
   }
 }
+
+namespace std
+{
+  template <>
+  struct hash<TransLucid::uuid>
+  {
+    size_t operator()(const TransLucid::uuid& u) const;
+  };
+}
+
 
 #endif

@@ -34,7 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/function_registry.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/parser_api.hpp>
-#include <tl/parser_iterator.hpp>
+//#include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
 
 namespace TransLucid
@@ -49,6 +49,8 @@ namespace TransLucid
   {
     class Parser;
   }
+
+  class StreamPosIterator;
 
   constexpr int MAX_FUNCTION_PARAMETERS = 10;
 
