@@ -246,13 +246,11 @@ private:
                 case 'i':
                     if (negate_)
                     {
-                        state_._flags = static_cast<regex_flags>
-                            (state_._flags & ~icase);
+                        state_._flags = state_._flags & ~icase;
                     }
                     else
                     {
-                        state_._flags = static_cast<regex_flags>
-                            (state_._flags | icase);
+                        state_._flags = state_._flags | icase;
                     }
 
                     negate_ = false;
@@ -260,13 +258,11 @@ private:
                 case 's':
                     if (negate_)
                     {
-                        state_._flags = static_cast<regex_flags>
-                            (state_._flags | dot_not_newline);
+                        state_._flags = state_._flags | dot_not_newline;
                     }
                     else
                     {
-                        state_._flags = static_cast<regex_flags>
-                            (state_._flags & ~dot_not_newline);
+                        state_._flags = state_._flags & ~dot_not_newline;
                     }
 
                     negate_ = false;

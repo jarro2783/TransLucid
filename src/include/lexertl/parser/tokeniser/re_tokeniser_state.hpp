@@ -25,8 +25,8 @@ struct basic_re_tokeniser_state
     const char_type * const _start;
     const char_type * const _end;
     const char_type *_curr;
-    regex_flags _flags;
-    std::stack<regex_flags> _flags_stack;
+    std::size_t _flags;
+    std::stack<std::size_t> _flags_stack;
     std::locale _locale;
     bool _macro;
     long _paren_count;
@@ -34,7 +34,7 @@ struct basic_re_tokeniser_state
     id_type _eol_id;
 
     basic_re_tokeniser_state (const char_type *start_,
-        const char_type * const end_, const regex_flags flags_,
+        const char_type * const end_, const std::size_t flags_,
         const std::locale locale_, const bool macro_) :
         _start (start_),
         _end (end_),

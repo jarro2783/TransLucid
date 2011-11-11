@@ -85,7 +85,7 @@ public:
         const rules_char_type * const end_, const id_type id_,
         const id_type user_id_, const id_type next_dfa_,
         const id_type push_dfa_, const bool pop_dfa_,
-        const regex_flags flags_, id_type &eol_id_, const bool seen_bol_,
+        const std::size_t flags_, id_type &eol_id_, const bool seen_bol_,
         const bool macro_)
     {
         node *root_ = 0;

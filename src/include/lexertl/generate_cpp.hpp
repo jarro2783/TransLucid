@@ -697,12 +697,12 @@ public:
             const id_type *ptr_ = &internals_._lookup[l_]->front ();
 
             // We want numbers regardless of id_type.
-            os_ << '{' << static_cast<std::size_t>(*ptr_++);
+            os_ << "{0x" << std::hex << static_cast<std::size_t>(*ptr_++);
 
             for (col_ = 1; col_ < lookup_divisor_; ++col_)
             {
                 // We want numbers regardless of id_type.
-                os_ << ", " << static_cast<std::size_t>(*ptr_++);
+                os_ << ", 0x" << std::hex << static_cast<std::size_t>(*ptr_++);
             }
 
             for (row_ = 1; row_ < lookup_quotient_; ++row_)
@@ -710,12 +710,13 @@ public:
                 os_ << ",\n";
                 output_tabs (tabs_ + 1, os_);
                 // We want numbers regardless of id_type.
-                os_ << static_cast<std::size_t>(*ptr_++);
+                os_ << "0x" << std::hex << static_cast<std::size_t>(*ptr_++);
 
                 for (col_ = 1; col_ < lookup_divisor_; ++col_)
                 {
                     // We want numbers regardless of id_type.
-                    os_ << ", " << static_cast<std::size_t>(*ptr_++);
+                    os_ << ", 0x" << std::hex <<
+                        static_cast<std::size_t>(*ptr_++);
                 }
             }
 
@@ -747,12 +748,13 @@ public:
         }
 
         // We want numbers regardless of id_type.
-        os_ << static_cast<std::size_t>(internals_._dfa_alphabet[0]);
+        os_ << "0x" << std::hex << static_cast<std::size_t>
+            (internals_._dfa_alphabet[0]);
 
         for (col_ = 1; col_ < dfas_; ++col_)
         {
             // We want numbers regardless of id_type.
-            os_ << ", " << static_cast<std::size_t>(internals_.
+            os_ << ", 0x" << std::hex << static_cast<std::size_t>(internals_.
                 _dfa_alphabet[col_]);
         }
 
@@ -851,19 +853,19 @@ protected:
             if (first_)
             {
                 // We want numbers regardless of id_type.
-                os_ << dfa_name_ << " + " << static_cast<std::size_t>(*ptr_++)
-                    * dfa_alphabet_;
+                os_ << dfa_name_ << " + 0x" << std::hex <<
+                    static_cast<std::size_t>(*ptr_++) * dfa_alphabet_;
             }
             else if (!zero_)
             {
-                os_ << "reinterpret_cast<const void *>("
+                os_ << "reinterpret_cast<const void *>(0x"
                     // We want numbers regardless of id_type.
-                    << static_cast<std::size_t>(*ptr_++) << ')';
+                    << std::hex << static_cast<std::size_t>(*ptr_++) << ')';
             }
             else
             {
                 // We want numbers regardless of id_type.
-                os_ << static_cast<std::size_t>(*ptr_++);
+                os_ << "0x" << std::hex << static_cast<std::size_t>(*ptr_++);
             }
 
             for (id_type id_index_ = id_index; id_index_ < transitions_index;
@@ -878,7 +880,7 @@ protected:
                 }
 
                 // We want numbers regardless of id_type.
-                os_ << static_cast<std::size_t>(*ptr_);
+                os_ << "0x" << std::hex << static_cast<std::size_t>(*ptr_);
 
                 if (!zero_)
                 {
@@ -899,21 +901,21 @@ protected:
                 else
                 {
                     // We want numbers regardless of id_type.
-                    os_ << dfa_name_ + " + "
-                        << static_cast<std::size_t>(*ptr_) * dfa_alphabet_;
+                    os_ << dfa_name_ + " + 0x" << std::hex <<
+                        static_cast<std::size_t>(*ptr_) * dfa_alphabet_;
                 }
             }
         }
         else
         {
             // We want numbers regardless of id_type.
-            os_ << static_cast<std::size_t>(*ptr_++) << "U";
+            os_ << "0x" << std::hex << static_cast<std::size_t>(*ptr_++);
 
             for (id_type alphabet_ = 1; alphabet_ < dfa_alphabet_;
                 ++alphabet_, ++ptr_)
             {
                 // We want numbers regardless of id_type.
-                os_ << ", " << static_cast<std::size_t>(*ptr_) << "U";
+                os_ << ", 0x" << std::hex << static_cast<std::size_t>(*ptr_);
             }
         }
     }

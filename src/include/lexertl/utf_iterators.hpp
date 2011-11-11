@@ -12,16 +12,16 @@
 namespace lexertl
 {
 template<typename char_iterator, typename char_type>
-class basic_utf8_input_iterator :
+class basic_utf8_in_iterator :
     public std::iterator<std::input_iterator_tag, char_type>
 {
 public:
-    basic_utf8_input_iterator () :
+    basic_utf8_in_iterator () :
         _char (0)
     {
     }
 
-    explicit basic_utf8_input_iterator (const char_iterator& it_) :
+    explicit basic_utf8_in_iterator (const char_iterator& it_) :
         _it (it_),
         _char (0)
     {
@@ -33,25 +33,25 @@ public:
         return _char;
     }
 
-    bool operator == (const basic_utf8_input_iterator &rhs_) const
+    bool operator == (const basic_utf8_in_iterator &rhs_) const
     {
         return _it == rhs_._it;
     }
 
-    bool operator != (const basic_utf8_input_iterator &rhs_) const
+    bool operator != (const basic_utf8_in_iterator &rhs_) const
     {
         return _it != rhs_._it;
     }
 
-    basic_utf8_input_iterator &operator ++ ()
+    basic_utf8_in_iterator &operator ++ ()
     {
         next ();
         return *this;
     }
 
-    basic_utf8_input_iterator operator ++ (int)
+    basic_utf8_in_iterator operator ++ (int)
     {
-        basic_utf8_input_iterator temp_ = *this;
+        basic_utf8_in_iterator temp_ = *this;
 
         next ();
         return temp_;
@@ -108,17 +108,17 @@ private:
 };
 
 template<typename char_iterator>
-class basic_utf8_output_iterator :
+class basic_utf8_out_iterator :
     public std::iterator<std::input_iterator_tag, char>
 {
 public:
-    basic_utf8_output_iterator () :
+    basic_utf8_out_iterator () :
         _count (0),
         _index (0)
     {
     }
 
-    explicit basic_utf8_output_iterator (const char_iterator& it_) :
+    explicit basic_utf8_out_iterator (const char_iterator& it_) :
         _it (it_),
         _count (0),
         _index (0)
@@ -131,17 +131,17 @@ public:
         return _bytes[_index];
     }
 
-    bool operator == (const basic_utf8_output_iterator &rhs_) const
+    bool operator == (const basic_utf8_out_iterator &rhs_) const
     {
         return _it == rhs_._it;
     }
 
-    bool operator != (const basic_utf8_output_iterator &rhs_) const
+    bool operator != (const basic_utf8_out_iterator &rhs_) const
     {
         return _it != rhs_._it;
     }
 
-    basic_utf8_output_iterator &operator ++ ()
+    basic_utf8_out_iterator &operator ++ ()
     {
         ++_index;
 
@@ -153,9 +153,9 @@ public:
         return *this;
     }
 
-    basic_utf8_output_iterator operator ++ (int)
+    basic_utf8_out_iterator operator ++ (int)
     {
-        basic_utf8_output_iterator temp_ = *this;
+        basic_utf8_out_iterator temp_ = *this;
 
         ++_index;
 
@@ -215,16 +215,16 @@ private:
 };
 
 template<typename char_iterator, typename char_type>
-class basic_utf16_iterator :
+class basic_utf16_in_iterator :
     public std::iterator<std::input_iterator_tag, char_type>
 {
 public:
-    basic_utf16_iterator () :
+    basic_utf16_in_iterator () :
         _char (0)
     {
     }
 
-    explicit basic_utf16_iterator (const char_iterator& it_) :
+    explicit basic_utf16_in_iterator (const char_iterator &it_) :
         _it (it_),
         _char (0)
     {
@@ -236,25 +236,25 @@ public:
         return _char;
     }
 
-    bool operator == (const basic_utf16_iterator &rhs_) const
+    bool operator == (const basic_utf16_in_iterator &rhs_) const
     {
         return _it == rhs_._it;
     }
 
-    bool operator != (const basic_utf16_iterator &rhs_) const
+    bool operator != (const basic_utf16_in_iterator &rhs_) const
     {
         return _it != rhs_._it;
     }
 
-    basic_utf16_iterator &operator ++ ()
+    basic_utf16_in_iterator &operator ++ ()
     {
         next ();
         return *this;
     }
 
-    basic_utf16_iterator operator ++ (int)
+    basic_utf16_in_iterator operator ++ (int)
     {
-        basic_utf16_iterator temp_ = *this;
+        basic_utf16_in_iterator temp_ = *this;
 
         next ();
         return temp_;
@@ -283,17 +283,17 @@ private:
 };
 
 template<typename char_iterator>
-class basic_utf16_output_iterator :
+class basic_utf16_out_iterator :
     public std::iterator<std::input_iterator_tag, wchar_t>
 {
 public:
-    basic_utf16_output_iterator () :
+    basic_utf16_out_iterator () :
         _count (0),
         _index (0)
     {
     }
 
-    explicit basic_utf16_output_iterator (const char_iterator& it_) :
+    explicit basic_utf16_out_iterator (const char_iterator& it_) :
         _it (it_),
         _count (0),
         _index (0)
@@ -306,17 +306,17 @@ public:
         return _chars[_index];
     }
 
-    bool operator == (const basic_utf16_output_iterator &rhs_) const
+    bool operator == (const basic_utf16_out_iterator &rhs_) const
     {
         return _it == rhs_._it;
     }
 
-    bool operator != (const basic_utf16_output_iterator &rhs_) const
+    bool operator != (const basic_utf16_out_iterator &rhs_) const
     {
         return _it != rhs_._it;
     }
 
-    basic_utf16_output_iterator &operator ++ ()
+    basic_utf16_out_iterator &operator ++ ()
     {
         ++_index;
 
@@ -328,9 +328,9 @@ public:
         return *this;
     }
 
-    basic_utf16_output_iterator operator ++ (int)
+    basic_utf16_out_iterator operator ++ (int)
     {
-        basic_utf16_output_iterator temp_ = *this;
+        basic_utf16_out_iterator temp_ = *this;
 
         ++_index;
 

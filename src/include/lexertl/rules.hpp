@@ -45,7 +45,7 @@ public:
     compile_assert<(static_cast<id_type>(~0) > 0)>
         _valid_id_type;
 
-    basic_rules (const regex_flags flags_ = dot_not_newline) :
+    basic_rules (const std::size_t flags_ = dot_not_newline) :
         _flags (flags_),
         _eoi (0)
     {
@@ -86,12 +86,12 @@ public:
         }
     }
 
-    void flags (const regex_flags flags_)
+    void flags (const std::size_t flags_)
     {
         _flags = flags_;
     }
 
-    regex_flags flags () const
+    std::size_t flags () const
     {
         return _flags;
     }
@@ -560,7 +560,7 @@ private:
     id_vector_deque _next_dfas;
     id_vector_deque _pushes;
     bool_vector_deque _pops;
-    regex_flags _flags;
+    std::size_t _flags;
     std::locale _locale;
     string_deque _lexer_state_names;
     id_type _eoi;
