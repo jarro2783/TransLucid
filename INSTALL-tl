@@ -167,10 +167,10 @@ from SVN can be found at
     http://gcc.gnu.org/svn.html
 
 The latest revision that we have verified for use with TransLucid
-is 179497.  The following checkout command
+is 181339.  The following checkout command
 
     cd $SRC
-    svn checkout -r 179497 svn://gcc.gnu.org/svn/gcc/trunk gcc-svn
+    svn checkout -r 181339 svn://gcc.gnu.org/svn/gcc/trunk gcc-svn
 
 will place the source in gcc-svn.  Please note that GCC needs to
 be built in a different directory.  Here are the building instructions:
