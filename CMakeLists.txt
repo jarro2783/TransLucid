@@ -25,7 +25,12 @@ set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 
 enable_testing()
 
-try_compile(GCC_IS_CORRECT_VERSION ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/checks/version.cpp)
+execute_process(COMMAND
+  ${CMAKE_SOURCE_DIR}/checks/generate_gcc_min_version_check
+  OUTPUT_FILE ${CMAKE_BINARY_DIR}/version.cpp)
+
+try_compile(GCC_IS_CORRECT_VERSION ${CMAKE_BINARY_DIR} 
+  ${CMAKE_BINARY_DIR}/version.cpp)
 
 if (NOT GCC_IS_CORRECT_VERSION)
    message(FATAL_ERROR "g++ version 4.7.0 or greater is required")
