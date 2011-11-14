@@ -1,1 +1,1 @@
-EXTRA_DIST= lexertl.hpp lexer_tokens.hpp parser-new.hpp
+EXTRA_DIST= lexertl.hpp lexer_tokens.hpp parser.hpp

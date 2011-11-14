@@ -17,7 +17,10 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt runtest runbinary.sh
 
-check_PROGRAMS = variant parser system_test uuid
+BUILD_TEST=variant parser system_test
+BUILD_NOTEST=uuid
+
+check_PROGRAMS = $(BUILD_TEST) $(BUILD_NOTEST)
 
 AM_LDFLAGS = -lpthread -lltdl -export-dynamic \
 $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -30,10 +33,11 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/include \
 system_test_SOURCES = system.cpp
 variant_SOURCES = variant.cpp
 parser_SOURCES = parser.cpp
+uuid_SOURCES = uuid.cpp
 
 TESTS_ENVIRONMENT = LIBRARY_PATH=$(top_builddir)/src/libs/int \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh $(SHELL) -x
-TESTS = $(patsubst %,run_%.sh,$(check_PROGRAMS))
+TESTS = $(patsubst %,run_%.sh,$(BUILD_TEST))
 
 run_%.sh: runtest
 	sed 's&PROGRAM_NAME&$(top_builddir)/src/tests/$*&' < \

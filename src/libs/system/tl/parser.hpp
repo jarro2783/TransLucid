@@ -135,6 +135,10 @@ namespace TransLucid
       is_string_constant(LexerIterator& begin, const LexerIterator& end,
         u32string& result);
 
+      bool
+      parse_data_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
       Token
       nextToken(LexerIterator& begin);
 

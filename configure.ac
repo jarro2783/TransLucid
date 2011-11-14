@@ -118,6 +118,8 @@ AC_CONFIG_FILES([
                  doc/Doxyfile
                  src/Makefile
                  src/include/Makefile
+                 src/include/lexertl/Makefile
+                 src/include/lexertl/containers/Makefile
                  src/include/tl/Makefile
                  src/include/tl/detail/Makefile
                  src/include/tl/hyperdatons/Makefile
