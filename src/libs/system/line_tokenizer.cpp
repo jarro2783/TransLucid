@@ -273,7 +273,19 @@ LineTokenizer::nextChar()
   {
     throw EndOfInput();
   }
+
   char32_t c = *m_current;
+
+  if (c == '\n')
+  {
+    ++m_lineCount;
+    m_charCount = 0;
+  }
+  else
+  {
+    ++m_charCount;
+  }
+
   m_line += c;
   return c;
 }

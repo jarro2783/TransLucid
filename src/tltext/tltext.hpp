@@ -110,6 +110,10 @@ namespace TransLucid
         m_is = is;
       }
 
+      template <typename String>
+      void
+      add_input(String&& file, std::istream* is);
+
       /**
        * Set the output stream. Sets the stream to use for output.
        * @param os The output stream.

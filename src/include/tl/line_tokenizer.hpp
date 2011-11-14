@@ -94,6 +94,8 @@ namespace TransLucid
     int m_whereDepth;
     bool m_readingIdent;
     u32string m_currentIdent;
+    int m_lineCount;
+    int m_charCount;
   };
 
   std::ostream&
