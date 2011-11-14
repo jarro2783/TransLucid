@@ -120,6 +120,10 @@ AC_CONFIG_FILES([
                  src/include/Makefile
                  src/include/lexertl/Makefile
                  src/include/lexertl/containers/Makefile
+                 src/include/lexertl/parser/Makefile
+                 src/include/lexertl/parser/tokeniser/Makefile
+                 src/include/lexertl/parser/tree/Makefile
+                 src/include/lexertl/partition/Makefile
                  src/include/tl/Makefile
                  src/include/tl/detail/Makefile
                  src/include/tl/hyperdatons/Makefile
