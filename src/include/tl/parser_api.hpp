@@ -94,6 +94,19 @@ namespace TransLucid
       u32string lib;
     };
 
+    struct DataConstructor
+    {
+      u32string name;
+      std::vector<DataConstructor> args;
+    };
+
+    struct DataType
+    {
+      u32string name;
+      std::vector<u32string> vars;
+      std::vector<DataConstructor> constructors;
+    };
+
     typedef Variant
     <
       Variable,
@@ -103,7 +116,8 @@ namespace TransLucid
       DimensionDecl,
       LibraryDecl,
       OutputDecl,
-      InputDecl
+      InputDecl,
+      DataType
     > Line;
 
     typedef PositionIterator<U32Iterator> StreamPosIterator;

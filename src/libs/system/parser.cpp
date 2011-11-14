@@ -130,6 +130,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"infixn", this, &Parser::parse_infix_decl);
   add_decl_parser(m_top_decls, U"postfix", this, &Parser::parse_unary_decl);
   add_decl_parser(m_top_decls, U"prefix", this, &Parser::parse_unary_decl);
+  add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
 }
 
 void
@@ -1069,6 +1070,28 @@ Parser::parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
   begin = current;
 
   return true;
+}
+
+bool
+Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"data")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  while (*current == TOKEN_ID)
+  {
+    ++current;
+  }
+
+  expect(begin, end, U"=", TOKEN_EQUALS);
+
+  return false;
 }
 
 bool

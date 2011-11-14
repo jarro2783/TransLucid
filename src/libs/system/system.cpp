@@ -428,6 +428,13 @@ namespace detail
       return uuid;
     }
 
+    Constant
+    operator()(const Parser::DataType& data)
+    {
+      //TODO
+      return Constant();
+    }
+
     private:
     System& m_system;
     bool m_verbose;
