@@ -7,7 +7,5 @@ VERSION=`cat $RUNDIR/gcc_min_version | sed 's/\(.*\)\.\(.*\)\..*/\1 \2/'`
 MAJOR=${VERSION%% *}
 MINOR=${VERSION#* }
 
-sed "s/REQUIRED_MAJOR/$MAJOR/" < $RUNDIR/version.cpp.in > $RUNDIR/version.cpp.tmp
-sed "s/REQUIRED_MINOR/$MINOR/" < \
-  $RUNDIR/version.cpp.tmp > $RUNDIR/version.cpp
-rm -f $RUNDIR/version.cpp.tmp
+sed -e "s/REQUIRED_MAJOR/$MAJOR/" -e "s/REQUIRED_MINOR/$MINOR/" < \
+  $RUNDIR/version.cpp.in

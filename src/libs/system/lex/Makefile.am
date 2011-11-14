@@ -1,8 +1,7 @@
-#noinst_PROGRAMS=generate_lexer
+$(builddir)/generate_lexer: lexertl.cpp
+	$(CXX) $(AM_CXXFLAGS) $(TL_CFLAGS) -I$(top_srcdir)/src/include \
+  -I$(srcdir)/.. $< -o $@
 
-$(bindir)/generate_lexer: lexertl.cpp
-
-#generate_lexer_SOURCES=lexertl.cpp
 BUILT_SOURCES=$(srcdir)/static_lexer.hpp
 EXTRA_DIST=$(BUILT_SOURCES) lexertl.cpp
 MAINTAINERCLEAN=$(BUILT_SOURCES)

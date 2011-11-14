@@ -35,11 +35,11 @@ AC_PROG_LIBTOOL
 AC_LANG([C++])
 
 GCC_MIN_VERSION=`cat $srcdir/checks/gcc_min_version`
-[$srcdir/checks/generate_gcc_min_version_check]
+GCC_CHECK_TEXT=`$srcdir/checks/generate_gcc_min_version_check`
 
 # check for the correct version of gcc
 AC_MSG_CHECKING([for gcc >= $GCC_MIN_VERSION])
-GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
+#GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([$GCC_CHECK_TEXT])], 
   [AC_MSG_RESULT([yes])],
   [AC_MSG_ERROR([gcc version $GCC_MIN_VERSION or greater is required])]
@@ -58,11 +58,6 @@ AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_CFLAGS)
 
 # Checks for typedefs, structures, and compiler characteristics.
-
-AC_CHECK_SIZEOF([wchar_t],,[#include <wchar.h>])
-if test "0$ac_cv_sizeof_wchar_t" -lt "4"; then
-   AC_MSG_ERROR([Sizeof wchar_t < 4, your system is braindead, I refuse to work])
-fi
 
 # Do we build tlweb
 AC_ARG_ENABLE([tlweb],
