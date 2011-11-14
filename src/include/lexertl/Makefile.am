@@ -1,4 +1,4 @@
-SUBDIRS = containers
+SUBDIRS = containers parser partition
 
 EXTRA_DIST = ./rules.hpp \
 ./enums.hpp \
@@ -8,7 +8,6 @@ EXTRA_DIST = ./rules.hpp \
 ./generate_cpp.hpp \
 ./string_token.hpp \
 ./compile_assert.hpp \
-./Makefile.am \
 ./internals.hpp \
 ./state_machine.hpp \
 ./generator.hpp \
