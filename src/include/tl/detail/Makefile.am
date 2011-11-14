@@ -17,6 +17,6 @@
 #   <http://www.gnu.org/licenses/>.
 includesdir = $(prefix)/include/tl/detail
 
-includes_HEADERS = lexer_detail.hpp types_detail.hpp
+includes_HEADERS = types_detail.hpp
 
 EXTRA_DIST = CMakeLists.txt
