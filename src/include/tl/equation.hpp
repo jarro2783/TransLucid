@@ -1,5 +1,5 @@
 /* Equations (ident = expr)
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -20,14 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef EQUATION_HPP_INCLUDED
 #define EQUATION_HPP_INCLUDED
 
-//#include <tl/ast.hpp>
+#include <tl/ast_fwd.hpp>
 #include <tl/exception.hpp>
 #include <tl/bestfit.hpp>
 #include <tl/workshop.hpp>
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
-
-#include <gmpxx.h>
 
 #include <memory>
 
@@ -65,12 +63,12 @@ namespace TransLucid
      * dimensions can still be added.
      **/
     GuardWS()
-    : m_timeStart(0), m_timeEnd(0), m_system(0)
+    : m_system(0)
     {
     }
 
     GuardWS(const Tuple& t)
-    : m_timeStart(0), m_timeEnd(0), m_system(0)
+    : m_system(0)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();
@@ -82,13 +80,7 @@ namespace TransLucid
 
     GuardWS(const GuardWS&);
 
-    ~GuardWS()
-    {
-      delete m_timeStart;
-      delete m_timeEnd;
-      //delete m_guard;
-      //delete m_boolean;
-    }
+    ~GuardWS() = default;
 
     GuardWS& operator=(const GuardWS&);
 
@@ -136,18 +128,6 @@ namespace TransLucid
        return m_boolean.get();
     }
 
-    void 
-    setTimeStart(mpz_class time)
-    {
-      m_timeStart = new mpz_class(time);
-    }
-
-    void 
-    setTimeEnd(mpz_class time)
-    {
-      m_timeEnd = new mpz_class(time);
-    }
-
     private:
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
@@ -161,9 +141,6 @@ namespace TransLucid
     std::map<WS*, WS*> m_dimNonNon;
 
     bool m_onlyConst;
-
-    mpz_class *m_timeStart;
-    mpz_class *m_timeEnd;
 
     System* m_system;
   };
@@ -224,6 +201,7 @@ namespace TransLucid
     GuardWS m_validContext;
     std::shared_ptr<WS> m_h;
     uuid m_id;
+    Tree::Expr* m_ast;
   };
 
   //represents all definitions of a variable, is responsible for

@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 #include <tl/builtin_types.hpp>
-#include <gmpxx.h>
+#include <tl/gmpxx_fwd.hpp>
 
 namespace TransLucid
 {
@@ -51,6 +51,9 @@ namespace TransLucid
     operator==(const Range& rhs) const;
 
     bool
+    operator<(const Range& rhs) const;
+
+    bool
     within(const mpz_class& value) const;
 
     bool
@@ -59,46 +62,6 @@ namespace TransLucid
     Range* clone() const
     {
       return new Range(*this);
-    }
-
-    bool
-    operator<(const Range& rhs) const
-    {
-      if (m_lower == 0 && rhs.m_lower != 0)
-      {
-        return true;
-      }
-
-      if (m_lower != 0 && rhs.m_lower == 0)
-      {
-        return false;
-      }
-
-      if (m_lower && rhs.m_lower)
-      {
-        if (*m_lower != *rhs.m_lower)
-        {
-          return *m_lower < *rhs.m_lower;
-        }
-      }
-
-      //the two lower bounds must be equal
-      if (m_upper == 0 && rhs.m_upper != 0)
-      {
-        return false;
-      }
-
-      if (m_upper != 0 && rhs.m_upper == 0)
-      {
-        return true;
-      }
-
-      if (m_upper && rhs.m_upper)
-      {
-        return *m_upper < *rhs.m_upper;
-      }
-      //everything is equal if we got here
-      return false;
     }
 
     const mpz_class*

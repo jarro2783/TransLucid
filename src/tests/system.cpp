@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
  * System tests.
  */
 
+#include <gmpxx.h>
+
 #include <tl/context.hpp>
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>

@@ -19,12 +19,12 @@ SUBDIRS=detail types hyperdatons
 
 includesdir = $(prefix)/include/tl
 
-includes_HEADERS = ast.hpp bestfit.hpp builtin_types.hpp \
+includes_HEADERS = ast.hpp ast_fwd.hpp bestfit.hpp builtin_types.hpp \
   cache.hpp \
   charset.hpp constws.hpp context.hpp \
   dimtranslator.hpp equation.hpp exception.hpp \
   eval_workshops.hpp fixed_indexes.hpp function_registry.hpp \
-  header_parser.hpp hyperdaton.hpp \
+  gmpxx_fwd.hpp header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer_util.hpp library.hpp \
   line_parser.hpp line_tokenizer.hpp mpl.hpp \
   object_registry.hpp output.hpp \

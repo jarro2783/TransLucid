@@ -742,25 +742,6 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
 {
   LexerIterator current = begin;
 
-  //parse the dimension capture list
-  std::vector<Tree::Expr> captures;
-  if (*current == TOKEN_LBRACE)
-  {
-    bool parsingList = true;
-
-    while (parsingList)
-    {
-      Tree::Expr e;
-      expect(current, end, e, U"expr", &Parser::parse_expr);
-
-      captures.push_back(std::move(e));
-
-      if (*current != TOKEN_COMMA) { parsingList = false; }
-    }
-
-    expect(current, end, U"}", TOKEN_RBRACE);
-  }
-
   expect_no_advance(current, end, U"identifier", TOKEN_ID);
   u32string name = get<u32string>(current->getValue());
   ++current;
@@ -772,13 +753,11 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
 
   if (type == TOKEN_SLASH)
   {
-    result = Tree::LambdaExpr(
-      std::move(captures), std::move(name), std::move(rhs));
+    result = Tree::LambdaExpr(std::move(name), std::move(rhs));
   }
   else if (type == TOKEN_DBLSLASH)
   {
-    result = Tree::PhiExpr(
-      std::move(captures), std::move(name), std::move(rhs));
+    result = Tree::PhiExpr(std::move(name), std::move(rhs));
   }
   else
   {

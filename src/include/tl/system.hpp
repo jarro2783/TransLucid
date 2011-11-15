@@ -28,13 +28,13 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_set>
 #include <unordered_map>
 
+#include <tl/ast_fwd.hpp>
 #include <tl/dimtranslator.hpp>
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
 #include <tl/function_registry.hpp>
 #include <tl/hyperdaton.hpp>
-#include <tl/parser_api.hpp>
-//#include <tl/parser_iterator.hpp>
+#include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
 
 namespace TransLucid

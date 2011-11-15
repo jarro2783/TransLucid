@@ -20,6 +20,8 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_ARRAYHD_HPP_INCLUDED
 #define TL_ARRAYHD_HPP_INCLUDED
 
+#include <gmpxx.h>
+
 #include <tl/fixed_indexes.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/types/special.hpp>

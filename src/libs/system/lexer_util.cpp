@@ -25,66 +25,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid { namespace Lexer {
 
-template <typename Iterator>
-mpq_class
-init_mpq(const Iterator& begin, const Iterator& end, int base)
-{
-  std::string s;
-
-  Iterator current = begin;
-  while (current != end)
-  {
-    if (*current == '_')
-    {
-      s += '/';
-    }
-    else
-    {
-      s += *current;
-    }
-    ++current;
-  }
-
-  mpq_class value(s, base);
-
-  return value;
-}
-
-template <typename Iterator>
-mpf_class
-init_mpf(const Iterator& begin, const Iterator& end, int base)
-{
-  unsigned int prec = mpf_get_default_prec();
-  Iterator current = begin;
-  std::string s;
-
-  bool find_precision = false;
-  while (current != end && !find_precision)
-  {
-    if (*current == '^')
-    {
-      s += '@';
-    }
-    else if (*current == '#')
-    {
-      find_precision = true;
-    }
-    else
-    {
-      s += *current;
-    }
-    ++current;
-  }
-
-  if (find_precision)
-  {
-    mpz_class precision(std::string(current, end), base);
-    prec = precision.get_si();
-  }
-
-  return mpf_class(s, prec, base);
-}
-
 //returns <valid, s>
 //reads whole sequences of escape characters at a time, this is so that
 //\x characters work
@@ -188,38 +128,6 @@ build_escaped_characters
   u32string u32result = utf8_to_utf32(building);
   return std::make_pair(!error, u32result);
 }
-
-template mpf_class init_mpf<Parser::U32Iterator>
-(
-  const Parser::U32Iterator&,
-  const Parser::U32Iterator&,
-  int
-);
-
-#if 0
-template mpf_class init_mpf<std::wstring::iterator>
-(
-  const std::wstring::iterator&,
-  const std::wstring::iterator&,
-  int
-);
-#endif
-
-template mpq_class init_mpq<Parser::U32Iterator>
-(
-  const Parser::U32Iterator&,
-  const Parser::U32Iterator&,
-  int
-);
-
-#if 0
-template mpq_class init_mpq<std::wstring::iterator>
-(
-  const std::wstring::iterator&,
-  const std::wstring::iterator&,
-  int
-);
-#endif
 
 template 
 std::pair<bool, u32string>

@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
  * The WSs that implement the evaluation of expressions.
  */
 
+#include <gmpxx.h>
+
 #include <tl/builtin_types.hpp>
 #include <tl/context.hpp>
 #include <tl/constws.hpp>

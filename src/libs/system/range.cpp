@@ -21,6 +21,8 @@ along with TransLucid; see the file COPYING.  If not see
  * The range object. Defines a set of integers in a range.
  */
 
+#include <gmpxx.h>
+
 #include <tl/output.hpp>
 #include <tl/range.hpp>
 
@@ -162,6 +164,46 @@ Range::operator==(const Range& rhs) const
   ((m_upper == 0 && rhs.m_upper == 0)
      || (m_upper != 0 && rhs.m_upper != 0 && *m_upper == *rhs.m_upper))
   ;
+}
+
+bool
+Range::operator<(const Range& rhs) const
+{
+  if (m_lower == 0 && rhs.m_lower != 0)
+  {
+    return true;
+  }
+
+  if (m_lower != 0 && rhs.m_lower == 0)
+  {
+    return false;
+  }
+
+  if (m_lower && rhs.m_lower)
+  {
+    if (*m_lower != *rhs.m_lower)
+    {
+      return *m_lower < *rhs.m_lower;
+    }
+  }
+
+  //the two lower bounds must be equal
+  if (m_upper == 0 && rhs.m_upper != 0)
+  {
+    return false;
+  }
+
+  if (m_upper != 0 && rhs.m_upper == 0)
+  {
+    return true;
+  }
+
+  if (m_upper && rhs.m_upper)
+  {
+    return *m_upper < *rhs.m_upper;
+  }
+  //everything is equal if we got here
+  return false;
 }
 
 bool

@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <gmpxx.h>
+
 #include <tl/fixed_indexes.hpp>
 #include <tl/range.hpp>
 #include <tl/types/range.hpp>

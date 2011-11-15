@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
  * Builtin type definitions.
  */
 
+#include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/equation.hpp>
 //#include <tl/hyperdatons/filehd.hpp>
@@ -654,6 +655,12 @@ namespace TransLucid
       {
         return make_constant_pointer
           (i, &intmp_type_functions, TYPE_INDEX_INTMP);
+      }
+
+      Constant
+      create(int v)
+      {
+        return create(mpz_class(v));
       }
 
       Constant

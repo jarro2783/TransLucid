@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <vector>
+
+#include <gmpxx.h>
+
 #include <tl/dimtranslator.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/types/intmp.hpp>
-#include <tl/types/tuple.hpp>
-#include <tl/output.hpp>
-
-#include <vector>
 
 namespace TransLucid
 {

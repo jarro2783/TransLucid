@@ -466,7 +466,7 @@ namespace detail
         for (auto riter = parameters.rbegin(); riter != parameters.rend();
           ++riter)
         {
-          lastfn = Tree::LambdaExpr({}, *riter, std::move(lastfn));
+          lastfn = Tree::LambdaExpr(*riter, std::move(lastfn));
         }
 
         m_system.addEquation

@@ -871,6 +871,7 @@ namespace TransLucid
       int m_char;
     };
 
+    typedef PositionIterator<U32Iterator> StreamPosIterator;
   } //namespace Parser
 } //namespace TransLucid
 

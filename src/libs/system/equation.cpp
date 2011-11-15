@@ -79,10 +79,9 @@ GuardWS::GuardWS(const GuardWS& other)
 , m_dimNonConst(other.m_dimNonConst)
 , m_dimNonNon(other.m_dimNonNon)
 , m_onlyConst(other.m_onlyConst)
-, m_timeStart(0)
-, m_timeEnd(0)
 , m_system(other.m_system)
 {
+#if 0
   try
   {
     if (other.m_timeStart) 
@@ -101,11 +100,12 @@ GuardWS::GuardWS(const GuardWS& other)
     delete m_timeEnd;
     throw;
   }
+#endif
 }
 
 GuardWS::GuardWS(WS* g, WS* b)
 : m_guard(g), m_boolean(b), m_onlyConst(false),
-  m_timeStart(0), m_timeEnd(0), m_system(nullptr)
+  m_system(nullptr)
 {
   if (b != 0)
   {
@@ -202,11 +202,6 @@ GuardWS::operator=(const GuardWS& rhs)
 {
   if (this != &rhs)
   {
-    delete m_timeStart;
-    delete m_timeEnd;
-    m_timeStart = 0;
-    m_timeEnd = 0;
-
     m_guard = rhs.m_guard;
     m_boolean = rhs.m_boolean;
 
@@ -218,27 +213,6 @@ GuardWS::operator=(const GuardWS& rhs)
     m_dimNonNon = rhs.m_dimNonNon;
 
     m_onlyConst = rhs.m_onlyConst;
-
-    try 
-    {
-      if (rhs.m_timeStart)
-      {
-        m_timeStart = new mpz_class(*rhs.m_timeStart);
-      }
-
-      if (rhs.m_timeEnd)
-      {
-        m_timeEnd = new mpz_class(*rhs.m_timeEnd);
-      }
-    }
-    catch (...)
-    {
-      delete m_timeStart;
-      delete m_timeEnd;
-      m_timeStart = 0;
-      m_timeEnd = 0;
-      throw;
-    }
   }
 
   return *this;
@@ -329,7 +303,7 @@ GuardWS::evaluate(Context& k) const
   else
   {
     t[DIM_TIME] = 
-      Types::Range::create(Range(m_timeStart, m_timeEnd));
+      Types::Range::create(Range(nullptr, nullptr));
   }
 
   return Tuple(t);
@@ -483,7 +457,7 @@ VariableWS::addEquation
   size_t time
 )
 {
-  guard.setTimeStart(time);
+  //guard.setTimeStart(time);
 
   EquationWS eq(name, guard, e);
 
@@ -521,7 +495,7 @@ VariableWS::replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr)
 void
 EquationWS::del(size_t time)
 {
-  m_validContext.setTimeEnd(time);
+  //m_validContext.setTimeEnd(time);
 }
 
 }

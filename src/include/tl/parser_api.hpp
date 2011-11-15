@@ -41,13 +41,6 @@ namespace TransLucid
       DECL_INPUT
     };
 
-    /**
-     * A parsed equation.
-     * The tuple is defined as: name, [], & bool, Expr
-     */
-    typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
-    Equation;
-
     template <size_t N>
     struct Declaration
     {
@@ -119,8 +112,6 @@ namespace TransLucid
       InputDecl,
       DataType
     > Line;
-
-    typedef PositionIterator<U32Iterator> StreamPosIterator;
   }
 
   typedef std::pair<Parser::Equation, TranslatedEquation> PTEquation;

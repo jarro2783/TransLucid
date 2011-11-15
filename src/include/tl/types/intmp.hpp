@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_INTMP_HPP_INCLUDED
 #define TYPES_INTMP_HPP_INCLUDED
 
-#include <gmpxx.h>
+#include <tl/gmpxx_fwd.hpp>
 #include <tl/types.hpp>
 
 namespace TransLucid
@@ -34,6 +34,9 @@ namespace TransLucid
 
       Constant
       create(const mpz_class& v);
+
+      Constant
+      create(int v);
 
       const mpz_class&
       get(const Constant& c);

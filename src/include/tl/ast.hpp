@@ -34,6 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <gmpxx.h>
 
+#include <tl/ast_fwd.hpp>
 #include <tl/types_basic.hpp>
 #include <tl/variant.hpp>
 
@@ -596,15 +597,13 @@ namespace TransLucid
       template <typename RExpr>
       LambdaExpr
       (
-        const std::vector<Expr>& captures, 
         const u32string& name, 
         RExpr&& rhs
       )
-      : captures(captures), name(name), rhs(std::forward<RExpr>(rhs))
+      : name(name), rhs(std::forward<RExpr>(rhs))
       {
       }
 
-      std::vector<Expr> captures;
       u32string name; /**<The bound parameter.*/
       Expr rhs; /**<The right-hand-side expression.*/
 
@@ -617,13 +616,11 @@ namespace TransLucid
     {
       PhiExpr() = default;
 
-      PhiExpr(const std::vector<Expr>& captures,
-        const u32string& name, const Expr& rhs)
-      : captures(captures), name(name), rhs(rhs)
+      PhiExpr(const u32string& name, const Expr& rhs)
+      : name(name), rhs(rhs)
       {
       }
 
-      std::vector<Expr> captures;
       u32string name;
       //std::vector<Expr> binds;
       Expr rhs;
@@ -748,6 +745,16 @@ namespace TransLucid
     PRINT_NODE(PhiAppExpr)
     PRINT_NODE(WhereExpr)
     #endif
+  }
+
+  namespace Parser
+  {
+    /**
+     * A parsed equation.
+     * The tuple is defined as: name, [], & bool, Expr
+     */
+    typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
+    Equation;
   }
 }
 
