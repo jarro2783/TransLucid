@@ -340,7 +340,7 @@ TLText::setup_clargs()
     std::vector<size_t> bounds{m_clargs.size()};
     std::vector<Constant> dims
     {
-      Types::Dimension::create(m_system.getDimensionIndex(U"n"))
+      Types::Dimension::create(m_system.getDimensionIndex(U"arg0"))
     };
 
     m_argsHD = new ArrayNHD<u32string, 1>
