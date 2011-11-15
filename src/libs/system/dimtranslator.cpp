@@ -19,8 +19,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <vector>
 
-#include <gmpxx.h>
-
 #include <tl/dimtranslator.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/types/intmp.hpp>
