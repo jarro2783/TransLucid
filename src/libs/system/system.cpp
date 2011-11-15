@@ -607,12 +607,6 @@ System::init_equations()
   addDecl(*this, U"infixn", U"DECLID");
   addDecl(*this, U"data", U"DECLID");
 
-  addDecl(*this, U"arg0", U"DIM");
-  addDecl(*this, U"arg1", U"DIM");
-  addDecl(*this, U"arg2", U"DIM");
-  addDecl(*this, U"type", U"DIM");
-  addDecl(*this, U"cons", U"DIM");
-
   //add PRINT="this type has no printer"
   addInitEqn(*this,
     U"PRINT",
@@ -668,12 +662,10 @@ System::System()
       U"name",
       U"symbol",
       U"fnname",
-      U"arg0",
-      U"arg1",
-      U"arg2",
       U"typename",
       U"text",
-      U"cons"
+      U"cons",
+      U"type"
     }
   );
 
@@ -803,11 +795,12 @@ Constant
 System::addDimension(const u32string& dimension)
 {
   //add equation DIM | [name : "dimension"] = true
+  //add equation dimension = Tree::DimensionExpr(U"dimension")
   Constant c = addEquation(Parser::Equation(
-    U"DIM", 
-    Tree::TupleExpr({{Tree::DimensionExpr(U"name"), dimension}}), 
+    dimension,
+    Tree::Expr(),
     Tree::Expr(), 
-    true
+    Tree::DimensionExpr(dimension)
   ));
 
   //add to the set of dimensions

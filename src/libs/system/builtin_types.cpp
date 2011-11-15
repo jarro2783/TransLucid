@@ -900,7 +900,7 @@ addTypeEquation(System& s, const u32string& type)
     type,
     Tree::Expr(),
     Tree::Expr(),
-    Tree::LiteralExpr(U"type", type)
+    Tree::LiteralExpr(U"typetype", type)
   ));
 }
 
@@ -952,7 +952,7 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
     );
   }
 
-  s.registerFunction(U"construct_type",
+  s.registerFunction(U"construct_typetype",
     make_function_type<1>::type(
       [&s] (const Constant& text) -> Constant
     {
@@ -1093,7 +1093,7 @@ init_builtin_types(System& s)
     U"bool",
     U"intmp",
     U"special",
-    U"type",
+    U"typetype",
     U"uchar",
     U"range",
     U"tuple"

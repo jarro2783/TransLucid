@@ -136,7 +136,8 @@ namespace
 
         const u32string& type = get_constant_pointer<u32string>(c);
 
-        if (type == U"DIM")
+        //first check if it is an argN
+        if (ident.find(U"arg") == 0)
         {
           id = TOKEN_DIM_IDENTIFIER;
         }
