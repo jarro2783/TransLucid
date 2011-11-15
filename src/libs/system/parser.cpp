@@ -761,8 +761,9 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
     expect(current, end, U"}", TOKEN_RBRACE);
   }
 
-  expect(current, end, U"identifier", TOKEN_ID);
+  expect_no_advance(current, end, U"identifier", TOKEN_ID);
   u32string name = get<u32string>(current->getValue());
+  ++current;
 
   expect(current, end, U"->", TOKEN_RARROW);
 
