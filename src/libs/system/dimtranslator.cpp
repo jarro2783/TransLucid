@@ -41,6 +41,7 @@ DimensionTranslator::DimensionTranslator()
    {U"time", DIM_TIME},
    {U"all", DIM_ALL},
    {U"cons", DIM_CONS},
+   {U"type", DIM_TYPE},
    {U"arg0", DIM_ARG0},
    {U"arg1", DIM_ARG1},
    {U"arg2", DIM_ARG2}

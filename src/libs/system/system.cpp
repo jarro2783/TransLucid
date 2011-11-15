@@ -610,6 +610,8 @@ System::init_equations()
   addDecl(*this, U"arg0", U"DIM");
   addDecl(*this, U"arg1", U"DIM");
   addDecl(*this, U"arg2", U"DIM");
+  addDecl(*this, U"type", U"DIM");
+  addDecl(*this, U"cons", U"DIM");
 
   //add PRINT="this type has no printer"
   addInitEqn(*this,
@@ -670,7 +672,8 @@ System::System()
       U"arg1",
       U"arg2",
       U"typename",
-      U"text"
+      U"text",
+      U"cons"
     }
   );
 
