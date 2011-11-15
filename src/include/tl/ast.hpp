@@ -593,13 +593,14 @@ namespace TransLucid
        * @param name The parameter to bind.
        * @param rhs The right-hand-side expression.
        */
+      template <typename RExpr>
       LambdaExpr
       (
         const std::vector<Expr>& captures, 
         const u32string& name, 
-        const Expr& rhs
+        RExpr&& rhs
       )
-      : captures(captures), name(name), rhs(rhs)
+      : captures(captures), name(name), rhs(std::forward<RExpr>(rhs))
       {
       }
 

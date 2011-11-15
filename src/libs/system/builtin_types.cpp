@@ -1095,7 +1095,8 @@ init_builtin_types(System& s)
     U"special",
     U"type",
     U"uchar",
-    U"range"
+    U"range",
+    U"tuple"
   };
 
   std::vector<u32string> type_names = to_print_types;

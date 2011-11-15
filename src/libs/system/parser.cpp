@@ -1084,14 +1084,87 @@ Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
   LexerIterator current = begin;
   ++current;
 
+  expect_no_advance(current, end, U"id", TOKEN_ID);
+
+  DataType data;
+  data.name = get<u32string>(current->getValue());
+  ++current;
+
   while (*current == TOKEN_ID)
   {
+    data.vars.push_back(get<u32string>(current->getValue()));
     ++current;
   }
 
-  expect(begin, end, U"=", TOKEN_EQUALS);
+  expect(current, end, U"=", TOKEN_EQUALS);
 
-  return false;
+  DataConstructor constructor;
+  expect(current, end, constructor, U"data constructor", 
+    &Parser::parse_data_constructor);
+
+  data.constructors.push_back(constructor);
+
+  while (*current == TOKEN_PIPE)
+  {
+    constructor.args.clear();
+    ++current;
+    expect(current, end, constructor, U"data constructor", 
+      &Parser::parse_data_constructor);
+
+    data.constructors.push_back(constructor);
+  }
+
+  begin = current;
+
+  result = data;
+
+  return true;
+}
+
+bool
+Parser::parse_data_constructor(LexerIterator& begin, const LexerIterator& end,
+  DataConstructor& result)
+{
+  if (*begin != TOKEN_ID)
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+
+  result.name = get<u32string>(current->getValue());
+  ++current;
+
+  bool parsingConstructor = true;
+  while (parsingConstructor)
+  {
+    if (*current == TOKEN_LPAREN)
+    {
+      ++current;
+      DataConstructor childConst;
+      expect(current, end, childConst, U"data constructor",
+        &Parser::parse_data_constructor);
+
+      expect(current, end, U")", TOKEN_RPAREN);
+
+      result.args.push_back(childConst);
+    }
+    else if (*current == TOKEN_ID)
+    {
+      result.args.push_back(
+        DataConstructor{get<u32string>(current->getValue())}
+      );
+      ++current;
+    }
+    else
+    {
+      parsingConstructor = false;
+    }
+  }
+
+  begin = current;
+
+  return true;
 }
 
 bool

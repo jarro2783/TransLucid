@@ -45,8 +45,9 @@ along with TransLucid; see the file COPYING.  If not see
 //respectively.
 
 #include <algorithm>
-#include <unordered_map>
 #include <initializer_list>
+#include <sstream>
+#include <unordered_map>
 
 #include <tl/builtin_types.hpp>
 #include <tl/constws.hpp>
@@ -431,7 +432,55 @@ namespace detail
     Constant
     operator()(const Parser::DataType& data)
     {
-      //TODO
+      //for each constructor in data.constructors
+      //constructor.name = \v_i (constructors.size() args) -> 
+      //  [type <- "data.name", cons <- "constructor.name", argi <- v_i]
+
+      for (const auto& cons : data.constructors)
+      {
+      
+        Tree::TupleExpr::TuplePairs pairs
+          {
+            {Tree::DimensionExpr{DIM_TYPE}, data.name},
+            {Tree::DimensionExpr{DIM_CONS}, cons.name}
+          }
+        ;
+
+        std::vector<u32string> parameters;
+        for (size_t i = 0; i != cons.args.size(); ++i)
+        {
+          std::ostringstream argos;
+          std::ostringstream paramos;
+          argos << "arg" << i;
+          paramos << "param" << i;
+          pairs.push_back(std::make_pair(
+            Tree::DimensionExpr(utf8_to_utf32(argos.str())),
+            Tree::IdentExpr(utf8_to_utf32(paramos.str()))
+          ));
+
+          parameters.push_back(utf8_to_utf32(paramos.str()));
+        }
+
+        Tree::Expr lastfn = Tree::TupleExpr{pairs};
+
+        for (auto riter = parameters.rbegin(); riter != parameters.rend();
+          ++riter)
+        {
+          lastfn = Tree::LambdaExpr({}, *riter, std::move(lastfn));
+        }
+
+        m_system.addEquation
+        (
+          Parser::Equation
+          (
+            cons.name,
+            Tree::nil(),
+            Tree::nil(),
+            lastfn
+          )
+        );
+      }
+
       return Constant();
     }
 
@@ -556,6 +605,7 @@ System::init_equations()
   addDecl(*this, U"infixl", U"DECLID");
   addDecl(*this, U"infixr", U"DECLID");
   addDecl(*this, U"infixn", U"DECLID");
+  addDecl(*this, U"data", U"DECLID");
 
   addDecl(*this, U"arg0", U"DIM");
   addDecl(*this, U"arg1", U"DIM");
@@ -590,6 +640,7 @@ System::System()
    {U"special", TYPE_INDEX_SPECIAL},
    {U"uchar", TYPE_INDEX_UCHAR},
    {U"dim", TYPE_INDEX_DIMENSION},
+   {U"tuple", TYPE_INDEX_TUPLE},
    {U"type", TYPE_INDEX_TYPE},
    {U"range", TYPE_INDEX_RANGE}
   }
@@ -729,6 +780,11 @@ System::parseLine
     setDefaultContext();
 
     return c;
+  }
+  else
+  {
+    //TODO fix this
+    std::cerr << "not a line" << std::endl;
   }
 
   return Types::Special::create(SP_CONST); 

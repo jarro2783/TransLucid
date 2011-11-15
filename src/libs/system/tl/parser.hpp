@@ -139,6 +139,10 @@ namespace TransLucid
       parse_data_decl(LexerIterator& begin, const LexerIterator& end,
         Line& result);
 
+      bool
+      parse_data_constructor(LexerIterator& begin, const LexerIterator& end,
+        DataConstructor& result);
+
       Token
       nextToken(LexerIterator& begin);
 

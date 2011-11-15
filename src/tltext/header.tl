@@ -25,6 +25,7 @@ var PRINT_TLTEXT [arg0 : ustring] = "`" + PRINT + "`";;
 var PRINT_TLTEXT [arg0 : uchar]   = "'" + PRINT + "'";;
 var PRINT_TLTEXT [arg0 : bool]    = PRINT;;
 var PRINT_TLTEXT [arg0 : range]   = PRINT;;
+var PRINT_TLTEXT [arg0 : tuple]   = "I don't know how to print a tuple";;
 var PRINT_TLTEXT                  = TYPENAME + "`" + PRINT + "`";;
 
 var CLARGS = "";;
