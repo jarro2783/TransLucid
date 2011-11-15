@@ -30,8 +30,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 #include <fstream>
 
-#include <boost/spirit/include/support_istream_iterator.hpp>
-
 #include "tltext.hpp"
 
 #ifdef HAVE_CONFIG_H
@@ -107,8 +105,8 @@ TLText::run()
     {
       is >> std::noskipws;
       Parser::U32Iterator begin(
-        Parser::makeUTF8Iterator(boost::spirit::istream_iterator(is)),
-        Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
+        Parser::makeUTF8Iterator(std::istream_iterator<char>(is)),
+        Parser::makeUTF8Iterator(std::istream_iterator<char>())
       );
 
       LineTokenizer tokens(begin);
@@ -120,8 +118,8 @@ TLText::run()
   *m_is >> std::noskipws;
 
   Parser::U32Iterator begin(
-    Parser::makeUTF8Iterator(boost::spirit::istream_iterator(*m_is)),
-    Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
+    Parser::makeUTF8Iterator(std::istream_iterator<char>(*m_is)),
+    Parser::makeUTF8Iterator(std::istream_iterator<char>())
   );
 
   Parser::U32Iterator end;
@@ -187,38 +185,6 @@ TLText::run()
           *m_error << "Error: PRINT didn't return a string" << std::endl;
           *m_error << "Type index: " << c.index() << std::endl;
         }
-
-        #if 0
-        if (c.index() == TYPE_INDEX_INTMP)
-        {
-          std::cout << get_constant_pointer<mpz_class>(c)
-            << std::endl;
-        }
-        else if (c.index() == TYPE_INDEX_SPECIAL)
-        {
-          std::cout << "special: " << get_constant<Special>(c)
-            << std::endl;
-        }
-        else if (c.index() == TYPE_INDEX_USTRING)
-        {
-          std::cout << "\"" << get_constant_pointer<u32string>(c) << "\""
-            << std::endl;
-        }
-        else if (c.index() == TYPE_INDEX_UCHAR)
-        {
-          std::cout << "'" << u32string(1, get_constant<char32_t>(c)) << "'"
-            << std::endl;
-        }
-        else if (c.index() == TYPE_INDEX_BOOL)
-        {
-          std::cout << std::boolalpha << get_constant<bool>(c) 
-                    << std::noboolalpha << std::endl;
-        }
-        else
-        {
-          std::cerr << "index: " << c.index() << std::endl;
-        }
-        #endif
       }
     }
     else
