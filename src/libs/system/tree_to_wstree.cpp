@@ -29,6 +29,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <tl/tree_to_wstree.hpp>
 
+#include "tl/free_variables.hpp"
+
 #include <sstream>
 
 namespace TransLucid
