@@ -291,12 +291,6 @@ RenameIdentifiers::operator()(const Tree::PhiExpr& e)
 }
 
 Tree::Expr
-RenameIdentifiers::operator()(const Tree::BangExpr& e)
-{
-  return renameFunction(e);
-}
-
-Tree::Expr
 RenameIdentifiers::operator()(const Tree::LambdaExpr& e)
 {
   return renameFunction(e);

@@ -281,7 +281,6 @@ namespace TransLucid
     class TupleExpr;
     class IfExpr;
     class AtExpr;
-    class BangExpr;
     class LambdaExpr;
     class PhiExpr;
     class BangAppExpr;
@@ -316,7 +315,6 @@ namespace TransLucid
       recursive_wrapper<HashExpr>,
       recursive_wrapper<TupleExpr>,
       recursive_wrapper<AtExpr>,
-      recursive_wrapper<BangExpr>,
       recursive_wrapper<LambdaExpr>,
       recursive_wrapper<PhiExpr>,
       recursive_wrapper<BangAppExpr>,
@@ -565,22 +563,6 @@ namespace TransLucid
       Expr rhs;
     };
 
-    struct BangExpr
-    {
-      BangExpr() = default;
-
-      BangExpr(const u32string& name, const Expr& rhs)
-      : name(name), rhs(rhs)
-      {
-      }
-
-      u32string name;
-      Expr rhs;
-
-      dimension_index argDim;
-      std::vector<dimension_index> scope;
-    };
-
     /**
      * A lambda expression. An expression node representing a lambda 
      * expression which creates an unnamed function.
@@ -667,6 +649,12 @@ namespace TransLucid
        */
       PhiAppExpr(const Expr& lhs, const Expr& rhs)
       : lhs(lhs), rhs(rhs)
+      {
+      }
+
+      PhiAppExpr(const Expr& lhs, const Expr& rhs, 
+        const std::vector<dimension_index>& lall)
+      : lhs(lhs), rhs(rhs), Lall(lall)
       {
       }
 

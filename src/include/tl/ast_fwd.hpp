@@ -51,7 +51,6 @@ namespace TransLucid
     class TupleExpr;
     class IfExpr;
     class AtExpr;
-    class BangExpr;
     class LambdaExpr;
     class PhiExpr;
     class BangAppExpr;
@@ -82,7 +81,6 @@ namespace TransLucid
       recursive_wrapper<HashExpr>,
       recursive_wrapper<TupleExpr>,
       recursive_wrapper<AtExpr>,
-      recursive_wrapper<BangExpr>,
       recursive_wrapper<LambdaExpr>,
       recursive_wrapper<PhiExpr>,
       recursive_wrapper<BangAppExpr>,

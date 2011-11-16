@@ -216,20 +216,6 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
 }
 
 WS*
-WorkshopBuilder::operator()(const Tree::BangExpr& e)
-{
-  WS* rhs = apply_visitor(*this, e.rhs);
-
-  return new Workshops::BaseAbstractionWS
-  (
-    e.name,
-    e.argDim,
-    e.scope,
-    rhs
-  );
-}
-
-WS*
 WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 {
   WS* rhs = apply_visitor(*this, e.rhs);

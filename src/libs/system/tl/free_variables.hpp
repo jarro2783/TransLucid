@@ -30,10 +30,10 @@ namespace TransLucid
 {
   class System;
 
-  class FreeVariableReplacer : private GenericTreeWalker
+  class FreeVariableReplacer : private GenericTreeWalker<FreeVariableReplacer>
   {
     public:
-    using GenericTreeWalker::operator();
+    using GenericTreeWalker<FreeVariableReplacer>::operator();
 
     typedef std::vector<std::pair<u32string, dimension_index>> Replaced;
 
@@ -43,6 +43,9 @@ namespace TransLucid
     : m_system(system) {}
 
     const Replaced&
+    getReplaced();
+
+    Tree::Expr
     replaceFree(const Tree::Expr& expr);
 
     template <typename T>

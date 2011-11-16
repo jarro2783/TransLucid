@@ -271,51 +271,6 @@ TreeToWSTree::operator()(const Tree::AtExpr& e)
 }
 
 Tree::Expr 
-TreeToWSTree::operator()(const Tree::BangExpr& e)
-{
-  //exactly the same as for lambda expressions
-
-  //1. generate a new dimension
-  //2. store our scope dimensions
-  //3. add ourselves to the scope
-  //4. visit the child
-  //5. add a new equation param = #dim
-  //6. restore the scope
-
-  Tree::BangExpr expr = e;
-
-  //1. generate a new dimension
-  dimension_index argDim = m_system->nextHiddenDim();
-
-  //2. store our scope dimensions and ourself
-  expr.argDim = argDim;
-  expr.scope = m_scope;
-
-  //3. add ourselves to the scope
-  m_scope.push_back(argDim);
-
-  //4. visit the child
-  expr.rhs = apply_visitor(*this, e.rhs);
-
-  //5. add a new equation param = #dim
-  m_newVars.push_back
-  (
-    std::make_tuple
-    (
-      e.name,
-      Tree::Expr(),
-      Tree::Expr(),
-      Tree::HashExpr(Tree::DimensionExpr(argDim))
-    )
-  );
-
-  //6. restore the scope
-  m_scope.pop_back();
-
-  return expr;
-}
-
-Tree::Expr 
 TreeToWSTree::operator()(const Tree::LambdaExpr& e)
 {
   //1. generate a new dimension
@@ -325,7 +280,8 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   //5. add a new equation param = #dim
   //6. restore the scope
 
-  Tree::LambdaExpr expr = e;
+  FreeVariableReplacer replacer(*m_system);
+  Tree::LambdaExpr expr = get<Tree::LambdaExpr>(replacer.replaceFree(e));
 
   //1. generate a new dimension
   dimension_index argDim = m_system->nextHiddenDim();
@@ -600,16 +556,33 @@ FreeVariableReplacer::operator()(const Tree::IdentExpr& e)
 Tree::Expr 
 FreeVariableReplacer::operator()(const Tree::LambdaExpr& e)
 {
+  m_bound.insert(e.name);
+  Tree::Expr replaced = apply_visitor(*this, e.rhs);
+  m_bound.erase(e.name);
+
+  return Tree::LambdaExpr(e.name, std::move(replaced));
 }
 
 Tree::Expr 
 FreeVariableReplacer::operator()(const Tree::PhiExpr& e)
 {
+  m_bound.insert(e.name);
+  Tree::Expr replaced = apply_visitor(*this, e.rhs);
+  m_bound.erase(e.name);
+
+  return Tree::PhiExpr(e.name, std::move(replaced));
 }
 
 Tree::Expr 
 FreeVariableReplacer::operator()(const Tree::WhereExpr& e)
 {
+}
+
+Tree::Expr
+FreeVariableReplacer::replaceFree(const Tree::Expr& expr)
+{
+  m_replaced.clear();
+  return apply_visitor(*this, expr);
 }
 
 }

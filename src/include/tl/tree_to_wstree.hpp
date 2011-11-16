@@ -65,7 +65,6 @@ namespace TransLucid
     Tree::Expr operator()(const Tree::HashExpr& e);
     Tree::Expr operator()(const Tree::TupleExpr& e);
     Tree::Expr operator()(const Tree::AtExpr& e);
-    Tree::Expr operator()(const Tree::BangExpr& e);
     Tree::Expr operator()(const Tree::LambdaExpr& e);
     Tree::Expr operator()(const Tree::PhiExpr& e);
     Tree::Expr operator()(const Tree::BangAppExpr& e);

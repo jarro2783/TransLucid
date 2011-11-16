@@ -61,7 +61,6 @@ namespace TransLucid
     WS* operator()(const Tree::HashExpr& e);
     WS* operator()(const Tree::TupleExpr& e);
     WS* operator()(const Tree::AtExpr& e);
-    WS* operator()(const Tree::BangExpr& e);
     WS* operator()(const Tree::LambdaExpr& e);
     WS* operator()(const Tree::PhiExpr& e);
     WS* operator()(const Tree::BangAppExpr& e);
