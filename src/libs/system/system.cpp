@@ -637,7 +637,7 @@ System::System()
    {U"uchar", TYPE_INDEX_UCHAR},
    {U"dim", TYPE_INDEX_DIMENSION},
    {U"tuple", TYPE_INDEX_TUPLE},
-   {U"type", TYPE_INDEX_TYPE},
+   {U"typetype", TYPE_INDEX_TYPE},
    {U"range", TYPE_INDEX_RANGE}
   }
   )
