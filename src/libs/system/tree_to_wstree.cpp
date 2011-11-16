@@ -580,4 +580,36 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
   return w;
 }
 
+//the free variable replacer code
+
+Tree::Expr 
+FreeVariableReplacer::operator()(const Tree::IdentExpr& e)
+{
+  if (m_bound.find(e.text) == m_bound.end())
+  {
+    dimension_index unique = m_system.nextHiddenDim();
+    m_replaced.push_back(std::make_pair(e.text, unique));
+    return Tree::HashExpr(Tree::DimensionExpr(unique));
+  }
+  else
+  {
+    return e;
+  }
+}
+
+Tree::Expr 
+FreeVariableReplacer::operator()(const Tree::LambdaExpr& e)
+{
+}
+
+Tree::Expr 
+FreeVariableReplacer::operator()(const Tree::PhiExpr& e)
+{
+}
+
+Tree::Expr 
+FreeVariableReplacer::operator()(const Tree::WhereExpr& e)
+{
+}
+
 }

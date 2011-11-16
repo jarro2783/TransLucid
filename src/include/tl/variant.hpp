@@ -559,18 +559,18 @@ namespace TransLucid
     }
   };
 
-  template <typename Visitor, typename Visitable>
+  template <typename Visitor, typename Visitable, typename... Args>
   typename Visitor::result_type
-  apply_visitor(Visitor& visitor, Visitable& visitable)
+  apply_visitor(Visitor& visitor, Visitable& visitable, Args&&... args)
   {
-    return visitable.apply_visitor(visitor);
+    return visitable.apply_visitor(visitor, std::forward<Args>(args)...);
   }
 
-  template <typename Visitor, typename Visitable>
+  template <typename Visitor, typename Visitable, typename... Args>
   typename Visitor::result_type
-  apply_visitor(const Visitor& visitor, Visitable& visitable)
+  apply_visitor(const Visitor& visitor, Visitable& visitable, Args&&... args)
   {
-    return visitable.apply_visitor(visitor);
+    return visitable.apply_visitor(visitor, std::forward<Args>(args)...);
   }
 
   template <typename T, typename First, typename... Types>

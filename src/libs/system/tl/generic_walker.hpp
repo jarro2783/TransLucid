@@ -1,4 +1,4 @@
-/* Replaces free variables with #hidden
+/* Tree walk when not much changes.
    Copyright (C) 2011 Jarryd Beck
 
 This file is part of TransLucid.
@@ -17,34 +17,16 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <vector>
-#include <unordered_set>
-#include <utility>
-
-#include <tl/ast_fwd.hpp>
-#include <tl/types_basic.hpp>
-
-#include "tl/generic_walker.hpp"
+#include <tl/ast.hpp>
 
 namespace TransLucid
 {
-  class System;
-
-  class FreeVariableReplacer : private GenericTreeWalker
+  //transforms the tree by doing nothing
+  //you want to use private inheritance to get all this functionality when
+  //most of the expression nodes in your tree walking don't change anything
+  class GenericTreeWalker
   {
     public:
-    using GenericTreeWalker::operator();
-
-    typedef std::vector<std::pair<u32string, dimension_index>> Replaced;
-
-    typedef Tree::Expr result_type;
-
-    FreeVariableReplacer(System& system)
-    : m_system(system) {}
-
-    const Replaced&
-    replaceFree(const Tree::Expr& expr);
-
     template <typename T>
     Tree::Expr
     operator()(const T& e)
@@ -53,13 +35,19 @@ namespace TransLucid
     }
 
     Tree::Expr operator()(const Tree::IdentExpr& e);
+    Tree::Expr operator()(const Tree::ParenExpr& e);
+    Tree::Expr operator()(const Tree::UnaryOpExpr& e);
+    Tree::Expr operator()(const Tree::BinaryOpExpr& e);
+    Tree::Expr operator()(const Tree::IfExpr& e);
+    Tree::Expr operator()(const Tree::HashExpr& e);
+    Tree::Expr operator()(const Tree::TupleExpr& e);
+    Tree::Expr operator()(const Tree::AtExpr& e);
+    Tree::Expr operator()(const Tree::BangExpr& e);
     Tree::Expr operator()(const Tree::LambdaExpr& e);
     Tree::Expr operator()(const Tree::PhiExpr& e);
+    Tree::Expr operator()(const Tree::BangAppExpr& e);
+    Tree::Expr operator()(const Tree::LambdaAppExpr& e);
+    Tree::Expr operator()(const Tree::PhiAppExpr& e);
     Tree::Expr operator()(const Tree::WhereExpr& e);
-
-    private:
-    System& m_system;
-    Replaced m_replaced;
-    std::unordered_set<u32string> m_bound;
   };
 }
