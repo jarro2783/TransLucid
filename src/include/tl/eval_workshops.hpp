@@ -613,14 +613,18 @@ namespace TransLucid
        */
       LambdaAbstractionWS
       (
+        System* system,
         const u32string& name, 
         dimension_index dim, 
-        std::vector<dimension_index> scope,
+        const std::vector<dimension_index> scope,
+        const std::vector<std::pair<u32string, dimension_index>>& free,
         WS* rhs
       )
-      : m_name(name)
+      : m_system(system)
+      , m_name(name)
       , m_argDim(dim)
       , m_scope(scope)
+      , m_free(free)
       , m_rhs(rhs)
       {
       }
@@ -640,10 +644,11 @@ namespace TransLucid
       operator()(Context& k);
 
       private:
-      WS* m_system;
+      System* m_system;
       u32string m_name;
       dimension_index m_argDim;
       std::vector<dimension_index> m_scope;
+      std::vector<std::pair<u32string, dimension_index>> m_free;
       WS* m_rhs;
     };
 

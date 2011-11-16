@@ -43,7 +43,10 @@ namespace TransLucid
     : m_system(system) {}
 
     const Replaced&
-    getReplaced();
+    getReplaced()
+    {
+      return m_replaced;
+    }
 
     Tree::Expr
     replaceFree(const Tree::Expr& expr);

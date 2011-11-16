@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
  * Also annotates tree with labels.
  */
 
+#include <tl/output.hpp>
+
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
 #include <tl/parser_api.hpp>
@@ -283,6 +285,8 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   FreeVariableReplacer replacer(*m_system);
   Tree::LambdaExpr expr = get<Tree::LambdaExpr>(replacer.replaceFree(e));
 
+  auto& replaced = replacer.getReplaced();
+
   //1. generate a new dimension
   dimension_index argDim = m_system->nextHiddenDim();
 
@@ -292,6 +296,14 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
 
   //3. add ourselves to the scope
   m_scope.push_back(argDim);
+
+  //add the dimensions to replace with to the scope
+  std::cout << "free variables:" << std::endl;
+  for (const auto& r : replaced)
+  {
+    std::cout << r.first << std::endl;
+    m_scope.push_back(r.second);
+  }
 
   //4. visit the child
   expr.rhs = apply_visitor(*this, e.rhs);
@@ -309,7 +321,11 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   );
 
   //6. restore the scope
-  m_scope.pop_back();
+  //m_scope.pop_back();
+  m_scope.resize(m_scope.size() - replaced.size() - 1);
+
+  //store the free variables to evaluate
+  expr.free = std::move(replaced);
 
   return expr;
 }
@@ -543,6 +559,7 @@ FreeVariableReplacer::operator()(const Tree::IdentExpr& e)
 {
   if (m_bound.find(e.text) == m_bound.end())
   {
+    std::cerr << "found free variable: " << e.text << std::endl;
     dimension_index unique = m_system.nextHiddenDim();
     m_replaced.push_back(std::make_pair(e.text, unique));
     return Tree::HashExpr(Tree::DimensionExpr(unique));
@@ -576,6 +593,51 @@ FreeVariableReplacer::operator()(const Tree::PhiExpr& e)
 Tree::Expr 
 FreeVariableReplacer::operator()(const Tree::WhereExpr& e)
 {
+  //bind all of the defined variables for the E
+  for (const auto& dim : e.dims)
+  {
+    m_bound.insert(dim.first);
+  }
+
+  for (const auto& var : e.vars)
+  {
+    m_bound.insert(std::get<0>(var));
+  }
+
+  Tree::Expr expr = apply_visitor(*this, e.e);
+  
+  //unbind them
+  for (const auto& dim : e.dims)
+  {
+    m_bound.insert(dim.first);
+  }
+
+  for (const auto& var : e.vars)
+  {
+    m_bound.insert(std::get<0>(var));
+  }
+
+  Tree::WhereExpr where;
+
+  //replace everything in the dimension expressions
+  for (const auto& dim : e.dims)
+  {
+    where.dims.push_back(std::make_pair(dim.first,
+      apply_visitor(*this, dim.second)));
+  }
+
+  //replace everything in the var expressions
+  for (const auto& var : e.vars)
+  {
+    where.vars.push_back(std::make_tuple(
+      std::get<0>(var),
+      apply_visitor(*this, std::get<1>(var)),
+      apply_visitor(*this, std::get<2>(var)),
+      apply_visitor(*this, std::get<3>(var))
+    ));
+  }
+  
+  return where;
 }
 
 Tree::Expr

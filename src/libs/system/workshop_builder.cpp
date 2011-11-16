@@ -222,9 +222,11 @@ WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 
   return new Workshops::LambdaAbstractionWS
   (
+    m_system,
     e.name,
     e.argDim,
     e.scope,
+    e.free,
     rhs
   );
 }

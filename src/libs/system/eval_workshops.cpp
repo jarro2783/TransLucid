@@ -418,9 +418,11 @@ LambdaAbstractionWS::operator()(Context& k)
   (
     ValueFunctionType
     (
+      m_system,
       m_name, 
       m_argDim, 
       m_scope,
+      m_free,
       m_rhs, 
       k
     )

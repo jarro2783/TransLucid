@@ -20,8 +20,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_FUNCTION_HPP_INCLUDED
 #define TYPES_FUNCTION_HPP_INCLUDED
 
+#include <tl/output.hpp>
+
 #include <tl/types.hpp>
 #include <tl/context.hpp>
+#include <tl/system.hpp>
 
 #include <vector>
 
@@ -125,11 +128,13 @@ namespace TransLucid
     public:
     ValueFunctionType
     (
+      System* system,
       const u32string& name, 
       dimension_index argDim, 
       const std::vector<dimension_index>& scope,
+      const std::vector<std::pair<u32string, dimension_index>>& free,
       WS* expr,
-      const Context& k
+      Context& k
     )
     : m_name(name), m_dim(argDim), m_expr(expr)
     {
@@ -137,6 +142,21 @@ namespace TransLucid
       {
         m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
       }
+
+      System::IdentifierLookup idents = system->lookupIdentifiers();
+
+      std::cout << "evaluating free variables" << std::endl;
+      //evaluate all of the free variables
+      for (const auto& v : free)
+      {
+        std::cout << "evaluating " << v.first << std::endl;
+        m_scopeDims.push_back(std::make_pair(
+          v.second,
+          (*idents.lookup(v.first))(k)
+        ));
+        std::cout << "done evaluating " << v.first << std::endl;
+      }
+      std::cout << "done evaluating free variables" << std::endl;
     }
 
     ValueFunctionType*

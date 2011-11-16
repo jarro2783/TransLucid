@@ -591,6 +591,9 @@ namespace TransLucid
 
       dimension_index argDim;
       std::vector<dimension_index> scope;
+
+      //the free variables to evaluate
+      std::vector<std::pair<u32string, dimension_index>> free;
     };
 
     //TODO: fix TreeToWSTree when I implement this
@@ -725,7 +728,6 @@ namespace TransLucid
     PRINT_NODE(HashExpr)
     PRINT_NODE(TupleExpr)
     PRINT_NODE(AtExpr)
-    PRINT_NODE(BangExpr)
     PRINT_NODE(LambdaExpr)
     PRINT_NODE(PhiExpr)
     PRINT_NODE(BangAppExpr)
