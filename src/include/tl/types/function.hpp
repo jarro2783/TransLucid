@@ -20,8 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_FUNCTION_HPP_INCLUDED
 #define TYPES_FUNCTION_HPP_INCLUDED
 
-#include <tl/output.hpp>
-
+#include <tl/types/special.hpp>
 #include <tl/types.hpp>
 #include <tl/context.hpp>
 #include <tl/system.hpp>
@@ -145,18 +144,17 @@ namespace TransLucid
 
       System::IdentifierLookup idents = system->lookupIdentifiers();
 
-      std::cout << "evaluating free variables" << std::endl;
       //evaluate all of the free variables
       for (const auto& v : free)
       {
-        std::cout << "evaluating " << v.first << std::endl;
+        auto var = idents.lookup(v.first);
+        Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
+          : (*idents.lookup(v.first))(k);
+
         m_scopeDims.push_back(std::make_pair(
-          v.second,
-          (*idents.lookup(v.first))(k)
+          v.second, value
         ));
-        std::cout << "done evaluating " << v.first << std::endl;
       }
-      std::cout << "done evaluating free variables" << std::endl;
     }
 
     ValueFunctionType*

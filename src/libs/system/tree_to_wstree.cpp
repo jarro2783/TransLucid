@@ -22,8 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
  * Also annotates tree with labels.
  */
 
-#include <tl/output.hpp>
-
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
 #include <tl/parser_api.hpp>
@@ -298,15 +296,13 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   m_scope.push_back(argDim);
 
   //add the dimensions to replace with to the scope
-  std::cout << "free variables:" << std::endl;
   for (const auto& r : replaced)
   {
-    std::cout << r.first << std::endl;
     m_scope.push_back(r.second);
   }
 
   //4. visit the child
-  expr.rhs = apply_visitor(*this, e.rhs);
+  expr.rhs = apply_visitor(*this, expr.rhs);
 
   //5. add a new equation param = #dim
   m_newVars.push_back
@@ -559,7 +555,6 @@ FreeVariableReplacer::operator()(const Tree::IdentExpr& e)
 {
   if (m_bound.find(e.text) == m_bound.end())
   {
-    std::cerr << "found free variable: " << e.text << std::endl;
     dimension_index unique = m_system.nextHiddenDim();
     m_replaced.push_back(std::make_pair(e.text, unique));
     return Tree::HashExpr(Tree::DimensionExpr(unique));
