@@ -24,7 +24,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
-//#include <tl/output.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/rename.hpp>
 #include <tl/system.hpp>
@@ -291,7 +290,6 @@ TreeToWSTree::operator()(const Tree::BangExpr& e)
   expr.scope = m_scope;
 
   //3. add ourselves to the scope
-  m_valueScopeArgs.push_back(argDim);
   m_scope.push_back(argDim);
 
   //4. visit the child

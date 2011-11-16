@@ -34,7 +34,7 @@ namespace TransLucid
 {
 
 WorkshopBuilder::WorkshopBuilder(System* system)
-: m_system(system)
+: m_system(system), m_infn(false)
 {
 }
 
