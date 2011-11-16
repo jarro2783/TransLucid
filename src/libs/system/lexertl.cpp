@@ -438,7 +438,7 @@ namespace
       else
       {
         //TODO fix this
-        std::cerr << "invalid operator type" << std::endl;
+        std::cerr << "invalid operator type for " << text << std::endl;
         throw "invalid operator type";
       }
     }

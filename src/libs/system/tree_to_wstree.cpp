@@ -614,6 +614,8 @@ FreeVariableReplacer::operator()(const Tree::WhereExpr& e)
 
   Tree::WhereExpr where;
 
+  where.e = e.e;
+
   //replace everything in the dimension expressions
   for (const auto& dim : e.dims)
   {

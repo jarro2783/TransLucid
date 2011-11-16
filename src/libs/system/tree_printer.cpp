@@ -173,10 +173,18 @@ class TreePrinterNew
     return m_os.str();
   }
 
+  #if 0
   template <typename T>
   void operator()(const T& e)
   {
     m_os << "not implemented";
+  }
+  #endif
+
+  void
+  operator()(const Tree::nil&)
+  {
+    m_os << "nil";
   }
 
   void 
@@ -462,6 +470,20 @@ class TreePrinterNew
     parenPop();
 
     pp(')', Precedence::FN_APP);
+  }
+
+  void
+  operator()(const Tree::BangAppExpr& b)
+  {
+    apply_visitor(*this, b.name);
+    m_os << "!(";
+    apply_visitor(*this, b.args.front());
+    for (auto iter = ++b.args.begin(); iter != b.args.end(); ++iter)
+    {
+      m_os << ", ";
+      apply_visitor(*this, *iter);
+    }
+    m_os << ")";
   }
 
   void

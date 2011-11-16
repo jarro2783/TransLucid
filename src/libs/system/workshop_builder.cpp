@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
  * Turns expressions into workshops.
  */
 
+#include <tl/output.hpp>
+
 #include <tl/ast.hpp>
 #include <tl/constws.hpp>
 #include <tl/eval_workshops.hpp>
@@ -94,6 +96,7 @@ WS*
 WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 {
   //return new Workshops::TypedValueWS(m_system, e.type, e.text);
+  std::cerr << "warning: compiling literal node" << std::endl;
   return 0;
 }
 
