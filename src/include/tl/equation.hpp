@@ -290,7 +290,7 @@ namespace TransLucid
     operator()(Context& k);
 
     private:
-    VariableWS m_var;
+    VariableWS *m_var;
   };
 };
 

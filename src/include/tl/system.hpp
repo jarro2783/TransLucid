@@ -304,7 +304,7 @@ namespace TransLucid
 
     //functions
     std::unordered_map<u32string, 
-      std::pair<ConditionalBestfitWS, std::vector<Parser::FnDecl>>> m_fndecls;
+      std::pair<ConditionalBestfitWS*, std::vector<Parser::FnDecl>>> m_fndecls;
 
     //---- the sets of all the uuids of objects ----
 

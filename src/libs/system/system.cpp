@@ -1209,32 +1209,33 @@ System::addFunction(const Parser::FnDecl& fn)
   //first try to find the function
   auto iter = m_fndecls.find(fn.name);
 
-  if (fn.args.size() == 0)
+  ConditionalBestfitWS* fnws = nullptr;
+
+  if (iter == m_fndecls.end())
   {
-    //lookup an already added function
-    if (iter == m_fndecls.end())
-    {
-      //error
-    }
-    else
-    {
-    }
+    //add a new one
+    fnws = new ConditionalBestfitWS;
+
+    m_fndecls.insert(std::make_pair(fn.name, 
+      std::make_pair(fnws, std::vector<Parser::FnDecl>())));
+
+    //create a new equation for this thing
+    addEquation(fn.name, fnws);
   }
   else
   {
-    //add a new one or an existing one but the args must match
-    if (iter == m_fndecls.end())
+    //match with an existing one
+    if (fn.args.size() != 0 && fn.args != iter->second.second.front().args)
     {
-      //add a new one
+      //error
     }
-    else
-    {
-      //check that the arguments are the same
-    }
+
+    fnws = iter->second.first;
   }
 
   //if we get here then we have a valid function, and a valid pointer
   //to a ConditionalBestfitWS, so add it to the system
+
   //compile the expression
 
   //add it as an equation to the conditional
