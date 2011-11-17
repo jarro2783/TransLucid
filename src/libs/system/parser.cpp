@@ -119,6 +119,7 @@ Parser::Parser(System& system)
 
   add_decl_parser(m_where_decls, U"dim", this, &Parser::parse_dim_decl);
   add_decl_parser(m_where_decls, U"var", this, &Parser::parse_var_decl);
+  add_decl_parser(m_where_decls, U"fun", this, &Parser::parse_fun_decl);
 
   add_decl_parser(m_top_decls, U"dim", this, &Parser::parse_dim_decl);
   add_decl_parser(m_top_decls, U"var", this, &Parser::parse_var_decl);
@@ -131,6 +132,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"postfix", this, &Parser::parse_unary_decl);
   add_decl_parser(m_top_decls, U"prefix", this, &Parser::parse_unary_decl);
   add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
+  add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
 }
 
 void
@@ -1174,6 +1176,63 @@ Parser::parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
   return false;
+}
+
+bool
+Parser::parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  //id (('.'|' ') id)*
+
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"fun")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  expect_no_advance(current, end, U"id", TOKEN_ID);
+
+  FnDecl decl;
+
+  decl.name = get<u32string>(current->getValue());
+  ++current;
+
+  bool readingFun = true;
+
+  while (readingFun)
+  {
+    if (*current == TOKEN_ID)
+    {
+      decl.args.push_back(std::make_pair(FnDecl::ArgType::CALL_BY_NAME,
+        get<u32string>(current->getValue())));
+      ++current;
+    }
+    else if (*current == TOKEN_DOT)
+    {
+      ++current;
+      expect_no_advance(current, end, U"id", TOKEN_ID);
+      decl.args.push_back(std::make_pair(FnDecl::ArgType::CALL_BY_VALUE,
+        get<u32string>(current->getValue())));
+    }
+    else
+    {
+      readingFun = false;
+    }
+  }
+
+  parse_tuple(current, end, decl.guard, SEPARATOR_COLON);
+
+  expect(current, end, U"=", TOKEN_EQUALS);
+
+  expect(current, end, decl.expr, U"expr", &Parser::parse_expr);
+
+  begin = current;
+
+  result = std::move(decl);
+
+  return true;
 }
 
 Token

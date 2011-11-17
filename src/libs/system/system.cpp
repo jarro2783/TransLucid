@@ -484,6 +484,12 @@ namespace detail
       return Constant();
     }
 
+    Constant
+    operator()(const Parser::FnDecl& fn)
+    {
+      return m_system.addFunction(fn);
+    }
+
     private:
     System& m_system;
     bool m_verbose;
@@ -606,6 +612,7 @@ System::init_equations()
   addDecl(*this, U"infixr", U"DECLID");
   addDecl(*this, U"infixn", U"DECLID");
   addDecl(*this, U"data", U"DECLID");
+  addDecl(*this, U"fun", U"DECLID");
 
   //add PRINT="this type has no printer"
   addInitEqn(*this,
@@ -1194,6 +1201,19 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows)
     tows.getAllScopeOdometer().begin(), tows.getAllScopeOdometer().end());
 
   return wstree;
+}
+
+Constant
+System::addFunction(const Parser::FnDecl& fn)
+{
+  if (fn.args.size() == 0)
+  {
+    //lookup an already added function
+  }
+  else
+  {
+    //add a new one or an existing one but the args must match
+  }
 }
 
 } //namespace TransLucid

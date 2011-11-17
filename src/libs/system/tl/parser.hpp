@@ -140,6 +140,10 @@ namespace TransLucid
         Line& result);
 
       bool
+      parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
       parse_data_constructor(LexerIterator& begin, const LexerIterator& end,
         DataConstructor& result);
 

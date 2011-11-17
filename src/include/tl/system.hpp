@@ -48,6 +48,7 @@ namespace TransLucid
   namespace Parser
   {
     class Parser;
+    class FnDecl;
   }
 
   class StreamPosIterator;
@@ -130,6 +131,9 @@ namespace TransLucid
 
     Constant
     addAssignment(const Parser::Equation& eqn);
+
+    Constant
+    addFunction(const Parser::FnDecl& fn);
 
     Constant 
     addDimension(const u32string& dimension);

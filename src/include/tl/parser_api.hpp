@@ -59,6 +59,20 @@ namespace TransLucid
     typedef Declaration<DECL_OUTPUT> OutputDecl;
     typedef Declaration<DECL_INPUT> InputDecl;
 
+    struct FnDecl
+    {
+      enum class ArgType
+      {
+        CALL_BY_VALUE,
+        CALL_BY_NAME
+      };
+
+      u32string name;
+      std::vector<std::pair<ArgType, u32string>> args;
+      Tree::Expr guard;
+      Tree::Expr expr;
+    };
+
     struct DimensionDecl
     {
       DimensionDecl() = default;
@@ -110,7 +124,8 @@ namespace TransLucid
       LibraryDecl,
       OutputDecl,
       InputDecl,
-      DataType
+      DataType,
+      FnDecl
     > Line;
   }
 
