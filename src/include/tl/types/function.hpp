@@ -184,18 +184,34 @@ namespace TransLucid
     public:
     NameFunctionType
     (
+      System* system,
       const u32string& name, 
       dimension_index argDim, 
       dimension_index odometerDim, 
       const std::vector<dimension_index>& scope,
+      const std::vector<std::pair<u32string, dimension_index>>& free,
       WS* expr,
-      const Context& k
+      Context& k
     )
     : m_name(name), m_argDim(argDim), m_odometerDim(odometerDim), m_expr(expr)
     {
       for (auto d : scope)
       {
         m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      System::IdentifierLookup idents = system->lookupIdentifiers();
+
+      //evaluate all of the free variables
+      for (const auto& v : free)
+      {
+        auto var = idents.lookup(v.first);
+        Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
+          : (*idents.lookup(v.first))(k);
+
+        m_scopeDims.push_back(std::make_pair(
+          v.second, value
+        ));
       }
     }
 

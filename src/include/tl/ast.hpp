@@ -613,6 +613,9 @@ namespace TransLucid
       dimension_index argDim;
       dimension_index odometerDim;
       std::vector<dimension_index> scope;
+
+      //the free variables to evaluate
+      std::vector<std::pair<u32string, dimension_index>> free;
     };
 
     /**

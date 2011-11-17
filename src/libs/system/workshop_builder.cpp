@@ -241,10 +241,12 @@ WorkshopBuilder::operator()(const Tree::PhiExpr& e)
 
   return new Workshops::NamedAbstractionWS
   (
+    m_system,
     e.name,
     e.argDim,
     e.odometerDim,
     e.scope,
+    e.free,
     rhs
   );
 }

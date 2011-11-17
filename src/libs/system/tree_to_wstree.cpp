@@ -336,7 +336,10 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   //5. add a new equation name = args @ [stuff]
   //6. restore the scope
 
-  Tree::PhiExpr expr = e;
+  FreeVariableReplacer replacer(*m_system);
+  Tree::PhiExpr expr = get<Tree::PhiExpr>(replacer.replaceFree(e));
+
+  auto& replaced = replacer.getReplaced();
 
   //1. generate new dimensions
   dimension_index argDim = m_system->nextHiddenDim();
@@ -352,12 +355,19 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   m_scope.push_back(argDim);
   m_scope.push_back(odometerDim);
 
+
+  //add the dimensions to replace with to the scope
+  for (const auto& r : replaced)
+  {
+    m_scope.push_back(r.second);
+  }
+
   //also the all scope
   m_namedAllScopeArgs.push_back(argDim);
   m_namedAllScopeOdometers.push_back(odometerDim);
 
   //4. visit the child
-  expr.rhs = apply_visitor(*this, e.rhs);
+  expr.rhs = apply_visitor(*this, expr.rhs);
 
   //5. add a new equation name = args @ [stuff]
   m_newVars.push_back(Parser::Equation
@@ -383,9 +393,10 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   ));
 
   //6. restore the scope
-  //we have two things to restore, the odometer and the arg
-  m_scope.pop_back();
-  m_scope.pop_back();
+  //we have two things to restore, the odometer and the two args
+  m_scope.resize(m_scope.size() - replaced.size() - 2);
+
+  expr.free = std::move(replaced);
 
   return expr;
 }

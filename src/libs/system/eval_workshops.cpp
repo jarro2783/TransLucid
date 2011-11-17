@@ -455,10 +455,12 @@ NamedAbstractionWS::operator()(Context& k)
   (
     NameFunctionType
     (
+      m_system,
       m_name,
       m_argDim,
       m_odometerDim,
       m_scope,
+      m_free,
       m_rhs, 
       k
     )

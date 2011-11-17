@@ -718,7 +718,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     {
       LexerIterator current = begin;
       ++current;
-      parse_function(current, end, result, TOKEN_SLASH);
+      parse_function(current, end, result, TOKEN_DBLSLASH);
       begin = current;
     }
     break;
