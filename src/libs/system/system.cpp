@@ -52,6 +52,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/builtin_types.hpp>
 #include <tl/constws.hpp>
 #include <tl/context.hpp>
+#include <tl/eval_workshops.hpp>
 #include <tl/function_registry.hpp>
 #include <tl/output.hpp>
 #include <tl/parser.hpp>
@@ -634,6 +635,7 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
   }
 }
 
+//TODO this type registry stuff should go somewhere that is easier to find
 System::System()
 : m_typeRegistry(m_nextTypeIndex,
   std::vector<std::pair<u32string, type_index>>{
@@ -645,7 +647,9 @@ System::System()
    {U"dim", TYPE_INDEX_DIMENSION},
    {U"tuple", TYPE_INDEX_TUPLE},
    {U"typetype", TYPE_INDEX_TYPE},
-   {U"range", TYPE_INDEX_RANGE}
+   {U"range", TYPE_INDEX_RANGE},
+   {U"lambda", TYPE_INDEX_VALUE_FUNCTION},
+   {U"phi", TYPE_INDEX_NAME_FUNCTION},
   }
   )
 , m_time(0)
@@ -1210,26 +1214,98 @@ System::addFunction(const Parser::FnDecl& fn)
   auto iter = m_fndecls.find(fn.name);
 
   ConditionalBestfitWS* fnws = nullptr;
+  TreeToWSTree tows(this);
+  WorkshopBuilder compile(this);
 
   if (iter == m_fndecls.end())
   {
+    if (fn.args.size() == 0)
+    {
+      //error
+      return Types::Special::create(SP_CONST);
+    }
     //add a new one
-    fnws = new ConditionalBestfitWS;
+    fnws = new ConditionalBestfitWS(fn.name);
 
     m_fndecls.insert(std::make_pair(fn.name, 
       std::make_pair(fnws, std::vector<Parser::FnDecl>())));
 
     //create a new equation for this thing
-    addEquation(fn.name, fnws);
+    //build up the parameters and end with fnws
+
+    Tree::Expr abstractions;
+    for (auto iter = fn.args.rbegin(); iter != fn.args.rend(); ++iter)
+    {
+      if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
+      {
+        abstractions = Tree::LambdaExpr(iter->second, std::move(abstractions));
+      }
+      else
+      {
+        abstractions = Tree::PhiExpr(iter->second, std::move(abstractions));
+      }
+    }
+
+    Tree::Expr absexpr = toWSTreePlusExtras(abstractions, tows);
+    WS* absws = compile.build_workshops(absexpr);
+
+    //go through the workshops and stick fnws at the end
+    WS* current = absws;
+    
+    //there can't possibly be zero arguments so this is safe
+    auto iterAhead = fn.args.begin();
+    auto iter = fn.args.begin();
+    ++iterAhead;
+
+    while (true)
+    {
+      if (iterAhead == fn.args.end())
+      {
+        //we're on the last one
+        if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
+        {
+          dynamic_cast<Workshops::LambdaAbstractionWS*>
+            (current)->set_rhs(fnws);
+        }
+        else
+        {
+          dynamic_cast<Workshops::NamedAbstractionWS*>
+            (current)->set_rhs(fnws);
+        }
+        break;
+      }
+      else
+      {
+        if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
+        {
+          current = dynamic_cast<Workshops::LambdaAbstractionWS*>
+            (current)->rhs();
+        }
+        else
+        {
+          current = dynamic_cast<Workshops::NamedAbstractionWS*>
+            (current)->rhs();
+        }
+      }
+
+      ++iter;
+      ++iterAhead;
+    }
+
+    addEquation(fn.name, absws);
+
+    std::cerr << "adding function abstraction:" << std::endl;
+    std::cerr << Printer::print_expr_tree(absexpr) << std::endl;
   }
   else
   {
-    //match with an existing one
     if (fn.args.size() != 0 && fn.args != iter->second.second.front().args)
     {
       //error
+      return Types::Special::create(SP_CONST);
     }
-
+    //either it has no args or its args match, so we can continue
+    //get the existing one
     fnws = iter->second.first;
   }
 
@@ -1237,8 +1313,37 @@ System::addFunction(const Parser::FnDecl& fn)
   //to a ConditionalBestfitWS, so add it to the system
 
   //compile the expression
+  //TODO I can probably remove this duplication
+  Tree::Expr guard = toWSTreePlusExtras(fn.guard, tows);
+  Tree::Expr expr = toWSTreePlusExtras(fn.expr, tows);
+
+  std::cerr << "adding function definition:" << std::endl;
+  std::cerr << Printer::print_expr_tree(guard) 
+            << " -> " 
+            << Printer::print_expr_tree(expr)
+            << std::endl;
+
+  WS* gws = compile.build_workshops(guard);
+  WS* ews = compile.build_workshops(expr);
 
   //add it as an equation to the conditional
+  std::cerr << "adding function equation" << std::endl;
+  uuid u = fnws->addEquation(fn.name, GuardWS(gws, nullptr), ews, m_time);
+
+  //add all the new equations
+  //more duplication
+  for (const auto& e : tows.newVars())
+  {
+    addDeclInternal(
+      std::get<0>(e),
+      GuardWS(compile.build_workshops(std::get<1>(e)),
+        compile.build_workshops(std::get<2>(e))),
+      compile.build_workshops(std::get<3>(e)),
+      m_equations
+    );
+  }
+
+  return Types::UUID::create(u);
 }
 
 } //namespace TransLucid

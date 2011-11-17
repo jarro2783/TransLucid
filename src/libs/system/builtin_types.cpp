@@ -1108,6 +1108,8 @@ init_builtin_types(System& s)
 
   std::vector<u32string> type_names = to_print_types;
   type_names.push_back(U"ustring");
+  type_names.push_back(U"lambda");
+  type_names.push_back(U"phi");
     
   //add all of the literals (LITERAL ... =)
   add_builtin_literals(s, type_names);

@@ -634,6 +634,19 @@ namespace TransLucid
         delete m_rhs;
       }
 
+      void
+      set_rhs(WS* rhs)
+      {
+        delete m_rhs;
+        m_rhs = rhs;
+      }
+
+      WS*
+      rhs() const
+      {
+        return m_rhs;
+      }
+
       /**
        * Evaluates the abstraction.
        * Creates a call-by-value abstraction.
@@ -730,6 +743,19 @@ namespace TransLucid
       ~NamedAbstractionWS()
       {
         delete m_rhs;
+      }
+
+      void
+      set_rhs(WS* rhs)
+      {
+        delete m_rhs;
+        m_rhs = rhs;
+      }
+
+      WS*
+      rhs() const
+      {
+        return m_rhs;
       }
 
       /**

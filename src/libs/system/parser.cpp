@@ -1215,6 +1215,7 @@ Parser::parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
       expect_no_advance(current, end, U"id", TOKEN_ID);
       decl.args.push_back(std::make_pair(FnDecl::ArgType::CALL_BY_VALUE,
         get<u32string>(current->getValue())));
+      ++current;
     }
     else
     {

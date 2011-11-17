@@ -286,8 +286,36 @@ namespace TransLucid
   class ConditionalBestfitWS : public WS
   {
     public:
+    template <typename String, typename Enable = 
+      std::enable_if<std::is_same<String, u32string>::value>
+    >
+    ConditionalBestfitWS(String&& name)
+    {
+      m_var = new VariableWS(name + U"_fn_conditional");
+    }
+
+    ConditionalBestfitWS(const ConditionalBestfitWS&) = delete;
+    ConditionalBestfitWS(ConditionalBestfitWS&) = delete;
+
+    ~ConditionalBestfitWS()
+    {
+      delete m_var;
+    }
+
     Constant
     operator()(Context& k);
+
+    uuid
+    addEquation
+    (
+      const u32string& name, 
+      GuardWS guard, 
+      WS* e, 
+      size_t time
+    )
+    {
+      return m_var->addEquation(name, guard, e, time);
+    }
 
     private:
     VariableWS *m_var;

@@ -501,6 +501,7 @@ EquationWS::del(size_t time)
 Constant
 ConditionalBestfitWS::operator()(Context& k)
 {
+  return (*m_var)(k);
 }
 
 }
