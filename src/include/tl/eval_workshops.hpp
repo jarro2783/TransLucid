@@ -825,9 +825,7 @@ namespace TransLucid
       std::vector<std::pair<WS*, WS*>> m_tuple;
       System& m_system;
     };
-
   }
-
 }
 
 #endif // SET_EVALUATOR_HPP_INCLUDED

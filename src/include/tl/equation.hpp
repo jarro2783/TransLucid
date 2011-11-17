@@ -282,6 +282,16 @@ namespace TransLucid
     BestFittable m_bestFit;
     CompileBestFit *m_compileBestFit;
   };
+
+  class ConditionalBestfitWS : public WS
+  {
+    public:
+    Constant
+    operator()(Context& k);
+
+    private:
+    VariableWS m_var;
+  };
 };
 
 #endif // EQUATION_HPP_INCLUDED

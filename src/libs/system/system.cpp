@@ -1206,14 +1206,38 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows)
 Constant
 System::addFunction(const Parser::FnDecl& fn)
 {
+  //first try to find the function
+  auto iter = m_fndecls.find(fn.name);
+
   if (fn.args.size() == 0)
   {
     //lookup an already added function
+    if (iter == m_fndecls.end())
+    {
+      //error
+    }
+    else
+    {
+    }
   }
   else
   {
     //add a new one or an existing one but the args must match
+    if (iter == m_fndecls.end())
+    {
+      //add a new one
+    }
+    else
+    {
+      //check that the arguments are the same
+    }
   }
+
+  //if we get here then we have a valid function, and a valid pointer
+  //to a ConditionalBestfitWS, so add it to the system
+  //compile the expression
+
+  //add it as an equation to the conditional
 }
 
 } //namespace TransLucid

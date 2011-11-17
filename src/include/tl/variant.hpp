@@ -190,10 +190,79 @@ namespace TransLucid
     }
   }
 
+  template 
+  <
+    typename Internal,
+    typename T, 
+    typename Storage, 
+    typename Visitor, 
+    typename... Args
+  >
+  typename Visitor::result_type
+  visitor_caller(Internal&& internal, 
+    Storage&& storage, Visitor&& visitor, Args&&... args)
+  {
+    typedef typename std::conditional
+    <
+      //std::is_const<typename std::remove_extent<Storage>::type>::value,
+      std::is_const<
+        typename std::remove_extent<
+          typename std::remove_reference<Storage>::type>::type
+      >::value,
+      const T,
+      T
+    >::type ConstType;
+
+    return visitor(detail::get_value(*reinterpret_cast<ConstType*>(storage), 
+      internal));
+  }
+
   template <typename First, typename... Types>
   class Variant
   {
     private:
+
+    template <typename... AllTypes>
+    struct do_visit
+    {
+      template 
+      <
+        typename Internal, 
+        typename VoidPtrCV, 
+        typename Visitor, 
+        typename... Args
+      >
+      typename Visitor::result_type
+      operator()
+      (
+        Internal&& internal,
+        size_t which, 
+        VoidPtrCV&& storage, 
+        Visitor& visitor, 
+        Args&&... args
+      )
+      {
+        typedef typename Visitor::result_type (*whichCaller)
+          (Internal&&, VoidPtrCV&&, Visitor&&, Args&&...);
+
+        static whichCaller callers[sizeof...(AllTypes)] =
+          {
+            &visitor_caller<Internal&&, AllTypes,
+              VoidPtrCV&&, Visitor, Args&&...>...
+          }
+        ;
+
+        assert(which >= 0 && which < sizeof...(AllTypes));
+
+        return (*callers[which])
+          (
+            std::forward<Internal>(internal),
+            std::forward<VoidPtrCV>(storage), 
+            std::forward<Visitor>(visitor), 
+            std::forward<Args>(args)...
+          );
+      }
+    };
 
     template <typename T>
     struct Sizeof
@@ -463,14 +532,17 @@ namespace TransLucid
     typename Visitor::result_type
     apply_visitor(Visitor& visitor)
     {
-      return detail::visit_impl<Internal, Visitor, void*, First, Types...>(
-        visitor, m_which, 0, m_storage);
+      //return detail::visit_impl<Internal, Visitor, void*, First, Types...>(
+      //  visitor, m_which, 0, m_storage);
+      return do_visit<First, Types...>()(Internal(), m_which, m_storage,
+        visitor);
     }
 
     template <typename Visitor, typename Internal = false_>
     typename Visitor::result_type
     apply_visitor(Visitor& visitor) const
     {
+      #if 0
       return detail::visit_impl
         <
           Internal, 
@@ -479,6 +551,9 @@ namespace TransLucid
           First, 
           Types...
         >(visitor, m_which, 0, m_storage);
+      #endif
+      return do_visit<First, Types...>()(Internal(), m_which, m_storage,
+        visitor);
     }
 
     private:
@@ -505,6 +580,7 @@ namespace TransLucid
     typename Visitor::result_type
     apply_visitor_internal(Visitor& visitor)
     {
+      //return visitor<First, Types...>()(true_(), visitor);
       return apply_visitor<Visitor, true_>(visitor);
     }
 

@@ -34,6 +34,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/equation.hpp>
 #include <tl/function_registry.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
 
@@ -300,6 +301,10 @@ namespace TransLucid
     //input and output hd declarations, for now just have the valid range
     std::unordered_map<u32string, Tuple> m_outputHDDecls;
     std::unordered_map<u32string, Tuple> m_inputHDDecls;
+
+    //functions
+    std::unordered_map<u32string, 
+      std::pair<ConditionalBestfitWS, std::vector<Parser::FnDecl>>> m_fndecls;
 
     //---- the sets of all the uuids of objects ----
 

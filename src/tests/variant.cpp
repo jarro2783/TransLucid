@@ -40,7 +40,7 @@ struct Multiply
   int b;
 };
 
-struct Visitor
+struct TestVisitor
 {
   typedef int result_type;
 
@@ -67,14 +67,14 @@ TEST_CASE ( "basic variant", "does the variant basic functionality work" )
 {
   var a(Sum{2,2});
 
-  CHECK(TransLucid::apply_visitor(Visitor(), a) == 4);
+  CHECK(TransLucid::apply_visitor(TestVisitor(), a) == 4);
 
   var b = a;
-  CHECK(TransLucid::apply_visitor(Visitor(), b) == 4);
+  CHECK(TransLucid::apply_visitor(TestVisitor(), b) == 4);
 
   var c;
   c = b;
-  CHECK(TransLucid::apply_visitor(Visitor(), c) == 4);
+  CHECK(TransLucid::apply_visitor(TestVisitor(), c) == 4);
 }
 
 TEST_CASE ("variant move semantics", 
@@ -82,10 +82,10 @@ TEST_CASE ("variant move semantics",
 {
   var a{var{Sum{5,10}}};  
 
-  CHECK(TransLucid::apply_visitor(Visitor(), a) == 15);
+  CHECK(TransLucid::apply_visitor(TestVisitor(), a) == 15);
 
   a = var{Multiply{3,4}};
-  CHECK(TransLucid::apply_visitor(Visitor(), a) == 12);
+  CHECK(TransLucid::apply_visitor(TestVisitor(), a) == 12);
 }
 
 TEST_CASE( "variant get", "the variant get function")

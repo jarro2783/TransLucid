@@ -4,7 +4,6 @@ set(RUN ${CMAKE_SOURCE_DIR}/src/tests/runbinary.sh)
 set(LIBDIR ${CMAKE_BINARY_DIR}/src/libs/int)
 set(BINDIR .)
 
-link_libraries(tlsystem ${TLLIBS} ${Boost_LIBRARIES})
 add_definitions(${TLCFLAGS})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/system)
@@ -19,6 +18,11 @@ add_executable(variant variant.cpp)
 add_executable(parser parser.cpp)
 add_executable(system system.cpp)
 add_executable(uuid uuid.cpp)
+
+target_link_libraries(system tlsystem ${TLLIBS})
+target_link_libraries(parser tlsystem ${TLLIBS})
+target_link_libraries(variant ${TLLIBS})
+target_link_libraries(uuid ${TLLIBS})
 
 #add_test(iterator ./iterator)
 #add_test(printing ./printing)

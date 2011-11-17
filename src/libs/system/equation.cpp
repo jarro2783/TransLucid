@@ -498,4 +498,9 @@ EquationWS::del(size_t time)
   //m_validContext.setTimeEnd(time);
 }
 
+Constant
+ConditionalBestfitWS::operator()(Context& k)
+{
+}
+
 }
