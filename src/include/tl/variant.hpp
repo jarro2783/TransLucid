@@ -214,7 +214,7 @@ namespace TransLucid
     >::type ConstType;
 
     return visitor(detail::get_value(*reinterpret_cast<ConstType*>(storage), 
-      internal));
+      internal), std::forward<Args>(args)...);
   }
 
   template <typename First, typename... Types>
@@ -528,19 +528,19 @@ namespace TransLucid
 
     int which() const {return m_which;}
 
-    template <typename Visitor, typename Internal = false_>
+    template <typename Internal, typename Visitor, typename... Args>
     typename Visitor::result_type
-    apply_visitor(Visitor& visitor)
+    apply_visitor(Visitor& visitor, Args&&... args)
     {
       //return detail::visit_impl<Internal, Visitor, void*, First, Types...>(
       //  visitor, m_which, 0, m_storage);
       return do_visit<First, Types...>()(Internal(), m_which, m_storage,
-        visitor);
+        visitor, std::forward<Args>(args)...);
     }
 
-    template <typename Visitor, typename Internal = false_>
+    template <typename Internal, typename Visitor, typename... Args>
     typename Visitor::result_type
-    apply_visitor(Visitor& visitor) const
+    apply_visitor(Visitor& visitor, Args&&... args) const
     {
       #if 0
       return detail::visit_impl
@@ -553,7 +553,7 @@ namespace TransLucid
         >(visitor, m_which, 0, m_storage);
       #endif
       return do_visit<First, Types...>()(Internal(), m_which, m_storage,
-        visitor);
+        visitor, std::forward<Args>(args)...);
     }
 
     private:
@@ -581,14 +581,14 @@ namespace TransLucid
     apply_visitor_internal(Visitor& visitor)
     {
       //return visitor<First, Types...>()(true_(), visitor);
-      return apply_visitor<Visitor, true_>(visitor);
+      return apply_visitor<true_, Visitor>(visitor);
     }
 
     template <typename Visitor>
     typename Visitor::result_type
     apply_visitor_internal(Visitor& visitor) const
     {
-      return apply_visitor<Visitor, true_>(visitor);
+      return apply_visitor<true_, Visitor>(visitor);
     }
 
     void
@@ -639,14 +639,16 @@ namespace TransLucid
   typename Visitor::result_type
   apply_visitor(Visitor& visitor, Visitable& visitable, Args&&... args)
   {
-    return visitable.apply_visitor(visitor, std::forward<Args>(args)...);
+    return visitable.apply_visitor<false_>
+      (visitor, std::forward<Args>(args)...);
   }
 
   template <typename Visitor, typename Visitable, typename... Args>
   typename Visitor::result_type
   apply_visitor(const Visitor& visitor, Visitable& visitable, Args&&... args)
   {
-    return visitable.apply_visitor(visitor, std::forward<Args>(args)...);
+    return visitable.apply_visitor<false_>
+      (visitor, std::forward<Args>(args)...);
   }
 
   template <typename T, typename First, typename... Types>

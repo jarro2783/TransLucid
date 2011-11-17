@@ -131,3 +131,30 @@ TEST_CASE( "recursive_wrapper", "the variant with recursive wrapper" )
   const auto& stored = TransLucid::get<Link>(b);
   CHECK(stored.x == "goodbye");
 }
+
+class ArgsVisitor
+{
+  public:
+  typedef int result_type;
+
+  int
+  operator()(const Sum& s, int add)
+  {
+    return s.a + s.b + add;
+  }
+
+  int
+  operator()(const Multiply& m, int factor)
+  {
+    return m.a * m.b * factor;
+  }
+};
+
+TEST_CASE( "args visitor", "visitor with several args")
+{
+  ArgsVisitor visit;
+
+  var a{Sum{1,2}};
+
+  CHECK(TransLucid::apply_visitor(visit, a, 5) == 8);
+}
