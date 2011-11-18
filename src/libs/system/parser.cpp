@@ -511,12 +511,15 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
           exprList.push_back(std::move(element));
 
           if (listIter->getType() != TOKEN_COMMA) { makingList = false; }
+          else { ++listIter; }
         }
 
-        expect(current, end, U")", TOKEN_RPAREN);
+        expect(listIter, end, U")", TOKEN_RPAREN);
 
         //build a host function with a list of arguments
         result = Tree::BangAppExpr(result, exprList);
+
+        current = listIter;
       }
       else
       {

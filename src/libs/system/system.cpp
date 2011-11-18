@@ -1400,8 +1400,8 @@ System::addFunction(const Parser::FnDecl& fn)
 
     addEquation(fn.name, absws);
 
-    std::cerr << "adding function abstraction:" << std::endl;
-    std::cerr << Printer::print_expr_tree(absexpr) << std::endl;
+    //std::cerr << "adding function abstraction:" << std::endl;
+    //std::cerr << Printer::print_expr_tree(absexpr) << std::endl;
   }
   else
   {
@@ -1424,35 +1424,35 @@ System::addFunction(const Parser::FnDecl& fn)
   //I need to rename in these two first somehow
   const auto& toRename = std::get<1>(iter->second);
 
-  std::cerr << "Renaming in function body:" << std::endl;
-  for (auto& p : toRename)
-  {
-    std::cerr << p.first << " -> " << p.second << std::endl;
-  }
+  //std::cerr << "Renaming in function body:" << std::endl;
+  //for (auto& p : toRename)
+  //{
+  //  std::cerr << p.first << " -> " << p.second << std::endl;
+  //}
 
   Tree::Expr guardFixed = fixupGuardArgs(fn.guard, std::get<2>(iter->second));
   Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
   Tree::Expr expr = toWSTreePlusExtras(fn.expr, tows, toRename);
 
-  std::cerr << "adding function definition:" << std::endl;
-  std::cerr << Printer::print_expr_tree(guard) 
-            << " -> " 
-            << Printer::print_expr_tree(expr)
-            << std::endl;
+  //std::cerr << "adding function definition:" << std::endl;
+  //std::cerr << Printer::print_expr_tree(guard) 
+  //          << " -> " 
+  //          << Printer::print_expr_tree(expr)
+  //          << std::endl;
 
   WS* gws = compile.build_workshops(guard);
   WS* ews = compile.build_workshops(expr);
 
   //add it as an equation to the conditional
-  std::cerr << "adding function equation" << std::endl;
+  //std::cerr << "adding function equation" << std::endl;
   uuid u = fnws->addEquation(fn.name, GuardWS(gws, nullptr), ews, m_time);
 
   //add all the new equations
   //more duplication
   for (const auto& e : tows.newVars())
   {
-    std::cerr << "adding extra equation:" << std::endl;
-    std::cerr << Printer::printEquation(e) << std::endl;
+    //std::cerr << "adding extra equation:" << std::endl;
+    //std::cerr << Printer::printEquation(e) << std::endl;
     addDeclInternal(
       std::get<0>(e),
       GuardWS(compile.build_workshops(std::get<1>(e)),
