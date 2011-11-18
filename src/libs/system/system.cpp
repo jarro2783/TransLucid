@@ -1190,10 +1190,12 @@ System::addInputHyperdaton
   }
 }
 
+template <typename... Renames>
 Tree::Expr
-System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows)
+System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows, 
+  Renames&&... renames)
 {
-  Tree::Expr wstree = tows.toWSTree(e);
+  Tree::Expr wstree = tows.toWSTree(e, renames...);
 
   //The L_in dims are set to 0 in the default context
   m_Lin.insert(m_Lin.end(), tows.getLin().begin(), tows.getLin().end());
@@ -1205,6 +1207,95 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows)
     tows.getAllScopeOdometer().begin(), tows.getAllScopeOdometer().end());
 
   return wstree;
+}
+
+//the two trees must be identical abstractions except for parameter names
+//makes a rename map from the difference
+//rename_dims is a map from the lhs name to the rhs dimension
+void
+findRenamedParams(const Tree::Expr& original, const Tree::Expr& renamed,
+  RenameIdentifiers::RenameRules& renames,
+  std::map<u32string, dimension_index>& rename_dims
+)
+{
+  const Tree::Expr* lhsexpr = &original;
+  const Tree::Expr* rhsexpr = &renamed;
+
+  bool done = false;
+  while (!done)
+  {
+    const Tree::LambdaExpr* lhslambda = get<Tree::LambdaExpr>(lhsexpr);
+
+    if (lhslambda != nullptr)
+    {
+      const Tree::LambdaExpr& rhslambda = get<Tree::LambdaExpr>(*rhsexpr);
+      renames.insert(std::make_pair(lhslambda->name, rhslambda.name));
+      rename_dims.insert(std::make_pair(lhslambda->name, rhslambda.argDim));
+
+      lhsexpr = &lhslambda->rhs;
+      rhsexpr = &rhslambda.rhs;
+    }
+    else
+    {
+      const Tree::PhiExpr* lhsphi = get<Tree::PhiExpr>(lhsexpr);
+      if (lhsphi != nullptr)
+      {
+        const Tree::PhiExpr& rhsphi = get<Tree::PhiExpr>(*rhsexpr);
+        renames.insert(std::make_pair(lhsphi->name, rhsphi.name));
+        rename_dims.insert(std::make_pair(lhsphi->name, rhsphi.argDim));
+        
+        lhsexpr = &lhsphi->rhs;
+        rhsexpr = &rhsphi.rhs;
+      }
+      else
+      {
+        done = true;
+      }
+    }
+  }
+
+}
+
+Tree::Expr
+fixupGuardArgs(const Tree::Expr& guard,
+  const std::map<u32string, dimension_index>& rewrites
+)
+{
+  //first check if it is nil
+  const Tree::nil* n = get<Tree::nil>(&guard);
+  if (n != nullptr)
+  {
+    return guard;
+  }
+
+  //the guard must be a tuple
+  const Tree::TupleExpr& tuple = get<Tree::TupleExpr>(guard);
+
+  decltype(tuple.pairs) rewritten;
+
+  for (auto& p : tuple.pairs)
+  {
+    const Tree::IdentExpr* id = get<Tree::IdentExpr>(&p.first);
+    if (id != nullptr)
+    {
+      auto iter = rewrites.find(id->text);
+      if (iter != rewrites.end())
+      {
+        rewritten.push_back(std::make_pair(
+          Tree::DimensionExpr(iter->second), p.second));
+      }
+      else
+      {
+        rewritten.push_back((p));
+      }
+    }
+    else
+    {
+      rewritten.push_back((p));
+    }
+  }
+
+  return Tree::TupleExpr{rewritten};
 }
 
 Constant
@@ -1227,9 +1318,6 @@ System::addFunction(const Parser::FnDecl& fn)
     //add a new one
     fnws = new ConditionalBestfitWS(fn.name);
 
-    m_fndecls.insert(std::make_pair(fn.name, 
-      std::make_pair(fnws, std::vector<Parser::FnDecl>())));
-
     //create a new equation for this thing
     //build up the parameters and end with fnws
 
@@ -1246,13 +1334,31 @@ System::addFunction(const Parser::FnDecl& fn)
       }
     }
 
+    //need to save the renamed variables here somehow
     Tree::Expr absexpr = toWSTreePlusExtras(abstractions, tows);
+
+    RenameIdentifiers::RenameRules renames; 
+    std::map<u32string, dimension_index> renamed_dims;
+
+    findRenamedParams(abstractions, absexpr, renames, renamed_dims);
+
+    iter = m_fndecls.insert(
+      std::make_pair(fn.name, 
+        std::make_tuple(
+          fnws, 
+          renames,
+          renamed_dims,
+          std::vector<Parser::FnDecl>()
+        )
+      )
+    ).first;
+
     WS* absws = compile.build_workshops(absexpr);
 
     //go through the workshops and stick fnws at the end
     WS* current = absws;
     
-    //there can't possibly be zero arguments so this is safe
+    //there can't possibly be zero arguments here so this is safe
     auto iterAhead = fn.args.begin();
     auto iter = fn.args.begin();
     ++iterAhead;
@@ -1299,14 +1405,15 @@ System::addFunction(const Parser::FnDecl& fn)
   }
   else
   {
-    if (fn.args.size() != 0 && fn.args != iter->second.second.front().args)
+    if (fn.args.size() != 0 && fn.args !=
+      std::get<3>(iter->second).front().args)
     {
       //error
       return Types::Special::create(SP_CONST);
     }
     //either it has no args or its args match, so we can continue
     //get the existing one
-    fnws = iter->second.first;
+    fnws = std::get<0>(iter->second);
   }
 
   //if we get here then we have a valid function, and a valid pointer
@@ -1314,8 +1421,18 @@ System::addFunction(const Parser::FnDecl& fn)
 
   //compile the expression
   //TODO I can probably remove this duplication
-  Tree::Expr guard = toWSTreePlusExtras(fn.guard, tows);
-  Tree::Expr expr = toWSTreePlusExtras(fn.expr, tows);
+  //I need to rename in these two first somehow
+  const auto& toRename = std::get<1>(iter->second);
+
+  std::cerr << "Renaming in function body:" << std::endl;
+  for (auto& p : toRename)
+  {
+    std::cerr << p.first << " -> " << p.second << std::endl;
+  }
+
+  Tree::Expr guardFixed = fixupGuardArgs(fn.guard, std::get<2>(iter->second));
+  Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
+  Tree::Expr expr = toWSTreePlusExtras(fn.expr, tows, toRename);
 
   std::cerr << "adding function definition:" << std::endl;
   std::cerr << Printer::print_expr_tree(guard) 
@@ -1334,6 +1451,8 @@ System::addFunction(const Parser::FnDecl& fn)
   //more duplication
   for (const auto& e : tows.newVars())
   {
+    std::cerr << "adding extra equation:" << std::endl;
+    std::cerr << Printer::printEquation(e) << std::endl;
     addDeclInternal(
       std::get<0>(e),
       GuardWS(compile.build_workshops(std::get<1>(e)),

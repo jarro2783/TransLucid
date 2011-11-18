@@ -36,19 +36,45 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-Tree::Expr
-TreeToWSTree::toWSTree(const Tree::Expr& expr)
+void
+TreeToWSTree::clear()
 {
   //clear everything because the object might be reused
   m_Lout.clear();
   m_Lin.clear();
   m_namedAllScopeArgs.clear();
   m_namedAllScopeOdometers.clear();
+}
 
-  //rename everything first
-  RenameIdentifiers rename(*m_system);
-
+template <typename... Args>
+Tree::Expr
+TreeToWSTree::rename(const Tree::Expr& expr, Args&&... args)
+{
+  RenameIdentifiers rename(*m_system, std::forward<Args>(args)...);
   Tree::Expr exprRenamed = rename.rename(expr);
+
+  m_lastRenamed = rename.takeLastRenamed();
+
+  return exprRenamed;
+}
+
+Tree::Expr
+TreeToWSTree::toWSTree(const Tree::Expr& expr)
+{
+  clear();
+
+  Tree::Expr exprRenamed = rename(expr);
+
+  return apply_visitor(*this, exprRenamed);
+}
+
+Tree::Expr
+TreeToWSTree::toWSTree(const Tree::Expr& expr, 
+  const RenameIdentifiers::RenameRules& initial)
+{
+  clear();
+
+  Tree::Expr exprRenamed = rename(expr, initial);
 
   return apply_visitor(*this, exprRenamed);
 }

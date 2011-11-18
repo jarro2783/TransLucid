@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_TREE_TO_WSTREE
 
 #include <tl/ast.hpp>
+#include <tl/rename.hpp>
 
 namespace TransLucid
 {
@@ -47,7 +48,11 @@ namespace TransLucid
 
     Tree::Expr
     toWSTree(const Tree::Expr& expr);
-    
+
+    Tree::Expr
+    toWSTree(const Tree::Expr& expr, 
+      const RenameIdentifiers::RenameRules& initial);
+
     Tree::Expr operator()(const Tree::nil& n);
     Tree::Expr operator()(bool b);
     Tree::Expr operator()(Special s);
@@ -92,7 +97,19 @@ namespace TransLucid
       return m_namedAllScopeOdometers;
     }
 
+    const RenameIdentifiers::RenameRules&
+    lastRename() const
+    {
+      return m_lastRenamed;
+    }
+
     private:
+
+    void clear();
+
+    template <typename... Args>
+    Tree::Expr
+    rename(const Tree::Expr& expr, Args&&... args);
 
     Tree::WhereExpr 
     renameWhereExpr(const Tree::WhereExpr& e);
@@ -107,6 +124,8 @@ namespace TransLucid
 
     std::vector<dimension_index> m_namedAllScopeArgs;
     std::vector<dimension_index> m_namedAllScopeOdometers;
+
+    RenameIdentifiers::RenameRules m_lastRenamed;
   };
 }
 

@@ -46,6 +46,7 @@ RenameIdentifiers::operator()(const Tree::IdentExpr& e)
 
   if (iter != m_rules.end())
   {
+    //record that we renamed something
     return Tree::IdentExpr(iter->second);
   }
   else

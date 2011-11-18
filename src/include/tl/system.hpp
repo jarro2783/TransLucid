@@ -286,8 +286,10 @@ namespace TransLucid
     void
     setDefaultContext();
 
+    template <typename... Renames>
     Tree::Expr
-    toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows);
+    toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
+      Renames&&... renames);
 
     DefinitionMap m_equations;
     DefinitionMap m_assignments;
@@ -303,8 +305,19 @@ namespace TransLucid
     std::unordered_map<u32string, Tuple> m_inputHDDecls;
 
     //functions
-    std::unordered_map<u32string, 
-      std::pair<ConditionalBestfitWS*, std::vector<Parser::FnDecl>>> m_fndecls;
+    //map from names to a tuple of
+    //(bestfitter, renamed arguments, args -> dim, definitions)
+    std::unordered_map
+    <
+      u32string, 
+      std::tuple
+      <
+        ConditionalBestfitWS*, 
+        std::map<u32string, u32string>,
+        std::map<u32string, dimension_index>,
+        std::vector<Parser::FnDecl>
+      >
+    > m_fndecls;
 
     //---- the sets of all the uuids of objects ----
 

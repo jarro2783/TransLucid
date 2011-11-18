@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifndef TL_RENAME_IDENTIFIERS_HPP_INCLUDED
+#define TL_RENAME_IDENTIFIERS_HPP_INCLUDED
+
 #include <unordered_map>
 
 #include <tl/ast.hpp>
@@ -102,6 +105,18 @@ namespace TransLucid
     u32string
     generateUnique(const u32string& suffix);
 
+    const RenameRules&
+    lastRenamed() const
+    {
+      return m_renamed;
+    }
+
+    RenameRules&&
+    takeLastRenamed()
+    {
+      return std::move(m_renamed);
+    }
+
     private:
 
     template <typename T>
@@ -114,6 +129,10 @@ namespace TransLucid
 
     RenameRules m_rules;
 
+    RenameRules m_renamed;
+
     System& m_system;
   };
 }
+
+#endif
