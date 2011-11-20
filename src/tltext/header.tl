@@ -19,6 +19,9 @@ infixl "||" "or" 20;;
 
 infixl ".." "range_construct" 0;;
 
+fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
+fun plus.a.b [a : ustring, b : ustring] = string_plus!(a,b);;
+
 //the print equations
 var PRINT_TLTEXT [arg0 : intmp]   = PRINT;;
 var PRINT_TLTEXT [arg0 : ustring] = "`" + PRINT + "`";;

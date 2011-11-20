@@ -122,6 +122,11 @@ namespace TransLucid
     Tuple m_k;
   };
 
+  //all the base functions that are function pointers in C++
+  class BuiltinBaseFunction : public BaseFunctionType
+  {
+  };
+
   class ValueFunctionType
   {
     public:
