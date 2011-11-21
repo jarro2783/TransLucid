@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/hyperdatons/arrayhd.hpp>
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>
+#include <tl/parser_api.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/string.hpp>
@@ -271,14 +272,22 @@ TLText::processExpressions(LineTokenizer& tokenizer)
           0, 0);
         Parser::StreamPosIterator posend;
 
-        Tree::Expr expr;
-        if (m_system.parseExpression(posbegin, posend, expr))
+        try
         {
-          if (m_verbose)
+          Tree::Expr expr;
+          if (m_system.parseExpression(posbegin, posend, expr))
           {
-            (*m_os) << Printer::print_expr_tree(expr) << std::endl;
+            if (m_verbose)
+            {
+              (*m_os) << Printer::print_expr_tree(expr) << std::endl;
+            }
+            exprs.push_back(expr);
           }
-          exprs.push_back(expr);
+        }
+        catch(TransLucid::ParseError& e)
+        //catch (std::exception& e)
+        {
+          (*m_error) << "error: " << e.what() << std::endl;
         }
       }
       break;

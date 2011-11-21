@@ -79,16 +79,16 @@ call_fn(Ret (T::*f)(Args...), T* t, Args&&... args)
 }
 
 u32string
-build_position_message(const LexerIterator& iter)
+build_position_message(const Position& pos)
 {
-  const Position& pos = iter.getPos();
   std::ostringstream os;
-  os << "At " << pos.file << ":" << pos.line << ":" << pos.character
+  os << "at " << pos.file << ":" << pos.line << ":" 
+     << pos.character
      << ": ";
   return utf8_to_utf32(os.str());
 }
 
-ExpectedToken::ExpectedToken(const LexerIterator& pos, 
+ExpectedToken::ExpectedToken(const Position& pos, 
   size_t token, const u32string& text)
 : ParseError(utf32_to_utf8(build_position_message(pos) + 
              U"expected `" + text + U"`"))
@@ -96,7 +96,7 @@ ExpectedToken::ExpectedToken(const LexerIterator& pos,
 {
 }
 
-ExpectedExpr::ExpectedExpr(const LexerIterator& pos, const u32string& text)
+ExpectedExpr::ExpectedExpr(const Position& pos, const u32string& text)
 : ParseError(utf32_to_utf8(build_position_message(pos) + U"expected " + text))
 {
 }
@@ -143,7 +143,7 @@ Parser::expect_no_advance(LexerIterator& begin, const LexerIterator& end,
 {
   if (begin == end || *begin != token)
   {
-    throw ExpectedToken(begin, token, message);
+    throw ExpectedToken(begin.getPos(), token, message);
   }
 }
 
@@ -173,7 +173,7 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
 
   if (!success)
   {
-    throw ExpectedExpr(begin, message);
+    throw ExpectedExpr(begin.getPos(), message);
   }
 
   begin = current;
@@ -1246,6 +1246,18 @@ Parser::nextToken(LexerIterator& begin)
 {
   ++begin;
   return *begin;
+}
+
+void
+LexerIterator::readOne()
+{
+  Token t = nextToken(*m_next, *m_end, *m_context, m_idents);
+
+  if (t != 0)
+  {
+    m_pos = m_stream->insert(m_pos, t);
+  }
+  //otherwise leave the stream at end
 }
 
 }

@@ -198,45 +198,6 @@ namespace TransLucid
 
       std::stack<DeclParsers*> m_which_decl;
     };
-
-    class ParseError : public std::exception
-    {
-      public:
-      ParseError(const std::string& message)
-      : m_message(message)
-      {}
-
-      const char*
-      what() const throw()
-      {
-        return m_message.c_str();
-      }
-
-      protected:
-      std::string m_message;
-    };
-
-    class ExpectedToken : public ParseError
-    {
-      public:
-      ExpectedToken(const LexerIterator& pos, 
-        size_t token, const u32string& text);
-
-      size_t
-      id() const
-      {
-        return m_token;
-      }
-
-      private:
-      size_t m_token;
-    };
-
-    class ExpectedExpr : public ParseError
-    {
-      public:
-      ExpectedExpr(const LexerIterator& pos, const u32string& text);
-    };
   }
 }
 

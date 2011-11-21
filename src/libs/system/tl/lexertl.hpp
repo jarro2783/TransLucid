@@ -39,16 +39,6 @@ namespace TransLucid
 {
   namespace Parser
   {
-    struct Position
-    {
-      u32string file;
-      int line;
-      int character;
-
-      U32Iterator begin;
-      U32Iterator end;
-    };
-
     struct nil {};
 
     typedef Variant
@@ -118,7 +108,7 @@ namespace TransLucid
       Context& context,
       System::IdentifierLookup& idents
     );
-
+    
     class LexerIterator
     {
       public:
@@ -213,16 +203,7 @@ namespace TransLucid
       }
 
       void
-      readOne()
-      {
-        Token t = nextToken(*m_next, *m_end, *m_context, m_idents);
-
-        if (t != 0)
-        {
-          m_pos = m_stream->insert(m_pos, t);
-        }
-        //otherwise leave the stream at end
-      }
+      readOne();
 
       TokenStreamPtr m_stream;
       TokenStream::iterator m_pos;

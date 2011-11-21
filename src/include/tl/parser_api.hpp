@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/ast.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
+#include <tl/system.hpp>
 
 /**
  * @file parser_api.hpp
@@ -127,6 +128,55 @@ namespace TransLucid
       DataType,
       FnDecl
     > Line;
+ 
+    struct Position
+    {
+      u32string file;
+      int line;
+      int character;
+
+      U32Iterator begin;
+      U32Iterator end;
+    };
+     
+    class ParseError : public std::exception
+    {
+      public:
+      ParseError(const std::string& message)
+      : m_message(message)
+      {}
+
+      const char*
+      what() const throw()
+      {
+        return m_message.c_str();
+      }
+
+      protected:
+      std::string m_message;
+    };
+
+    class ExpectedToken : public ParseError
+    {
+      public:
+      ExpectedToken(const Position& pos, 
+        size_t token, const u32string& text);
+
+      size_t
+      id() const
+      {
+        return m_token;
+      }
+
+      private:
+      size_t m_token;
+    };
+
+    class ExpectedExpr : public ParseError
+    {
+      public:
+      ExpectedExpr(const Position& pos, const u32string& text);
+    };
   }
 
   typedef std::pair<Parser::Equation, TranslatedEquation> PTEquation;
