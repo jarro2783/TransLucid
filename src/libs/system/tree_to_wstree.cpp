@@ -190,12 +190,22 @@ TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 Tree::Expr
 TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 {
+  //(e.op.op) . (e.lhs) . (e.rhs)
   //(FN2 ! (#arg0, #arg1))
   //  @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)]
 
   Tree::Expr elhs = apply_visitor(*this, e.lhs);
   Tree::Expr erhs = apply_visitor(*this, e.rhs);
 
+  Tree::Expr result = Tree::LambdaAppExpr
+  (
+    Tree::LambdaAppExpr(Tree::IdentExpr(e.op.op), e.lhs),
+    e.rhs
+  );
+
+  return apply_visitor(*this, result);
+
+  #if 0
   Tree::DimensionExpr arg0(U"arg0");
   Tree::DimensionExpr arg1(U"arg1");
 
@@ -220,6 +230,7 @@ TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
       }
     )
   );
+  #endif
 }
 
 Tree::Expr
@@ -307,6 +318,7 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   //6. restore the scope
 
   FreeVariableReplacer replacer(*m_system);
+  replacer.addBound(m_scopeNames);
   Tree::LambdaExpr expr = get<Tree::LambdaExpr>(replacer.replaceFree(e));
 
   auto& replaced = replacer.getReplaced();
@@ -320,6 +332,7 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
 
   //3. add ourselves to the scope
   m_scope.push_back(argDim);
+  m_scopeNames.push_back(e.name);
 
   //add the dimensions to replace with to the scope
   for (const auto& r : replaced)
@@ -363,6 +376,7 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   //6. restore the scope
 
   FreeVariableReplacer replacer(*m_system);
+  replacer.addBound(m_scopeNames);
   Tree::PhiExpr expr = get<Tree::PhiExpr>(replacer.replaceFree(e));
 
   auto& replaced = replacer.getReplaced();
@@ -378,9 +392,9 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   expr.odometerDim = odometerDim;
 
   //3. add ourselves to the scope
+  m_scopeNames.push_back(e.name);
   m_scope.push_back(argDim);
   m_scope.push_back(odometerDim);
-
 
   //add the dimensions to replace with to the scope
   for (const auto& r : replaced)
@@ -586,6 +600,8 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
 }
 
 //the free variable replacer code
+//whenever this is called everything has been renamed, so there is
+//no problem with name clashes
 
 Tree::Expr 
 FreeVariableReplacer::operator()(const Tree::IdentExpr& e)
@@ -638,17 +654,6 @@ FreeVariableReplacer::operator()(const Tree::WhereExpr& e)
 
   Tree::Expr expr = apply_visitor(*this, e.e);
   
-  //unbind them
-  for (const auto& dim : e.dims)
-  {
-    m_bound.insert(dim.first);
-  }
-
-  for (const auto& var : e.vars)
-  {
-    m_bound.insert(std::get<0>(var));
-  }
-
   Tree::WhereExpr where;
 
   where.e = e.e;
@@ -671,6 +676,17 @@ FreeVariableReplacer::operator()(const Tree::WhereExpr& e)
     ));
   }
   
+  //unbind them
+  for (const auto& dim : e.dims)
+  {
+    m_bound.erase(dim.first);
+  }
+
+  for (const auto& var : e.vars)
+  {
+    m_bound.erase(std::get<0>(var));
+  }
+
   return where;
 }
 

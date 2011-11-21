@@ -856,10 +856,12 @@ Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
 
   ++current;
 
-  expect(current, end, U"identifier", TOKEN_ID);
+  expect_no_advance(current, end, U"identifier", TOKEN_ID);
   //a name and an optional initialiser
 
-  u32string name = get<u32string>(begin->getValue());
+  u32string name = get<u32string>(current->getValue());
+
+  ++current;
 
   Tree::Expr init;
   if (*current == TOKEN_LARROW)

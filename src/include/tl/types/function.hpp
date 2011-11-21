@@ -122,9 +122,133 @@ namespace TransLucid
     Tuple m_k;
   };
 
+  namespace detail
+  {
+    template <size_t N, typename... Args>
+    struct make_const_func_n
+    {
+      //we generate 0--N, so we need to go from 0--(N-1)
+      typedef typename make_const_func_n<N-1, Args..., const Constant&>::type
+        type;
+    };
+
+    template <typename... Args>
+    struct make_const_func_n<0, Args...>
+    {
+      typedef Constant (*type)(Args...);
+    };
+
+    template <size_t N, size_t... Args>
+    struct n_args_caller : public n_args_caller<N-1, N, Args...>
+    {
+    };
+
+    template <size_t... Args>
+    struct n_args_caller<-1, Args...>
+    {
+      template <typename F>
+      Constant 
+      operator()(F f, const std::vector<Constant>& args)
+      {
+        return f(args.at(Args)...);
+      }
+    };
+
+    template <size_t N, typename F>
+    Constant 
+    call_n_args(F f, const std::vector<Constant>& args)
+    {
+      return n_args_caller<N-1>()(f, args);
+    }
+
+    template <size_t N>
+    struct apply_one_func
+    {
+      template <typename F>
+      Constant
+      operator()(F f, const Constant&)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+    };
+
+    template <>
+    struct apply_one_func<1>
+    {
+      template <typename F>
+      Constant
+      operator()(F f, const Constant& c)
+      {
+        return f(c);
+      }
+    };
+  }
+
   //all the base functions that are function pointers in C++
+  template <size_t NumArgs>
   class BuiltinBaseFunction : public BaseFunctionType
   {
+    public:
+
+    typedef typename detail::make_const_func_n<NumArgs>::type func_type;
+
+    constexpr BuiltinBaseFunction(func_type f)
+    : m_fn(f)
+    {
+    }
+
+    BuiltinBaseFunction*
+    cloneSelf() const
+    {
+      return new BuiltinBaseFunction(*this);
+    }
+
+    #if 0
+    template <typename E = typename std::enable_if<NumArgs == 1, void>::type>
+    Constant
+    apply_one_func
+    (
+      const Constant& c,
+      int = 0
+    ) const
+    {
+      return m_fn(c);
+    }
+
+    template <typename E = typename std::enable_if<NumArgs != 1, void>::type>
+    Constant
+    apply_one_func
+    (
+      const Constant& c,
+      float = 0.0
+    ) const
+    {
+      return Types::Special::create(SP_TYPEERROR);
+    }
+    #endif
+
+    Constant
+    applyFn(const Constant& c) const
+    {
+      if (NumArgs != 1)
+      {
+        return detail::apply_one_func<NumArgs>()(m_fn, c);
+      }
+    }
+
+    Constant
+    applyFn(const std::vector<Constant>& args) const
+    {
+      if (NumArgs != args.size())
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return detail::call_n_args<NumArgs>(m_fn, args);
+    }
+
+    private:
+    func_type m_fn;
   };
 
   class ValueFunctionType

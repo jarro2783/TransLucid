@@ -42,6 +42,16 @@ namespace TransLucid
     FreeVariableReplacer(System& system)
     : m_system(system) {}
 
+    template <typename Container>
+    void
+    addBound(const Container& c)
+    {
+      for (const auto& val : c)
+      {
+        m_bound.insert(val);
+      }
+    }
+
     const Replaced&
     getReplaced()
     {

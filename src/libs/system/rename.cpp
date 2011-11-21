@@ -123,6 +123,37 @@ RenameIdentifiers::operator()(const Tree::AtExpr& e)
   );
 }
 
+void
+RenameIdentifiers::makeVarUnique(RenameRules& newNames, RenameRules& shadowed, 
+  const u32string& original, const u32string& prefix)
+{
+  u32string unique;
+
+  auto newIter = newNames.find(original);
+  if (newIter != newNames.end())
+  {
+    unique = newIter->second;
+  }
+  else
+  {
+    unique = generateUnique(prefix);
+    newIter = newNames.insert(std::make_pair(original, unique)).first;
+    
+    //if it shadows an existing name, but we only care if it is the first
+    //time that we have seen this variable
+    auto rulesIter = m_rules.find(original);
+    if (rulesIter != m_rules.end())
+    {
+      shadowed.insert(*rulesIter);
+      rulesIter->second = unique;
+    }
+    else
+    {
+      m_rules.insert(*newIter);
+    }
+  }
+}
+
 Tree::Expr
 RenameIdentifiers::operator()(const Tree::WhereExpr& e)
 {
@@ -187,33 +218,10 @@ RenameIdentifiers::operator()(const Tree::WhereExpr& e)
   //care of it
   for (const auto& var : e.vars)
   {
-    u32string unique;
-    const u32string& original = std::get<0>(var);
-
-    auto newIter = newNames.find(original);
-    if (newIter != newNames.end())
-    {
-      unique = newIter->second;
-    }
-    else
-    {
-      unique = generateUnique(U"uniquevar");
-      newIter = newNames.insert(std::make_pair(original, unique)).first;
-      
-      //if it shadows an existing name, but we only care if it is the first
-      //time that we have seen this variable
-      auto rulesIter = m_rules.find(original);
-      if (rulesIter != m_rules.end())
-      {
-        shadowed.insert(*rulesIter);
-        rulesIter->second = unique;
-      }
-      else
-      {
-        m_rules.insert(*newIter);
-      }
-    }
+    makeVarUnique(newNames, shadowed, std::get<0>(var), U"uniquevar");
   }
+
+  //generate a new name for every dimension
 
   //then do some renaming
 

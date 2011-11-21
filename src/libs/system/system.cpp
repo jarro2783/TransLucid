@@ -1443,6 +1443,9 @@ System::addFunction(const Parser::FnDecl& fn)
   WS* gws = compile.build_workshops(guard);
   WS* ews = compile.build_workshops(expr);
 
+  //add the definition to the end of the vector of functions
+  std::get<3>(iter->second).push_back(fn);
+
   //add it as an equation to the conditional
   //std::cerr << "adding function equation" << std::endl;
   uuid u = fnws->addEquation(fn.name, GuardWS(gws, nullptr), ews, m_time);

@@ -20,6 +20,11 @@ infixl "||" "or" 20;;
 infixl ".." "range_construct" 0;;
 
 fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
+fun minus.a.b [a : intmp, b : intmp] = int_minus!(a,b);;
+fun times.a.b [a : intmp, b : intmp] = int_times!(a,b);;
+
+fun lte.a.b [a : intmp, b : intmp] = int_lte!(a,b);;
+
 fun plus.a.b [a : ustring, b : ustring] = string_plus!(a,b);;
 
 //the print equations

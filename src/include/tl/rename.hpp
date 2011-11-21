@@ -105,6 +105,11 @@ namespace TransLucid
     u32string
     generateUnique(const u32string& suffix);
 
+    //makes a unique name for dimensions and variables
+    void
+    makeVarUnique(RenameRules& newNames, RenameRules& shadowed, 
+      const u32string& name, const u32string& prefix);
+
     const RenameRules&
     lastRenamed() const
     {

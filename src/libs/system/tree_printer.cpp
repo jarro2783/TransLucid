@@ -510,7 +510,10 @@ class TreePrinterNew
     for (const auto& v : w.vars)
     {
       std::string var = Printer::printEquation(v);
+      m_os << var << ";;" << std::endl;
     }
+
+    m_os << "end" << std::endl;
 
     pp(')', Precedence::WHERE_CLAUSE);
   }

@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
+#include "tl/builtin_ops.hpp"
 #include <tl/equation.hpp>
 //#include <tl/hyperdatons/filehd.hpp>
 #include <tl/internal_strings.hpp>
@@ -42,6 +43,34 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/utility.hpp>
 
 #include <gmpxx.h>
+
+namespace TransLucid
+{
+  namespace
+  {
+    using namespace TransLucid::BuiltinOps;
+
+    BuiltinBaseFunction<2> integer_plus{&mpz_plus};
+    BuiltinBaseFunction<2> integer_minus{&mpz_minus};
+    BuiltinBaseFunction<2> integer_times{&mpz_times};
+    BuiltinBaseFunction<2> integer_lte{&mpz_lte};
+
+    struct BuiltinFunction
+    {
+      const char32_t* abstract_name;
+      const char32_t* op_name;
+      BaseFunctionType* fn;
+    };
+
+    constexpr BuiltinFunction fn_table[] =
+    {
+      {U"plus", U"int_plus", &integer_plus},
+      {U"minus", U"int_minus", &integer_minus},
+      {U"times", U"int_times", &integer_times},
+      {U"lte", U"int_lte", &integer_lte},
+    };
+  }
+}
 
 namespace std
 {
@@ -156,6 +185,10 @@ namespace TransLucid
     }
     ;
 
+  }
+
+  namespace BuiltinOps
+  {
     Constant
     mpz_plus(const Constant& a, const Constant& b)
     {
@@ -802,7 +835,29 @@ namespace TransLucid
         return get(lhs).ws() == get(rhs).ws();
       }
     }
+  }
 
+  namespace
+  {
+    //all this does is return a bang abstraction type object with the
+    //pointer that it is constructed with
+    class BangAbstractionWS : public WS
+    {
+      public:
+      constexpr BangAbstractionWS(BaseFunctionType* fn)
+      : m_fn(fn)
+      {
+      }
+
+      Constant
+      operator()(Context& k)
+      {
+        return Types::BaseFunction::create(*m_fn);
+      }
+
+      private:
+      BaseFunctionType* m_fn;
+    };
   }
 }
 
@@ -1064,6 +1119,21 @@ add_one_fun2
 }
 
 void
+add_base_functions(System& s)
+{
+  for (const auto& fn : fn_table)
+  {
+    std::unique_ptr<BangAbstractionWS> 
+      op(new BangAbstractionWS(fn.fn->clone()));
+
+    //add equation fn.op_name = bang abstraction workshop with fn.fn
+    s.addEquation(fn.op_name, op.get());
+
+    op.release();
+  }
+}
+
+void
 add_builtin_ops(System& s)
 {
   add_one_fun2(s, U"plus", U"int_plus", U"intmp", &mpz_plus);
@@ -1091,6 +1161,8 @@ add_builtin_ops(System& s)
   add_one_fun2(s, U"range_construct", U"range_construct", U"intmp", 
     static_cast<Constant (*)(const Constant&, const Constant&)>
       (&Types::Range::create));
+
+  add_base_functions(s);
 }
 
 void
