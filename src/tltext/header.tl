@@ -22,10 +22,20 @@ infixl ".." "range_construct" 0;;
 fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun minus.a.b [a : intmp, b : intmp] = int_minus!(a,b);;
 fun times.a.b [a : intmp, b : intmp] = int_times!(a,b);;
+fun divide.a.b [a : intmp, b : intmp] = int_divide!(a,b);;
+fun modulus.a.b [a : intmp, b : intmp] = int_modulus!(a,b);;
 
 fun lte.a.b [a : intmp, b : intmp] = int_lte!(a,b);;
+fun lt.a.b [a : intmp, b : intmp] = int_lt!(a,b);;
+fun gte.a.b [a : intmp, b : intmp] = int_gte!(a,b);;
+fun gt.a.b [a : intmp, b : intmp] = int_gt!(a,b);;
+fun eq.a.b [a : intmp, b : intmp] = int_eq!(a,b);;
+fun ne.a.b [a : intmp, b : intmp] = int_ne!(a,b);;
 
-fun plus.a.b [a : ustring, b : ustring] = string_plus!(a,b);;
+fun bool_and a b = if a then b else false fi;;
+fun bool_or a b = if a then true else b fi;;
+
+fun plus a b [a : ustring, b : ustring] = string_plus!(a,b);;
 
 //the print equations
 var PRINT_TLTEXT [arg0 : intmp]   = PRINT;;

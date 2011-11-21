@@ -53,7 +53,14 @@ namespace TransLucid
     BuiltinBaseFunction<2> integer_plus{&mpz_plus};
     BuiltinBaseFunction<2> integer_minus{&mpz_minus};
     BuiltinBaseFunction<2> integer_times{&mpz_times};
+    BuiltinBaseFunction<2> integer_divide{&mpz_divide};
+    BuiltinBaseFunction<2> integer_modulus{&mpz_modulus};
     BuiltinBaseFunction<2> integer_lte{&mpz_lte};
+    BuiltinBaseFunction<2> integer_lt{&mpz_lt};
+    BuiltinBaseFunction<2> integer_gte{&mpz_gte};
+    BuiltinBaseFunction<2> integer_gt{&mpz_gt};
+    BuiltinBaseFunction<2> integer_eq{&mpz_eq};
+    BuiltinBaseFunction<2> integer_ne{&mpz_ne};
 
     struct BuiltinFunction
     {
@@ -67,7 +74,14 @@ namespace TransLucid
       {U"plus", U"int_plus", &integer_plus},
       {U"minus", U"int_minus", &integer_minus},
       {U"times", U"int_times", &integer_times},
+      {U"divide", U"int_divide", &integer_divide},
+      {U"modulus", U"int_modulus", &integer_modulus},
       {U"lte", U"int_lte", &integer_lte},
+      {U"lt", U"int_lt", &integer_lt},
+      {U"gte", U"int_gte", &integer_gte},
+      {U"gt", U"int_gt", &integer_gt},
+      {U"eq", U"int_eq", &integer_eq},
+      {U"ne", U"int_ne", &integer_ne},
     };
   }
 }
