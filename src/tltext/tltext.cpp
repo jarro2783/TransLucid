@@ -220,7 +220,15 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
           0,0);
         Parser::StreamPosIterator posend;
 
-        auto result = m_system.parseLine(posbegin, posend, m_verbose, m_debug);
+        try
+        {
+          auto result = 
+            m_system.parseLine(posbegin, posend, m_verbose, m_debug);
+        }
+        catch (TransLucid::Parser::ParseError& e)
+        {
+          (*m_error) << "error parsing line: " << e.what() << std::endl;
+        }
       }
       break;
 
@@ -284,10 +292,9 @@ TLText::processExpressions(LineTokenizer& tokenizer)
             exprs.push_back(expr);
           }
         }
-        catch(TransLucid::ParseError& e)
-        //catch (std::exception& e)
+        catch(TransLucid::Parser::ParseError& e)
         {
-          (*m_error) << "error: " << e.what() << std::endl;
+          (*m_error) << "error parsing expression: " << e.what() << std::endl;
         }
       }
       break;
