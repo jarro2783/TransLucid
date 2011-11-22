@@ -62,6 +62,8 @@ namespace TransLucid
     BuiltinBaseFunction<2> integer_eq{&mpz_eq};
     BuiltinBaseFunction<2> integer_ne{&mpz_ne};
 
+    BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus};
+
     struct BuiltinFunction
     {
       const char32_t* abstract_name;
@@ -82,6 +84,7 @@ namespace TransLucid
       {U"gt", U"int_gt", &integer_gt},
       {U"eq", U"int_eq", &integer_eq},
       {U"ne", U"int_ne", &integer_ne},
+      {U"plus", U"ustring_plus", &ustring_plus_fn},
     };
   }
 }

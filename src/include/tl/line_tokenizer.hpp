@@ -46,6 +46,15 @@ namespace TransLucid
     };
 
     public:
+
+    struct Line
+    {
+      int character;
+      int line;
+      u32string text;
+      LineType type;
+    };
+
     //construct with an iterator
     LineTokenizer(TransLucid::Parser::U32Iterator& begin)
     : m_current(begin)
@@ -63,6 +72,12 @@ namespace TransLucid
     {
       return m_current == m_end;
     }
+
+    void
+    startChar(int c);
+
+    void
+    startLine(int line);
 
     private:
 
