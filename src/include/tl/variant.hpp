@@ -146,48 +146,6 @@ namespace TransLucid
     {
       return t.get();
     }
-
-    template
-    <
-      typename Internal,
-      typename Visitor,
-      typename VoidPtrCV
-    >
-    typename Visitor::result_type
-    visit_impl(Visitor& visitor, int which, int current, VoidPtrCV storage,
-      Internal internal)
-    {
-      //if your program fails here, then the visitor broke
-      assert(false);
-    }
-
-    template 
-    <
-      typename Internal,
-      typename Visitor, 
-      typename VoidPtrCV,
-      typename First, 
-      typename... Types
-    >
-    typename Visitor::result_type
-    visit_impl(Visitor& visitor, int which, int current, 
-               VoidPtrCV storage, Internal internal = Internal())
-    {
-      typedef typename std::conditional
-      <
-        std::is_const<typename std::remove_pointer<VoidPtrCV>::type>::value,
-        const First,
-        First
-      >::type ConstType;
-
-      if (which == current)
-      {
-        return visitor(get_value(*reinterpret_cast<ConstType*>(storage), 
-          internal));
-      }
-      return visit_impl<Internal, Visitor, VoidPtrCV, Types...>
-        (visitor, which, current + 1, storage, internal);
-    }
   }
 
   template 
