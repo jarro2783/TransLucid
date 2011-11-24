@@ -66,14 +66,14 @@ auto
 call_fn(Fn&& f, T* object, Args&&... args)
   -> decltype(f(args...))
 {
-  return f(args...);
+  return f(std::forward<Args>(args)...);
 }
 
 template <typename Ret, typename T, typename...Args>
 Ret
 call_fn(Ret (T::*f)(Args...), T* t, Args&&... args)
 {
-  return (t->*f)(args...);
+  return (t->*f)(std::forward<Args>(args)...);
 }
 
 }

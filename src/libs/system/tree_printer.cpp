@@ -399,9 +399,8 @@ class TreePrinterNew
     if (iter != t.pairs.end())
     {
       print_tuple_pair(*iter);
+      ++iter;
     }
-
-    ++iter;
 
     while (iter != t.pairs.end())
     {

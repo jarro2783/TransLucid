@@ -87,7 +87,7 @@ namespace TransLucid
         ));
       }
 
-      return visited;
+      return Tree::TupleExpr{visited};
     }
 
     Tree::Expr operator()(const Tree::AtExpr& e)

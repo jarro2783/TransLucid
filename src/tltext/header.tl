@@ -37,6 +37,11 @@ fun bool_or a b = if a then true else b fi;;
 
 fun plus a b [a : ustring, b : ustring] = string_plus!(a,b);;
 
+var fby = \d -> \\X -> \\Y -> if #d <= 0 then X else prev.d Y fi;;
+var index = \d -> #d + 1;;
+var prev = \d -> \\X -> X @ [d <- #d - 1];;
+var next = \d -> \\X -> X @ [d <- #d + 1];;
+
 //the print equations
 var PRINT_TLTEXT [arg0 : intmp]   = PRINT;;
 var PRINT_TLTEXT [arg0 : ustring] = "`" + PRINT + "`";;

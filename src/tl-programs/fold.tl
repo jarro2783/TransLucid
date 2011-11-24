@@ -1,7 +1,3 @@
-var fby = \d -> \\X -> \\Y -> if #d <= 0 then X else prev.d Y fi;;
-var prev = \d -> \\X -> X @ [d <- #d - 1];;
-var next = \d -> \\X -> X @ [d <- #d + 1];;
-
 var foldL = \d -> \f -> \z -> \\x -> folds where
   var folds = fby.d z (f.folds.(next.d x));;
 end;;
