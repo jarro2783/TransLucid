@@ -579,8 +579,9 @@ parse
         break;
 
         case TL::Parser::TOKEN_DIM_IDENTIFIER:
-        checker.dimid(TL::get<std::pair<TL::u32string, TL::u32string>>
-          (tok.getValue()));
+        checker.dimid(std::make_pair(U"dim", 
+          TL::get<TL::u32string>(tok.getValue())));
+        break;
 
         //identifier
         case TL::Parser::TOKEN_ID:
