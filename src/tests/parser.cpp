@@ -291,6 +291,22 @@ class Checker
     FAIL("should not have reached here: " << message);
   }
 
+	void dimid(const std::pair<TL::u32string, TL::u32string>& d)
+	{
+    INFO("Testing identifier: " << d.second);
+    REQUIRE(m_current != m_tokens.end());
+
+    const std::pair<TL::u32string, TL::u32string>* wsp 
+      = TL::get<std::pair<TL::u32string, TL::u32string>>(&*m_current);
+
+    //if this fails the type of the token is wrong
+    REQUIRE(wsp != 0);
+    CHECK(d.first == U"dim");
+    CHECK(d.second == wsp->second);
+
+    ++m_current;
+	}
+
 	void identifier(const TL::u32string& ws)
 	{
     INFO("Testing identifier: " << ws);
@@ -562,6 +578,9 @@ parse
         checker.character(TL::get<char32_t>(tok.getValue()));
         break;
 
+        case TL::Parser::TOKEN_DIM_IDENTIFIER:
+        checker.dimid(TL::get<std::pair<TL::u32string, TL::u32string>>
+          (tok.getValue()));
 
         //identifier
         case TL::Parser::TOKEN_ID:
@@ -773,7 +792,7 @@ TEST_CASE ( "symbols", "check all the symbols" )
 
 TEST_CASE ( "mixed", "random test" )
 {
-  TL::u32string input = U"intmp @ 10 (hello if) cats [1 <- 5]";
+  TL::u32string input = U"intmp @ 10 (hello if) cats [1 <- 5] arg0 arg1";
   Checker checker({
     U"intmp",
     TOKEN_AT,
@@ -787,7 +806,9 @@ TEST_CASE ( "mixed", "random test" )
     mpz_class(1),
     TOKEN_LARROW,
     mpz_class(5),
-    TOKEN_RSQUARE
+    TOKEN_RSQUARE,
+    std::make_pair(U"dim", U"arg0"),
+    std::make_pair(U"dim", U"arg1")
   });
 
   check(input, checker);
