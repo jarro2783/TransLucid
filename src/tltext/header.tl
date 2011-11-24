@@ -35,7 +35,7 @@ fun ne.a.b [a : intmp, b : intmp] = int_ne!(a,b);;
 fun bool_and a b = if a then b else false fi;;
 fun bool_or a b = if a then true else b fi;;
 
-fun plus a b [a : ustring, b : ustring] = string_plus!(a,b);;
+fun plus.a.b [a : ustring, b : ustring] = string_plus!(a,b);;
 
 var fby = \d -> \\X -> \\Y -> if #d <= 0 then X else prev.d Y fi;;
 var index = \d -> #d + 1;;
