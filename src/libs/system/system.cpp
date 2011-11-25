@@ -273,7 +273,7 @@ namespace detail
     InputHDWS(const u32string& name, System& system)
     : m_name(name)
     , m_system(system)
-    , m_hd(0)
+    , m_hd(nullptr)
     {
       auto iter = m_system.m_inputHDs.find(m_name);
       if (iter == m_system.m_inputHDs.end())

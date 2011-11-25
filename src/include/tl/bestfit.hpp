@@ -51,7 +51,7 @@ namespace TransLucid
   {
     public:
     BestFittable()
-    : m_bestFit(0)
+    : m_bestFit(nullptr)
     {
     }
 

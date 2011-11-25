@@ -96,8 +96,8 @@ namespace TransLucid
       public:
 
       U32Iterator()
-      : m_iter(0)
-      , m_end(0)
+      : m_iter(nullptr)
+      , m_end(nullptr)
       {
         #ifdef ITERATOR_DEBUG
         std::cerr << this << ": U32Iterator()" << std::endl;
@@ -129,8 +129,8 @@ namespace TransLucid
        * @param other The U32Iterator to make a copy of.
        */
       U32Iterator(const U32Iterator& other)
-      : m_iter(other.m_iter != 0 ? other.m_iter->clone() : 0)
-      , m_end(other.m_end != 0 ? other.m_end->clone() : 0)
+      : m_iter(other.m_iter != nullptr ? other.m_iter->clone() : nullptr)
+      , m_end(other.m_end != nullptr ? other.m_end->clone() : nullptr)
       {
         #ifdef ITERATOR_DEBUG
         std::cerr << this << " U32Iterator(*" << &other << ")" << std::endl;
@@ -151,13 +151,13 @@ namespace TransLucid
         #endif
         if (this != &rhs)
         {
-          Iterator* iter_copy = 0;
-          Iterator* end_copy = 0;
+          Iterator* iter_copy = nullptr;
+          Iterator* end_copy = nullptr;
 
           try
           {
-            iter_copy = rhs.m_iter != 0 ? rhs.m_iter->clone() : 0;
-            end_copy = rhs.m_end != 0 ? rhs.m_end->clone() : 0;
+            iter_copy = rhs.m_iter != nullptr ? rhs.m_iter->clone() : nullptr;
+            end_copy = rhs.m_end != nullptr ? rhs.m_end->clone() : nullptr;
 
             delete m_iter;
             delete m_end;
@@ -192,12 +192,12 @@ namespace TransLucid
         bool lhs_end = false;
         bool rhs_end = false;
 
-        if (m_iter == 0 || *m_iter == *m_end)
+        if (m_iter == nullptr || *m_iter == *m_end)
         {
           lhs_end = true;
         }
 
-        if (rhs.m_iter == 0 || *rhs.m_iter == *rhs.m_end)
+        if (rhs.m_iter == nullptr || *rhs.m_iter == *rhs.m_end)
         {
           rhs_end = true;
         }

@@ -27,7 +27,7 @@ namespace TransLucid
 //system
 TaggedConstant CompileBestFit::operator()(const Tuple& k)
 {
-  BestFit* b = 0;
+  BestFit* b = nullptr;
   BestFit* old = m_bestFittable->setBestFit(b);
   if (old != this) {
   }

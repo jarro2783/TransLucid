@@ -63,12 +63,12 @@ namespace TransLucid
      * dimensions can still be added.
      **/
     GuardWS()
-    : m_system(0)
+    : m_system(nullptr)
     {
     }
 
     GuardWS(const Tuple& t)
-    : m_system(0)
+    : m_system(nullptr)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();

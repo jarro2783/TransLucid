@@ -107,13 +107,13 @@ GuardWS::GuardWS(WS* g, WS* b)
 : m_guard(g), m_boolean(b), m_onlyConst(false),
   m_system(nullptr)
 {
-  if (b != 0)
+  if (b != nullptr)
   {
     std::cerr << "I don't know how to handle boolean guards" << std::endl;
     throw "I don't know how to handle boolean guards";
   }
 
-  if (g == 0)
+  if (g == nullptr)
   {
     return;
   }
@@ -127,7 +127,7 @@ GuardWS::GuardWS(WS* g, WS* b)
   Workshops::TupleWS* t = dynamic_cast<Workshops::TupleWS*>(g);
 
   //For now guards must be a literal tuple
-  if (t != 0)
+  if (t != nullptr)
   {
     const auto& pairs = t->getElements();
     System& s = t->getSystem();
@@ -314,7 +314,7 @@ GuardWS makeGuardWithTime(const mpz_class& start)
 {
   GuardWS g;
   g.addDimension(DIM_TIME,
-    Types::Range::create(Range(&start, 0)));
+    Types::Range::create(Range(&start, nullptr)));
   return g;
 }
 

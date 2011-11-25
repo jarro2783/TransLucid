@@ -198,7 +198,8 @@ namespace TransLucid
 
       //makes an end iterator, we still need to point to a stream
       LexerIterator(const TokenStreamPtr& s)
-      : m_stream(s), m_pos(m_stream->end()), m_next(0), m_end(0), m_context(0)
+      : m_stream(s), m_pos(m_stream->end()), m_next(nullptr), 
+        m_end(nullptr), m_context(nullptr)
       {
       }
 

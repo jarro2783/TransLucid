@@ -32,25 +32,25 @@ namespace TransLucid
 {
 
 Range::Range()
-: m_lower(0), m_upper(0)
+: m_lower(nullptr), m_upper(nullptr)
 {
 }
 
 Range::Range(const mpz_class* lower, const mpz_class* upper)
-: m_lower(lower != 0 ? new mpz_class(*lower) : 0),
-m_upper(upper != 0 ? new mpz_class(*upper) : 0)
+: m_lower(lower != nullptr ? new mpz_class(*lower) : nullptr),
+m_upper(upper != nullptr ? new mpz_class(*upper) : nullptr)
 {
 }
 
 Range::Range(const Range& other)
-: m_lower(0), m_upper(0)
+: m_lower(nullptr), m_upper(nullptr)
 {
-  mpz_class* lower = 0;
-  mpz_class* upper = 0;
+  mpz_class* lower = nullptr;
+  mpz_class* upper = nullptr;
   try
   {
-    lower = other.m_lower != 0 ? new mpz_class(*other.m_lower) : 0;
-    upper = other.m_upper != 0 ? new mpz_class(*other.m_upper) : 0;
+    lower = other.m_lower != nullptr ? new mpz_class(*other.m_lower) : nullptr;
+    upper = other.m_upper != nullptr ? new mpz_class(*other.m_upper) : nullptr;
     m_lower = lower;
     m_upper = upper;
   }
@@ -70,8 +70,8 @@ Range::operator=(const Range& rhs)
     delete m_lower;
     delete m_upper;
 
-    mpz_class* lower = 0;
-    mpz_class* upper = 0;
+    mpz_class* lower = nullptr;
+    mpz_class* upper = nullptr;
 
     try
     {
@@ -108,7 +108,7 @@ Range::hash() const
 {
   size_t seed = 0;
 
-  if (m_lower == 0) {
+  if (m_lower == nullptr) {
     std::_Hash_impl::__hash_combine(0, seed);
   }
   else
@@ -116,7 +116,7 @@ Range::hash() const
     std::_Hash_impl::__hash_combine(*m_lower, seed);
   }
 
-  if (m_upper == 0)
+  if (m_upper == nullptr)
   {
     std::_Hash_impl::__hash_combine(0, seed);
   }
@@ -131,7 +131,7 @@ Range::hash() const
 void
 Range::print(std::ostream& os) const
 {
-  if (m_lower == 0)
+  if (m_lower == nullptr)
   {
     os << "inf";
   }
@@ -142,7 +142,7 @@ Range::print(std::ostream& os) const
 
   os << " .. ";
 
-  if (m_upper == 0)
+  if (m_upper == nullptr)
   {
     os << "inf";
   }
@@ -158,23 +158,25 @@ Range::operator==(const Range& rhs) const
   //for both upper and lower
   //either both rhs and lhs are 0, or they are not zero and are equal
   return
-  ((m_lower == 0 && rhs.m_lower == 0)
-     || (m_lower != 0 && rhs.m_lower != 0 && *m_lower == *rhs.m_lower))
+  ((m_lower == nullptr && rhs.m_lower == nullptr)
+     || (m_lower != nullptr && rhs.m_lower != nullptr && 
+         *m_lower == *rhs.m_lower))
   &&
-  ((m_upper == 0 && rhs.m_upper == 0)
-     || (m_upper != 0 && rhs.m_upper != 0 && *m_upper == *rhs.m_upper))
+  ((m_upper == nullptr && rhs.m_upper == nullptr)
+     || (m_upper != nullptr && rhs.m_upper != nullptr && 
+         *m_upper == *rhs.m_upper))
   ;
 }
 
 bool
 Range::operator<(const Range& rhs) const
 {
-  if (m_lower == 0 && rhs.m_lower != 0)
+  if (m_lower == nullptr && rhs.m_lower != nullptr)
   {
     return true;
   }
 
-  if (m_lower != 0 && rhs.m_lower == 0)
+  if (m_lower != nullptr && rhs.m_lower == nullptr)
   {
     return false;
   }
@@ -188,12 +190,12 @@ Range::operator<(const Range& rhs) const
   }
 
   //the two lower bounds must be equal
-  if (m_upper == 0 && rhs.m_upper != 0)
+  if (m_upper == nullptr && rhs.m_upper != nullptr)
   {
     return false;
   }
 
-  if (m_upper != 0 && rhs.m_upper == 0)
+  if (m_upper != nullptr && rhs.m_upper == nullptr)
   {
     return true;
   }
@@ -262,11 +264,11 @@ Range::within(const Range& other) const
 {
   //is the other range inside this range
   //lower must be <= other.lower and upper must be >= other.upper
-  return (m_lower == 0
-  || (other.m_lower != 0 &&  *m_lower <= *other.m_lower))
+  return (m_lower == nullptr
+  || (other.m_lower != nullptr &&  *m_lower <= *other.m_lower))
   &&
-  (m_upper == 0
-  || (other.m_upper != 0 && *m_upper >= *other.m_upper));
+  (m_upper == nullptr
+  || (other.m_upper != nullptr && *m_upper >= *other.m_upper));
 }
 
 }

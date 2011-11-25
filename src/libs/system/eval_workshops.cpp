@@ -165,12 +165,12 @@ DimensionWS::operator()(Context& k)
 Constant
 IdentWS::operator()(Context& k)
 {
-  if (m_e == 0)
+  if (m_e == nullptr)
   {
     m_e = m_identifiers.lookup(m_name);
   }
 
-  if (m_e != 0)
+  if (m_e != nullptr)
   {
     return (*m_e)(k);
   }

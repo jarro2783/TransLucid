@@ -53,7 +53,7 @@ WorkshopBuilder::build_workshops(const Tree::Expr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::nil& n)
 {
-  return 0;
+  return nullptr;
 }
 
 WS*
@@ -97,7 +97,7 @@ WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 {
   //return new Workshops::TypedValueWS(m_system, e.type, e.text);
   std::cerr << "warning: compiling literal node" << std::endl;
-  return 0;
+  return nullptr;
 }
 
 WS*
@@ -137,7 +137,7 @@ WorkshopBuilder::operator()(const Tree::BinaryOpExpr& e)
 {
   //this should be compiled out
   throw "WorkshopBuilder::operator()(BinaryOpExpr)";
-  return 0;
+  return nullptr;
 }
 
 WS*

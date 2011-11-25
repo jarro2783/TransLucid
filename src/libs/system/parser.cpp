@@ -339,11 +339,11 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
             //for now just check if it's a var or dim and do the appropriate
             Variable* v = get<Variable>(&line);
             DimensionDecl* d = get<DimensionDecl>(&line);
-            if (v != 0)
+            if (v != nullptr)
             {
               where.vars.push_back(v->eqn);
             }
-            else if (d != 0)
+            else if (d != nullptr)
             {
               where.dims.push_back(std::make_pair(d->dim, d->initialise));
             }
