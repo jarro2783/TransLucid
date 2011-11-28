@@ -1,0 +1,13 @@
+//List Operations
+data List a = Cons a (List a) | ListTail;;
+
+fun head.l [l : [type <- "List"]] = l!arg0;;
+fun tail.l [l : [type <- "List"]] = l!arg1;;
+
+var headv [arg0 : [type <- "List"]] = #!arg0!arg0;;
+var tailv [arg0 : [type <- "List"]] = #!arg0!arg1;;
+
+%%
+
+head.(Cons.4.(Cons.5.ListTail));;
+headv @ [arg0 <- Cons.4.(Cons.5.ListTail)];;
