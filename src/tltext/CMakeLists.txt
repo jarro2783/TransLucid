@@ -31,6 +31,17 @@ add_definitions(${TLCFLAGS})
 add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})
 add_test(examples ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${EXAMPLESPATH})
 
+set(EXAMPLES_OUT examples.html)
+
+add_custom_command(OUTPUT ${EXAMPLES_OUT}
+  COMMAND ${CMAKE_SOURCE_DIR}/src/tltext/build_examples.sh 
+    ${EXAMPLESPATH} > ${EXAMPLES_OUT}
+  DEPENDS examples/*.in
+  DEPENDS build_examples.sh
+)
+
+add_custom_target(examples DEPENDS examples.html)
+
 install(TARGETS tltext
    RUNTIME DESTINATION bin
 )
