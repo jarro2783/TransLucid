@@ -1,7 +1,7 @@
 bin_PROGRAMS = tltext
 
 if WANT_TLWEB
-  bin_PROGRAMS += tlweb
+  bin_PROGRAMS += tlweb matrixweb
 endif
 
 TLTEXT_LIBS = $(top_builddir)/src/libs/system/libtlsystem.la \
@@ -20,6 +20,8 @@ endif
 tlweb_LDFLAGS = $(TLTEXT_LIBS) $(TLWEB_STATIC_FLAGS)
 tlweb_CPPFLAGS = $(tltext_CPPFLAGS)
 
+matrixweb_CPPFLAGS=-std=gnu++11
+
 if WEB_SEPARATE_DATA
   tlweb_CPPFLAGS += -DHEADERDIR=\"$(WEBHEADER)\"
 else
@@ -31,6 +33,8 @@ TLTEXT_SHARED_SOURCES = tltext.cpp tltext.hpp demandhd.cpp demandhd.hpp
 tltext_SOURCES = main.cpp $(TLTEXT_SHARED_SOURCES)
 
 tlweb_SOURCES= tlweb.cpp $(TLTEXT_SHARED_SOURCES)
+
+matrixweb_SOURCES = matrixweb.cpp
 
 TESTS_ENVIRONMENT = TLTEXT=$(top_builddir)/src/tltext/tltext \
   TESTDIR=$(top_srcdir)/src/tltext/tests \
