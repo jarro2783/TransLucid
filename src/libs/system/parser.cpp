@@ -948,7 +948,7 @@ Parser::parse_assign_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   Equation eqn;
-  if (parse_equation_decl(begin, end, eqn, TOKEN_ASSIGNTO, U":="))
+  if (parse_equation_decl(current, end, eqn, TOKEN_ASSIGNTO, U":="))
   {
     begin = current;
     result = Assignment(std::move(eqn));
@@ -970,12 +970,14 @@ Parser::parse_out_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   Equation eqn;
-  bool success = parse_equation_decl(begin, end, eqn, TOKEN_EQUALS, U"=");
+  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"=");
 
   if (success)
   {
     result = OutputDecl(eqn);
   }
+
+  begin = current;
 
   return success;
 }
@@ -993,12 +995,14 @@ Parser::parse_in_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   Equation eqn;
-  bool success = parse_equation_decl(begin, end, eqn, TOKEN_EQUALS, U"=");
+  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"=");
 
   if (success)
   {
     result = InputDecl(eqn);
   }
+
+  begin = current;
 
   return success;
 }

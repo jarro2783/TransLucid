@@ -16,6 +16,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 add_executable(tltext main.cpp tltext.cpp demandhd.cpp)
 target_link_libraries(tltext tlsystem ${Boost_LIBRARIES})
 
+add_executable(matrixweb matrixweb.cpp)
 
 if (ENABLE_TLWEB)
   add_executable(tlweb tlweb.cpp tltext.cpp demandhd.cpp)

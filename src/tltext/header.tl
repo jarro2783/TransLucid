@@ -37,6 +37,8 @@ fun bool_or a b = if a then true else b fi;;
 
 fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
 
+fun range_construct.a.b = make_range!(a,b);;
+
 var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;

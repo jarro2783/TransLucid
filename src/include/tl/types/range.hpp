@@ -31,6 +31,9 @@ namespace TransLucid
       Constant
       create(const TransLucid::Range& r);
 
+      Constant
+      create(const Constant& lhs, const Constant& rhs);
+
       const TransLucid::Range&
       get(const Constant& c);
 

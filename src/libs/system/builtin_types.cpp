@@ -64,6 +64,11 @@ namespace TransLucid
 
     BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus};
 
+    BuiltinBaseFunction<2> range_create{
+      static_cast<Constant (*)(const Constant&, const Constant&)>
+        (&Types::Range::create)
+    };
+
     struct BuiltinFunction
     {
       const char32_t* abstract_name;
@@ -85,6 +90,7 @@ namespace TransLucid
       {U"eq", U"int_eq", &integer_eq},
       {U"ne", U"int_ne", &integer_ne},
       {U"plus", U"ustring_plus", &ustring_plus_fn},
+      {U"range_construct", U"make_range", &range_create}
     };
   }
 }
@@ -1175,7 +1181,7 @@ add_builtin_ops(System& s)
   add_one_fun2(s, U"plus", U"ustring_plus", U"ustring", &ustring_plus);
 
   //range construction a..b
-  add_one_fun2(s, U"range_construct", U"range_construct", U"intmp", 
+  add_one_fun2(s, U"range_construct", U"make_range", U"intmp", 
     static_cast<Constant (*)(const Constant&, const Constant&)>
       (&Types::Range::create));
 
@@ -1208,7 +1214,9 @@ init_builtin_types(System& s)
 
   add_builtin_printers(s, to_print_types);
 
-  add_builtin_ops(s);
+  add_base_functions(s);
+
+  //add_builtin_ops(s);
 
   add_file_io(s);
 }
