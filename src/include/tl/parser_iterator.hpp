@@ -148,7 +148,6 @@ namespace TransLucid
         if (this != &rhs)
         {
           Iterator* iter_copy = nullptr;
-          Iterator* end_copy = nullptr;
 
           try
           {
@@ -161,7 +160,6 @@ namespace TransLucid
           catch (...)
           {
             delete iter_copy;
-            delete end_copy;
             throw;
           }
         }
@@ -180,7 +178,7 @@ namespace TransLucid
       bool operator==(const U32Iterator& rhs) const
       {
         return (m_iter == nullptr && rhs.m_iter == nullptr)
-          || (m_iter != nullptr || rhs.m_iter != nullptr || 
+          || (m_iter == nullptr || rhs.m_iter == nullptr || 
               *m_iter == *rhs.m_iter)
         ;
         #if 0

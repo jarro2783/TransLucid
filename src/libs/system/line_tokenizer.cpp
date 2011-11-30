@@ -175,7 +175,7 @@ LineTokenizer::readOuter()
   //do nothing if they didn't match, because the rest of the algorithm needs
   //to start with that character (it could be the first ; or a " or `)
 
-  while (!done && m_current != Parser::U32Iterator())
+  while (!done && m_current != m_end)
   {
     if (m_readingIdent)
     {

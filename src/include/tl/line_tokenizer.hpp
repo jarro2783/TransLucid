@@ -57,7 +57,7 @@ namespace TransLucid
 
     //construct with an iterator
     LineTokenizer(TransLucid::Parser::U32Iterator& begin,
-      TransLucid::Parser::U32Iterator& end
+      const TransLucid::Parser::U32Iterator& end
     )
     : m_current(begin)
     , m_end(end)
