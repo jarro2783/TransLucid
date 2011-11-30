@@ -102,12 +102,12 @@ TEST_CASE ( "utf8 iterator copy increment", "copy then increment" )
 
   auto iter2 = iter;
 
-  CHECK(*iter == 'h');
+  CHECK(*iter == U'h');
 
   ++iter;
 
-  CHECK(*iter == 'e');
-  CHECK(*iter2 == 'h');
+  CHECK(*iter == U'e');
+  CHECK(*iter2 == U'h');
 }
 
 TEST_CASE ( "utf8 iterator non-ascii", 
@@ -173,27 +173,27 @@ TEST_CASE( "utf8 iterator stream increment",
 
   CHECK(pos != end);
 
-  CHECK(*pos++ == '1');
+  CHECK(*pos++ == U'1');
   pos2 = pos;
   CHECK(pos != end);
 
-  CHECK(*pos++ == '2');
+  CHECK(*pos++ == U'2');
   pos2 = pos;
   CHECK(pos != end);
 
-  CHECK(*pos++ == '3');
+  CHECK(*pos++ == U'3');
   pos2 = pos;
   CHECK(pos != end);
 
-  CHECK(*pos++ == '4');
+  CHECK(*pos++ == U'4');
   pos2 = pos;
   CHECK(pos != end);
 
-  CHECK(*pos++ == '5');
+  CHECK(*pos++ == U'5');
   pos2 = pos;
   CHECK(pos != end);
 
-  CHECK(*pos++ == '6');
+  CHECK(*pos++ == U'6');
   pos2 = pos;
   CHECK(pos != end);
 }
@@ -215,13 +215,13 @@ TEST_CASE( "utf8 iterator stream weird",
     TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
   );
 
-  CHECK(*pos++ == '%');
-  CHECK(*pos++ == '%');
-  CHECK(*pos++ == '%');
-  CHECK(*pos++ == '%');
-  CHECK(*pos++ == '5');
-  CHECK(*pos++ == ';');
-  CHECK(*pos++ == ';');
+  CHECK(*pos++ == U'%');
+  CHECK(*pos++ == U'%');
+  CHECK(*pos++ == U'%');
+  CHECK(*pos++ == U'%');
+  CHECK(*pos++ == U'5');
+  CHECK(*pos++ == U';');
+  CHECK(*pos++ == U';');
   CHECK(pos == TL::Parser::U32Iterator());
 }
 
@@ -239,14 +239,14 @@ TEST_CASE( "utf8 iterator multi_pass", "iterator with multi_pass" )
 
   auto pos2 = pos;
   auto segment_begin = pos;
-  CHECK(*pos == 'a');
+  CHECK(*pos == U'a');
 
   for (int i = 0; i != 7; ++i)
   {
     ++pos;
   }
 
-  CHECK(*pos == 'h');
+  CHECK(*pos == U'h');
   auto segment_end = pos;
 
   TL::u32string result;
@@ -340,14 +340,14 @@ TEST_CASE( "utf32 iterator multi_pass", "can we use it with multi_pass" )
   );
 
   auto pos2 = pos;
-  CHECK(*pos == 'a');
+  CHECK(*pos == U'a');
 
   for (int i = 0; i != 7; ++i)
   {
     ++pos;
   }
 
-  CHECK(*pos == 'h');
+  CHECK(*pos == U'h');
 
   TL::u32string result;
   for (int i = 0; i != 16; ++i)
@@ -384,25 +384,25 @@ TEST_CASE( "utf32 iterator copy", "copy the iterator")
 
   TL::Parser::U32Iterator savePos = iter;
 
-  CHECK(*iter == 't');
+  CHECK(*iter == U't');
 
   ++iter;
-  CHECK(*iter == 'e');
+  CHECK(*iter == U'e');
 
   TL::Parser::U32Iterator iter2 = iter;
-  CHECK(*iter2 == 'e');
+  CHECK(*iter2 == U'e');
 
   ++iter;
-  CHECK(*iter == 's');
-  CHECK(*iter2 == 'e');
+  CHECK(*iter == U's');
+  CHECK(*iter2 == U'e');
 
   ++iter2;
-  CHECK(*iter2 == 's');
+  CHECK(*iter2 == U's');
 
   TL::Parser::U32Iterator fakeEnd = iter;
 
   ++iter2;
-  CHECK(*iter2 == 't');
+  CHECK(*iter2 == U't');
 
   ++iter;
   CHECK(iter == iter2);

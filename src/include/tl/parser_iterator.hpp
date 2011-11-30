@@ -41,7 +41,7 @@ namespace TransLucid
       public std::iterator
       <
         std::forward_iterator_tag,
-        wchar_t
+        char32_t
       >
     {
     };
@@ -268,7 +268,7 @@ namespace TransLucid
       {
         #ifdef ITERATOR_DEBUG
         std::cerr << this << ": *" << std::endl;
-        wchar_t value = **m_iter;
+        char32_t value = **m_iter;
         std::cerr << u32string(U"> ") + u32string(1, value) << std::endl;
         #endif
         return **m_iter;
@@ -331,7 +331,7 @@ namespace TransLucid
           m_haveRead = false;
         }
 
-        wchar_t&
+        char32_t&
         get()
         {
           if (!m_haveRead)
@@ -404,7 +404,7 @@ namespace TransLucid
         T m_iter_actual;
         T m_iter;
         bool m_haveRead;
-        wchar_t m_value;
+        char32_t m_value;
       };
     }
 

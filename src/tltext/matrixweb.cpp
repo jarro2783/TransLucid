@@ -126,8 +126,7 @@ var multiply = \d_r -> \d_c -> \k -> \\X -> \\Y -> W where
     var Y = fby.dx X (Y + next.dx X);;
   end;;
 end;;
-
-  )**";
+)**";
 }
 
 void
@@ -143,13 +142,13 @@ printForms()
 1 2 3
 4 5 6
 7 8 9
-    </textarea>)"
+</textarea>)"
     << "<h2>B</h2>"
     << R"(<textarea rows="15" cols="30" name="Bin">
 2 0 0
 0 2 0
 0 0 2
-    </textarea>)"
+</textarea>)"
     << "<h2>Matrix Program</h2>"
     << R"(<textarea rows="15" cols="80" readonly="readonly" name="prog">)"
     << matrix_prog()
@@ -158,7 +157,7 @@ printForms()
     << R"(<textarea rows="15" cols="80" name="decls">
 assign C [arg0 : 0..2, arg1 : 0..2, time : 0] := 
   multiply.arg0.arg1.3 A B;;
-       </textarea>)"
+</textarea>)"
     << "<h2>Expressions</h2>"
     << R"(<textarea rows="15" cols="80" name="exprs">)"
     << "</textarea>"
@@ -199,9 +198,9 @@ generate_io
 
   output 
     << "in A = file_array_in_hd!\"" << aname.str() << "\";;\n"
-    << "in B = file_array_in_hd!\"" << bname.str() << "\";;\n"
+    << "in B = file_array_in_hd!\"" << bname.str() << "\";;\n\n"
     << "out C = file_array_out_hd!(\"" << outname.str() << "\", "
-    << numcols << ", " << numrows << ");;\n";
+    << numcols << ", " << numrows << ");;\n\n";
 
   std::ostringstream outlink;
 
@@ -285,7 +284,8 @@ int main(int argc, char* argv[])
     std::ostringstream programin;
     std::ostringstream tlwebin;
     
-    programin << prog->second << decls->second << iodecls.first
+    programin << prog->second << '\n' << decls->second << '\n' 
+      << iodecls.first
       << "%%\n" << exprs->second << iodecls.second;
 
     tlwebin << "program=" << htmlescape(programin.str());
