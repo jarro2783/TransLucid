@@ -173,6 +173,9 @@ namespace TransLucid
 
   Constant
   listTail(const Constant& l);
+
+  std::string
+  read_file(std::istream& is);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

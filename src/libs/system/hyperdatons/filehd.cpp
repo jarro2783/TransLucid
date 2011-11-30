@@ -28,6 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/dimension.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/string.hpp>
+#include <tl/utility.hpp>
 
 #include <fstream>
 
@@ -38,6 +39,9 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 : InputHD(0)
 {
   std::ifstream in(utf32_to_utf8(file).c_str());
+
+  //first read in the whole file
+  std::string content = read_file(in);
 
   if (!in.is_open())
   {

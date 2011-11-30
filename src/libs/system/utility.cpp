@@ -598,4 +598,20 @@ listTail(const Constant& l)
   return Types::Tuple::get(l).find(DIM_ARG1)->second;
 }
 
+std::string
+read_file(std::istream& is)
+{
+  is.seekg(0, std::ios_base::end);
+  size_t length = is.tellg();
+
+  is.seekg(0);
+
+  std::unique_ptr<char[]> raw(new char[length+1]);
+  raw[length] = 0;
+
+  is.read(raw.get(), length);
+
+  return raw.get();
+}
+
 }
