@@ -97,7 +97,6 @@ namespace TransLucid
 
       U32Iterator()
       : m_iter(nullptr)
-      , m_end(nullptr)
       {
         #ifdef ITERATOR_DEBUG
         std::cerr << this << ": U32Iterator()" << std::endl;
@@ -106,7 +105,6 @@ namespace TransLucid
 
       ~U32Iterator()
       {
-        delete m_end;
         delete m_iter;
       }
 
@@ -115,9 +113,8 @@ namespace TransLucid
        * We need to know where the end of the stream is to decide when we
        * have reached the end.
        */
-      U32Iterator(const Iterator& i, const Iterator& end)
+      U32Iterator(const Iterator& i)
       : m_iter(i.clone())
-      , m_end(end.clone())
       {
         #ifdef ITERATOR_DEBUG
         std::cerr << this << ": U32Iterator(i, end)" << std::endl;
@@ -130,7 +127,6 @@ namespace TransLucid
        */
       U32Iterator(const U32Iterator& other)
       : m_iter(other.m_iter != nullptr ? other.m_iter->clone() : nullptr)
-      , m_end(other.m_end != nullptr ? other.m_end->clone() : nullptr)
       {
         #ifdef ITERATOR_DEBUG
         std::cerr << this << " U32Iterator(*" << &other << ")" << std::endl;
@@ -157,13 +153,10 @@ namespace TransLucid
           try
           {
             iter_copy = rhs.m_iter != nullptr ? rhs.m_iter->clone() : nullptr;
-            end_copy = rhs.m_end != nullptr ? rhs.m_end->clone() : nullptr;
 
             delete m_iter;
-            delete m_end;
 
             m_iter = iter_copy;
-            m_end = end_copy;
           }
           catch (...)
           {
@@ -186,6 +179,11 @@ namespace TransLucid
        */
       bool operator==(const U32Iterator& rhs) const
       {
+        return (m_iter == nullptr && rhs.m_iter == nullptr)
+          || (m_iter != nullptr || rhs.m_iter != nullptr || 
+              *m_iter == *rhs.m_iter)
+        ;
+        #if 0
         #ifdef ITERATOR_DEBUG
         std::cerr << this << " == " << &rhs;
         #endif
@@ -216,6 +214,7 @@ namespace TransLucid
           #endif
           return lhs_end == rhs_end;
         }
+        #endif
       }
 
       /**
@@ -288,7 +287,6 @@ namespace TransLucid
 
       private:
       Iterator* m_iter;
-      Iterator* m_end;
     };
 
     namespace detail
@@ -451,12 +449,12 @@ namespace TransLucid
 
       bool operator==(const Iterator& rhs) const
       {
-        try
+        const UTF8Iterator* crhs = dynamic_cast<const UTF8Iterator*>(&rhs);
+        if (crhs)
         {
-          const UTF8Iterator& crhs = dynamic_cast<const UTF8Iterator&>(rhs);
-          return *m_data == *crhs.m_data;
+          return *m_data == *(*crhs).m_data;
         }
-        catch (std::bad_cast&)
+        else
         {
           return false;
         }
@@ -707,15 +705,14 @@ namespace TransLucid
 
       bool operator==(const Iterator& rhs) const
       {
-        try
+        const UTF32Iterator<T>* rhs_cast = 
+            dynamic_cast<const UTF32Iterator<T>*>(&rhs);
+        if (rhs_cast)
         {
-          const UTF32Iterator<T>& rhs_cast = 
-            dynamic_cast<const UTF32Iterator<T>&>(rhs);
-          return m_iter == rhs_cast.m_iter;
+          return m_iter == rhs_cast->m_iter;
         }
-        catch (std::bad_cast)
+        else
         {
-          //std::cerr << "bad cast in operator==" << std::endl;
           return false;
         }
       }

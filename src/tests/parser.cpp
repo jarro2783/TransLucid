@@ -32,11 +32,14 @@ TEST_CASE ( "empty input", "empty input to line tokenizer" )
   std::string input;
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin())
+  );
+
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
 
@@ -49,11 +52,14 @@ TEST_CASE ( "simple", "simply line iterator tests" )
   std::string input = "eqn a = 5;; assign y := 6;;";
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin())
+  );
+
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
   CHECK(n.first == TL::LineType::LINE);
@@ -68,12 +74,12 @@ TEST_CASE( "dollar symbol", "line tokenizer $$" )
 {
   std::string input = "eqn a = b;;  $$";
 
-  TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(input.begin()));
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
 
@@ -94,11 +100,13 @@ TEST_CASE( "white space", "line tokenizer white space" )
   std::string input = "eqn a = b;;  $$  ";
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin())
+  );
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
   CHECK(n.first == TL::LineType::LINE);
@@ -118,11 +126,13 @@ TEST_CASE( "%%", "line tokenizer %%" )
   std::string input = "eqn x = 42;;\n%%\nx;;";
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin())
+  );
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
   CHECK(n.first == TL::LineType::LINE);
@@ -147,11 +157,13 @@ TEST_CASE( "where clause", "does a where clause with vars work" )
     std::string input = "x where var x = 5;; end;;";
 
     TL::Parser::U32Iterator iter(
-      TL::Parser::makeUTF8Iterator(input.begin()),
+      TL::Parser::makeUTF8Iterator(input.begin())
+    );
+    TL::Parser::U32Iterator end(
       TL::Parser::makeUTF8Iterator(input.end())
     );
 
-    TL::LineTokenizer tokenize(iter);
+    TL::LineTokenizer tokenize(iter, end);
 
     auto n = tokenize.next();
     CHECK(n.first == TL::LineType::LINE);
@@ -167,11 +179,13 @@ end;;)";
 
     
     TL::Parser::U32Iterator iter(
-      TL::Parser::makeUTF8Iterator(input.begin()),
+      TL::Parser::makeUTF8Iterator(input.begin())
+    );
+    TL::Parser::U32Iterator end(
       TL::Parser::makeUTF8Iterator(input.end())
     );
 
-    TL::LineTokenizer tokenize(iter);
+    TL::LineTokenizer tokenize(iter, end);
 
     auto n = tokenize.next();
     CHECK(n.first == TL::LineType::LINE);
@@ -634,15 +648,19 @@ bool check(const TL::u32string& input, Checker& checker)
   TL::Context& k = system.getDefaultContext();
   TL::System::IdentifierLookup idents = system.lookupIdentifiers();
 
-  iterator first
+  TL::Parser::U32Iterator baseBegin(
+    TL::Parser::makeUTF32Iterator(input.begin()));
+
+  TL::Parser::U32Iterator baseEnd(
+    TL::Parser::makeUTF32Iterator(input.end())
+  );
+
+  TL::Parser::StreamPosIterator first
   (
-    TL::Parser::U32Iterator(
-      TL::Parser::makeUTF32Iterator(input.begin()),
-      TL::Parser::makeUTF32Iterator(input.end())
-    ),
+    baseBegin,
     input
   );
-  iterator last(TL::Parser::U32Iterator{});
+  TL::Parser::StreamPosIterator last(baseEnd);
 
   return parse(first, last, k, idents, checker)
     && first == last;
@@ -654,15 +672,19 @@ bool check_utf8(const std::string& input, Checker& checker)
   TL::Context& k = system.getDefaultContext();
   TL::System::IdentifierLookup idents = system.lookupIdentifiers();
 
-  iterator first
+  TL::Parser::U32Iterator baseBegin(
+    TL::Parser::makeUTF8Iterator(input.begin()));
+
+  TL::Parser::U32Iterator baseEnd(
+    TL::Parser::makeUTF8Iterator(input.end())
+  );
+
+  TL::Parser::StreamPosIterator first
   (
-    TL::Parser::U32Iterator(
-      TL::Parser::makeUTF8Iterator(input.begin()),
-      TL::Parser::makeUTF8Iterator(input.end())
-    ),
+    baseBegin,
     TL::utf8_to_utf32(input)
   );
-  iterator last(TL::Parser::U32Iterator{});
+  TL::Parser::StreamPosIterator last(baseEnd);
 
   return parse(first, last, k, idents, checker)
     && first == last;
@@ -880,13 +902,14 @@ TEST_CASE( "lexer iterator", "the lexer token stream iterator" )
   TL::Parser::StreamPosIterator rawbegin
   (
     TL::Parser::U32Iterator(
-      TL::Parser::makeUTF8Iterator(input.begin()),
-      TL::Parser::makeUTF8Iterator(input.end())
+      TL::Parser::makeUTF8Iterator(input.begin())
     ),
     U"42"
   );
 
-  TL::Parser::StreamPosIterator rawend{TL::Parser::U32Iterator()};
+  TL::Parser::StreamPosIterator rawend{
+    TL::Parser::makeUTF8Iterator(input.end())
+  };
 
   TL::Parser::LexerIterator begin
   (
@@ -921,13 +944,14 @@ TEST_CASE( "expr parser", "basic expression parser tests" )
   TL::Parser::StreamPosIterator rawbegin
   (
     TL::Parser::U32Iterator(
-      TL::Parser::makeUTF8Iterator(input.begin()),
-      TL::Parser::makeUTF8Iterator(input.end())
+      TL::Parser::makeUTF8Iterator(input.begin())
     ),
     U"42"
   );
 
-  TL::Parser::StreamPosIterator rawend{TL::Parser::U32Iterator()};
+  TL::Parser::StreamPosIterator rawend{
+    TL::Parser::makeUTF8Iterator(input.end())
+  };
 
   TL::Parser::LexerIterator begin
   (
@@ -952,16 +976,19 @@ TEST_CASE( "expr parser", "basic expression parser tests" )
   TL::Parser::StreamPosIterator rawbegin2
   (
     TL::Parser::U32Iterator(
-      TL::Parser::makeUTF8Iterator(input2.begin()),
-      TL::Parser::makeUTF8Iterator(input2.end())
+      TL::Parser::makeUTF8Iterator(input2.begin())
     ),
     U"f.d A B"
+  );
+
+  TL::Parser::StreamPosIterator rawend2(
+    TL::Parser::makeUTF8Iterator(input2.end())
   );
 
   TL::Parser::LexerIterator begin2
   {
     rawbegin2,
-    rawend,
+    rawend2,
     s.getDefaultContext(),
     s.lookupIdentifiers()
   };
@@ -997,16 +1024,20 @@ TEST_CASE( "expr parser", "basic expression parser tests" )
   TL::Parser::StreamPosIterator rawbegin3
   (
     TL::Parser::U32Iterator(
-      TL::Parser::makeUTF8Iterator(input3.begin()),
-      TL::Parser::makeUTF8Iterator(input3.end())
+      TL::Parser::makeUTF8Iterator(input3.begin())
     ),
     U"5 + 6 + 7"
+  );
+
+  TL::Parser::StreamPosIterator rawend3
+  (
+    TL::Parser::makeUTF8Iterator(input3.end())
   );
 
   TL::Parser::LexerIterator begin3
   {
     rawbegin3,
-    rawend,
+    rawend3,
     s.getDefaultContext(),
     s.lookupIdentifiers()
   };
@@ -1021,16 +1052,20 @@ TEST_CASE( "expr parser", "basic expression parser tests" )
   TL::Parser::StreamPosIterator rawbegin4
   (
     TL::Parser::U32Iterator(
-      TL::Parser::makeUTF8Iterator(input4.begin()),
-      TL::Parser::makeUTF8Iterator(input4.end())
+      TL::Parser::makeUTF8Iterator(input4.begin())
     ),
     U"5 * (6 + 7)"
+  );
+
+  TL::Parser::StreamPosIterator rawend4
+  (
+    TL::Parser::makeUTF8Iterator(input4.end())
   );
 
   TL::Parser::LexerIterator begin4
   {
     rawbegin4,
-    rawend,
+    rawend4,
     s.getDefaultContext(),
     s.lookupIdentifiers()
   };

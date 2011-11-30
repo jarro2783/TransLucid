@@ -45,10 +45,10 @@ TEST_CASE ( "utf8 iterator comparison",
   "two constructed iterators compare equal" )
 {
   std::string s = "test";
-  TL::Parser::U32Iterator iter3(TL::Parser::makeUTF8Iterator(s.begin()),
-    TL::Parser::makeUTF8Iterator(s.end()));
-  TL::Parser::U32Iterator iter4(TL::Parser::makeUTF8Iterator(s.begin()),
-    TL::Parser::makeUTF8Iterator(s.end()));
+  TL::Parser::U32Iterator iter3(TL::Parser::makeUTF8Iterator(s.begin()));
+
+  TL::Parser::U32Iterator iter4(TL::Parser::makeUTF8Iterator(s.begin()));
+
   CHECK(iter3 == iter4);
 }
 
@@ -63,33 +63,36 @@ TEST_CASE ( "utf8 iterator end", "go to the end, do they compare equal" )
   ++utf8iter;
   CHECK(utf8iter == utf8iter_end);
 
-  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
-    TL::Parser::makeUTF8Iterator(s.end()));
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()));
+  TL::Parser::U32Iterator end(TL::Parser::makeUTF8Iterator(s.end()));
 
-  CHECK(iter != TL::Parser::U32Iterator());
+  CHECK(iter != end);
 
   ++iter;
   ++iter;
-  CHECK(iter == TL::Parser::U32Iterator());
+  CHECK(iter == end);
 
 }
 
 TEST_CASE ( "utf8 iterator copying", "do the iterators copy correctly" )
 {
   std::string s = "test";
-  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
-    TL::Parser::makeUTF8Iterator(s.end()));
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()));
 
-  std::basic_string<unsigned int> copy;
+  TL::Parser::U32Iterator end(
+    TL::Parser::makeUTF8Iterator(s.end())
+  );
 
-  while (iter != TL::Parser::U32Iterator())
+  TL::u32string copy;
+
+  while (iter != end)
   {
     unsigned int c = *iter;
     copy += c;
     ++iter;
   }
 
-  std::basic_string<unsigned int> correct = {'t', 'e', 's', 't'};
+  TL::u32string correct = U"test";
   CHECK(copy == correct);
 }
 
@@ -97,8 +100,7 @@ TEST_CASE ( "utf8 iterator copy increment", "copy then increment" )
 {
   std::string s = "hello world";
 
-  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
-    TL::Parser::makeUTF8Iterator(s.end()));
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()));
 
   auto iter2 = iter;
 
@@ -114,14 +116,15 @@ TEST_CASE ( "utf8 iterator non-ascii",
   "does the iterator read a non-ascii character correctly")
 {
   std::string s = u8"\u00e9";
-  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()),
-    TL::Parser::makeUTF8Iterator(s.end()));
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF8Iterator(s.begin()));
 
   unsigned int c = *iter;
 
   CHECK(c == U'\u00e9');
 }
 
+//not doing streams anymore
+#if 0
 TEST_CASE ( "utf8 iterator stream", 
   "does the iterator read from a stream correctly" )
 {
@@ -281,6 +284,7 @@ TEST_CASE( "utf8 iterator multi_pass", "iterator with multi_pass" )
   CHECK(TL::u32string(segment_begin, segment_end) ==
     TL::u32string(U"abcdefg"));
 }
+#endif
 
 #if 0
 TEST_CASE ( comparison )
@@ -299,14 +303,14 @@ TEST_CASE ( comparison )
 TEST_CASE ( "utf32 iterator end", "the end iterator" )
 {
   TL::u32string s = U"ab";
-  TL::Parser::U32Iterator iter(TL::Parser::makeUTF32Iterator(s.begin()),
-    TL::Parser::makeUTF32Iterator(s.end()));
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF32Iterator(s.begin()));
+  TL::Parser::U32Iterator end(TL::Parser::makeUTF32Iterator(s.end()));
 
-  CHECK(iter != TL::Parser::U32Iterator());
+  CHECK(iter != end);
 
   ++iter;
   ++iter;
-  CHECK(iter == TL::Parser::U32Iterator());
+  CHECK(iter == end);
 }
 
 TEST_CASE ( "utf32 iterator copying", "can we copy them" )
@@ -314,10 +318,10 @@ TEST_CASE ( "utf32 iterator copying", "can we copy them" )
   TL::u32string s(U"test");
   TL::u32string result;
 
-  TL::Parser::U32Iterator iter(TL::Parser::makeUTF32Iterator(s.begin()),
-    TL::Parser::makeUTF32Iterator(s.end()));
+  TL::Parser::U32Iterator iter(TL::Parser::makeUTF32Iterator(s.begin()));
+  TL::Parser::U32Iterator end(TL::Parser::makeUTF32Iterator(s.end()));
 
-  while (iter != TL::Parser::U32Iterator())
+  while (iter != end)
   {
     result += *iter;
     ++iter;
@@ -327,6 +331,8 @@ TEST_CASE ( "utf32 iterator copying", "can we copy them" )
 }
 
 //need to test this since lex uses multipass
+//no more multipass
+#if 0
 TEST_CASE( "utf32 iterator multi_pass", "can we use it with multi_pass" )
 {
   TL::u32string s = U"abcdefghijklmnop";
@@ -371,16 +377,18 @@ TEST_CASE( "utf32 iterator multi_pass", "can we use it with multi_pass" )
   CHECK(pos == 
     boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
 }
+#endif
 
 TEST_CASE( "utf32 iterator copy", "copy the iterator")
 { 
   TL::u32string s = U"test";
   TL::Parser::U32Iterator iter
   (
-    TL::Parser::makeUTF32Iterator(s.begin()),
+    TL::Parser::makeUTF32Iterator(s.begin())
+  );
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF32Iterator(s.end())
   );
-  TL::Parser::U32Iterator end;
 
   TL::Parser::U32Iterator savePos = iter;
 
@@ -424,11 +432,12 @@ TEST_CASE( "line tokenizer empty input", "is it correct with empty input")
   std::string input;
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin()));
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
 
@@ -441,11 +450,12 @@ TEST_CASE( "line tokenizer simple splitting", "some simply tests" )
   std::string input = "eqn a = 5;; assign y := 6;;";
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin()));
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
   CHECK(n.first == TL::LineType::LINE);
@@ -461,11 +471,12 @@ TEST_CASE( "line tokenizer $ symbol", "does it handle $$ correctly" )
   std::string input = "eqn a = b;;  $$";
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin()));
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
 
@@ -486,11 +497,12 @@ TEST_CASE( "line tokenizer extra spaces", "arbitrary white space to skip" )
   std::string input = "eqn a = b;;  $$  ";
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin()));
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
   CHECK(n.first == TL::LineType::LINE);
@@ -510,11 +522,12 @@ TEST_CASE( "line tokenizer %% symbol", "does it handle %% correctly"  )
   std::string input = "eqn x = 42;;\n%%\nx;;";
 
   TL::Parser::U32Iterator iter(
-    TL::Parser::makeUTF8Iterator(input.begin()),
+    TL::Parser::makeUTF8Iterator(input.begin()));
+  TL::Parser::U32Iterator end(
     TL::Parser::makeUTF8Iterator(input.end())
   );
 
-  TL::LineTokenizer tokenize(iter);
+  TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
   CHECK(n.first == TL::LineType::LINE);

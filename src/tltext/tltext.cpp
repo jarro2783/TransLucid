@@ -106,11 +106,14 @@ TLText::run()
     {
       is >> std::noskipws;
       Parser::U32Iterator begin(
-        Parser::makeUTF8Iterator(std::istream_iterator<char>(is)),
+        Parser::makeUTF8Iterator(std::istream_iterator<char>(is))
+      );
+
+      Parser::U32Iterator end(
         Parser::makeUTF8Iterator(std::istream_iterator<char>())
       );
 
-      LineTokenizer tokens(begin);
+      LineTokenizer tokens(begin, end);
       processDefinitions(tokens);
     }
   }
@@ -119,13 +122,13 @@ TLText::run()
   *m_is >> std::noskipws;
 
   Parser::U32Iterator begin(
-    Parser::makeUTF8Iterator(std::istream_iterator<char>(*m_is)),
-    Parser::makeUTF8Iterator(std::istream_iterator<char>())
+    Parser::makeUTF8Iterator(std::istream_iterator<char>(*m_is))
   );
 
-  Parser::U32Iterator end;
+  Parser::U32Iterator end(
+    Parser::makeUTF8Iterator(std::istream_iterator<char>()));
 
-  LineTokenizer tokenizer(begin);
+  LineTokenizer tokenizer(begin, end);
 
   bool done = false;
   while (!done)
@@ -212,13 +215,14 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
       //parse a line with the system
       {
         Parser::U32Iterator lineBegin(
-          Parser::makeUTF32Iterator(line.second.begin()),
+          Parser::makeUTF32Iterator(line.second.begin()));
+        Parser::U32Iterator lineEnd(
           Parser::makeUTF32Iterator(line.second.end())
         );
 
         Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
           0,0);
-        Parser::StreamPosIterator posend;
+        Parser::StreamPosIterator posend(lineEnd);
 
         try
         {
@@ -271,14 +275,14 @@ TLText::processExpressions(LineTokenizer& tokenizer)
       //parse an expression
       {
         Parser::U32Iterator lineBegin(
-          Parser::makeUTF32Iterator(line.second.begin()),
+          Parser::makeUTF32Iterator(line.second.begin()));
+        Parser::U32Iterator lineEnd(
           Parser::makeUTF32Iterator(line.second.end())
         );
-        Parser::U32Iterator lineEnd;
 
         Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
           0, 0);
-        Parser::StreamPosIterator posend;
+        Parser::StreamPosIterator posend(lineEnd);
 
         try
         {
