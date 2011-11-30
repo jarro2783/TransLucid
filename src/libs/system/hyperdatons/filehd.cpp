@@ -30,6 +30,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/utility.hpp>
 
+#include <tl/parser_iterator.hpp>
+#include "tl/lexertl.hpp"
+
 #include <fstream>
 
 namespace TransLucid
@@ -40,70 +43,16 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 {
   std::ifstream in(utf32_to_utf8(file).c_str());
 
-  //first read in the whole file
-  std::string content = read_file(in);
-
   if (!in.is_open())
   {
     throw "Could not open file";
   }
 
-  size_t height;
-  size_t maxWidth = 0;
+  //first read in the whole file
+  std::string content = read_file(in);
 
-  //simply read everything in each line and stuff it into an array
-  std::vector<std::vector<mpz_class>> inArray;
-  while (in)
-  {
-    std::string line;
-    std::getline(in, line);
-
-    std::istringstream linestream(line);
-    std::vector<mpz_class> lineArray;
-
-
-    mpz_class v;
-    linestream >> v;
-    while (linestream)
-    {
-      lineArray.push_back(v);
-      linestream >> v;
-    }
-
-    if (lineArray.size() > maxWidth)
-    {
-      maxWidth = lineArray.size();
-    }
-    if (lineArray.size() != 0)
-    {
-      inArray.push_back(lineArray);
-    }
-  }
-  height = inArray.size();
-
-  std::cerr << "read in: " << height << " x " << maxWidth << " array" <<
-    std::endl;
-
-  m_array = new ArrayNHD<mpz_class, 2>
-  (
-    {height, maxWidth},
-    {Types::Dimension::create(DIM_ARG0), Types::Dimension::create(DIM_ARG1)},
-    s,
-    static_cast<Constant(*)(const mpz_class&)>(&Types::Intmp::create),
-    &Types::Intmp::get
-  );
-
-  size_t i = 0, j;
-  for (auto outer = inArray.begin(); outer != inArray.end(); ++outer)
-  {
-    j = 0;
-    for (auto inner = outer->begin(); inner != outer->end(); ++inner)
-    {
-      (*m_array)[i][j] = *inner;
-      ++j;
-    }
-    ++i;
-  }
+  Parser::StreamPosIterator begin(Parser::makeUTF8Iterator(content.begin()));
+  Parser::StreamPosIterator end(Parser::makeUTF8Iterator(content.end()));
 }
 
 Constant
