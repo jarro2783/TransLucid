@@ -23,20 +23,54 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/hyperdatons/filehd.hpp>
+#include <tl/parser.hpp>
+#include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
+#include <tl/types_basic.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/string.hpp>
 #include <tl/utility.hpp>
 
-#include <tl/parser_iterator.hpp>
 #include "tl/lexertl.hpp"
+#include "tl/lexer_tokens.hpp"
 
 #include <fstream>
 
 namespace TransLucid
 {
+
+namespace TL = TransLucid;
+
+void
+parse_array_init(
+  Parser::LexerIterator& begin,
+  const Parser::LexerIterator& end,
+  size_t maxNum, 
+  size_t current
+)
+{
+  //parses comma separated list of stuff
+  //if maxNum == current then the stuff is strings
+  //otherwise it is array initialisers
+
+  while (true)
+  {
+    if (maxNum == current)
+    {
+    }
+    else
+    {
+      parse_array_init(begin, end, maxNum, current + 1);
+    }
+    
+    if (*begin != Parser::TOKEN_COMMA)
+    {
+      break;
+    }
+  }
+}
 
 FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 : InputHD(0)
@@ -51,8 +85,148 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   //first read in the whole file
   std::string content = read_file(in);
 
-  Parser::StreamPosIterator begin(Parser::makeUTF8Iterator(content.begin()));
-  Parser::StreamPosIterator end(Parser::makeUTF8Iterator(content.end()));
+  Parser::StreamPosIterator rawbegin(
+    Parser::makeUTF8Iterator(content.begin()));
+  Parser::StreamPosIterator rawend(Parser::makeUTF8Iterator(content.end()));
+
+  //something is rotten in the state of denmark
+  Context& k = s.getDefaultContext();
+
+  auto idents = s.lookupIdentifiers();
+
+  Parser::LexerIterator lexer(rawbegin, rawend, k, idents);
+  auto end = lexer.makeEnd();
+
+  Parser::Parser parser(s);
+
+  if (*lexer != Parser::TOKEN_ID || 
+      TransLucid::get<u32string>(lexer->getValue()) != U"contains")
+  {
+    throw "Expected identifier \"contains\"";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_CONSTANT)
+  {
+    throw "Expected string constant";
+  }
+
+  const auto& thetype = TL::get<std::pair<u32string, u32string>>(
+    lexer->getValue());
+
+  if (thetype.first != U"ustring")
+  {
+    throw "Expected string constant";
+  }
+
+  ++lexer;
+  if (*lexer != Parser::TOKEN_DBLSEMI)
+  {
+    throw "Expected \";;\"";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_ID || 
+      TransLucid::get<u32string>(lexer->getValue()) != U"indexedby")
+  {
+    throw "Expected identifier \"indexedby\"";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_LBRACE)
+  {
+    throw "Expected {";
+  }
+
+  ++lexer;
+
+  //parse a comma separated list of exprs
+  std::vector<Tree::Expr> index;
+  while (true)
+  {
+    Tree::Expr dim;
+    if (!parser.parse_expr(lexer, end, dim))
+    {
+      throw "Expected expression";
+    }
+
+    index.push_back(dim);
+
+    ++lexer;
+
+    if (*lexer != Parser::TOKEN_COMMA)
+    {
+      break;
+    }
+    ++lexer;
+  }
+
+  if (*lexer != Parser::TOKEN_RBRACE)
+  {
+    throw "Expected }";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_ID ||
+      TransLucid::get<u32string>(lexer->getValue()) != U"entries")
+  {
+    throw "Expected \"entries\"";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_EQUALS)
+  {
+    throw "Expected =";
+  }
+
+  ++lexer;
+
+  size_t numDims = index.size();
+  size_t currentDim = 0;
+
+  parse_array_init(lexer, end, numDims, currentDim);
+
+#if 0
+  while (true)
+  {
+    switch (lexer->getType())
+    {
+      case Parser::TOKEN_LBRACE:
+      ++currentDim;
+
+      if (currentDim > numDims)
+      {
+        throw "too many dimensions in initialiser";
+      }
+      break;
+
+      case Parser::TOKEN_RBRACE:
+      --currentDim;
+      break;
+
+      case Parser::TOKEN_CONSTANT:
+      if (currentDim != numDims)
+      {
+        throw "constant cannot appear here";
+      }
+      break;
+
+      default:
+      throw "invalid token";
+    }
+    ++lexer;
+
+    if (currentDim == 0)
+    {
+      break;
+    }
+  }
+#endif
 }
 
 Constant
