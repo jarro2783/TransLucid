@@ -43,7 +43,25 @@ namespace TransLucid
 
 namespace TL = TransLucid;
 
-void
+namespace
+{
+
+struct array_initialiser;
+
+typedef Variant<u32string, recursive_wrapper<array_initialiser>> ArrayInit;
+
+struct array_initialiser
+{
+  std::vector<ArrayInit> array;
+
+  decltype(array)*
+  operator->()
+  {
+    return &array;
+  }
+};
+
+ArrayInit
 parse_array_init(
   Parser::LexerIterator& begin,
   const Parser::LexerIterator& end,
@@ -55,25 +73,86 @@ parse_array_init(
   //if maxNum == current then the stuff is strings
   //otherwise it is array initialisers
 
+  if (*begin != Parser::TOKEN_LBRACE)
+  {
+    throw "expected {";
+  }
+
+  ++begin;
+
+  array_initialiser a;
+
   while (true)
   {
     if (maxNum == current)
     {
+      if (*begin != Parser::TOKEN_CONSTANT)
+      {
+        throw "expected constant in array initialiser";
+      }
+
+      const auto& value = 
+        get<std::pair<u32string, u32string>>(begin->getValue());
+
+      if (value.first != U"ustring")
+      {
+        throw "expected string constant in array initialiser";
+      }
+
+      a->push_back(value.second);
     }
     else
     {
-      parse_array_init(begin, end, maxNum, current + 1);
+      a->push_back(parse_array_init(begin, end, maxNum, current + 1));
     }
+
+    ++begin;
     
     if (*begin != Parser::TOKEN_COMMA)
     {
       break;
     }
+    else
+    {
+      ++begin;
+    }
   }
+
+  if (*begin != Parser::TOKEN_RBRACE)
+  {
+    throw "expected }";
+  }
+
+  return a;
+}
+
+//data must only have dims number of dimensions of data in it
+Constant*
+fill_array(const ArrayInit& data, size_t dims)
+{
+  //first count all the dimensions
+  std::vector<size_t> max(dims, 0);
+
+  //find the size of the array
+  size_t n = 
+    std::accumulate(max.begin(), max.end(), 1, std::multiplies<size_t>());
+
+  //allocate the array
+  std::unique_ptr<Constant> array(new Constant[n]);
+
+  //now fill it in
+
+  Constant* raw = array.get();
+  array.release();
+
+  return raw;
+}
+
 }
 
 FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 : InputHD(0)
+, m_data(nullptr)
 {
   std::ifstream in(utf32_to_utf8(file).c_str());
 
@@ -189,44 +268,9 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   size_t numDims = index.size();
   size_t currentDim = 0;
 
-  parse_array_init(lexer, end, numDims, currentDim);
+  ArrayInit array = parse_array_init(lexer, end, numDims, currentDim);
 
-#if 0
-  while (true)
-  {
-    switch (lexer->getType())
-    {
-      case Parser::TOKEN_LBRACE:
-      ++currentDim;
-
-      if (currentDim > numDims)
-      {
-        throw "too many dimensions in initialiser";
-      }
-      break;
-
-      case Parser::TOKEN_RBRACE:
-      --currentDim;
-      break;
-
-      case Parser::TOKEN_CONSTANT:
-      if (currentDim != numDims)
-      {
-        throw "constant cannot appear here";
-      }
-      break;
-
-      default:
-      throw "invalid token";
-    }
-    ++lexer;
-
-    if (currentDim == 0)
-    {
-      break;
-    }
-  }
-#endif
+  m_data = fill_array(array, numDims);
 }
 
 Constant

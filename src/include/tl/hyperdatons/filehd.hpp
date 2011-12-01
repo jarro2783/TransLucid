@@ -141,7 +141,10 @@ namespace TransLucid
 
     FileArrayInHD(const u32string& file, System& system);
 
-    ~FileArrayInHD() throw() {}
+    ~FileArrayInHD() throw() 
+    {
+      delete [] m_data;
+    }
 
     Tuple
     variance() const;
@@ -151,6 +154,7 @@ namespace TransLucid
 
     private:
     ArrayNHD<mpz_class, 2>* m_array;
+    Constant* m_data;
   };
 
   class FileArrayOutHD : public OutputHD
