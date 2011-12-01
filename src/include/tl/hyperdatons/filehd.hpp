@@ -153,8 +153,9 @@ namespace TransLucid
     get(const Context& k) const;
 
     private:
-    ArrayNHD<mpz_class, 2>* m_array;
     Constant* m_data;
+    Tuple m_variance;
+    std::vector<std::pair<dimension_index, size_t>> m_bounds;
   };
 
   class FileArrayOutHD : public OutputHD

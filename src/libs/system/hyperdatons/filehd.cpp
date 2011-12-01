@@ -54,6 +54,12 @@ struct array_initialiser
 {
   std::vector<ArrayInit> array;
 
+  const decltype(array)*
+  operator->() const
+  {
+    return &array;
+  }
+
   decltype(array)*
   operator->()
   {
@@ -126,12 +132,39 @@ parse_array_init(
   return a;
 }
 
+void
+count_dims
+(
+  std::vector<size_t>& lengths, 
+  const ArrayInit& data, 
+  size_t current
+)
+{
+  auto p = get<array_initialiser>(&data);
+
+  if (p)
+  {
+    auto l = (*p)->size();
+    if (l > lengths.at(current))
+    {
+      lengths.at(current) = l;
+
+      for (auto sub : p->array)
+      {
+        count_dims(lengths, sub, current + 1);
+      }
+    }
+  }
+}
+
 //data must only have dims number of dimensions of data in it
 Constant*
 fill_array(const ArrayInit& data, size_t dims)
 {
   //first count all the dimensions
   std::vector<size_t> max(dims, 0);
+
+  count_dims(max, data, 0);
 
   //find the size of the array
   size_t n = 
@@ -271,6 +304,8 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   ArrayInit array = parse_array_init(lexer, end, numDims, currentDim);
 
   m_data = fill_array(array, numDims);
+
+  //set up the dimensions to index it by
 }
 
 Constant
@@ -346,17 +381,18 @@ FileArrayOutFn::applyFn(const Constant& arg) const
   return Constant();
 }
 
-//for now we will just fill it with some random data to see what happens
 Tuple
 FileArrayInHD::variance() const
 {
-  return m_array->variance();
+  return m_variance;
 }
 
 Constant
 FileArrayInHD::get(const Context& k) const
 {
-  return m_array->get(k);
+  //this is the hard one
+  //lookup the bounds dimensions in the context, and convert that to an
+  //index
 }
 
 
