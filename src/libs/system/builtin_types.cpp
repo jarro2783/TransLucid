@@ -1041,6 +1041,30 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
     );
   }
 
+  #if 0
+  BuiltinBaseFunction<1> construct_typetype(
+    [&s] (const Constant& text) -> Constant
+    {
+      type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
+
+      if (t == 0)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+      else
+      {
+        return Types::Type::create(t);
+      }
+    }
+  );
+
+  std::unique_ptr<BangAbstractionWS> 
+    typetype_op(new BangAbstractionWS(fn.fn->clone()));
+
+  s.addEquation(fn.op_name, typetype_op.get());
+  typetype_op.release();
+  #endif
+
   s.registerFunction(U"construct_typetype",
     make_function_type<1>::type(
       [&s] (const Constant& text) -> Constant
