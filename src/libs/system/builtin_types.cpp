@@ -50,6 +50,9 @@ namespace TransLucid
   {
     using namespace TransLucid::BuiltinOps;
 
+    BuiltinBaseFunction<1> construct_integer{Types::Intmp::create};
+      //static_cast<Constant (*)(const Constant&)>(Types::Intmp::create)));
+
     BuiltinBaseFunction<2> integer_plus{&mpz_plus};
     BuiltinBaseFunction<2> integer_minus{&mpz_minus};
     BuiltinBaseFunction<2> integer_times{&mpz_times};
@@ -90,7 +93,8 @@ namespace TransLucid
       {U"eq", U"int_eq", &integer_eq},
       {U"ne", U"int_ne", &integer_ne},
       {U"plus", U"ustring_plus", &ustring_plus_fn},
-      {U"range_construct", U"make_range", &range_create}
+      {U"range_construct", U"make_range", &range_create},
+      {U"ignored", U"construct_intmp", &construct_integer}
     };
   }
 }

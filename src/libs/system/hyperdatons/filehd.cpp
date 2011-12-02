@@ -157,28 +157,128 @@ count_dims
   }
 }
 
-//data must only have dims number of dimensions of data in it
-Constant*
-fill_array(const ArrayInit& data, size_t dims)
+struct fill_array
 {
-  //first count all the dimensions
-  std::vector<size_t> max(dims, 0);
+  const std::vector<size_t>& m_max;
+  const BaseFunctionType* m_constructor;
 
-  count_dims(max, data, 0);
+  fill_array
+  (
+    const std::vector<size_t>& max,
+    const BaseFunctionType* constructor
+  )
+  : m_max(max), m_constructor(constructor)
+  {
+  }
 
-  //find the size of the array
-  size_t n = 
-    std::accumulate(max.begin(), max.end(), 1, std::multiplies<size_t>());
+  Constant*
+  do_fill
+  (
+    Constant* data,
+    const array_initialiser& entry,
+    size_t depth
+  )
+  {
+    
+    //the only entries that should have constants in them should be
+    //when we are at depth == max.size() - 1
 
-  //allocate the array
-  std::unique_ptr<Constant> array(new Constant[n]);
+    Constant* nextspot = data;
+    if (depth == m_max.size() - 1)
+    {
+      for (size_t current = 0; current != entry->size(); ++current)
+      {
+        const u32string& nextentry = 
+          get<u32string>(entry->at(current));
 
-  //now fill it in
+        //construct the Constant here and put it in the array
+        *nextspot = m_constructor->apply(Types::String::create(nextentry));
+        ++nextspot;
+      }
 
-  Constant* raw = array.get();
-  array.release();
+      //compute the address of the next row
+      nextspot += m_max.at(depth) - (nextspot - data);
 
-  return raw;
+      //TODO fill in zeros
+    }
+    else
+    { 
+      size_t current;
+      for (current = 0; current != entry->size(); ++current)
+      {
+        const array_initialiser& nextentry = 
+          get<array_initialiser>(entry->at(current));
+
+        nextspot = do_fill(nextspot, nextentry, depth+1);
+      }
+
+      if (entry->size() != m_max.at(depth))
+      {
+        //find the next entry
+        auto maxindex = m_max.begin() + depth;
+        ++maxindex;
+
+        size_t increment = std::accumulate(maxindex, m_max.end(), 1, 
+          std::multiplies<size_t>());
+
+        nextspot += (m_max.at(depth) - current) * increment;
+      }
+    }
+
+    return nextspot;
+  }
+
+  //data must only have dims number of dimensions of data in it
+  Constant*
+  operator()
+    (const ArrayInit& data, size_t dims)
+  {
+    //find the size of the array
+    size_t n = std::accumulate
+      (m_max.begin(), m_max.end(), 1, std::multiplies<size_t>());
+
+    //allocate the array
+    std::unique_ptr<Constant> array(new Constant[n]);
+
+    //now fill it in
+
+    //array of the current index
+    std::vector<size_t> index(m_max.size(), 0);
+
+    //the first set of entries
+    const auto& first = get<array_initialiser>(data);
+
+    do_fill(array.get(), first, 0);
+
+    Constant* raw = array.get();
+    array.release();
+
+    return raw;
+  }
+};
+
+const BaseFunctionType*
+get_constructor(const u32string& type, System& s, Context& k)
+{
+  u32string construct = U"construct_" + type;
+
+  WS* fn = s.lookupIdentifiers().lookup(construct);
+
+  if (fn == nullptr)
+  {
+    throw "Could not find constructor for type";
+  }
+  else
+  {
+    Constant constructor = (*fn)(k);
+
+    if (constructor.index() != TYPE_INDEX_BASE_FUNCTION)
+    {
+      throw "Invalid type for constructor";
+    }
+
+    return &get_constant_pointer<BaseFunctionType>(constructor);
+  }
 }
 
 }
@@ -303,9 +403,46 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 
   ArrayInit array = parse_array_init(lexer, end, numDims, currentDim);
 
-  m_data = fill_array(array, numDims);
+  //first count all the dimensions
+  std::vector<size_t> max(numDims, 0);
+
+  count_dims(max, array, 0);
+
+  using std::placeholders::_1;
 
   //set up the dimensions to index it by
+  //eval the dimensions
+  std::vector<Constant> indexVals;
+  std::transform(index.begin(), index.end(),
+    std::back_inserter(indexVals),
+    std::bind(std::mem_fun(&System::evalExpr), &s, _1)
+  );
+
+  //get the dim indices
+  for (size_t i = 0; i != indexVals.size(); ++i)
+  {
+    m_bounds.push_back
+    (std::make_pair(
+      s.getDimensionIndex(indexVals.at(i)),
+      max.at(i)
+    ));
+  }
+
+  //get the constructor and the zero value
+  const BaseFunctionType* constructor = get_constructor(thetype.second, s, k);
+  m_data = fill_array(max, constructor)(array, numDims);
+
+  //make the variance tuple
+  tuple_t variance;
+  mpz_class a = 0;
+  for (const auto& bound : m_bounds)
+  {
+    mpz_class b = bound.second;
+    variance.insert(std::make_pair(bound.first,
+      Types::Range::create(Range(&a, &b))));
+  }
+
+  m_variance = variance;
 }
 
 Constant

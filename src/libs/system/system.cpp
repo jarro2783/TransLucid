@@ -1468,4 +1468,10 @@ System::addFunction(const Parser::FnDecl& fn)
   return Types::UUID::create(u);
 }
 
+Constant
+System::evalExpr(const Tree::Expr& e)
+{
+  return compile_and_evaluate(e, *this);
+}
+
 } //namespace TransLucid

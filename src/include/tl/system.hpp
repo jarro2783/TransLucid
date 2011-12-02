@@ -195,6 +195,9 @@ namespace TransLucid
     void
     go();
 
+    Constant
+    evalExpr(const Tree::Expr& e);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
