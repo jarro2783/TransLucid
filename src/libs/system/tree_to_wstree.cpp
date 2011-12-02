@@ -125,16 +125,10 @@ TreeToWSTree::operator()(const Tree::LiteralExpr& e)
             << "LITERAL @ [typename <- \"" << e.type << "\", text <- \""
             << e.text << "\"]" << std::endl;
   #endif
-  return Tree::AtExpr
+  return Tree::BangAppExpr
   (
-    Tree::IdentExpr(LITERAL_IDENT),
-    Tree::TupleExpr
-    (
-      {
-        {Tree::DimensionExpr(type_name_dim), e.type},
-        {Tree::DimensionExpr(text_dim), e.text}
-      }
-    )
+    Tree::IdentExpr(U"construct_" + e.type),
+    e.text
   );
 }
 
