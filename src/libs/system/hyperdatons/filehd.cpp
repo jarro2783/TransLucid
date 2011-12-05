@@ -259,7 +259,7 @@ struct fill_array
   }
 };
 
-const BaseFunctionType*
+Constant
 get_constructor(const u32string& type, System& s, Context& k)
 {
   u32string construct = U"construct_" + type;
@@ -279,7 +279,7 @@ get_constructor(const u32string& type, System& s, Context& k)
       throw "Invalid type for constructor";
     }
 
-    return &get_constant_pointer<BaseFunctionType>(constructor);
+    return constructor;
   }
 }
 
@@ -440,7 +440,9 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   }
 
   //get the constructor and the zero value
-  const BaseFunctionType* constructor = get_constructor(thetype.second, s, k);
+  Constant fnconstant = get_constructor(thetype.second, s, k);
+  const BaseFunctionType* constructor = 
+    &get_constant_pointer<BaseFunctionType>(fnconstant);
   m_data = fill_array(max, constructor)(array, numDims);
 
   //make the variance tuple
@@ -462,8 +464,8 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   auto bounditer = m_bounds.rbegin();
   while (muliter != m_multipliers.rend())
   {
-    prev = prev * bounditer->second;
     *muliter = prev;
+    prev = prev * bounditer->second;
     ++muliter;
     ++bounditer;
   }
