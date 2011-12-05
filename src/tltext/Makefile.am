@@ -15,6 +15,7 @@ tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 
 if TLWEB_STATIC
   TLWEB_STATIC_FLAGS = -all-static
+  matrixweb_LDFLAGS=-all-static
 endif
 
 tlweb_LDFLAGS = $(TLTEXT_LIBS) $(TLWEB_STATIC_FLAGS)

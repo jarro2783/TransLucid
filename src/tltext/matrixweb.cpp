@@ -133,7 +133,9 @@ void
 printForms()
 {
   std::cout 
-    << R"(<form action="matrixweb" method="post">)" << std::endl
+    << R"(<form action="http://translucid.cse.unsw.edu.au/cgi-bin/matrixweb" 
+       method="post">)" 
+    << std::endl
     << "What are the dimensions of your output variable?<br>"
     << R"(Cols: <input type="text" name="outrows" size="4" value="3">)"
     << R"(Rows: <input type="text" name="outcols" size="4", value="3">)"
@@ -319,7 +321,7 @@ int main(int argc, char* argv[])
       setenv("SCRIPT_NAME", "tlweb", 1);
 
       //run tlweb
-      execl("tlweb", "tlweb", nullptr);
+      execl("/web/translucid/cgi-bin/tlweb2", "tlweb", nullptr);
     }
     else
     {
