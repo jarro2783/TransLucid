@@ -98,7 +98,8 @@ namespace
     tupleRefines
     (
       Types::Tuple::get(sub),
-      Types::Tuple::get(super)
+      Types::Tuple::get(super),
+      true
     );
 
     //std::cerr << "refines = " << r << std::endl;
@@ -245,64 +246,11 @@ valueRefines(const Constant& a, const Constant& b)
     //there is no comparator, just check if they are equal
     return a == b;
   }
-
-  //three cases, range, type, anything else
-
-  if (b.index() == TYPE_INDEX_RANGE)
-  {
-    if (a.index() == TYPE_INDEX_RANGE)
-    {
-      if (!Types::Range::get(b).within(Types::Range::get(a)))
-      {
-        //std::cerr << "no" << std::endl;
-        return false;
-      }
-    }
-    else if (a.index() == TYPE_INDEX_INTMP)
-    {
-      if (!Types::Range::get(b).within(Types::Intmp::get(a)))
-      {
-        //std::cerr << "no" << std::endl;
-        return false;
-      }
-    }
-    else
-    {
-        //std::cerr << "no" << std::endl;
-      return false;
-    }
-        //std::cerr << "yes" << std::endl;
-    return true;
-  }
-  else if (b.index() == TYPE_INDEX_TYPE)
-  {
-    //std::cerr << "type type index == " << b.value<Type>().index()
-    //<< std::endl;
-    if (a.index() == get_constant<type_index>(b))
-    {
-        //std::cerr << "yes" << std::endl;
-      return true;
-    }
-    else
-    {
-        //std::cerr << "no" << std::endl;
-      return false;
-    }
-  }
-  else
-  {
-    //std::cerr << (a==b ? "yes" : "no") << std::endl;
-    return a == b;
-  }
-
-  //for now a and b just have to be equal
-    //std::cerr << (a==b ? "yes" : "no") << std::endl;
-  return a == b;
 }
 
 //does a refine b
 bool
-tupleRefines(const Tuple& a, const Tuple& b)
+tupleRefines(const Tuple& a, const Tuple& b, bool canequal)
 {
   #if 0
   std::cerr << "== tuple refines ==" << std::endl;
@@ -377,7 +325,7 @@ tupleRefines(const Tuple& a, const Tuple& b)
   //if we get here then a is either equal to b or refines it
   //if not equal then the variable equal would have been changed somewhere
   //std::cerr << (!equal ? "yes" : "no") << std::endl;
-  return !equal;
+  return !equal || canequal;
 }
 
 bool

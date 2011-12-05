@@ -125,7 +125,7 @@ namespace TransLucid
   tupleApplicable(const Tuple& def, const Context& c);
 
   bool
-  tupleRefines(const Tuple& a, const Tuple& b);
+  tupleRefines(const Tuple& a, const Tuple& b, bool canequal = false);
 
   bool
   valueRefines(const Constant& a, const Constant& b);
