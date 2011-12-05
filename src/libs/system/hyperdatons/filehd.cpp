@@ -129,6 +129,8 @@ parse_array_init(
     throw "expected }";
   }
 
+  ++begin;
+
   return a;
 }
 
@@ -367,8 +369,6 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 
     index.push_back(dim);
 
-    ++lexer;
-
     if (*lexer != Parser::TOKEN_COMMA)
     {
       break;
@@ -379,6 +379,13 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   if (*lexer != Parser::TOKEN_RBRACE)
   {
     throw "Expected }";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_DBLSEMI)
+  {
+    throw "Expected ';;'";
   }
 
   ++lexer;
@@ -399,9 +406,13 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   ++lexer;
 
   size_t numDims = index.size();
-  size_t currentDim = 0;
 
-  ArrayInit array = parse_array_init(lexer, end, numDims, currentDim);
+  ArrayInit array = parse_array_init(lexer, end, numDims, 1);
+
+  if (*lexer != Parser::TOKEN_DBLSEMI)
+  {
+    throw "Expected ';;'";
+  }
 
   //first count all the dimensions
   std::vector<size_t> max(numDims, 0);
@@ -443,6 +454,19 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   }
 
   m_variance = variance;
+
+  //set up the multipliers for indexing the array
+  m_multipliers.insert(m_multipliers.end(), m_bounds.size(), 0);
+  size_t prev = 1;
+  auto muliter = m_multipliers.rbegin(); 
+  auto bounditer = m_bounds.rbegin();
+  while (muliter != m_multipliers.rend())
+  {
+    prev = prev * bounditer->second;
+    *muliter = prev;
+    ++muliter;
+    ++bounditer;
+  }
 }
 
 Constant
@@ -530,6 +554,22 @@ FileArrayInHD::get(const Context& k) const
   //this is the hard one
   //lookup the bounds dimensions in the context, and convert that to an
   //index
+
+  //assume that the dimensions are correct
+  auto boundsiter = m_bounds.begin();
+  auto muliter = m_multipliers.begin();
+  size_t index = 0;
+  while (boundsiter != m_bounds.end())
+  {
+    auto dim = boundsiter->first;
+    const auto& value = k.lookup(dim);
+    mpz_class next = (get_constant_pointer<mpz_class>(value) * *muliter);
+    index += next.get_ui();
+    ++boundsiter;
+    ++muliter;
+  }
+
+  return m_data[index];
 }
 
 
