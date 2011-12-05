@@ -162,13 +162,15 @@ struct fill_array
 {
   const std::vector<size_t>& m_max;
   const BaseFunctionType* m_constructor;
+  Constant m_zero;
 
   fill_array
   (
     const std::vector<size_t>& max,
-    const BaseFunctionType* constructor
+    const BaseFunctionType* constructor,
+    const Constant zero
   )
-  : m_max(max), m_constructor(constructor)
+  : m_max(max), m_constructor(constructor), m_zero(zero)
   {
   }
 
@@ -197,10 +199,17 @@ struct fill_array
         ++nextspot;
       }
 
+      auto firstzero = nextspot;
+
       //compute the address of the next row
       nextspot += m_max.at(depth) - (nextspot - data);
 
       //TODO fill in zeros
+      while (firstzero != nextspot)
+      {
+        *firstzero = m_zero;
+        ++firstzero;
+      }
     }
     else
     { 
@@ -442,16 +451,23 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   Constant fnconstant = get_constructor(thetype.second, s, k);
   const BaseFunctionType* constructor = 
     &get_constant_pointer<BaseFunctionType>(fnconstant);
-  m_data = fill_array(max, constructor)(array, numDims);
+
+  auto zerows = idents.lookup(thetype.second + U"_zero");
+
+  Constant zero = zerows == nullptr ? Types::Special::create(SP_UNDEF) : 
+    (*zerows)(k)
+  ;
+
+  m_data = fill_array(max, constructor, zero)(array, numDims);
 
   //make the variance tuple
   tuple_t variance;
   mpz_class a = 0;
   for (const auto& bound : m_bounds)
   {
+    mpz_class b = bound.second - 1;
     std::cerr << "bounds are " << bound.first << ": " 
-      << 0 << ".." << bound.second << std::endl;
-    mpz_class b = bound.second;
+      << 0 << ".." << b << std::endl;
     variance.insert(std::make_pair(bound.first,
       Types::Range::create(Range(&a, &b))));
   }
