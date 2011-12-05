@@ -21,6 +21,8 @@ along with TransLucid; see the file COPYING.  If not see
  * Builtin type definitions.
  */
 
+#include <sstream>
+
 #include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
 #include "tl/builtin_ops.hpp"
@@ -92,6 +94,12 @@ namespace TransLucid
       {U"plus", U"ustring_plus", &ustring_plus_fn},
       {U"range_construct", U"make_range", &range_create}
     };
+  }
+
+  Constant
+  print_error_value(const Constant& arg)
+  {
+    return Types::String::create(U"internal compiler error");
   }
 }
 
@@ -512,6 +520,16 @@ namespace TransLucid
       create(type_index t)
       {
         return Constant(t, TYPE_INDEX_TYPE);
+      }
+
+      Constant
+      print(const Constant& v)
+      {
+        std::ostringstream os;
+        os << get_constant<type_index>(v);
+
+        std::string s = os.str();
+        return String::create(u32string(s.begin(), s.end()));
       }
     }
     
@@ -997,6 +1015,7 @@ addTypeNames(System& s, const std::vector<u32string>& types)
   {
     addTypeEquation(s, t);
   }
+  addTypeEquation(s, U"error");
 }
 
 void
@@ -1037,20 +1056,28 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
     );
   }
 
+  s.addEquation(Parser::Equation(
+    U"TYPENAME",
+    Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), 
+      Tree::IdentExpr(U"error")}}),
+    Tree::Expr(),
+    u32string(U"error"))
+  );
+
   s.registerFunction(U"construct_typetype",
     make_function_type<1>::type(
       [&s] (const Constant& text) -> Constant
     {
       type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
 
-      if (t == 0)
-      {
-        return Types::Special::create(SP_CONST);
-      }
-      else
-      {
+      //if (t == 0)
+      //{
+      //  return Types::Special::create(SP_CONST);
+      //}
+      //else
+      //{
         return Types::Type::create(t);
-      }
+      //}
     })
   );
 
@@ -1091,6 +1118,12 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
 
   s.registerFunction(U"print_range",
     make_function_type<1>::type(&Types::Range::print));
+
+  s.registerFunction(U"print_typetype",
+    make_function_type<1>::type(&Types::Type::print));
+
+  s.registerFunction(U"print_error",
+    make_function_type<1>::type(&print_error_value));
 
   //string returns itself
   //PRINT | [arg0 : ustring] = #arg0;;
@@ -1211,6 +1244,8 @@ init_builtin_types(System& s)
 
   //add all the definitions of t = type"t";;
   addTypeNames(s, type_names);
+
+  to_print_types.push_back(U"error");
 
   add_builtin_printers(s, to_print_types);
 

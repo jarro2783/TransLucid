@@ -263,6 +263,16 @@ namespace
 
     }
   };
+
+  class MakeErrorWS : public WS
+  {
+    public:
+    Constant
+    operator()(Context& k)
+    {
+      return Constant();
+    }
+  };
 }
 
 namespace detail
@@ -624,6 +634,8 @@ System::init_equations()
   //args = case hd(##\psi) of E @ [#\pi <- tl(##\pi), #\psi <- tl(##\psi)]
   //  @ hd(##\pi)
   addEquation(U"args", GuardWS(), new ArgsWorkshop);
+
+  addEquation(U"make_error", GuardWS(), new MakeErrorWS);
 }
 
 void 
@@ -639,6 +651,7 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
 System::System()
 : m_typeRegistry(m_nextTypeIndex,
   std::vector<std::pair<u32string, type_index>>{
+   {U"error", TYPE_INDEX_ERROR},
    {U"ustring", TYPE_INDEX_USTRING},
    {U"intmp", TYPE_INDEX_INTMP},
    {U"bool", TYPE_INDEX_BOOL},
