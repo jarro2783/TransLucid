@@ -106,13 +106,12 @@ parse_array_init(
       }
 
       a->push_back(value.second);
+      ++begin;
     }
     else
     {
       a->push_back(parse_array_init(begin, end, maxNum, current + 1));
     }
-
-    ++begin;
     
     if (*begin != Parser::TOKEN_COMMA)
     {
@@ -450,6 +449,8 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   mpz_class a = 0;
   for (const auto& bound : m_bounds)
   {
+    std::cerr << "bounds are " << bound.first << ": " 
+      << 0 << ".." << bound.second << std::endl;
     mpz_class b = bound.second;
     variance.insert(std::make_pair(bound.first,
       Types::Range::create(Range(&a, &b))));
