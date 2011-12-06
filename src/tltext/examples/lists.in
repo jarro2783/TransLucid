@@ -1,7 +1,7 @@
 //List Operations
 data List a = Cons a (List a) | ListTail;;
 
-infixl "::" "cons_list" ~10;;
+infixr "::" "cons_list" ~10;;
 
 fun cons_list.a.b [b : [type <- "List"]] = Cons.a.b;;
 fun cons_list.a.b = Cons.a.(Cons.b.ListTail);;
@@ -18,3 +18,4 @@ head.(Cons.4.(Cons.5.ListTail));;
 headv @ [arg0 <- Cons.4.(Cons.5.ListTail)];;
 head.(1::2);;
 head.(tail.(1::2));;
+head.(1::2::3);;
