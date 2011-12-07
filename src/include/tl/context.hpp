@@ -81,6 +81,9 @@ namespace TransLucid
     void
     reset();
 
+    bool
+    operator<=(const Context& rhs) const;
+
     private:
 
     dimension_index
@@ -93,7 +96,7 @@ namespace TransLucid
 
     //one before the smallest
     dimension_index m_min;
-    //one before the biggest
+    //the biggest
     dimension_index m_max;
 
     Constant m_all;

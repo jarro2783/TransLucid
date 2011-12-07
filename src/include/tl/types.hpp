@@ -213,6 +213,12 @@ namespace TransLucid
       }
     }
 
+    bool
+    operator!=(const Constant& rhs) const
+    {
+      return !(*this == rhs);
+    }
+
     type_index
     index() const
     {
