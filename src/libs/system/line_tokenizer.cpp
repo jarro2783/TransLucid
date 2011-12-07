@@ -216,9 +216,19 @@ LineTokenizer::readOuter()
         if (c == ';' && m_whereDepth == 0)
         {
           done = true;
+          m_state = State::READ_SCANNING;
         }
       }
       break;
+
+      case '/':
+      {
+        c = nextChar();
+        if (c == '/')
+        {
+          skipToNewline();
+        }
+      }
 
       case '"':
       readInterpretedString();
@@ -288,6 +298,16 @@ LineTokenizer::nextChar()
 
   m_line += c;
   return c;
+}
+
+void
+LineTokenizer::skipToNewline()
+{
+  char32_t c = nextChar();
+  while (c != '\n')
+  {
+    c = nextChar();
+  }
 }
 
 void
