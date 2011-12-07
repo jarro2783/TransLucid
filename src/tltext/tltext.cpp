@@ -315,7 +315,7 @@ TLText::processExpressions(LineTokenizer& tokenizer)
     }
   }
 
-  return exprs;
+  return std::move(exprs);
 }
 
 void
