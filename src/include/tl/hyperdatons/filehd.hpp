@@ -158,6 +158,7 @@ namespace TransLucid
     Tuple m_variance;
     std::vector<std::pair<dimension_index, size_t>> m_bounds;
     std::vector<size_t> m_multipliers;
+    ArrayHD m_array;
   };
 
   class FileArrayOutHD : public OutputHD

@@ -18,6 +18,7 @@ ast.cpp bestfit.cpp builtin_types.cpp charset.cpp
 context.cpp dimtranslator.cpp 
 equation.cpp
 eval_workshops.cpp
+hyperdatons/arrayhd.cpp
 hyperdatons/envhd.cpp
 hyperdatons/filehd.cpp
 internal_strings.cpp lexertl.cpp lexer_util.cpp 

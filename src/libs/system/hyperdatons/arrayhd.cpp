@@ -17,62 +17,29 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <vector>
-#include <utility>
-
-#include <tl/hyperdaton.hpp>
+#include <tl/hyperdatons/arrayhd.hpp>
 
 namespace TransLucid
 {
-  class ArrayHD : public IOHD
-  {
-    public:
 
-    ArrayHD()
-    : IOHD(1), m_size(0), m_data(nullptr)
-    {}
+Constant
+ArrayHD::get(const Context& k) const
+{
+}
 
-    void
-    initialise(const std::vector<std::pair<dimension_index, size_t>>& bounds);
+void
+ArrayHD::put(const Context& k, const Constant& c)
+{
+}
 
-    Constant*
-    begin()
-    {
-      return m_data;
-    }
+void
+ArrayHD::commit()
+{
+}
 
-    const Constant*
-    begin() const
-    {
-      return m_data;
-    }
+Tuple
+ArrayHD::variance() const
+{
+}
 
-    Constant*
-    end()
-    {
-      return m_data + m_size;
-    }
-
-    const Constant*
-    end() const
-    {
-      return m_data + m_size;
-    }
-
-    Constant
-    get(const Context& k) const;
-
-    void
-    put(const Context&, const Constant&);
-
-    void
-    commit();
-
-    Tuple
-    variance() const;
-
-    private:
-    size_t m_size;
-    Constant* m_data;
-  };
 }
