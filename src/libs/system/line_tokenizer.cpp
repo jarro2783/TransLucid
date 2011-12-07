@@ -229,6 +229,7 @@ LineTokenizer::readOuter()
           skipToNewline();
         }
       }
+      break;
 
       case '"':
       readInterpretedString();

@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/tree_printer.hpp>
 #include "tl/lexertl.hpp"
 #include <tl/line_tokenizer.hpp>
+#include <tl/output.hpp>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -192,6 +193,32 @@ end;;)";
     CHECK(n.second == TL::to_u32string(input));
   }
 
+}
+
+TEST_CASE( "comment", "where clause with comments" )
+{
+  {
+    std::string input = 
+R"(//this is a comment
+var f = x + #d where
+   var x = 5;;
+   dim d <- 4;;
+end;;)";
+
+    
+    TL::Parser::U32Iterator iter(
+      TL::Parser::makeUTF8Iterator(input.begin())
+    );
+    TL::Parser::U32Iterator end(
+      TL::Parser::makeUTF8Iterator(input.end())
+    );
+
+    TL::LineTokenizer tokenize(iter, end);
+
+    auto n = tokenize.next();
+    CHECK(n.first == TL::LineType::LINE);
+    CHECK(n.second == TL::to_u32string(input));
+  }
 }
 
 namespace
