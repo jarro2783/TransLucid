@@ -108,7 +108,7 @@ namespace
   enumerateContextSet
   (
     const Tuple& ctxts, 
-    const Tuple& k,
+    Context& k,
     WS& compute,
     OutputHD* out
   )
@@ -158,8 +158,9 @@ namespace
         p.perturb(v.first, Types::Intmp::create(v.second));
       }
 
-      //evaluate all the stuff if applicable
-      if (tupleApplicable(variance, evalContext))
+      //is the demand valid for the hyperdaton, and is the demand valid for
+      //the current context
+      if (tupleApplicable(variance, evalContext) && k <= evalContext)
       {
         out->put(evalContext, compute(evalContext));
       }
@@ -729,19 +730,21 @@ System::go()
       continue;
     }
 
-    Context theContext = m_defaultk;
+    Context theContext;// = m_defaultk;
+
+    theContext.perturb(DIM_TIME, Types::Intmp::create(m_time));
 
     //this needs to be way better
     //for a start: only look at demands for the current time
     auto equations = ident.second->equations();
     for (auto& assign : equations)
     {
-      const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
+      //const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
       const GuardWS& guard = assign.second.validContext();
 
       Tuple ctxts = guard.evaluate(theContext);
 
-      ContextPerturber p(theContext, constraint);
+      //ContextPerturber p(theContext, constraint);
 
       //the demand could have ranges, so we need to enumerate them
       enumerateContextSet(ctxts, theContext, assign.second, hd->second);

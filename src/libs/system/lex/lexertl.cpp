@@ -107,7 +107,8 @@ namespace TransLucid
         m_rules.add(U"([ \\r\\n\\t])|(\\/\\/([^\\n]*)\\n)", 
           m_state_machine.skip());
         
-        m_rules.add(UR"**([\+!\$%\^&\|\*\-_\?\/<>=\p{S}]+)**", TOKEN_OPERATOR);
+        m_rules.add(UR"**([:\+!\$%\^&\|\*\-_\?\/<>=\p{S}]+)**", 
+          TOKEN_OPERATOR);
         //, spaces(U"[ \\n\\t]")
         //, binary_op_(U".", OpTokens::TOK_BINARY_OP)
         //, prefix_op_(U".", OpTokens::TOK_PREFIX_OP)

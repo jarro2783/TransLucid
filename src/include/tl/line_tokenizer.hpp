@@ -42,7 +42,7 @@ namespace TransLucid
       READ_RAW,
       READ_INTERPRETED,
       READ_SEMI,
-      READ_SKIP_SPACE
+      READ_SKIP_SPACE,
     };
 
     public:
@@ -102,6 +102,9 @@ namespace TransLucid
 
     char32_t
     currentChar();
+
+    void
+    skipToNewline();
 
     Parser::U32Iterator& m_current;
     Parser::U32Iterator m_end;

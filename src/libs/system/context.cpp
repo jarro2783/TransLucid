@@ -144,4 +144,75 @@ Context::operator Tuple() const
   return Tuple(t);
 }
 
+bool
+Context::operator<=(const Context& rhs) const
+{
+  //rhs should have more or the same things defined as this, and for those that
+  //are defined, they should be equal
+
+  //check if anything is defined outside of rhs's min
+  dimension_index current = m_min + 1; 
+  dimension_index index = makeIndex(current);
+  if (m_min < rhs.m_min)
+  {
+    while(current != rhs.m_min + 1)
+    {
+      if (!m_context[index].empty())
+      {
+        return false;
+      }
+
+      ++current;
+      ++index;
+    }
+  }
+
+  //now we are at the first thing in rhs
+  dimension_index last = m_max < rhs.m_max ? m_max : rhs.m_max;
+  dimension_index rhsIndex = rhs.makeIndex(current);
+
+  while (current != last)
+  {
+    const auto& ls = m_context[index];
+    const auto& rs = rhs.m_context[rhsIndex];
+    if (!ls.empty())
+    {
+      if (!rs.empty())
+      {
+        const Constant& lc = ls.top();
+        const Constant& rc = rs.top();
+
+        if (lc != rc)
+        {
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    ++index;
+    ++current;
+    ++rhsIndex;
+  }
+
+  //check that this has nothing else
+  if (m_max > rhs.m_max)
+  {
+    while (current < m_max)
+    {
+      if (!m_context[index].empty())
+      {
+        return false;
+      }
+      ++index;
+      ++current;
+    }
+  }
+
+  return true;
+}
+
 }
