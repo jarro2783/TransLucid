@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/charset.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/hyperdatons/arrayhd.hpp>
 #include <tl/hyperdatons/multi_arrayhd.hpp>
 #include <tl/types_util.hpp>
 #include <tl/types/function.hpp>
