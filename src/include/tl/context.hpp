@@ -96,7 +96,7 @@ namespace TransLucid
 
     //one before the smallest
     dimension_index m_min;
-    //the biggest
+    //one after the biggest
     dimension_index m_max;
 
     Constant m_all;

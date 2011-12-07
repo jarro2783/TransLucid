@@ -168,7 +168,7 @@ Context::operator<=(const Context& rhs) const
   }
 
   //now we are at the first thing in rhs
-  dimension_index last = m_max < rhs.m_max ? m_max + 1 : rhs.m_max + 1;
+  dimension_index last = m_max < rhs.m_max ? m_max : rhs.m_max;
   dimension_index rhsIndex = rhs.makeIndex(current);
 
   while (current != last)
@@ -187,6 +187,10 @@ Context::operator<=(const Context& rhs) const
           return false;
         }
       }
+      else
+      {
+        return false;
+      }
     }
 
     ++index;
@@ -197,7 +201,7 @@ Context::operator<=(const Context& rhs) const
   //check that this has nothing else
   if (m_max > rhs.m_max)
   {
-    while (current < m_max + 1)
+    while (current < m_max)
     {
       if (!m_context[index].empty())
       {
