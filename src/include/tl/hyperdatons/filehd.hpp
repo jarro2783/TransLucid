@@ -26,7 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/hyperdatons/arrayhd.hpp>
-#include <tl/hyperdatons/multi_arrayhd.hpp>
+//#include <tl/hyperdatons/multi_arrayhd.hpp>
 #include <tl/types_util.hpp>
 #include <tl/types/function.hpp>
 
@@ -188,7 +188,7 @@ namespace TransLucid
     size_t m_height;
     size_t m_width;
 
-    ArrayNHD<mpz_class, 2>* m_array;
+    ArrayHD m_array;
     std::ofstream m_file;
   };
 }

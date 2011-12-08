@@ -22,6 +22,9 @@ along with TransLucid; see the file COPYING.  If not see
  * File hyperdaton implementation.
  */
 
+#include <fstream>
+#include <algorithm>
+
 #include <tl/hyperdatons/filehd.hpp>
 #include <tl/parser.hpp>
 #include <tl/parser_iterator.hpp>
@@ -35,8 +38,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "tl/lexertl.hpp"
 #include "tl/lexer_tokens.hpp"
-
-#include <fstream>
 
 namespace TransLucid
 {
@@ -598,6 +599,7 @@ FileArrayOutHD::FileArrayOutHD
 )
 : OutputHD(1), m_height(height.get_ui()), m_width(width.get_ui())
 {
+  #if 0
   m_file.open(utf32_to_utf8(file));
 
   if (!m_file.is_open())
@@ -613,17 +615,19 @@ FileArrayOutHD::FileArrayOutHD
     static_cast<Constant(*)(const mpz_class&)>(&Types::Intmp::create),
     &Types::Intmp::get
   );
+  #endif
 }
 
 Tuple
 FileArrayOutHD::variance() const
 {
-  return m_array->variance();
+  return m_array.variance();
 }
 
 void
 FileArrayOutHD::commit()
 {
+  #if 0
   //write to file
   for (size_t i = 0; i != m_height; ++i)
   {
@@ -633,15 +637,13 @@ FileArrayOutHD::commit()
     }
     m_file << std::endl;
   }
+  #endif
 }
 
 void
 FileArrayOutHD::put(const Context& t, const Constant& c)
 {
-  if (c.index() == TYPE_INDEX_INTMP)
-  {
-    m_array->put(t, c);
-  }
+  m_array.put(t, c);
 }
 
 class FileInCreateWS : public WS
