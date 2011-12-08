@@ -239,17 +239,10 @@ struct fill_array
   }
 
   //data must only have dims number of dimensions of data in it
-  Constant*
+  void
   operator()
-    (const ArrayInit& data, size_t dims)
+    (Constant* dest, const ArrayInit& data, size_t dims)
   {
-    //find the size of the array
-    size_t n = std::accumulate
-      (m_max.begin(), m_max.end(), 1, std::multiplies<size_t>());
-
-    //allocate the array
-    std::unique_ptr<Constant> array(new Constant[n]);
-
     //now fill it in
 
     //array of the current index
@@ -258,12 +251,7 @@ struct fill_array
     //the first set of entries
     const auto& first = get<array_initialiser>(data);
 
-    do_fill(array.get(), first, 0);
-
-    Constant* raw = array.get();
-    array.release();
-
-    return raw;
+    do_fill(dest, first, 0);
   }
 };
 
@@ -458,8 +446,11 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
     (*zerows)(k)
   ;
 
-  m_data = fill_array(max, constructor, zero)(array, numDims);
+  m_array.initialise(m_bounds);
 
+  fill_array(max, constructor, zero)(m_array.begin(), array, numDims);
+
+#if 0
   //make the variance tuple
   tuple_t variance;
   mpz_class a = 0;
@@ -486,6 +477,7 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
     ++muliter;
     ++bounditer;
   }
+#endif
 }
 
 Constant
@@ -564,12 +556,16 @@ FileArrayOutFn::applyFn(const Constant& arg) const
 Tuple
 FileArrayInHD::variance() const
 {
-  return m_variance;
+  //return m_variance;
+  return m_array.variance();
 }
 
 Constant
 FileArrayInHD::get(const Context& k) const
 {
+  return m_array.get(k);
+
+#if 0
   //this is the hard one
   //lookup the bounds dimensions in the context, and convert that to an
   //index
@@ -589,6 +585,7 @@ FileArrayInHD::get(const Context& k) const
   }
 
   return m_data[index];
+#endif
 }
 
 

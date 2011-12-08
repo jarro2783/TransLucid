@@ -74,5 +74,8 @@ namespace TransLucid
     private:
     size_t m_size;
     Constant* m_data;
+    std::vector<std::pair<dimension_index, size_t>> m_bounds;
+    std::vector<size_t> m_multipliers;
+    Tuple m_variance;
   };
 }
