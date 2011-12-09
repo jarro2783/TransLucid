@@ -256,7 +256,7 @@ IfWS::operator()(Context& k)
       //run the elsifs and else
       for (const auto& p : m_elsifs_2)
       {
-        Constant cond = p.second->operator()(k);
+        Constant cond = p.first->operator()(k);
 
         type_index index = cond.index();
 

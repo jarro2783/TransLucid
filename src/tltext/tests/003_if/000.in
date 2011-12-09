@@ -1,0 +1,2 @@
+%%
+if false then "a" elsif true then "b" else "c" fi;;
