@@ -730,9 +730,9 @@ System::go()
       continue;
     }
 
-    Context theContext;// = m_defaultk;
+    Context theContext = m_defaultk;
 
-    theContext.perturb(DIM_TIME, Types::Intmp::create(m_time));
+    //theContext.perturb(DIM_TIME, Types::Intmp::create(m_time));
 
     //this needs to be way better
     //for a start: only look at demands for the current time
