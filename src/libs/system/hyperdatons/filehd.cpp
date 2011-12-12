@@ -515,6 +515,7 @@ FileArrayInFn::applyFn(const Constant& arg) const
 Constant
 FileArrayOutFn::applyFn(const std::vector<Constant>& args) const
 {  
+  #if 0
   if 
   (
     args.size() == 3 && 
@@ -546,12 +547,26 @@ FileArrayOutFn::applyFn(const std::vector<Constant>& args) const
   {
     return Types::Special::create(SP_CONST);
   }
+  #endif
+  return Types::Special::create(SP_CONST);
 }
 
 Constant
 FileArrayOutFn::applyFn(const Constant& arg) const
 {
-  return Constant();
+  if (arg.index() != TYPE_INDEX_USTRING)
+  {
+    return Types::Special::create(SP_CONST);
+  }
+  return Types::Hyperdatons::create
+  (
+    new FileArrayOutHD
+    (
+      Types::String::get(arg),
+      m_system
+    ),
+    TYPE_INDEX_OUTHD
+  );
 }
 
 Tuple
@@ -593,11 +608,9 @@ FileArrayInHD::get(const Context& k) const
 FileArrayOutHD::FileArrayOutHD
 (
   const u32string& file, 
-  const mpz_class& height,
-  const mpz_class& width,
   System& system
 )
-: OutputHD(1), m_height(height.get_ui()), m_width(width.get_ui())
+: OutputHD(1), m_file(file), m_system(system)
 {
   #if 0
   m_file.open(utf32_to_utf8(file));
@@ -621,12 +634,31 @@ FileArrayOutHD::FileArrayOutHD
 Tuple
 FileArrayOutHD::variance() const
 {
-  return m_array.variance();
+  return Tuple();
 }
 
 void
 FileArrayOutHD::commit()
 {
+  System::IdentifierLookup idents = m_system.lookupIdentifiers();
+  WS* PRINT = idents.lookup(U"PRINT");
+  WS* TYPENAME = idents.lookup(U"TYPENAME");
+  Context k;
+
+  //the array where everything is stored, assuming only one region at the
+  //moment
+  const ArrayHD& array = *m_regions.at(0).second;
+
+  //get the first thing written to find the typename
+  const Constant* current = array.begin();
+
+  {
+    ContextPerturber p(k, {{DIM_ARG0, *current}});
+
+    Constant type = TYPENAME->operator()(k);
+  }
+  
+  //std::ostringstream dataout;
   #if 0
   //write to file
   for (size_t i = 0; i != m_height; ++i)
@@ -643,7 +675,66 @@ FileArrayOutHD::commit()
 void
 FileArrayOutHD::put(const Context& t, const Constant& c)
 {
-  m_array.put(t, c);
+  //m_array.put(t, c);
+
+  for (const auto& region : m_regions)
+  {
+    if (tupleApplicable(region.first, t))
+    {
+      region.second->put(t, c);
+      break;
+    }
+  }
+}
+
+void
+FileArrayOutHD::addAssignment(const Tuple& region)
+{
+  //for now only allow one assignment
+  if (m_regions.size() == 1)
+  {
+    return;
+  }
+
+  std::unique_ptr<ArrayHD> array(new ArrayHD);
+
+  //initialise the array
+  std::vector<std::pair<dimension_index, size_t>> bounds;
+
+  for (const auto& dim : region)
+  {
+    switch (dim.second.index())
+    {
+      case TYPE_INDEX_INTMP:
+      //let's just make a region 0..value now
+      {
+        const mpz_class& val = get_constant_pointer<mpz_class>(dim.second);
+        bounds.push_back({dim.first, val.get_ui()});
+      }
+      break;
+
+      case TYPE_INDEX_RANGE:
+      //zero to maximum
+      {
+        const Range& val = get_constant_pointer<Range>(dim.second);
+        if (val.upper() == nullptr)
+        {
+          return ;
+        }
+        bounds.push_back({dim.first, val.upper()->get_ui()});
+      }
+      break;
+
+      default:
+      return;
+    }
+  }
+
+  array->initialise(bounds);
+
+  m_regions.push_back(std::make_pair(region, array.get()));
+
+  array.release();
 }
 
 class FileInCreateWS : public WS

@@ -71,6 +71,12 @@ namespace TransLucid
     Tuple
     variance() const;
 
+    void
+    addAssignment(const Tuple&)
+    {
+      //ignore this
+    }
+
     private:
     size_t m_size;
     Constant* m_data;

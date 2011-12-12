@@ -168,8 +168,6 @@ namespace TransLucid
     FileArrayOutHD
     (
       const u32string& file, 
-      const mpz_class& height,
-      const mpz_class& width,
       System& system
     );
 
@@ -184,11 +182,16 @@ namespace TransLucid
     void
     put(const Context& t, const Constant& c);
 
+    void
+    addAssignment(const Tuple& region);
+
     private:
     size_t m_height;
     size_t m_width;
 
-    ArrayHD m_array;
-    std::ofstream m_file;
+    //ArrayHD m_array;
+    std::vector<std::pair<Tuple, ArrayHD*>> m_regions;
+    u32string m_file;
+    System& m_system;
   };
 }

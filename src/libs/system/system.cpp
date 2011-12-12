@@ -744,6 +744,8 @@ System::go()
 
       Tuple ctxts = guard.evaluate(theContext);
 
+      hd->second->addAssignment(ctxts);
+
       //ContextPerturber p(theContext, constraint);
 
       //the demand could have ranges, so we need to enumerate them

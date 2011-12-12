@@ -186,6 +186,12 @@ namespace TransLucid
     {
       return m_variance;
     }
+
+    void
+    addAssignment(const Tuple&)
+    {
+      //ignore because this is a fixed sized array
+    }
   };
 }
 

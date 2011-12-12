@@ -52,6 +52,12 @@ namespace TransLucid
       void
       commit();
 
+      void
+      addAssignment(const Tuple&)
+      {
+        //ignore, we handle this in put
+      }
+
       private:
 
       std::vector<Constant> m_results;
