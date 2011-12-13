@@ -132,8 +132,6 @@ namespace TransLucid
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
 
-    Tuple m_tupleConstDims;
-
     std::map<dimension_index, Constant> m_dimConstConst;
     std::map<dimension_index, WS*> m_dimConstNon;
 
