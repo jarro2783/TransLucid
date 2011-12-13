@@ -1054,6 +1054,16 @@ System::getDimensionIndex(const Constant& c)
   return m_dimTranslator.lookup(c);
 }
 
+//parses an expression, returns a tree of the expression as parsed by
+//the current definitions of the system
+bool
+System::parseExpression(Parser::LexerIterator& begin, 
+  Parser::LexerIterator& end,
+  Tree::Expr& expr)
+{
+  return m_parser->parse_expr(begin, end, expr);
+}
+
 bool
 System::parseExpression(Parser::StreamPosIterator& iter, 
   Parser::StreamPosIterator& end,
@@ -1061,8 +1071,8 @@ System::parseExpression(Parser::StreamPosIterator& iter,
 {
   Parser::LexerIterator lexit(iter, end, m_defaultk, lookupIdentifiers());
   auto lexend = lexit.makeEnd();
-
-  return m_parser->parse_expr(lexit, lexend, expr);
+  
+  return parseExpression(lexit, lexend, expr);
 }
 
 Constant
