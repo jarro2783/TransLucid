@@ -49,7 +49,15 @@ namespace
 
 struct array_initialiser;
 
-typedef Variant<u32string, recursive_wrapper<array_initialiser>> ArrayInit;
+//this is a hack, for some reason ArrayInit can't have Expr directly in it
+//because constructing with array_initialiser is ambiguous
+//it sounds like a bug
+struct TreeHolder
+{
+  Tree::Expr expr;
+};
+
+typedef Variant<TreeHolder, recursive_wrapper<array_initialiser>> ArrayInit;
 
 struct array_initialiser
 {
