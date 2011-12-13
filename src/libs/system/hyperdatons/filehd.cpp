@@ -70,6 +70,7 @@ struct array_initialiser
 
 ArrayInit
 parse_array_init(
+  System& s,
   Parser::LexerIterator& begin,
   const Parser::LexerIterator& end,
   size_t maxNum, 
@@ -93,6 +94,7 @@ parse_array_init(
   {
     if (maxNum == current)
     {
+      #if 0
       if (*begin != Parser::TOKEN_CONSTANT)
       {
         throw "expected constant in array initialiser";
@@ -105,13 +107,14 @@ parse_array_init(
       {
         throw "expected string constant in array initialiser";
       }
+      #endif
 
-      a->push_back(value.second);
+      //a->push_back(value.second);
       ++begin;
     }
     else
     {
-      a->push_back(parse_array_init(begin, end, maxNum, current + 1));
+      a->push_back(parse_array_init(s, begin, end, maxNum, current + 1));
     }
     
     if (*begin != Parser::TOKEN_COMMA)
@@ -131,7 +134,7 @@ parse_array_init(
 
   ++begin;
 
-  return a;
+  return ArrayInit(a);
 }
 
 void
@@ -162,16 +165,12 @@ count_dims
 struct fill_array
 {
   const std::vector<size_t>& m_max;
-  const BaseFunctionType* m_constructor;
-  Constant m_zero;
 
   fill_array
   (
-    const std::vector<size_t>& max,
-    const BaseFunctionType* constructor,
-    const Constant zero
+    const std::vector<size_t>& max
   )
-  : m_max(max), m_constructor(constructor), m_zero(zero)
+  : m_max(max)
   {
   }
 
@@ -192,11 +191,11 @@ struct fill_array
     {
       for (size_t current = 0; current != entry->size(); ++current)
       {
-        const u32string& nextentry = 
-          get<u32string>(entry->at(current));
+        //const u32string& nextentry = 
+        //  get<u32string>(entry->at(current));
 
         //construct the Constant here and put it in the array
-        *nextspot = m_constructor->apply(Types::String::create(nextentry));
+        //*nextspot = m_constructor->apply(Types::String::create(nextentry));
         ++nextspot;
       }
 
@@ -208,7 +207,7 @@ struct fill_array
       //TODO fill in zeros
       while (firstzero != nextspot)
       {
-        *firstzero = m_zero;
+        *firstzero = Types::Special::create(SP_CONST);
         ++firstzero;
       }
     }
@@ -311,35 +310,6 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
   Parser::Parser parser(s);
 
   if (*lexer != Parser::TOKEN_ID || 
-      TransLucid::get<u32string>(lexer->getValue()) != U"contains")
-  {
-    throw "Expected identifier \"contains\"";
-  }
-
-  ++lexer;
-
-  if (*lexer != Parser::TOKEN_CONSTANT)
-  {
-    throw "Expected string constant";
-  }
-
-  const auto& thetype = TL::get<std::pair<u32string, u32string>>(
-    lexer->getValue());
-
-  if (thetype.first != U"ustring")
-  {
-    throw "Expected string constant";
-  }
-
-  ++lexer;
-  if (*lexer != Parser::TOKEN_DBLSEMI)
-  {
-    throw "Expected \";;\"";
-  }
-
-  ++lexer;
-
-  if (*lexer != Parser::TOKEN_ID || 
       TransLucid::get<u32string>(lexer->getValue()) != U"indexedby")
   {
     throw "Expected identifier \"indexedby\"";
@@ -404,7 +374,7 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 
   size_t numDims = index.size();
 
-  ArrayInit array = parse_array_init(lexer, end, numDims, 1);
+  ArrayInit array = parse_array_init(s, lexer, end, numDims, 1);
 
   if (*lexer != Parser::TOKEN_DBLSEMI)
   {
@@ -436,20 +406,9 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
     ));
   }
 
-  //get the constructor and the zero value
-  Constant fnconstant = get_constructor(thetype.second, s, k);
-  const BaseFunctionType* constructor = 
-    &get_constant_pointer<BaseFunctionType>(fnconstant);
-
-  auto zerows = idents.lookup(thetype.second + U"_zero");
-
-  Constant zero = zerows == nullptr ? Types::Special::create(SP_UNDEF) : 
-    (*zerows)(k)
-  ;
-
   m_array.initialise(m_bounds);
 
-  fill_array(max, constructor, zero)(m_array.begin(), array, numDims);
+  fill_array{max}(m_array.begin(), array, numDims);
 
 #if 0
   //make the variance tuple
