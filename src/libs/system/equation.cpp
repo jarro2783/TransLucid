@@ -73,7 +73,6 @@ VariableWS::~VariableWS()
 GuardWS::GuardWS(const GuardWS& other)
 : m_guard(other.m_guard)
 , m_boolean(other.m_boolean)
-, m_tupleConstDims(other.m_tupleConstDims)
 , m_dimConstConst(other.m_dimConstConst)
 , m_dimConstNon(other.m_dimConstNon)
 , m_dimNonConst(other.m_dimNonConst)
@@ -188,7 +187,6 @@ GuardWS::GuardWS(WS* g, WS* b)
     {
       m_onlyConst = true;
     }
-    m_tupleConstDims = m_dimConstConst;
   }
   else
   {
@@ -204,8 +202,6 @@ GuardWS::operator=(const GuardWS& rhs)
   {
     m_guard = rhs.m_guard;
     m_boolean = rhs.m_boolean;
-
-    m_tupleConstDims = rhs.m_tupleConstDims;
 
     m_dimConstConst = rhs.m_dimConstConst;
     m_dimConstNon = rhs.m_dimConstNon;
@@ -223,7 +219,7 @@ GuardWS::evaluate(Context& k) const
 {
   if (m_onlyConst)
   {
-    return m_tupleConstDims;
+    return Tuple(m_dimConstConst);
   }
 
   tuple_t t = m_dimConstConst;
