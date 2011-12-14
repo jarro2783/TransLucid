@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 
 void htmlHead()
 {
@@ -226,6 +227,8 @@ generate_io
 
 int main(int argc, char* argv[])
 {
+  umask(0002);
+
   //get the input length
   char* lengthstr = getenv("CONTENT_LENGTH");
   if (lengthstr == nullptr)
