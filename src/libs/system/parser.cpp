@@ -1184,6 +1184,30 @@ bool
 Parser::parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
+  if (*begin != TOKEN_DECLID)
+  {
+    return false;
+  }
+
+  const u32string& decl = get<u32string>(begin->getValue());
+
+  if (decl == U"prefix")
+  {
+  }
+  else if (decl == U"postfix")
+  {
+  }
+  else
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+
+  ++current;
+
+  begin = current;
+
   return false;
 }
 
