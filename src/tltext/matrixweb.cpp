@@ -322,7 +322,7 @@ int main(int argc, char* argv[])
       setenv("SCRIPT_NAME", "/~translucid/cgi-bin/tlweb2", 1);
 
       //run tlweb
-      execl("/web/translucid/cgi-bin/tlweb2", "tlweb", nullptr);
+      execl("/web/translucid/cgi-bin/tlweb2", "tlweb2", nullptr);
     }
     else
     {
