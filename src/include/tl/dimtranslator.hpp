@@ -49,6 +49,12 @@ namespace TransLucid
     dimension_index
     lookup(const Constant& value);
 
+    const u32string*
+    reverse_lookup_named(dimension_index dim) const;
+
+    const Constant*
+    reverse_lookup_constant(dimension_index dim) const;
+
     /**
      * @brief Returns the value of a unique dimension.
      * The next index counter is incremented, and it isn't mapped to a name,

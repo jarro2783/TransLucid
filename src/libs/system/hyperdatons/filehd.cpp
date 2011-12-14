@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <algorithm>
 
 #include <tl/hyperdatons/filehd.hpp>
+#include <tl/output.hpp>
 #include <tl/parser.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
@@ -294,6 +295,19 @@ get_constructor(const u32string& type, System& s, Context& k)
 
     return constructor;
   }
+}
+
+template <typename Iterator>
+void
+printEntries
+(
+  std::ostream& os,
+  Iterator begin,
+  Iterator end,
+  const Constant* data,
+  System& system
+)
+{
 }
 
 }
@@ -616,36 +630,33 @@ FileArrayOutHD::variance() const
 void
 FileArrayOutHD::commit()
 {
-  System::IdentifierLookup idents = m_system.lookupIdentifiers();
-  WS* PRINT = idents.lookup(U"PRINT");
-  WS* TYPENAME = idents.lookup(U"TYPENAME");
-  Context k;
-
   //the array where everything is stored, assuming only one region at the
   //moment
   const ArrayHD& array = *m_regions.at(0).second;
 
-  //get the first thing written to find the typename
   const Constant* current = array.begin();
 
-  {
-    ContextPerturber p(k, {{DIM_ARG0, *current}});
+  std::ofstream os(utf32_to_utf8(m_file).c_str());
 
-    Constant type = TYPENAME->operator()(k);
-  }
-  
-  //std::ostringstream dataout;
-  #if 0
-  //write to file
-  for (size_t i = 0; i != m_height; ++i)
+  os << "indexedby = {";
+
+  auto& bounds = array.bounds();
+
+  auto iter = bounds.begin();
+  os << m_system.printDimension(iter->first);
+  ++iter;
+
+  while (iter != bounds.end())
   {
-    for (size_t j = 0; j != m_width; ++j)
-    {
-      m_file << (*m_array)[i][j] << " ";
-    }
-    m_file << std::endl;
+    os << ", " << iter->first;
+    ++iter;
   }
-  #endif
+
+  os << "};;" << std::endl;
+
+  os << "entries = ";
+
+  printEntries(os, bounds.begin(), bounds.end(), current, m_system);
 }
 
 void

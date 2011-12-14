@@ -58,9 +58,29 @@ namespace TransLucid
     private:
 
     typedef std::unordered_map<T, Index> ObjectMap;
+    typedef std::unordered_map<Index, T> ReverseMap;
+
     ObjectMap m_objects;
+    ReverseMap m_reverse;
 
     Index& m_index;
+
+    public:
+
+    const T* 
+    reverseLookup(const Index& index) const
+    {
+      auto iter = m_reverse.find(index);
+      if (iter == m_reverse.end())
+      {
+        return nullptr;
+      }
+      else
+      {
+        return &iter->second;
+      }
+    }
+
   };
 }
 

@@ -1502,4 +1502,42 @@ System::evalExpr(const Tree::Expr& e)
   return compile_and_evaluate(e, *this);
 }
 
+u32string
+System::printDimension(dimension_index dim) const
+{
+  const u32string* name = m_dimTranslator.reverse_lookup_named(dim);
+
+  if (name != nullptr)
+  {
+    return *name;
+  }
+
+  const Constant* val = m_dimTranslator.reverse_lookup_constant(dim);
+
+  if (val != nullptr)
+  {
+    auto printer = m_equations.find(U"CANONICAL_PRINT");
+
+    Context k = m_defaultk;
+
+    ContextPerturber p(k, {{DIM_ARG0, *val}});
+
+    Constant string = printer->second->operator()(k);
+
+    if (string.index() != TYPE_INDEX_USTRING)
+    {
+      return U"error printing dimension";
+    }
+    else
+    {
+      return get_constant_pointer<u32string>(string);
+    }
+  }
+
+  std::ostringstream os;
+  os << dim;
+
+  return utf8_to_utf32(os.str());
+}
+
 } //namespace TransLucid

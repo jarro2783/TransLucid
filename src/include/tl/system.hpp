@@ -86,6 +86,9 @@ namespace TransLucid
     dimension_index
     getDimensionIndex(const Constant& c);
 
+    u32string
+    printDimension(dimension_index dim) const;
+
     //generate a new dimension index
     dimension_index
     nextDimensionIndex()

@@ -83,5 +83,14 @@ namespace TransLucid
     std::vector<std::pair<dimension_index, size_t>> m_bounds;
     std::vector<size_t> m_multipliers;
     Tuple m_variance;
+
+    public:
+
+    const decltype(m_bounds)&
+    bounds() const
+    {
+      return m_bounds;
+    }
+
   };
 }
