@@ -47,8 +47,6 @@ ArrayHD::initialise(
   delete [] m_data;
   m_data = new Constant[size];
 
-  std::cerr << "making array of size " << size << std::endl;
-
   m_bounds = bounds;
 
   //make the variance tuple
@@ -120,7 +118,6 @@ ArrayHD::put(const Context& k, const Constant& c)
     ++muliter;
   }
 
-  std::cerr << "putting into array at index " << index << std::endl;
   m_data[index] = c;
 }
 

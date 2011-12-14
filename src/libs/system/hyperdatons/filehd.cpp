@@ -316,7 +316,7 @@ printEntries
 
     os << Types::String::get(result);
 
-    return ++data;
+    return data + 1;
   }
   else
   {
@@ -334,7 +334,7 @@ printEntries
     while (i != begin->second)
     {
       os << ", ";
-      next = printEntries(os, nextiter, end, data, print, k);
+      next = printEntries(os, nextiter, end, next, print, k);
       ++i;
     }
 
@@ -681,7 +681,7 @@ FileArrayOutHD::commit()
 
   while (iter != bounds.end())
   {
-    os << ", " << iter->first;
+    os << ", " << m_system.printDimension(iter->first);
     ++iter;
   }
 
@@ -716,7 +716,6 @@ void
 FileArrayOutHD::addAssignment(const Tuple& region)
 {
   //for now only allow one assignment
-  std::cerr << "adding assignment for output" << std::endl;
   if (m_regions.size() == 1)
   {
     return;

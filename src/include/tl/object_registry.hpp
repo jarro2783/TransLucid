@@ -41,6 +41,7 @@ namespace TransLucid
       for (auto i : initial)
       {
         m_objects.insert(i);
+        m_reverse.insert({i.second, i.first});
       }
     }
 
@@ -50,6 +51,7 @@ namespace TransLucid
       auto result = m_objects.insert(std::make_pair(v, m_index));
       if (result.second)
       {
+        m_reverse.insert({m_index, v});
         ++m_index;
       }
       return result.first->second;
