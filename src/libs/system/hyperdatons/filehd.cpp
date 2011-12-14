@@ -117,8 +117,15 @@ parse_array_init(
       }
       #endif
 
-      //a->push_back(value.second);
-      ++begin;
+      Tree::Expr expr;
+      if (s.parseExpression(begin, end, expr))
+      {
+        a->push_back(TreeHolder{expr});
+      }
+      else
+      {
+        throw "Expected expression in initialiser";
+      }
     }
     else
     {
@@ -173,12 +180,14 @@ count_dims
 struct fill_array
 {
   const std::vector<size_t>& m_max;
+  System& m_s;
 
   fill_array
   (
-    const std::vector<size_t>& max
+    const std::vector<size_t>& max,
+    System& s
   )
-  : m_max(max)
+  : m_max(max), m_s(s)
   {
   }
 
@@ -199,11 +208,11 @@ struct fill_array
     {
       for (size_t current = 0; current != entry->size(); ++current)
       {
-        //const u32string& nextentry = 
-        //  get<u32string>(entry->at(current));
+        const TreeHolder& nextentry = 
+          get<TreeHolder>(entry->at(current));
 
         //construct the Constant here and put it in the array
-        //*nextspot = m_constructor->apply(Types::String::create(nextentry));
+        *nextspot = m_s.evalExpr(nextentry.expr);
         ++nextspot;
       }
 
@@ -416,7 +425,7 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 
   m_array.initialise(m_bounds);
 
-  fill_array{max}(m_array.begin(), array, numDims);
+  fill_array{max, s}(m_array.begin(), array, numDims);
 
 #if 0
   //make the variance tuple

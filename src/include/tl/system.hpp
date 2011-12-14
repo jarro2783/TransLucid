@@ -188,14 +188,14 @@ namespace TransLucid
     //the current definitions of the system
     bool
     parseExpression(Parser::StreamPosIterator& begin, 
-      Parser::StreamPosIterator& end,
+      const Parser::StreamPosIterator& end,
       Tree::Expr& expr);
 
     //parses an expression, returns a tree of the expression as parsed by
     //the current definitions of the system
     bool
     parseExpression(Parser::LexerIterator& begin, 
-      Parser::LexerIterator& end,
+      const Parser::LexerIterator& end,
       Tree::Expr& expr);
 
     void

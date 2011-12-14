@@ -1058,7 +1058,7 @@ System::getDimensionIndex(const Constant& c)
 //the current definitions of the system
 bool
 System::parseExpression(Parser::LexerIterator& begin, 
-  Parser::LexerIterator& end,
+  const Parser::LexerIterator& end,
   Tree::Expr& expr)
 {
   return m_parser->parse_expr(begin, end, expr);
@@ -1066,7 +1066,7 @@ System::parseExpression(Parser::LexerIterator& begin,
 
 bool
 System::parseExpression(Parser::StreamPosIterator& iter, 
-  Parser::StreamPosIterator& end,
+  const Parser::StreamPosIterator& end,
   Tree::Expr& expr)
 {
   Parser::LexerIterator lexit(iter, end, m_defaultk, lookupIdentifiers());
