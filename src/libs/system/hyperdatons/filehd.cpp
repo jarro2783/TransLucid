@@ -716,6 +716,7 @@ void
 FileArrayOutHD::addAssignment(const Tuple& region)
 {
   //for now only allow one assignment
+  std::cerr << "adding assignment for output" << std::endl;
   if (m_regions.size() == 1)
   {
     return;
@@ -734,7 +735,7 @@ FileArrayOutHD::addAssignment(const Tuple& region)
       //let's just make a region 0..value now
       {
         const mpz_class& val = get_constant_pointer<mpz_class>(dim.second);
-        bounds.push_back({dim.first, val.get_ui()});
+        bounds.push_back({dim.first, val.get_ui()+1});
       }
       break;
 
@@ -746,7 +747,7 @@ FileArrayOutHD::addAssignment(const Tuple& region)
         {
           return ;
         }
-        bounds.push_back({dim.first, val.upper()->get_ui()});
+        bounds.push_back({dim.first, val.upper()->get_ui()+1});
       }
       break;
 

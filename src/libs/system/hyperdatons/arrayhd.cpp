@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 
 #include <algorithm>
+#include <iostream>
 
 #include <gmpxx.h>
 
@@ -45,6 +46,8 @@ ArrayHD::initialise(
 
   delete [] m_data;
   m_data = new Constant[size];
+
+  std::cerr << "making array of size " << size << std::endl;
 
   m_bounds = bounds;
 
@@ -103,6 +106,22 @@ ArrayHD::get(const Context& k) const
 void
 ArrayHD::put(const Context& k, const Constant& c)
 {
+  //assume that the dimensions are correct
+  auto boundsiter = m_bounds.begin();
+  auto muliter = m_multipliers.begin();
+  size_t index = 0;
+  while (boundsiter != m_bounds.end())
+  {
+    auto dim = boundsiter->first;
+    const auto& value = k.lookup(dim);
+    mpz_class next = (get_constant_pointer<mpz_class>(value) * *muliter);
+    index += next.get_ui();
+    ++boundsiter;
+    ++muliter;
+  }
+
+  std::cerr << "putting into array at index " << index << std::endl;
+  m_data[index] = c;
 }
 
 void
