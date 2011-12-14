@@ -167,6 +167,17 @@ TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
 {
   //(FN1 ! (#arg0)) @ [fnname <- e.op.op, arg0 <- T(e.e)]
 
+  Tree::Expr expr = apply_visitor(*this, e.e);
+
+  Tree::Expr result = Tree::LambdaAppExpr
+  (
+    Tree::IdentExpr(e.op.op),
+    expr
+  );
+
+  return apply_visitor(*this, result);
+
+#if 0
   Tree::DimensionExpr arg0(U"arg0");
 
   return 
@@ -185,6 +196,7 @@ TreeToWSTree::operator()(const Tree::UnaryOpExpr& e)
       }
     )
   );
+#endif
 }
 
 Tree::Expr
