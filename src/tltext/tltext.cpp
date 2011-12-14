@@ -166,7 +166,7 @@ TLText::run()
           Tree::Expr(),
 
           Tree::AtExpr(
-            Tree::IdentExpr(U"PRINT_TLTEXT"),
+            Tree::IdentExpr(U"CANONICAL_PRINT"),
             Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), e}})
           )
         ));

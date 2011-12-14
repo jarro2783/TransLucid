@@ -298,16 +298,49 @@ get_constructor(const u32string& type, System& s, Context& k)
 }
 
 template <typename Iterator>
-void
+const Constant*
 printEntries
 (
   std::ostream& os,
   Iterator begin,
   Iterator end,
   const Constant* data,
-  System& system
+  WS* print,
+  Context& k
 )
 {
+  if (begin == end)
+  {
+    ContextPerturber p(k, {{DIM_ARG0, *data}});
+    Constant result = print->operator()(k);
+
+    os << Types::String::get(result);
+
+    return ++data;
+  }
+  else
+  {
+    os << "{";
+
+    const Constant* next = data;
+    size_t i = 0;
+
+    auto nextiter = begin;
+    ++nextiter;
+
+    next = printEntries(os, nextiter, end, next, print, k);
+    ++i;
+
+    while (i != begin->second)
+    {
+      os << ", ";
+      next = printEntries(os, nextiter, end, data, print, k);
+      ++i;
+    }
+
+    os << "}";
+    return next;
+  }
 }
 
 }
@@ -656,7 +689,12 @@ FileArrayOutHD::commit()
 
   os << "entries = ";
 
-  printEntries(os, bounds.begin(), bounds.end(), current, m_system);
+  auto idents = m_system.lookupIdentifiers();
+  WS* print = idents.lookup(U"CANONICAL_PRINT");
+  Context k = m_system.getDefaultContext();
+  printEntries(os, bounds.begin(), bounds.end(), current, print, k);
+
+  os << ";;" << std::endl;
 }
 
 void

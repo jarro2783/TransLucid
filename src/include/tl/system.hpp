@@ -267,7 +267,7 @@ namespace TransLucid
     );
 
     template <typename T>
-    void
+    Tuple
     addHDDecl
     (
       const u32string& name,

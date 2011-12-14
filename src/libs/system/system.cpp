@@ -744,8 +744,6 @@ System::go()
 
       Tuple ctxts = guard.evaluate(theContext);
 
-      hd->second->addAssignment(ctxts);
-
       //ContextPerturber p(theContext, constraint);
 
       //the demand could have ranges, so we need to enumerate them
@@ -1137,7 +1135,7 @@ System::setDefaultContext()
 }
 
 template <typename T>
-void
+Tuple
 System::addHDDecl
 (
   const u32string& name,
@@ -1161,9 +1159,11 @@ System::addHDDecl
       if (t == iter->second || tupleRefines(t, iter->second))
       {
         iter->second = t;
+        return t;
       }
     }
   }
+  return Tuple();
 }
 
 void
@@ -1173,7 +1173,15 @@ System::addOutputDeclaration
   const Tree::Expr& guard
 )
 {
-  addHDDecl(name, guard, m_outputHDDecls);
+  Tuple t = addHDDecl(name, guard, m_outputHDDecls);
+
+  //inform the hd of the same thing
+  auto iter = m_outputHDs.find(name);
+
+  if (iter != m_outputHDs.end())
+  {
+    iter->second->addAssignment(t);
+  }
 }
 
 void
