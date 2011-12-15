@@ -623,6 +623,8 @@ System::init_equations()
   addDecl(*this, U"infixl", U"DECLID");
   addDecl(*this, U"infixr", U"DECLID");
   addDecl(*this, U"infixn", U"DECLID");
+  addDecl(*this, U"prefix", U"DECLID");
+  addDecl(*this, U"postfix", U"DECLID");
   addDecl(*this, U"data", U"DECLID");
   addDecl(*this, U"fun", U"DECLID");
 

@@ -1184,7 +1184,42 @@ bool
 Parser::parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
-  return false;
+  if (*begin != TOKEN_DECLID)
+  {
+    return false;
+  }
+
+  const u32string& decl = get<u32string>(begin->getValue());
+
+  Tree::UnaryType type;
+  if (decl == U"prefix")
+  {
+    type = Tree::UNARY_PREFIX;
+  }
+  else if (decl == U"postfix")
+  {
+    type = Tree::UNARY_POSTFIX;
+  }
+  else
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+
+  ++current;
+
+  u32string symbol;
+  expect(current, end, symbol, U"string", &Parser::is_string_constant);
+
+  u32string opname;
+  expect(current, end, opname, U"string", &Parser::is_string_constant);
+
+  begin = current;
+
+  result = Tree::UnaryOperator(opname, symbol, type);
+
+  return true;
 }
 
 bool
