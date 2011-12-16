@@ -347,6 +347,15 @@ TLText::setup_clargs()
 
     m_system.addInputHyperdaton(U"CLARGS", m_argsHD);
   }
+  
+  m_system.addEquation(Parser::Equation
+    {
+      U"CLARGS",
+      Tree::Expr(),
+      Tree::Expr(),
+      u32string()
+    }
+  );
 }
 
 void
