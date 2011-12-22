@@ -232,8 +232,9 @@ namespace TransLucid
     {
       if (NumArgs != 1)
       {
-        return detail::apply_one_func<NumArgs>()(m_fn, c);
+        return Types::Special::create(SP_TYPEERROR);
       }
+      return detail::apply_one_func<NumArgs>()(m_fn, c);
     }
 
     Constant

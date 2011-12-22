@@ -52,6 +52,9 @@ namespace TransLucid
   {
     using namespace TransLucid::BuiltinOps;
 
+    BuiltinBaseFunction<1> construct_integer{Types::Intmp::create};
+      //static_cast<Constant (*)(const Constant&)>(Types::Intmp::create)));
+
     BuiltinBaseFunction<2> integer_plus{&mpz_plus};
     BuiltinBaseFunction<2> integer_minus{&mpz_minus};
     BuiltinBaseFunction<2> integer_times{&mpz_times};
@@ -92,7 +95,8 @@ namespace TransLucid
       {U"eq", U"int_eq", &integer_eq},
       {U"ne", U"int_ne", &integer_ne},
       {U"plus", U"ustring_plus", &ustring_plus_fn},
-      {U"range_construct", U"make_range", &range_create}
+      {U"range_construct", U"make_range", &range_create},
+      {U"ignored", U"construct_intmp", &construct_integer}
     };
   }
 
@@ -1055,6 +1059,30 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
       t)
     );
   }
+
+  #if 0
+  BuiltinBaseFunction<1> construct_typetype(
+    [&s] (const Constant& text) -> Constant
+    {
+      type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
+
+      if (t == 0)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+      else
+      {
+        return Types::Type::create(t);
+      }
+    }
+  );
+
+  std::unique_ptr<BangAbstractionWS> 
+    typetype_op(new BangAbstractionWS(fn.fn->clone()));
+
+  s.addEquation(fn.op_name, typetype_op.get());
+  typetype_op.release();
+  #endif
 
   s.addEquation(Parser::Equation(
     U"TYPENAME",

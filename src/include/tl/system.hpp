@@ -50,6 +50,8 @@ namespace TransLucid
   {
     class Parser;
     class FnDecl;
+
+    class LexerIterator;
   }
 
   class StreamPosIterator;
@@ -83,6 +85,9 @@ namespace TransLucid
 
     dimension_index
     getDimensionIndex(const Constant& c);
+
+    u32string
+    printDimension(dimension_index dim) const;
 
     //generate a new dimension index
     dimension_index
@@ -186,7 +191,14 @@ namespace TransLucid
     //the current definitions of the system
     bool
     parseExpression(Parser::StreamPosIterator& begin, 
-      Parser::StreamPosIterator& end,
+      const Parser::StreamPosIterator& end,
+      Tree::Expr& expr);
+
+    //parses an expression, returns a tree of the expression as parsed by
+    //the current definitions of the system
+    bool
+    parseExpression(Parser::LexerIterator& begin, 
+      const Parser::LexerIterator& end,
       Tree::Expr& expr);
 
     void
@@ -194,6 +206,9 @@ namespace TransLucid
 
     void
     go();
+
+    Constant
+    evalExpr(const Tree::Expr& e);
 
     private:
     //definitions of Equations
@@ -252,7 +267,7 @@ namespace TransLucid
     );
 
     template <typename T>
-    void
+    Tuple
     addHDDecl
     (
       const u32string& name,

@@ -22,20 +22,332 @@ along with TransLucid; see the file COPYING.  If not see
  * File hyperdaton implementation.
  */
 
+#include <fstream>
+#include <algorithm>
+
 #include <tl/hyperdatons/filehd.hpp>
+#include <tl/output.hpp>
+#include <tl/parser.hpp>
+#include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
+#include <tl/types_basic.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/string.hpp>
+#include <tl/utility.hpp>
 
-#include <fstream>
+#include "tl/lexertl.hpp"
+#include "tl/lexer_tokens.hpp"
 
 namespace TransLucid
 {
 
+namespace TL = TransLucid;
+
+namespace
+{
+
+struct array_initialiser;
+
+//this is a hack, for some reason ArrayInit can't have Expr directly in it
+//because constructing with array_initialiser is ambiguous
+//it sounds like a bug
+struct TreeHolder
+{
+  Tree::Expr expr;
+};
+
+typedef Variant<TreeHolder, recursive_wrapper<array_initialiser>> ArrayInit;
+
+struct array_initialiser
+{
+  std::vector<ArrayInit> array;
+
+  const decltype(array)*
+  operator->() const
+  {
+    return &array;
+  }
+
+  decltype(array)*
+  operator->()
+  {
+    return &array;
+  }
+};
+
+ArrayInit
+parse_array_init(
+  System& s,
+  Parser::LexerIterator& begin,
+  const Parser::LexerIterator& end,
+  size_t maxNum, 
+  size_t current
+)
+{
+  //parses comma separated list of stuff
+  //if maxNum == current then the stuff is strings
+  //otherwise it is array initialisers
+
+  if (*begin != Parser::TOKEN_LBRACE)
+  {
+    throw "expected {";
+  }
+
+  ++begin;
+
+  array_initialiser a;
+
+  while (true)
+  {
+    if (maxNum == current)
+    {
+      #if 0
+      if (*begin != Parser::TOKEN_CONSTANT)
+      {
+        throw "expected constant in array initialiser";
+      }
+
+      const auto& value = 
+        get<std::pair<u32string, u32string>>(begin->getValue());
+
+      if (value.first != U"ustring")
+      {
+        throw "expected string constant in array initialiser";
+      }
+      #endif
+
+      Tree::Expr expr;
+      if (s.parseExpression(begin, end, expr))
+      {
+        a->push_back(TreeHolder{expr});
+      }
+      else
+      {
+        throw "Expected expression in initialiser";
+      }
+    }
+    else
+    {
+      a->push_back(parse_array_init(s, begin, end, maxNum, current + 1));
+    }
+    
+    if (*begin != Parser::TOKEN_COMMA)
+    {
+      break;
+    }
+    else
+    {
+      ++begin;
+    }
+  }
+
+  if (*begin != Parser::TOKEN_RBRACE)
+  {
+    throw "expected }";
+  }
+
+  ++begin;
+
+  return ArrayInit(a);
+}
+
+void
+count_dims
+(
+  std::vector<size_t>& lengths, 
+  const ArrayInit& data, 
+  size_t current
+)
+{
+  auto p = get<array_initialiser>(&data);
+
+  if (p)
+  {
+    auto l = (*p)->size();
+    if (l > lengths.at(current))
+    {
+      lengths.at(current) = l;
+
+      for (auto sub : p->array)
+      {
+        count_dims(lengths, sub, current + 1);
+      }
+    }
+  }
+}
+
+struct fill_array
+{
+  const std::vector<size_t>& m_max;
+  System& m_s;
+
+  fill_array
+  (
+    const std::vector<size_t>& max,
+    System& s
+  )
+  : m_max(max), m_s(s)
+  {
+  }
+
+  Constant*
+  do_fill
+  (
+    Constant* data,
+    const array_initialiser& entry,
+    size_t depth
+  )
+  {
+    
+    //the only entries that should have constants in them should be
+    //when we are at depth == max.size() - 1
+
+    Constant* nextspot = data;
+    if (depth == m_max.size() - 1)
+    {
+      for (size_t current = 0; current != entry->size(); ++current)
+      {
+        const TreeHolder& nextentry = 
+          get<TreeHolder>(entry->at(current));
+
+        //construct the Constant here and put it in the array
+        *nextspot = m_s.evalExpr(nextentry.expr);
+        ++nextspot;
+      }
+
+      auto firstzero = nextspot;
+
+      //compute the address of the next row
+      nextspot += m_max.at(depth) - (nextspot - data);
+
+      //TODO fill in zeros
+      while (firstzero != nextspot)
+      {
+        *firstzero = Types::Special::create(SP_CONST);
+        ++firstzero;
+      }
+    }
+    else
+    { 
+      size_t current;
+      for (current = 0; current != entry->size(); ++current)
+      {
+        const array_initialiser& nextentry = 
+          get<array_initialiser>(entry->at(current));
+
+        nextspot = do_fill(nextspot, nextentry, depth+1);
+      }
+
+      if (entry->size() != m_max.at(depth))
+      {
+        //find the next entry
+        auto maxindex = m_max.begin() + depth;
+        ++maxindex;
+
+        size_t increment = std::accumulate(maxindex, m_max.end(), 1, 
+          std::multiplies<size_t>());
+
+        nextspot += (m_max.at(depth) - current) * increment;
+      }
+    }
+
+    return nextspot;
+  }
+
+  //data must only have dims number of dimensions of data in it
+  void
+  operator()
+    (Constant* dest, const ArrayInit& data, size_t dims)
+  {
+    //now fill it in
+
+    //array of the current index
+    std::vector<size_t> index(m_max.size(), 0);
+
+    //the first set of entries
+    const auto& first = get<array_initialiser>(data);
+
+    do_fill(dest, first, 0);
+  }
+};
+
+Constant
+get_constructor(const u32string& type, System& s, Context& k)
+{
+  u32string construct = U"construct_" + type;
+
+  WS* fn = s.lookupIdentifiers().lookup(construct);
+
+  if (fn == nullptr)
+  {
+    throw "Could not find constructor for type";
+  }
+  else
+  {
+    Constant constructor = (*fn)(k);
+
+    if (constructor.index() != TYPE_INDEX_BASE_FUNCTION)
+    {
+      throw "Invalid type for constructor";
+    }
+
+    return constructor;
+  }
+}
+
+template <typename Iterator>
+const Constant*
+printEntries
+(
+  std::ostream& os,
+  Iterator begin,
+  Iterator end,
+  const Constant* data,
+  WS* print,
+  Context& k
+)
+{
+  if (begin == end)
+  {
+    ContextPerturber p(k, {{DIM_ARG0, *data}});
+    Constant result = print->operator()(k);
+
+    os << Types::String::get(result);
+
+    return data + 1;
+  }
+  else
+  {
+    os << "{";
+
+    const Constant* next = data;
+    size_t i = 0;
+
+    auto nextiter = begin;
+    ++nextiter;
+
+    next = printEntries(os, nextiter, end, next, print, k);
+    ++i;
+
+    while (i != begin->second)
+    {
+      os << ", ";
+      next = printEntries(os, nextiter, end, next, print, k);
+      ++i;
+    }
+
+    os << "}";
+    return next;
+  }
+}
+
+}
+
 FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
 : InputHD(0)
+, m_data(nullptr)
 {
   std::ifstream in(utf32_to_utf8(file).c_str());
 
@@ -44,62 +356,152 @@ FileArrayInHD::FileArrayInHD(const u32string& file, System& s)
     throw "Could not open file";
   }
 
-  size_t height;
-  size_t maxWidth = 0;
+  //first read in the whole file
+  std::string content = read_file(in);
 
-  //simply read everything in each line and stuff it into an array
-  std::vector<std::vector<mpz_class>> inArray;
-  while (in)
+  Parser::StreamPosIterator rawbegin(
+    Parser::makeUTF8Iterator(content.begin()));
+  Parser::StreamPosIterator rawend(Parser::makeUTF8Iterator(content.end()));
+
+  //something is rotten in the state of denmark
+  Context& k = s.getDefaultContext();
+
+  auto idents = s.lookupIdentifiers();
+
+  Parser::LexerIterator lexer(rawbegin, rawend, k, idents);
+  auto end = lexer.makeEnd();
+
+  Parser::Parser parser(s);
+
+  if (*lexer != Parser::TOKEN_ID || 
+      TransLucid::get<u32string>(lexer->getValue()) != U"indexedby")
   {
-    std::string line;
-    std::getline(in, line);
-
-    std::istringstream linestream(line);
-    std::vector<mpz_class> lineArray;
-
-
-    mpz_class v;
-    linestream >> v;
-    while (linestream)
-    {
-      lineArray.push_back(v);
-      linestream >> v;
-    }
-
-    if (lineArray.size() > maxWidth)
-    {
-      maxWidth = lineArray.size();
-    }
-    if (lineArray.size() != 0)
-    {
-      inArray.push_back(lineArray);
-    }
+    throw "Expected identifier \"indexedby\"";
   }
-  height = inArray.size();
 
-  std::cerr << "read in: " << height << " x " << maxWidth << " array" <<
-    std::endl;
+  ++lexer;
 
-  m_array = new ArrayNHD<mpz_class, 2>
-  (
-    {height, maxWidth},
-    {Types::Dimension::create(DIM_ARG0), Types::Dimension::create(DIM_ARG1)},
-    s,
-    static_cast<Constant(*)(const mpz_class&)>(&Types::Intmp::create),
-    &Types::Intmp::get
+  if (*lexer != Parser::TOKEN_LBRACE)
+  {
+    throw "Expected {";
+  }
+
+  ++lexer;
+
+  //parse a comma separated list of exprs
+  std::vector<Tree::Expr> index;
+  while (true)
+  {
+    Tree::Expr dim;
+    if (!parser.parse_expr(lexer, end, dim))
+    {
+      throw "Expected expression";
+    }
+
+    index.push_back(dim);
+
+    if (*lexer != Parser::TOKEN_COMMA)
+    {
+      break;
+    }
+    ++lexer;
+  }
+
+  if (*lexer != Parser::TOKEN_RBRACE)
+  {
+    throw "Expected }";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_DBLSEMI)
+  {
+    throw "Expected ';;'";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_ID ||
+      TransLucid::get<u32string>(lexer->getValue()) != U"entries")
+  {
+    throw "Expected \"entries\"";
+  }
+
+  ++lexer;
+
+  if (*lexer != Parser::TOKEN_EQUALS)
+  {
+    throw "Expected =";
+  }
+
+  ++lexer;
+
+  size_t numDims = index.size();
+
+  ArrayInit array = parse_array_init(s, lexer, end, numDims, 1);
+
+  if (*lexer != Parser::TOKEN_DBLSEMI)
+  {
+    throw "Expected ';;'";
+  }
+
+  //first count all the dimensions
+  std::vector<size_t> max(numDims, 0);
+
+  count_dims(max, array, 0);
+
+  using std::placeholders::_1;
+
+  //set up the dimensions to index it by
+  //eval the dimensions
+  std::vector<Constant> indexVals;
+  std::transform(index.begin(), index.end(),
+    std::back_inserter(indexVals),
+    std::bind(std::mem_fun(&System::evalExpr), &s, _1)
   );
 
-  size_t i = 0, j;
-  for (auto outer = inArray.begin(); outer != inArray.end(); ++outer)
+  //get the dim indices
+  for (size_t i = 0; i != indexVals.size(); ++i)
   {
-    j = 0;
-    for (auto inner = outer->begin(); inner != outer->end(); ++inner)
-    {
-      (*m_array)[i][j] = *inner;
-      ++j;
-    }
-    ++i;
+    m_bounds.push_back
+    (std::make_pair(
+      s.getDimensionIndex(indexVals.at(i)),
+      max.at(i)
+    ));
   }
+
+  m_array.initialise(m_bounds);
+
+  fill_array{max, s}(m_array.begin(), array, numDims);
+
+#if 0
+  //make the variance tuple
+  tuple_t variance;
+  mpz_class a = 0;
+  for (const auto& bound : m_bounds)
+  {
+    mpz_class b = bound.second - 1;
+    std::cerr << "bounds are " << bound.first << ": " 
+      << 0 << ".." << b << std::endl;
+    variance.insert(std::make_pair(bound.first,
+      Types::Range::create(Range(&a, &b))));
+  }
+
+  m_variance = variance;
+
+  //set up the multipliers for indexing the array
+  m_multipliers.insert(m_multipliers.end(), m_bounds.size(), 0);
+  size_t prev = 1;
+  auto muliter = m_multipliers.rbegin(); 
+  auto bounditer = m_bounds.rbegin();
+  while (muliter != m_multipliers.rend())
+  {
+    *muliter = prev;
+    prev = prev * bounditer->second;
+    ++muliter;
+    ++bounditer;
+  }
+#endif
 }
 
 Constant
@@ -136,6 +538,7 @@ FileArrayInFn::applyFn(const Constant& arg) const
 Constant
 FileArrayOutFn::applyFn(const std::vector<Constant>& args) const
 {  
+  #if 0
   if 
   (
     args.size() == 3 && 
@@ -167,37 +570,72 @@ FileArrayOutFn::applyFn(const std::vector<Constant>& args) const
   {
     return Types::Special::create(SP_CONST);
   }
+  #endif
+  return Types::Special::create(SP_CONST);
 }
 
 Constant
 FileArrayOutFn::applyFn(const Constant& arg) const
 {
-  return Constant();
+  if (arg.index() != TYPE_INDEX_USTRING)
+  {
+    return Types::Special::create(SP_CONST);
+  }
+  return Types::Hyperdatons::create
+  (
+    new FileArrayOutHD
+    (
+      Types::String::get(arg),
+      m_system
+    ),
+    TYPE_INDEX_OUTHD
+  );
 }
 
-//for now we will just fill it with some random data to see what happens
 Tuple
 FileArrayInHD::variance() const
 {
-  return m_array->variance();
+  //return m_variance;
+  return m_array.variance();
 }
 
 Constant
 FileArrayInHD::get(const Context& k) const
 {
-  return m_array->get(k);
+  return m_array.get(k);
+
+#if 0
+  //this is the hard one
+  //lookup the bounds dimensions in the context, and convert that to an
+  //index
+
+  //assume that the dimensions are correct
+  auto boundsiter = m_bounds.begin();
+  auto muliter = m_multipliers.begin();
+  size_t index = 0;
+  while (boundsiter != m_bounds.end())
+  {
+    auto dim = boundsiter->first;
+    const auto& value = k.lookup(dim);
+    mpz_class next = (get_constant_pointer<mpz_class>(value) * *muliter);
+    index += next.get_ui();
+    ++boundsiter;
+    ++muliter;
+  }
+
+  return m_data[index];
+#endif
 }
 
 
 FileArrayOutHD::FileArrayOutHD
 (
   const u32string& file, 
-  const mpz_class& height,
-  const mpz_class& width,
   System& system
 )
-: OutputHD(1), m_height(height.get_ui()), m_width(width.get_ui())
+: OutputHD(1), m_file(file), m_system(system)
 {
+  #if 0
   m_file.open(utf32_to_utf8(file));
 
   if (!m_file.is_open())
@@ -213,35 +651,115 @@ FileArrayOutHD::FileArrayOutHD
     static_cast<Constant(*)(const mpz_class&)>(&Types::Intmp::create),
     &Types::Intmp::get
   );
+  #endif
 }
 
 Tuple
 FileArrayOutHD::variance() const
 {
-  return m_array->variance();
+  return Tuple();
 }
 
 void
 FileArrayOutHD::commit()
 {
-  //write to file
-  for (size_t i = 0; i != m_height; ++i)
+  //the array where everything is stored, assuming only one region at the
+  //moment
+  const ArrayHD& array = *m_regions.at(0).second;
+
+  const Constant* current = array.begin();
+
+  std::ofstream os(utf32_to_utf8(m_file).c_str());
+
+  os << "indexedby = {";
+
+  auto& bounds = array.bounds();
+
+  auto iter = bounds.begin();
+  os << m_system.printDimension(iter->first);
+  ++iter;
+
+  while (iter != bounds.end())
   {
-    for (size_t j = 0; j != m_width; ++j)
-    {
-      m_file << (*m_array)[i][j] << " ";
-    }
-    m_file << std::endl;
+    os << ", " << m_system.printDimension(iter->first);
+    ++iter;
   }
+
+  os << "};;" << std::endl;
+
+  os << "entries = ";
+
+  auto idents = m_system.lookupIdentifiers();
+  WS* print = idents.lookup(U"CANONICAL_PRINT");
+  Context k = m_system.getDefaultContext();
+  printEntries(os, bounds.begin(), bounds.end(), current, print, k);
+
+  os << ";;" << std::endl;
 }
 
 void
 FileArrayOutHD::put(const Context& t, const Constant& c)
 {
-  if (c.index() == TYPE_INDEX_INTMP)
+  //m_array.put(t, c);
+
+  for (const auto& region : m_regions)
   {
-    m_array->put(t, c);
+    if (tupleApplicable(region.first, t))
+    {
+      region.second->put(t, c);
+      break;
+    }
   }
+}
+
+void
+FileArrayOutHD::addAssignment(const Tuple& region)
+{
+  //for now only allow one assignment
+  if (m_regions.size() == 1)
+  {
+    return;
+  }
+
+  std::unique_ptr<ArrayHD> array(new ArrayHD);
+
+  //initialise the array
+  std::vector<std::pair<dimension_index, size_t>> bounds;
+
+  for (const auto& dim : region)
+  {
+    switch (dim.second.index())
+    {
+      case TYPE_INDEX_INTMP:
+      //let's just make a region 0..value now
+      {
+        const mpz_class& val = get_constant_pointer<mpz_class>(dim.second);
+        bounds.push_back({dim.first, val.get_ui()+1});
+      }
+      break;
+
+      case TYPE_INDEX_RANGE:
+      //zero to maximum
+      {
+        const Range& val = get_constant_pointer<Range>(dim.second);
+        if (val.upper() == nullptr)
+        {
+          return ;
+        }
+        bounds.push_back({dim.first, val.upper()->get_ui()+1});
+      }
+      break;
+
+      default:
+      return;
+    }
+  }
+
+  array->initialise(bounds);
+
+  m_regions.push_back(std::make_pair(region, array.get()));
+
+  array.release();
 }
 
 class FileInCreateWS : public WS

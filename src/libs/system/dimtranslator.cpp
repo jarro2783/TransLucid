@@ -74,4 +74,16 @@ DimensionTranslator::lookup(const Constant& value)
   }
 }
 
+const u32string*
+DimensionTranslator::reverse_lookup_named(dimension_index dim) const
+{
+  return m_named.reverseLookup(dim);
+}
+
+const Constant*
+DimensionTranslator::reverse_lookup_constant(dimension_index dim) const
+{
+  return m_constants.reverseLookup(dim);
+}
+
 }

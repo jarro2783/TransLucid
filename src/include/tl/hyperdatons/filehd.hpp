@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/hyperdatons/arrayhd.hpp>
+//#include <tl/hyperdatons/multi_arrayhd.hpp>
 #include <tl/types_util.hpp>
 #include <tl/types/function.hpp>
 
@@ -141,7 +142,10 @@ namespace TransLucid
 
     FileArrayInHD(const u32string& file, System& system);
 
-    ~FileArrayInHD() throw() {}
+    ~FileArrayInHD() throw() 
+    {
+      delete [] m_data;
+    }
 
     Tuple
     variance() const;
@@ -150,7 +154,11 @@ namespace TransLucid
     get(const Context& k) const;
 
     private:
-    ArrayNHD<mpz_class, 2>* m_array;
+    Constant* m_data;
+    Tuple m_variance;
+    std::vector<std::pair<dimension_index, size_t>> m_bounds;
+    std::vector<size_t> m_multipliers;
+    ArrayHD m_array;
   };
 
   class FileArrayOutHD : public OutputHD
@@ -160,8 +168,6 @@ namespace TransLucid
     FileArrayOutHD
     (
       const u32string& file, 
-      const mpz_class& height,
-      const mpz_class& width,
       System& system
     );
 
@@ -176,11 +182,16 @@ namespace TransLucid
     void
     put(const Context& t, const Constant& c);
 
+    void
+    addAssignment(const Tuple& region);
+
     private:
     size_t m_height;
     size_t m_width;
 
-    ArrayNHD<mpz_class, 2>* m_array;
-    std::ofstream m_file;
+    //ArrayHD m_array;
+    std::vector<std::pair<Tuple, ArrayHD*>> m_regions;
+    u32string m_file;
+    System& m_system;
   };
 }

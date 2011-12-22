@@ -1054,15 +1054,25 @@ System::getDimensionIndex(const Constant& c)
   return m_dimTranslator.lookup(c);
 }
 
+//parses an expression, returns a tree of the expression as parsed by
+//the current definitions of the system
+bool
+System::parseExpression(Parser::LexerIterator& begin, 
+  const Parser::LexerIterator& end,
+  Tree::Expr& expr)
+{
+  return m_parser->parse_expr(begin, end, expr);
+}
+
 bool
 System::parseExpression(Parser::StreamPosIterator& iter, 
-  Parser::StreamPosIterator& end,
+  const Parser::StreamPosIterator& end,
   Tree::Expr& expr)
 {
   Parser::LexerIterator lexit(iter, end, m_defaultk, lookupIdentifiers());
   auto lexend = lexit.makeEnd();
-
-  return m_parser->parse_expr(lexit, lexend, expr);
+  
+  return parseExpression(lexit, lexend, expr);
 }
 
 Constant
@@ -1127,7 +1137,7 @@ System::setDefaultContext()
 }
 
 template <typename T>
-void
+Tuple
 System::addHDDecl
 (
   const u32string& name,
@@ -1151,9 +1161,11 @@ System::addHDDecl
       if (t == iter->second || tupleRefines(t, iter->second))
       {
         iter->second = t;
+        return t;
       }
     }
   }
+  return Tuple();
 }
 
 void
@@ -1163,7 +1175,15 @@ System::addOutputDeclaration
   const Tree::Expr& guard
 )
 {
-  addHDDecl(name, guard, m_outputHDDecls);
+  Tuple t = addHDDecl(name, guard, m_outputHDDecls);
+
+  //inform the hd of the same thing
+  auto iter = m_outputHDs.find(name);
+
+  if (iter != m_outputHDs.end())
+  {
+    iter->second->addAssignment(t);
+  }
 }
 
 void
@@ -1484,6 +1504,50 @@ System::addFunction(const Parser::FnDecl& fn)
   }
 
   return Types::UUID::create(u);
+}
+
+Constant
+System::evalExpr(const Tree::Expr& e)
+{
+  return compile_and_evaluate(e, *this);
+}
+
+u32string
+System::printDimension(dimension_index dim) const
+{
+  const u32string* name = m_dimTranslator.reverse_lookup_named(dim);
+
+  if (name != nullptr)
+  {
+    return *name;
+  }
+
+  const Constant* val = m_dimTranslator.reverse_lookup_constant(dim);
+
+  if (val != nullptr)
+  {
+    auto printer = m_equations.find(U"CANONICAL_PRINT");
+
+    Context k = m_defaultk;
+
+    ContextPerturber p(k, {{DIM_ARG0, *val}});
+
+    Constant string = printer->second->operator()(k);
+
+    if (string.index() != TYPE_INDEX_USTRING)
+    {
+      return U"error printing dimension";
+    }
+    else
+    {
+      return get_constant_pointer<u32string>(string);
+    }
+  }
+
+  std::ostringstream os;
+  os << dim;
+
+  return utf8_to_utf32(os.str());
 }
 
 } //namespace TransLucid

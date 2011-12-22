@@ -18,7 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/ast.hpp>
-#include <tl/hyperdatons/arrayhd_fwd.hpp>
+#include <tl/hyperdatons/multi_arrayhd_fwd.hpp>
 #include <tl/hyperdatons/envhd.hpp>
 #include <tl/library.hpp>
 #include <tl/system.hpp>
