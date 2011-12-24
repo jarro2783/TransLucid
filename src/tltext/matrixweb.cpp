@@ -140,15 +140,21 @@ printForms()
     << R"(Rows: <input type="text" name="outcols" size="4", value="3">)"
     << "<h2>A</h2>"
     << R"(<textarea rows="15" cols="30" name="Ain">
-1 2 3
-4 5 6
-7 8 9
+indexedby = {0,1};;
+entries = {
+{1, 2, 3},
+{4, 5, 6},
+{7, 8, 9}
+;;
 </textarea>)"
     << "<h2>B</h2>"
     << R"(<textarea rows="15" cols="30" name="Bin">
-2 0 0
-0 2 0
-0 0 2
+indexedby = {0,1};;
+entries = {
+{2, 0, 0},
+0, 2, 0},
+0, 0, 2}
+;;
 </textarea>)"
     << "<h2>Matrix Program</h2>"
     << R"(<textarea rows="15" cols="80" readonly="readonly" name="prog">)"
@@ -200,8 +206,8 @@ generate_io
   output 
     << "in A = file_array_in_hd!\"" << aname.str() << "\";;\n"
     << "in B = file_array_in_hd!\"" << bname.str() << "\";;\n\n"
-    << "out C = file_array_out_hd!(\"" << outname.str() << "\", "
-    << numcols << ", " << numrows << ");;\n\n";
+    << "out C [0 : 0.." << numcols << ", 1 : 0.." << numrows << 
+       "] = file_array_out_hd!\"" << outname.str() << ";;\n\n";
 
   std::ostringstream outlink;
 

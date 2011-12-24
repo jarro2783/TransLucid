@@ -1288,6 +1288,7 @@ init_builtin_types(System& s)
 
 namespace std
 {
+  #if 0
   template <>
   size_t
   hash<basic_string<unsigned int>>::operator()
@@ -1300,8 +1301,8 @@ namespace std
     }
     return val;
   }
+  #endif
 
-  template <>
   size_t
   hash<TransLucid::Special>::operator()
   (TransLucid::Special v) const
