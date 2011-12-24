@@ -41,6 +41,7 @@ namespace TransLucid
       for (auto i : initial)
       {
         m_objects.insert(i);
+        m_reverse.insert({i.second, i.first});
       }
     }
 
@@ -50,6 +51,7 @@ namespace TransLucid
       auto result = m_objects.insert(std::make_pair(v, m_index));
       if (result.second)
       {
+        m_reverse.insert({m_index, v});
         ++m_index;
       }
       return result.first->second;
@@ -58,9 +60,29 @@ namespace TransLucid
     private:
 
     typedef std::unordered_map<T, Index> ObjectMap;
+    typedef std::unordered_map<Index, T> ReverseMap;
+
     ObjectMap m_objects;
+    ReverseMap m_reverse;
 
     Index& m_index;
+
+    public:
+
+    const T* 
+    reverseLookup(const Index& index) const
+    {
+      auto iter = m_reverse.find(index);
+      if (iter == m_reverse.end())
+      {
+        return nullptr;
+      }
+      else
+      {
+        return &iter->second;
+      }
+    }
+
   };
 }
 

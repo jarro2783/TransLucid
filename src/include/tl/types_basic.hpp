@@ -25,4 +25,14 @@ namespace TransLucid
   };
 }
 
+namespace std
+{
+  template <>
+  struct hash<TransLucid::Special>
+  {
+    size_t
+    operator()(TransLucid::Special s) const;
+  };
+}
+
 #endif

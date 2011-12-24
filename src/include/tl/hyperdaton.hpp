@@ -87,6 +87,9 @@ namespace TransLucid
     put(const Context& k, const Constant& c) = 0;
 
     virtual void
+    addAssignment(const Tuple& region) = 0;
+
+    virtual void
     commit() = 0;
   };
 
