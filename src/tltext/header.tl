@@ -49,6 +49,17 @@ var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;
 
+var sperrorr = special"sperror";;
+var spaccess = special"spaccess";;
+var sptypeerror = special"typeerror";;
+var spdim = special"dim";;
+var sparith = special"arith";;
+var spundef = special"undef";;
+var spconst = special"const";;
+var spmultidef = special"multidef";;
+var sploop = special"loop";;
+
+
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
 var CANONICAL_PRINT [arg0 : ustring] = "`" + PRINT + "`";;
