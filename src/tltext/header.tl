@@ -49,7 +49,7 @@ var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;
 
-var sperrorr = special"sperror";;
+var sperror = special"sperror";;
 var spaccess = special"spaccess";;
 var sptypeerror = special"typeerror";;
 var spdim = special"dim";;
@@ -59,6 +59,15 @@ var spconst = special"const";;
 var spmultidef = special"multidef";;
 var sploop = special"loop";;
 
+var PRINT_SPECIAL [arg0 : sperror] = "sperror";;
+var PRINT_SPECIAL [arg0 : spaccess] = "spaccess";;
+var PRINT_SPECIAL [arg0 : sptypeerror] = "typeerror";;
+var PRINT_SPECIAL [arg0 : spdim] = "dim";;
+var PRINT_SPECIAL [arg0 : sparith] = "arith";;
+var PRINT_SPECIAL [arg0 : spundef] = "undef";;
+var PRINT_SPECIAL [arg0 : spconst] = "const";;
+var PRINT_SPECIAL [arg0 : spmultidef] = "multidef";;
+var PRINT_SPECIAL [arg0 : sploop] = "loop";;
 
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
@@ -67,4 +76,5 @@ var CANONICAL_PRINT [arg0 : uchar]   = "'" + PRINT + "'";;
 var CANONICAL_PRINT [arg0 : bool]    = PRINT;;
 var CANONICAL_PRINT [arg0 : range]   = PRINT;;
 var CANONICAL_PRINT [arg0 : tuple]   = "I don't know how to print a tuple";;
+var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
 var CANONICAL_PRINT                  = TYPENAME + "`" + PRINT + "`";;
