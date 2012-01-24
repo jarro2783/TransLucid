@@ -59,7 +59,6 @@ Context::lookup(dimension_index dim) const
 {
   if (dim <= m_min || dim >= m_max)
   {
-    std::cerr << "undefined dim for " << dim << std::endl;
     return m_all;
   }
   else
@@ -68,7 +67,6 @@ Context::lookup(dimension_index dim) const
 
     if (s.empty())
     {
-      std::cerr << "undefined dim for " << dim << std::endl;
       return m_all;
     }
     else
