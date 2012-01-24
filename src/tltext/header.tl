@@ -37,12 +37,37 @@ fun bool_or a b = if a then true else b fi;;
 
 fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
 
-fun range_construct.a.b = make_range!(a,b);;
+data Infinite = infty | neginfty;;
+
+fun range_construct.a.b [a : intmp, b : intmp] = make_range!(a,b);;
+fun range_construct.a.b [a : intmp, b : infty] = make_range_infty!b;;
+fun range_construct.a.b [a : neginfty, b : intmp] = make_range_neginfty!a;;
+fun range_construct.a.b [a : neginfty, b : infty] = make_range_infinite;;
 
 var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;
+
+var sperror = special"sperror";;
+var spaccess = special"spaccess";;
+var sptypeerror = special"typeerror";;
+var spdim = special"dim";;
+var sparith = special"arith";;
+var spundef = special"undef";;
+var spconst = special"const";;
+var spmultidef = special"multidef";;
+var sploop = special"loop";;
+
+var PRINT_SPECIAL [arg0 : sperror] = "sperror";;
+var PRINT_SPECIAL [arg0 : spaccess] = "spaccess";;
+var PRINT_SPECIAL [arg0 : sptypeerror] = "typeerror";;
+var PRINT_SPECIAL [arg0 : spdim] = "dim";;
+var PRINT_SPECIAL [arg0 : sparith] = "arith";;
+var PRINT_SPECIAL [arg0 : spundef] = "undef";;
+var PRINT_SPECIAL [arg0 : spconst] = "const";;
+var PRINT_SPECIAL [arg0 : spmultidef] = "multidef";;
+var PRINT_SPECIAL [arg0 : sploop] = "loop";;
 
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
@@ -51,4 +76,5 @@ var CANONICAL_PRINT [arg0 : uchar]   = "'" + PRINT + "'";;
 var CANONICAL_PRINT [arg0 : bool]    = PRINT;;
 var CANONICAL_PRINT [arg0 : range]   = PRINT;;
 var CANONICAL_PRINT [arg0 : tuple]   = "I don't know how to print a tuple";;
+var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
 var CANONICAL_PRINT                  = TYPENAME + "`" + PRINT + "`";;

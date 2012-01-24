@@ -74,6 +74,33 @@ namespace TransLucid
         (&Types::Range::create)
     };
 
+    BuiltinBaseFunction<1> range_create_inf{
+      [] (const Constant& lhs) -> Constant
+      {
+        const mpz_class* lhsp = &get_constant_pointer<mpz_class>(lhs);
+        return Types::Range::create(TransLucid::Range(lhsp, nullptr));
+      }
+    };
+
+    BuiltinBaseFunction<1> range_create_neginf{
+      [] (const Constant& rhs) -> Constant
+      {
+        const mpz_class* rhsp = &get_constant_pointer<mpz_class>(rhs);
+        return Types::Range::create(TransLucid::Range(nullptr, rhsp));
+      }
+    };
+
+    BuiltinBaseFunction<0> range_create_infinity{
+      [] () -> Constant
+      {
+        return Types::Range::create(TransLucid::Range(nullptr, nullptr));
+      }
+    };
+
+    BuiltinBaseFunction<1> construct_special{
+      static_cast<Constant (*)(const Constant&)>(&Types::Special::create)
+    };
+
     struct BuiltinFunction
     {
       const char32_t* abstract_name;
@@ -96,7 +123,11 @@ namespace TransLucid
       {U"ne", U"int_ne", &integer_ne},
       {U"plus", U"ustring_plus", &ustring_plus_fn},
       {U"range_construct", U"make_range", &range_create},
-      {U"ignored", U"construct_intmp", &construct_integer}
+      {U"range_construct", U"make_range_infty", &range_create_inf},
+      {U"range_construct", U"make_range_neginfty", &range_create_neginf},
+      //{U"range_construct", U"make_range_infinite", &range_create_infinite},
+      {U"ignored", U"construct_intmp", &construct_integer},
+      {U"ignored", U"construct_special", &construct_special}
     };
   }
 
@@ -219,6 +250,18 @@ namespace TransLucid
       //SPECIAL_LAST is not an actual value
     }
     ;
+
+    std::unordered_map<u32string, TransLucid::Special> special_map
+    {
+      {U"sperror", SP_ERROR},
+      {U"spaccess", SP_ACCESS},
+      {U"sptypeerror", SP_TYPEERROR},
+      {U"sparith", SP_ARITH},
+      {U"spundef", SP_UNDEF},
+      {U"spconst", SP_CONST},
+      {U"spmultidef", SP_MULTIDEF},
+      {U"sploop", SP_LOOP}
+    };
 
   }
 
@@ -627,6 +670,22 @@ namespace TransLucid
       create(TransLucid::Special s)
       {
         return Constant(s, TYPE_INDEX_SPECIAL);
+      }
+
+      Constant
+      create(const Constant& c)
+      {
+        const u32string& s = get_constant_pointer<u32string>(c);
+        auto iter = special_map.find(s);
+
+        if (iter != special_map.end())
+        {
+          return create(iter->second);
+        }
+        else
+        {
+          return create(SP_CONST);
+        }
       }
 
       Constant
@@ -1112,6 +1171,10 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
   s.registerFunction(U"construct_intmp", 
     make_function_type<1>::type(
       static_cast<Constant (*)(const Constant&)>(Types::Intmp::create)));
+
+  s.registerFunction(U"construct_special", 
+    make_function_type<1>::type(
+      static_cast<Constant (*)(const Constant&)>(Types::Special::create)));
 }
 
 void
