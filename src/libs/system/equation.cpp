@@ -374,7 +374,7 @@ VariableWS::operator()(Context& k)
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
-    std::cerr << "undef for " << m_name << std::endl;
+    //std::cerr << "undef for " << m_name << std::endl;
     return Types::Special::create(SP_UNDEF);
   }
   else if (applicable.size() == 1)
@@ -433,7 +433,7 @@ VariableWS::operator()(Context& k)
   }
   else
   {
-    std::cerr << "multidef for " << m_name << std::endl;
+    //std::cerr << "multidef for " << m_name << std::endl;
     return Types::Special::create(SP_MULTIDEF);
   }
 }
