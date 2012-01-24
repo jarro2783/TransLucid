@@ -74,6 +74,29 @@ namespace TransLucid
         (&Types::Range::create)
     };
 
+    BuiltinBaseFunction<1> range_create_inf{
+      [] (const Constant& lhs) -> Constant
+      {
+        const mpz_class* lhsp = &get_constant_pointer<mpz_class>(lhs);
+        return Types::Range::create(TransLucid::Range(lhsp, nullptr));
+      }
+    };
+
+    BuiltinBaseFunction<1> range_create_neginf{
+      [] (const Constant& rhs) -> Constant
+      {
+        const mpz_class* rhsp = &get_constant_pointer<mpz_class>(rhs);
+        return Types::Range::create(TransLucid::Range(nullptr, rhsp));
+      }
+    };
+
+    BuiltinBaseFunction<0> range_create_infinity{
+      [] () -> Constant
+      {
+        return Types::Range::create(TransLucid::Range(nullptr, nullptr));
+      }
+    };
+
     struct BuiltinFunction
     {
       const char32_t* abstract_name;
@@ -96,6 +119,9 @@ namespace TransLucid
       {U"ne", U"int_ne", &integer_ne},
       {U"plus", U"ustring_plus", &ustring_plus_fn},
       {U"range_construct", U"make_range", &range_create},
+      {U"range_construct", U"make_range_infty", &range_create_inf},
+      {U"range_construct", U"make_range_neginfty", &range_create_neginf},
+      //{U"range_construct", U"make_range_infinite", &range_create_infinite},
       {U"ignored", U"construct_intmp", &construct_integer}
     };
   }

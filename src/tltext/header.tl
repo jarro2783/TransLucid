@@ -37,7 +37,12 @@ fun bool_or a b = if a then true else b fi;;
 
 fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
 
-fun range_construct.a.b = make_range!(a,b);;
+data Infinite = infty | neginfty;;
+
+fun range_construct.a.b [a : intmp, b : intmp] = make_range!(a,b);;
+fun range_construct.a.b [a : intmp, b : infty] = make_range_infty!b;;
+fun range_construct.a.b [a : neginfty, b : intmp] = make_range_neginfty!a;;
+fun range_construct.a.b [a : neginfty, b : infty] = make_range_infinite;;
 
 var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
