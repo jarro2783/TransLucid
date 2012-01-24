@@ -49,11 +49,18 @@ var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;
 
+fun escape_character.c [c : '\n'] = `\n`;;
+
+fun escape_string.s = escape_character.(first.s)
+  + escape_string.(tail.s)
+;;
+
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
-var CANONICAL_PRINT [arg0 : ustring] = "`" + PRINT + "`";;
-var CANONICAL_PRINT [arg0 : uchar]   = "'" + PRINT + "'";;
+var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
+var CANONICAL_PRINT [arg0 : uchar]   = "'" + escape_string.PRINT + "'";;
 var CANONICAL_PRINT [arg0 : bool]    = PRINT;;
 var CANONICAL_PRINT [arg0 : range]   = PRINT;;
 var CANONICAL_PRINT [arg0 : tuple]   = "I don't know how to print a tuple";;
-var CANONICAL_PRINT                  = TYPENAME + "`" + PRINT + "`";;
+var CANONICAL_PRINT                  = TYPENAME + `"` + escape_string.PRINT 
+                                       + `"`;;
