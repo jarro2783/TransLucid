@@ -51,23 +51,23 @@ var next = \d -> \\X -> X @ [d <- #!d + 1];;
 
 var sperror = special"sperror";;
 var spaccess = special"spaccess";;
-var sptypeerror = special"typeerror";;
-var spdim = special"dim";;
-var sparith = special"arith";;
-var spundef = special"undef";;
-var spconst = special"const";;
-var spmultidef = special"multidef";;
-var sploop = special"loop";;
+var sptypeerror = special"sptypeerror";;
+var spdim = special"spdim";;
+var sparith = special"sparith";;
+var spundef = special"spundef";;
+var spconst = special"spconst";;
+var spmultidef = special"spmultidef";;
+var sploop = special"sploop";;
 
 var PRINT_SPECIAL [arg0 : sperror] = "sperror";;
 var PRINT_SPECIAL [arg0 : spaccess] = "spaccess";;
 var PRINT_SPECIAL [arg0 : sptypeerror] = "typeerror";;
-var PRINT_SPECIAL [arg0 : spdim] = "dim";;
-var PRINT_SPECIAL [arg0 : sparith] = "arith";;
-var PRINT_SPECIAL [arg0 : spundef] = "undef";;
-var PRINT_SPECIAL [arg0 : spconst] = "const";;
-var PRINT_SPECIAL [arg0 : spmultidef] = "multidef";;
-var PRINT_SPECIAL [arg0 : sploop] = "loop";;
+var PRINT_SPECIAL [arg0 : spdim] = "spdim";;
+var PRINT_SPECIAL [arg0 : sparith] = "sparith";;
+var PRINT_SPECIAL [arg0 : spundef] = "spundef";;
+var PRINT_SPECIAL [arg0 : spconst] = "spconst";;
+var PRINT_SPECIAL [arg0 : spmultidef] = "spmultidef";;
+var PRINT_SPECIAL [arg0 : sploop] = "sploop";;
 
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
@@ -78,3 +78,5 @@ var CANONICAL_PRINT [arg0 : range]   = PRINT;;
 var CANONICAL_PRINT [arg0 : tuple]   = "I don't know how to print a tuple";;
 var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
 var CANONICAL_PRINT                  = TYPENAME + "`" + PRINT + "`";;
+
+var RETURN = 0;;

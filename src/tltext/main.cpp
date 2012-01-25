@@ -83,10 +83,21 @@ int main(int argc, char *argv[])
     ("version", "show version")
   ;
 
+  std::vector<po::basic_option<char>> options;
+
   try
   {
-    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::basic_parsed_options<char> parsed = po::command_line_parser(argc, argv).
+      options(desc).allow_unregistered().run();
     po::notify(vm);
+
+    po::store(parsed, vm);
+
+    std::vector<std::string> extra_options = 
+      po::collect_unrecognized(parsed.options, po::exclude_positional);
+
+
+    options = parsed.options;
   }
   catch (std::exception& e)
   {
@@ -112,7 +123,24 @@ int main(int argc, char *argv[])
   try
   {
     TransLucid::TLText::TLText tltext("TLText...");
-    
+ 
+    for (const auto& s : options)
+    {
+      if (s.unregistered)
+      {
+        if (s.value.size() == 1)
+        {
+          tltext.add_argument(TransLucid::utf8_to_utf32(s.string_key),
+            TransLucid::utf8_to_utf32(s.value.at(0)));
+        }
+        else
+        {
+          //if it doesn't have one thing, then it must have zero
+          tltext.add_argument(TransLucid::utf8_to_utf32(s.string_key));
+        }
+      }
+    }
+   
     if (vm.count("debug"))
     {
       tltext.debug(true);
@@ -155,6 +183,10 @@ int main(int argc, char *argv[])
   {
     std::cerr << "terminated with exception: " << c << std::endl;
     return 1;
+  }
+  catch (TransLucid::TLText::ReturnError& ret)
+  {
+    return ret.m_code;
   }
   catch (std::exception& e)
   {

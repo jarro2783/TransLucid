@@ -49,6 +49,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <sstream>
 #include <unordered_map>
 
+#include <unistd.h>
+
 #include <tl/builtin_types.hpp>
 #include <tl/constws.hpp>
 #include <tl/context.hpp>
@@ -1134,6 +1136,11 @@ System::setDefaultContext()
     )
     );
   }
+
+  for (const auto& v : m_envvars)
+  {
+    m_defaultk.perturb(v.first, v.second);
+  }
 }
 
 template <typename T>
@@ -1548,6 +1555,36 @@ System::printDimension(dimension_index dim) const
   os << dim;
 
   return utf8_to_utf32(os.str());
+}
+
+void
+System::addEnvVars()
+{
+  char** envvar = environ;
+
+  while (*envvar != nullptr)
+  {
+    std::string var = *envvar;
+    size_t equals = var.find('=');
+
+    std::string varname = var.substr(0, equals);
+    std::string varvalue = var.substr(equals + 1, std::string::npos);
+
+    u32string u32name(varname.begin(), varname.end());
+
+    addEnvVar(u32name, 
+      Types::String::create(u32string(varvalue.begin(), varvalue.end())));
+
+    ++envvar;
+  }
+}
+
+void
+System::addEnvVar(const u32string& name, const Constant& value)
+{
+  m_envvars.insert({getDimensionIndex(name), value});
+
+  addDimension(name);
 }
 
 } //namespace TransLucid
