@@ -196,11 +196,34 @@ namespace TransLucid
       setup_hds();
 
       DemandHD* m_demands;
+      DemandHD* m_returnhd;
 
       std::vector<std::string> m_headers;
       std::vector<std::string> m_clargs;
       ArrayNHD<u32string, 1>* m_argsHD;
       EnvHD* m_envHD;
+    };
+
+    enum TLtextReturnCode
+    {
+      RETURN_CODE_NOT_INTMP = 1,
+      RETURN_CODE_BOUNDS
+    };
+
+    class ReturnError : public std::exception
+    {
+      public:
+      ReturnError(int code)
+      : m_code(code)
+      {
+      }
+
+      const char* what() const throw()
+      {
+        return "TransLucid TLtext return code exception";
+      }
+
+      int m_code;
     };
   }
 }

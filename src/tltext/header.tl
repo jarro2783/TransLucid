@@ -78,3 +78,5 @@ var CANONICAL_PRINT [arg0 : range]   = PRINT;;
 var CANONICAL_PRINT [arg0 : tuple]   = "I don't know how to print a tuple";;
 var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
 var CANONICAL_PRINT                  = TYPENAME + "`" + PRINT + "`";;
+
+var RETURN = 0;;

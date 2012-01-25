@@ -68,6 +68,25 @@ TLText::TLText(const std::string& initOut)
   m_demands = new DemandHD(m_system);
 
   m_system.addOutputHyperdaton(U"demand", m_demands);
+
+  //set up demand for RETURN
+  m_returnhd = new DemandHD(m_system);
+  m_system.addOutputHyperdaton(U"returnval", m_returnhd);
+  m_system.addAssignment
+  (
+    Parser::Equation
+    (
+      U"returnval", 
+      Tree::TupleExpr
+      (
+        {
+          {Tree::DimensionExpr(U"slot"), mpz_class(0)}
+        }
+      ),
+      Tree::Expr(), 
+      Tree::IdentExpr(U"RETURN")
+    )
+  );
 }
 
 TLText::~TLText()
@@ -188,6 +207,26 @@ TLText::run()
         {
           *m_error << "Error: PRINT didn't return a string" << std::endl;
           *m_error << "Type index: " << c.index() << std::endl;
+        }
+      }
+
+      //check the return value
+      const auto& ret = (*m_returnhd)(0);
+      if (ret.index() != TYPE_INDEX_INTMP)
+      {
+        throw ReturnError(RETURN_CODE_NOT_INTMP);
+      }
+      else
+      {
+        const mpz_class& val = get_constant_pointer<mpz_class>(ret);
+        if (!val.fits_sint_p())
+        {
+          throw ReturnError(RETURN_CODE_BOUNDS);
+        }
+
+        if (val != 0)
+        {
+          throw ReturnError(val.get_si());
         }
       }
     }
