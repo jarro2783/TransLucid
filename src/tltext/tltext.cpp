@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/tree_printer.hpp>
+#include <tl/types/boolean.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types_util.hpp>
@@ -407,6 +408,20 @@ TLText::setup_envhd()
   m_system.addInputHyperdaton(U"ENV", m_envHD);
 }
 
-} //namespace TLCore
+
+void
+TLText::add_argument(const u32string& arg)
+{
+  m_system.addEnvVar(arg, Types::Boolean::create(true));
+}
+
+void
+TLText::add_argument(const u32string& arg, const u32string& value)
+{
+  std::cout << "adding variable " << arg << " = " << value << std::endl;
+  m_system.addEnvVar(arg, Types::String::create(value));
+}
+
+} //namespace TLText
 
 } //namespace TransLucid

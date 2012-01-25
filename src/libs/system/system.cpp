@@ -1571,13 +1571,20 @@ System::addEnvVars()
     std::string varvalue = var.substr(equals + 1, std::string::npos);
 
     u32string u32name(varname.begin(), varname.end());
-    m_envvars.insert({getDimensionIndex(u32name),
-      Types::String::create(u32string(varvalue.begin(), varvalue.end()))});
 
-    addDimension(u32name);
+    addEnvVar(u32name, 
+      Types::String::create(u32string(varvalue.begin(), varvalue.end())));
 
     ++envvar;
   }
+}
+
+void
+System::addEnvVar(const u32string& name, const Constant& value)
+{
+  m_envvars.insert({getDimensionIndex(name), value});
+
+  addDimension(name);
 }
 
 } //namespace TransLucid

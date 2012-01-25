@@ -151,6 +151,12 @@ namespace TransLucid
       void
       add_header(const std::string& header);
 
+      void
+      add_argument(const u32string& arg);
+
+      void
+      add_argument(const u32string& arg, const u32string& value);
+
       private:
       bool m_verbose;
       bool m_uuids;

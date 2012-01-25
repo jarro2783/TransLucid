@@ -213,6 +213,9 @@ namespace TransLucid
     void
     addEnvVars();
 
+    void
+    addEnvVar(const u32string& name, const Constant& value);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
