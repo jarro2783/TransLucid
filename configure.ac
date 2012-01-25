@@ -57,6 +57,10 @@ TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing -DBOOST_SPIRIT_UNICODE \
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_CFLAGS)
 
+PKG_CHECK_MODULES([ICU], [icu-uc])
+AC_SUBST([ICU_CFLAGS])
+AC_SUBST([ICU_LIBS])
+
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Do we build tlweb

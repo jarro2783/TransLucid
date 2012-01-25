@@ -49,11 +49,22 @@ var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;
 
+fun escape_character.c = c;;
+fun escape_character.c | is_printable!c && code_point.c <= 0GFFFF 
+  = `\u` + code_point_4!c;;
+fun escape_character.c | is_printable!c && code_point.c > 0GFFFF 
+  = `\U` + code_point_8!c;;
 fun escape_character.c [c : '\n'] = `\n`;;
+fun escape_character.c [c : '\t'] = `\t`;;
+fun escape_character.c [c : '\r'] = `\r`;;
+fun escape_character.c [c : '\\'] = `\\`;;
+fun escape_character.c [c : '\"'] = `\"`;;
+fun escape_character.c [c : '\''] = `\'`;;
 
-fun escape_string.s = escape_character.(first.s)
-  + escape_string.(tail.s)
+fun escape_string.s = escape_character.(string_at.s.0)
+  + escape_string.(substring.s.1.npos)
 ;;
+fun escape_string.s [s : ""] = "";;
 
 var sperror = special"sperror";;
 var spaccess = special"spaccess";;
@@ -81,7 +92,7 @@ var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
 var CANONICAL_PRINT [arg0 : uchar]   = "'" + escape_string.PRINT + "'";;
 var CANONICAL_PRINT [arg0 : bool]    = PRINT;;
 var CANONICAL_PRINT [arg0 : range]   = PRINT;;
-var CANONICAL_PRINT [arg0 : tuple]   = "I don't know how to print a tuple";;
+var CANONICAL_PRINT [arg0 : tuple]   = "[I don't know how to print a tuple]";;
 var CANONICAL_PRINT                  = TYPENAME + `"` + escape_string.PRINT 
                                        + `"`;;
 var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;

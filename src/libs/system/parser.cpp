@@ -1269,6 +1269,13 @@ Parser::parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
 
   parse_tuple(current, end, decl.guard, SEPARATOR_COLON);
 
+  if (*current == TOKEN_PIPE)
+  {
+    Tree::Expr boolexpr;
+    ++current;
+    expect(current, end, boolexpr, U"expr", &Parser::parse_expr); 
+  }
+
   expect(current, end, U"=", TOKEN_EQUALS);
 
   expect(current, end, decl.expr, U"expr", &Parser::parse_expr);
