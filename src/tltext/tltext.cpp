@@ -219,7 +219,7 @@ TLText::run()
       else
       {
         const mpz_class& val = get_constant_pointer<mpz_class>(ret);
-        if (!val.fits_sint_p())
+        if (val < 0 || val > 255)
         {
           throw ReturnError(RETURN_CODE_BOUNDS);
         }
