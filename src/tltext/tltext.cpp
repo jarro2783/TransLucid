@@ -87,6 +87,8 @@ TLText::TLText(const std::string& initOut)
       Tree::IdentExpr(U"RETURN")
     )
   );
+
+  m_system.addEnvVars();
 }
 
 TLText::~TLText()
