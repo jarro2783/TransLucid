@@ -210,6 +210,12 @@ namespace TransLucid
     Constant
     evalExpr(const Tree::Expr& e);
 
+    void
+    addEnvVars();
+
+    void
+    addEnvVar(const u32string& name, const Constant& value);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
@@ -361,6 +367,7 @@ namespace TransLucid
     //Translator *m_translator;
     std::vector<dimension_index> m_Lin;
     std::vector<dimension_index> m_fnLists;
+    std::map<dimension_index, Constant> m_envvars;
 
     size_t m_uniqueVarIndex;
     size_t m_uniqueDimIndex;

@@ -55,6 +55,26 @@ fun escape_string.s = escape_character.(first.s)
   + escape_string.(tail.s)
 ;;
 
+var sperror = special"sperror";;
+var spaccess = special"spaccess";;
+var sptypeerror = special"sptypeerror";;
+var spdim = special"spdim";;
+var sparith = special"sparith";;
+var spundef = special"spundef";;
+var spconst = special"spconst";;
+var spmultidef = special"spmultidef";;
+var sploop = special"sploop";;
+
+var PRINT_SPECIAL [arg0 : sperror] = "sperror";;
+var PRINT_SPECIAL [arg0 : spaccess] = "spaccess";;
+var PRINT_SPECIAL [arg0 : sptypeerror] = "typeerror";;
+var PRINT_SPECIAL [arg0 : spdim] = "spdim";;
+var PRINT_SPECIAL [arg0 : sparith] = "sparith";;
+var PRINT_SPECIAL [arg0 : spundef] = "spundef";;
+var PRINT_SPECIAL [arg0 : spconst] = "spconst";;
+var PRINT_SPECIAL [arg0 : spmultidef] = "spmultidef";;
+var PRINT_SPECIAL [arg0 : sploop] = "sploop";;
+
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
 var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
@@ -64,3 +84,6 @@ var CANONICAL_PRINT [arg0 : range]   = PRINT;;
 var CANONICAL_PRINT [arg0 : tuple]   = "I don't know how to print a tuple";;
 var CANONICAL_PRINT                  = TYPENAME + `"` + escape_string.PRINT 
                                        + `"`;;
+var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
+
+var RETURN = 0;;

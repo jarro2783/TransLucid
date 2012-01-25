@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/tree_printer.hpp>
+#include <tl/types/boolean.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types_util.hpp>
@@ -68,6 +69,27 @@ TLText::TLText(const std::string& initOut)
   m_demands = new DemandHD(m_system);
 
   m_system.addOutputHyperdaton(U"demand", m_demands);
+
+  //set up demand for RETURN
+  m_returnhd = new DemandHD(m_system);
+  m_system.addOutputHyperdaton(U"returnval", m_returnhd);
+  m_system.addAssignment
+  (
+    Parser::Equation
+    (
+      U"returnval", 
+      Tree::TupleExpr
+      (
+        {
+          {Tree::DimensionExpr(U"slot"), mpz_class(0)}
+        }
+      ),
+      Tree::Expr(), 
+      Tree::IdentExpr(U"RETURN")
+    )
+  );
+
+  m_system.addEnvVars();
 }
 
 TLText::~TLText()
@@ -188,6 +210,26 @@ TLText::run()
         {
           *m_error << "Error: PRINT didn't return a string" << std::endl;
           *m_error << "Type index: " << c.index() << std::endl;
+        }
+      }
+
+      //check the return value
+      const auto& ret = (*m_returnhd)(0);
+      if (ret.index() != TYPE_INDEX_INTMP)
+      {
+        throw ReturnError(RETURN_CODE_NOT_INTMP);
+      }
+      else
+      {
+        const mpz_class& val = get_constant_pointer<mpz_class>(ret);
+        if (val < 0 || val > 255)
+        {
+          throw ReturnError(RETURN_CODE_BOUNDS);
+        }
+
+        if (val != 0)
+        {
+          throw ReturnError(val.get_si());
         }
       }
     }
@@ -366,6 +408,20 @@ TLText::setup_envhd()
   m_system.addInputHyperdaton(U"ENV", m_envHD);
 }
 
-} //namespace TLCore
+
+void
+TLText::add_argument(const u32string& arg)
+{
+  m_system.addEnvVar(arg, Types::Boolean::create(true));
+}
+
+void
+TLText::add_argument(const u32string& arg, const u32string& value)
+{
+  std::cout << "adding variable " << arg << " = " << value << std::endl;
+  m_system.addEnvVar(arg, Types::String::create(value));
+}
+
+} //namespace TLText
 
 } //namespace TransLucid
