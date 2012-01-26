@@ -76,7 +76,7 @@ namespace TransLucid
 
         m_rules.add(U"{IDENT}?{stringRAW}", TOKEN_CONSTANT_RAW);
         m_rules.add(U"{IDENT}?{stringINTERPRET}", TOKEN_CONSTANT_INTERPRETED);
-        m_rules.add(U"'([^'\\\\]|\\\\.)+'", TOKEN_UCHAR);
+        m_rules.add(U"\\'([^\\'\\\\]|\\\\.)+\\'", TOKEN_UCHAR);
 
         m_rules.add(U":=", TOKEN_ASSIGNTO);
         m_rules.add(U"@", TOKEN_AT);

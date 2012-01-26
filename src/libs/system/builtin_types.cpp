@@ -23,6 +23,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <sstream>
 
+#include <unicode/uchar.h>
+
 #include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
 #include "tl/builtin_ops.hpp"
@@ -101,33 +103,47 @@ namespace TransLucid
       static_cast<Constant (*)(const Constant&)>(&Types::Special::create)
     };
 
+    BuiltinBaseFunction<1> icu_is_printable{
+      [] (const Constant& c) -> Constant
+      {
+        if (c.index() != TYPE_INDEX_UCHAR)
+        {
+          return Types::Special::create(Special::SP_TYPEERROR);
+        }
+        else
+        {
+          return Types::Boolean::create(u_isprint(get_constant<char32_t>(c)));
+        }
+      }
+    };
+
     struct BuiltinFunction
     {
-      const char32_t* abstract_name;
       const char32_t* op_name;
       BaseFunctionType* fn;
     };
 
     constexpr BuiltinFunction fn_table[] =
     {
-      {U"plus", U"int_plus", &integer_plus},
-      {U"minus", U"int_minus", &integer_minus},
-      {U"times", U"int_times", &integer_times},
-      {U"divide", U"int_divide", &integer_divide},
-      {U"modulus", U"int_modulus", &integer_modulus},
-      {U"lte", U"int_lte", &integer_lte},
-      {U"lt", U"int_lt", &integer_lt},
-      {U"gte", U"int_gte", &integer_gte},
-      {U"gt", U"int_gt", &integer_gt},
-      {U"eq", U"int_eq", &integer_eq},
-      {U"ne", U"int_ne", &integer_ne},
-      {U"plus", U"ustring_plus", &ustring_plus_fn},
-      {U"range_construct", U"make_range", &range_create},
-      {U"range_construct", U"make_range_infty", &range_create_inf},
-      {U"range_construct", U"make_range_neginfty", &range_create_neginf},
-      //{U"range_construct", U"make_range_infinite", &range_create_infinite},
-      {U"ignored", U"construct_intmp", &construct_integer},
-      {U"ignored", U"construct_special", &construct_special}
+      {U"int_plus", &integer_plus},
+      {U"int_minus", &integer_minus},
+      {U"int_times", &integer_times},
+      {U"int_divide", &integer_divide},
+      {U"int_modulus", &integer_modulus},
+      {U"int_lte", &integer_lte},
+      {U"int_lt", &integer_lt},
+      {U"int_gte", &integer_gte},
+      {U"int_gt", &integer_gt},
+      {U"int_eq", &integer_eq},
+      {U"int_ne", &integer_ne},
+      {U"ustring_plus", &ustring_plus_fn},
+      {U"make_range", &range_create},
+      {U"make_range_infty", &range_create_inf},
+      {U"make_range_neginfty", &range_create_neginf},
+      {U"make_range_infinite", &range_create_infinity},
+      {U"construct_intmp", &construct_integer},
+      {U"construct_special", &construct_special},
+      {U"is_printable", &icu_is_printable}
     };
   }
 

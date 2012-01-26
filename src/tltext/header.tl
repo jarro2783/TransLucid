@@ -61,8 +61,8 @@ fun escape_character.c [c : '\\'] = `\\`;;
 fun escape_character.c [c : '\"'] = `\"`;;
 fun escape_character.c [c : '\''] = `\'`;;
 
-fun escape_string.s = escape_character.(string_at.s.0)
-  + escape_string.(substring.s.1.npos)
+fun escape_string.s = escape_character.(string_at!(s,0))
+  + escape_string.(substring!(s,1,npos))
 ;;
 fun escape_string.s [s : ""] = "";;
 
@@ -88,13 +88,15 @@ var PRINT_SPECIAL [arg0 : sploop] = "sploop";;
 
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
-var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
-var CANONICAL_PRINT [arg0 : uchar]   = "'" + escape_string.PRINT + "'";;
+//var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
+//var CANONICAL_PRINT [arg0 : uchar]   = "'" + escape_string.PRINT + "'";;
+var CANONICAL_PRINT [arg0 : ustring] = `"` + PRINT + `"`;;
+var CANONICAL_PRINT [arg0 : uchar]   = "'" + PRINT + "'";;
 var CANONICAL_PRINT [arg0 : bool]    = PRINT;;
 var CANONICAL_PRINT [arg0 : range]   = PRINT;;
 var CANONICAL_PRINT [arg0 : tuple]   = "[I don't know how to print a tuple]";;
-var CANONICAL_PRINT                  = TYPENAME + `"` + escape_string.PRINT 
-                                       + `"`;;
+//var CANONICAL_PRINT                  = TYPENAME + `"` + PRINT 
+//                                       + `"`;;
 var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
 
 var RETURN = 0;;

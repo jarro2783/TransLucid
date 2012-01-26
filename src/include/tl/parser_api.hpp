@@ -71,6 +71,7 @@ namespace TransLucid
       u32string name;
       std::vector<std::pair<ArgType, u32string>> args;
       Tree::Expr guard;
+      Tree::Expr boolean;
       Tree::Expr expr;
     };
 
