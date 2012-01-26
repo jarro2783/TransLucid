@@ -1038,6 +1038,9 @@ Parser::parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
     case 'r':
     assoc = Tree::ASSOC_RIGHT;
     break;
+    case 'n':
+    assoc = Tree::ASSOC_NON;
+    break;
 
     default:
     throw 
