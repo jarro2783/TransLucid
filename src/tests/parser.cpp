@@ -765,10 +765,10 @@ TEST_CASE ( "constants", "check the built in constants" )
                         U"\"text\\u00E4\\xC2\\xA2\"";
   Checker checker({
     std::make_pair(U"ustring", U"hello"),
-    char32_t('a'),
-    U'\u0041',
-    U'\u0041',
-    U'\u00a2',
+    std::make_pair(U"uchar", U"a"),
+    std::make_pair(U"uchar", U"\u0041"),
+    std::make_pair(U"uchar", U"\u0041"),
+    std::make_pair(U"uchar", U"\u00a2"),
     std::make_pair(U"ustring", U"text\u00e4\u00a2")
   });
 
