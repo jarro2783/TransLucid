@@ -26,6 +26,8 @@ along with TransLucid; see the file COPYING.  If not see
 //#define HAND_CONVERT
 #define ICONV_CONVERT
 
+#include <iostream>
+
 #include <tl/utility.hpp>
 #include <tl/equation.hpp>
 #include <tl/system.hpp>
@@ -269,6 +271,9 @@ tupleRefines(const Tuple& a, const Tuple& b, bool canequal)
   {
     type_index d1 = it1->first;
     type_index d2 = it2->first;
+
+    //std::cerr << "tuples have dimensions: " << d1 << " and " << d2 << 
+    //  std::endl;
 
     //extra dimension in b
     if (d2 < d1)

@@ -63,7 +63,7 @@ namespace TransLucid
      * dimensions can still be added.
      **/
     GuardWS()
-    : m_system(nullptr)
+    : m_guard(nullptr), m_boolean(nullptr), m_system(nullptr)
     {
     }
 
@@ -93,8 +93,8 @@ namespace TransLucid
     operator bool() const
     {
        return 
-          m_guard != 0 
-       || m_boolean != 0
+          m_guard != nullptr
+       || m_boolean != nullptr
        || m_dimConstConst.size() != 0
        || m_dimConstNon.size() != 0
        || m_dimNonConst.size() != 0

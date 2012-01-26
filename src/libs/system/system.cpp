@@ -1477,6 +1477,7 @@ System::addFunction(const Parser::FnDecl& fn)
 
   Tree::Expr guardFixed = fixupGuardArgs(fn.guard, std::get<2>(iter->second));
   Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
+  Tree::Expr boolean = toWSTreePlusExtras(fn.boolean, tows, toRename);
   Tree::Expr expr = toWSTreePlusExtras(fn.expr, tows, toRename);
 
   //std::cerr << "adding function definition:" << std::endl;
@@ -1486,14 +1487,16 @@ System::addFunction(const Parser::FnDecl& fn)
   //          << std::endl;
 
   WS* gws = compile.build_workshops(guard);
+  WS* bws = compile.build_workshops(boolean);
   WS* ews = compile.build_workshops(expr);
 
   //add the definition to the end of the vector of functions
   std::get<3>(iter->second).push_back(fn);
 
   //add it as an equation to the conditional
-  //std::cerr << "adding function equation" << std::endl;
-  uuid u = fnws->addEquation(fn.name, GuardWS(gws, nullptr), ews, m_time);
+  //std::cerr << "adding function equation to " << fn.name << std::endl;
+  //std::cerr << "guard is " << gws << std::endl;
+  uuid u = fnws->addEquation(fn.name, GuardWS(gws, bws), ews, m_time);
 
   //add all the new equations
   //more duplication

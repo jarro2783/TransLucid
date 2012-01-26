@@ -23,6 +23,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <sstream>
 
+#include <unicode/uchar.h>
+
 #include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
 #include "tl/builtin_ops.hpp"
@@ -69,6 +71,8 @@ namespace TransLucid
 
     BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus};
 
+    BuiltinBaseFunction<2> boolean_eq{&bool_eq};
+
     BuiltinBaseFunction<2> range_create{
       static_cast<Constant (*)(const Constant&, const Constant&)>
         (&Types::Range::create)
@@ -101,33 +105,178 @@ namespace TransLucid
       static_cast<Constant (*)(const Constant&)>(&Types::Special::create)
     };
 
+    BuiltinBaseFunction<1> icu_is_printable{
+      [] (const Constant& c) -> Constant
+      {
+        if (c.index() != TYPE_INDEX_UCHAR)
+        {
+          return Types::Special::create(Special::SP_TYPEERROR);
+        }
+        else
+        {
+          return Types::Boolean::create(u_isprint(get_constant<char32_t>(c)));
+        }
+      }
+    };
+
+    BuiltinBaseFunction<1> uchar_code_point{
+      [] (const Constant& c) -> Constant
+      {
+        if (c.index() != TYPE_INDEX_UCHAR)
+        {
+          return Types::Special::create(Special::SP_TYPEERROR);
+        }
+        else
+        {
+          return Types::Intmp::create(get_constant<char32_t>(c));
+        }
+      }
+    };
+
+    BuiltinBaseFunction<2> string_at_base{
+      [] (const Constant& s, const Constant& at) -> Constant
+      {
+        if (s.index() != TYPE_INDEX_USTRING || at.index() != TYPE_INDEX_INTMP)
+        {
+          return Types::Special::create(Special::SP_TYPEERROR);
+        }
+        else
+        {
+          const u32string& string = get_constant_pointer<u32string>(s);
+          const mpz_class& index = get_constant_pointer<mpz_class>(at);
+
+          if (index < string.length())
+          {
+            return Types::UChar::create(string.at(index.get_si()));
+          }
+          else
+          {
+            return Types::Special::create(Special::SP_UNDEF);
+          }
+        }
+      }
+    };
+
+    BuiltinBaseFunction<3> substring_base{
+      [] (const Constant& s, const Constant& start, const Constant& length)
+        -> Constant
+      {
+        if (s.index() != TYPE_INDEX_USTRING || 
+            start.index() != TYPE_INDEX_INTMP ||
+            length.index() != TYPE_INDEX_INTMP)
+        {
+          return Types::Special::create(Special::SP_TYPEERROR);
+        }
+        else
+        {
+          const u32string& string = get_constant_pointer<u32string>(s);
+          const mpz_class& startz = get_constant_pointer<mpz_class>(start);
+          const mpz_class& lengthz = get_constant_pointer<mpz_class>(length);
+
+          return Types::String::create(string.substr(
+            startz.get_si(), lengthz.get_si()));
+        }
+      }
+    };
+
+    BuiltinBaseFunction<2> substring_toend_base{
+      [] (const Constant& s, const Constant& start)
+        -> Constant
+      {
+        if (s.index() != TYPE_INDEX_USTRING || 
+            start.index() != TYPE_INDEX_INTMP)
+        {
+          return Types::Special::create(Special::SP_TYPEERROR);
+        }
+        else
+        {
+          const u32string& string = get_constant_pointer<u32string>(s);
+          const mpz_class& number = get_constant_pointer<mpz_class>(start);
+
+          return Types::String::create(string.substr(number.get_si(), 
+                   u32string::npos));
+        }
+      }
+    };
+
+    Constant code_point_n(const Constant& c, int numDigits)
+    {
+      u32string text(numDigits, U'0');
+      if (c.index() != TYPE_INDEX_UCHAR)
+      {
+        return Types::Special::create(Special::SP_TYPEERROR);
+      }
+      else
+      {
+        char32_t val = get_constant<char32_t>(c);
+        while (numDigits != 0)
+        {
+          int current = val % 16;
+
+          if (current >= 0 && current <= 9)
+          {
+            text[numDigits-1] = static_cast<char32_t>(current + '0');
+          }
+          else
+          {
+            text[numDigits-1] = static_cast<char32_t>(current + 'A' - 10);
+          }
+          val = val / 16;
+          --numDigits;
+        }
+      }
+      
+      return Types::String::create(text);
+    }
+
+    BuiltinBaseFunction<1> code_point_4{
+      [] (const Constant& c) -> Constant
+      {
+        return code_point_n(c, 4);
+      }
+    };
+
+    BuiltinBaseFunction<1> code_point_8{
+      [] (const Constant& c) -> Constant
+      {
+        return code_point_n(c, 8);
+      }
+    };
+
     struct BuiltinFunction
     {
-      const char32_t* abstract_name;
       const char32_t* op_name;
       BaseFunctionType* fn;
     };
 
     constexpr BuiltinFunction fn_table[] =
     {
-      {U"plus", U"int_plus", &integer_plus},
-      {U"minus", U"int_minus", &integer_minus},
-      {U"times", U"int_times", &integer_times},
-      {U"divide", U"int_divide", &integer_divide},
-      {U"modulus", U"int_modulus", &integer_modulus},
-      {U"lte", U"int_lte", &integer_lte},
-      {U"lt", U"int_lt", &integer_lt},
-      {U"gte", U"int_gte", &integer_gte},
-      {U"gt", U"int_gt", &integer_gt},
-      {U"eq", U"int_eq", &integer_eq},
-      {U"ne", U"int_ne", &integer_ne},
-      {U"plus", U"ustring_plus", &ustring_plus_fn},
-      {U"range_construct", U"make_range", &range_create},
-      {U"range_construct", U"make_range_infty", &range_create_inf},
-      {U"range_construct", U"make_range_neginfty", &range_create_neginf},
-      //{U"range_construct", U"make_range_infinite", &range_create_infinite},
-      {U"ignored", U"construct_intmp", &construct_integer},
-      {U"ignored", U"construct_special", &construct_special}
+      {U"int_plus", &integer_plus},
+      {U"int_minus", &integer_minus},
+      {U"int_times", &integer_times},
+      {U"int_divide", &integer_divide},
+      {U"int_modulus", &integer_modulus},
+      {U"int_lte", &integer_lte},
+      {U"int_lt", &integer_lt},
+      {U"int_gte", &integer_gte},
+      {U"int_gt", &integer_gt},
+      {U"int_eq", &integer_eq},
+      {U"int_ne", &integer_ne},
+      {U"bool_eq", &boolean_eq},
+      {U"ustring_plus", &ustring_plus_fn},
+      {U"make_range", &range_create},
+      {U"make_range_infty", &range_create_inf},
+      {U"make_range_neginfty", &range_create_neginf},
+      {U"make_range_infinite", &range_create_infinity},
+      {U"construct_intmp", &construct_integer},
+      {U"construct_special", &construct_special},
+      {U"is_printable", &icu_is_printable},
+      {U"string_at_base", &string_at_base},
+      {U"substring_base", &substring_base},
+      {U"substring_toend_base", &substring_toend_base},
+      {U"code_point", &uchar_code_point},
+      {U"code_point_4", &code_point_4},
+      {U"code_point_8", &code_point_8}
     };
   }
 

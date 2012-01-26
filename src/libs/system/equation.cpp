@@ -106,12 +106,6 @@ GuardWS::GuardWS(WS* g, WS* b)
 : m_guard(g), m_boolean(b), m_onlyConst(false),
   m_system(nullptr)
 {
-  if (b != nullptr)
-  {
-    std::cerr << "I don't know how to handle boolean guards" << std::endl;
-    throw "I don't know how to handle boolean guards";
-  }
-
   if (g == nullptr)
   {
     return;
@@ -219,7 +213,7 @@ GuardWS::evaluate(Context& k) const
 {
   if (m_onlyConst)
   {
-    return Tuple(m_dimConstConst);
+    //return Tuple(m_dimConstConst);
   }
 
   tuple_t t = m_dimConstConst;
@@ -298,8 +292,8 @@ GuardWS::evaluate(Context& k) const
   }
   else
   {
-    t[DIM_TIME] = 
-      Types::Range::create(Range(nullptr, nullptr));
+    //t[DIM_TIME] = 
+    //  Types::Range::create(Range(nullptr, nullptr));
   }
 
   return Tuple(t);
@@ -324,12 +318,11 @@ Constant
 VariableWS::operator()(Context& k)
 {
 
-  #if 0
-  std::cerr << "evaluating variable "
-            << m_name << ", context: " << std::endl;
-  k.print(std::cerr);
-  std::cerr << std::endl;
-  #endif
+  //std::cerr << "evaluating variable " << m_name 
+  //<< ", context: " 
+  //<< std::endl;
+  //k.print(std::cerr);
+  //std::cerr << std::endl;
 
   typedef std::tuple<Tuple, UUIDEquationMap::const_iterator> ApplicableTuple;
   typedef std::vector<ApplicableTuple> applicable_list;
@@ -346,9 +339,9 @@ VariableWS::operator()(Context& k)
       {
         const GuardWS& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
-        if (tupleApplicable(evalContext, k) 
-          //we don't know how to do booleans for now
-          //&& booleanTrue(guard, k)
+        //std::cerr << "checking applicability" << std::endl;
+        if (tupleApplicable(evalContext, k)
+          && booleanTrue(guard, k)
         )
         {
           applicable.push_back
@@ -391,11 +384,9 @@ VariableWS::operator()(Context& k)
        i != applicable.end(); ++i)
   {
     bool best = true;
-    //TODO && best in condition
     for (applicable_list::const_iterator j = applicable.begin();
          j != applicable.end(); ++j)
     {
-
       if (i != j && !tupleRefines(std::get<0>(*i), std::get<0>(*j)))
       {
         best = false;

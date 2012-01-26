@@ -14,8 +14,8 @@ infixl ">" "gt" 50;;
 infixl ">=" "gte" 50;;
 infixl "==" "eq" 25;;
 infixl "!=" "ne" 25;;
-infixl "&&" "and" 20;;
-infixl "||" "or" 20;;
+infixl "&&" "bool_and" 20;;
+infixl "||" "bool_or" 20;;
 
 infixl ".." "range_construct" 0;;
 
@@ -32,8 +32,10 @@ fun gt.a.b [a : intmp, b : intmp] = int_gt!(a,b);;
 fun eq.a.b [a : intmp, b : intmp] = int_eq!(a,b);;
 fun ne.a.b [a : intmp, b : intmp] = int_ne!(a,b);;
 
-fun bool_and a b = if a then b else false fi;;
-fun bool_or a b = if a then true else b fi;;
+fun eq.a.b [a : bool, b : bool] = bool_eq!(a,b);;
+
+fun bool_and.a.b = if a then b else false fi;;
+fun bool_or.a.b = if a then true else b fi;;
 
 fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
 
@@ -48,6 +50,32 @@ var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;
+
+fun escape_character.c | is_printable!c = printme @ [arg0 <- c]
+where
+  var printme = PRINT;;
+end;;
+fun escape_character.c | is_printable!c == false && code_point!c <= 0GFFFF 
+  = `\u` + code_point_4!c;;
+fun escape_character.c | is_printable!c == false && code_point!c > 0GFFFF 
+  = `\U` + code_point_8!c;;
+fun escape_character.c [c : '\n'] = `\n`;;
+fun escape_character.c [c : '\t'] = `\t`;;
+fun escape_character.c [c : '\r'] = `\r`;;
+fun escape_character.c [c : '\\'] = `\\`;;
+fun escape_character.c [c : '\"'] = `\"`;;
+fun escape_character.c [c : '\''] = `\'`;;
+
+fun string_at.s.pos [s : ustring, pos : intmp] = string_at_base!(s,pos);;
+fun substring.s.start.length [s : ustring, start : intmp, length : intmp]
+  = substring_base!(s, start, length);;
+fun substring.s.start.length [s : ustring, start : intmp, length : infty]
+  = substring_toend_base!(s, start);;
+
+fun escape_string.s = escape_character.(string_at.s.0)
+  + escape_string.(substring.s.1.infty)
+;;
+fun escape_string.s [s : ""] = "";;
 
 var sperror = special"sperror";;
 var spaccess = special"spaccess";;
@@ -71,12 +99,15 @@ var PRINT_SPECIAL [arg0 : sploop] = "sploop";;
 
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
-var CANONICAL_PRINT [arg0 : ustring] = "`" + PRINT + "`";;
-var CANONICAL_PRINT [arg0 : uchar]   = "'" + PRINT + "'";;
+var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
+var CANONICAL_PRINT [arg0 : uchar]   = "'" + escape_string.PRINT + "'";;
+//var CANONICAL_PRINT [arg0 : ustring] = `"` + PRINT + `"`;;
+//var CANONICAL_PRINT [arg0 : uchar]   = "'" + PRINT + "'";;
 var CANONICAL_PRINT [arg0 : bool]    = PRINT;;
 var CANONICAL_PRINT [arg0 : range]   = PRINT;;
-var CANONICAL_PRINT [arg0 : tuple]   = "I don't know how to print a tuple";;
+var CANONICAL_PRINT [arg0 : tuple]   = "[I don't know how to print a tuple]";;
+var CANONICAL_PRINT                  = TYPENAME + `"` + PRINT 
+                                       + `"`;;
 var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
-var CANONICAL_PRINT                  = TYPENAME + "`" + PRINT + "`";;
 
 var RETURN = 0;;

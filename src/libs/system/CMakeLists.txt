@@ -48,7 +48,7 @@ if (BUILD_STATIC_SYSTEM)
   set_target_properties(tlsystem-static PROPERTIES PREFIX "lib")
 endif()
 
-target_link_libraries(tlsystem ltdl rt gmpxx)
+target_link_libraries(tlsystem ltdl rt gmpxx ${ICU_LIBRARIES})
 INSTALL(TARGETS tlsystem
    LIBRARY DESTINATION lib
 )

@@ -733,6 +733,9 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     ++begin;
     break;
 
+    //case TOKEN_UCHAR:
+    //result = Tree::
+
     default:
     success = false;
   }
@@ -1268,6 +1271,12 @@ Parser::parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
   }
 
   parse_tuple(current, end, decl.guard, SEPARATOR_COLON);
+
+  if (*current == TOKEN_PIPE)
+  {
+    ++current;
+    expect(current, end, decl.boolean, U"expr", &Parser::parse_expr); 
+  }
 
   expect(current, end, U"=", TOKEN_EQUALS);
 

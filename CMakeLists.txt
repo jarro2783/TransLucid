@@ -23,6 +23,8 @@ set(VERSION "0.0.80")
 set(builddir ${CMAKE_BINARY_DIR}/doc)
 set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
+
 enable_testing()
 
 execute_process(COMMAND
@@ -40,7 +42,6 @@ find_package(PkgConfig REQUIRED)
 
 set(TLCFLAGS -Wall -std=gnu++0x -DPACKAGE_VERSION=\"0.0.35\"
   -DHAVE_CONFIG_H)
-set(TLLIBS -std=gnu++0x)
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
 "${CMAKE_INSTALL_PREFIX}/share/tl")
@@ -55,6 +56,13 @@ find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options)
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
 endif()
+
+
+pkg_check_modules(ICU REQUIRED icu-uc)
+if (NOT ICU_FOUND)
+  message(FATAL_ERROR "ICU not found")
+endif()
+set(TLLIBS -std=gnu++0x ${ICU_LIBRARIES})
 
 # do we build tlweb
 #option (ENABLE_TLWEB "Build the tlweb application" OFF)

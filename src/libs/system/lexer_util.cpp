@@ -66,6 +66,16 @@ build_escaped_characters
       ++current;
       break;
 
+      case 'r':
+      building += "\r";
+      ++current;
+      break;
+
+      case 't':
+      building += "\t";
+      ++current;
+      break;
+
       case '\'':
       building += "\'";
       ++current;
