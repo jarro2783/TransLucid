@@ -8,12 +8,12 @@ infixl "-" "minus" 100;;
 infixl "*" "times" 200;;
 infixl "/" "divide" 200;;
 infixl "%" "modulus" 200;;
-infixl "<" "lt" 50;;
-infixl "<=" "lte" 50;;
-infixl ">" "gt" 50;;
-infixl ">=" "gte" 50;;
-infixl "==" "eq" 25;;
-infixl "!=" "ne" 25;;
+infixn "<" "lt" 50;;
+infixn "<=" "lte" 50;;
+infixn ">" "gt" 50;;
+infixn ">=" "gte" 50;;
+infixn "==" "eq" 25;;
+infixn "!=" "ne" 25;;
 infixl "&&" "bool_and" 20;;
 infixl "||" "bool_or" 20;;
 
