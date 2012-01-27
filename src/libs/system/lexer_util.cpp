@@ -139,11 +139,11 @@ build_escaped_characters
 
       //it was a byte if it was two characters, otherwise it was a whole
       //character
-      //if (chars.length() == 2)
-      //{
-      //  building += char(value & 0xFF);
-      //}
-      //else
+      if (chars.length() == 2)
+      {
+        building += char(value & 0xFF);
+      }
+      else
       {
         building += utf32_to_utf8(u32string(1, value));
       }

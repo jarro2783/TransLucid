@@ -180,126 +180,6 @@ namespace TransLucid
     };
     #endif
 
-    typedef Constant (*BangFunc)
-    (
-      System& system,
-      const u32string&,
-      const std::vector<WS*>&, 
-      Context&
-    );
-
-    //N arguments, but they go from 0 to N-1, so evaluate the (N-1)th
-    template <size_t N>
-    struct evaluate_bang_func
-    {
-      template <typename F, typename... Args>
-      Constant
-      operator()
-      (
-        F f, 
-        const std::vector<WS*>& uneval, 
-        Context& k,
-        Args... args
-      )
-      {
-        return evaluate_bang_func<N-1>()
-          (f, uneval, k, (*uneval[N-1])(k), args...);
-      }
-    };
-
-    template <>
-    struct evaluate_bang_func<0>
-    {
-      template <typename F, typename... Args>
-      Constant
-      operator()
-      (
-        F f,
-        const std::vector<WS*>& uneval,
-        Context& k,
-        Args... args
-      )
-      {
-        return f(args...);
-      }
-    };
-
-    template <size_t N>
-    Constant
-    bang_func
-    (
-      System& system,
-      const u32string& name,
-      const std::vector<WS*>& args,
-      Context& k
-    )
-    {
-      auto f = system.lookupFunction<N>(name);
-
-      if (f)
-      {
-        return evaluate_bang_func<N>()(f, args, k);
-      }
-      else
-      {
-        return Types::Special::create(SP_UNDEF);
-      }
-    }
-
-    template <size_t N>
-    struct generate_bang_funcs
-    {
-      generate_bang_funcs(BangFunc* funcs)
-      {
-        funcs[N] = &bang_func<N>;
-        generate_bang_funcs<N-1> tmp(funcs);
-      }
-    };
-
-    template <>
-    struct generate_bang_funcs<-1>
-    {
-      generate_bang_funcs(BangFunc* funcs)
-      {
-      }
-    };
-
-    template <size_t N>
-    class BangCaller
-    {
-      public:
-
-      BangCaller(System& system)
-      : m_system(system)
-      {
-        generate_bang_funcs<N> tmp(m_funcs);
-      }
-
-      Constant
-      operator()
-      (
-        const u32string& name, 
-        const std::vector<WS*>& args,
-        Context& k
-      )
-      {
-        if (args.size() < N)
-        {
-          return (*m_funcs[args.size()])(m_system, name, args, k);
-        }
-        else
-        {
-          return Types::Special::create(SP_UNDEF);
-        }
-      }
-
-      private:
-      System& m_system;
-
-      //N+1 spots for 0 to N parameters
-      BangFunc m_funcs[N+1];
-    };
-
     /**
      * A bang operation workshop. Evaluates a host function.
      */
@@ -325,7 +205,6 @@ namespace TransLucid
       , m_name(name)
       , m_args(args)
       , m_numArgs(args.size())
-      , m_caller(system)
       {
       }
 
@@ -354,7 +233,6 @@ namespace TransLucid
       WS* m_name;
       std::vector<WS*> m_args;
       size_t m_numArgs;
-      BangCaller<MAX_FUNCTION_PARAMETERS> m_caller;
     };
 
     class BangOpSingleWS : public WS

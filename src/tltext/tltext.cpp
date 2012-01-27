@@ -418,7 +418,6 @@ TLText::add_argument(const u32string& arg)
 void
 TLText::add_argument(const u32string& arg, const u32string& value)
 {
-  std::cout << "adding variable " << arg << " = " << value << std::endl;
   m_system.addEnvVar(arg, Types::String::create(value));
 }
 
