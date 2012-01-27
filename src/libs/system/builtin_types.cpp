@@ -1269,6 +1269,8 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
   for (auto t : types)
   {
     //constructor
+    //removing with functions
+    #if 0
     s.addEquation(Parser::Equation(
       U"LITERAL",
       Tree::TupleExpr({{Tree::DimensionExpr(type_name_dim), t}}),
@@ -1285,6 +1287,7 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
       Tree::Expr(),
       t)
     );
+    #endif
   }
 
   BuiltinBaseFunction<1> construct_typetype{
