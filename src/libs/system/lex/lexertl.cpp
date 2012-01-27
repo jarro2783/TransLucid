@@ -42,7 +42,7 @@ namespace TransLucid
       {
         //macros
         //m_rules.add_macro(U"IDENT", U"[A-Za-z][_A-Za-z0-9]*");
-        m_rules.add_macro(U"IDENT", U"[\\p{L}][_\\p{L}\\p{N}]*");
+        m_rules.add_macro(U"IDENT", U"[_\\p{L}][_\\p{L}\\p{N}]*");
 
         m_rules.add_macro(U"DIGIT",     U"[0-9]");
         m_rules.add_macro(U"ADIGIT",    U"[0-9A-Za-z]");
