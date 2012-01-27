@@ -118,13 +118,12 @@ TreeToWSTree::operator()(const u32string& s)
 Tree::Expr
 TreeToWSTree::operator()(const Tree::LiteralExpr& e)
 {
-  //LITERAL @ [type : e.type, text : e.text]
   #if 0
+  //construct_literal. e.type . e.text
   std::cerr << "Translating LiteralExpr " << e.type << "\"" << e.text
             << "\" to" << std::endl
-            << "LITERAL @ [typename <- \"" << e.type << "\", text <- \""
-            << e.text << "\"]" << std::endl;
-  #endif
+            << "construct_literal. \"" << e.type << "\".\""
+            << e.text << "\"" << std::endl;
   return Tree::AtExpr
   (
     Tree::IdentExpr(LITERAL_IDENT),
@@ -136,6 +135,12 @@ TreeToWSTree::operator()(const Tree::LiteralExpr& e)
       }
     )
   );
+  #endif
+
+  return 
+    Tree::LambdaAppExpr( 
+      Tree::LambdaAppExpr(Tree::IdentExpr(U"construct_literal"), e.type),
+      e.text);
 }
 
 Tree::Expr

@@ -42,7 +42,7 @@ namespace TransLucid
       {
         //macros
         //m_rules.add_macro(U"IDENT", U"[A-Za-z][_A-Za-z0-9]*");
-        m_rules.add_macro(U"IDENT", U"[\\p{L}][_\\p{L}0-9]*");
+        m_rules.add_macro(U"IDENT", U"[\\p{L}][_\\p{L}\\p{N}]*");
 
         m_rules.add_macro(U"DIGIT",     U"[0-9]");
         m_rules.add_macro(U"ADIGIT",    U"[0-9A-Za-z]");
@@ -107,7 +107,7 @@ namespace TransLucid
         m_rules.add(U"([ \\r\\n\\t])|(\\/\\/([^\\n]*)\\n)", 
           m_state_machine.skip());
         
-        m_rules.add(UR"**([:\+!\$%\^&\|\*\-_\?\/<>=\p{S}]+)**", 
+        m_rules.add(UR"**([\p{S}!%\*\-\.&/:]+)**", 
           TOKEN_OPERATOR);
         //, spaces(U"[ \\n\\t]")
         //, binary_op_(U".", OpTokens::TOK_BINARY_OP)
