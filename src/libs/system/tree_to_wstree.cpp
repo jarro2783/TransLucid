@@ -31,8 +31,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "tl/free_variables.hpp"
 
-#include <tl/output.hpp>
-
 #include <sstream>
 
 namespace TransLucid
@@ -120,12 +118,12 @@ TreeToWSTree::operator()(const u32string& s)
 Tree::Expr
 TreeToWSTree::operator()(const Tree::LiteralExpr& e)
 {
-  //LITERAL @ [type : e.type, text : e.text]
+  #if 0
+  //construct_literal. e.type . e.text
   std::cerr << "Translating LiteralExpr " << e.type << "\"" << e.text
             << "\" to" << std::endl
             << "construct_literal. \"" << e.type << "\".\""
             << e.text << "\"" << std::endl;
-  #if 0
   return Tree::AtExpr
   (
     Tree::IdentExpr(LITERAL_IDENT),

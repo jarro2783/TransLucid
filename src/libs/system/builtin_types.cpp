@@ -69,7 +69,7 @@ namespace TransLucid
 
     BuiltinBaseFunction<1> print_intmp{&Types::Intmp::print};
     BuiltinBaseFunction<1> print_uchar{&Types::UChar::print};
-    BuiltinBaseFunction<1> print_special{&Types::Special::print};
+    //BuiltinBaseFunction<1> print_special_base{&Types::Special::print};
     BuiltinBaseFunction<1> print_bool{&Types::Boolean::print};
     BuiltinBaseFunction<1> print_range{&Types::Range::print};
     BuiltinBaseFunction<1> print_typetype{&Types::Type::print};
@@ -293,7 +293,7 @@ namespace TransLucid
       {U"code_point_8", &code_point_8},
       {U"print_intmp", &print_intmp},
       {U"print_uchar", &print_uchar},
-      {U"print_special", &print_special},
+      //{U"print_special", &print_special},
       {U"print_bool", &print_bool},
       {U"print_range", &print_range},
       {U"print_typetype", &print_typetype},
