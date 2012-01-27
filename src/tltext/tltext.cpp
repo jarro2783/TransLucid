@@ -187,10 +187,12 @@ TLText::run()
           ),
           Tree::Expr(),
 
-          Tree::AtExpr(
-            Tree::IdentExpr(U"CANONICAL_PRINT"),
-            Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), e}})
-          )
+          Tree::LambdaAppExpr(Tree::IdentExpr(U"canonical_print"), e)
+
+          //Tree::AtExpr(
+          //  Tree::IdentExpr(U"CANONICAL_PRINT"),
+          //  Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), e}})
+          //)
         ));
         ++slot;
       }

@@ -51,10 +51,7 @@ var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;
 
-fun escape_character.c | is_printable!c = printme @ [arg0 <- c]
-where
-  var printme = PRINT;;
-end;;
+fun escape_character.c | is_printable!c = print.c;;
 fun escape_character.c | is_printable!c == false && code_point!c <= 0GFFFF 
   = `\u` + code_point_4!c;;
 fun escape_character.c | is_printable!c == false && code_point!c > 0GFFFF 
@@ -97,6 +94,36 @@ var PRINT_SPECIAL [arg0 : spconst] = "spconst";;
 var PRINT_SPECIAL [arg0 : spmultidef] = "spmultidef";;
 var PRINT_SPECIAL [arg0 : sploop] = "sploop";;
 
+fun print_special.c [c : sperror] = "sperror";;
+fun print_special.c [c : spaccess] = "spaccess";;
+fun print_special.c [c : sptypeerror] = "typeerror";;
+fun print_special.c [c : spdim] = "spdim";;
+fun print_special.c [c : sparith] = "sparith";;
+fun print_special.c [c : spundef] = "spundef";;
+fun print_special.c [c : spconst] = "spconst";;
+fun print_special.c [c : spmultidef] = "spmultidef";;
+fun print_special.c [c : sploop] = "sploop";;
+
+fun print.c = "I don't know how to print this type";;
+fun print.c [c : ustring] = c;;
+fun print.c [c : intmp] = print_intmp!c;;
+fun print.c [c : bool] = print_bool!c;;
+fun print.c [c : special] = print_special.c;;
+fun print.c [c : typetype] = print_typetype!c;;
+fun print.c [c : uchar] = print_uchar!c;;
+fun print.c [c : range] = print_range!c;;
+fun print.c [c : tuple] = print_tuple!c;;
+
+fun print_typename.c = "unknown typename";;
+fun print_typename.c [c : intmp] = "intmp";;
+fun print_typename.c [c : ustring] = "ustring";;
+fun print_typename.c [c : uchar] = "uchar";;
+fun print_typename.c [c : bool] = "bool";;
+fun print_typename.c [c : range] = "range";;
+fun print_typename.c [c : tuple] = "tuple";;
+fun print_typename.c [c : special] = "special";;
+fun print_typename.c [c : typetype] = "typetype";;
+
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
 var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
@@ -109,5 +136,16 @@ var CANONICAL_PRINT [arg0 : tuple]   = "[I don't know how to print a tuple]";;
 var CANONICAL_PRINT                  = TYPENAME + `"` + PRINT 
                                        + `"`;;
 var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
+
+//the print equations
+fun canonical_print.c [c : intmp]   = print.c;;
+fun canonical_print.c [c : ustring] = `"` + escape_string.(print.c) + `"`;;
+fun canonical_print.c [c : uchar]   = "'" + escape_string.(print.c) + "'";;
+fun canonical_print.c [c : bool]    = print.c;;
+fun canonical_print.c [c : range]   = print.c;;
+fun canonical_print.c [c : tuple]   = "[I don't know how to print a tuple]";;
+fun canonical_print.c               = typename.c + `"` + 
+                                      escape_string.(print.c) + `"`;;
+fun canonical_print.c [c : special] = print.c;;
 
 var RETURN = 0;;
