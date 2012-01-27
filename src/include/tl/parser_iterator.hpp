@@ -33,6 +33,10 @@ along with TransLucid; see the file COPYING.  If not see
 //define this to get lots of debugging
 //#define ITERATOR_DEBUG
 
+#ifdef ITERATOR_DEBUG
+#include <tl/output.hpp>
+#endif
+
 namespace TransLucid
 {
   namespace Parser
@@ -359,19 +363,21 @@ namespace TransLucid
           {
             //two characters
             toRead = 1;
-            m_value = 0x7C0 & (c << 6);
+            m_value = (0x1F & c) << 6;
             nextShift = 0;
           }
           else if ((c & 0xF0) == 0xE0)
           {
             //three characters
             toRead = 2;
+            m_value = (0x0F & c) << 12;
             nextShift = 6;
           }
           else if ((c & 0xF8) == 0xF0)
           {
             //four characters
             toRead = 3;
+            m_value = (0x07 & c) << 18;
             nextShift = 12;
           }
           else
