@@ -124,6 +124,10 @@ fun print_typename.c [c : tuple] = "tuple";;
 fun print_typename.c [c : special] = "special";;
 fun print_typename.c [c : typetype] = "typetype";;
 
+fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
+fun construct_literal.t.v [t : "special"] = construct_special!v;;
+fun construct_literal.t.v [t : "typetype"] = construct_typetype!v;;
+
 //the print equations
 var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
 var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
