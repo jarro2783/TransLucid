@@ -39,6 +39,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
+#include <tl/output.hpp>
+
 namespace TransLucid
 {
 
@@ -188,13 +190,7 @@ BangOpWS::operator()(Context& k)
   //evaluate name expr
   Constant name = (*m_name)(k);
 
-  if (name.index() == TYPE_INDEX_USTRING)
-  {
-    //evaluate all the args in context k and pass them as the parameters
-    //to the function
-    return m_caller(get_constant_pointer<u32string>(name), m_args, k);
-  }
-  else if (name.index() == TYPE_INDEX_BASE_FUNCTION)
+  if (name.index() == TYPE_INDEX_BASE_FUNCTION)
   {
     if (m_args.size() == 1)
     {

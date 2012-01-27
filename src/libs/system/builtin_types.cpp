@@ -42,6 +42,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/range.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
+#include <tl/types/type.hpp>
 #include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
@@ -50,12 +51,29 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+
+  Constant
+  print_error_value(const Constant& arg);
+
   namespace
   {
     using namespace TransLucid::BuiltinOps;
 
-    BuiltinBaseFunction<1> construct_integer{Types::Intmp::create};
-      //static_cast<Constant (*)(const Constant&)>(Types::Intmp::create)));
+    BuiltinBaseFunction<1> construct_integer{
+      static_cast<Constant (*)(const Constant&)>(&Types::Intmp::create)
+    };
+
+    BuiltinBaseFunction<1> construct_special{
+      static_cast<Constant (*)(const Constant&)>(&Types::Special::create)
+    };
+
+    BuiltinBaseFunction<1> print_intmp{&Types::Intmp::print};
+    BuiltinBaseFunction<1> print_uchar{&Types::UChar::print};
+    BuiltinBaseFunction<1> print_special{&Types::Special::print};
+    BuiltinBaseFunction<1> print_bool{&Types::Boolean::print};
+    BuiltinBaseFunction<1> print_range{&Types::Range::print};
+    BuiltinBaseFunction<1> print_typetype{&Types::Type::print};
+    BuiltinBaseFunction<1> print_error{&print_error_value};
 
     BuiltinBaseFunction<2> integer_plus{&mpz_plus};
     BuiltinBaseFunction<2> integer_minus{&mpz_minus};
@@ -99,10 +117,6 @@ namespace TransLucid
       {
         return Types::Range::create(TransLucid::Range(nullptr, nullptr));
       }
-    };
-
-    BuiltinBaseFunction<1> construct_special{
-      static_cast<Constant (*)(const Constant&)>(&Types::Special::create)
     };
 
     BuiltinBaseFunction<1> icu_is_printable{
@@ -276,7 +290,14 @@ namespace TransLucid
       {U"substring_toend_base", &substring_toend_base},
       {U"code_point", &uchar_code_point},
       {U"code_point_4", &code_point_4},
-      {U"code_point_8", &code_point_8}
+      {U"code_point_8", &code_point_8},
+      {U"print_intmp", &print_intmp},
+      {U"print_uchar", &print_uchar},
+      {U"print_special", &print_special},
+      {U"print_bool", &print_bool},
+      {U"print_range", &print_range},
+      {U"print_typetype", &print_typetype},
+      {U"print_error", &print_error},
     };
   }
 
@@ -1207,6 +1228,18 @@ add_file_io(System& s)
   init_file_hds(s);
 }
 
+void
+add_one_base_function(System& s, const u32string& name, BaseFunctionType* fn)
+{
+  std::unique_ptr<BangAbstractionWS> 
+    op(new BangAbstractionWS(fn->clone()));
+
+  //add equation fn.op_name = bang abstraction workshop with fn.fn
+  s.addEquation(name, op.get());
+
+  op.release();
+}
+
 inline
 void
 addTypeEquation(System& s, const u32string& type)
@@ -1233,20 +1266,6 @@ addTypeNames(System& s, const std::vector<u32string>& types)
 void
 add_builtin_literals(System& s, const std::vector<u32string>& types)
 {
-  //the type type
-  #if 0
-  s.addEquation(Parser::Equation(
-    U"LITERAL",
-    Tree::TupleExpr({{Tree::DimensionExpr(U"typename"), U"type"}}),
-    Tree::Expr(),
-    Tree::BangAppExpr(U"construct_type",
-      {
-        Tree::HashExpr(Tree::DimensionExpr(U"text")),
-      }
-    )
-  ));
-  #endif
-
   for (auto t : types)
   {
     //constructor
@@ -1254,7 +1273,7 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
       U"LITERAL",
       Tree::TupleExpr({{Tree::DimensionExpr(type_name_dim), t}}),
       Tree::Expr(),
-      Tree::BangAppExpr(U"construct_" + t,
+      Tree::BangAppExpr(Tree::IdentExpr(U"construct_" + t),
           Tree::HashExpr(Tree::DimensionExpr(U"text"))
       )
     ));
@@ -1268,29 +1287,16 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
     );
   }
 
-  #if 0
-  BuiltinBaseFunction<1> construct_typetype(
+  BuiltinBaseFunction<1> construct_typetype{
     [&s] (const Constant& text) -> Constant
     {
       type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
 
-      if (t == 0)
-      {
-        return Types::Special::create(SP_CONST);
-      }
-      else
-      {
-        return Types::Type::create(t);
-      }
+      return Types::Type::create(t);
     }
-  );
+  };
 
-  std::unique_ptr<BangAbstractionWS> 
-    typetype_op(new BangAbstractionWS(fn.fn->clone()));
-
-  s.addEquation(fn.op_name, typetype_op.get());
-  typetype_op.release();
-  #endif
+  add_one_base_function(s, U"construct_typetype", &construct_typetype);
 
   s.addEquation(Parser::Equation(
     U"TYPENAME",
@@ -1299,31 +1305,6 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
     Tree::Expr(),
     u32string(U"error"))
   );
-
-  s.registerFunction(U"construct_typetype",
-    make_function_type<1>::type(
-      [&s] (const Constant& text) -> Constant
-    {
-      type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
-
-      //if (t == 0)
-      //{
-      //  return Types::Special::create(SP_CONST);
-      //}
-      //else
-      //{
-        return Types::Type::create(t);
-      //}
-    })
-  );
-
-  s.registerFunction(U"construct_intmp", 
-    make_function_type<1>::type(
-      static_cast<Constant (*)(const Constant&)>(Types::Intmp::create)));
-
-  s.registerFunction(U"construct_special", 
-    make_function_type<1>::type(
-      static_cast<Constant (*)(const Constant&)>(Types::Special::create)));
 }
 
 void
@@ -1338,32 +1319,11 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
       PRINT_IDENT,
       Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(t)}}),
       Tree::Expr(),
-      Tree::BangAppExpr(U"print_" + t,
+      Tree::BangAppExpr(Tree::IdentExpr(U"print_" + t),
           Tree::HashExpr(Tree::DimensionExpr(U"arg0"))
       )
     ));
   }
-
-  s.registerFunction(U"print_intmp", 
-    make_function_type<1>::type(&Types::Intmp::print));
-
-  s.registerFunction(U"print_uchar",
-    make_function_type<1>::type(&Types::UChar::print));
-
-  s.registerFunction(U"print_special",
-    make_function_type<1>::type(&Types::Special::print));
-
-  s.registerFunction(U"print_bool",
-    make_function_type<1>::type(&Types::Boolean::print));
-
-  s.registerFunction(U"print_range",
-    make_function_type<1>::type(&Types::Range::print));
-
-  s.registerFunction(U"print_typetype",
-    make_function_type<1>::type(&Types::Type::print));
-
-  s.registerFunction(U"print_error",
-    make_function_type<1>::type(&print_error_value));
 
   //string returns itself
   //PRINT | [arg0 : ustring] = #arg0;;
@@ -1380,86 +1340,15 @@ add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
   ));
 }
 
-template <typename F>
-void
-add_one_fun2
-(
-  System& s, 
-  const u32string& fnname, 
-  const u32string& sysop,
-  const u32string& type,
-  F func
-)
-{
-  s.addEquation(Parser::Equation(
-    FN2_IDENT,
-    Tree::TupleExpr
-    ({
-      //{Tree::DimensionExpr(fnname_dim), u32string(U"plus")},
-      {Tree::DimensionExpr(fnname_dim), fnname},
-      {Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(type)},
-      {Tree::DimensionExpr(U"arg1"), Tree::IdentExpr(type)}
-    }),
-    Tree::Expr(),
-    //u32string(U"int_plus")
-    sysop
-  ));
-
-  s.registerFunction
-  (
-    //U"int_plus",
-    //make_function_type<2>::type(&mpz_plus)
-    sysop,
-    make_function_type<2>::type(func)
-  );
-}
-
 void
 add_base_functions(System& s)
 {
   for (const auto& fn : fn_table)
   {
-    std::unique_ptr<BangAbstractionWS> 
-      op(new BangAbstractionWS(fn.fn->clone()));
-
-    //add equation fn.op_name = bang abstraction workshop with fn.fn
-    s.addEquation(fn.op_name, op.get());
-
-    op.release();
+    add_one_base_function(s, fn.op_name, fn.fn);
   }
 }
 
-void
-add_builtin_ops(System& s)
-{
-  add_one_fun2(s, U"plus", U"int_plus", U"intmp", &mpz_plus);
-  add_one_fun2(s, U"minus", U"int_minus", U"intmp", &mpz_minus);
-  add_one_fun2(s, U"times", U"int_times", U"intmp", &mpz_times);
-  add_one_fun2(s, U"divide", U"int_divide", U"intmp", &mpz_divide);
-  add_one_fun2(s, U"modulus", U"int_modulus", U"intmp", &mpz_modulus);
-  add_one_fun2(s, U"lte", U"int_lte", U"intmp", &mpz_lte);
-  add_one_fun2(s, U"lt", U"int_lt", U"intmp", &mpz_lt);
-  add_one_fun2(s, U"gte", U"int_gte", U"intmp", &mpz_gte);
-  add_one_fun2(s, U"gt", U"int_gt", U"intmp", &mpz_gt);
-  add_one_fun2(s, U"eq", U"int_eq", U"intmp", &mpz_eq);
-  add_one_fun2(s, U"ne", U"int_ne", U"intmp", &mpz_ne);
-
-  add_one_fun2(s, U"eq", U"bool_eq", U"bool", &bool_eq);
-  add_one_fun2(s, U"ne", U"bool_ne", U"bool", &bool_ne);
-  add_one_fun2(s, U"and", U"bool_and", U"bool", &bool_and);
-  add_one_fun2(s, U"or", U"bool_or", U"bool", &bool_or);
-
-  add_one_fun2(s, U"eq", U"ustring_eq", U"ustring", &ustring_eq);
-  add_one_fun2(s, U"ne", U"ustring_ne", U"ustring", &ustring_ne);
-  add_one_fun2(s, U"plus", U"ustring_plus", U"ustring", &ustring_plus);
-
-  //range construction a..b
-  add_one_fun2(s, U"range_construct", U"make_range", U"intmp", 
-    static_cast<Constant (*)(const Constant&, const Constant&)>
-      (&Types::Range::create));
-
-  add_base_functions(s);
-}
 
 void
 init_builtin_types(System& s)
@@ -1490,8 +1379,6 @@ init_builtin_types(System& s)
   add_builtin_printers(s, to_print_types);
 
   add_base_functions(s);
-
-  //add_builtin_ops(s);
 
   add_file_io(s);
 }

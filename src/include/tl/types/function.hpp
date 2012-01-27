@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 
 #include <vector>
+#include <functional>
 
 namespace TransLucid
 {
@@ -38,8 +39,8 @@ namespace TransLucid
     {
     }
 
-    //virtual ~BaseFunctionType() = default;
-    virtual ~BaseFunctionType() throw() {}
+    virtual ~BaseFunctionType() = default;
+    //virtual ~BaseFunctionType() throw() {}
 
     BaseFunctionType*
     clone() const
@@ -135,7 +136,7 @@ namespace TransLucid
     template <typename... Args>
     struct make_const_func_n<0, Args...>
     {
-      typedef Constant (*type)(Args...);
+      typedef typename std::function<Constant(Args...)> type;
     };
 
     template <size_t N, size_t... Args>
@@ -192,10 +193,13 @@ namespace TransLucid
 
     typedef typename detail::make_const_func_n<NumArgs>::type func_type;
 
-    constexpr BuiltinBaseFunction(func_type f)
+    template <typename Fun>
+    constexpr BuiltinBaseFunction(Fun&& f)
     : m_fn(f)
     {
     }
+
+    ~BuiltinBaseFunction() throw() {}
 
     BuiltinBaseFunction*
     cloneSelf() const

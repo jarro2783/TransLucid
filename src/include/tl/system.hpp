@@ -32,7 +32,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/dimtranslator.hpp>
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
-#include <tl/function_registry.hpp>
+//#include <tl/function_registry.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
@@ -360,7 +360,7 @@ namespace TransLucid
 
     //give ourselves a function registry which can register functions of
     //up to ten arguments
-    FunctionRegistry<MAX_FUNCTION_PARAMETERS> m_functions;
+    //FunctionRegistry<MAX_FUNCTION_PARAMETERS> m_functions;
 
     Context m_defaultk;
     size_t m_time;
@@ -439,24 +439,13 @@ namespace TransLucid
       return IdentifierLookup(m_equations);
     }
 
-    template <size_t N>
-    auto
-    lookupFunction(const u32string& name)
-      -> decltype(m_functions.lookupFunction<N>(name))
-    {
-      return m_functions.lookupFunction<N>(name);
-    }
-
-    template <typename... Args>
-    void
-    registerFunction
-    (
-      const u32string& name, 
-      std::function<Constant(Args... args)> f
-    )
-    {
-      m_functions.registerFunction(name, f);
-    }
+    //template <size_t N>
+    //auto
+    //lookupFunction(const u32string& name)
+    //  -> decltype(m_functions.lookupFunction<N>(name))
+    //{
+    //  return m_functions.lookupFunction<N>(name);
+    //}
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);
