@@ -142,6 +142,39 @@ LineTokenizer::next()
   return std::make_pair(type, m_line);
 }
 
+void
+LineTokenizer::preLineSkip()
+{
+  bool done = false;
+
+  char32_t current;
+
+  while (!done)
+  {
+    current = nextCharDiscard();
+    //try to skip spaces
+    while (is_space(current))
+    {
+      current = nextCharDiscard();
+    }
+
+    //try to skip comments
+    if (current == '/')
+    {
+      current = nextCharDiscard();
+
+      if (current == '/')
+      {
+        //skip to the end of the line discarding characters
+      }
+      else
+      {
+        done = true;
+      }
+    }
+  }
+}
+
 //upon entering this function, we will have skipped all the spaces at the
 //start, and we will be at the first character which has already been added to
 //the buffer
@@ -276,7 +309,7 @@ LineTokenizer::currentChar()
 }
 
 char32_t
-LineTokenizer::nextChar()
+LineTokenizer::nextCharCommon()
 {
   ++m_current;
 
@@ -297,6 +330,19 @@ LineTokenizer::nextChar()
     ++m_charCount;
   }
 
+  return c;
+}
+
+char32_t
+LineTokenizer::nextCharDiscard()
+{
+  return nextCharCommon();
+}
+
+char32_t
+LineTokenizer::nextChar()
+{
+  char32_t c = nextCharCommon();
   m_line += c;
   return c;
 }

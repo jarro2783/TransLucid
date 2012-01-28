@@ -92,6 +92,9 @@ namespace TransLucid
     readOuter();
 
     void
+    preLineSkip();
+
+    void
     readRawString();
 
     void
@@ -99,6 +102,12 @@ namespace TransLucid
 
     char32_t
     nextChar();
+
+    char32_t
+    nextCharCommon();
+
+    char32_t
+    nextCharDiscard();
 
     char32_t
     currentChar();
