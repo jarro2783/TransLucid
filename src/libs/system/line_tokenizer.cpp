@@ -74,14 +74,19 @@ LineTokenizer::next()
       //but we have to make sure that there is actually some input
       if (m_current != m_end)
       {
+        m_currentChar = *m_current;
         //if we see a space then do nothing
         //otherwise start the reading
+        preLineSkip();
+
+        #if 0
         char32_t c = *m_current;
         if (!is_space(c))
         {
           m_line += *m_current;
           m_state = State::READ_SCANNING;
         }
+        #endif
       }
       else
       {
@@ -91,17 +96,14 @@ LineTokenizer::next()
     else
     {
       //otherwise get going on the next character
-      ++m_current;
-
-      //make sure we didn't get to the end
-      if (m_current == m_end)
-      {
-        throw EndOfInput();
-      }
+      nextCharDiscard();
+      preLineSkip();
     }
+
 
     //are we still in skipping spaces mode?
     //if so, start reading and don't add to the buffer
+    #if 0
     if (m_state == State::READ_SKIP_SPACE)
     {
       char32_t c = *m_current;
@@ -121,6 +123,7 @@ LineTokenizer::next()
       //the last one that failed needs to go onto the buffer
       m_line += c;
     }
+    #endif
 
     type = readOuter();
   } 
@@ -147,11 +150,10 @@ LineTokenizer::preLineSkip()
 {
   bool done = false;
 
-  char32_t current;
+  char32_t current = currentChar();
 
   while (!done)
   {
-    current = nextCharDiscard();
     //try to skip spaces
     while (is_space(current))
     {
@@ -161,18 +163,31 @@ LineTokenizer::preLineSkip()
     //try to skip comments
     if (current == '/')
     {
-      current = nextCharDiscard();
+      current = peek();
 
       if (current == '/')
       {
+        //consume the token properly
+        nextCharDiscard();
         //skip to the end of the line discarding characters
+        current = nextCharDiscard();
+        while (current != '\n')
+        {
+          current = nextCharDiscard();
+        }
       }
       else
       {
         done = true;
       }
     }
+    else
+    {
+      done = true;
+    }
   }
+
+  m_line += current;
 }
 
 //upon entering this function, we will have skipped all the spaces at the
@@ -305,20 +320,38 @@ LineTokenizer::readRawString()
 char32_t
 LineTokenizer::currentChar()
 {
-  return *m_current;
+  return m_currentChar;
 }
 
 char32_t
 LineTokenizer::nextCharCommon()
 {
-  ++m_current;
-
-  if (m_current == m_end)
+  char32_t c;
+  if (m_peek.size() > 0)
   {
-    throw EndOfInput();
+    c = m_peek.at(0);
+
+    if (c == static_cast<char32_t>(-1))
+    {
+      throw EndOfInput();
+    }
+
+    m_peek.pop_front();
+  }
+  else
+  {
+    ++m_current;
+
+    if (m_current == m_end)
+    {
+      throw EndOfInput();
+    }
+
+    c = *m_current;
+    m_peeked = 0;
   }
 
-  char32_t c = *m_current;
+  m_currentChar = c;
 
   if (c == '\n')
   {
@@ -344,6 +377,40 @@ LineTokenizer::nextChar()
 {
   char32_t c = nextCharCommon();
   m_line += c;
+  return c;
+}
+
+char32_t
+LineTokenizer::peek()
+{
+  char32_t c;
+  if (m_peek.size() > m_peeked)
+  {
+    c = m_peek.at(m_peeked);  
+    ++m_peeked;
+  }
+  else
+  {
+    if (m_current == m_end)
+    {
+      c = -1;
+    }
+    else
+    {
+      ++m_current;
+
+      if (m_current == m_end)
+      {
+        c = -1;
+      }
+      else
+      {
+        c = *m_current;
+      }
+    }
+    m_peek.push_back(c);
+  }
+
   return c;
 }
 
