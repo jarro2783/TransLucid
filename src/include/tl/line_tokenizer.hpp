@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define LINE_TOKENIZER_HPP_INCLUDED
 
 #include <tl/parser_iterator.hpp>
+#include <deque>
 
 namespace TransLucid
 {
@@ -65,6 +66,7 @@ namespace TransLucid
     , m_first(true)
     , m_whereDepth(0)
     , m_readingIdent(false)
+    , m_peeked(0)
     {
     }
 
@@ -92,6 +94,9 @@ namespace TransLucid
     readOuter();
 
     void
+    preLineSkip();
+
+    void
     readRawString();
 
     void
@@ -101,13 +106,24 @@ namespace TransLucid
     nextChar();
 
     char32_t
+    nextCharCommon();
+
+    char32_t
+    nextCharDiscard();
+
+    char32_t
     currentChar();
 
     void
     skipToNewline();
 
+    //peeks at the next character and stores it in a buffer so that
+    //nextChar still gives the first one before the peeking
+    char32_t peek();
+
     Parser::U32Iterator& m_current;
     Parser::U32Iterator m_end;
+    char32_t m_currentChar;
     u32string m_line;
     State m_state;
     bool m_first;
@@ -117,6 +133,9 @@ namespace TransLucid
     u32string m_currentIdent;
     int m_lineCount;
     int m_charCount;
+
+    std::deque<char32_t> m_peek;
+    size_t m_peeked;
   };
 
   std::ostream&

@@ -198,26 +198,27 @@ end;;)";
 TEST_CASE( "comment", "where clause with comments" )
 {
   {
-    std::string input = 
-R"(//this is a comment
-var f = x + #d where
+    std::string input_no_comment = 
+R"(var f = x + #d where
    var x = 5;;
    dim d <- 4;;
 end;;)";
+    
+    std::string input_comment = "//this is a comment\n" + input_no_comment;
 
     
     TL::Parser::U32Iterator iter(
-      TL::Parser::makeUTF8Iterator(input.begin())
+      TL::Parser::makeUTF8Iterator(input_comment.begin())
     );
     TL::Parser::U32Iterator end(
-      TL::Parser::makeUTF8Iterator(input.end())
+      TL::Parser::makeUTF8Iterator(input_comment.end())
     );
 
     TL::LineTokenizer tokenize(iter, end);
 
     auto n = tokenize.next();
     CHECK(n.first == TL::LineType::LINE);
-    CHECK(n.second == TL::to_u32string(input));
+    CHECK(n.second == TL::to_u32string(input_no_comment));
   }
 }
 
