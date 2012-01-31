@@ -265,7 +265,7 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
         );
 
         Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
-          0,0);
+          line.line,line.character);
         Parser::StreamPosIterator posend(lineEnd);
 
         try
@@ -325,7 +325,7 @@ TLText::processExpressions(LineTokenizer& tokenizer)
         );
 
         Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
-          0, 0);
+          line.line, line.character);
         Parser::StreamPosIterator posend(lineEnd);
 
         try
