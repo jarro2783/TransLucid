@@ -92,11 +92,44 @@ PKG_CHECK_MODULES([ICU], [icu-uc])
 AC_SUBST([ICU_CFLAGS])
 AC_SUBST([ICU_LIBS])
 
+# we have to look for lots of versions of is_print in icuuc
+
 if test "x$enable_static" = "xyes"; then
 
-AC_CHECK_LIB([icuuc], [u_isprint_48], true,
-AC_MSG_FAILURE([Cannot find the ICU static libraries]),
-[${ICU_LIBS} -static])
+  AC_MSG_NOTICE([checking that ICU is linkable statically])
+  ICU_FOUND=no
+
+  AC_CHECK_LIB([icuuc], [u_isprint], ICU_FOUND=yes,
+  ,
+  [${ICU_LIBS} -static])
+
+  if test "x$ICU_FOUND" = "xno"; then
+    AC_CHECK_LIB([icuuc], [u_isprint_49], ICU_FOUND=yes,
+    ,
+    [${ICU_LIBS} -static])
+  fi
+
+  if test "x$ICU_FOUND" = "xno"; then
+    AC_CHECK_LIB([icuuc], [u_isprint_48], ICU_FOUND=yes,
+    ,
+    [${ICU_LIBS} -static])
+  fi
+
+  if test "x$ICU_FOUND" = "xno"; then
+    AC_CHECK_LIB([icuuc], [u_isprint_47], ICU_FOUND=yes,
+    ,
+    [${ICU_LIBS} -static])
+  fi
+
+  if test "x$ICU_FOUND" = "xno"; then
+    AC_CHECK_LIB([icuuc], [u_isprint_46], ICU_FOUND=yes,
+    ,
+    [${ICU_LIBS} -static])
+  fi
+
+  if test "x$ICU_FOUND" = "xno"; then
+    AC_MSG_FAILURE([Cannot find the ICU static libraries])
+  fi
 
 fi
 
