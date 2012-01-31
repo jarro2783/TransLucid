@@ -24,8 +24,8 @@ lib_LTLIBRARIES = libtlsystem.la
 
 libtlsystem_la_LDFLAGS = -version-info 0:0:0 \
 $(BOOST_LDFLAGS) $(TL_LDFLAGS)
-libtlsystem_la_LIBADD = -lrt -lgmpxx -lgmp $(BOOST_THREAD_LIB) \
--lltdl
+libtlsystem_la_LIBADD = -lgmpxx -lgmp \
+-lltdl $(TL_LIBS) -lrt
 
 libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   charset.cpp context.cpp \

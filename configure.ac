@@ -45,25 +45,6 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([$GCC_CHECK_TEXT])],
   [AC_MSG_ERROR([gcc version $GCC_MIN_VERSION or greater is required])]
 )
 
-# Checks for libraries.
-
-AX_BOOST_BASE([1.46])
-AX_BOOST_PROGRAM_OPTIONS
-
-PKG_CHECK_MODULES([ICU], [icu-uc])
-AC_SUBST([ICU_CFLAGS])
-AC_SUBST([ICU_LIBS])
-
-TL_LDFLAGS="-std=gnu++0x ${ICU_LIBS}"
-TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing -DBOOST_SPIRIT_UNICODE \
-  -DBOOST_MPL_LIMIT_LIST_SIZE=30 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS \
-  ${ICU_CFLAGS}"
-
-AC_SUBST(TL_LDFLAGS)
-AC_SUBST(TL_CFLAGS)
-
-# Checks for typedefs, structures, and compiler characteristics.
-
 # Do we build tlweb
 AC_ARG_ENABLE([tlweb],
   AS_HELP_STRING([--enable-tlweb], [Whether to build the Web server or not, 
@@ -82,7 +63,7 @@ AC_ARG_ENABLE([tlweb],
 )
 
 # check that if tlweb is static, that disable static is not set
-if test "x$enable_tlweb" == "xstatic" && test "x$enable_static" = xno; then
+if test "x$enable_tlweb" == "xstatic" && test "x$enable_static" = "xno"; then
   AC_MSG_FAILURE([--enable-tlweb=static and --enable-static=no])
 fi
 
@@ -93,6 +74,43 @@ AC_ARG_ENABLE([webheaderdir],
 )
 
 AC_SUBST(WEBHEADER)
+
+# Checks for libraries.
+
+AX_BOOST_BASE([1.46])
+AX_BOOST_PROGRAM_OPTIONS
+
+PKG_PROG_PKG_CONFIG([0.26])
+
+# check for libraries statically
+if test "x$enable_static" = "xyes"; then
+  PKG_CONFIG="${PKG_CONFIG} --static"
+fi
+
+PKG_CHECK_MODULES([ICU], [icu-uc])
+
+AC_SUBST([ICU_CFLAGS])
+AC_SUBST([ICU_LIBS])
+
+if test "x$enable_static" = "xyes"; then
+
+AC_CHECK_LIB([icuuc], [u_isprint_48], true,
+AC_MSG_FAILURE([Cannot find the ICU static libraries]),
+[${ICU_LIBS} -static])
+
+fi
+
+TL_LDFLAGS="-std=gnu++0x"
+TL_LIBS="${ICU_LIBS}"
+TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing -DBOOST_SPIRIT_UNICODE \
+  -DBOOST_MPL_LIMIT_LIST_SIZE=30 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS \
+  ${ICU_CFLAGS}"
+
+AC_SUBST(TL_LDFLAGS)
+AC_SUBST(TL_LIBS)
+AC_SUBST(TL_CFLAGS)
+
+# Checks for typedefs, structures, and compiler characteristics.
 
 AM_CONDITIONAL([WANT_TLWEB], [test "x$enable_tlweb" != xno])
 AM_CONDITIONAL([TLWEB_STATIC], [test "x$enable_tlweb" = xstatic])
