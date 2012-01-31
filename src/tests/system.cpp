@@ -441,8 +441,8 @@ TEST_CASE( "line tokenizer empty input", "is it correct with empty input")
 
   auto n = tokenize.next();
 
-  CHECK(n.first == TL::LineType::EMPTY);
-  CHECK(n.second == TL::u32string());
+  CHECK(n.type == TL::LineType::EMPTY);
+  CHECK(n.text == TL::u32string());
 }
 
 TEST_CASE( "line tokenizer simple splitting", "some simply tests" )
@@ -458,12 +458,12 @@ TEST_CASE( "line tokenizer simple splitting", "some simply tests" )
   TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"eqn a = 5;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"eqn a = 5;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"assign y := 6;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"assign y := 6;;"));
 }
 
 TEST_CASE( "line tokenizer $ symbol", "does it handle $$ correctly" )
@@ -480,16 +480,16 @@ TEST_CASE( "line tokenizer $ symbol", "does it handle $$ correctly" )
 
   auto n = tokenize.next();
 
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"eqn a = b;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"eqn a = b;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::DOUBLE_DOLLAR);
-  CHECK(n.second == TL::u32string(U"$$"));
+  CHECK(n.type == TL::LineType::DOUBLE_DOLLAR);
+  CHECK(n.text == TL::u32string(U"$$"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::EMPTY);
-  CHECK(n.second == TL::u32string());
+  CHECK(n.type == TL::LineType::EMPTY);
+  CHECK(n.text == TL::u32string());
 }
 
 TEST_CASE( "line tokenizer extra spaces", "arbitrary white space to skip" )
@@ -505,16 +505,16 @@ TEST_CASE( "line tokenizer extra spaces", "arbitrary white space to skip" )
   TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"eqn a = b;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"eqn a = b;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::DOUBLE_DOLLAR);
-  CHECK(n.second == TL::u32string(U"$$"));
+  CHECK(n.type == TL::LineType::DOUBLE_DOLLAR);
+  CHECK(n.text == TL::u32string(U"$$"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::EMPTY);
-  CHECK(n.second == TL::u32string());
+  CHECK(n.type == TL::LineType::EMPTY);
+  CHECK(n.text == TL::u32string());
 }
 
 TEST_CASE( "line tokenizer %% symbol", "does it handle %% correctly"  )
@@ -530,20 +530,20 @@ TEST_CASE( "line tokenizer %% symbol", "does it handle %% correctly"  )
   TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"eqn x = 42;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"eqn x = 42;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::DOUBLE_PERCENT);
-  CHECK(n.second == TL::u32string(U"%%"));
+  CHECK(n.type == TL::LineType::DOUBLE_PERCENT);
+  CHECK(n.text == TL::u32string(U"%%"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"x;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"x;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::EMPTY);
-  CHECK(n.second == TL::u32string());
+  CHECK(n.type == TL::LineType::EMPTY);
+  CHECK(n.text == TL::u32string());
 }
 
 TEST_CASE( "context manipulation", "perturb and restore some contexts")

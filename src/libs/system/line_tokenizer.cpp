@@ -53,10 +53,14 @@ is_ident_inside(char32_t c)
   return is_ident_begin(c) || (c >= '0' && c <= '9');
 }
  
-std::pair<LineType, u32string>
+//std::pair<LineType, u32string>
+LineTokenizer::Line
 LineTokenizer::next()
 {
   LineType type = LineType::LINE;
+
+  m_startLine = m_lineCount;
+  m_startChar = m_charCount;
 
   try
   {
@@ -142,7 +146,8 @@ LineTokenizer::next()
     //new line token found in string
   }
   
-  return std::make_pair(type, m_line);
+  //return std::make_pair(type, m_line);
+  return Line{m_startLine, m_startChar, m_line, type};
 }
 
 void
