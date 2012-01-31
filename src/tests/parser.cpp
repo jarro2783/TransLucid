@@ -44,8 +44,8 @@ TEST_CASE ( "empty input", "empty input to line tokenizer" )
 
   auto n = tokenize.next();
 
-  CHECK(n.first == TL::LineType::EMPTY);
-  CHECK(n.second == TL::u32string());
+  CHECK(n.type == TL::LineType::EMPTY);
+  CHECK(n.text == TL::u32string());
 }
 
 TEST_CASE ( "simple", "simply line iterator tests" )
@@ -63,12 +63,12 @@ TEST_CASE ( "simple", "simply line iterator tests" )
   TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"eqn a = 5;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"eqn a = 5;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"assign y := 6;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"assign y := 6;;"));
 }
 
 TEST_CASE( "dollar symbol", "line tokenizer $$" )
@@ -84,16 +84,16 @@ TEST_CASE( "dollar symbol", "line tokenizer $$" )
 
   auto n = tokenize.next();
 
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"eqn a = b;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"eqn a = b;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::DOUBLE_DOLLAR);
-  CHECK(n.second == TL::u32string(U"$$"));
+  CHECK(n.type == TL::LineType::DOUBLE_DOLLAR);
+  CHECK(n.text == TL::u32string(U"$$"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::EMPTY);
-  CHECK(n.second == TL::u32string());
+  CHECK(n.type == TL::LineType::EMPTY);
+  CHECK(n.text == TL::u32string());
 }
 
 TEST_CASE( "white space", "line tokenizer white space" )
@@ -110,16 +110,16 @@ TEST_CASE( "white space", "line tokenizer white space" )
   TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"eqn a = b;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"eqn a = b;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::DOUBLE_DOLLAR);
-  CHECK(n.second == TL::u32string(U"$$"));
+  CHECK(n.type == TL::LineType::DOUBLE_DOLLAR);
+  CHECK(n.text == TL::u32string(U"$$"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::EMPTY);
-  CHECK(n.second == TL::u32string());
+  CHECK(n.type == TL::LineType::EMPTY);
+  CHECK(n.text == TL::u32string());
 }
 
 TEST_CASE( "%%", "line tokenizer %%" )
@@ -136,20 +136,20 @@ TEST_CASE( "%%", "line tokenizer %%" )
   TL::LineTokenizer tokenize(iter, end);
 
   auto n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"eqn x = 42;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"eqn x = 42;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::DOUBLE_PERCENT);
-  CHECK(n.second == TL::u32string(U"%%"));
+  CHECK(n.type == TL::LineType::DOUBLE_PERCENT);
+  CHECK(n.text == TL::u32string(U"%%"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::LINE);
-  CHECK(n.second == TL::u32string(U"x;;"));
+  CHECK(n.type == TL::LineType::LINE);
+  CHECK(n.text == TL::u32string(U"x;;"));
 
   n = tokenize.next();
-  CHECK(n.first == TL::LineType::EMPTY);
-  CHECK(n.second == TL::u32string());
+  CHECK(n.type == TL::LineType::EMPTY);
+  CHECK(n.text == TL::u32string());
 }
 
 TEST_CASE( "where clause", "does a where clause with vars work" )
@@ -167,8 +167,8 @@ TEST_CASE( "where clause", "does a where clause with vars work" )
     TL::LineTokenizer tokenize(iter, end);
 
     auto n = tokenize.next();
-    CHECK(n.first == TL::LineType::LINE);
-    CHECK(n.second == TL::to_u32string(input));
+    CHECK(n.type == TL::LineType::LINE);
+    CHECK(n.text == TL::to_u32string(input));
   }
 
   {
@@ -189,8 +189,8 @@ end;;)";
     TL::LineTokenizer tokenize(iter, end);
 
     auto n = tokenize.next();
-    CHECK(n.first == TL::LineType::LINE);
-    CHECK(n.second == TL::to_u32string(input));
+    CHECK(n.type == TL::LineType::LINE);
+    CHECK(n.text == TL::to_u32string(input));
   }
 
 }
@@ -217,8 +217,8 @@ end;;)";
     TL::LineTokenizer tokenize(iter, end);
 
     auto n = tokenize.next();
-    CHECK(n.first == TL::LineType::LINE);
-    CHECK(n.second == TL::to_u32string(input_no_comment));
+    CHECK(n.type == TL::LineType::LINE);
+    CHECK(n.text == TL::to_u32string(input_no_comment));
   }
 }
 

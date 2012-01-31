@@ -253,15 +253,15 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
   while (!done)
   {
     auto line = tokenizer.next();
-    switch(line.first)
+    switch(line.type)
     {
       case LineType::LINE:
       //parse a line with the system
       {
         Parser::U32Iterator lineBegin(
-          Parser::makeUTF32Iterator(line.second.begin()));
+          Parser::makeUTF32Iterator(line.text.begin()));
         Parser::U32Iterator lineEnd(
-          Parser::makeUTF32Iterator(line.second.end())
+          Parser::makeUTF32Iterator(line.text.end())
         );
 
         Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
@@ -313,15 +313,15 @@ TLText::processExpressions(LineTokenizer& tokenizer)
   {
     auto line = tokenizer.next();
 
-    switch(line.first)
+    switch(line.type)
     {
       case LineType::LINE:
       //parse an expression
       {
         Parser::U32Iterator lineBegin(
-          Parser::makeUTF32Iterator(line.second.begin()));
+          Parser::makeUTF32Iterator(line.text.begin()));
         Parser::U32Iterator lineEnd(
-          Parser::makeUTF32Iterator(line.second.end())
+          Parser::makeUTF32Iterator(line.text.end())
         );
 
         Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",

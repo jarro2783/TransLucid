@@ -66,11 +66,14 @@ namespace TransLucid
     , m_first(true)
     , m_whereDepth(0)
     , m_readingIdent(false)
+    , m_lineCount(0)
+    , m_charCount(0)
     , m_peeked(0)
     {
     }
 
-    std::pair<LineType, u32string> next();
+    //std::pair<LineType, u32string> next();
+    Line next();
 
     bool
     end() const
@@ -133,6 +136,9 @@ namespace TransLucid
     u32string m_currentIdent;
     int m_lineCount;
     int m_charCount;
+
+    int m_startLine;
+    int m_startChar;
 
     std::deque<char32_t> m_peek;
     size_t m_peeked;
