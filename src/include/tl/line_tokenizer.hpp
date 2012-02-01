@@ -66,7 +66,7 @@ namespace TransLucid
     , m_first(true)
     , m_whereDepth(0)
     , m_readingIdent(false)
-    , m_lineCount(0)
+    , m_lineCount(1)
     , m_charCount(0)
     , m_peeked(0)
     {
