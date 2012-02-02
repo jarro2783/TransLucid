@@ -63,15 +63,17 @@ namespace TransLucid
     dimension_index
     unique()
     {
-      return m_nextIndex++;
+      return m_nextIndex--;
     }
 
     private:
 
     dimension_index m_nextIndex;
 
-    ObjectRegistry<u32string, decltype(m_nextIndex)> m_named;
-    ObjectRegistry<Constant, decltype(m_nextIndex)> m_constants;
+    ObjectRegistry<u32string, decltype(m_nextIndex), 
+      Decrement<decltype(m_nextIndex)>> m_named;
+    ObjectRegistry<Constant, decltype(m_nextIndex),
+      Decrement<decltype(m_nextIndex)>> m_constants;
   };
 }
 

@@ -99,7 +99,8 @@ namespace TransLucid
     dimension_index
     nextHiddenDim()
     {
-      return m_hiddenDim--;
+      return m_dimTranslator.unique();
+      //return m_hiddenDim--;
     }
 
     /**

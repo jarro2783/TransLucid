@@ -59,35 +59,35 @@ namespace TransLucid
   enum DimensionIndexes
   {
     //dimensions
-    DIM_TIME,
-    DIM_ALL,
-    DIM_ID,
-    DIM_TYPE,
-    DIM_TEXT,
-    DIM_NAME,
-    DIM_VALUE,
-    DIM_SYMBOL,
+    DIM_TIME = -1,
+    DIM_ALL = -2,
+    DIM_ID = -3,
+    DIM_TYPE = -4,
+    DIM_TEXT = -5,
+    DIM_NAME = -6,
+    DIM_VALUE = -7,
+    DIM_SYMBOL = -8,
 
     //the two global dims for phi functions
-    DIM_PI,
-    DIM_PSI,
+    DIM_PI = -9,
+    DIM_PSI = -10,
 
     //for array indices, these are the integers 0, 1, 2
-    DIM_ZERO,
-    DIM_ONE,
-    DIM_TWO,
+    DIM_ZERO = -11,
+    DIM_ONE = -12,
+    DIM_TWO = -13,
 
     //the constructor dim for data types
-    DIM_CONS,
+    DIM_CONS = -14,
 
     //fix some defaults for arg0, arg1, arg2 because they are commonly
     //used in code
-    DIM_ARG0,
-    DIM_ARG1,
-    DIM_ARG2,
+    DIM_ARG0 = -15,
+    DIM_ARG1 = -16,
+    DIM_ARG2 = -17,
 
     //the last one
-    DIM_INDEX_LAST
+    DIM_INDEX_LAST = -18
   };
 
 } //namespace TransLucid
