@@ -56,6 +56,7 @@ std::unique_ptr<std::ofstream> openOutput(const std::string& output)
   return os;
 }
 
+#if 0
 void
 handleSignals(int signal)
 {
@@ -83,6 +84,7 @@ setSignals()
     perror("sigaction");
   }
 }
+#endif
 
 }
 
@@ -96,7 +98,7 @@ int main(int argc, char *argv[])
 {
   setlocale(LC_ALL, "");
 
-  setSignals();
+  //setSignals();
 
   //void (*foo)() = nullptr;
   //(*foo)();
