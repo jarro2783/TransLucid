@@ -49,6 +49,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <sstream>
 #include <unordered_map>
 
+#include <signal.h>
 #include <unistd.h>
 
 #include <tl/builtin_types.hpp>
@@ -75,6 +76,35 @@ namespace TransLucid
 
 namespace
 {
+
+  void
+  handleSignals(int signal)
+  {
+    switch (signal)
+    {
+      case SIGSEGV:
+      std::cerr << "libtl has encountered a segfault, goodbye..." << std::endl;
+      exit(1);
+      break;
+    }
+  }
+
+  void
+  setSignals()
+  {
+    struct sigaction action;
+
+    action.sa_handler = &handleSignals;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+
+    if (sigaction(SIGSEGV, &action, nullptr) == -1)
+    {
+      std::cerr << "Could not set signal handler:";
+      perror("sigaction");
+    }
+  }
+
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {
@@ -277,6 +307,15 @@ namespace
     }
   };
 }
+
+  SignalHandler::SignalHandler()
+  {
+    setSignals();
+    //void (*foo)() = nullptr;
+    //(*foo)();
+  }
+
+  SignalHandler System::m_signals;
 
 namespace detail
 {

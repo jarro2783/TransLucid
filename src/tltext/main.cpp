@@ -30,6 +30,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 #include "tltext.hpp"
 #include <fstream>
+#include <signal.h>
 
 namespace po = boost::program_options;
 

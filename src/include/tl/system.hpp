@@ -61,6 +61,11 @@ namespace TransLucid
   class Translator;
   class TreeToWSTree;
 
+  struct SignalHandler
+  {
+    SignalHandler();
+  };
+
   /**
    * @brief System base class.
    *
@@ -446,6 +451,8 @@ namespace TransLucid
     //{
     //  return m_functions.lookupFunction<N>(name);
     //}
+
+    static SignalHandler m_signals;
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);
