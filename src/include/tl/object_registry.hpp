@@ -77,6 +77,22 @@ namespace TransLucid
       return result.first->second;
     }
 
+    bool
+    assignIndex(const T& v, Index index)
+    {
+      auto iter = m_objects.find(v);
+
+      if (iter != m_objects.end())
+      {
+        return false;
+      }
+
+      m_objects.insert(std::make_pair(v, index));
+      m_reverse.insert(std::make_pair(index, v));
+
+      return true;
+    }
+
     private:
 
     typedef std::unordered_map<T, Index> ObjectMap;

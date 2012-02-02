@@ -134,6 +134,9 @@ namespace TransLucid
     }
 
     Constant
+    addHostDimension(const u32string& name, dimension_index index);
+
+    Constant
     addEquation(const Parser::Equation& eqn);
 
     Constant

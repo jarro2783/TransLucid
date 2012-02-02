@@ -865,12 +865,15 @@ Parser::parse_host_decl(LexerIterator& begin, const LexerIterator& end,
   HostDecl decl;
 
   decl.identifier = get<u32string>(current->getValue());
+  ++current;
 
   expect(current, end, U"=", TOKEN_EQUALS);
 
   expect(current, end, decl.expr, U"expr", &Parser::parse_expr);
 
   result = decl;
+
+  begin = current;
 
   return true;
 }

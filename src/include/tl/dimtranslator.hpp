@@ -66,6 +66,9 @@ namespace TransLucid
       return m_nextIndex--;
     }
 
+    bool
+    assignIndex(const u32string& name, dimension_index index);
+
     private:
 
     dimension_index m_nextIndex;
