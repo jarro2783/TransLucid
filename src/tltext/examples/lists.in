@@ -1,21 +1,24 @@
 //List Operations
-data List a = Cons a (List a) | ListTail;;
+data List a = Cons a (List a) | Nil;;
 
 infixr "::" "cons_list" ~10;;
 
 fun cons_list.a.b [b : [type <- "List"]] = Cons.a.b;;
-fun cons_list.a.b = Cons.a.(Cons.b.ListTail);;
+fun cons_list.a.b = Cons.a.(Cons.b.Nil);;
 
 fun head.l [l : [type <- "List"]] = l!arg0;;
 fun tail.l [l : [type <- "List"]] = l!arg1;;
+
+//fun head.l [l!dtype : "List"] = l!arg0;;
+//fun tail.l [l!dtype : "List"] = l!arg1;;
 
 var headv [arg0 : [type <- "List"]] = #!arg0!arg0;;
 var tailv [arg0 : [type <- "List"]] = #!arg0!arg1;;
 
 %%
 
-head.(Cons.4.(Cons.5.ListTail));;
-headv @ [arg0 <- Cons.4.(Cons.5.ListTail)];;
+head.(Cons.4.(Cons.5.Nil));;
+headv @ [arg0 <- Cons.4.(Cons.5.Nil)];;
 head.(1::2);;
 head.(tail.(1::2));;
 head.(1::2::3);;

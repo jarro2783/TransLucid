@@ -121,6 +121,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_where_decls, U"var", this, &Parser::parse_var_decl);
   add_decl_parser(m_where_decls, U"fun", this, &Parser::parse_fun_decl);
 
+  add_decl_parser(m_top_decls, U"host", this, &Parser::parse_host_decl);
   add_decl_parser(m_top_decls, U"dim", this, &Parser::parse_dim_decl);
   add_decl_parser(m_top_decls, U"var", this, &Parser::parse_var_decl);
   add_decl_parser(m_top_decls, U"assign", this, &Parser::parse_assign_decl);
@@ -843,6 +844,35 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
   {
     return false;
   }
+}
+
+bool
+Parser::parse_host_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  LexerIterator current = begin;
+
+  if (*current != TOKEN_DECLID || 
+      get<u32string>(current->getValue()) != U"host")
+  {
+    return false;
+  }
+
+  ++current;
+
+  expect_no_advance(current, end, U"identifier", TOKEN_ID);
+
+  HostDecl decl;
+
+  decl.identifier = get<u32string>(current->getValue());
+
+  expect(current, end, U"=", TOKEN_EQUALS);
+
+  expect(current, end, decl.expr, U"expr", &Parser::parse_expr);
+
+  result = decl;
+
+  return true;
 }
 
 bool

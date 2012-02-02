@@ -444,6 +444,19 @@ namespace detail
     }
 
     Constant
+    operator()(const Parser::HostDecl& host)
+    {
+      Constant decl = compile_and_evaluate(host.expr, m_system);
+
+      if (decl.index() != TYPE_INDEX_TUPLE)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const Tuple& t = get_constant_pointer<Tuple>(decl);
+    }
+
+    Constant
     operator()(const Parser::DataType& data)
     {
       //for each constructor in data.constructors
@@ -618,6 +631,7 @@ System::init_equations()
 
   //var, dim, assign, in, out
   addDecl(*this, U"var", U"DECLID");
+  addDecl(*this, U"host", U"DECLID");
   addDecl(*this, U"dim", U"DECLID");
   addDecl(*this, U"assign", U"DECLID");
   addDecl(*this, U"in", U"DECLID");
