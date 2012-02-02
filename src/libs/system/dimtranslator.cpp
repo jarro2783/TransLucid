@@ -86,4 +86,10 @@ DimensionTranslator::reverse_lookup_constant(dimension_index dim) const
   return m_constants.reverseLookup(dim);
 }
 
+bool
+DimensionTranslator::assignIndex(const u32string& name, dimension_index index)
+{
+  return m_named.assignIndex(name, index);
+}
+
 }

@@ -116,6 +116,12 @@ namespace TransLucid
       std::vector<DataConstructor> constructors;
     };
 
+    struct HostDecl
+    {
+      u32string identifier;
+      Tree::Expr expr;
+    };
+
     typedef Variant
     <
       Variable,
@@ -127,7 +133,8 @@ namespace TransLucid
       OutputDecl,
       InputDecl,
       DataType,
-      FnDecl
+      FnDecl,
+      HostDecl
     > Line;
  
     struct Position

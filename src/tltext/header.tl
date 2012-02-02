@@ -2,6 +2,14 @@
 dim slot;;
 dim envvar;;
 
+data Assoc = assocn | assocl | assocr;;
+data HostDecl = HostDim intmp | HostType intmp | HostFunc intmp;;
+data OpType = OpPostfix ustring bool
+            | OpPrefix ustring bool
+            | OpInfix ustring bool Assoc intmp
+            ;;
+data Hyperdaton = HdIn ustring | HdOut ustring;;
+
 //the basic operators
 infixl "+" "plus" 100;;
 infixl "-" "minus" 100;;

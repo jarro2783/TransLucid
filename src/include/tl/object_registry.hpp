@@ -25,7 +25,27 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  template <typename T, typename Index>
+  template <typename T>
+  struct Increment
+  {
+    void
+    operator()(T& i)
+    {
+      ++i;
+    }
+  };
+
+  template <typename T>
+  struct Decrement
+  {
+    void
+    operator()(T& i)
+    {
+      --i;
+    }
+  };
+
+  template <typename T, typename Index, typename Next = Increment<Index>>
   class ObjectRegistry
   {
     public:
@@ -52,9 +72,25 @@ namespace TransLucid
       if (result.second)
       {
         m_reverse.insert({m_index, v});
-        ++m_index;
+        m_next(m_index);
       }
       return result.first->second;
+    }
+
+    bool
+    assignIndex(const T& v, Index index)
+    {
+      auto iter = m_objects.find(v);
+
+      if (iter != m_objects.end())
+      {
+        return false;
+      }
+
+      m_objects.insert(std::make_pair(v, index));
+      m_reverse.insert(std::make_pair(index, v));
+
+      return true;
     }
 
     private:
@@ -66,6 +102,7 @@ namespace TransLucid
     ReverseMap m_reverse;
 
     Index& m_index;
+    Next m_next;
 
     public:
 

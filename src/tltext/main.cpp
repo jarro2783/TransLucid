@@ -56,6 +56,36 @@ std::unique_ptr<std::ofstream> openOutput(const std::string& output)
   return os;
 }
 
+#if 0
+void
+handleSignals(int signal)
+{
+  switch (signal)
+  {
+    case SIGSEGV:
+    std::cerr << "TLText has encountered a segfault, goodbye..." << std::endl;
+    exit(1);
+    break;
+  }
+}
+
+void
+setSignals()
+{
+  struct sigaction action;
+
+  action.sa_handler = &handleSignals;
+  sigemptyset(&action.sa_mask);
+  action.sa_flags = 0;
+
+  if (sigaction(SIGSEGV, &action, nullptr) == -1)
+  {
+    std::cerr << "Could not set signal handler:";
+    perror("sigaction");
+  }
+}
+#endif
+
 }
 
 /**
@@ -67,6 +97,11 @@ std::unique_ptr<std::ofstream> openOutput(const std::string& output)
 int main(int argc, char *argv[])
 {
   setlocale(LC_ALL, "");
+
+  //setSignals();
+
+  //void (*foo)() = nullptr;
+  //(*foo)();
 
   po::variables_map vm;
   po::options_description desc("tltext options");

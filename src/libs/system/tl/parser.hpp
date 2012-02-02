@@ -99,6 +99,10 @@ namespace TransLucid
         const u32string& separator_text);
 
       bool
+      parse_host_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
       parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
         Line& result);
 

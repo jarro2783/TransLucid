@@ -444,6 +444,67 @@ namespace detail
     }
 
     Constant
+    operator()(const Parser::HostDecl& host)
+    {
+      Constant decl = compile_and_evaluate(host.expr, m_system);
+
+      if (decl.index() != TYPE_INDEX_TUPLE)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const Tuple& t = get_constant_pointer<Tuple>(decl);
+
+      auto consiter = t.find(DIM_CONS);
+      if (consiter == t.end())
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const Constant& cons = consiter->second;
+      if (cons.index() != TYPE_INDEX_USTRING)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const u32string& consname = get_constant_pointer<u32string>(cons);
+
+      if (consname == U"HostDim" || consname == U"HostType")
+      {
+        //get the number out of the tuple
+        auto arg0iter = t.find(DIM_ARG0);
+        if (arg0iter == t.end())
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const Constant& index = arg0iter->second;
+        if (index.index() != TYPE_INDEX_INTMP)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const mpz_class& zindex = get_constant_pointer<mpz_class>(index);
+
+        dimension_index dimindex = zindex.get_si();
+
+        return m_system.addHostDimension(host.identifier, dimindex);
+      }
+      else if (consname == U"HostType")
+      {
+        return Types::Special::create(SP_CONST);
+      }
+      else if (consname == U"HostFunc")
+      {
+        return Types::Special::create(SP_CONST);
+      }
+      else
+      {
+        return Types::Special::create(SP_CONST);
+      }
+    }
+
+    Constant
     operator()(const Parser::DataType& data)
     {
       //for each constructor in data.constructors
@@ -618,6 +679,7 @@ System::init_equations()
 
   //var, dim, assign, in, out
   addDecl(*this, U"var", U"DECLID");
+  addDecl(*this, U"host", U"DECLID");
   addDecl(*this, U"dim", U"DECLID");
   addDecl(*this, U"assign", U"DECLID");
   addDecl(*this, U"in", U"DECLID");
@@ -1588,6 +1650,25 @@ System::addEnvVar(const u32string& name, const Constant& value)
   m_envvars.insert({getDimensionIndex(name), value});
 
   addDimension(name);
+}
+
+Constant
+System::addHostDimension(const u32string& name, dimension_index index)
+{
+  if (m_dimTranslator.assignIndex(name, index))
+  {
+    return addEquation(Parser::Equation
+      (
+        name,
+        Tree::Expr(),
+        Tree::Expr(),
+        Tree::DimensionExpr(index)
+      ));
+  }
+  else
+  {
+    return Types::Special::create(SP_CONST);
+  }
 }
 
 } //namespace TransLucid
