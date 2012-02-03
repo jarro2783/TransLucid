@@ -497,6 +497,7 @@ namespace detail
         {
           //HostType
           type_index tindex = zindex.get_ui();
+          (void)tindex;
           return Types::Special::create(SP_CONST);
         }
       }
@@ -659,6 +660,8 @@ namespace detail
         Tree::UnaryOperator unop(op.optext, stranslateTo, Tree::UNARY_PREFIX);
         unop.call_by_name = bcbn;
       }
+
+      return Types::Special::create(SP_CONST);
     }
 
     Constant
