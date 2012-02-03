@@ -397,16 +397,16 @@ namespace
       //look up the operator in the system and set the match information
       //appropriately
 
+      std::u32string text = u32string(begin, end);
+
       //need OPTYPE @ [symbol <- u32string(first, last)]
       WS* ws = idents.lookup(U"OPTYPE");
 
       if (ws == nullptr)
       {
-        //TODO fix this
-        throw "no OPTYPE variable in the system";
+        //just pass TOKEN_OPERATOR on
+        return text;
       }
-
-      std::u32string text = u32string(begin, end);
 
       ContextPerturber p(context, 
         {{DIM_SYMBOL, Types::String::create(text)}}
@@ -438,9 +438,7 @@ namespace
       }
       else
       {
-        //TODO fix this
-        std::cerr << "invalid operator type for " << text << std::endl;
-        throw "invalid operator type";
+        return text;
       }
     }
     

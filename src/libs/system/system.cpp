@@ -734,6 +734,7 @@ System::init_equations()
   addDecl(*this, U"postfix", U"DECLID");
   addDecl(*this, U"data", U"DECLID");
   addDecl(*this, U"fun", U"DECLID");
+  addDecl(*this, U"op", U"DECLID");
 
   //add PRINT="this type has no printer"
   addInitEqn(*this,

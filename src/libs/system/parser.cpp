@@ -134,6 +134,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"prefix", this, &Parser::parse_unary_decl);
   add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
   add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
+  add_decl_parser(m_top_decls, U"op", this, &Parser::parse_op_decl);
 }
 
 void
@@ -1149,6 +1150,21 @@ Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
   result = data;
 
   return true;
+}
+
+bool
+Parser::parse_op_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"op")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  expect_no_advance(current, end, U"operator", TOKEN_OPERATOR);
 }
 
 bool

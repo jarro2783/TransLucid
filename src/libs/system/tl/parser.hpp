@@ -51,6 +51,7 @@ namespace TransLucid
         SEPARATOR_COLON,
         SEPARATOR_ARROW
       };
+
       //all the parse functions
       bool
       parse_where(LexerIterator& begin, const LexerIterator& end,
@@ -150,6 +151,10 @@ namespace TransLucid
       bool
       parse_data_constructor(LexerIterator& begin, const LexerIterator& end,
         DataConstructor& result);
+
+      bool
+      parse_op_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
 
       Token
       nextToken(LexerIterator& begin);
