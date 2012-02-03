@@ -61,6 +61,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/tree_printer.hpp>
+#include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
@@ -486,16 +487,59 @@ namespace detail
 
         const mpz_class& zindex = get_constant_pointer<mpz_class>(index);
 
-        dimension_index dimindex = zindex.get_si();
+        if (consname == U"HostDim")
+        {
+          dimension_index dimindex = zindex.get_si();
 
-        return m_system.addHostDimension(host.identifier, dimindex);
-      }
-      else if (consname == U"HostType")
-      {
-        return Types::Special::create(SP_CONST);
+          return m_system.addHostDimension(host.identifier, dimindex);
+        }
+        else
+        {
+          //HostType
+          type_index tindex = zindex.get_ui();
+          (void)tindex;
+          return Types::Special::create(SP_CONST);
+        }
       }
       else if (consname == U"HostFunc")
       {
+        //get arg0 and arg1
+
+        auto arg0iter = t.find(DIM_ARG0);
+        auto arg1iter = t.find(DIM_ARG1);
+
+        if (arg0iter == t.end() || arg1iter == t.end())
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        //arg0 is an address
+        const Constant& caddress = arg0iter->second;
+
+        //arg1 is the arity
+        const Constant& carity = arg1iter->second;
+
+        if (caddress.index() != TYPE_INDEX_INTMP || 
+            carity.index() != TYPE_INDEX_INTMP)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const mpz_class& zaddress = get_constant_pointer<mpz_class>(caddress);
+        const mpz_class& zarity = get_constant_pointer<mpz_class>(carity);
+
+        if (!zaddress.fits_ulong_p() || zarity < 1)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        long laddress = zaddress.get_ui();
+
+        BaseFunctionType* paddress = 
+          reinterpret_cast<BaseFunctionType*>(laddress);
+
+        m_system.addHostFunction(host.identifier, paddress, zarity.get_ui());
+
         return Types::Special::create(SP_CONST);
       }
       else
@@ -557,6 +601,77 @@ namespace detail
       }
 
       return Constant();
+    }
+
+    Constant
+    operator()(const Parser::OpDecl& op)
+    {
+      Constant decl = compile_and_evaluate(op.expr, m_system);
+
+      if (decl.index() != TYPE_INDEX_TUPLE)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const Tuple& t = get_constant_pointer<Tuple>(decl);
+
+      auto consiter = t.find(DIM_CONS);
+      if (consiter == t.end())
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const Constant& cons = consiter->second;
+      if (cons.index() != TYPE_INDEX_USTRING)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const u32string& consname = get_constant_pointer<u32string>(cons);
+
+      if (consname == U"OpPostfix" || consname == U"OpPrefix")
+      {
+        //need arg0 and arg1
+        auto arg0iter = t.find(DIM_ARG0);
+        auto arg1iter = t.find(DIM_ARG1);
+
+        if (arg0iter == t.end() || arg1iter == t.end())
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const Constant& ctranslateTo = arg0iter->second;
+        const Constant& ccbn = arg1iter->second;
+
+        if (ctranslateTo.index() != TYPE_INDEX_USTRING)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        if (ccbn.index() != TYPE_INDEX_BOOL)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const u32string& stranslateTo = 
+          get_constant_pointer<u32string>(ctranslateTo);
+        bool bcbn = get_constant<bool>(ccbn);
+
+        Tree::UnaryType optype;
+        if (consname == U"OpPrefix")
+        {
+          optype = Tree::UNARY_PREFIX;
+        }
+        else
+        {
+          optype = Tree::UNARY_POSTFIX;
+        }
+
+        Tree::UnaryOperator unop(op.optext, stranslateTo, optype);
+        unop.call_by_name = bcbn;
+      }
+
+      return Types::Special::create(SP_CONST);
     }
 
     Constant
@@ -691,6 +806,7 @@ System::init_equations()
   addDecl(*this, U"postfix", U"DECLID");
   addDecl(*this, U"data", U"DECLID");
   addDecl(*this, U"fun", U"DECLID");
+  addDecl(*this, U"op", U"DECLID");
 
   //add PRINT="this type has no printer"
   addInitEqn(*this,
@@ -1669,6 +1785,26 @@ System::addHostDimension(const u32string& name, dimension_index index)
   {
     return Types::Special::create(SP_CONST);
   }
+}
+
+Constant
+System::addHostFunction
+  (const u32string& name, BaseFunctionType* address, int arity)
+{
+  std::unique_ptr<BaseFunctionType> theclone(address->clone());
+  std::unique_ptr<BangAbstractionWS> 
+    op(new BangAbstractionWS(theclone.get()));
+
+  //add equation fn.op_name = bang abstraction workshop with fn.fn
+  uuid u = addEquation(name, op.get());
+  Constant c = Types::UUID::create(u);
+
+  m_functionRegistry.insert({name, std::make_tuple(theclone.get(), u)});
+
+  op.release();
+  theclone.release();
+
+  return c;
 }
 
 } //namespace TransLucid

@@ -1,6 +1,6 @@
 //Multidimensional fold
-fun fold.op.d X = f where
-  var f = fby.d X (op.(next.d X).f);;
+fun fold.operation.d X = f where
+  var f = fby.d X (operation.(next.d X).f);;
 end;;
 
 var N = #!0;;

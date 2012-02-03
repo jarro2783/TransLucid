@@ -1110,29 +1110,6 @@ namespace TransLucid
       }
     }
   }
-
-  namespace
-  {
-    //all this does is return a bang abstraction type object with the
-    //pointer that it is constructed with
-    class BangAbstractionWS : public WS
-    {
-      public:
-      constexpr BangAbstractionWS(BaseFunctionType* fn)
-      : m_fn(fn)
-      {
-      }
-
-      Constant
-      operator()(Context& k)
-      {
-        return Types::BaseFunction::create(*m_fn);
-      }
-
-      private:
-      BaseFunctionType* m_fn;
-    };
-  }
 }
 
 #if 0

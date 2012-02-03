@@ -377,7 +377,7 @@ namespace TransLucid
 
     std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
   };
-
+  
   namespace Types
   {
     namespace BaseFunction
@@ -425,6 +425,31 @@ namespace TransLucid
       hash(const Constant& c);
     }
   }
+  
+  //all this does is return a bang abstraction type object with the
+  //pointer that it is constructed with
+  class BangAbstractionWS : public WS
+  {
+    public:
+    constexpr BangAbstractionWS(BaseFunctionType* fn)
+    : m_fn(fn)
+    {
+    }
+
+    ~BangAbstractionWS()
+    {
+      delete m_fn;
+    }
+
+    Constant
+    operator()(Context& k)
+    {
+      return Types::BaseFunction::create(*m_fn);
+    }
+
+    private:
+    BaseFunctionType* m_fn;
+  };
 }
 
 #endif

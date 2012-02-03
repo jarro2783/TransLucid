@@ -75,6 +75,21 @@ AC_ARG_ENABLE([webheaderdir],
 
 AC_SUBST(WEBHEADER)
 
+# Check that sizeof long == sizeof void*, we need it in system.cpp, 
+# LineAdder::operator()(const Parser::HostDecl&)
+# when we convert an mpz to long with get_ui
+# if this breaks on a system then we will have to do something specialised
+AC_CHECK_SIZEOF([void*])
+AC_CHECK_SIZEOF([long])
+
+AC_MSG_CHECKING([that sizeof(long) == sizeof(void*)])
+if test $ac_cv_sizeof_long -ne $ac_cv_sizeof_voidp; then
+  AC_MSG_RESULT([no])
+  AC_MSG_FAILURE([sizeof(long) != sizeof(void*) on your system, please file a
+  bug report which includes your system and compiler details])
+fi
+AC_MSG_RESULT([yes])
+
 # Checks for libraries.
 
 AX_BOOST_BASE([1.46])

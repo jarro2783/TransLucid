@@ -61,6 +61,8 @@ namespace TransLucid
   class Translator;
   class TreeToWSTree;
 
+  class BaseFunctionType;
+
   /**
    * @brief System base class.
    *
@@ -135,6 +137,10 @@ namespace TransLucid
 
     Constant
     addHostDimension(const u32string& name, dimension_index index);
+
+    Constant
+    addHostFunction
+      (const u32string& name, BaseFunctionType* address, int arity);
 
     Constant
     addEquation(const Parser::Equation& eqn);
@@ -359,6 +365,9 @@ namespace TransLucid
     type_index m_nextTypeIndex;
     ObjectRegistry<u32string, decltype(m_nextTypeIndex)> m_typeRegistry;
     DimensionTranslator m_dimTranslator;
+
+    std::unordered_map<u32string, std::tuple<BaseFunctionType*, uuid>>
+      m_functionRegistry;
 
     //std::map<u32string, size_t> builtin_name_to_index;
 
