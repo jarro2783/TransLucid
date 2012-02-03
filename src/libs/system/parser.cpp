@@ -1161,10 +1161,26 @@ Parser::parse_op_decl(LexerIterator& begin, const LexerIterator& end,
     return false;
   }
 
+  OpDecl decl;
+
   LexerIterator current = begin;
   ++current;
 
   expect_no_advance(current, end, U"operator", TOKEN_OPERATOR);
+
+  decl.optext = get<u32string>(current->getValue());
+
+  ++current;
+
+  expect(current, end, U"=", TOKEN_EQUALS);
+
+  expect(current, end, decl.expr, U"expr", &Parser::parse_expr);
+
+  begin = current;
+
+  result = decl;
+
+  return true;
 }
 
 bool

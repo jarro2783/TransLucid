@@ -75,7 +75,7 @@ namespace TransLucid
         const u32string& symbol,
         UnaryType type
       )
-      : op(op), symbol(symbol), type(type)
+      : op(op), symbol(symbol), type(type), call_by_name(false)
       {}
 
       /**
@@ -92,6 +92,9 @@ namespace TransLucid
        * The type of operator.
        */
       UnaryType type;
+
+      //call by value if false
+      bool call_by_name;
 
       /**
        * Equality of two unary operations.

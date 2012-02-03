@@ -603,6 +603,65 @@ namespace detail
     }
 
     Constant
+    operator()(const Parser::OpDecl& op)
+    {
+      Constant decl = compile_and_evaluate(op.expr, m_system);
+
+      if (decl.index() != TYPE_INDEX_TUPLE)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const Tuple& t = get_constant_pointer<Tuple>(decl);
+
+      auto consiter = t.find(DIM_CONS);
+      if (consiter == t.end())
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const Constant& cons = consiter->second;
+      if (cons.index() != TYPE_INDEX_USTRING)
+      {
+        return Types::Special::create(SP_CONST);
+      }
+
+      const u32string& consname = get_constant_pointer<u32string>(cons);
+
+      if (consname == U"OpPostfix" || consname == U"OpPrefix")
+      {
+        //need arg0 and arg1
+        auto arg0iter = t.find(DIM_ARG0);
+        auto arg1iter = t.find(DIM_ARG1);
+
+        if (arg0iter == t.end() || arg1iter == t.end())
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const Constant& ctranslateTo = arg0iter->second;
+        const Constant& ccbn = arg1iter->second;
+
+        if (ctranslateTo.index() != TYPE_INDEX_USTRING)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        if (ccbn.index() != TYPE_INDEX_BOOL)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const u32string& stranslateTo = 
+          get_constant_pointer<u32string>(ctranslateTo);
+        bool bcbn = get_constant<bool>(ccbn);
+
+        Tree::UnaryOperator unop(op.optext, stranslateTo, Tree::UNARY_PREFIX);
+        unop.call_by_name = bcbn;
+      }
+    }
+
+    Constant
     operator()(const Parser::FnDecl& fn)
     {
       return m_system.addFunction(fn);

@@ -122,6 +122,12 @@ namespace TransLucid
       Tree::Expr expr;
     };
 
+    struct OpDecl
+    {
+      u32string optext;
+      Tree::Expr expr;
+    };
+
     typedef Variant
     <
       Variable,
@@ -134,7 +140,8 @@ namespace TransLucid
       InputDecl,
       DataType,
       FnDecl,
-      HostDecl
+      HostDecl,
+      OpDecl
     > Line;
  
     struct Position
