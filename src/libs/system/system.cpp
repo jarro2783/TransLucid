@@ -668,7 +668,17 @@ namespace detail
           get_constant_pointer<u32string>(ctranslateTo);
         bool bcbn = get_constant<bool>(ccbn);
 
-        Tree::UnaryOperator unop(op.optext, stranslateTo, Tree::UNARY_PREFIX);
+        Tree::UnaryType optype;
+        if (consname == U"OpPrefix")
+        {
+          optype = Tree::UNARY_PREFIX;
+        }
+        else
+        {
+          optype = Tree::UNARY_POSTFIX;
+        }
+
+        Tree::UnaryOperator unop(op.optext, stranslateTo, optype);
         unop.call_by_name = bcbn;
       }
 
