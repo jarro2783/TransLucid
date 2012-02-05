@@ -606,6 +606,17 @@ namespace detail
     Constant
     operator()(const Parser::OpDecl& op)
     {
+      //add OPERATOR [symbol : "op.optext"] = op.expr;;
+      m_system.addEquation(Parser::Equation
+        (
+          U"OPERATOR",
+          Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.optext}}),
+          Tree::Expr(),
+          op.expr
+        )
+      );
+
+      #if 0
       Constant decl = compile_and_evaluate(op.expr, m_system);
 
       if (decl.index() != TYPE_INDEX_TUPLE)
@@ -660,6 +671,8 @@ namespace detail
         Tree::UnaryOperator unop(op.optext, stranslateTo, Tree::UNARY_PREFIX);
         unop.call_by_name = bcbn;
       }
+
+      #endif
 
       return Types::Special::create(SP_CONST);
     }
