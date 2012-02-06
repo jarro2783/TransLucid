@@ -189,7 +189,7 @@ namespace TransLucid
       processDefinitions(LineTokenizer& line, const u32string& streamName);
 
       std::vector<Tree::Expr>
-      processExpressions(LineTokenizer& line);
+      processExpressions(LineTokenizer& line, const u32string& streamName);
 
       void
       setup_clargs();

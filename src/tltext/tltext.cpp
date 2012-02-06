@@ -172,7 +172,7 @@ TLText::run()
       //only parse expressions if the right tokens were seen
       if (defs.second)
       {
-        exprs = processExpressions(tokenizer);
+        exprs = processExpressions(tokenizer, m_inputName);
       }
 
       //now process the instant
@@ -317,7 +317,11 @@ TLText::processDefinitions
 }
 
 std::vector<Tree::Expr>
-TLText::processExpressions(LineTokenizer& tokenizer)
+TLText::processExpressions
+(
+  LineTokenizer& tokenizer, 
+  const u32string& streamName
+)
 {
   std::vector<Tree::Expr> exprs;
   bool done = false;
@@ -336,7 +340,7 @@ TLText::processExpressions(LineTokenizer& tokenizer)
           Parser::makeUTF32Iterator(line.text.end())
         );
 
-        Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
+        Parser::StreamPosIterator posbegin(lineBegin, streamName,
           line.line, line.character);
         Parser::StreamPosIterator posend(lineEnd);
 
