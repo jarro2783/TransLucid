@@ -5,7 +5,7 @@
 
 namespace TransLucid
 {
-  typedef uint16_t type_index;
+  typedef int16_t type_index;
   typedef std::u32string u32string;
   typedef int32_t dimension_index;
 

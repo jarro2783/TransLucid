@@ -498,6 +498,7 @@ namespace detail
           //HostType
           type_index tindex = zindex.get_ui();
           (void)tindex;
+          m_system.addHostTypeIndex(tindex, host.identifier);
           return Types::Special::create(SP_CONST);
         }
       }
@@ -1890,6 +1891,12 @@ System::addHostFunction
   theclone.release();
 
   return c;
+}
+
+void
+System::addHostTypeIndex(type_index index, const u32string& name)
+{
+  m_typeRegistry.assignIndex(name, index);
 }
 
 } //namespace TransLucid

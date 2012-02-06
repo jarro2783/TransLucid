@@ -226,6 +226,9 @@ namespace TransLucid
     void
     addEnvVar(const u32string& name, const Constant& value);
 
+    void
+    addHostTypeIndex(type_index index, const u32string& name);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
@@ -363,7 +366,8 @@ namespace TransLucid
 
     //registries
     type_index m_nextTypeIndex;
-    ObjectRegistry<u32string, decltype(m_nextTypeIndex)> m_typeRegistry;
+    ObjectRegistry<u32string, decltype(m_nextTypeIndex), Decrement<type_index>> 
+      m_typeRegistry;
     DimensionTranslator m_dimTranslator;
 
     std::unordered_map<u32string, std::tuple<BaseFunctionType*, uuid>>
