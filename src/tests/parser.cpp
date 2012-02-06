@@ -234,12 +234,12 @@ namespace
     {
       theSystem.addUnaryOperator(
         TransLucid::Tree::UnaryOperator
-          {U"operator+", U"+", TransLucid::Tree::UNARY_POSTFIX}
+          {U"plus", U"+", TransLucid::Tree::UNARY_POSTFIX}
       );
 
       theSystem.addUnaryOperator(
         TransLucid::Tree::UnaryOperator
-          {U"operator-", U"-", TransLucid::Tree::UNARY_PREFIX}
+          {U"minus", U"-", TransLucid::Tree::UNARY_PREFIX}
       );
 
       theSystem.addBinaryOperator(
@@ -308,6 +308,7 @@ typedef TL::Variant
   std::pair<TL::u32string, TL::u32string>,
   char32_t,
   std::pair<TL::u32string, int>,
+  TL::Tree::UnaryOperator,
   TL::Tree::BinaryOperator
 > Values;
 
@@ -428,35 +429,36 @@ class Checker
   }
 
   void
-  binop(const TL::Tree::BinaryOperator& theop)
+  binop(const TL::Tree::BinaryOperator& op)
   {
-    INFO("Testing binop: " << theop.symbol);
+    INFO("Testing binop: " << op.symbol);
     REQUIRE(m_current != m_tokens.end());
 
     auto opval = TL::get<TL::Tree::BinaryOperator>(&*m_current);
 
     REQUIRE(opval != nullptr);
-    CHECK(opval->op == theop.op);
-    CHECK(opval->symbol == theop.symbol);
-    CHECK(opval->cbn == theop.cbn);
-    CHECK(opval->assoc == theop.assoc);
-    CHECK(opval->precedence == theop.precedence);
+    CHECK(opval->op == op.op);
+    CHECK(opval->symbol == op.symbol);
+    CHECK(opval->cbn == op.cbn);
+    CHECK(opval->assoc == op.assoc);
+    CHECK(opval->precedence == op.precedence);
 
     ++m_current;
   }
-
+  
   void
-  op(const TL::u32string& text, int type)
+  unaryop(const TL::Tree::UnaryOperator& op)
   {
-    INFO("Testing op: " << text);
+    INFO("Testing unaryop: " << op.symbol);
     REQUIRE(m_current != m_tokens.end());
 
-    auto opval = TL::get<std::pair<TL::u32string, int>>
-      (&*m_current);
+    auto opval = TL::get<TL::Tree::UnaryOperator>(&*m_current);
 
     REQUIRE(opval != nullptr);
-    CHECK(opval->first == text);
-    CHECK(opval->second == type);
+    CHECK(opval->op == op.op);
+    CHECK(opval->symbol == op.symbol);
+    CHECK(opval->call_by_name == op.call_by_name);
+
     ++m_current;
   }
 
@@ -665,7 +667,7 @@ parse
         //ops
         case TL::Parser::TOKEN_PREFIX_OP:
         case TL::Parser::TOKEN_POSTFIX_OP:
-        checker.op(TL::get<TL::u32string>(tok.getValue()), tok.getType());
+        checker.unaryop(TL::get<TL::Tree::UnaryOperator>(tok.getValue()));
         break;
 
         case TL::Parser::TOKEN_BINARY_OP:
@@ -896,8 +898,8 @@ TEST_CASE ( "operators", "check arbitrary operators" )
     mpz_class(4),
     TL::Tree::BinaryOperator(TL::Tree::ASSOC_LEFT, U"modulus", U"%", 10),
     mpz_class(5),
-    std::make_pair(U"-", TL::Parser::TOKEN_PREFIX_OP),
-    std::make_pair(U"+", TL::Parser::TOKEN_POSTFIX_OP)
+    TL::Tree::UnaryOperator(U"minus", U"-", TL::Tree::UNARY_PREFIX),
+    TL::Tree::UnaryOperator(U"plus", U"+", TL::Tree::UNARY_POSTFIX)
   });
 
   check(input, checker);

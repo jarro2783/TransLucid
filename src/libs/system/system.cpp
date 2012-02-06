@@ -1043,6 +1043,32 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
   Constant a = addATLSymbol(op.symbol, op.op);
   if (op.type == Tree::UNARY_PREFIX)
   {
+    typeName = U"OpPrefix";
+  }
+  else
+  {
+    typeName = U"OpPostfix";
+  }
+
+  return addEquation(Parser::Equation(
+    U"OPERATOR",
+    Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
+    Tree::Expr(),
+    Tree::TupleExpr(
+    {
+      {Tree::DimensionExpr(DIM_TYPE), u32string(U"OpType")},
+      {Tree::DimensionExpr(DIM_CONS), u32string(typeName)},
+      {Tree::DimensionExpr(DIM_ARG0), op.op},
+      {Tree::DimensionExpr(DIM_ARG1), op.call_by_name},
+    }
+    )
+  ));
+  #if 0
+  u32string typeName;
+
+  Constant a = addATLSymbol(op.symbol, op.op);
+  if (op.type == Tree::UNARY_PREFIX)
+  {
     typeName = U"PREFIX";
   }
   else
@@ -1068,6 +1094,7 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
   ));
 
   return Types::UUID::create(u);
+  #endif
 }
 
 Constant

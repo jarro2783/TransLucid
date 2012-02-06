@@ -453,13 +453,13 @@ namespace
         if (consname == U"OpPrefix")
         {
           id = TOKEN_PREFIX_OP;
-          return Tree::UnaryOperator(text, arg0value, Tree::UNARY_PREFIX, 
+          return Tree::UnaryOperator(arg0value, text, Tree::UNARY_PREFIX, 
             arg1value);
         }
         else if (consname == U"OpPostfix")
         {
           id = TOKEN_POSTFIX_OP;
-          return Tree::UnaryOperator(text, arg0value, Tree::UNARY_POSTFIX, 
+          return Tree::UnaryOperator(arg0value, text, Tree::UNARY_POSTFIX, 
             arg1value);
         }
         else if (consname == U"OpInfix")
