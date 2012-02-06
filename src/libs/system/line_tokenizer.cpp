@@ -59,9 +59,6 @@ LineTokenizer::next()
 {
   LineType type = LineType::LINE;
 
-  m_startLine = m_lineCount;
-  m_startChar = m_charCount;
-
   try
   {
     m_state = State::READ_SKIP_SPACE;
@@ -104,6 +101,8 @@ LineTokenizer::next()
       preLineSkip();
     }
 
+    m_startLine = m_lineCount;
+    m_startChar = m_charCount;
 
     //are we still in skipping spaces mode?
     //if so, start reading and don't add to the buffer
@@ -146,8 +145,7 @@ LineTokenizer::next()
     //new line token found in string
   }
   
-  //return std::make_pair(type, m_line);
-  return Line{m_startLine, m_startChar, m_line, type};
+  return Line{m_startChar, m_startLine, m_line, type};
 }
 
 void

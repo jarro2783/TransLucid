@@ -194,8 +194,9 @@ int main(int argc, char *argv[])
     std::unique_ptr<std::ifstream> input;
     if (vm.count("input"))
     {
-      input = openInput(vm["input"].as<std::string>());
-      tltext.set_input(input.get());
+      std::string inputName = vm["input"].as<std::string>();
+      input = openInput(inputName);
+      tltext.set_input(input.get(), inputName);
     }
 
     std::unique_ptr<std::ofstream> output;

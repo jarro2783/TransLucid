@@ -58,6 +58,7 @@ TLText::TLText(const std::string& initOut)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_error(&std::cerr)
+ ,m_inputName(U"<interactive>")
  ,m_initialOut(initOut)
  ,m_time(0)
  ,m_lastLibLoaded(0)
@@ -99,6 +100,13 @@ TLText::~TLText()
   delete m_envHD;
 }
 
+void 
+TLText::set_input(std::istream* is, const std::string& name)
+{
+  m_is = is;
+  m_inputName = utf8_to_utf32(name);
+}
+
 void
 TLText::add_header(const std::string& header)
 {
@@ -136,7 +144,7 @@ TLText::run()
       );
 
       LineTokenizer tokens(begin, end);
-      processDefinitions(tokens);
+      processDefinitions(tokens, utf8_to_utf32(h));
     }
   }
 
@@ -155,7 +163,7 @@ TLText::run()
   bool done = false;
   while (!done)
   {
-    auto defs = processDefinitions(tokenizer);
+    auto defs = processDefinitions(tokenizer, m_inputName);
 
     //only continue if the instant is valid
     if (defs.first)
@@ -243,7 +251,11 @@ TLText::run()
 }
 
 std::pair<bool, bool>
-TLText::processDefinitions(LineTokenizer& tokenizer)
+TLText::processDefinitions
+(
+  LineTokenizer& tokenizer, 
+  const u32string& streamName
+)
 {
   bool instantValid = true;
   bool parseExpressions = true;
@@ -264,7 +276,7 @@ TLText::processDefinitions(LineTokenizer& tokenizer)
           Parser::makeUTF32Iterator(line.text.end())
         );
 
-        Parser::StreamPosIterator posbegin(lineBegin, U"<interactive>",
+        Parser::StreamPosIterator posbegin(lineBegin, streamName,
           line.line,line.character);
         Parser::StreamPosIterator posend(lineEnd);
 

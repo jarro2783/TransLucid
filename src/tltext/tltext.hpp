@@ -105,10 +105,7 @@ namespace TransLucid
        * @param is The input stream.
        */
       void 
-      set_input(std::istream* is)
-      {
-        m_is = is;
-      }
+      set_input(std::istream* is, const std::string& name);
 
       template <typename String>
       void
@@ -166,6 +163,8 @@ namespace TransLucid
       std::ostream* m_os;
       std::ostream* m_error;
 
+      u32string m_inputName;
+
       std::string m_initialOut;
 
       System m_system;
@@ -187,7 +186,7 @@ namespace TransLucid
 
       //is the instant valid, do we parse expressions
       std::pair<bool, bool>
-      processDefinitions(LineTokenizer& line);
+      processDefinitions(LineTokenizer& line, const u32string& streamName);
 
       std::vector<Tree::Expr>
       processExpressions(LineTokenizer& line);
