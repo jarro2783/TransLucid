@@ -73,9 +73,10 @@ namespace TransLucid
       (
         const u32string& op,
         const u32string& symbol,
-        UnaryType type
+        UnaryType type,
+        bool cbn = false
       )
-      : op(op), symbol(symbol), type(type), call_by_name(false)
+      : op(op), symbol(symbol), type(type), call_by_name(cbn)
       {}
 
       /**
@@ -140,9 +141,10 @@ namespace TransLucid
         InfixAssoc assoc,
         const u32string& op,
         const u32string& symbol,
-        const mpz_class& precedence
+        const mpz_class& precedence,
+        bool cbn = false
       )
-      : op(op), symbol(symbol), assoc(assoc), precedence(precedence)
+      : op(op), symbol(symbol), assoc(assoc), precedence(precedence), cbn(cbn)
       {}
 
       /**
@@ -188,6 +190,11 @@ namespace TransLucid
        * The precedence.
        */
       mpz_class precedence;
+
+      /**
+       * Call-by-name or call-by-value. True for call-by-name.
+       */
+      bool cbn;
     };
 
     /**

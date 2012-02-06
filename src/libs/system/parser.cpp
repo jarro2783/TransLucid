@@ -403,6 +403,7 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
       ++current;
       expect(current, end, rhs, U"app_expr", &Parser::parse_app_expr);
 
+#if 0
       app = Tree::insert_binary_operator
       (
         find_binary_operator
@@ -412,6 +413,14 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
           DIM_SYMBOL,
           m_context
         ),
+        app, 
+        rhs
+      );
+#endif
+
+      app = Tree::insert_binary_operator
+      (
+        get<Tree::BinaryOperator>(t.getValue()),
         app, 
         rhs
       );

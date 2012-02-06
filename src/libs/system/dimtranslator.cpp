@@ -42,7 +42,8 @@ DimensionTranslator::DimensionTranslator()
    {U"type", DIM_TYPE},
    {U"arg0", DIM_ARG0},
    {U"arg1", DIM_ARG1},
-   {U"arg2", DIM_ARG2}
+   {U"arg2", DIM_ARG2},
+   {U"arg3", DIM_ARG3}
   }
   )
 , m_constants(m_nextIndex, std::vector<std::pair<Constant, dimension_index>>

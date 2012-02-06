@@ -244,7 +244,7 @@ namespace
 
       theSystem.addBinaryOperator(
         TransLucid::Tree::BinaryOperator
-          {TransLucid::Tree::ASSOC_LEFT, U"operator%", U"%", 10}
+          {TransLucid::Tree::ASSOC_LEFT, U"modulus", U"%", 10}
       );
       initialized = true;
     }

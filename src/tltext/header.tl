@@ -2,13 +2,27 @@
 dim slot;;
 dim envvar;;
 
-data Assoc = assocn | assocl | assocr;;
+data Assoc = AssocNon | AssocLeft | AssocRight;;
 data HostDecl = HostDim intmp | HostType intmp | HostFunc intmp;;
 data OpType = OpPostfix ustring bool
             | OpPrefix ustring bool
             | OpInfix ustring bool Assoc intmp
             ;;
 data Hyperdaton = HdIn ustring | HdOut ustring;;
+
+op + = OpInfix."plus".false.AssocLeft.100;;
+op - = OpInfix."minus".false.AssocLeft.100;;
+op * = OpInfix."times".false.AssocLeft.200;;
+op / = OpInfix."divide".false.AssocLeft.200;;
+op % = OpInfix."modulus".false.AssocLeft.200;;
+op < = OpInfix."lt".false.AssocNon.50;;
+op <= = OpInfix."lte".false.AssocNon.50;;
+op > = OpInfix."gt".false.AssocNon.50;;
+op >= = OpInfix."gte".false.AssocNon.50;;
+op == = OpInfix."eq".false.AssocNon.25;;
+op != = OpInfix."ne".false.AssocNon.25;;
+op && = OpInfix."bool_and".false.AssocLeft.20;;
+op || = OpInfix."bool_and".false.AssocLeft.20;;
 
 //the basic operators
 infixl "+" "plus" 100;;

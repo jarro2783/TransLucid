@@ -1073,6 +1073,50 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
 Constant
 System::addBinaryOperator(const Tree::BinaryOperator& op)
 {
+  u32string assocType;
+
+  switch(op.assoc)
+  {
+    case Tree::ASSOC_NON:
+    assocType = U"AssocNon";
+    break;
+
+    case Tree::ASSOC_LEFT:
+    assocType = U"AssocLeft";
+    break;
+
+    case Tree::ASSOC_RIGHT:
+    assocType = U"AssocRight";
+    break;
+
+    default:
+    return Types::Special::create(SP_CONST);
+    break;
+  }
+
+  return addEquation(Parser::Equation(
+    U"OPERATOR",
+    Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
+    Tree::Expr(),
+    Tree::TupleExpr(
+    {
+      {Tree::DimensionExpr(DIM_TYPE), u32string(U"OpType")},
+      {Tree::DimensionExpr(DIM_CONS), u32string(U"OpInfix")},
+      {Tree::DimensionExpr(DIM_ARG0), op.op},
+      {Tree::DimensionExpr(DIM_ARG1), op.cbn},
+      {Tree::DimensionExpr(DIM_ARG2), 
+        Tree::TupleExpr(
+        {
+          {Tree::DimensionExpr(DIM_TYPE), u32string(U"Assoc")},
+          {Tree::DimensionExpr(DIM_CONS), assocType}
+        })
+      },
+      {Tree::DimensionExpr(DIM_ARG3), op.precedence}
+    }
+    )
+  ));
+
+  #if 0
   u32string assocName;
 
   switch(op.assoc)
@@ -1119,6 +1163,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
   ));
 
   return Types::UUID::create(u);
+  #endif
 }
 
 Constant 
