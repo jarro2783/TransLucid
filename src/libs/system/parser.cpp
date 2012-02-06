@@ -127,11 +127,6 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"assign", this, &Parser::parse_assign_decl);
   add_decl_parser(m_top_decls, U"in", this, &Parser::parse_in_decl);
   add_decl_parser(m_top_decls, U"out", this, &Parser::parse_out_decl);
-  add_decl_parser(m_top_decls, U"infixl", this, &Parser::parse_infix_decl);
-  add_decl_parser(m_top_decls, U"infixr", this, &Parser::parse_infix_decl);
-  add_decl_parser(m_top_decls, U"infixn", this, &Parser::parse_infix_decl);
-  add_decl_parser(m_top_decls, U"postfix", this, &Parser::parse_unary_decl);
-  add_decl_parser(m_top_decls, U"prefix", this, &Parser::parse_unary_decl);
   add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
   add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
   add_decl_parser(m_top_decls, U"op", this, &Parser::parse_op_decl);
@@ -837,7 +832,7 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
     if (iter == decls->end())
     {
       //TODO I don't know how to parse this thing
-      std::cerr << "unknown line declaration" << std::endl;
+      std::cerr << "unknown line declaration: " << id << std::endl;
       throw "unknown line declaration";
     }
 
