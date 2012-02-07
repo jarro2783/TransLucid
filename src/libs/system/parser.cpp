@@ -126,6 +126,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"var", this, &Parser::parse_var_decl);
   add_decl_parser(m_top_decls, U"assign", this, &Parser::parse_assign_decl);
   add_decl_parser(m_top_decls, U"in", this, &Parser::parse_in_decl);
+  add_decl_parser(m_top_decls, U"hd", this, &Parser::parse_in_decl);
   add_decl_parser(m_top_decls, U"out", this, &Parser::parse_out_decl);
   add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
   add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
@@ -996,6 +997,31 @@ Parser::parse_assign_decl(LexerIterator& begin, const LexerIterator& end,
     return true;
   }
   return false;
+}
+
+bool
+Parser::parse_hd_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"out")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  Equation eqn;
+  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"=");
+
+  if (success)
+  {
+    result = HDDecl(eqn);
+  }
+
+  begin = current;
+
+  return success;
 }
 
 bool

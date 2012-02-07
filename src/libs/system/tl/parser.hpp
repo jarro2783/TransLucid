@@ -124,6 +124,10 @@ namespace TransLucid
         Line& result);
 
       bool
+      parse_hd_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
       parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
         Equation& result);
 

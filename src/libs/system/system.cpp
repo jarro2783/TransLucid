@@ -324,6 +324,11 @@ namespace detail
     typedef Constant result_type;
 
     Constant
+    operator()(const Parser::HDDecl& hd)
+    {
+    }
+
+    Constant
     operator()(const Tree::BinaryOperator& binop)
     {
       return m_system.addBinaryOperator(binop);
