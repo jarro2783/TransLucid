@@ -22,6 +22,9 @@ AC_CONFIG_SRCDIR([src/libs/system/system.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
+AM_GNU_GETTEXT_VERSION(0.18)
+AM_GNU_GETTEXT([external])
+
 AM_INIT_AUTOMAKE([dist-bzip2 -Wno-portability])
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
