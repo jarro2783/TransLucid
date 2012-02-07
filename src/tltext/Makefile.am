@@ -11,7 +11,7 @@ tltext_LDFLAGS = $(TLTEXT_LIBS) $(TL_LDFLAGS) -export-dynamic
 
 tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -DPREFIX=\"$(prefix)\" \
--Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
+-Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) -DLOCALEDIR=\"$(localedir)\"
 
 if TLWEB_STATIC
   TLWEB_STATIC_FLAGS = -all-static

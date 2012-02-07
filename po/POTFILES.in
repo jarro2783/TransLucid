@@ -4,3 +4,4 @@ src/libs/system/system.cpp
 src/libs/system/parser.cpp
 
 src/tltext/tltext.cpp
+src/tltext/main.cpp

@@ -32,6 +32,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <fstream>
 #include <signal.h>
 
+#include <libintl.h>
+
+#define _(String) gettext (String)
+
 namespace po = boost::program_options;
 
 namespace
@@ -107,6 +111,13 @@ setSignals()
   }
 }
 
+void
+init_gettext()
+{
+  bindtextdomain(PACKAGE, LOCALEDIR);
+  textdomain(PACKAGE);
+}
+
 }
 
 /**
@@ -118,6 +129,8 @@ setSignals()
 int main(int argc, char *argv[])
 {
   setlocale(LC_ALL, "");
+
+  init_gettext();
 
   //setSignals();
 
@@ -131,7 +144,7 @@ int main(int argc, char *argv[])
       po::value<std::vector<std::string>>()->multitoken(),
       "arguments to pass to TransLucid in the CLARGS variable")
     ("debug,d", "debug mode")
-    ("help,h", "show this message")
+    ("help,h", _("show this message"))
     ("input,i", po::value<std::string>(), "input file")
     ("output,o", po::value<std::string>(), "output file")
     ("uuid", "print uuids")
