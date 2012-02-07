@@ -142,12 +142,17 @@ int main(int argc, char *argv[])
   desc.add_options()
     ("args", 
       po::value<std::vector<std::string>>()->multitoken(),
-      "arguments to pass to TransLucid in the CLARGS variable")
+      /* TRANSLATORS: the help message for --args */
+      _("arguments to pass to TransLucid in the CLARGS variable"))
     ("debug,d", "debug mode")
+    /* TRANSLATORS: the help message for --help */
     ("help,h", _("show this message"))
-    ("input,i", po::value<std::string>(), "input file")
-    ("output,o", po::value<std::string>(), "output file")
-    ("uuid", "print uuids")
+    /* TRANSLATORS: the help message for --input */
+    ("input,i", po::value<std::string>(), _("input file"))
+    /* TRANSLATORS: the help message for --output */
+    ("output,o", po::value<std::string>(), _("output file"))
+    /* TRANSLATORS: the help message for --uuid */
+    ("uuid", _("print uuids"))
     ("verbose,v", "verbose output")
     ("version", "show version")
   ;
