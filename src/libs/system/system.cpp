@@ -80,29 +80,50 @@ namespace
   void
   handleSignals(int signal)
   {
-    switch (signal)
-    {
-      case SIGSEGV:
+    //switch (signal)
+    //{
+    //  case SIGSEGV:
       std::cerr << "libtl has encountered a segfault, goodbye..." << std::endl;
       exit(1);
-      break;
-    }
+    //  break;
+    //}
+  }
+
+  void
+  handleSignalsInfo(int sig, siginfo_t* si, void*)
+  {
+    std::cerr << "libtl has encountered a segfault, goodbye..." << std::endl;
+    std::cerr << "accessing: " << si->si_addr << std::endl;
+    exit(1);
   }
 
   void
   setSignals()
   {
     struct sigaction action;
+    memset(&action, 0, sizeof(action));
 
-    action.sa_handler = &handleSignals;
+    //action.sa_handler = &handleSignals;
+    action.sa_sigaction = &handleSignalsInfo;
     sigemptyset(&action.sa_mask);
-    action.sa_flags = 0;
+    action.sa_flags = SA_SIGINFO;
 
-    if (sigaction(SIGSEGV, &action, nullptr) == -1)
+    struct sigaction oldact;
+
+    int result = sigaction(SIGSEGV, &action, &oldact);
+
+    std::cerr << "result setting signal: " << result << std::endl;
+
+    if (result == -1)
     {
       std::cerr << "Could not set signal handler:";
       perror("sigaction");
     }
+    std::cerr << "old signal handler " << oldact.sa_sigaction << std::endl;
+
+    sigaction(SIGABRT, &action, &oldact);
+    sigaction(SIGKILL, &action, &oldact);
+    sigaction(SIGBUS, &action, &oldact);
   }
 
   bool
@@ -314,8 +335,6 @@ namespace
     //void (*foo)() = nullptr;
     //(*foo)();
   }
-
-  SignalHandler System::m_signals;
 
 namespace detail
 {
@@ -729,6 +748,7 @@ System::System()
 , m_hiddenDim(-1)
 , m_debug(false)
 {
+  //static SignalHandler signals;
   //create the obj, const and fun ids
 
   setDefaultContext();
@@ -776,6 +796,9 @@ System::~System()
 void
 System::go()
 {
+  //SignalHandler signals;
+  //SignalHandler signals2;
+
   for (const auto& ident : m_assignments)
   {
     auto hd = m_outputHDs.find(ident.first);
