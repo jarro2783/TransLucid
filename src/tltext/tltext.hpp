@@ -71,7 +71,7 @@ namespace TransLucid
        * @param v @b true to turn verbose on, @b false to turn it off.
        */
       void 
-      verbose(bool v)
+      verbose(int v)
       {
         m_verbose = v;
       }
@@ -90,6 +90,12 @@ namespace TransLucid
       debug(bool d = true)
       {
         m_debug = d;
+      }
+
+      void
+      silent(bool s = true)
+      {
+        m_silent = s;
       }
 
       /**
@@ -155,7 +161,7 @@ namespace TransLucid
       add_argument(const u32string& arg, const u32string& value);
 
       private:
-      bool m_verbose;
+      int m_verbose;
       bool m_uuids;
       bool m_debug;
 
