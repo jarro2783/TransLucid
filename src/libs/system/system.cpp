@@ -49,6 +49,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <sstream>
 #include <unordered_map>
 
+#include <signal.h>
 #include <unistd.h>
 
 #include <tl/builtin_types.hpp>
@@ -76,6 +77,7 @@ namespace TransLucid
 
 namespace
 {
+
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {

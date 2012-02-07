@@ -463,6 +463,7 @@ namespace TransLucid
     //{
     //  return m_functions.lookupFunction<N>(name);
     //}
+
   };
 
   Constant hash(const Constant& dimension, const Tuple& context);

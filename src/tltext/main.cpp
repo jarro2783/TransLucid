@@ -30,6 +30,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 #include "tltext.hpp"
 #include <fstream>
+#include <signal.h>
 
 namespace po = boost::program_options;
 
@@ -56,7 +57,8 @@ std::unique_ptr<std::ofstream> openOutput(const std::string& output)
   return os;
 }
 
-#if 0
+void* altstack;
+
 void
 handleSignals(int signal)
 {
@@ -72,11 +74,31 @@ handleSignals(int signal)
 void
 setSignals()
 {
+  //set up an alternate stack because when we have a stack overflow we
+  //overflow the stack trying to handle the stack overflow
+
+  //ask for 512kB
+  altstack = malloc(512*1024);
+
+  stack_t ss;
+
+  ss.ss_sp = altstack;
+  ss.ss_size = 512*1024;
+  ss.ss_flags = 0;
+
+  if (sigaltstack(&ss, nullptr) == -1)
+  {
+    std::cerr << "error: could not allocate alternate signal stack" 
+              << std::endl;
+    perror("sigaltstack: ");
+    exit(1);
+  }
+
   struct sigaction action;
 
   action.sa_handler = &handleSignals;
   sigemptyset(&action.sa_mask);
-  action.sa_flags = 0;
+  action.sa_flags = SA_ONSTACK;
 
   if (sigaction(SIGSEGV, &action, nullptr) == -1)
   {
@@ -84,7 +106,6 @@ setSignals()
     perror("sigaction");
   }
 }
-#endif
 
 }
 
