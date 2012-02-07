@@ -72,6 +72,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
+#include "tl/gettext_internal.h"
+
 namespace TransLucid
 {
 
@@ -279,6 +281,13 @@ namespace
       return Constant();
     }
   };
+}
+
+GettextInit System::m_gettext;
+
+GettextInit::GettextInit()
+{
+  bindtextdomain(PACKAGE, LOCALEDIR);
 }
 
 namespace detail

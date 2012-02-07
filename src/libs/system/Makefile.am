@@ -38,7 +38,8 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   types.cpp utility.cpp uuid.cpp workshop_builder.cpp
 
 libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \
--DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS)
+-DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) \
+-DPACKAGE=\"libtl\" -DLOCALEDIR=\"$(localedir)\"
 
 systemdatadir = $(pkgdatadir)
 dist_systemdata_DATA = system_header.tl
