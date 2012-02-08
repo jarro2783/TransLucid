@@ -162,7 +162,6 @@ namespace TransLucid
   {
     typedef typename std::conditional
     <
-      //std::is_const<typename std::remove_extent<Storage>::type>::value,
       std::is_const<
         typename std::remove_extent<
           typename std::remove_reference<Storage>::type>::type
@@ -430,23 +429,8 @@ namespace TransLucid
 
       //compile error here means that T is not unambiguously convertible to
       //any of the types in (First, Types...)
-      #if 0
-      typedef typename std::remove_reference<T>::type type;
-      typedef detail::get_which<type, First, Types...> which_type;
-
-      indicate_which(which_type::value);
-      construct(typename which_type::type(std::forward<T>(t)));
-      #endif
       initialiser<0, First, Types...>::initialise(*this, std::forward<T>(t));
     }
-
-    #if 0
-    Variant(Variant& rhs)
-    {
-      rhs.apply_visitor_internal(constructor(*this));
-      indicate_which(rhs.which());
-    }
-    #endif
 
     Variant(const Variant& rhs)
     {
@@ -490,8 +474,6 @@ namespace TransLucid
     typename Visitor::result_type
     apply_visitor(Visitor& visitor, Args&&... args)
     {
-      //return detail::visit_impl<Internal, Visitor, void*, First, Types...>(
-      //  visitor, m_which, 0, m_storage);
       return do_visit<First, Types...>()(Internal(), m_which, m_storage,
         visitor, std::forward<Args>(args)...);
     }
@@ -500,16 +482,6 @@ namespace TransLucid
     typename Visitor::result_type
     apply_visitor(Visitor& visitor, Args&&... args) const
     {
-      #if 0
-      return detail::visit_impl
-        <
-          Internal, 
-          Visitor, 
-          const void*, 
-          First, 
-          Types...
-        >(visitor, m_which, 0, m_storage);
-      #endif
       return do_visit<First, Types...>()(Internal(), m_which, m_storage,
         visitor, std::forward<Args>(args)...);
     }
@@ -538,7 +510,6 @@ namespace TransLucid
     typename Visitor::result_type
     apply_visitor_internal(Visitor& visitor)
     {
-      //return visitor<First, Types...>()(true_(), visitor);
       return apply_visitor<true_, Visitor>(visitor);
     }
 
@@ -581,7 +552,6 @@ namespace TransLucid
     result_type
     operator()(T& val) const
     {
-      //typedef typename T::hello h;
       return &val;
     }
 

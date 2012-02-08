@@ -1,6 +1,5 @@
 Makefile.in.in
 Makevars.template
-POTFILES.in
 Rules-quot
 boldquot.sed
 en@boldquot.header
