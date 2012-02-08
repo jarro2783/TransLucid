@@ -49,7 +49,12 @@ namespace TransLucid
       Tree::UnaryType,
       u32string,
       mpz_class,
-      std::pair<u32string, u32string>
+      std::pair<u32string, u32string>,
+      //used for unary operators
+      std::pair<u32string, bool>,
+      Tree::UnaryOperator,
+      //used for binary operators
+      Tree::BinaryOperator
     > TokenValue;
 
     class Token

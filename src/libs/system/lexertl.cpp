@@ -400,7 +400,7 @@ namespace
       std::u32string text = u32string(begin, end);
 
       //need OPTYPE @ [symbol <- u32string(first, last)]
-      WS* ws = idents.lookup(U"OPTYPE");
+      WS* ws = idents.lookup(U"OPERATOR");
 
       if (ws == nullptr)
       {
@@ -414,12 +414,111 @@ namespace
 
       Constant v = (*ws)(context);
 
-      //the result is either a string or a special, just ignore if not
-      //a string
-      if (v.index() == TYPE_INDEX_USTRING)
+      //the result should be a tuple, just ignore if not
+      //a tuple
+      if (v.index() == TYPE_INDEX_TUPLE)
       {
-        const u32string& type = get_constant_pointer<u32string>(v);
+        const Tuple& info = get_constant_pointer<Tuple>(v);
 
+        auto consiter = info.find(DIM_CONS);
+        auto arg0iter = info.find(DIM_ARG0);
+        auto arg1iter = info.find(DIM_ARG1);
+
+        if (consiter == info.end() || arg0iter == info.end()
+            || arg1iter == info.end())
+        {
+          return text;
+        }
+
+        if (consiter->second.index() != TYPE_INDEX_USTRING)
+        {
+          return text;
+        }
+
+        if (arg0iter->second.index() != TYPE_INDEX_USTRING ||
+            arg1iter->second.index() != TYPE_INDEX_BOOL)
+        {
+          return text;
+        }
+
+        const u32string& arg0value = get_constant_pointer<u32string>(
+          arg0iter->second);
+
+        bool arg1value = get_constant<bool>(
+          arg1iter->second);
+
+        const u32string& consname = get_constant_pointer<u32string>(
+          consiter->second);
+
+        if (consname == U"OpPrefix")
+        {
+          id = TOKEN_PREFIX_OP;
+          return Tree::UnaryOperator(arg0value, text, Tree::UNARY_PREFIX, 
+            arg1value);
+        }
+        else if (consname == U"OpPostfix")
+        {
+          id = TOKEN_POSTFIX_OP;
+          return Tree::UnaryOperator(arg0value, text, Tree::UNARY_POSTFIX, 
+            arg1value);
+        }
+        else if (consname == U"OpInfix")
+        {
+          auto arg2iter = info.find(DIM_ARG2);
+          auto arg3iter = info.find(DIM_ARG3);
+
+          if (arg2iter == info.end() || arg3iter == info.end())
+          {
+            return text;
+          }
+
+          if (arg2iter->second.index() != TYPE_INDEX_TUPLE ||
+              arg3iter->second.index() != TYPE_INDEX_INTMP)
+          {
+            return text;
+          }
+
+          const Tuple& assoct = get_constant_pointer<Tuple>(arg2iter->second);
+          const mpz_class& prec = get_constant_pointer<mpz_class>(
+            arg3iter->second);
+
+          auto assoccons = assoct.find(DIM_CONS);
+          if (assoccons == assoct.end() || 
+              assoccons->second.index() != TYPE_INDEX_USTRING)
+          {
+            return text;
+          }
+
+          const u32string& assoctext = get_constant_pointer<u32string>(
+            assoccons->second);
+
+          Tree::InfixAssoc assoc = Tree::ASSOC_LEFT;
+
+          if (assoctext == U"AssocLeft")
+          {
+            assoc = Tree::ASSOC_LEFT;
+          }
+          else if (assoctext == U"AssocRight")
+          {
+            assoc = Tree::ASSOC_RIGHT;
+          }
+          else if (assoctext == U"AssocNon")
+          {
+            assoc = Tree::ASSOC_NON;
+          }
+
+          id = TOKEN_BINARY_OP;
+
+          return Tree::BinaryOperator(assoc, arg0value, text, prec, arg1value);
+
+          //return std::make_tuple(arg0value, arg1value, assoc, prec);
+        }
+        else
+        {
+          return text;
+        }
+
+        #if 0
         if (type == U"BINARY")
         {
           id = TOKEN_BINARY_OP;
@@ -433,6 +532,7 @@ namespace
           //postfix is all that is left
           id = TOKEN_POSTFIX_OP;
         }
+        #endif
 
         return text;
       }

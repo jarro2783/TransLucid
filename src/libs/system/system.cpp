@@ -49,6 +49,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <sstream>
 #include <unordered_map>
 
+#include <signal.h>
 #include <unistd.h>
 
 #include <tl/builtin_types.hpp>
@@ -76,6 +77,7 @@ namespace TransLucid
 
 namespace
 {
+
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {
@@ -324,6 +326,11 @@ namespace detail
     typedef Constant result_type;
 
     Constant
+    operator()(const Parser::HDDecl& hd)
+    {
+    }
+
+    Constant
     operator()(const Tree::BinaryOperator& binop)
     {
       return m_system.addBinaryOperator(binop);
@@ -498,6 +505,7 @@ namespace detail
           //HostType
           type_index tindex = zindex.get_ui();
           (void)tindex;
+          m_system.addHostTypeIndex(tindex, host.identifier);
           return Types::Special::create(SP_CONST);
         }
       }
@@ -606,6 +614,17 @@ namespace detail
     Constant
     operator()(const Parser::OpDecl& op)
     {
+      //add OPERATOR [symbol : "op.optext"] = op.expr;;
+      m_system.addEquation(Parser::Equation
+        (
+          U"OPERATOR",
+          Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.optext}}),
+          Tree::Expr(),
+          op.expr
+        )
+      );
+
+      #if 0
       Constant decl = compile_and_evaluate(op.expr, m_system);
 
       if (decl.index() != TYPE_INDEX_TUPLE)
@@ -670,6 +689,8 @@ namespace detail
         Tree::UnaryOperator unop(op.optext, stranslateTo, optype);
         unop.call_by_name = bcbn;
       }
+
+      #endif
 
       return Types::Special::create(SP_CONST);
     }
@@ -1030,6 +1051,32 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
   Constant a = addATLSymbol(op.symbol, op.op);
   if (op.type == Tree::UNARY_PREFIX)
   {
+    typeName = U"OpPrefix";
+  }
+  else
+  {
+    typeName = U"OpPostfix";
+  }
+
+  return addEquation(Parser::Equation(
+    U"OPERATOR",
+    Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
+    Tree::Expr(),
+    Tree::TupleExpr(
+    {
+      {Tree::DimensionExpr(DIM_TYPE), u32string(U"OpType")},
+      {Tree::DimensionExpr(DIM_CONS), u32string(typeName)},
+      {Tree::DimensionExpr(DIM_ARG0), op.op},
+      {Tree::DimensionExpr(DIM_ARG1), op.call_by_name},
+    }
+    )
+  ));
+  #if 0
+  u32string typeName;
+
+  Constant a = addATLSymbol(op.symbol, op.op);
+  if (op.type == Tree::UNARY_PREFIX)
+  {
     typeName = U"PREFIX";
   }
   else
@@ -1055,11 +1102,56 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
   ));
 
   return Types::UUID::create(u);
+  #endif
 }
 
 Constant
 System::addBinaryOperator(const Tree::BinaryOperator& op)
 {
+  u32string assocType;
+
+  switch(op.assoc)
+  {
+    case Tree::ASSOC_NON:
+    assocType = U"AssocNon";
+    break;
+
+    case Tree::ASSOC_LEFT:
+    assocType = U"AssocLeft";
+    break;
+
+    case Tree::ASSOC_RIGHT:
+    assocType = U"AssocRight";
+    break;
+
+    default:
+    return Types::Special::create(SP_CONST);
+    break;
+  }
+
+  return addEquation(Parser::Equation(
+    U"OPERATOR",
+    Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
+    Tree::Expr(),
+    Tree::TupleExpr(
+    {
+      {Tree::DimensionExpr(DIM_TYPE), u32string(U"OpType")},
+      {Tree::DimensionExpr(DIM_CONS), u32string(U"OpInfix")},
+      {Tree::DimensionExpr(DIM_ARG0), op.op},
+      {Tree::DimensionExpr(DIM_ARG1), op.cbn},
+      {Tree::DimensionExpr(DIM_ARG2), 
+        Tree::TupleExpr(
+        {
+          {Tree::DimensionExpr(DIM_TYPE), u32string(U"Assoc")},
+          {Tree::DimensionExpr(DIM_CONS), assocType}
+        })
+      },
+      {Tree::DimensionExpr(DIM_ARG3), op.precedence}
+    }
+    )
+  ));
+
+  #if 0
   u32string assocName;
 
   switch(op.assoc)
@@ -1106,6 +1198,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
   ));
 
   return Types::UUID::create(u);
+  #endif
 }
 
 Constant 
@@ -1805,6 +1898,12 @@ System::addHostFunction
   theclone.release();
 
   return c;
+}
+
+void
+System::addHostTypeIndex(type_index index, const u32string& name)
+{
+  m_typeRegistry.assignIndex(name, index);
 }
 
 } //namespace TransLucid

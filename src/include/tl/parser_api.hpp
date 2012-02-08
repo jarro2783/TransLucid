@@ -39,7 +39,8 @@ namespace TransLucid
       DECL_VARIABLE,
       DECL_ASSIGNMENT,
       DECL_OUTPUT,
-      DECL_INPUT
+      DECL_INPUT,
+      DECL_HD
     };
 
     template <size_t N>
@@ -59,6 +60,7 @@ namespace TransLucid
     typedef Declaration<DECL_ASSIGNMENT> Assignment;
     typedef Declaration<DECL_OUTPUT> OutputDecl;
     typedef Declaration<DECL_INPUT> InputDecl;
+    typedef Declaration<DECL_HD> HDDecl;
 
     struct FnDecl
     {
@@ -141,7 +143,8 @@ namespace TransLucid
       DataType,
       FnDecl,
       HostDecl,
-      OpDecl
+      OpDecl,
+      HDDecl
     > Line;
  
     struct Position

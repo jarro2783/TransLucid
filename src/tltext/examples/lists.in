@@ -1,7 +1,7 @@
 //List Operations
 data List a = Cons a (List a) | Nil;;
 
-infixr "::" "cons_list" ~10;;
+op :: = OpInfix."cons_list".false.AssocRight. ~10;;
 
 fun cons_list.a.b [b : [type <- "List"]] = Cons.a.b;;
 fun cons_list.a.b = Cons.a.(Cons.b.Nil);;

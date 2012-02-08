@@ -80,14 +80,15 @@ namespace TransLucid
     //the constructor dim for data types
     DIM_CONS = -14,
 
-    //fix some defaults for arg0, arg1, arg2 because they are commonly
+    //fix some defaults for arg0, arg1, arg2 and arg3 because they are commonly
     //used in code
     DIM_ARG0 = -15,
     DIM_ARG1 = -16,
     DIM_ARG2 = -17,
+    DIM_ARG3 = -18,
 
     //the last one
-    DIM_INDEX_LAST = -18
+    DIM_INDEX_LAST = -19
   };
 
 } //namespace TransLucid

@@ -126,12 +126,8 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"var", this, &Parser::parse_var_decl);
   add_decl_parser(m_top_decls, U"assign", this, &Parser::parse_assign_decl);
   add_decl_parser(m_top_decls, U"in", this, &Parser::parse_in_decl);
+  add_decl_parser(m_top_decls, U"hd", this, &Parser::parse_in_decl);
   add_decl_parser(m_top_decls, U"out", this, &Parser::parse_out_decl);
-  add_decl_parser(m_top_decls, U"infixl", this, &Parser::parse_infix_decl);
-  add_decl_parser(m_top_decls, U"infixr", this, &Parser::parse_infix_decl);
-  add_decl_parser(m_top_decls, U"infixn", this, &Parser::parse_infix_decl);
-  add_decl_parser(m_top_decls, U"postfix", this, &Parser::parse_unary_decl);
-  add_decl_parser(m_top_decls, U"prefix", this, &Parser::parse_unary_decl);
   add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
   add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
   add_decl_parser(m_top_decls, U"op", this, &Parser::parse_op_decl);
@@ -403,6 +399,7 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
       ++current;
       expect(current, end, rhs, U"app_expr", &Parser::parse_app_expr);
 
+#if 0
       app = Tree::insert_binary_operator
       (
         find_binary_operator
@@ -412,6 +409,14 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
           DIM_SYMBOL,
           m_context
         ),
+        app, 
+        rhs
+      );
+#endif
+
+      app = Tree::insert_binary_operator
+      (
+        get<Tree::BinaryOperator>(t.getValue()),
         app, 
         rhs
       );
@@ -828,7 +833,7 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
     if (iter == decls->end())
     {
       //TODO I don't know how to parse this thing
-      std::cerr << "unknown line declaration" << std::endl;
+      std::cerr << "unknown line declaration: " << id << std::endl;
       throw "unknown line declaration";
     }
 
@@ -992,6 +997,31 @@ Parser::parse_assign_decl(LexerIterator& begin, const LexerIterator& end,
     return true;
   }
   return false;
+}
+
+bool
+Parser::parse_hd_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"out")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  Equation eqn;
+  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"=");
+
+  if (success)
+  {
+    result = HDDecl(eqn);
+  }
+
+  begin = current;
+
+  return success;
 }
 
 bool
