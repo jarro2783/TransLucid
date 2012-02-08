@@ -650,10 +650,6 @@ parse
         checker.identifier(TL::get<TL::u32string>(tok.getValue()));
         break;
 
-        //infix declaration
-        case TL::Parser::TOKEN_INFIXBIN:
-        break;
-
         //unary symbol declaration
         case TL::Parser::TOKEN_UNARY:
         checker.identifier(TL::get<TL::u32string>(tok.getValue()));
@@ -681,7 +677,6 @@ parse
 
         case TL::Parser::TOKEN_OPERATOR:
         INFO("Got TOKEN_OPERATOR");
-        case TL::Parser::TOKEN_RANGE:
         default:
         success = false;
         break;
