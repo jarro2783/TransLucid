@@ -32,7 +32,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <fstream>
 #include <signal.h>
 
-#include <libintl.h>
+#include "gettext.h"
 
 #define _(String) gettext (String)
 

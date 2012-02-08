@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_GETTEXT_INTERNAL_H_INCLUDED
 #define TL_GETTEXT_INTERNAL_H_INCLUDED
 
-#include <libintl.h>
+#include "tl/gettext.h"
 #define _(String) dgettext (PACKAGE, String)
 
 #endif
