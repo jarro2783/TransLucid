@@ -17,8 +17,17 @@
 #   <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS=checks src doc
+SUBDIRS= src po checks doc 
 EXTRA_DIST=CMakeLists.txt
+
+update-gmo:
+	make -C po update-gmo
+
+update-po:
+	make -C po update-po
+
+$(PACKAGE).pot-update:
+	make -C po $(PACKAGE).pot-update
 
 doc:
 if DX_COND_doc

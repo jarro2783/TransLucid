@@ -32,6 +32,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include <fstream>
 #include <signal.h>
 
+#include "gettext.h"
+
+#define _(String) gettext (String)
+
 namespace po = boost::program_options;
 
 namespace
@@ -65,7 +69,8 @@ handleSignals(int signal)
   switch (signal)
   {
     case SIGSEGV:
-    std::cerr << "TLText has encountered a segfault, goodbye..." << std::endl;
+    std::cerr << _("TLText has encountered a segfault, goodbye...") 
+              << std::endl;
     exit(1);
     break;
   }
@@ -107,6 +112,13 @@ setSignals()
   }
 }
 
+void
+init_gettext()
+{
+  bindtextdomain(PACKAGE, LOCALEDIR);
+  textdomain(PACKAGE);
+}
+
 }
 
 /**
@@ -119,6 +131,8 @@ int main(int argc, char *argv[])
 {
   setlocale(LC_ALL, "");
 
+  init_gettext();
+
   //setSignals();
 
   //void (*foo)() = nullptr;
@@ -129,12 +143,17 @@ int main(int argc, char *argv[])
   desc.add_options()
     ("args", 
       po::value<std::vector<std::string>>()->multitoken(),
-      "arguments to pass to TransLucid in the CLARGS variable")
+      /* TRANSLATORS: the help message for --args */
+      _("arguments to pass to TransLucid in the CLARGS variable"))
     ("debug,d", "debug mode")
-    ("help,h", "show this message")
-    ("input,i", po::value<std::string>(), "input file")
-    ("output,o", po::value<std::string>(), "output file")
-    ("uuid", "print uuids")
+    /* TRANSLATORS: the help message for --help */
+    ("help,h", _("show this message"))
+    /* TRANSLATORS: the help message for --input */
+    ("input,i", po::value<std::string>(), _("input file"))
+    /* TRANSLATORS: the help message for --output */
+    ("output,o", po::value<std::string>(), _("output file"))
+    /* TRANSLATORS: the help message for --uuid */
+    ("uuid", _("print uuids"))
     ("verbose,v", "verbose output")
     ("version", "show version")
   ;

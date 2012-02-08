@@ -1,4 +1,4 @@
-#   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+#   Copyright (C) 2009, 2010, 2011, 2012 Jarryd Beck and John Plaice
 #
 #   This file is part of TransLucid.
 #
@@ -19,7 +19,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(tl)
 
-set(VERSION "0.0.80")
+set(VERSION "0.0.100")
 set(builddir ${CMAKE_BINARY_DIR}/doc)
 set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 
@@ -38,9 +38,13 @@ if (NOT GCC_IS_CORRECT_VERSION)
    message(FATAL_ERROR "g++ version 4.7.0 or greater is required")
 endif()
 
+find_package(Gettext REQUIRED)
+
 find_package(PkgConfig REQUIRED)
 
-set(TLCFLAGS -Wall -std=gnu++0x -DPACKAGE_VERSION=\"0.0.35\"
+set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
+
+set(TLCFLAGS -Wall -std=gnu++0x -DPACKAGE_VERSION=\"${VERSION}\"
   -DHAVE_CONFIG_H)
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
@@ -88,4 +92,5 @@ set(HEADERDIR \"${CMAKE_INSTALL_PREFIX}/share/tl/tltext\")
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
 add_subdirectory(src)
+add_subdirectory(po)
 add_subdirectory(doc)

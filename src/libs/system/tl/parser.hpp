@@ -171,6 +171,12 @@ namespace TransLucid
 
       void
       expect(LexerIterator& begin, const LexerIterator& end, 
+        const std::string& message,
+        size_t token
+      );
+
+      void
+      expect(LexerIterator& begin, const LexerIterator& end, 
         const u32string& message,
         size_t token
       );

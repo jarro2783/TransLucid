@@ -1,0 +1,62 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: tl 0.0.80\n"
+"Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
+"POT-Creation-Date: 2012-02-08 15:09+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. TRANSLATORS: keyword
+#: src/libs/system/parser.cpp:629 src/libs/system/parser.cpp:644
+msgid "'then'"
+msgstr ""
+
+#. TRANSLATORS: keyword
+#: src/libs/system/parser.cpp:653
+msgid "'else'"
+msgstr ""
+
+#. TRANSLATORS: keyword
+#: src/libs/system/parser.cpp:659
+msgid "'fi'"
+msgstr ""
+
+#: src/tltext/main.cpp:72
+msgid "TLText has 'encountered' a segfault, goodbye..."
+msgstr ""
+
+#. TRANSLATORS: the help message for --args
+#: src/tltext/main.cpp:147
+msgid "arguments to pass to TransLucid in the CLARGS variable"
+msgstr ""
+
+#. TRANSLATORS: the help message for --help
+#: src/tltext/main.cpp:150
+msgid "show this message"
+msgstr ""
+
+#. TRANSLATORS: the help message for --input
+#: src/tltext/main.cpp:152
+msgid "input file"
+msgstr ""
+
+#. TRANSLATORS: the help message for --output
+#: src/tltext/main.cpp:154
+msgid "output file"
+msgstr ""
+
+#. TRANSLATORS: the help message for --uuid
+#: src/tltext/main.cpp:156
+msgid "print uuids"
+msgstr ""
