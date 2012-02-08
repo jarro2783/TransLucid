@@ -1,4 +1,4 @@
-#   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+#   Copyright (C) 2009, 2010, 2011, 2012 Jarryd Beck and John Plaice
 #
 #   This file is part of TransLucid.
 #
@@ -92,4 +92,5 @@ set(HEADERDIR \"${CMAKE_INSTALL_PREFIX}/share/tl/tltext\")
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
 add_subdirectory(src)
+add_subdirectory(po)
 add_subdirectory(doc)
