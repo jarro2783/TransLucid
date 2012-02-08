@@ -59,91 +59,91 @@ namespace
 //this list must correspond exactly to Parser::TokenType
 const char* token_names[] =
 {
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("end of file"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`:='"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`!'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("constant literal"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("raw constant"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("interpreted constant"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`:'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`,'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`%%'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`;;'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`\\\\'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("declaration"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("dimension identifier"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`.'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`else'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`elsif'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`end'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`='"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`false'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`fi'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`#'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`if'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("identifier"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("integer literal"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`<-'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`{'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`('"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`['"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("operator symbol"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`|'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`->'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`}'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`)'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`]'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`\\'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`then'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`true'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("character literal"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`unary'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("`where'"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("prefix operator"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("infix operator"),
-  /* TRANSLATOR: token name */
+  /* TRANSLATORS: token name */
   _("postfix operator")
 };
 

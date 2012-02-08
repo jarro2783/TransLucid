@@ -155,7 +155,8 @@ int main(int argc, char *argv[])
     /* TRANSLATORS: the help message for --uuid */
     ("uuid", _("print uuids"))
     ("verbose,v", "verbose output")
-    ("version", "show version")
+    /* TRANSLATORS: the help message for --version */
+    ("version", _("show version"))
   ;
 
   std::vector<po::basic_option<char>> options;
