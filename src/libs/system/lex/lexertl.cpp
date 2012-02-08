@@ -94,7 +94,6 @@ namespace TransLucid
         m_rules.add(U"\\(", TOKEN_LPAREN);
         m_rules.add(U"\\[", TOKEN_LSQUARE);
         m_rules.add(U"\\|", TOKEN_PIPE);
-        //m_rules.add(UR"(\.\.)", TOKEN_RANGE);
         m_rules.add(U"->", TOKEN_RARROW);
         m_rules.add(U"\\}", TOKEN_RBRACE);
         m_rules.add(U"\\)", TOKEN_RPAREN);

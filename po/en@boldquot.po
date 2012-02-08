@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-02-08 15:09+1100\n"
-"PO-Revision-Date: 2012-02-08 15:09+1100\n"
+"POT-Creation-Date: 2012-02-08 16:02+1100\n"
+"PO-Revision-Date: 2012-02-08 16:02+1100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"
@@ -42,24 +42,202 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: src/libs/system/parser.cpp:63
+msgid "end of file"
+msgstr "end of file"
+
+#: src/libs/system/parser.cpp:65
+msgid "`:='"
+msgstr "‘[1m:=[0m’"
+
+#: src/libs/system/parser.cpp:67
+msgid "`!'"
+msgstr "‘[1m![0m’"
+
+#: src/libs/system/parser.cpp:69
+msgid "constant literal"
+msgstr "constant literal"
+
+#: src/libs/system/parser.cpp:71
+msgid "raw constant"
+msgstr "raw constant"
+
+#: src/libs/system/parser.cpp:73
+msgid "interpreted constant"
+msgstr "interpreted constant"
+
+#: src/libs/system/parser.cpp:75
+msgid "`:'"
+msgstr "‘[1m:[0m’"
+
+#: src/libs/system/parser.cpp:77
+msgid "`,'"
+msgstr "‘[1m,[0m’"
+
+#: src/libs/system/parser.cpp:79
+#, c-format
+msgid "`%%'"
+msgstr "‘[1m%%[0m’"
+
+#: src/libs/system/parser.cpp:81
+msgid "`;;'"
+msgstr "‘[1m;;[0m’"
+
+#: src/libs/system/parser.cpp:83
+msgid "`\\\\'"
+msgstr "‘[1m\\\\[0m’"
+
+#: src/libs/system/parser.cpp:85
+msgid "declaration"
+msgstr "declaration"
+
+#: src/libs/system/parser.cpp:87
+msgid "dimension identifier"
+msgstr "dimension identifier"
+
+#: src/libs/system/parser.cpp:89
+msgid "`.'"
+msgstr "‘[1m.[0m’"
+
+#: src/libs/system/parser.cpp:91
+msgid "`else'"
+msgstr "‘[1melse[0m’"
+
+#: src/libs/system/parser.cpp:93
+msgid "`elsif'"
+msgstr "‘[1melsif[0m’"
+
+#: src/libs/system/parser.cpp:95
+msgid "`end'"
+msgstr "‘[1mend[0m’"
+
+#: src/libs/system/parser.cpp:97
+msgid "`='"
+msgstr "‘[1m=[0m’"
+
+#: src/libs/system/parser.cpp:99
+msgid "`false'"
+msgstr "‘[1mfalse[0m’"
+
+#: src/libs/system/parser.cpp:101
+msgid "`fi'"
+msgstr "‘[1mfi[0m’"
+
+#: src/libs/system/parser.cpp:103
+msgid "`#'"
+msgstr "‘[1m#[0m’"
+
+#: src/libs/system/parser.cpp:105
+msgid "`if'"
+msgstr "‘[1mif[0m’"
+
+#: src/libs/system/parser.cpp:107
+msgid "identifier"
+msgstr "identifier"
+
+#: src/libs/system/parser.cpp:109
+msgid "integer literal"
+msgstr "integer literal"
+
+#: src/libs/system/parser.cpp:111
+msgid "`<-'"
+msgstr "‘[1m<-[0m’"
+
+#: src/libs/system/parser.cpp:113
+msgid "`{'"
+msgstr "‘[1m{[0m’"
+
+#: src/libs/system/parser.cpp:115
+msgid "`('"
+msgstr "‘[1m([0m’"
+
+#: src/libs/system/parser.cpp:117
+msgid "`['"
+msgstr "‘[1m[[0m’"
+
+#: src/libs/system/parser.cpp:119
+msgid "operator symbol"
+msgstr "operator symbol"
+
+#: src/libs/system/parser.cpp:121
+msgid "`|'"
+msgstr "‘[1m|[0m’"
+
+#: src/libs/system/parser.cpp:123
+msgid "`->'"
+msgstr "‘[1m->[0m’"
+
+#: src/libs/system/parser.cpp:125
+msgid "`}'"
+msgstr "‘[1m}[0m’"
+
+#: src/libs/system/parser.cpp:127
+msgid "`)'"
+msgstr "‘[1m)[0m’"
+
+#: src/libs/system/parser.cpp:129
+msgid "`]'"
+msgstr "‘[1m][0m’"
+
+#: src/libs/system/parser.cpp:131
+msgid "`\\'"
+msgstr "‘[1m\\[0m’"
+
+#: src/libs/system/parser.cpp:133
+msgid "`then'"
+msgstr "‘[1mthen[0m’"
+
+#: src/libs/system/parser.cpp:135
+msgid "`true'"
+msgstr "‘[1mtrue[0m’"
+
+#: src/libs/system/parser.cpp:137
+msgid "character literal"
+msgstr "character literal"
+
+#: src/libs/system/parser.cpp:139
+msgid "`unary'"
+msgstr "‘[1munary[0m’"
+
+#: src/libs/system/parser.cpp:141
+msgid "`where'"
+msgstr "‘[1mwhere[0m’"
+
+#: src/libs/system/parser.cpp:143
+msgid "prefix operator"
+msgstr "prefix operator"
+
+#: src/libs/system/parser.cpp:145
+msgid "infix operator"
+msgstr "infix operator"
+
+#: src/libs/system/parser.cpp:147
+msgid "postfix operator"
+msgstr "postfix operator"
+
+#: src/libs/system/parser.cpp:193
+#, c-format
+msgid "expected %s after %s"
+msgstr "expected %s after %s"
+
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:629 src/libs/system/parser.cpp:644
+#: src/libs/system/parser.cpp:727 src/libs/system/parser.cpp:742
 msgid "'then'"
 msgstr "'then'"
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:653
+#: src/libs/system/parser.cpp:751
 msgid "'else'"
 msgstr "'else'"
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:659
+#: src/libs/system/parser.cpp:757
 msgid "'fi'"
 msgstr "'fi'"
 
 #: src/tltext/main.cpp:72
-msgid "TLText has 'encountered' a segfault, goodbye..."
-msgstr "TLText has ‘[1mencountered[0m’ a segfault, goodbye..."
+msgid "TLText has encountered a segfault, goodbye..."
+msgstr "TLText has encountered a segfault, goodbye..."
 
 #. TRANSLATORS: the help message for --args
 #: src/tltext/main.cpp:147

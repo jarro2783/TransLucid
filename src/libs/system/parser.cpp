@@ -53,6 +53,100 @@ namespace Parser
 namespace
 {
 
+//the descriptions of each token for the parser errors
+//because of the way gettext's quote translation works, we need to quote
+//everything with `'
+//this list must correspond exactly to Parser::TokenType
+const char* token_names[] =
+{
+  /* TRANSLATOR: token name */
+  _("end of file"),
+  /* TRANSLATOR: token name */
+  _("`:='"),
+  /* TRANSLATOR: token name */
+  _("`!'"),
+  /* TRANSLATOR: token name */
+  _("constant literal"),
+  /* TRANSLATOR: token name */
+  _("raw constant"),
+  /* TRANSLATOR: token name */
+  _("interpreted constant"),
+  /* TRANSLATOR: token name */
+  _("`:'"),
+  /* TRANSLATOR: token name */
+  _("`,'"),
+  /* TRANSLATOR: token name */
+  _("`%%'"),
+  /* TRANSLATOR: token name */
+  _("`;;'"),
+  /* TRANSLATOR: token name */
+  _("`\\\\'"),
+  /* TRANSLATOR: token name */
+  _("declaration"),
+  /* TRANSLATOR: token name */
+  _("dimension identifier"),
+  /* TRANSLATOR: token name */
+  _("`.'"),
+  /* TRANSLATOR: token name */
+  _("`else'"),
+  /* TRANSLATOR: token name */
+  _("`elsif'"),
+  /* TRANSLATOR: token name */
+  _("`end'"),
+  /* TRANSLATOR: token name */
+  _("`='"),
+  /* TRANSLATOR: token name */
+  _("`false'"),
+  /* TRANSLATOR: token name */
+  _("`fi'"),
+  /* TRANSLATOR: token name */
+  _("`#'"),
+  /* TRANSLATOR: token name */
+  _("`if'"),
+  /* TRANSLATOR: token name */
+  _("identifier"),
+  /* TRANSLATOR: token name */
+  _("integer literal"),
+  /* TRANSLATOR: token name */
+  _("`<-'"),
+  /* TRANSLATOR: token name */
+  _("`{'"),
+  /* TRANSLATOR: token name */
+  _("`('"),
+  /* TRANSLATOR: token name */
+  _("`['"),
+  /* TRANSLATOR: token name */
+  _("operator symbol"),
+  /* TRANSLATOR: token name */
+  _("`|'"),
+  /* TRANSLATOR: token name */
+  _("`->'"),
+  /* TRANSLATOR: token name */
+  _("`}'"),
+  /* TRANSLATOR: token name */
+  _("`)'"),
+  /* TRANSLATOR: token name */
+  _("`]'"),
+  /* TRANSLATOR: token name */
+  _("`\\'"),
+  /* TRANSLATOR: token name */
+  _("`then'"),
+  /* TRANSLATOR: token name */
+  _("`true'"),
+  /* TRANSLATOR: token name */
+  _("character literal"),
+  /* TRANSLATOR: token name */
+  _("`unary'"),
+  /* TRANSLATOR: token name */
+  _("`where'"),
+  /* TRANSLATOR: token name */
+  _("prefix operator"),
+  /* TRANSLATOR: token name */
+  _("infix operator"),
+  /* TRANSLATOR: token name */
+  _("postfix operator")
+};
+
 template <typename Fn, typename... Args>
 auto
 call_fn(Fn&& f, Args&&... args)
@@ -96,6 +190,10 @@ ExpectedToken::ExpectedToken(const Position& pos,
              U"expected " + text))
 , m_token(token)
 {
+  const char* message = _("expected %s after %s");
+  std::string text_c = utf32_to_utf8(text);
+  char* result;
+  asprintf(&result, message, text_c.c_str(), token_names[token]);
 }
 
 ExpectedExpr::ExpectedExpr(const Position& pos, const u32string& text)
