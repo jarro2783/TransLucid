@@ -92,12 +92,6 @@ namespace TransLucid
         m_debug = d;
       }
 
-      void
-      silent(bool s = true)
-      {
-        m_silent = s;
-      }
-
       /**
        * Run the system. Starts the system, parses input and evaluates 
        * according to the semantics of tlcore. Doesn't return until a parse
@@ -205,6 +199,22 @@ namespace TransLucid
 
       void
       setup_hds();
+
+      class VerboseOutput
+      {
+        public:
+        VerboseOutput(int currentLevel, int wantedLevel, std::ostream& os)
+        : m_current(currentLevel), m_wanted(wantedLevel), m_os(os)
+        {
+        }
+
+        int m_current;
+        int m_wanted;
+        std::ostream& m_os;
+      };
+
+      VerboseOutput&
+      output(std::ostream& os, const u32string& text);
 
       DemandHD* m_demands;
       DemandHD* m_returnhd;

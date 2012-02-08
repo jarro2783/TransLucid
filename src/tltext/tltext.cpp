@@ -52,7 +52,7 @@ namespace TLText
 
 TLText::TLText(const std::string& initOut)
 : 
-  m_verbose(false)
+  m_verbose(1)
  ,m_uuids(false)
  ,m_debug(false)
  ,m_is(&std::cin)

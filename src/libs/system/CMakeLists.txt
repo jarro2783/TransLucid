@@ -6,6 +6,7 @@ endif(COMMAND cmake_policy)
 
 add_definitions(${TLCFLAGS} 
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
+-DPACKAGE=\"tl\" -DLOCALEDIR=\"${LOCALEDIR}\"
 -Wall)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/system/)
