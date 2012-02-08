@@ -29,8 +29,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-02-08 15:09+1100\n"
-"PO-Revision-Date: 2012-02-08 15:09+1100\n"
+"POT-Creation-Date: 2012-02-08 16:10+1100\n"
+"PO-Revision-Date: 2012-02-08 16:10+1100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@quot\n"
@@ -39,24 +39,245 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:63
+msgid "end of file"
+msgstr "end of file"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:65
+msgid "`:='"
+msgstr "‘:=’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:67
+msgid "`!'"
+msgstr "‘!’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:69
+msgid "constant literal"
+msgstr "constant literal"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:71
+msgid "raw constant"
+msgstr "raw constant"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:73
+msgid "interpreted constant"
+msgstr "interpreted constant"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:75
+msgid "`:'"
+msgstr "‘:’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:77
+msgid "`,'"
+msgstr "‘,’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:79
+#, c-format
+msgid "`%%'"
+msgstr "‘%%’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:81
+msgid "`;;'"
+msgstr "‘;;’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:83
+msgid "`\\\\'"
+msgstr "‘\\\\’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:85
+msgid "declaration"
+msgstr "declaration"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:87
+msgid "dimension identifier"
+msgstr "dimension identifier"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:89
+msgid "`.'"
+msgstr "‘.’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:91
+msgid "`else'"
+msgstr "‘else’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:93
+msgid "`elsif'"
+msgstr "‘elsif’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:95
+msgid "`end'"
+msgstr "‘end’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:97
+msgid "`='"
+msgstr "‘=’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:99
+msgid "`false'"
+msgstr "‘false’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:101
+msgid "`fi'"
+msgstr "‘fi’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:103
+msgid "`#'"
+msgstr "‘#’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:105
+msgid "`if'"
+msgstr "‘if’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:107
+msgid "identifier"
+msgstr "identifier"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:109
+msgid "integer literal"
+msgstr "integer literal"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:111
+msgid "`<-'"
+msgstr "‘<-’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:113
+msgid "`{'"
+msgstr "‘{’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:115
+msgid "`('"
+msgstr "‘(’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:117
+msgid "`['"
+msgstr "‘[’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:119
+msgid "operator symbol"
+msgstr "operator symbol"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:121
+msgid "`|'"
+msgstr "‘|’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:123
+msgid "`->'"
+msgstr "‘->’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:125
+msgid "`}'"
+msgstr "‘}’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:127
+msgid "`)'"
+msgstr "‘)’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:129
+msgid "`]'"
+msgstr "‘]’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:131
+msgid "`\\'"
+msgstr "‘\\’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:133
+msgid "`then'"
+msgstr "‘then’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:135
+msgid "`true'"
+msgstr "‘true’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:137
+msgid "character literal"
+msgstr "character literal"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:139
+msgid "`unary'"
+msgstr "‘unary’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:141
+msgid "`where'"
+msgstr "‘where’"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:143
+msgid "prefix operator"
+msgstr "prefix operator"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:145
+msgid "infix operator"
+msgstr "infix operator"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:147
+msgid "postfix operator"
+msgstr "postfix operator"
+
+#: src/libs/system/parser.cpp:193
+#, c-format
+msgid "expected %s after %s"
+msgstr "expected %s after %s"
+
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:629 src/libs/system/parser.cpp:644
+#: src/libs/system/parser.cpp:727 src/libs/system/parser.cpp:742
 msgid "'then'"
 msgstr "'then'"
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:653
+#: src/libs/system/parser.cpp:751
 msgid "'else'"
 msgstr "'else'"
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:659
+#: src/libs/system/parser.cpp:757
 msgid "'fi'"
 msgstr "'fi'"
 
 #: src/tltext/main.cpp:72
-msgid "TLText has 'encountered' a segfault, goodbye..."
-msgstr "TLText has ‘encountered’ a segfault, goodbye..."
+msgid "TLText has encountered a segfault, goodbye..."
+msgstr "TLText has encountered a segfault, goodbye..."
 
 #. TRANSLATORS: the help message for --args
 #: src/tltext/main.cpp:147
@@ -82,3 +303,8 @@ msgstr "output file"
 #: src/tltext/main.cpp:156
 msgid "print uuids"
 msgstr "print uuids"
+
+#. TRANSLATORS: the help message for --version
+#: src/tltext/main.cpp:159
+msgid "show version"
+msgstr "show version"
