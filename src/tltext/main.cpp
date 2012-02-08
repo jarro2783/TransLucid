@@ -69,7 +69,8 @@ handleSignals(int signal)
   switch (signal)
   {
     case SIGSEGV:
-    std::cerr << "TLText has encountered a segfault, goodbye..." << std::endl;
+    std::cerr << _("TLText has encountered a segfault, goodbye...") 
+              << std::endl;
     exit(1);
     break;
   }
