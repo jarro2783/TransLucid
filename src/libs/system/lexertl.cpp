@@ -58,8 +58,6 @@ namespace
       m_functions[TOKEN_ID] = &buildIdentifier;
       m_functions[TOKEN_UCHAR] = &buildChar;
       m_functions[TOKEN_WHERE] = &buildWhere;
-      m_functions[TOKEN_RANGE] = &buildRange;
-      m_functions[TOKEN_INFIXBIN] = &buildInfixDecl;
       m_functions[TOKEN_UNARY] = &buildUnaryDecl;
       m_functions[TOKEN_OPERATOR] = &buildOperator;
     }

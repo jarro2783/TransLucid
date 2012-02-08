@@ -7,3 +7,19 @@ It is also possible to compile this software using cmake.
 To do this, type:
 
   cmake -DCMAKE_CXXFLAGS=-O1
+
+
+== Mainteners ==
+
+=== gettext ===
+
+To maintain gettext, from your build directory:
+
+to look for new translatable strings:
+  make tl.pot-update
+
+to merge the new strings with the translation files
+  make update-po
+
+to rebuild the translated string binaries
+  make update-gmo

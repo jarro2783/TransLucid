@@ -39,6 +39,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/types_util.hpp>
 
+#include "tl/gettext_internal.h"
+
 #define XSTRING(x) STRING(x)
 #define STRING(x) #x
 
@@ -50,6 +52,100 @@ namespace Parser
 
 namespace
 {
+
+//the descriptions of each token for the parser errors
+//because of the way gettext's quote translation works, we need to quote
+//everything with `'
+//this list must correspond exactly to Parser::TokenType
+const char* token_names[] =
+{
+  /* TRANSLATORS: token name */
+  _("end of file"),
+  /* TRANSLATORS: token name */
+  _("`:='"),
+  /* TRANSLATORS: token name */
+  _("`!'"),
+  /* TRANSLATORS: token name */
+  _("constant literal"),
+  /* TRANSLATORS: token name */
+  _("raw constant"),
+  /* TRANSLATORS: token name */
+  _("interpreted constant"),
+  /* TRANSLATORS: token name */
+  _("`:'"),
+  /* TRANSLATORS: token name */
+  _("`,'"),
+  /* TRANSLATORS: token name */
+  _("`%%'"),
+  /* TRANSLATORS: token name */
+  _("`;;'"),
+  /* TRANSLATORS: token name */
+  _("`\\\\'"),
+  /* TRANSLATORS: token name */
+  _("declaration"),
+  /* TRANSLATORS: token name */
+  _("dimension identifier"),
+  /* TRANSLATORS: token name */
+  _("`.'"),
+  /* TRANSLATORS: token name */
+  _("`else'"),
+  /* TRANSLATORS: token name */
+  _("`elsif'"),
+  /* TRANSLATORS: token name */
+  _("`end'"),
+  /* TRANSLATORS: token name */
+  _("`='"),
+  /* TRANSLATORS: token name */
+  _("`false'"),
+  /* TRANSLATORS: token name */
+  _("`fi'"),
+  /* TRANSLATORS: token name */
+  _("`#'"),
+  /* TRANSLATORS: token name */
+  _("`if'"),
+  /* TRANSLATORS: token name */
+  _("identifier"),
+  /* TRANSLATORS: token name */
+  _("integer literal"),
+  /* TRANSLATORS: token name */
+  _("`<-'"),
+  /* TRANSLATORS: token name */
+  _("`{'"),
+  /* TRANSLATORS: token name */
+  _("`('"),
+  /* TRANSLATORS: token name */
+  _("`['"),
+  /* TRANSLATORS: token name */
+  _("operator symbol"),
+  /* TRANSLATORS: token name */
+  _("`|'"),
+  /* TRANSLATORS: token name */
+  _("`->'"),
+  /* TRANSLATORS: token name */
+  _("`}'"),
+  /* TRANSLATORS: token name */
+  _("`)'"),
+  /* TRANSLATORS: token name */
+  _("`]'"),
+  /* TRANSLATORS: token name */
+  _("`\\'"),
+  /* TRANSLATORS: token name */
+  _("`then'"),
+  /* TRANSLATORS: token name */
+  _("`true'"),
+  /* TRANSLATORS: token name */
+  _("character literal"),
+  /* TRANSLATORS: token name */
+  _("`unary'"),
+  /* TRANSLATORS: token name */
+  _("`where'"),
+  /* TRANSLATORS: token name */
+  _("prefix operator"),
+  /* TRANSLATORS: token name */
+  _("infix operator"),
+  /* TRANSLATORS: token name */
+  _("postfix operator")
+};
 
 template <typename Fn, typename... Args>
 auto
@@ -91,9 +187,13 @@ build_position_message(const Position& pos)
 ExpectedToken::ExpectedToken(const Position& pos, 
   size_t token, const u32string& text)
 : ParseError(utf32_to_utf8(build_position_message(pos) + 
-             U"expected `" + text + U"`"))
+             U"expected " + text))
 , m_token(token)
 {
+  const char* message = _("expected %s after %s");
+  std::string text_c = utf32_to_utf8(text);
+  char* result;
+  asprintf(&result, message, text_c.c_str(), token_names[token]);
 }
 
 ExpectedExpr::ExpectedExpr(const Position& pos, const u32string& text)
@@ -143,6 +243,15 @@ Parser::expect_no_advance(LexerIterator& begin, const LexerIterator& end,
   {
     throw ExpectedToken(begin.getPos(), token, message);
   }
+}
+
+void
+Parser::expect(LexerIterator& begin, const LexerIterator& end, 
+  const std::string& message,
+  size_t token
+)
+{
+  expect(begin, end, utf8_to_utf32(message), token);
 }
 
 void
@@ -397,7 +506,7 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
       //TODO build binary op
       Tree::Expr rhs;
       ++current;
-      expect(current, end, rhs, U"app_expr", &Parser::parse_app_expr);
+      expect(current, end, rhs, U"expression", &Parser::parse_app_expr);
 
 #if 0
       app = Tree::insert_binary_operator
@@ -482,7 +591,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
     {
       Tree::Expr rhs;
       ++current;
-      expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
+      expect(current, end, rhs, U"expression", &Parser::parse_prefix_expr);
       //build at expr
       result = Tree::AtExpr(result, rhs);
     }
@@ -492,7 +601,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
     {
       Tree::Expr rhs;
       ++current;
-      expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
+      expect(current, end, rhs, U"expression", &Parser::parse_prefix_expr);
       //value application
       result = Tree::LambdaAppExpr(result, rhs);
     }
@@ -514,7 +623,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
         bool makingList = true;
         while (makingList)
         {
-          expect(listIter, end, element, U"expr", &Parser::parse_expr);
+          expect(listIter, end, element, U"expression", &Parser::parse_expr);
           exprList.push_back(std::move(element));
 
           if (listIter->getType() != TOKEN_COMMA) { makingList = false; }
@@ -530,7 +639,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
       }
       else
       {
-        expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
+        expect(current, end, rhs, U"expression", &Parser::parse_prefix_expr);
         //host function application with one argument
         result = Tree::BangAppExpr(result, rhs);
       }
@@ -556,7 +665,7 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
     LexerIterator current = begin;
     ++current;
     Tree::Expr rhs;
-    expect(current, end, rhs, U"prefix_expr", &Parser::parse_prefix_expr);
+    expect(current, end, rhs, U"expression", &Parser::parse_prefix_expr);
 
     auto op = find_unary_operator(
       get<u32string>(begin->getValue()), 
@@ -613,12 +722,12 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
     ++current;
 
     Tree::Expr cond;
-    expect(current, end, cond, U"expr", &Parser::parse_expr);
+    expect(current, end, cond, U"expression", &Parser::parse_expr);
 
-    expect(current, end, U"then", TOKEN_THEN);
+    expect(current, end, _("'then'"), TOKEN_THEN);
 
     Tree::Expr action;
-    expect(current, end, action, U"expr", &Parser::parse_expr);
+    expect(current, end, action, U"expression", &Parser::parse_expr);
     
     //then some elsifs
     std::vector<std::pair<Tree::Expr, Tree::Expr>> elsifs;
@@ -627,22 +736,25 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
       ++current;
 
       Tree::Expr econd;
-      expect(current, end, econd, U"expr", &Parser::parse_expr); 
+      expect(current, end, econd, U"expression", &Parser::parse_expr); 
 
-      expect(current, end, U"then", TOKEN_THEN);
+      /* TRANSLATORS: keyword */
+      expect(current, end, _("'then'"), TOKEN_THEN);
 
       Tree::Expr ethen;
-      expect(current, end, ethen, U"expr", &Parser::parse_expr); 
+      expect(current, end, ethen, U"expression", &Parser::parse_expr); 
 
       elsifs.push_back(std::make_pair(econd, ethen));
     }
 
-    expect(current, end, U"else", TOKEN_ELSE);
+    /* TRANSLATORS: keyword */
+    expect(current, end, _("'else'"), TOKEN_ELSE);
 
     Tree::Expr elseexpr;
-    expect(current, end, elseexpr, U"expr", &Parser::parse_expr);
+    expect(current, end, elseexpr, U"expression", &Parser::parse_expr);
 
-    expect(current, end, U"fi", TOKEN_FI);
+    /* TRANSLATORS: keyword */
+    expect(current, end, _("'fi'"), TOKEN_FI);
 
     result = Tree::IfExpr(cond, action, elsifs, elseexpr);
 

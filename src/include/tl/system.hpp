@@ -63,6 +63,11 @@ namespace TransLucid
 
   class BaseFunctionType;
 
+  struct GettextInit
+  {
+    GettextInit();
+  };
+
   /**
    * @brief System base class.
    *
@@ -394,6 +399,8 @@ namespace TransLucid
     bool m_verbose;
 
     Parser::Parser* m_parser;
+
+    static GettextInit m_gettext;
 
     friend class detail::InputHDWS;
 

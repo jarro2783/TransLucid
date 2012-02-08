@@ -180,6 +180,8 @@ namespace TransLucid
       ExpectedToken(const Position& pos, 
         size_t token, const u32string& text);
 
+      ~ExpectedToken() noexcept {}
+
       size_t
       id() const
       {
@@ -187,6 +189,8 @@ namespace TransLucid
       }
 
       private:
+      Position m_pos;
+      std::string m_message;
       size_t m_token;
     };
 

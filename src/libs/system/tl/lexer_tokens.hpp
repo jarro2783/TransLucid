@@ -27,7 +27,6 @@ namespace TransLucid
     enum TokenType
     {
       TOKEN_EOF = 0, //end of file is 0 according to lexertl
-      TOKEN_AND,
       TOKEN_ASSIGNTO, //:=
       TOKEN_AT,
       TOKEN_BANG,
@@ -41,7 +40,6 @@ namespace TransLucid
       TOKEN_DBLSLASH,
       TOKEN_DECLID,
       TOKEN_DIM_IDENTIFIER,
-      TOKEN_DOLLAR,
       TOKEN_DOT,
       TOKEN_ELSE,
       TOKEN_ELSIF,
@@ -52,7 +50,6 @@ namespace TransLucid
       TOKEN_HASH,
       TOKEN_IF,
       TOKEN_ID,
-      TOKEN_INFIXBIN,
       TOKEN_INTEGER,
       TOKEN_LARROW,
       TOKEN_LBRACE,
@@ -60,7 +57,6 @@ namespace TransLucid
       TOKEN_LSQUARE,
       TOKEN_OPERATOR, //don't match this, it's converted to the right op
       TOKEN_PIPE,
-      TOKEN_RANGE,
       TOKEN_RARROW,
       TOKEN_RBRACE,
       TOKEN_RPAREN,
