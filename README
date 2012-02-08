@@ -13,10 +13,10 @@ To do this, type:
 
 === gettext ===
 
-To maintain gettext, from your configure directory:
+To maintain gettext, from your build directory:
 
 to look for new translatable strings:
-  make tl.po-update
+  make tl.pot-update
 
 to merge the new strings with the translation files
   make update-po
