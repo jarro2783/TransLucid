@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS=checks src doc
+SUBDIRS= src po checks doc 
 EXTRA_DIST=CMakeLists.txt
 
 doc:
