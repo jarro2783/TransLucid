@@ -287,7 +287,9 @@ TLText::processDefinitions
         }
         catch (TransLucid::Parser::ParseError& e)
         {
-          (*m_error) << "error parsing line: " << e.what() << std::endl;
+          const Parser::Position& pos = e.m_pos;
+          (*m_error) << "tltext:" << m_inputName << ":" << pos.line << ":" 
+                     << pos.character << ":" << e.what() << std::endl;
         }
       }
       break;

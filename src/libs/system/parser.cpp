@@ -64,6 +64,8 @@ const char* token_names[] =
   /* TRANSLATORS: token name */
   _("`:='"),
   /* TRANSLATORS: token name */
+  _("`@'"),
+  /* TRANSLATORS: token name */
   _("`!'"),
   /* TRANSLATORS: token name */
   _("constant literal"),
@@ -174,30 +176,26 @@ call_fn(Ret (T::*f)(Args...), T* t, Args&&... args)
 
 }
 
-u32string
+std::string
 build_position_message(const Position& pos)
 {
   std::ostringstream os;
   os << "at " << pos.file << ":" << pos.line << ":" 
      << pos.character
      << ": ";
-  return utf8_to_utf32(os.str());
+  return os.str();
 }
 
 ExpectedToken::ExpectedToken(const Position& pos, 
-  size_t token, const u32string& text)
-: ParseError(utf32_to_utf8(build_position_message(pos) + 
-             U"expected " + text))
+  size_t token, const std::string& text)
+: ParseError(pos, text)
+, m_pos(pos)
 , m_token(token)
 {
-  const char* message = _("expected %s after %s");
-  std::string text_c = utf32_to_utf8(text);
-  char* result;
-  asprintf(&result, message, text_c.c_str(), token_names[token]);
 }
 
-ExpectedExpr::ExpectedExpr(const Position& pos, const u32string& text)
-: ParseError(utf32_to_utf8(build_position_message(pos) + U"expected " + text))
+ExpectedExpr::ExpectedExpr(const Position& pos, const std::string& text)
+: ParseError(pos, build_position_message(pos) + "expected " + text)
 {
 }
 
@@ -235,28 +233,27 @@ Parser::Parser(System& system)
 
 void
 Parser::expect_no_advance(LexerIterator& begin, const LexerIterator& end, 
-  const u32string& message,
+  const std::string& message,
   size_t token
 )
 {
   if (begin == end || *begin != token)
   {
-    throw ExpectedToken(begin.getPos(), token, message);
+    char* result;
+    asprintf(&result, _("missing token: %s, found token: %s"), 
+      token_names[token], token_names[begin->getType()]);
+
+    std::unique_ptr<char, void (*)(void*)> result_managed(result, &std::free);
+
+    std::string messagestr = result;
+
+    throw ExpectedToken(begin.getPos(), token, messagestr);
   }
 }
 
 void
 Parser::expect(LexerIterator& begin, const LexerIterator& end, 
   const std::string& message,
-  size_t token
-)
-{
-  expect(begin, end, utf8_to_utf32(message), token);
-}
-
-void
-Parser::expect(LexerIterator& begin, const LexerIterator& end, 
-  const u32string& message,
   size_t token
 )
 {
@@ -269,7 +266,7 @@ Parser::expect(LexerIterator& begin, const LexerIterator& end,
 template <typename Result, typename Fn, typename... Args>
 void
 Parser::expect(LexerIterator& begin, const LexerIterator& end, 
-  Result&& result, const std::u32string& message,
+  Result&& result, const std::string& message,
   Fn f,
   Args&&... args
 )
@@ -475,7 +472,7 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
       }
       m_which_decl.pop();
 
-      expect(current, end, U"end", TOKEN_END);
+      expect(current, end, token_names[TOKEN_END], TOKEN_END);
 
       where.e = binary_expr;
       result = where;
@@ -506,7 +503,7 @@ Parser::parse_binary_op(LexerIterator& begin, const LexerIterator& end,
       //TODO build binary op
       Tree::Expr rhs;
       ++current;
-      expect(current, end, rhs, U"expression", &Parser::parse_app_expr);
+      expect(current, end, rhs, "expression", &Parser::parse_app_expr);
 
 #if 0
       app = Tree::insert_binary_operator
@@ -591,7 +588,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
     {
       Tree::Expr rhs;
       ++current;
-      expect(current, end, rhs, U"expression", &Parser::parse_prefix_expr);
+      expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
       //build at expr
       result = Tree::AtExpr(result, rhs);
     }
@@ -601,7 +598,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
     {
       Tree::Expr rhs;
       ++current;
-      expect(current, end, rhs, U"expression", &Parser::parse_prefix_expr);
+      expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
       //value application
       result = Tree::LambdaAppExpr(result, rhs);
     }
@@ -623,14 +620,14 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
         bool makingList = true;
         while (makingList)
         {
-          expect(listIter, end, element, U"expression", &Parser::parse_expr);
+          expect(listIter, end, element, "expression", &Parser::parse_expr);
           exprList.push_back(std::move(element));
 
           if (listIter->getType() != TOKEN_COMMA) { makingList = false; }
           else { ++listIter; }
         }
 
-        expect(listIter, end, U")", TOKEN_RPAREN);
+        expect(listIter, end, ")", TOKEN_RPAREN);
 
         //build a host function with a list of arguments
         result = Tree::BangAppExpr(result, exprList);
@@ -639,7 +636,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
       }
       else
       {
-        expect(current, end, rhs, U"expression", &Parser::parse_prefix_expr);
+        expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
         //host function application with one argument
         result = Tree::BangAppExpr(result, rhs);
       }
@@ -665,7 +662,7 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
     LexerIterator current = begin;
     ++current;
     Tree::Expr rhs;
-    expect(current, end, rhs, U"expression", &Parser::parse_prefix_expr);
+    expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
 
     auto op = find_unary_operator(
       get<u32string>(begin->getValue()), 
@@ -722,12 +719,12 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
     ++current;
 
     Tree::Expr cond;
-    expect(current, end, cond, U"expression", &Parser::parse_expr);
+    expect(current, end, cond, "expression", &Parser::parse_expr);
 
     expect(current, end, _("'then'"), TOKEN_THEN);
 
     Tree::Expr action;
-    expect(current, end, action, U"expression", &Parser::parse_expr);
+    expect(current, end, action, "expression", &Parser::parse_expr);
     
     //then some elsifs
     std::vector<std::pair<Tree::Expr, Tree::Expr>> elsifs;
@@ -736,13 +733,13 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
       ++current;
 
       Tree::Expr econd;
-      expect(current, end, econd, U"expression", &Parser::parse_expr); 
+      expect(current, end, econd, "expression", &Parser::parse_expr); 
 
       /* TRANSLATORS: keyword */
       expect(current, end, _("'then'"), TOKEN_THEN);
 
       Tree::Expr ethen;
-      expect(current, end, ethen, U"expression", &Parser::parse_expr); 
+      expect(current, end, ethen, "expression", &Parser::parse_expr); 
 
       elsifs.push_back(std::make_pair(econd, ethen));
     }
@@ -751,7 +748,7 @@ Parser::parse_if_expr(LexerIterator& begin, const LexerIterator& end,
     expect(current, end, _("'else'"), TOKEN_ELSE);
 
     Tree::Expr elseexpr;
-    expect(current, end, elseexpr, U"expression", &Parser::parse_expr);
+    expect(current, end, elseexpr, "expression", &Parser::parse_expr);
 
     /* TRANSLATORS: keyword */
     expect(current, end, _("'fi'"), TOKEN_FI);
@@ -809,7 +806,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
       LexerIterator current = begin;
       Tree::Expr tuple;
 
-      expect(current, begin, tuple, U"tuple", 
+      expect(current, begin, tuple, "tuple", 
         &Parser::parse_tuple, SEPARATOR_ARROW);
 
       result = tuple;
@@ -822,8 +819,8 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
       LexerIterator current = begin;
       ++current;
       Tree::Expr e;
-      expect(current, end, e, U"expr", &Parser::parse_expr);
-      expect(current, end, U")", TOKEN_RPAREN);
+      expect(current, end, e, "expression", &Parser::parse_expr);
+      expect(current, end, ")", TOKEN_RPAREN);
       result = e;
       begin = current;
     }
@@ -869,14 +866,14 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
 {
   LexerIterator current = begin;
 
-  expect_no_advance(current, end, U"identifier", TOKEN_ID);
+  expect_no_advance(current, end, "identifier", TOKEN_ID);
   u32string name = get<u32string>(current->getValue());
   ++current;
 
-  expect(current, end, U"->", TOKEN_RARROW);
+  expect(current, end, "->", TOKEN_RARROW);
 
   Tree::Expr rhs;
-  expect(current, end, rhs, U"expr", &Parser::parse_expr);
+  expect(current, end, rhs, "expr", &Parser::parse_expr);
 
   if (type == TOKEN_SLASH)
   {
@@ -912,9 +909,9 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
   {
     Tree::Expr lhs;
     Tree::Expr rhs;
-    expect(current, end, lhs, U"expr", &Parser::parse_expr);
-    expect(current, end, U"<-", tok);
-    expect(current, end, rhs, U"expr", &Parser::parse_expr);
+    expect(current, end, lhs, "expr", &Parser::parse_expr);
+    expect(current, end, "<-", tok);
+    expect(current, end, rhs, "expr", &Parser::parse_expr);
 
     pairs.push_back(std::make_pair(lhs, rhs));
 
@@ -922,7 +919,7 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
     else { ++current; }
   }
 
-  expect(current, end, U"]", TOKEN_RSQUARE);
+  expect(current, end, "]", TOKEN_RSQUARE);
 
   result = Tree::TupleExpr(pairs);
   begin = current;
@@ -951,9 +948,10 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
 
     LexerIterator current = begin;
 
-    expect(current, end, result, U"line: '" + id + U"'", iter->second);
+    expect(current, end, result, "line: '" + utf32_to_utf8(id) + "'", 
+           iter->second);
 
-    expect(current, end, U";;", TOKEN_DBLSEMI);
+    expect(current, end, ";;", TOKEN_DBLSEMI);
 
     begin = current;
     return true;
@@ -978,16 +976,16 @@ Parser::parse_host_decl(LexerIterator& begin, const LexerIterator& end,
 
   ++current;
 
-  expect_no_advance(current, end, U"identifier", TOKEN_ID);
+  expect_no_advance(current, end, "identifier", TOKEN_ID);
 
   HostDecl decl;
 
   decl.identifier = get<u32string>(current->getValue());
   ++current;
 
-  expect(current, end, U"=", TOKEN_EQUALS);
+  expect(current, end, "=", TOKEN_EQUALS);
 
-  expect(current, end, decl.expr, U"expr", &Parser::parse_expr);
+  expect(current, end, decl.expr, "expr", &Parser::parse_expr);
 
   result = decl;
 
@@ -1010,7 +1008,7 @@ Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
 
   ++current;
 
-  expect_no_advance(current, end, U"identifier", TOKEN_ID);
+  expect_no_advance(current, end, "identifier", TOKEN_ID);
   //a name and an optional initialiser
 
   u32string name = get<u32string>(current->getValue());
@@ -1021,7 +1019,7 @@ Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
   if (*current == TOKEN_LARROW)
   {
     ++current;
-    expect(current, end, init, U"expr", &Parser::parse_expr);
+    expect(current, end, init, "expr", &Parser::parse_expr);
   }
 
   begin = current;
@@ -1033,7 +1031,7 @@ Parser::parse_dim_decl(LexerIterator& begin, const LexerIterator& end,
 
 bool
 Parser::parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
-  Equation& result, size_t separator_symbol, const u32string& separator_text)
+  Equation& result, size_t separator_symbol, const std::string& separator_text)
 {
   LexerIterator current = begin;
   if (*current != TOKEN_ID)
@@ -1053,13 +1051,13 @@ Parser::parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
   if (*current == TOKEN_PIPE)
   {
     ++current;
-    expect(current, end, boolean, U"expr", &Parser::parse_expr);
+    expect(current, end, boolean, "expr", &Parser::parse_expr);
   }
 
   expect(current, end, separator_text, separator_symbol);
 
   Tree::Expr expr;
-  expect(current, end, expr, U"expr", &Parser::parse_expr);
+  expect(current, end, expr, "expr", &Parser::parse_expr);
 
   result = Equation(name, tuple, boolean, expr);
 
@@ -1080,7 +1078,7 @@ Parser::parse_var_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   Equation eqn;
-  if (parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"="))
+  if (parse_equation_decl(current, end, eqn, TOKEN_EQUALS, "="))
   {
     begin = current;
     result = Variable(std::move(eqn));
@@ -1102,7 +1100,7 @@ Parser::parse_assign_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   Equation eqn;
-  if (parse_equation_decl(current, end, eqn, TOKEN_ASSIGNTO, U":="))
+  if (parse_equation_decl(current, end, eqn, TOKEN_ASSIGNTO, ":="))
   {
     begin = current;
     result = Assignment(std::move(eqn));
@@ -1124,7 +1122,7 @@ Parser::parse_hd_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   Equation eqn;
-  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"=");
+  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, "=");
 
   if (success)
   {
@@ -1149,7 +1147,7 @@ Parser::parse_out_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   Equation eqn;
-  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"=");
+  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, "=");
 
   if (success)
   {
@@ -1174,7 +1172,7 @@ Parser::parse_in_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   Equation eqn;
-  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, U"=");
+  bool success = parse_equation_decl(current, end, eqn, TOKEN_EQUALS, "=");
 
   if (success)
   {
@@ -1228,12 +1226,12 @@ Parser::parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   u32string symbol;
-  expect(current, end, symbol, U"constant", &Parser::is_string_constant);
+  expect(current, end, symbol, "constant", &Parser::is_string_constant);
 
   u32string name;
-  expect(current, end, name, U"constant", &Parser::is_string_constant);
+  expect(current, end, name, "constant", &Parser::is_string_constant);
 
-  expect_no_advance(current, end, U"integer", TOKEN_INTEGER);
+  expect_no_advance(current, end, "integer", TOKEN_INTEGER);
 
   mpz_class precedence = get<mpz_class>(current->getValue());
   ++current;
@@ -1257,7 +1255,7 @@ Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
   LexerIterator current = begin;
   ++current;
 
-  expect_no_advance(current, end, U"id", TOKEN_ID);
+  expect_no_advance(current, end, "id", TOKEN_ID);
 
   DataType data;
   data.name = get<u32string>(current->getValue());
@@ -1269,10 +1267,10 @@ Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
     ++current;
   }
 
-  expect(current, end, U"=", TOKEN_EQUALS);
+  expect(current, end, "=", TOKEN_EQUALS);
 
   DataConstructor constructor;
-  expect(current, end, constructor, U"data constructor", 
+  expect(current, end, constructor, "data constructor", 
     &Parser::parse_data_constructor);
 
   data.constructors.push_back(constructor);
@@ -1281,7 +1279,7 @@ Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
   {
     constructor.args.clear();
     ++current;
-    expect(current, end, constructor, U"data constructor", 
+    expect(current, end, constructor, "data constructor", 
       &Parser::parse_data_constructor);
 
     data.constructors.push_back(constructor);
@@ -1308,15 +1306,15 @@ Parser::parse_op_decl(LexerIterator& begin, const LexerIterator& end,
   LexerIterator current = begin;
   ++current;
 
-  expect_no_advance(current, end, U"operator", TOKEN_OPERATOR);
+  expect_no_advance(current, end, "operator", TOKEN_OPERATOR);
 
   decl.optext = get<u32string>(current->getValue());
 
   ++current;
 
-  expect(current, end, U"=", TOKEN_EQUALS);
+  expect(current, end, "=", TOKEN_EQUALS);
 
-  expect(current, end, decl.expr, U"expr", &Parser::parse_expr);
+  expect(current, end, decl.expr, "expr", &Parser::parse_expr);
 
   begin = current;
 
@@ -1346,10 +1344,10 @@ Parser::parse_data_constructor(LexerIterator& begin, const LexerIterator& end,
     {
       ++current;
       DataConstructor childConst;
-      expect(current, end, childConst, U"data constructor",
+      expect(current, end, childConst, "data constructor",
         &Parser::parse_data_constructor);
 
-      expect(current, end, U")", TOKEN_RPAREN);
+      expect(current, end, ")", TOKEN_RPAREN);
 
       result.args.push_back(childConst);
     }
@@ -1423,10 +1421,10 @@ Parser::parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
   ++current;
 
   u32string symbol;
-  expect(current, end, symbol, U"string", &Parser::is_string_constant);
+  expect(current, end, symbol, "string", &Parser::is_string_constant);
 
   u32string opname;
-  expect(current, end, opname, U"string", &Parser::is_string_constant);
+  expect(current, end, opname, "string", &Parser::is_string_constant);
 
   begin = current;
 
@@ -1449,7 +1447,7 @@ Parser::parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
   LexerIterator current = begin;
   ++current;
 
-  expect_no_advance(current, end, U"id", TOKEN_ID);
+  expect_no_advance(current, end, "id", TOKEN_ID);
 
   FnDecl decl;
 
@@ -1469,7 +1467,7 @@ Parser::parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
     else if (*current == TOKEN_DOT)
     {
       ++current;
-      expect_no_advance(current, end, U"id", TOKEN_ID);
+      expect_no_advance(current, end, "id", TOKEN_ID);
       decl.args.push_back(std::make_pair(FnDecl::ArgType::CALL_BY_VALUE,
         get<u32string>(current->getValue())));
       ++current;
@@ -1485,12 +1483,12 @@ Parser::parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
   if (*current == TOKEN_PIPE)
   {
     ++current;
-    expect(current, end, decl.boolean, U"expr", &Parser::parse_expr); 
+    expect(current, end, decl.boolean, "expr", &Parser::parse_expr); 
   }
 
-  expect(current, end, U"=", TOKEN_EQUALS);
+  expect(current, end, "=", TOKEN_EQUALS);
 
-  expect(current, end, decl.expr, U"expr", &Parser::parse_expr);
+  expect(current, end, decl.expr, "expr", &Parser::parse_expr);
 
   begin = current;
 
