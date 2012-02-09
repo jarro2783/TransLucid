@@ -27,6 +27,10 @@ along with TransLucid; see the file COPYING.  If not see
  * The parser.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <tl/system.hpp>
 
 #include <functional>
@@ -57,97 +61,106 @@ namespace
 //because of the way gettext's quote translation works, we need to quote
 //everything with `'
 //this list must correspond exactly to Parser::TokenType
-const char* token_names[] =
+//this also needs to be inside a function with a static variable so that
+//a) the names are looked up after gettext is initialised, and
+//b) we don't look up every name every single time we want just one
+const char*
+token_name(int token)
 {
-  /* TRANSLATORS: token name */
-  _("end of file"),
-  /* TRANSLATORS: token name */
-  _("`:='"),
-  /* TRANSLATORS: token name */
-  _("`@'"),
-  /* TRANSLATORS: token name */
-  _("`!'"),
-  /* TRANSLATORS: token name */
-  _("constant literal"),
-  /* TRANSLATORS: token name */
-  _("raw constant"),
-  /* TRANSLATORS: token name */
-  _("interpreted constant"),
-  /* TRANSLATORS: token name */
-  _("`:'"),
-  /* TRANSLATORS: token name */
-  _("`,'"),
-  /* TRANSLATORS: token name */
-  _("`%%'"),
-  /* TRANSLATORS: token name */
-  _("`;;'"),
-  /* TRANSLATORS: token name */
-  _("`\\\\'"),
-  /* TRANSLATORS: token name */
-  _("declaration"),
-  /* TRANSLATORS: token name */
-  _("dimension identifier"),
-  /* TRANSLATORS: token name */
-  _("`.'"),
-  /* TRANSLATORS: token name */
-  _("`else'"),
-  /* TRANSLATORS: token name */
-  _("`elsif'"),
-  /* TRANSLATORS: token name */
-  _("`end'"),
-  /* TRANSLATORS: token name */
-  _("`='"),
-  /* TRANSLATORS: token name */
-  _("`false'"),
-  /* TRANSLATORS: token name */
-  _("`fi'"),
-  /* TRANSLATORS: token name */
-  _("`#'"),
-  /* TRANSLATORS: token name */
-  _("`if'"),
-  /* TRANSLATORS: token name */
-  _("identifier"),
-  /* TRANSLATORS: token name */
-  _("integer literal"),
-  /* TRANSLATORS: token name */
-  _("`<-'"),
-  /* TRANSLATORS: token name */
-  _("`{'"),
-  /* TRANSLATORS: token name */
-  _("`('"),
-  /* TRANSLATORS: token name */
-  _("`['"),
-  /* TRANSLATORS: token name */
-  _("operator symbol"),
-  /* TRANSLATORS: token name */
-  _("`|'"),
-  /* TRANSLATORS: token name */
-  _("`->'"),
-  /* TRANSLATORS: token name */
-  _("`}'"),
-  /* TRANSLATORS: token name */
-  _("`)'"),
-  /* TRANSLATORS: token name */
-  _("`]'"),
-  /* TRANSLATORS: token name */
-  _("`\\'"),
-  /* TRANSLATORS: token name */
-  _("`then'"),
-  /* TRANSLATORS: token name */
-  _("`true'"),
-  /* TRANSLATORS: token name */
-  _("character literal"),
-  /* TRANSLATORS: token name */
-  _("`unary'"),
-  /* TRANSLATORS: token name */
-  _("`where'"),
-  /* TRANSLATORS: token name */
-  _("prefix operator"),
-  /* TRANSLATORS: token name */
-  _("infix operator"),
-  /* TRANSLATORS: token name */
-  _("postfix operator")
-};
+  static const char* token_names[] =
+  {
+    /* TRANSLATORS: token name */
+    _("end of file"),
+    /* TRANSLATORS: token name */
+    _("`:='"),
+    /* TRANSLATORS: token name */
+    _("`@'"),
+    /* TRANSLATORS: token name */
+    _("`!'"),
+    /* TRANSLATORS: token name */
+    _("constant literal"),
+    /* TRANSLATORS: token name */
+    _("raw constant"),
+    /* TRANSLATORS: token name */
+    _("interpreted constant"),
+    /* TRANSLATORS: token name */
+    _("`:'"),
+    /* TRANSLATORS: token name */
+    _("`,'"),
+    /* TRANSLATORS: token name */
+    _("`\%\%'"),
+    /* TRANSLATORS: token name */
+    _("`;;'"),
+    /* TRANSLATORS: token name */
+    _("`\\\\'"),
+    /* TRANSLATORS: token name */
+    _("declaration"),
+    /* TRANSLATORS: token name */
+    _("dimension identifier"),
+    /* TRANSLATORS: token name */
+    _("`.'"),
+    /* TRANSLATORS: token name */
+    _("`else'"),
+    /* TRANSLATORS: token name */
+    _("`elsif'"),
+    /* TRANSLATORS: token name */
+    _("`end'"),
+    /* TRANSLATORS: token name */
+    _("`='"),
+    /* TRANSLATORS: token name */
+    _("`false'"),
+    /* TRANSLATORS: token name */
+    _("`fi'"),
+    /* TRANSLATORS: token name */
+    _("`#'"),
+    /* TRANSLATORS: token name */
+    _("`if'"),
+    /* TRANSLATORS: token name */
+    _("identifier"),
+    /* TRANSLATORS: token name */
+    _("integer literal"),
+    /* TRANSLATORS: token name */
+    _("`<-'"),
+    /* TRANSLATORS: token name */
+    _("`{'"),
+    /* TRANSLATORS: token name */
+    _("`('"),
+    /* TRANSLATORS: token name */
+    _("`['"),
+    /* TRANSLATORS: token name */
+    _("operator symbol"),
+    /* TRANSLATORS: token name */
+    _("`|'"),
+    /* TRANSLATORS: token name */
+    _("`->'"),
+    /* TRANSLATORS: token name */
+    _("`}'"),
+    /* TRANSLATORS: token name */
+    _("`)'"),
+    /* TRANSLATORS: token name */
+    _("`]'"),
+    /* TRANSLATORS: token name */
+    _("`\\'"),
+    /* TRANSLATORS: token name */
+    _("`then'"),
+    /* TRANSLATORS: token name */
+    _("`true'"),
+    /* TRANSLATORS: token name */
+    _("character literal"),
+    /* TRANSLATORS: token name */
+    _("`unary'"),
+    /* TRANSLATORS: token name */
+    _("`where'"),
+    /* TRANSLATORS: token name */
+    _("prefix operator"),
+    /* TRANSLATORS: token name */
+    _("infix operator"),
+    /* TRANSLATORS: token name */
+    _("postfix operator")
+  };
+
+  return token_names[token];
+}
 
 template <typename Fn, typename... Args>
 auto
@@ -241,7 +254,7 @@ Parser::expect_no_advance(LexerIterator& begin, const LexerIterator& end,
   {
     char* result;
     asprintf(&result, _("missing token: %s, found token: %s"), 
-      token_names[token], token_names[begin->getType()]);
+      token_name(token), token_name(begin->getType()));
 
     std::unique_ptr<char, void (*)(void*)> result_managed(result, &std::free);
 
@@ -472,7 +485,7 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
       }
       m_which_decl.pop();
 
-      expect(current, end, token_names[TOKEN_END], TOKEN_END);
+      expect(current, end, token_name(TOKEN_END), TOKEN_END);
 
       where.e = binary_expr;
       result = where;

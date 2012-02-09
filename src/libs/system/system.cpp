@@ -44,6 +44,10 @@ along with TransLucid; see the file COPYING.  If not see
 //the appropriate addDeclInternal, they pass m_equations and m_assignments
 //respectively.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <algorithm>
 #include <initializer_list>
 #include <sstream>
