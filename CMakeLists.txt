@@ -92,5 +92,4 @@ set(HEADERDIR \"${CMAKE_INSTALL_PREFIX}/share/tl/tltext\")
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
 add_subdirectory(src)
-add_subdirectory(po)
 add_subdirectory(doc)

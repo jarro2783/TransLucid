@@ -1,4 +1,5 @@
 add_subdirectory(lex)
+add_subdirectory(po)
 
 if (COMMAND cmake_policy)
    cmake_policy(SET CMP0005 NEW)
@@ -6,7 +7,7 @@ endif(COMMAND cmake_policy)
 
 add_definitions(${TLCFLAGS} 
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
--DPACKAGE=\"tl\" -DLOCALEDIR=\"${LOCALEDIR}\"
+-DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"${LOCALEDIR}\"
 -Wall)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/system/)

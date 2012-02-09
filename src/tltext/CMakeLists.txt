@@ -27,7 +27,8 @@ if (ENABLE_TLWEB)
   endif()
 endif()
 
-add_definitions(${TLCFLAGS} -DPACKAGE=\"tl\" -DLOCALEDIR=\"${LOCALEDIR}\")
+add_definitions(${TLCFLAGS} -DTRANSLATE_DOMAIN=\"tltext\" 
+  -DLOCALEDIR=\"${LOCALEDIR}\")
 
 add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})
 add_test(examples ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${EXAMPLESPATH})
