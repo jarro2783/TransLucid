@@ -1,0 +1,259 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Jarryd Beck
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: tl 0.0.80\n"
+"Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
+"POT-Creation-Date: 2012-02-09 12:38+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:63
+msgid "end of file"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:65
+msgid "`:='"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:67
+msgid "`@'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:69
+msgid "`!'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:71
+msgid "constant literal"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:73
+msgid "raw constant"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:75
+msgid "interpreted constant"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:77
+msgid "`:'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:79
+msgid "`,'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:81
+#, c-format
+msgid "`%%'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:83
+msgid "`;;'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:85
+msgid "`\\\\'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:87
+msgid "declaration"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:89
+msgid "dimension identifier"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:91
+msgid "`.'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:93
+msgid "`else'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:95
+msgid "`elsif'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:97
+msgid "`end'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:99
+msgid "`='"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:101
+msgid "`false'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:103
+msgid "`fi'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:105
+msgid "`#'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:107
+msgid "`if'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:109
+msgid "identifier"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:111
+msgid "integer literal"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:113
+msgid "`<-'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:115
+msgid "`{'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:117
+msgid "`('"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:119
+msgid "`['"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:121
+msgid "operator symbol"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:123
+msgid "`|'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:125
+msgid "`->'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:127
+msgid "`}'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:129
+msgid "`)'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:131
+msgid "`]'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:133
+msgid "`\\'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:135
+msgid "`then'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:137
+msgid "`true'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:139
+msgid "character literal"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:141
+msgid "`unary'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:143
+msgid "`where'"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:145
+msgid "prefix operator"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:147
+msgid "infix operator"
+msgstr ""
+
+#. TRANSLATORS: token name
+#: src/libs/system/parser.cpp:149
+msgid "postfix operator"
+msgstr ""
+
+#: src/libs/system/parser.cpp:243
+#, c-format
+msgid "missing token: %s, found token: %s"
+msgstr ""
+
+#. TRANSLATORS: keyword
+#: src/libs/system/parser.cpp:724 src/libs/system/parser.cpp:739
+msgid "'then'"
+msgstr ""
+
+#. TRANSLATORS: keyword
+#: src/libs/system/parser.cpp:748
+msgid "'else'"
+msgstr ""
+
+#. TRANSLATORS: keyword
+#: src/libs/system/parser.cpp:754
+msgid "'fi'"
+msgstr ""

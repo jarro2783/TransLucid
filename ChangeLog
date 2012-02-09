@@ -1,5 +1,0 @@
-2012-02-09  gettextize  <bug-gnu-gettext@gnu.org>
-
-	* Makefile.am (SUBDIRS): Add src/libs/system/po.
-	* configure.ac (AC_CONFIG_FILES): Add src/libs/system/po/Makefile.in, src/tltext/po/Makefile.in.
-
