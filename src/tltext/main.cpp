@@ -115,8 +115,8 @@ setSignals()
 void
 init_gettext()
 {
-  bindtextdomain(PACKAGE, LOCALEDIR);
-  textdomain(PACKAGE);
+  bindtextdomain(TRANSLATE_DOMAIN, LOCALEDIR);
+  textdomain(TRANSLATE_DOMAIN);
 }
 
 }

@@ -19,4 +19,8 @@
 
 SUBDIRS = include libs tests tltext
 
+PO_SUBDIRS=tltext libs
+
+include ../Makefile.pot
+
 EXTRA_DIST = CMakeLists.txt

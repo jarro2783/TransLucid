@@ -1,0 +1,9 @@
+update-gmo:
+	for subdir in $(PO_SUBDIRS); do make -C $$subdir update-gmo; done
+
+update-po:
+	for subdir in $(PO_SUBDIRS); do make -C $$subdir update-po; done
+
+$(PACKAGE).pot-update:
+	for subdir in $(PO_SUBDIRS); do make -C $$subdir $(PACKAGE).pot-update; done
+

@@ -39,8 +39,8 @@ along with TransLucid; see the file COPYING.  If not see
 #endif
 
 /**
- * @file tlcore.cpp
- * The tlcore application. All of the code which runs the main tlcore
+ * @file tltext.cpp
+ * The tltext application. All of the code which runs the main tltext
  * application.
  */
 
@@ -351,7 +351,7 @@ TLText::processExpressions
           Tree::Expr expr;
           if (m_system.parseExpression(posbegin, posend, expr))
           {
-            if (m_verbose)
+            if (m_verbose > 1)
             {
               (*m_os) << Printer::print_expr_tree(expr) << std::endl;
             }

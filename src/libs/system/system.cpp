@@ -287,7 +287,7 @@ GettextInit System::m_gettext;
 
 GettextInit::GettextInit()
 {
-  bindtextdomain(PACKAGE, LOCALEDIR);
+  bindtextdomain(TRANSLATE_DOMAIN, LOCALEDIR);
 }
 
 namespace detail
@@ -326,7 +326,7 @@ namespace detail
   {
     public:
 
-    LineAdder(System& s, bool verbose)
+    LineAdder(System& s, int verbose)
     : m_system(s)
     , m_verbose(verbose)
     {
@@ -354,7 +354,7 @@ namespace detail
     Constant
     operator()(const Parser::Variable& var)
     {
-      if (m_verbose)
+      if (m_verbose > 1)
       {
         std::cout << Printer::printEquation(var.eqn) << std::endl;
       }
@@ -364,7 +364,7 @@ namespace detail
     Constant
     operator()(const Parser::Assignment& assign)
     {
-      if (m_verbose)
+      if (m_verbose > 1)
       {
         std::cout << Printer::printEquation(assign.eqn) << std::endl;
       }
@@ -712,7 +712,7 @@ namespace detail
 
     private:
     System& m_system;
-    bool m_verbose;
+    int m_verbose;
   };
 }
 
@@ -990,7 +990,7 @@ System::parseLine
 (
   Parser::StreamPosIterator& begin, 
   const Parser::StreamPosIterator& end,
-  bool verbose,
+  int verbose,
   bool debug
 )
 {

@@ -1,7 +1,0 @@
-# List of source files which contain translatable strings.
-
-# tllib
-src/libs/system/parser.cpp
-
-# tltext
-src/tltext/main.cpp

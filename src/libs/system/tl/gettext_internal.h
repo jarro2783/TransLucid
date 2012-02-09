@@ -21,6 +21,6 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_GETTEXT_INTERNAL_H_INCLUDED
 
 #include "tl/gettext.h"
-#define _(String) dgettext (PACKAGE, String)
+#define _(String) dgettext (TRANSLATE_DOMAIN, String)
 
 #endif

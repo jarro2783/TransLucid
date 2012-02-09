@@ -17,3 +17,6 @@
 #   <http://www.gnu.org/licenses/>.
 SUBDIRS = system
 EXTRA_DIST=CMakeLists.txt
+
+PO_SUBDIRS=system
+include ../../Makefile.pot
