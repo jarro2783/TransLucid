@@ -50,9 +50,10 @@ namespace TransLucid
 namespace TLText
 {
 
-TLText::TLText(const std::string& initOut)
+TLText::TLText(const std::string& progname, const std::string& initOut)
 : 
-  m_verbose(1)
+  m_myname(progname)
+ ,m_verbose(1)
  ,m_uuids(false)
  ,m_debug(false)
  ,m_is(&std::cin)
@@ -288,7 +289,7 @@ TLText::processDefinitions
         catch (TransLucid::Parser::ParseError& e)
         {
           const Parser::Position& pos = e.m_pos;
-          (*m_error) << "tltext:" << m_inputName << ":" << pos.line << ":" 
+          (*m_error) << m_myname << m_inputName << ":" << pos.line << ":" 
                      << pos.character << ":" << e.what() << std::endl;
         }
       }
@@ -360,7 +361,9 @@ TLText::processExpressions
         }
         catch(TransLucid::Parser::ParseError& e)
         {
-          (*m_error) << "error parsing expression: " << e.what() << std::endl;
+          const auto& pos = e.m_pos;
+          (*m_error) << m_myname << m_inputName << ":" << pos.line << ":" 
+                     << pos.character << ":" << e.what() << std::endl;
         }
       }
       break;

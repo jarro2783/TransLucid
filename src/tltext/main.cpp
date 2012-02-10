@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    TransLucid::TLText::TLText tltext("TLText...");
+    TransLucid::TLText::TLText tltext(argv[0], "TLText...");
  
     for (const auto& s : options)
     {

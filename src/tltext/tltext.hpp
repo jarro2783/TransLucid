@@ -62,7 +62,7 @@ namespace TransLucid
       /**
        * Construct the evaluator.
        */
-      TLText(const std::string& initOut);
+      TLText(const std::string& progname, const std::string& initOut);
 
       ~TLText();
 
@@ -155,6 +155,8 @@ namespace TransLucid
       add_argument(const u32string& arg, const u32string& value);
 
       private:
+      std::string m_myname;
+
       int m_verbose;
       bool m_uuids;
       bool m_debug;
