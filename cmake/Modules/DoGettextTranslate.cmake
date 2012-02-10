@@ -105,20 +105,25 @@ macro(GettextTranslate)
         COMMAND mv ${PO_FILE_NAME}.new ${PO_FILE_NAME}
         DEPENDS ${TEMPLATE_FILE_ABS}
       )
-    #add_custom_target(${PO_TARGET} DEPENDS ${PO_FILE_NAME})
-
-      message(STATUS "${lang}.gmo depends on
-        ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po")
-      add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo
-        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -c --statistics --verbose -o
-          ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo
-          ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po
-          DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po
-      )
-      add_custom_target(${GMO_TARGET} DEPENDS ${GMO_FILE_NAME})
 
     endif()
+
+    message(STATUS "${lang}.gmo depends on
+      ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po")
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo
+      COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -c --statistics --verbose -o
+        ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo
+        ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po
+    )
+    add_custom_target(${GMO_TARGET} DEPENDS ${GMO_FILE_NAME})
+
     add_custom_target(${PO_TARGET} DEPENDS ${PO_FILE_NAME})
+
+    install(FILES ${GMO_FILE_NAME} DESTINATION
+      ${LOCALEDIR}/${lang}/LC_MESSAGES
+      RENAME ${MAKEVAR_DOMAIN}.mo
+    )
 
   endforeach()
 
