@@ -1,5 +1,7 @@
 enable_testing()
 
+add_subdirectory(po)
+
 set(RUN ${CMAKE_SOURCE_DIR}/src/tests/runbinary.sh)
 set(LIBDIR
 ${CMAKE_BINARY_DIR}/src/libs/int:${CMAKE_BINARY_DIR}/src/libs/string)

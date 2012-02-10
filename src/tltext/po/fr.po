@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
-"Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-02-09 12:36+1100\n"
+"Report-Msgid-Bugs-To: \"jarrydb@cse.unsw.edu.au\"\n"
+"POT-Creation-Date: 2012-02-10 15:44+1100\n"
 "PO-Revision-Date: 2012-02-08 11:56+11\n"
 "Last-Translator: Jarryd Beck <jarrydb@cse.unsw.edu.au>\n"
 "Language-Team: French <translucid@cse.unsw.edu.au>\n"
@@ -17,46 +17,46 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/tltext/main.cpp:72
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:72
 msgid "TLText has encountered a segfault, goodbye..."
 msgstr ""
 
 #. TRANSLATORS: the options description name in the help message
-#: src/tltext/main.cpp:143
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:143
 msgid "tltext options"
 msgstr ""
 
 #. TRANSLATORS: the help message for --args
-#: src/tltext/main.cpp:148
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:148
 msgid "arguments to pass to TransLucid in the CLARGS variable"
 msgstr ""
 
 #. TRANSLATORS: the help message for --help
-#: src/tltext/main.cpp:151
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:151
 msgid "show this message"
 msgstr "afficher ce message"
 
 #. TRANSLATORS: the help message for --input
-#: src/tltext/main.cpp:153
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:153
 msgid "input file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --output
-#: src/tltext/main.cpp:155
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:155
 msgid "output file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --uuid
-#: src/tltext/main.cpp:157
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:157
 msgid "print uuids"
 msgstr "afficher les UUIDs"
 
 #. TRANSLATORS: the help message for --verbose
-#: src/tltext/main.cpp:159
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:159
 msgid "level of verbosity"
 msgstr ""
 
 #. TRANSLATORS: the help message for --version
-#: src/tltext/main.cpp:161
+#: /home/jarryd/current/gits/translucid/src/tltext/po/../../../src/tltext/main.cpp:161
 msgid "show version"
 msgstr ""

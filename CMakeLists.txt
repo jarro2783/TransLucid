@@ -24,6 +24,7 @@ set(builddir ${CMAKE_BINARY_DIR}/doc)
 set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
+include(DoGettextTranslate)
 
 enable_testing()
 

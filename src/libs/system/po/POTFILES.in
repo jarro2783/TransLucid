@@ -1,3 +1,5 @@
 # List of source files which contain translatable strings.
 
 src/libs/system/parser.cpp
+src/libs/system/system.cpp
+src/libs/system/equation.cpp

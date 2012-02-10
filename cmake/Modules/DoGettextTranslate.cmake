@@ -1,3 +1,8 @@
+# add the update-po and update-gmo targets, the actual files that need to
+# depend on this will be added as we go
+add_custom_target(update-po)
+add_custom_target(update-gmo)
+
 macro(GettextTranslate)
 
   message(STATUS "gettext translate")
@@ -22,6 +27,105 @@ macro(GettextTranslate)
     message(STATUS split: ${MAKEVAR_KEY}=${MAKEVAR_${MAKEVAR_KEY}})
   endforeach()
   message(STATUS DOMAIN=${MAKEVAR_DOMAIN})
+
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in
+    ${CMAKE_CURRENT_BINARY_DIR}/POTFILES
+    COPYONLY
+  )
+
+  file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in potfiles
+    REGEX "^[^#].*"
+  )
+
+  foreach(potfile ${potfiles})
+    message(STATUS "using file: "${MAKEVAR_top_builddir}/${potfile})
+    list(APPEND source_translatable 
+      ${CMAKE_CURRENT_SOURCE_DIR}/${MAKEVAR_top_builddir}/${potfile})
+  endforeach()
+
+  set(TEMPLATE_FILE ${MAKEVAR_DOMAIN}.pot)
+  set(TEMPLATE_FILE_ABS ${CMAKE_CURRENT_SOURCE_DIR}/${TEMPLATE_FILE})
+  add_custom_target(${MAKEVAR_DOMAIN}.pot-update DEPENDS
+    ${TEMPLATE_FILE_ABS}
+  )
+
+  message(STATUS "options are " ${MAKEVAR_XGETTEXT_OPTIONS})
+  string(REGEX MATCHALL "[^ ]+" XGETTEXT_OPTS ${MAKEVAR_XGETTEXT_OPTIONS})
+  add_custom_command(OUTPUT ${TEMPLATE_FILE_ABS}
+    COMMAND xgettext ${XGETTEXT_OPTS}
+      ${source_translatable} -o ${TEMPLATE_FILE_ABS} 
+      --default-domain=${MAKEVAR_DOMAIN}
+      --add-comments=TRANSLATORS:
+      --copyright-holder='${MAKEVAR_COPYRIGHT_HOLDER}'
+      --msgid-bugs-address="${MAKEVAR_MSGID_BUGS_ADDRESS}"
+    DEPENDS ${source_translatable}
+    VERBATIM
+  )
+
+  file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/LINGUAS LINGUAS 
+      REGEX "^[^#].*")
+  message(STATUS "stripped languages: " ${LINGUAS})
+  string(REGEX MATCHALL "[^ ]+" languages ${LINGUAS})
+
+  foreach(lang ${languages})
+    message(STATUS "language: "${lang})
+
+    set(PO_FILE_NAME "${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po")
+    set(GMO_FILE_NAME "${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo")
+    set(PO_TARGET "generate-${MAKEVAR_DOMAIN}-${lang}-po")
+    set(GMO_TARGET "generate-${MAKEVAR_DOMAIN}-${lang}-gmo")
+    list(APPEND po_files ${PO_TARGET})
+    list(APPEND gmo_files ${GMO_TARGET})
+
+    if(${lang} MATCHES "en@(.*)quot")
+
+      add_custom_command(OUTPUT ${lang}.insert-header
+        COMMAND
+        sed -e "'/^#/d'" -e 's/HEADER/${lang}.header/g'
+        ${CMAKE_CURRENT_SOURCE_DIR}/insert-header.sin > ${lang}.insert-header
+      )
+
+      #generate the en@quot files
+      add_custom_command(OUTPUT ${PO_FILE_NAME}
+        COMMAND
+        msginit -i ${TEMPLATE_FILE_ABS} --no-translator -l en -o - 2>/dev/null
+        | sed -f ${lang}.insert-header | msgconv -t UTF-8 |
+        msgfilter sed -f ${CMAKE_CURRENT_SOURCE_DIR}/`echo ${lang} | sed -e 's/.*@//'`.sed 2>/dev/null >
+        ${PO_FILE_NAME}
+        DEPENDS ${lang}.insert-header ${TEMPLATE_FILE_ABS}
+      )
+
+    else()
+
+      message(STATUS "${lang}.po depends on ${TEMPLATE_FILE_ABS}")
+      add_custom_command(OUTPUT ${PO_FILE_NAME}
+        COMMAND ${GETTEXT_MSGMERGE_EXECUTABLE} --lang=${lang}
+          ${PO_FILE_NAME} ${TEMPLATE_FILE_ABS} 
+          -o ${PO_FILE_NAME}.new
+        COMMAND mv ${PO_FILE_NAME}.new ${PO_FILE_NAME}
+        DEPENDS ${TEMPLATE_FILE_ABS}
+      )
+    #add_custom_target(${PO_TARGET} DEPENDS ${PO_FILE_NAME})
+
+      message(STATUS "${lang}.gmo depends on
+        ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po")
+      add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -c --statistics --verbose -o
+          ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo
+          ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po
+          DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po
+      )
+      add_custom_target(${GMO_TARGET} DEPENDS ${GMO_FILE_NAME})
+
+    endif()
+    add_custom_target(${PO_TARGET} DEPENDS ${PO_FILE_NAME})
+
+  endforeach()
+
+  message(STATUS "target update-po depends on ${po_files}")
+  add_dependencies(update-po ${po_files})
+  message(STATUS "target update-gmo depends on ${gmo_files}")
+  add_dependencies(update-gmo ${gmo_files})
 
 #string(REGEX MATCH "^[^=]+=(.*)$" parsed_variables ${makevars})
 
