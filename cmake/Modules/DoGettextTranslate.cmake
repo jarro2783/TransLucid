@@ -57,14 +57,17 @@ macro(GettextTranslate)
   string(REGEX MATCHALL "[^ ]+" XGETTEXT_OPTS ${MAKEVAR_XGETTEXT_OPTIONS})
   add_custom_command(OUTPUT ${TEMPLATE_FILE_ABS}
     COMMAND xgettext ${XGETTEXT_OPTS}
-      ${source_translatable} -o ${TEMPLATE_FILE_ABS} 
+      -o ${TEMPLATE_FILE_ABS} 
       --default-domain=${MAKEVAR_DOMAIN}
       --add-comments=TRANSLATORS:
       --copyright-holder='${MAKEVAR_COPYRIGHT_HOLDER}'
       --msgid-bugs-address="${MAKEVAR_MSGID_BUGS_ADDRESS}"
+      --directory=${MAKEVAR_top_builddir}
+      --files-from=${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in
     DEPENDS ${source_translatable}
     ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in
     VERBATIM
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
   add_dependencies(update-po ${MAKEVAR_DOMAIN}.pot-update)
