@@ -33,6 +33,14 @@ macro(GettextTranslate)
     COPYONLY
   )
 
+  #set the directory to not clean
+  define_property(DIRECTORY PROPERTY CLEAN_NO_CUSTOM
+    BRIEF_DOCS "do not clean the translation files"
+    FULL_DOCS "CMake will clean the translation files because they are
+    generated, we don't want to do this because then all the existing
+    translations will be lost"
+  )
+
   file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in potfiles
     REGEX "^[^#].*"
   )
@@ -59,8 +67,11 @@ macro(GettextTranslate)
       --copyright-holder='${MAKEVAR_COPYRIGHT_HOLDER}'
       --msgid-bugs-address="${MAKEVAR_MSGID_BUGS_ADDRESS}"
     DEPENDS ${source_translatable}
+    ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in
     VERBATIM
   )
+
+  add_dependencies(update-po ${MAKEVAR_DOMAIN}.pot-update)
 
   file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/LINGUAS LINGUAS 
       REGEX "^[^#].*")
