@@ -34,12 +34,8 @@ macro(GettextTranslate)
   )
 
   #set the directory to not clean
-  define_property(DIRECTORY PROPERTY CLEAN_NO_CUSTOM
-    BRIEF_DOCS "do not clean the translation files"
-    FULL_DOCS "CMake will clean the translation files because they are
-    generated, we don't want to do this because then all the existing
-    translations will be lost"
-  )
+  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    PROPERTY CLEAN_NO_CUSTOM)
 
   file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in potfiles
     REGEX "^[^#].*"
