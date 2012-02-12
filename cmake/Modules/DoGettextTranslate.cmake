@@ -35,7 +35,7 @@ macro(GettextTranslate)
 
   #set the directory to not clean
   set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    PROPERTY CLEAN_NO_CUSTOM)
+    PROPERTY CLEAN_NO_CUSTOM true)
 
   file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in potfiles
     REGEX "^[^#].*"
