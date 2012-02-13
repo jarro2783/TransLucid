@@ -28,6 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/range.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/tuple.hpp>
+#include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
 #include <vector>
@@ -35,14 +36,15 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-EquationWS::EquationWS(const u32string& name, const GuardWS& valid, WS* h)
+EquationWS::EquationWS(const u32string& name, const GuardWS& valid, WS* h,
+  int provenance)
 : m_name(name), m_validContext(valid), m_h(h),
-  m_id(generate_uuid())
+  m_id(generate_uuid()), m_provenance(provenance)
 {
 }
 
 EquationWS::EquationWS()
-: m_h(0), m_id(generate_nil_uuid())
+: m_h(0), m_id(generate_nil_uuid()), m_provenance(0)
 {
 }
 
@@ -211,18 +213,11 @@ GuardWS::operator=(const GuardWS& rhs)
 Tuple
 GuardWS::evaluate(Context& k) const
 {
-  if (m_onlyConst)
-  {
-    //return Tuple(m_dimConstConst);
-  }
-
   tuple_t t = m_dimConstConst;
 
   if (m_guard)
   {
     //start with the const dimensions and evaluate the non-const ones
-    //Constant v = (*m_guard)(k);
-    //t.insert(m_dimConstConst.begin(), m_dimConstConst.end());
 
     //evaluate the ones left
     for (const auto& constNon : m_dimConstNon)
@@ -255,49 +250,9 @@ GuardWS::evaluate(Context& k) const
 
       t.insert(std::make_pair(index, ord));
     }
-
-    //still need to remove this magic
-    #if 0
-    if (v.index() == TYPE_INDEX_TUPLE)
-    {
-      for(const Tuple::value_type& value : Types::Tuple::get(v))
-      {
-        if (t.find(value.first) != t.end())
-        {
-          throw InvalidGuard();
-        }
-
-        t.insert(value);
-      }
-    }
-    else
-    {
-      throw ParseError(__FILE__ ":" STRING_(__LINE__)
-                       U": guard is not a tuple");
-    }
-    #endif
-  }
-
-  //add the time
-  tuple_t::const_iterator timeIter = t.find(DIM_TIME);
-  if (timeIter != t.end())
-  {
-    //std::cerr << "warning: user specified time, don't know what to do" 
-    //  << std::endl;
-    //fix this, don't know what to do if the user has specified time
-    
-    // This is complicated, at t, we can't add an equation with time t - i,
-    // i > 0, effectively changing the past. However, we can add equations
-    // for time > t.
-  }
-  else
-  {
-    //t[DIM_TIME] = 
-    //  Types::Range::create(Range(nullptr, nullptr));
   }
 
   return Tuple(t);
-  //TaggedConstant v = (*m_guard)(k);
 }
 
 GuardWS makeGuardWithTime(const mpz_class& start)
@@ -329,39 +284,44 @@ VariableWS::operator()(Context& k)
   applicable_list applicable;
   applicable.reserve(m_equations.size());
 
+  const mpz_class& theTime = Types::Intmp::get(k.lookup(DIM_TIME));
+
   //find all the applicable ones
-  for (UUIDEquationMap::const_iterator eqn_i = m_equations.begin();
-      eqn_i != m_equations.end(); ++eqn_i)
+  for (auto priorityIter = m_priorityVars.rbegin();
+       priorityIter != m_priorityVars.rend() && applicable.empty();
+       ++priorityIter
+  )
   {
-    if (eqn_i->second.validContext())
+    const auto& thisPriority = priorityIter->second;
+    for (auto provenanceIter = thisPriority.begin();
+         provenanceIter != thisPriority.end() 
+           && provenanceIter->first <= theTime;
+         ++provenanceIter
+    )
     {
-      try
+      const auto& eqn_i = provenanceIter->second;
+      if (eqn_i->second.validContext())
       {
         const GuardWS& guard = eqn_i->second.validContext();
         Tuple evalContext = guard.evaluate(k);
-        //std::cerr << "checking applicability" << std::endl;
+
         if (tupleApplicable(evalContext, k)
           && booleanTrue(guard, k)
         )
         {
           applicable.push_back
             (ApplicableTuple(evalContext, eqn_i));
-         }
+        }
       }
-      catch (InvalidGuard& e)
+      else
       {
+        if (eqn_i->second.provenance() <= theTime)
+        {
+          applicable.push_back
+            (ApplicableTuple(Tuple(), eqn_i));
+        }
       }
     }
-    else
-    {
-      applicable.push_back
-        (ApplicableTuple(Tuple(), eqn_i));
-    }
-    #if 0
-    if (equationValid(eqn_i->second, k))
-    {
-    }
-    #endif
   }
 
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
@@ -432,7 +392,22 @@ VariableWS::operator()(Context& k)
 uuid
 VariableWS::addEquation(EquationWS* e, size_t time)
 {
-  return m_equations.insert(std::make_pair(e->id(), *e)).first->first;
+  auto uiter = m_equations.insert(std::make_pair(e->id(), *e)).first;
+
+  //insert in the priority list
+  //assume priority zero for now
+  int priority = 0;
+  auto iter = m_priorityVars.find(priority);
+
+  if (iter == m_priorityVars.end())
+  {
+    iter = m_priorityVars.insert(std::make_pair(priority, ProvenanceList()))
+      .first;
+  }
+
+  iter->second.push_back(std::make_pair(time, uiter));
+
+  return uiter->first;
 }
 
 uuid
@@ -446,9 +421,11 @@ VariableWS::addEquation
 {
   //guard.setTimeStart(time);
 
-  EquationWS eq(name, guard, e);
+  EquationWS eq(name, guard, e, time);
 
-  return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
+  return addEquation(&eq, time);
+
+  //return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
 }
 
 bool
