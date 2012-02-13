@@ -38,13 +38,14 @@ namespace TransLucid
 
 EquationWS::EquationWS(const u32string& name, const GuardWS& valid, WS* h,
   int provenance)
-: m_name(name), m_validContext(valid), m_h(h),
-  m_id(generate_uuid()), m_provenance(provenance)
+: m_name(name), m_validContext(valid), m_h(h)
+, m_id(generate_uuid()), m_provenance(provenance)
+, m_priority(valid.priority())
 {
 }
 
 EquationWS::EquationWS()
-: m_h(0), m_id(generate_nil_uuid()), m_provenance(0)
+: m_h(0), m_id(generate_nil_uuid()), m_provenance(0), m_priority(0)
 {
 }
 
@@ -81,6 +82,7 @@ GuardWS::GuardWS(const GuardWS& other)
 , m_dimNonNon(other.m_dimNonNon)
 , m_onlyConst(other.m_onlyConst)
 , m_system(other.m_system)
+, m_priority(other.m_priority)
 {
 #if 0
   try
@@ -106,7 +108,7 @@ GuardWS::GuardWS(const GuardWS& other)
 
 GuardWS::GuardWS(WS* g, WS* b)
 : m_guard(g), m_boolean(b), m_onlyConst(false),
-  m_system(nullptr)
+  m_system(nullptr), m_priority(0)
 {
   if (g == nullptr)
   {
@@ -183,6 +185,17 @@ GuardWS::GuardWS(WS* g, WS* b)
     {
       m_onlyConst = true;
     }
+
+    //find a priority dimension setting
+    auto priorityIter = m_dimConstConst.find(DIM_PRIORITY);
+    if (priorityIter != m_dimConstConst.end())
+    {
+      if (priorityIter->second.index() == TYPE_INDEX_INTMP)
+      {
+        m_priority = Types::Intmp::get(priorityIter->second).get_si();
+        m_dimConstConst.erase(priorityIter);
+      }
+    }
   }
   else
   {
@@ -205,6 +218,9 @@ GuardWS::operator=(const GuardWS& rhs)
     m_dimNonNon = rhs.m_dimNonNon;
 
     m_onlyConst = rhs.m_onlyConst;
+
+    m_priority = rhs.m_priority;
+    m_system = rhs.m_system;
   }
 
   return *this;
@@ -394,9 +410,9 @@ VariableWS::addEquation(EquationWS* e, size_t time)
 {
   auto uiter = m_equations.insert(std::make_pair(e->id(), *e)).first;
 
+  int priority = e->priority();
+
   //insert in the priority list
-  //assume priority zero for now
-  int priority = 0;
   auto iter = m_priorityVars.find(priority);
 
   if (iter == m_priorityVars.end())

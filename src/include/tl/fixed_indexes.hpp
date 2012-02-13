@@ -56,39 +56,42 @@ namespace TransLucid
     TYPE_INDEX_LAST
   };
 
+  //if you change something here, make sure to update the names in
+  //src/libs/system/dimtranslator.cpp
   enum DimensionIndexes
   {
     //dimensions
     DIM_TIME = -1,
-    DIM_ALL = -2,
-    DIM_ID = -3,
-    DIM_TYPE = -4,
-    DIM_TEXT = -5,
-    DIM_NAME = -6,
-    DIM_VALUE = -7,
-    DIM_SYMBOL = -8,
+    DIM_PRIORITY = -2,
+    DIM_ALL = -3,
+    DIM_ID = -4,
+    DIM_TYPE = -5,
+    DIM_TEXT = -6,
+    DIM_NAME = -7,
+    DIM_VALUE = -8,
+    DIM_SYMBOL = -9,
 
     //the two global dims for phi functions
-    DIM_PI = -9,
-    DIM_PSI = -10,
+    DIM_PI = -10,
+    DIM_PSI = -11,
 
     //for array indices, these are the integers 0, 1, 2
-    DIM_ZERO = -11,
-    DIM_ONE = -12,
-    DIM_TWO = -13,
+    DIM_ZERO = -12,
+    DIM_ONE = -13,
+    DIM_TWO = -14,
 
     //the constructor dim for data types
-    DIM_CONS = -14,
+    DIM_CONS = -15,
 
     //fix some defaults for arg0, arg1, arg2 and arg3 because they are commonly
     //used in code
-    DIM_ARG0 = -15,
-    DIM_ARG1 = -16,
-    DIM_ARG2 = -17,
-    DIM_ARG3 = -18,
+    DIM_ARG0 = -16,
+    DIM_ARG1 = -17,
+    DIM_ARG2 = -18,
+    DIM_ARG3 = -19,
 
     //the last one
-    DIM_INDEX_LAST = -19
+    DIM_INDEX_LAST = -20
   };
 
 } //namespace TransLucid

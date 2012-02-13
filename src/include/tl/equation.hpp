@@ -65,11 +65,12 @@ namespace TransLucid
      **/
     GuardWS()
     : m_guard(nullptr), m_boolean(nullptr), m_system(nullptr)
+    , m_priority(0)
     {
     }
 
     GuardWS(const Tuple& t)
-    : m_system(nullptr)
+    : m_system(nullptr), m_priority(0)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();
@@ -129,6 +130,12 @@ namespace TransLucid
        return m_boolean.get();
     }
 
+    int
+    priority() const
+    {
+      return m_priority;
+    }
+
     private:
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
@@ -142,6 +149,8 @@ namespace TransLucid
     bool m_onlyConst;
 
     System* m_system;
+
+    int m_priority;
   };
 
   class VariableWS;
@@ -200,6 +209,12 @@ namespace TransLucid
     provenance() const
     {
       return m_provenance;
+    }
+
+    int
+    priority() const
+    {
+      return m_priority;
     }
 
     private:
@@ -276,9 +291,6 @@ namespace TransLucid
     //maps uuid to variables so that we know which child owns the equation
     //belonging to a uuid
     typedef std::map<uuid, VariableWS*> UUIDVarMap;
-
-    uuid
-    addEquationInternal();
 
     UUIDEquationMap m_equations;
 

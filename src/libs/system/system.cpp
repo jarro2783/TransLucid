@@ -899,6 +899,7 @@ System::System()
   init_dimensions
   (
     {
+      U"priority",
       U"time",
       U"name",
       U"symbol",
