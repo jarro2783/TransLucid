@@ -223,14 +223,14 @@ TLText::run()
 
       output(*m_os, OUTPUT_STANDARD) << 
       //TRANSLATORS: verbose output, which instant we are at
-        boost::format(_("instant %1%")) % time << std::endl;
+        boost::format(_("// instant %1% beginning")) % time << std::endl;
 
       //print some stuff
       for (int s = 0; s != slot; ++s)
       {
         output(*m_os, OUTPUT_STANDARD) << 
         //TRANSLATORS: verbose output, which demand we are printing
-          boost::format(_("demand %1%")) % s << std::endl;
+          boost::format(_("// demand %1%")) % s << std::endl;
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_USTRING)
         {
@@ -245,6 +245,10 @@ TLText::run()
             << std::endl;
         }
       }
+
+      output(*m_os, OUTPUT_STANDARD) << 
+      //TRANSLATORS: verbose output, which instant we are at
+        boost::format(_("// instant %1% end")) % time << std::endl;
 
       //check the return value
       const auto& ret = (*m_returnhd)(0);
