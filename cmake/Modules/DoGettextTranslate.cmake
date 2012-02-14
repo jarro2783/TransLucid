@@ -33,6 +33,11 @@ macro(GettextTranslate)
     COPYONLY
   )
 
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/LINGUAS
+    ${CMAKE_CURRENT_BINARY_DIR}/LINGUAS
+    COPYONLY
+  )
+
   #set the directory to not clean
   set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     PROPERTY CLEAN_NO_CUSTOM true)
