@@ -8,6 +8,7 @@ endif(COMMAND cmake_policy)
 add_definitions(${TLCFLAGS} 
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
 -DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"${LOCALEDIR}\"
+-DENABLE_NLS
 -Wall)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/system/)
