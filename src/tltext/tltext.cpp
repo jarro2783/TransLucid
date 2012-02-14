@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <tl/hyperdatons/multi_arrayhd.hpp>
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>
@@ -32,11 +36,13 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 #include <fstream>
 
+#include <boost/format.hpp>
+
 #include "tltext.hpp"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include "gettext.h"
+
+#define _(String) gettext (String)
 
 /**
  * @file tltext.cpp
@@ -215,12 +221,16 @@ TLText::run()
       //run the demands
       m_system.go();
 
-      output(*m_os, OUTPUT_STANDARD) << "time " << time << std::endl;
+      output(*m_os, OUTPUT_STANDARD) << 
+      //TRANSLATORS: verbose output, which instant we are at
+        boost::format(_("instant %1%")) % time << std::endl;
 
       //print some stuff
       for (int s = 0; s != slot; ++s)
       {
-        output(*m_os, OUTPUT_STANDARD) << "slot " << s << std::endl;
+        output(*m_os, OUTPUT_STANDARD) << 
+        //TRANSLATORS: verbose output, which demand we are printing
+          boost::format(_("demand %1%")) % s << std::endl;
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_USTRING)
         {

@@ -1,20 +1,19 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Jarryd Beck
-# This file is distributed under the same license as the PACKAGE package.
+# TransLucid Spanish translations
+# Copyright (C) 2012 Jarryd Beck
+# This file is distributed under the same license as the TransLucid package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
-"Report-Msgid-Bugs-To: \"jarrydb@cse.unsw.edu.au\"\n"
-"POT-Creation-Date: 2012-02-14 13:22+1100\n"
+"Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
+"POT-Creation-Date: 2012-02-14 15:58+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: French <translucid@cse.unsw.edu.au>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TRANSLATORS: token description

@@ -340,6 +340,9 @@ VariableWS::operator()(Context& k)
     }
   }
 
+  //for whichever priority something was chosen, they will have been added from
+  //oldest to newest, so we now have a list in order of oldest to newest
+
   //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
   if (applicable.size() == 0)
   {
@@ -363,32 +366,49 @@ VariableWS::operator()(Context& k)
     for (applicable_list::const_iterator j = applicable.begin();
          j != applicable.end(); ++j)
     {
-      if (i != j && !tupleRefines(std::get<0>(*i), std::get<0>(*j)))
+      if (i != j && !tupleRefines(std::get<0>(*i), std::get<0>(*j), true))
       {
         best = false;
       }
-
-    #if 0
-    if (bestIter == applicable.end())
-    {
-      bestIter = iter;
-    }
-    else if (tupleRefines(std::get<0>(*iter), std::get<0>(*bestIter)))
-    {
-      bestIter = iter;
-    }
-    else if (!tupleRefines(std::get<0>(*bestIter), std::get<0>(*iter)))
-    {
-      bestIter = applicable.end();
-    }
-    #endif
-
     }
 
     if (best)
     {
       bestIters.push_back(i);
     }
+  }
+
+  //the list of best will be in order from oldest to newest, so go through 
+  //from the back and find everything with the highest provenance
+  if (bestIters.size() >= 1)
+  {
+    //std::cerr << m_name << ": More than one best" << std::endl;
+    std::vector<applicable_list::const_iterator> newestBest;
+
+    auto iter = bestIters.rbegin();
+    int latest = std::get<1>(**iter)->second.provenance();
+    while (iter != bestIters.rend() &&
+           latest == std::get<1>(**iter)->second.provenance())
+    {
+      newestBest.push_back(*iter);
+      ++iter;
+    }
+
+    if (newestBest.size() == 1)
+    {
+      //std::cerr << m_name << ": One newest" << std::endl;
+      return (*std::get<1>(*newestBest.front())->second.equation())(k);
+    }
+    else
+    {
+      //std::cerr << m_name << ": multiple newest" << std::endl;
+      return Types::Special::create(SP_MULTIDEF);
+    }
+  }
+  else
+  {
+    //std::cerr << m_name << ": no best" << std::endl;
+    return Types::Special::create(SP_UNDEF);
   }
  
   //std::cerr << "running equation " << std::get<1>(*bestIter)->id()
