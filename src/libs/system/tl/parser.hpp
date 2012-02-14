@@ -97,7 +97,7 @@ namespace TransLucid
       bool
       parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
         Equation& result, size_t separator_symbol, 
-        const u32string& separator_text);
+        const std::string& separator_text);
 
       bool
       parse_host_decl(LexerIterator& begin, const LexerIterator& end,
@@ -165,19 +165,13 @@ namespace TransLucid
 
       void
       expect_no_advance(LexerIterator& begin, const LexerIterator& end, 
-        const u32string& message,
-        size_t token
-      );
-
-      void
-      expect(LexerIterator& begin, const LexerIterator& end, 
         const std::string& message,
         size_t token
       );
 
       void
       expect(LexerIterator& begin, const LexerIterator& end, 
-        const u32string& message,
+        const std::string& message,
         size_t token
       );
 
@@ -195,7 +189,7 @@ namespace TransLucid
       template <typename Result, typename Fn, typename... Args>
       void
       expect(LexerIterator& begin, const LexerIterator& end, 
-        Result&& result, const std::u32string& message,
+        Result&& result, const std::string& message,
         Fn f,
         Args&&... args
       );

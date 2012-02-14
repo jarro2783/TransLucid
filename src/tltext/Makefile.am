@@ -1,3 +1,5 @@
+SUBDIRS=. po
+
 bin_PROGRAMS = tltext
 
 if WANT_TLWEB
@@ -11,7 +13,8 @@ tltext_LDFLAGS = $(TLTEXT_LIBS) $(TL_LDFLAGS) -export-dynamic
 
 tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -DPREFIX=\"$(prefix)\" \
--Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) -DLOCALEDIR=\"$(localedir)\"
+-Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) -DLOCALEDIR=\"$(localedir)\" \
+-DTRANSLATE_DOMAIN=\"tltext\"
 
 if TLWEB_STATIC
   TLWEB_STATIC_FLAGS = -all-static
@@ -54,3 +57,6 @@ TESTS = tltext-tests.sh
 #	$(top_srcdir)/src/tests/runbinary.sh $(top_srcdir)/src/tlcore/runtests.sh \
 #	$(top_builddir)/src/tlcore/tlcore \
 #	$(top_srcdir)/src/tlcore/tests
+
+PO_SUBDIRS=po
+include ../../Makefile.pot

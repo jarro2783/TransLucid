@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
 
+#include <list>
 #include <memory>
 
 namespace TransLucid
@@ -64,11 +65,12 @@ namespace TransLucid
      **/
     GuardWS()
     : m_guard(nullptr), m_boolean(nullptr), m_system(nullptr)
+    , m_priority(0)
     {
     }
 
     GuardWS(const Tuple& t)
-    : m_system(nullptr)
+    : m_system(nullptr), m_priority(0)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();
@@ -128,6 +130,12 @@ namespace TransLucid
        return m_boolean.get();
     }
 
+    int
+    priority() const
+    {
+      return m_priority;
+    }
+
     private:
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
@@ -141,6 +149,8 @@ namespace TransLucid
     bool m_onlyConst;
 
     System* m_system;
+
+    int m_priority;
   };
 
   class VariableWS;
@@ -150,7 +160,8 @@ namespace TransLucid
   class EquationWS : public WS
   {
     public:
-    EquationWS(const u32string& name, const GuardWS& valid, WS* h);
+    EquationWS(const u32string& name, const GuardWS& valid, WS* h,
+      int provenance);
 
     EquationWS();
 
@@ -194,12 +205,26 @@ namespace TransLucid
       return (*m_h)(k);
     }
 
+    int
+    provenance() const
+    {
+      return m_provenance;
+    }
+
+    int
+    priority() const
+    {
+      return m_priority;
+    }
+
     private:
     u32string m_name;
     GuardWS m_validContext;
     std::shared_ptr<WS> m_h;
     uuid m_id;
     Tree::Expr* m_ast;
+    int m_provenance;
+    int m_priority;
   };
 
   //represents all definitions of a variable, is responsible for
@@ -258,18 +283,14 @@ namespace TransLucid
 
     private:
 
+    typedef std::list<std::pair<int, UUIDEquationMap::iterator>> 
+      ProvenanceList;
+
+    typedef std::map<int, ProvenanceList> PriorityList;
+
     //maps uuid to variables so that we know which child owns the equation
     //belonging to a uuid
     typedef std::map<uuid, VariableWS*> UUIDVarMap;
-
-    std::pair<uuid, UUIDEquationMap::iterator>
-    addExprInternal(const Tuple& k, WS* h);
-
-    std::pair<uuid, UUIDEquationMap::iterator>
-    addExprActual(const Tuple& k, WS* e);
-
-    //bool 
-    //equationValid(const EquationWS& e, const Tuple& k);
 
     UUIDEquationMap m_equations;
 
@@ -279,6 +300,8 @@ namespace TransLucid
 
     BestFittable m_bestFit;
     CompileBestFit *m_compileBestFit;
+
+    PriorityList m_priorityVars;
   };
 
   class ConditionalBestfitWS : public WS

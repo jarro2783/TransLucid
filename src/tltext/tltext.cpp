@@ -39,8 +39,8 @@ along with TransLucid; see the file COPYING.  If not see
 #endif
 
 /**
- * @file tlcore.cpp
- * The tlcore application. All of the code which runs the main tlcore
+ * @file tltext.cpp
+ * The tltext application. All of the code which runs the main tltext
  * application.
  */
 
@@ -50,9 +50,10 @@ namespace TransLucid
 namespace TLText
 {
 
-TLText::TLText(const std::string& initOut)
+TLText::TLText(const std::string& progname, const std::string& initOut)
 : 
-  m_verbose(false)
+  m_myname(progname)
+ ,m_verbose(1)
  ,m_uuids(false)
  ,m_debug(false)
  ,m_is(&std::cin)
@@ -98,6 +99,12 @@ TLText::~TLText()
   delete m_demands;
   delete m_argsHD;
   delete m_envHD;
+}
+
+VerboseOutput
+TLText::output(std::ostream& os, int level)
+{
+  return VerboseOutput(m_verbose, level, os);
 }
 
 void 
@@ -208,18 +215,24 @@ TLText::run()
       //run the demands
       m_system.go();
 
+      output(*m_os, OUTPUT_STANDARD) << "time " << time << std::endl;
+
       //print some stuff
       for (int s = 0; s != slot; ++s)
       {
+        output(*m_os, OUTPUT_STANDARD) << "slot " << s << std::endl;
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_USTRING)
         {
-          (*m_os) << get_constant_pointer<u32string>(c) << std::endl;
+          output(*m_os, OUTPUT_SILENT) << Types::String::get(c) << std::endl;
         }
         else
         {
-          *m_error << "Error: PRINT didn't return a string" << std::endl;
-          *m_error << "Type index: " << c.index() << std::endl;
+          output(*m_error, OUTPUT_SILENT) 
+            << "Error: PRINT didn't return a string" 
+            << std::endl;
+          output(*m_error, OUTPUT_SILENT) << "Type index: " << c.index() 
+            << std::endl;
         }
       }
 
@@ -287,7 +300,10 @@ TLText::processDefinitions
         }
         catch (TransLucid::Parser::ParseError& e)
         {
-          (*m_error) << "error parsing line: " << e.what() << std::endl;
+          const Parser::Position& pos = e.m_pos;
+          output(*m_error, OUTPUT_SILENT) << m_myname << m_inputName << ":" 
+            << pos.line << ":" 
+            << pos.character << ":" << e.what() << std::endl;
         }
       }
       break;
@@ -349,7 +365,7 @@ TLText::processExpressions
           Tree::Expr expr;
           if (m_system.parseExpression(posbegin, posend, expr))
           {
-            if (m_verbose)
+            if (m_verbose > 1)
             {
               (*m_os) << Printer::print_expr_tree(expr) << std::endl;
             }
@@ -358,7 +374,9 @@ TLText::processExpressions
         }
         catch(TransLucid::Parser::ParseError& e)
         {
-          (*m_error) << "error parsing expression: " << e.what() << std::endl;
+          const auto& pos = e.m_pos;
+          (*m_error) << m_myname << m_inputName << ":" << pos.line << ":" 
+                     << pos.character << ":" << e.what() << std::endl;
         }
       }
       break;

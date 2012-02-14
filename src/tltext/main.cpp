@@ -115,8 +115,8 @@ setSignals()
 void
 init_gettext()
 {
-  bindtextdomain(PACKAGE, LOCALEDIR);
-  textdomain(PACKAGE);
+  bindtextdomain(TRANSLATE_DOMAIN, LOCALEDIR);
+  textdomain(TRANSLATE_DOMAIN);
 }
 
 }
@@ -139,7 +139,8 @@ int main(int argc, char *argv[])
   //(*foo)();
 
   po::variables_map vm;
-  po::options_description desc("tltext options");
+  /* TRANSLATORS: the options description name in the help message */
+  po::options_description desc(_("tltext options"));
   desc.add_options()
     ("args", 
       po::value<std::vector<std::string>>()->multitoken(),
@@ -154,7 +155,8 @@ int main(int argc, char *argv[])
     ("output,o", po::value<std::string>(), _("output file"))
     /* TRANSLATORS: the help message for --uuid */
     ("uuid", _("print uuids"))
-    ("verbose,v", "verbose output")
+    /* TRANSLATORS: the help message for --verbose */
+    ("verbose,v", po::value<int>(), _("level of verbosity"))
     /* TRANSLATORS: the help message for --version */
     ("version", _("show version"))
   ;
@@ -198,7 +200,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    TransLucid::TLText::TLText tltext("TLText...");
+    TransLucid::TLText::TLText tltext(argv[0], "TLText...");
  
     for (const auto& s : options)
     {
@@ -216,15 +218,10 @@ int main(int argc, char *argv[])
         }
       }
     }
-   
-    if (vm.count("debug"))
-    {
-      tltext.debug(true);
-    }
     
     if (vm.count("verbose"))
     {
-      tltext.verbose(true);
+      tltext.verbose(vm["verbose"].as<int>());
     }
 
     if (vm.count("uuid"))

@@ -24,6 +24,7 @@ set(builddir ${CMAKE_BINARY_DIR}/doc)
 set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
+include(DoGettextTranslate)
 
 enable_testing()
 
@@ -92,5 +93,4 @@ set(HEADERDIR \"${CMAKE_INSTALL_PREFIX}/share/tl/tltext\")
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
 add_subdirectory(src)
-add_subdirectory(po)
 add_subdirectory(doc)

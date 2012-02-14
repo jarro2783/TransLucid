@@ -179,7 +179,8 @@ fi
 
 AC_SUBST(HAVE_DOT)
 
-AC_CONFIG_FILES([ po/Makefile.in
+AC_CONFIG_FILES([src/libs/system/po/Makefile.in 
+                 src/tltext/po/Makefile.in
                  translucid.pc
                  Makefile
                  checks/Makefile

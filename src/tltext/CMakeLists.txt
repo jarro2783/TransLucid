@@ -1,5 +1,7 @@
 enable_testing()
 
+add_subdirectory(po)
+
 set(RUN ${CMAKE_SOURCE_DIR}/src/tests/runbinary.sh)
 set(LIBDIR
 ${CMAKE_BINARY_DIR}/src/libs/int:${CMAKE_BINARY_DIR}/src/libs/string)
@@ -27,7 +29,8 @@ if (ENABLE_TLWEB)
   endif()
 endif()
 
-add_definitions(${TLCFLAGS} -DPACKAGE=\"tl\" -DLOCALEDIR=\"${LOCALEDIR}\")
+add_definitions(${TLCFLAGS} -DTRANSLATE_DOMAIN=\"tltext\" 
+  -DLOCALEDIR=\"${LOCALEDIR}\")
 
 add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})
 add_test(examples ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${EXAMPLESPATH})

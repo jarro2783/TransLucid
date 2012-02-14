@@ -44,6 +44,10 @@ along with TransLucid; see the file COPYING.  If not see
 //the appropriate addDeclInternal, they pass m_equations and m_assignments
 //respectively.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <algorithm>
 #include <initializer_list>
 #include <sstream>
@@ -287,7 +291,7 @@ GettextInit System::m_gettext;
 
 GettextInit::GettextInit()
 {
-  bindtextdomain(PACKAGE, LOCALEDIR);
+  bindtextdomain(TRANSLATE_DOMAIN, LOCALEDIR);
 }
 
 namespace detail
@@ -326,7 +330,7 @@ namespace detail
   {
     public:
 
-    LineAdder(System& s, bool verbose)
+    LineAdder(System& s, int verbose)
     : m_system(s)
     , m_verbose(verbose)
     {
@@ -337,6 +341,8 @@ namespace detail
     Constant
     operator()(const Parser::HDDecl& hd)
     {
+      //TODO understand hyperdatons
+      return Types::Special::create(SP_CONST);
     }
 
     Constant
@@ -354,7 +360,7 @@ namespace detail
     Constant
     operator()(const Parser::Variable& var)
     {
-      if (m_verbose)
+      if (m_verbose > 1)
       {
         std::cout << Printer::printEquation(var.eqn) << std::endl;
       }
@@ -364,7 +370,7 @@ namespace detail
     Constant
     operator()(const Parser::Assignment& assign)
     {
-      if (m_verbose)
+      if (m_verbose > 1)
       {
         std::cout << Printer::printEquation(assign.eqn) << std::endl;
       }
@@ -712,7 +718,7 @@ namespace detail
 
     private:
     System& m_system;
-    bool m_verbose;
+    int m_verbose;
   };
 }
 
@@ -895,6 +901,7 @@ System::System()
   init_dimensions
   (
     {
+      U"priority",
       U"time",
       U"name",
       U"symbol",
@@ -990,7 +997,7 @@ System::parseLine
 (
   Parser::StreamPosIterator& begin, 
   const Parser::StreamPosIterator& end,
-  bool verbose,
+  int verbose,
   bool debug
 )
 {

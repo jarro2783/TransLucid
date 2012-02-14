@@ -160,9 +160,11 @@ namespace TransLucid
     class ParseError : public std::exception
     {
       public:
-      ParseError(const std::string& message)
-      : m_message(message)
+      ParseError(const Position& pos, const std::string& message)
+      : m_pos(pos), m_message(message)
       {}
+
+      ~ParseError() noexcept {}
 
       const char*
       what() const throw()
@@ -170,7 +172,7 @@ namespace TransLucid
         return m_message.c_str();
       }
 
-      protected:
+      Position m_pos;
       std::string m_message;
     };
 
@@ -178,7 +180,7 @@ namespace TransLucid
     {
       public:
       ExpectedToken(const Position& pos, 
-        size_t token, const u32string& text);
+        size_t token, const std::string& text);
 
       ~ExpectedToken() noexcept {}
 
@@ -197,7 +199,7 @@ namespace TransLucid
     class ExpectedExpr : public ParseError
     {
       public:
-      ExpectedExpr(const Position& pos, const u32string& text);
+      ExpectedExpr(const Position& pos, const std::string& text);
     };
   }
 

@@ -198,7 +198,7 @@ namespace TransLucid
     (
       Parser::StreamPosIterator& begin, 
       const Parser::StreamPosIterator& end,
-      bool verbose = false, 
+      int verbose = 1, 
       bool debug = false
     );
 
