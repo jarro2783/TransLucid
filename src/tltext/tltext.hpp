@@ -53,8 +53,71 @@ namespace TransLucid
      */
     typedef std::vector<std::pair<Tree::Expr, WS*>> ExprList;
 
+    enum OutputVerbosity
+    {
+      OUTPUT_SILENT,
+      OUTPUT_STANDARD,
+      OUTPUT_VERBOSE,
+      OUTPUT_DEBUG
+    };
+
+    class VerboseOutput
+    {
+      public:
+      //we want to output at level wanted, and we're allowed to output
+      //at current or less
+      VerboseOutput(int currentLevel, int wantedLevel, std::ostream& os)
+      : m_current(currentLevel), m_wanted(wantedLevel), m_os(os)
+      {
+      }
+
+      template <typename T>
+      friend
+      const VerboseOutput&
+      operator<<(const VerboseOutput&, T&&);
+
+      const VerboseOutput&
+      operator<<(std::ostream& (*pf)(std::ostream&)) const
+      {
+        if (m_wanted <= m_current)
+        {
+          pf(m_os);
+        }
+
+        return *this;
+      }
+
+      template <typename T>
+      const VerboseOutput&
+      operator()(T&& rhs) const
+      {
+        if (m_wanted <= m_current)
+        {
+          m_os << std::forward<T>(rhs);
+        }
+
+        return *this;
+      }
+
+      int m_current;
+      int m_wanted;
+      std::ostream& m_os;
+    };
+
+    template <typename T>
+    const VerboseOutput&
+    operator<<(const TLText::VerboseOutput& out, T&& rhs)
+    {
+      if (out.m_wanted <= out.m_current)
+      {
+        out.m_os << std::forward<T>(rhs);
+      }
+
+      return out;
+    }
+
     /**
-     * The tlcore evaluator.
+     * The tltext evaluator.
      */
     class TLText
     {
@@ -202,21 +265,8 @@ namespace TransLucid
       void
       setup_hds();
 
-      class VerboseOutput
-      {
-        public:
-        VerboseOutput(int currentLevel, int wantedLevel, std::ostream& os)
-        : m_current(currentLevel), m_wanted(wantedLevel), m_os(os)
-        {
-        }
-
-        int m_current;
-        int m_wanted;
-        std::ostream& m_os;
-      };
-
-      VerboseOutput&
-      output(std::ostream& os, const u32string& text);
+      VerboseOutput
+      output(std::ostream& os, int level);
 
       DemandHD* m_demands;
       DemandHD* m_returnhd;

@@ -101,6 +101,12 @@ TLText::~TLText()
   delete m_envHD;
 }
 
+VerboseOutput
+TLText::output(std::ostream& os, int level)
+{
+  return VerboseOutput(m_verbose, level, os);
+}
+
 void 
 TLText::set_input(std::istream* is, const std::string& name)
 {
@@ -209,18 +215,24 @@ TLText::run()
       //run the demands
       m_system.go();
 
+      output(*m_os, OUTPUT_STANDARD) << "time " << time << std::endl;
+
       //print some stuff
       for (int s = 0; s != slot; ++s)
       {
+        output(*m_os, OUTPUT_STANDARD) << "slot " << s << std::endl;
         const auto& c = (*m_demands)(s);
         if (c.index() == TYPE_INDEX_USTRING)
         {
-          (*m_os) << get_constant_pointer<u32string>(c) << std::endl;
+          output(*m_os, OUTPUT_SILENT) << Types::String::get(c) << std::endl;
         }
         else
         {
-          *m_error << "Error: PRINT didn't return a string" << std::endl;
-          *m_error << "Type index: " << c.index() << std::endl;
+          output(*m_error, OUTPUT_SILENT) 
+            << "Error: PRINT didn't return a string" 
+            << std::endl;
+          output(*m_error, OUTPUT_SILENT) << "Type index: " << c.index() 
+            << std::endl;
         }
       }
 
@@ -289,8 +301,9 @@ TLText::processDefinitions
         catch (TransLucid::Parser::ParseError& e)
         {
           const Parser::Position& pos = e.m_pos;
-          (*m_error) << m_myname << m_inputName << ":" << pos.line << ":" 
-                     << pos.character << ":" << e.what() << std::endl;
+          output(*m_error, OUTPUT_SILENT) << m_myname << m_inputName << ":" 
+            << pos.line << ":" 
+            << pos.character << ":" << e.what() << std::endl;
         }
       }
       break;

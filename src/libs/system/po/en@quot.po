@@ -1,14 +1,14 @@
 # English translations for tl package.
-# Copyright (C) 2012 'Jarryd Beck'
+# Copyright (C) 2012 Jarryd Beck
 # This file is distributed under the same license as the tl package.
 # Automatically generated, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
-"Report-Msgid-Bugs-To: “jarrydb@cse.unsw.edu.au”\n"
-"POT-Creation-Date: 2012-02-13 09:43+1100\n"
-"PO-Revision-Date: 2012-02-13 09:43+1100\n"
+"Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
+"POT-Creation-Date: 2012-02-14 09:46+1100\n"
+"PO-Revision-Date: 2012-02-14 09:46+1100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en\n"

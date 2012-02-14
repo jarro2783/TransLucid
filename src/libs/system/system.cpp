@@ -341,6 +341,8 @@ namespace detail
     Constant
     operator()(const Parser::HDDecl& hd)
     {
+      //TODO understand hyperdatons
+      return Types::Special::create(SP_CONST);
     }
 
     Constant
