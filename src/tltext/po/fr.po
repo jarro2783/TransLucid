@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the tl package.
 # Jarryd Beck <jarrydb@cse.unsw.edu.au>, 2012.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
-"Report-Msgid-Bugs-To: \"jarrydb@cse.unsw.edu.au\"\n"
-"POT-Creation-Date: 2012-02-14 09:52+1100\n"
+"Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
+"POT-Creation-Date: 2012-02-14 15:58+1100\n"
 "PO-Revision-Date: 2012-02-08 11:56+11\n"
 "Last-Translator: Jarryd Beck <jarrydb@cse.unsw.edu.au>\n"
 "Language-Team: French <translucid@cse.unsw.edu.au>\n"
@@ -16,6 +15,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#. TRANSLATORS: verbose output, which instant we are at
+#: src/tltext/tltext.cpp:226
+msgid "instant %1%"
+msgstr ""
+
+#. TRANSLATORS: verbose output, which demand we are printing
+#: src/tltext/tltext.cpp:233
+msgid "demand %1%"
+msgstr ""
 
 #: src/tltext/main.cpp:72
 msgid "TLText has encountered a segfault, goodbye..."

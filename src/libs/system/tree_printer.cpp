@@ -30,7 +30,7 @@ namespace TransLucid
 namespace Printer
 {
 
-class TreePrinterNew
+class TreePrinter
 {
   public:
 
@@ -38,7 +38,7 @@ class TreePrinterNew
   //everything else needs to be public so that the visitor works,
   //but DO NOT use the visitor directly
   //I cannot be responsible for what happens if you do
-  //of course since this class is only used internall, you knew all that right
+  //of course since this class is only used internally, you knew all that right
   std::string printTree(const Tree::Expr& e);
 
   private:
@@ -520,12 +520,12 @@ class TreePrinterNew
 
 std::string print_expr_tree(const Tree::Expr& expr)
 {
-  TreePrinterNew print;
+  TreePrinter print;
   return print.printTree(expr);
 }
 
 std::string 
-TreePrinterNew::printTree(const Tree::Expr& e)
+TreePrinter::printTree(const Tree::Expr& e)
 {
   m_os.clear();
   parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);

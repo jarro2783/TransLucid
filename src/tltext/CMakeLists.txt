@@ -30,7 +30,8 @@ if (ENABLE_TLWEB)
 endif()
 
 add_definitions(${TLCFLAGS} -DTRANSLATE_DOMAIN=\"tltext\" 
-  -DLOCALEDIR=\"${LOCALEDIR}\")
+  -DLOCALEDIR=\"${LOCALEDIR}\"
+  -DENABLE_NLS)
 
 add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})
 add_test(examples ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${EXAMPLESPATH})

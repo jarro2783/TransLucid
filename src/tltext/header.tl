@@ -91,16 +91,6 @@ var spconst = special"spconst";;
 var spmultidef = special"spmultidef";;
 var sploop = special"sploop";;
 
-var PRINT_SPECIAL [arg0 : sperror] = "sperror";;
-var PRINT_SPECIAL [arg0 : spaccess] = "spaccess";;
-var PRINT_SPECIAL [arg0 : sptypeerror] = "typeerror";;
-var PRINT_SPECIAL [arg0 : spdim] = "spdim";;
-var PRINT_SPECIAL [arg0 : sparith] = "sparith";;
-var PRINT_SPECIAL [arg0 : spundef] = "spundef";;
-var PRINT_SPECIAL [arg0 : spconst] = "spconst";;
-var PRINT_SPECIAL [arg0 : spmultidef] = "spmultidef";;
-var PRINT_SPECIAL [arg0 : sploop] = "sploop";;
-
 fun print_special.c [c : sperror] = "sperror";;
 fun print_special.c [c : spaccess] = "spaccess";;
 fun print_special.c [c : sptypeerror] = "typeerror";;
@@ -134,19 +124,6 @@ fun print_typename.c [c : typetype] = "typetype";;
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;
 fun construct_literal.t.v [t : "typetype"] = construct_typetype!v;;
-
-//the print equations
-var CANONICAL_PRINT [arg0 : intmp]   = PRINT;;
-var CANONICAL_PRINT [arg0 : ustring] = `"` + escape_string.PRINT + `"`;;
-var CANONICAL_PRINT [arg0 : uchar]   = "'" + escape_string.PRINT + "'";;
-//var CANONICAL_PRINT [arg0 : ustring] = `"` + PRINT + `"`;;
-//var CANONICAL_PRINT [arg0 : uchar]   = "'" + PRINT + "'";;
-var CANONICAL_PRINT [arg0 : bool]    = PRINT;;
-var CANONICAL_PRINT [arg0 : range]   = PRINT;;
-var CANONICAL_PRINT [arg0 : tuple]   = "[I don't know how to print a tuple]";;
-var CANONICAL_PRINT                  = TYPENAME + `"` + PRINT 
-                                       + `"`;;
-var CANONICAL_PRINT [arg0 : special]   = PRINT_SPECIAL;;
 
 //the print equations
 fun canonical_print.c [c : intmp]   = print.c;;

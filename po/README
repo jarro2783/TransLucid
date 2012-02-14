@@ -1,0 +1,87 @@
+There are currently two sets of translation files, these are in
+  src/tltext/po
+  src/libs/system/po
+
+If you are a translator for a particular language, then you should modify ll.po
+in the above directories, where ll is the code for your particular language.
+
+== New translations ==
+
+If you are starting a new translation then read the remainder of this section.
+Otherwise skip ahead to "Existing translations".
+
+To create a new translation file for a language, you can either copy domain.pot
+to ll.po, or use msginit, where domain is the translation domain for the
+current directory---if you are unsure what this is, there is only one *.pot
+file in each po directory. For example, to start a translation for German in
+src/tltext/po, you could run:
+  msginit -l de -i tltext.pot -o de.po
+Then add the text `de' (without quotes) to the file LINGUAS in that directory.
+
+At the top of your new file you will see something like:
+
+# SOME DESCRIPTIVE TITLE.                                                       
+# Copyright (C) YEAR Jarryd Beck
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: tl 0.0.80\n"
+"Report-Msgid-Bugs-To: \"jarrydb@cse.unsw.edu.au\"\n"
+"POT-Creation-Date: 2012-02-14 09:52+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+You should change the first section to look like:
+
+# TransLucid LANGUAGE message translations
+# Copyright (C) YEAR Jarryd Beck                 
+# This file is distributed under the same license as the TransLucid package.
+
+adjusting LANGUAGE and YEAR as appropriate.
+
+* Fill in the FIRST AUTHOR field.
+* Delete the line #, fuzzy
+* Change Language-Team to:
+  LANGUAGE <translucid@cse.unsw.edu.au>
+  where LANGUAGE is the name of the language.
+* Change CHARSET to UTF-8
+
+Finally, when you make a change to the file, adjust the PO-Revision-Date, and
+adjust the Last-Translator field if necessary.
+
+== Existing translations ==
+
+If you are adding translations for a language that already has translation
+files set up, then here are some guidelines:
+
+A translation looks like:
+
+#. TRANSLATORS: the options description name in the help message
+#: src/tltext/main.cpp:143
+msgid "tltext options"
+msgstr ""
+
+Most of our strings will have a comment that starts with
+#. TRANSLATORS:
+at the top, this will be some sort of description of what the string is for.
+The original string is in the msgid field, the translated string should be
+placed in the msgstr field. 
+All strings are C style strings and should be escaped appropriately.
+
+There are a few special cases for strings:
+
+  * Tokens should not be translated. However, they have a string to be
+    translated because they need to be quoted appropriately. These are
+    identified by the translator note: token
+  * Token descriptions should be translated, these are things like "integer
+    literal", they are identified with the translator note "token description"
+  * The help strings for tltext might need special attention, they are also 
+    mentioned in the translator notes.
