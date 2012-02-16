@@ -176,6 +176,9 @@ namespace TransLucid
 
   std::string
   read_file(std::istream& is);
+
+  Constant
+  applyFunction(Context& k, const Constant& lhs, const Constant& rhs);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

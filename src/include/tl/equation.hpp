@@ -234,7 +234,7 @@ namespace TransLucid
     public:
     typedef std::map<uuid, EquationWS> UUIDEquationMap;
 
-    VariableWS(const u32string& name);
+    VariableWS(const u32string& name, System& system);
     
     ~VariableWS();
 
@@ -295,7 +295,7 @@ namespace TransLucid
     UUIDEquationMap m_equations;
 
     u32string m_name;
-    WS* m_system;
+    System& m_system;
     bool storeuuid;
 
     BestFittable m_bestFit;
@@ -310,9 +310,9 @@ namespace TransLucid
     template <typename String, typename Enable = 
       std::enable_if<std::is_same<String, u32string>::value>
     >
-    ConditionalBestfitWS(String&& name)
+    ConditionalBestfitWS(String&& name, System& system)
     {
-      m_var = new VariableWS(name + U"_fn_conditional");
+      m_var = new VariableWS(U"fun_" + name, system);
     }
 
     ConditionalBestfitWS(const ConditionalBestfitWS&) = delete;

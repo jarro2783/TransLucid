@@ -192,19 +192,63 @@ BangOpWS::operator()(Context& k)
 
   if (name.index() == TYPE_INDEX_BASE_FUNCTION)
   {
-    if (m_args.size() == 1)
+    bool isSpecial = false;
+    std::vector<Constant> args;
+    for (auto ws : m_args)
     {
-      Constant arg = (*m_args[0])(k);
-      return Types::BaseFunction::get(name).apply(arg);
+      args.push_back((*ws)(k));
+
+      if (args.back().index() == TYPE_INDEX_SPECIAL)
+      {
+        isSpecial = true;
+      }
+    }
+
+    if (isSpecial)
+    {
+      //combine all the specials with the special combiner
+      WS* combine = m_system.lookupIdentifiers().lookup(U"special_combine");
+      if (combine == nullptr)
+      {
+        throw "no default special combiner";
+      }
+
+      Constant fn = (*combine)(k);
+      Constant currentValue;
+
+      //find the first special
+      auto iter = args.begin();
+      while (iter->index() != TYPE_INDEX_SPECIAL)
+      {
+        ++iter;
+      }
+
+      currentValue = *iter;
+
+      ++iter;
+      while (iter != args.end())
+      {
+        if (iter->index() == TYPE_INDEX_SPECIAL)
+        {
+          Constant fn2 = applyFunction(k, fn, currentValue);
+          currentValue = applyFunction(k, fn2, *iter);
+        }
+        ++iter;
+      }
+
+      return currentValue;
     }
     else
     {
-      std::vector<Constant> args;
-      for (auto ws : m_args)
+      if (args.size() == 1)
       {
-        args.push_back((*ws)(k));
+        Constant arg = (*m_args[0])(k);
+        return Types::BaseFunction::get(name).apply(arg);
       }
-      return Types::BaseFunction::get(name).apply(args);
+      else
+      {
+        return Types::BaseFunction::get(name).apply(args);
+      }
     }
   }
   else if (name.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
