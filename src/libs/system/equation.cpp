@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/eval_workshops.hpp>
 #include <tl/output.hpp>
 #include <tl/range.hpp>
+#include <tl/types/function.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types_util.hpp>
@@ -35,6 +36,28 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+
+namespace
+{
+  template <typename Container>
+  Constant
+  evaluateBestselect(Context& k, Container&& results, const Constant& fn)
+  {
+    Constant currentVal = results.front();
+
+    auto iter = results.begin();
+    ++iter;
+
+    while (iter != results.end())
+    {
+      Constant fn2 = applyFunction(k, fn, currentVal);
+      currentVal = applyFunction(k, fn2, *iter);
+      ++iter;
+    }
+
+    return currentVal;
+  }
+}
 
 EquationWS::EquationWS(const u32string& name, const GuardWS& valid, WS* h,
   int provenance)
@@ -53,8 +76,8 @@ EquationWS::~EquationWS()
 {
 }
 
-VariableWS::VariableWS(const u32string& name)
-: m_name(name)
+VariableWS::VariableWS(const u32string& name, System& system)
+: m_name(name), m_system(system)
 #if 0
  ,m_compileBestFit
   (
@@ -343,7 +366,8 @@ VariableWS::operator()(Context& k)
   //for whichever priority something was chosen, they will have been added from
   //oldest to newest, so we now have a list in order of oldest to newest
 
-  //std::cout << "have " << applicable.size() << " applicable equations" << std::endl;
+  //std::cout << "have " << applicable.size() << " applicable equations" 
+  //          << std::endl;
   if (applicable.size() == 0)
   {
     //std::cerr << "undef for " << m_name << std::endl;
@@ -356,7 +380,7 @@ VariableWS::operator()(Context& k)
     return (*std::get<1>(applicable.front())->second.equation())(k);
   }
 
-  //find the best ones
+  //if there is more than applicable equation, find the best
   std::vector<applicable_list::const_iterator> bestIters;
 
   for (applicable_list::const_iterator i = applicable.begin();
@@ -382,7 +406,7 @@ VariableWS::operator()(Context& k)
   //from the back and find everything with the highest provenance
   if (bestIters.size() >= 1)
   {
-    //std::cerr << m_name << ": More than one best" << std::endl;
+    //std::cerr << m_name << ": " << bestIters.size() << " best" << std::endl;
     std::vector<applicable_list::const_iterator> newestBest;
 
     auto iter = bestIters.rbegin();
@@ -402,7 +426,39 @@ VariableWS::operator()(Context& k)
     else
     {
       //std::cerr << m_name << ": multiple newest" << std::endl;
-      return Types::Special::create(SP_MULTIDEF);
+
+      //evaluate everything first
+      std::vector<Constant> bestEvaluated;
+      for (const auto& best : newestBest)
+      {
+        //best is an applicable_list::const_iterator
+        bestEvaluated.push_back((*std::get<1>(*best)->second.equation())(k));
+      }
+
+      //find the bestselect
+      auto bestselectName = U"bestselect_" + m_name;
+      auto findIdent = m_system.lookupIdentifiers();
+      WS* bestselect = findIdent.lookup(bestselectName);
+
+      if (bestselect != nullptr)
+      {
+        Constant fn = (*bestselect)(k);
+        return evaluateBestselect(k, bestEvaluated, fn);
+      }
+      else
+      {
+        //find default bestselect
+        WS* bestselectDefault = findIdent.lookup(U"bestselect__");
+
+        if (bestselectDefault == nullptr)
+        {
+          //we can blow up here
+          throw "No default bestselect defined";
+        }
+
+        Constant fn = (*bestselectDefault)(k);
+        return evaluateBestselect(k, bestEvaluated, fn);
+      }
     }
   }
   else

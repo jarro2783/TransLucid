@@ -1254,7 +1254,7 @@ System::addDeclInternal
 
   if (i == declarations.end())
   {
-    var = new VariableWS(name);
+    var = new VariableWS(name, *this);
     declarations.insert(std::make_pair(name, var));
   }
   else
@@ -1648,7 +1648,7 @@ System::addFunction(const Parser::FnDecl& fn)
       return Types::Special::create(SP_CONST);
     }
     //add a new one
-    fnws = new ConditionalBestfitWS(fn.name);
+    fnws = new ConditionalBestfitWS(fn.name, *this);
 
     //create a new equation for this thing
     //build up the parameters and end with fnws

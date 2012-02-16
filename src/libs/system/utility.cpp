@@ -32,6 +32,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/equation.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
+#include <tl/types/function.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/special.hpp>
@@ -566,5 +567,21 @@ read_file(std::istream& is)
 
   return raw.get();
 }
+
+Constant
+applyFunction(Context& k, const Constant& lhs, const Constant& rhs)
+{
+  if (lhs.index() == TYPE_INDEX_VALUE_FUNCTION)
+  {
+    const auto& fnval = Types::ValueFunction::get(lhs);
+
+    return fnval.apply(k, rhs);
+  }
+  else
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+}
+
 
 }
