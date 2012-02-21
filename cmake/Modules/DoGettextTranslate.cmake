@@ -65,13 +65,15 @@ macro(GettextTranslate)
       -o ${TEMPLATE_FILE_ABS} 
       --default-domain=${MAKEVAR_DOMAIN}
       --add-comments=TRANSLATORS:
-      --copyright-holder='${MAKEVAR_COPYRIGHT_HOLDER}'
+      --copyright-holder=${MAKEVAR_COPYRIGHT_HOLDER}
       --msgid-bugs-address="${MAKEVAR_MSGID_BUGS_ADDRESS}"
       --directory=${MAKEVAR_top_builddir}
       --files-from=${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in
+      --package-version=${VERSION}
+      --package-name=${CMAKE_PROJECT_NAME}
     DEPENDS ${source_translatable}
     ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in
-    VERBATIM
+    #    VERBATIM
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
@@ -103,11 +105,15 @@ macro(GettextTranslate)
       #generate the en@quot files
       add_custom_command(OUTPUT ${PO_FILE_NAME}
         COMMAND
-        msginit -i ${TEMPLATE_FILE_ABS} --no-translator -l en -o - 2>/dev/null
-        | sed -f ${lang}.insert-header | msgconv -t UTF-8 |
-        msgfilter sed -f ${CMAKE_CURRENT_SOURCE_DIR}/`echo ${lang} | sed -e 's/.*@//'`.sed 2>/dev/null >
+        msginit -i ${TEMPLATE_FILE_ABS} --no-translator -l ${lang} 
+        -o - 2>/dev/null
+        | sed -f ${CMAKE_CURRENT_BINARY_DIR}/${lang}.insert-header 
+        | msgconv -t UTF-8 
+        | msgfilter sed -f ${CMAKE_CURRENT_SOURCE_DIR}/`echo ${lang} 
+        | sed -e 's/.*@//'`.sed 2>/dev/null >
         ${PO_FILE_NAME}
         DEPENDS ${lang}.insert-header ${TEMPLATE_FILE_ABS}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       )
 
     else()
