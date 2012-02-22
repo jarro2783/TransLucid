@@ -43,6 +43,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
+#include <tl/types/uuid.hpp>
 #include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
@@ -67,6 +68,10 @@ namespace TransLucid
       static_cast<Constant (*)(const Constant&)>(&Types::Special::create)
     };
 
+    BuiltinBaseFunction<1> construct_uuid {
+      static_cast<Constant (*)(const Constant&)>(&Types::UUID::create)
+    };
+
     BuiltinBaseFunction<1> print_intmp{&Types::Intmp::print};
     BuiltinBaseFunction<1> print_uchar{&Types::UChar::print};
     //BuiltinBaseFunction<1> print_special_base{&Types::Special::print};
@@ -74,6 +79,7 @@ namespace TransLucid
     BuiltinBaseFunction<1> print_range{&Types::Range::print};
     BuiltinBaseFunction<1> print_typetype{&Types::Type::print};
     BuiltinBaseFunction<1> print_error{&print_error_value};
+    BuiltinBaseFunction<1> print_uuid{&Types::UUID::print};
 
     BuiltinBaseFunction<2> integer_plus{&mpz_plus};
     BuiltinBaseFunction<2> integer_minus{&mpz_minus};
@@ -284,6 +290,7 @@ namespace TransLucid
       {U"make_range_infinite", &range_create_infinity},
       {U"construct_intmp", &construct_integer},
       {U"construct_special", &construct_special},
+      {U"construct_uuid", &construct_uuid},
       {U"is_printable", &icu_is_printable},
       {U"string_at_base", &string_at_base},
       {U"substring_base", &substring_base},
@@ -298,6 +305,7 @@ namespace TransLucid
       {U"print_range", &print_range},
       {U"print_typetype", &print_typetype},
       {U"print_error", &print_error},
+      {U"print_uuid", &print_uuid},
     };
   }
 
@@ -1347,6 +1355,7 @@ init_builtin_types(System& s)
   type_names.push_back(U"ustring");
   type_names.push_back(U"lambda");
   type_names.push_back(U"phi");
+  type_names.push_back(U"uuid");
     
   //add all of the literals (LITERAL ... =)
   add_builtin_literals(s, type_names);

@@ -110,6 +110,7 @@ fun print.c [c : typetype] = print_typetype!c;;
 fun print.c [c : uchar] = print_uchar!c;;
 fun print.c [c : range] = print_range!c;;
 fun print.c [c : tuple] = print_tuple!c;;
+fun print.c [c : uuid] = print_uuid!c;;
 
 fun print_typename.c = "unknown typename";;
 fun print_typename.c [c : intmp] = "intmp";;
@@ -120,10 +121,12 @@ fun print_typename.c [c : range] = "range";;
 fun print_typename.c [c : tuple] = "tuple";;
 fun print_typename.c [c : special] = "special";;
 fun print_typename.c [c : typetype] = "typetype";;
+fun print_typename.c [c : uuid] = "uuid";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;
 fun construct_literal.t.v [t : "typetype"] = construct_typetype!v;;
+fun construct_literal.t.v [t : "uuid"] = construct_uuid!v;;
 
 //the print equations
 fun canonical_print.c [c : intmp]   = print.c;;
@@ -132,7 +135,7 @@ fun canonical_print.c [c : uchar]   = "'" + escape_string.(print.c) + "'";;
 fun canonical_print.c [c : bool]    = print.c;;
 fun canonical_print.c [c : range]   = print.c;;
 fun canonical_print.c [c : tuple]   = "[I don't know how to print a tuple]";;
-fun canonical_print.c               = typename.c + `"` + 
+fun canonical_print.c               = print_typename.c + `"` + 
                                       escape_string.(print.c) + `"`;;
 fun canonical_print.c [c : special] = print.c;;
 

@@ -217,6 +217,12 @@ namespace TransLucid
       return m_priority;
     }
 
+    int
+    endTime() const
+    {
+      return m_endTime;
+    }
+
     private:
     u32string m_name;
     GuardWS m_validContext;
@@ -224,6 +230,7 @@ namespace TransLucid
     uuid m_id;
     Tree::Expr* m_ast;
     int m_provenance;
+    int m_endTime;
     int m_priority;
   };
 

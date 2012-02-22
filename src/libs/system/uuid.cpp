@@ -20,9 +20,13 @@ along with TransLucid; see the file COPYING.  If not see
 #include <random>
 
 #include <tl/fixed_indexes.hpp>
+#include <tl/types/special.hpp>
+#include <tl/types/string.hpp>
 #include <tl/types/uuid.hpp>
 #include <tl/types_util.hpp>
 #include <tl/uuid.hpp>
+
+#include <tl/output.hpp>
 
 namespace TransLucid
 {
@@ -133,6 +137,66 @@ namespace TransLucid
       full_bits_generator generator;
     };
 
+    struct InvalidUUID
+    {
+    };
+
+    uuid
+    parse_uuid(const u32string& text)
+    {
+      if (text.length() != 32)
+      {
+        throw InvalidUUID();
+      }
+
+      uuid u;
+      uuid::iterator data = u.begin();
+      int which = 0;
+      for (auto c : text)
+      {
+        int value;
+        if (c >= '0' && c <= '9')
+        {
+          value = c - '0';
+        }
+        else if (c >= 'A' && c <= 'F')
+        {
+          value = c - 'A' + 10;
+        }
+        else
+        {
+          throw InvalidUUID();
+        }
+
+        if (which == 0)
+        {
+          *data = value << 4;    
+          which = 1;
+        }
+        else
+        {
+          *data = *data | value;
+          ++data;
+          which = 0;
+        }
+      }
+
+      return u;
+    }
+
+    void
+    append_char(int value, u32string& result)
+    {
+      if (value >= 0 && value <= 9)
+      {
+        result += value + '0';
+      }
+      else
+      {
+        result += value - 10 + 'A';
+      }
+    }
+
     uuid_random_generator<std::mt19937> uuid_generator;
   }
 
@@ -162,6 +226,28 @@ namespace TransLucid
           (i, &uuid_type_functions, TYPE_INDEX_UUID);
       }
 
+      Constant
+      create(const Constant& c)
+      {
+        if (c.index() != TYPE_INDEX_USTRING)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const u32string& text = Types::String::get(c);
+
+        try
+        {
+          uuid result = parse_uuid(text);
+
+          return create(result);
+        }
+        catch (InvalidUUID& e)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+      }
+
       const uuid&
       get(const Constant& u)
       {
@@ -178,6 +264,30 @@ namespace TransLucid
       hash(const Constant& c)
       {
         return std::hash<uuid>()(get(c));
+      }
+
+      Constant
+      print(const Constant& c)
+      {
+        if (c.index() != TYPE_INDEX_UUID)
+        {
+          return Types::Special::create(SP_CONST);
+        }
+
+        const uuid& u = UUID::get(c);
+
+        u32string result;
+
+        for (auto v : u)
+        {
+          int low = v & 0xF;
+          int high = (v >> 4) & 0xF;
+
+          append_char(high, result);
+          append_char(low, result);
+        }
+
+        return Types::String::create(result);
       }
     }
   }

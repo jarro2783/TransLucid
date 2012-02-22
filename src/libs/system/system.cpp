@@ -843,6 +843,8 @@ System::init_equations()
   addDecl(*this, U"data", U"DECLID");
   addDecl(*this, U"fun", U"DECLID");
   addDecl(*this, U"op", U"DECLID");
+  addDecl(*this, U"del", U"DECLID");
+  addDecl(*this, U"repl", U"DECLID");
 
   //add PRINT="this type has no printer"
   addInitEqn(*this,
@@ -882,6 +884,7 @@ System::System()
    {U"range", TYPE_INDEX_RANGE},
    {U"lambda", TYPE_INDEX_VALUE_FUNCTION},
    {U"phi", TYPE_INDEX_NAME_FUNCTION},
+   {U"uuid", TYPE_INDEX_UUID},
   }
   )
 , m_time(0)
