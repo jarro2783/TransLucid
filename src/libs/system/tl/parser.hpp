@@ -124,20 +124,16 @@ namespace TransLucid
         Line& result);
 
       bool
+      parse_del_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
       parse_hd_decl(LexerIterator& begin, const LexerIterator& end,
         Line& result);
 
       bool
       parse_equation_decl(LexerIterator& begin, const LexerIterator& end,
         Equation& result);
-
-      bool
-      parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
-        Line& result);
-
-      bool
-      parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
-        Line& result);
 
       //checks that begin is a ustring"stuff" and puts stuff in result
       bool

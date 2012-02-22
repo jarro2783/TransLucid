@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.100\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-02-21 16:25+1100\n"
-"PO-Revision-Date: 2012-02-21 16:25+1100\n"
+"POT-Creation-Date: 2012-02-22 14:44+1100\n"
+"PO-Revision-Date: 2012-02-22 14:44+1100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"
@@ -262,22 +262,30 @@ msgstr "infix operator"
 msgid "postfix operator"
 msgstr "postfix operator"
 
-#: src/libs/system/parser.cpp:256
+#: src/libs/system/parser.cpp:257
 #, c-format
 msgid "missing token: %s, found token: %s"
 msgstr "missing token: %s, found token: %s"
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:737 src/libs/system/parser.cpp:752
+#: src/libs/system/parser.cpp:738 src/libs/system/parser.cpp:753
 msgid "'then'"
 msgstr "'then'"
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:761
+#: src/libs/system/parser.cpp:762
 msgid "'else'"
 msgstr "'else'"
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:767
+#: src/libs/system/parser.cpp:768
 msgid "'fi'"
 msgstr "'fi'"
+
+#: src/libs/system/system.cpp:1973
+msgid "no print function defined"
+msgstr "no print function defined"
+
+#: src/libs/system/system.cpp:1982
+msgid "canonical_print didn't return a string"
+msgstr "canonical_print didn't return a string"

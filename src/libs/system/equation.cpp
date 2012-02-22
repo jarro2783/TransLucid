@@ -349,7 +349,7 @@ VariableWS::operator()(Context& k)
       const auto& eqn_i = provenanceIter->second;
       int endTime = eqn_i->second.endTime();
 
-      if (endTime == END_TIME_INFINITE || endTime <= theTime)
+      if (endTime == END_TIME_INFINITE || endTime > theTime)
       {
         if (eqn_i->second.validContext())
         {
@@ -564,7 +564,7 @@ VariableWS::replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr)
 void
 EquationWS::del(size_t time)
 {
-  //m_validContext.setTimeEnd(time);
+  m_endTime = time;
 }
 
 Constant

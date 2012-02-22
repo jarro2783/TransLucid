@@ -130,12 +130,17 @@ namespace TransLucid
       Tree::Expr expr;
     };
 
+    struct DelDecl
+    {
+      Tree::Expr id;
+    };
+
     typedef Variant
     <
       Variable,
       Assignment,
-      Tree::UnaryOperator,
-      Tree::BinaryOperator,
+      //Tree::UnaryOperator,
+      //Tree::BinaryOperator,
       DimensionDecl,
       LibraryDecl,
       OutputDecl,
@@ -144,7 +149,8 @@ namespace TransLucid
       FnDecl,
       HostDecl,
       OpDecl,
-      HDDecl
+      HDDecl,
+      DelDecl
     > Line;
  
     struct Position

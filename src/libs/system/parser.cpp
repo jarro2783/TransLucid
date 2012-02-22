@@ -242,6 +242,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
   add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
   add_decl_parser(m_top_decls, U"op", this, &Parser::parse_op_decl);
+  add_decl_parser(m_top_decls, U"del", this, &Parser::parse_del_decl);
 }
 
 void
@@ -1198,65 +1199,6 @@ Parser::parse_in_decl(LexerIterator& begin, const LexerIterator& end,
 }
 
 bool
-Parser::parse_infix_decl(LexerIterator& begin, const LexerIterator& end,
-  Line& result)
-{
-  if (*begin != TOKEN_DECLID)
-  {
-    return false;
-  }
-
-  const u32string& decl = get<u32string>(begin->getValue());
-
-  //infix[lrnpm] has length 6
-  if (decl.size() != 6 || decl.substr(0, 4) == U"infix")
-  {
-    return false;
-  }
-
-  char32_t type = decl[5];
-  Tree::InfixAssoc assoc;
-
-  switch(type)
-  {
-    case 'l':
-    assoc = Tree::ASSOC_LEFT;
-    break;
-    case 'r':
-    assoc = Tree::ASSOC_RIGHT;
-    break;
-    case 'n':
-    assoc = Tree::ASSOC_NON;
-    break;
-
-    default:
-    throw 
-      "internal compiler error at: " __FILE__ ":" XSTRING(__LINE__);
-    break;
-  }
-
-  LexerIterator current = begin;
-  ++current;
-
-  u32string symbol;
-  expect(current, end, symbol, "constant", &Parser::is_string_constant);
-
-  u32string name;
-  expect(current, end, name, "constant", &Parser::is_string_constant);
-
-  expect_no_advance(current, end, "integer", TOKEN_INTEGER);
-
-  mpz_class precedence = get<mpz_class>(current->getValue());
-  ++current;
-
-  result = Tree::BinaryOperator(assoc, name, symbol, precedence);
-
-  begin = current;
-
-  return true;
-}
-
-bool
 Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
@@ -1337,6 +1279,29 @@ Parser::parse_op_decl(LexerIterator& begin, const LexerIterator& end,
 }
 
 bool
+Parser::parse_del_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"del")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  DelDecl del;
+
+  expect(current, end, del.id, "expr", &Parser::parse_expr);
+
+  begin = current;
+
+  result = del;
+
+  return true;
+}
+
+bool
 Parser::parse_data_constructor(LexerIterator& begin, const LexerIterator& end,
   DataConstructor& result)
 {
@@ -1400,48 +1365,6 @@ Parser::is_string_constant(LexerIterator& begin, const LexerIterator& end,
 
   result = value.second;
   ++begin;
-
-  return true;
-}
-
-bool
-Parser::parse_unary_decl(LexerIterator& begin, const LexerIterator& end,
-  Line& result)
-{
-  if (*begin != TOKEN_DECLID)
-  {
-    return false;
-  }
-
-  const u32string& decl = get<u32string>(begin->getValue());
-
-  Tree::UnaryType type;
-  if (decl == U"prefix")
-  {
-    type = Tree::UNARY_PREFIX;
-  }
-  else if (decl == U"postfix")
-  {
-    type = Tree::UNARY_POSTFIX;
-  }
-  else
-  {
-    return false;
-  }
-
-  LexerIterator current = begin;
-
-  ++current;
-
-  u32string symbol;
-  expect(current, end, symbol, "string", &Parser::is_string_constant);
-
-  u32string opname;
-  expect(current, end, opname, "string", &Parser::is_string_constant);
-
-  begin = current;
-
-  result = Tree::UnaryOperator(opname, symbol, type);
 
   return true;
 }
