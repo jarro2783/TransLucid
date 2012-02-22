@@ -24,7 +24,7 @@ set(builddir ${CMAKE_BINARY_DIR}/doc)
 set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
-include(DoGettextTranslate)
+include(GettextTranslate)
 
 enable_testing()
 
@@ -39,7 +39,7 @@ if (NOT GCC_IS_CORRECT_VERSION)
    message(FATAL_ERROR "g++ version 4.7.0 or greater is required")
 endif()
 
-find_package(Gettext REQUIRED)
+#find_package(Gettext REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 
