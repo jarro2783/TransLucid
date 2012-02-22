@@ -467,6 +467,11 @@ namespace detail
     }
 
     Constant
+    operator()(const Parser::ReplDecl& repl)
+    {
+    }
+
+    Constant
     operator()(const Parser::HostDecl& host)
     {
       Constant decl = compile_and_evaluate(host.expr, m_system);
@@ -1027,7 +1032,7 @@ System::parseLine
 
   Parser::LexerIterator lexit(begin, end, m_defaultk, lookupIdentifiers());
   Parser::LexerIterator lexend = lexit.makeEnd();
-  bool success = m_parser->parse_line(lexit, lexend, line);
+  bool success = m_parser->parse_decl(lexit, lexend, line);
 
   if (success)
   {

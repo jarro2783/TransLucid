@@ -243,6 +243,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
   add_decl_parser(m_top_decls, U"op", this, &Parser::parse_op_decl);
   add_decl_parser(m_top_decls, U"del", this, &Parser::parse_del_decl);
+  add_decl_parser(m_top_decls, U"repl", this, &Parser::parse_repl_decl);
 }
 
 void
@@ -426,6 +427,20 @@ Parser::parse_expr(LexerIterator& begin, const LexerIterator& end,
 }
 
 bool
+Parser::parse_constant(LexerIterator& begin, const LexerIterator& end,
+  Tree::Expr& result)
+{
+  if (begin->getType() == TOKEN_CONSTANT)
+  {
+    result = construct_typed_constant(begin);
+    ++begin;
+    return true;
+  }
+
+  return false;
+}
+
+bool
 Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
   Tree::Expr& result)
 {
@@ -452,7 +467,7 @@ Parser::parse_where(LexerIterator& begin, const LexerIterator& end,
         while (parsingWhere)
         {
           Line line;
-          if (parse_line(current, end, line))
+          if (parse_decl(current, end, line))
           {
             //for now just check if it's a var or dim and do the appropriate
             Variable* v = get<Variable>(&line);
@@ -941,6 +956,24 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
 }
 
 bool
+Parser::parse_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  LexerIterator current = begin;
+
+  if (!parse_line(current, end, result))
+  {
+    return false;
+  }
+
+  expect(current, end, ";;", TOKEN_DBLSEMI);
+
+  begin = current;
+
+  return true;
+}
+
+bool
 Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
@@ -964,8 +997,6 @@ Parser::parse_line(LexerIterator& begin, const LexerIterator& end,
 
     expect(current, end, result, "line: '" + utf32_to_utf8(id) + "'", 
            iter->second);
-
-    expect(current, end, ";;", TOKEN_DBLSEMI);
 
     begin = current;
     return true;
@@ -1292,11 +1323,34 @@ Parser::parse_del_decl(LexerIterator& begin, const LexerIterator& end,
 
   DelDecl del;
 
-  expect(current, end, del.id, "expr", &Parser::parse_expr);
+  expect(current, end, del.id, "constant", &Parser::parse_constant);
 
   begin = current;
 
   result = del;
+
+  return true;
+}
+
+bool
+Parser::parse_repl_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != U"repl")
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+  ++current;
+
+  ReplDecl repl;
+
+  expect(current, end, repl.id, "constant", &Parser::parse_constant);
+
+  expect(current, end, repl.repl, "line", &Parser::parse_line);
+
+  begin = current;
 
   return true;
 }

@@ -135,6 +135,8 @@ namespace TransLucid
       Tree::Expr id;
     };
 
+    struct ReplDecl;
+
     typedef Variant
     <
       Variable,
@@ -150,8 +152,17 @@ namespace TransLucid
       HostDecl,
       OpDecl,
       HDDecl,
-      DelDecl
+      DelDecl,
+      recursive_wrapper<ReplDecl>
     > Line;
+
+    struct ReplDecl
+    {
+      //replace this...
+      Tree::Expr id;
+      //with this
+      Line repl;
+    };
  
     struct Position
     {

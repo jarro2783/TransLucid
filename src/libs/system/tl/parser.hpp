@@ -41,6 +41,12 @@ namespace TransLucid
       parse_expr(LexerIterator& begin, const LexerIterator& end,
         Tree::Expr& result);
 
+      //parses a line plus the dbl semi
+      bool
+      parse_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      //parses just a line
       bool
       parse_line(LexerIterator& begin, const LexerIterator& end,
         Line& result);
@@ -53,6 +59,10 @@ namespace TransLucid
       };
 
       //all the parse functions
+      bool
+      parse_constant(LexerIterator& begin, const LexerIterator& end,
+        Tree::Expr& result);
+
       bool
       parse_where(LexerIterator& begin, const LexerIterator& end,
         Tree::Expr& result);
@@ -125,6 +135,10 @@ namespace TransLucid
 
       bool
       parse_del_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
+      parse_repl_decl(LexerIterator& begin, const LexerIterator& end,
         Line& result);
 
       bool
