@@ -29,6 +29,10 @@ along with TransLucid; see the file COPYING.  If not see
 #include "config.h"
 #endif
 
+#include "gettext.h"
+
+#define _(String) String
+
 //This runs the main web app interface to tltext.
 //We are using the POST method for html.
 
@@ -42,6 +46,59 @@ timeoutHandler(int sig)
 {
   std::cout << "CPU time limit exceeded" << std::endl;
   exit(1);
+}
+
+void* altstack;
+
+void
+handleSignals(int signal)
+{
+  switch (signal)
+  {
+    case SIGSEGV:
+
+    std::cout << "processing has terminated with a segfault"
+              << std::endl;
+    std::cout << "</body></html>" << std::endl;
+    exit(1);
+    break;
+  }
+}
+
+void
+setSignals()
+{
+  //set up an alternate stack because when we have a stack overflow we
+  //overflow the stack trying to handle the stack overflow
+
+  //ask for 512kB
+  altstack = malloc(512*1024);
+
+  stack_t ss;
+
+  ss.ss_sp = altstack;
+  ss.ss_size = 512*1024;
+  ss.ss_flags = 0;
+
+  if (sigaltstack(&ss, nullptr) == -1)
+  {
+    std::cerr << "error: could not allocate alternate signal stack" 
+              << std::endl;
+    perror("sigaltstack: ");
+    exit(1);
+  }
+
+  struct sigaction action;
+
+  action.sa_handler = &handleSignals;
+  sigemptyset(&action.sa_mask);
+  action.sa_flags = SA_ONSTACK;
+
+  if (sigaction(SIGSEGV, &action, nullptr) == -1)
+  {
+    std::cerr << "Could not set signal handler:";
+    perror("sigaction");
+  }
 }
 
 // Parse character as hex digit.
@@ -157,6 +214,8 @@ printForm(const std::string& program)
 int main(int argc, char* argv[])
 {
   htmlHead();
+
+  setSignals();
 
   //get the input length
   char* lengthstr = getenv("CONTENT_LENGTH");

@@ -141,6 +141,10 @@ TLText::run()
   setup_hds();
 
   //load up headers
+
+  //save some settings
+  bool uuids = m_uuids;
+  m_uuids = false;
   for (auto h : m_headers)
   {
     std::ifstream is(h.c_str());
@@ -160,6 +164,8 @@ TLText::run()
       processDefinitions(tokens, utf8_to_utf32(h));
     }
   }
+
+  m_uuids = uuids;
 
   *m_error << m_initialOut << std::endl;
   *m_is >> std::noskipws;
@@ -311,6 +317,13 @@ TLText::processDefinitions
         {
           auto result = 
             m_system.parseLine(posbegin, posend, m_verbose, m_debug);
+
+          if (m_uuids)
+          {
+            //print out whatever we got back
+            output(*m_os, OUTPUT_STANDARD) << m_system.printConstant(result)
+              << std::endl;
+          }
         }
         catch (TransLucid::Parser::ParseError& e)
         {

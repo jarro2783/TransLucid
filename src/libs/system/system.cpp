@@ -467,6 +467,11 @@ namespace detail
     }
 
     Constant
+    operator()(const Parser::ReplDecl& repl)
+    {
+    }
+
+    Constant
     operator()(const Parser::HostDecl& host)
     {
       Constant decl = compile_and_evaluate(host.expr, m_system);
@@ -624,6 +629,21 @@ namespace detail
       }
 
       return Constant();
+    }
+
+    Constant
+    operator()(const Parser::DelDecl& decl)
+    {
+      Constant id = compile_and_evaluate(decl.id, m_system);
+
+      if (id.index() != TYPE_INDEX_UUID)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      const uuid& u = Types::UUID::get(id);
+
+      return Types::Boolean::create(m_system.deleteEntity(u));
     }
 
     Constant
@@ -843,6 +863,8 @@ System::init_equations()
   addDecl(*this, U"data", U"DECLID");
   addDecl(*this, U"fun", U"DECLID");
   addDecl(*this, U"op", U"DECLID");
+  addDecl(*this, U"del", U"DECLID");
+  addDecl(*this, U"repl", U"DECLID");
 
   //add PRINT="this type has no printer"
   addInitEqn(*this,
@@ -882,6 +904,7 @@ System::System()
    {U"range", TYPE_INDEX_RANGE},
    {U"lambda", TYPE_INDEX_VALUE_FUNCTION},
    {U"phi", TYPE_INDEX_NAME_FUNCTION},
+   {U"uuid", TYPE_INDEX_UUID},
   }
   )
 , m_time(0)
@@ -983,7 +1006,7 @@ System::go()
 uuid
 System::addEquation(const u32string& name, const GuardWS& guard, WS* e)
 {
-  return addDeclInternal(name, guard, e, m_equations);
+  return addDeclInternal(name, guard, e, m_equations, m_equationUUIDs);
 }
 
 void
@@ -1009,7 +1032,7 @@ System::parseLine
 
   Parser::LexerIterator lexit(begin, end, m_defaultk, lookupIdentifiers());
   Parser::LexerIterator lexend = lexit.makeEnd();
-  bool success = m_parser->parse_line(lexit, lexend, line);
+  bool success = m_parser->parse_decl(lexit, lexend, line);
 
   if (success)
   {
@@ -1034,7 +1057,7 @@ System::parseLine
 Constant
 System::addEquation(const Parser::Equation& eqn)
 {
-  return addDeclInternal(eqn, m_equations);
+  return addDeclInternal(eqn, m_equations, m_equationUUIDs);
 }
 
 Constant 
@@ -1246,7 +1269,8 @@ System::addDeclInternal
 (
   const u32string& name, 
   const GuardWS& guard, WS* e,
-  DefinitionMap& declarations
+  DefinitionMap& declarations,
+  UUIDDefinition& uuids
 )
 {
   auto i = declarations.find(name);
@@ -1255,21 +1279,26 @@ System::addDeclInternal
   if (i == declarations.end())
   {
     var = new VariableWS(name, *this);
-    declarations.insert(std::make_pair(name, var));
+    i = declarations.insert(std::make_pair(name, var)).first;
   }
   else
   {
     var = i->second;
   }
 
-  return var->addEquation(name, guard, e, m_time);
+  uuid u = var->addEquation(name, guard, e, m_time);
+
+  uuids.insert(std::make_pair(u, i));
+
+  return u;
 }
 
 Constant
 System::addDeclInternal
 (
   const Parser::Equation& eqn, 
-  DefinitionMap& declarations
+  DefinitionMap& declarations,
+  UUIDDefinition& uuids
 )
 {
   TreeToWSTree tows(this);
@@ -1301,7 +1330,8 @@ System::addDeclInternal
     GuardWS(compile.build_workshops(guard),
       compile.build_workshops(boolean)),
     compile.build_workshops(expr),
-    declarations
+    declarations,
+    uuids
   );
 
   //add all the new equations
@@ -1312,7 +1342,8 @@ System::addDeclInternal
       GuardWS(compile.build_workshops(std::get<1>(e)),
         compile.build_workshops(std::get<2>(e))),
       compile.build_workshops(std::get<3>(e)),
-      declarations
+      declarations,
+      uuids
     );
   }
 
@@ -1322,7 +1353,7 @@ System::addDeclInternal
 Constant
 System::addAssignment(const Parser::Equation& eqn)
 {
-  return addDeclInternal(eqn, m_assignments);
+  return addDeclInternal(eqn, m_assignments, m_assignmentUUIDs);
 }
 
 type_index
@@ -1796,7 +1827,8 @@ System::addFunction(const Parser::FnDecl& fn)
       GuardWS(compile.build_workshops(std::get<1>(e)),
         compile.build_workshops(std::get<2>(e))),
       compile.build_workshops(std::get<3>(e)),
-      m_equations
+      m_equations,
+      m_equationUUIDs
     );
   }
 
@@ -1920,6 +1952,42 @@ void
 System::addHostTypeIndex(type_index index, const u32string& name)
 {
   m_typeRegistry.assignIndex(name, index);
+}
+
+bool
+System::deleteEntity(const uuid& u)
+{
+  //only look for equations at the moment
+  auto iter = m_equationUUIDs.find(u);
+
+  if (iter == m_equationUUIDs.end())
+  {
+    return false;
+  }
+
+  return iter->second->second->delexpr(u, m_time);
+}
+
+u32string
+System::printConstant(const Constant& c)
+{
+  auto iter = m_equations.find(U"canonical_print");
+
+  if (iter == m_equations.end())
+  {
+    return utf8_to_utf32(_("no print function defined"));
+  }
+
+  Constant func = (*iter->second)(m_defaultk);
+
+  Constant result = applyFunction(m_defaultk, func, c); 
+
+  if (result.index() != TYPE_INDEX_USTRING)
+  {
+    return utf8_to_utf32(_("canonical_print didn't return a string"));
+  }
+
+  return Types::String::get(result);
 }
 
 } //namespace TransLucid

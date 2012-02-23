@@ -32,6 +32,9 @@ namespace TransLucid
       Constant
       create(const uuid& u);
 
+      Constant
+      create(const Constant& c);
+
       const uuid&
       get(const Constant& c);
 
@@ -40,6 +43,9 @@ namespace TransLucid
 
       size_t
       hash(const Constant& c);
+
+      Constant
+      print(const Constant& c);
     }
   }
 }

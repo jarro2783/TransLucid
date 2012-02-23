@@ -234,9 +234,16 @@ namespace TransLucid
     void
     addHostTypeIndex(type_index index, const u32string& name);
 
+    bool
+    deleteEntity(const uuid& u);
+
+    u32string
+    printConstant(const Constant& c);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
+    typedef std::unordered_map<uuid, DefinitionMap::iterator> UUIDDefinition;
 
     //output hyperdatons
     typedef std::unordered_map<u32string, OutputHD*> OutputHDMap;
@@ -316,11 +323,14 @@ namespace TransLucid
     (
       const u32string& name, 
       const GuardWS& guard, WS* e,
-      DefinitionMap& declarations
+      DefinitionMap& declarations,
+      UUIDDefinition& uuids
     );
 
     Constant
-    addDeclInternal(const Parser::Equation& eqn, DefinitionMap& declarations);
+    addDeclInternal(const Parser::Equation& eqn, DefinitionMap& declarations,
+      UUIDDefinition& uuids
+    );
 
     void
     setDefaultContext();
@@ -331,7 +341,9 @@ namespace TransLucid
       Renames&&... renames);
 
     DefinitionMap m_equations;
+    UUIDDefinition m_equationUUIDs;
     DefinitionMap m_assignments;
+    UUIDDefinition m_assignmentUUIDs;
 
     //maps of string to hds and the hds uuids
     OutputHDMap m_outputHDs;

@@ -39,6 +39,9 @@ namespace TransLucid
 
 namespace
 {
+  //-1 represents no end time
+  constexpr int END_TIME_INFINITE = -1;
+
   template <typename Container>
   Constant
   evaluateBestselect(Context& k, Container&& results, const Constant& fn)
@@ -63,6 +66,7 @@ EquationWS::EquationWS(const u32string& name, const GuardWS& valid, WS* h,
   int provenance)
 : m_name(name), m_validContext(valid), m_h(h)
 , m_id(generate_uuid()), m_provenance(provenance)
+, m_endTime(END_TIME_INFINITE)
 , m_priority(valid.priority())
 {
 }
@@ -326,11 +330,15 @@ VariableWS::operator()(Context& k)
   const mpz_class& theTime = Types::Intmp::get(k.lookup(DIM_TIME));
 
   //find all the applicable ones
+
+  //for each priority...
+  //if nothing was found at this priority then look at the next one
   for (auto priorityIter = m_priorityVars.rbegin();
        priorityIter != m_priorityVars.rend() && applicable.empty();
        ++priorityIter
   )
   {
+    //look at everything created before this time
     const auto& thisPriority = priorityIter->second;
     for (auto provenanceIter = thisPriority.begin();
          provenanceIter != thisPriority.end() 
@@ -339,25 +347,30 @@ VariableWS::operator()(Context& k)
     )
     {
       const auto& eqn_i = provenanceIter->second;
-      if (eqn_i->second.validContext())
-      {
-        const GuardWS& guard = eqn_i->second.validContext();
-        Tuple evalContext = guard.evaluate(k);
+      int endTime = eqn_i->second.endTime();
 
-        if (tupleApplicable(evalContext, k)
-          && booleanTrue(guard, k)
-        )
-        {
-          applicable.push_back
-            (ApplicableTuple(evalContext, eqn_i));
-        }
-      }
-      else
+      if (endTime == END_TIME_INFINITE || endTime > theTime)
       {
-        if (eqn_i->second.provenance() <= theTime)
+        if (eqn_i->second.validContext())
         {
-          applicable.push_back
-            (ApplicableTuple(Tuple(), eqn_i));
+          const GuardWS& guard = eqn_i->second.validContext();
+          Tuple evalContext = guard.evaluate(k);
+
+          if (tupleApplicable(evalContext, k)
+            && booleanTrue(guard, k)
+          )
+          {
+            applicable.push_back
+              (ApplicableTuple(evalContext, eqn_i));
+          }
+        }
+        else
+        {
+          if (eqn_i->second.provenance() <= theTime)
+          {
+            applicable.push_back
+              (ApplicableTuple(Tuple(), eqn_i));
+          }
         }
       }
     }
@@ -551,7 +564,7 @@ VariableWS::replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr)
 void
 EquationWS::del(size_t time)
 {
-  //m_validContext.setTimeEnd(time);
+  m_endTime = time;
 }
 
 Constant
