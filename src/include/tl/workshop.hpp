@@ -34,8 +34,8 @@ namespace TransLucid
     virtual Constant
     operator()(Context& k) = 0;
 
-    virtual Constant
-    operator()(Context& kappa, Context& delta) = 0;
+    //virtual Constant
+    //operator()(Context& kappa, Context& delta) = 0;
   };
 } //namespace TransLucid
 
