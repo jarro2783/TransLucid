@@ -209,6 +209,16 @@ namespace
     }
 
     Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      //make sure the necessary dimensions are there
+      //I should write this in TL
+      //
+      //args = eval_workshop.(#!#!psi) 
+      //         @ #!#!pi @ [#!psi <- tail.#!#!psi, #!pi <- #!#!pi]
+    }
+
+    Constant
     operator()(Context& k)
     {
       //this should always work, but it's a bit hacky
@@ -876,6 +886,18 @@ System::init_equations()
 
   //args = case hd(##\psi) of E @ [#\pi <- tl(##\pi), #\psi <- tl(##\psi)]
   //  @ hd(##\pi)
+
+  //add a function eval_workshop
+  #if 0
+  addEquation(Parser::Equation
+  (
+    U"eval_workshop",
+    Tree::Expr(),
+    Tree::Expr(),
+    Tree::LambdaExpr(U"x")
+  ));
+  #endif
+
   addEquation(U"args", GuardWS(), new ArgsWorkshop);
 
   addEquation(U"make_error", GuardWS(), new MakeErrorWS);
