@@ -447,6 +447,12 @@ namespace TransLucid
       return Types::BaseFunction::create(*m_fn);
     }
 
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      return operator()(kappa);
+    }
+
     private:
     BaseFunctionType* m_fn;
   };

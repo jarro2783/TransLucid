@@ -205,6 +205,12 @@ namespace TransLucid
       return (*m_h)(k);
     }
 
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      return (*m_h)(kappa, delta);
+    }
+
     int
     provenance() const
     {
