@@ -36,6 +36,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/types/boolean.hpp>
 #include <tl/types/char.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/intmp.hpp>
@@ -399,6 +400,13 @@ namespace TransLucid
         &delete_ptr<WorkshopType>
       };
 
+    TypeFunctions demand_type_functions =
+      {
+        &Types::Demand::equality,
+        &Types::Demand::hash,
+        &delete_ptr<DemandType>
+      };
+
     //copied and pasted from types.hpp, this should match the strings below
     #if 0
     SP_ERROR, /**<Error value. Should never have this value, having a special
@@ -675,6 +683,16 @@ namespace TransLucid
       operator()(const Tuple& t)
       {
         return new Tuple(t);
+      }
+    };
+
+    template <>
+    struct clone<DemandType>
+    {
+      DemandType*
+      operator()(const DemandType& d)
+      {
+        return new DemandType(d);
       }
     };
   }
@@ -1115,6 +1133,34 @@ namespace TransLucid
       equality(const Constant& lhs, const Constant& rhs)
       {
         return get(lhs).ws() == get(rhs).ws();
+      }
+    }
+
+    namespace Demand
+    {
+      Constant
+      create(std::vector<dimension_index>& dims)
+      {
+        return make_constant_pointer(DemandType(dims), &demand_type_functions, 
+          TYPE_INDEX_DEMAND);
+      }
+
+      bool
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return get(c).hash();
+      }
+
+      const DemandType&
+      get(const Constant& c)
+      {
+        return get_constant_pointer<DemandType>(c);
       }
     }
   }

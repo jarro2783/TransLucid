@@ -469,6 +469,8 @@ namespace detail
     Constant
     operator()(const Parser::ReplDecl& repl)
     {
+      //TODO implement repl
+      return Constant();
     }
 
     Constant
