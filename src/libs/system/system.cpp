@@ -216,6 +216,27 @@ namespace
       //
       //args = eval_workshop.(#!#!psi) 
       //         @ #!#!pi @ [#!psi <- tail.#!#!psi, #!pi <- #!#!pi]
+
+      //we need to check if DIM_PSI and DIM_PI exist
+      //then look them up and check that their dims exist
+      //then we can call the normal operator()
+      
+      std::vector<dimension_index> needs;
+
+      if (!delta.has_entry(DIM_PSI))
+      {
+        needs.push_back(DIM_PSI);
+      }
+
+      if (!delta.has_entry(DIM_PI))
+      {
+        needs.push_back(DIM_PI);
+      }
+
+      if (needs.size() > 0)
+      {
+        //stop here
+      }
     }
 
     Constant

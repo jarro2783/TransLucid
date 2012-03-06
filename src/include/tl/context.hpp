@@ -84,6 +84,15 @@ namespace TransLucid
     bool
     operator<=(const Context& rhs) const;
 
+    bool
+    has_entry(dimension_index i) const
+    {
+      return 
+        i > m_min && 
+        i < m_max && 
+        m_context.at(makeIndex(i)).size() != 0;
+    }
+
     private:
 
     dimension_index
