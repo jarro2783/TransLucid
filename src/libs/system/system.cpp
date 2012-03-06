@@ -66,6 +66,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/tree_printer.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/special.hpp>
@@ -235,38 +236,85 @@ namespace
 
       if (needs.size() > 0)
       {
-        //stop here
+        return Types::Demand::create(needs);
       }
-    }
 
-    Constant
-    operator()(Context& k)
-    {
-      //this should always work, but it's a bit hacky
-
-      //head of ##\psi
-      Constant hashPsi = k.lookup(DIM_PSI);
+      //then we have the dimensions that we need
+      Constant hashPsi = delta.lookup(DIM_PSI);
 
       if (hashPsi.index() != TYPE_INDEX_DIMENSION)
       {
         throw "list dimension not a dimension";
       }
-
-      Constant hashHashPsi = k.lookup(get_constant<dimension_index>(hashPsi));
-
-      if (hashHashPsi.index() != TYPE_INDEX_TUPLE)
+      
+      auto d1 = get_constant<dimension_index>(hashPsi);
+      if (!delta.has_entry(d1))
       {
-        throw "list expected, type not a tuple";
+        needs.push_back(d1);
       }
 
-      Constant hashPi = k.lookup(DIM_PI);
+      Constant hashPi = delta.lookup(DIM_PI);
 
       if (hashPi.index() != TYPE_INDEX_DIMENSION)
       {
         throw "list dimension not a dimension";
       }
 
-      Constant hashHashPi = k.lookup(get_constant<dimension_index>(hashPi));
+      auto d2 = get_constant<dimension_index>(hashPi);
+      if (!delta.has_entry(d2))
+      {
+        needs.push_back(d2);
+      }
+
+      if (needs.size() > 0)
+      {
+        return Types::Demand::create(needs);
+      }
+
+      return evaluate(kappa, delta);
+    }
+
+    Constant
+    operator()(Context& k)
+    {
+      return evaluate(k);
+    }
+
+    //when this is called, delta will be setup correctly if it is the cached
+    //version, if not it just won't exist
+    //in which case it is always safe to read from the kappa
+    //then pass on kappa and delta if it exists as appropriate
+    template <typename... Delta>
+    Constant
+    evaluate(Context& kappa, Delta&&... delta)
+    {
+      //this should always work, but it's a bit hacky
+
+      //head of ##\psi
+      Constant hashPsi = kappa.lookup(DIM_PSI);
+
+      if (hashPsi.index() != TYPE_INDEX_DIMENSION)
+      {
+        throw "list dimension not a dimension";
+      }
+
+      Constant hashHashPsi = 
+        kappa.lookup(get_constant<dimension_index>(hashPsi));
+
+      if (hashHashPsi.index() != TYPE_INDEX_TUPLE)
+      {
+        throw "list expected, type not a tuple";
+      }
+
+      Constant hashPi = kappa.lookup(DIM_PI);
+
+      if (hashPi.index() != TYPE_INDEX_DIMENSION)
+      {
+        throw "list dimension not a dimension";
+      }
+
+      Constant hashHashPi = 
+        kappa.lookup(get_constant<dimension_index>(hashPi));
 
       if (hashHashPi.index() != TYPE_INDEX_TUPLE)
       {
@@ -281,7 +329,7 @@ namespace
       try
       {
 
-        ContextPerturber p(k,
+        ContextPerturber p(kappa,
           {
             {get_constant<dimension_index>(hashPsi), listTail(hashHashPsi)},
             {get_constant<dimension_index>(hashPi), listTail(hashHashPi)}
@@ -292,7 +340,7 @@ namespace
 
         WS* w = Types::Workshop::get(expr).ws();
 
-        return (*w)(k);
+        return (*w)(kappa, delta...);
       
       }
       catch (...)
@@ -310,6 +358,12 @@ namespace
   class MakeErrorWS : public WS
   {
     public:
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      return operator()(kappa);
+    }
+
     Constant
     operator()(Context& k)
     {
