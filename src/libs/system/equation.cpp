@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/eval_workshops.hpp>
 #include <tl/output.hpp>
 #include <tl/range.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/tuple.hpp>
@@ -256,6 +257,7 @@ GuardWS::operator=(const GuardWS& rhs)
 Tuple
 GuardWS::evaluate(Context& k) const
 {
+  m_demands.clear();
   tuple_t t = m_dimConstConst;
 
   if (m_guard)
@@ -266,19 +268,36 @@ GuardWS::evaluate(Context& k) const
     for (const auto& constNon : m_dimConstNon)
     {
       Constant ord = constNon.second->operator()(k);
-      t.insert(std::make_pair(constNon.first, ord));
+
+      if (ord.index() == TYPE_INDEX_DEMAND)
+      {
+        const auto& dims = Types::Demand::get(ord).dims();
+        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
+      }
+      else
+      {
+        t.insert(std::make_pair(constNon.first, ord));
+      }
     }
 
     for (const auto& nonConst : m_dimNonConst)
     {
       Constant dim = nonConst.first->operator()(k);
 
-      dimension_index index =
-        dim.index() == TYPE_INDEX_DIMENSION 
-        ? get_constant<dimension_index>(dim)
-        : m_system->getDimensionIndex(dim);
+      if (dim.index() == TYPE_INDEX_DEMAND)
+      {
+        const auto& dims = Types::Demand::get(dim).dims();
+        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
+      }
+      else
+      {
+        dimension_index index =
+          dim.index() == TYPE_INDEX_DIMENSION 
+          ? get_constant<dimension_index>(dim)
+          : m_system->getDimensionIndex(dim);
 
-      t.insert(std::make_pair(index, nonConst.second));
+        t.insert(std::make_pair(index, nonConst.second));
+      }
     }
 
     for (const auto& nonNon : m_dimNonNon)
@@ -286,12 +305,31 @@ GuardWS::evaluate(Context& k) const
       Constant dim = nonNon.first->operator()(k);
       Constant ord = nonNon.second->operator()(k);
 
-      dimension_index index =
-        dim.index() == TYPE_INDEX_DIMENSION 
-        ? get_constant<dimension_index>(dim)
-        : m_system->getDimensionIndex(dim);
+      bool isdemand = false;
 
-      t.insert(std::make_pair(index, ord));
+      if (ord.index() == TYPE_INDEX_DEMAND)
+      {
+        const auto& dims = Types::Demand::get(ord).dims();
+        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
+        isdemand = true;
+      }
+
+      if (dim.index() == TYPE_INDEX_DEMAND)
+      {
+        const auto& dims = Types::Demand::get(dim).dims();
+        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
+        isdemand = true;
+      }
+
+      if (!isdemand)
+      {
+        dimension_index index =
+          dim.index() == TYPE_INDEX_DIMENSION 
+          ? get_constant<dimension_index>(dim)
+          : m_system->getDimensionIndex(dim);
+
+        t.insert(std::make_pair(index, ord));
+      }
     }
   }
 

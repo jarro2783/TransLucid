@@ -136,6 +136,14 @@ namespace TransLucid
       return m_priority;
     }
 
+    //after a call to evaluate, these are reset to whatever demands evaluate
+    //produced
+    const std::vector<dimension_index>&
+    demands() const
+    {
+      return m_demands;
+    }
+
     private:
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
@@ -151,6 +159,8 @@ namespace TransLucid
     System* m_system;
 
     int m_priority;
+
+    mutable std::vector<dimension_index> m_demands;
   };
 
   class VariableWS;
