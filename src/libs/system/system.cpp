@@ -405,6 +405,30 @@ namespace detail
       return m_hd->get(k);
     }
 
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      //check that the variance is in the delta
+      const auto& variance = m_hd->variance();
+
+      std::vector<dimension_index> needs;
+
+      for (const auto& d : variance)
+      {
+        if (!delta.has_entry(d.first))
+        {
+          needs.push_back(d.first);
+        }
+      }
+
+      if (needs.size() != 0)
+      {
+        return Types::Demand::create(needs);
+      }
+
+      return operator()(kappa);
+    }
+
     private:
     u32string m_name;
     System& m_system;

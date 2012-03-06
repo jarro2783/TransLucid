@@ -573,4 +573,10 @@ ConditionalBestfitWS::operator()(Context& k)
   return (*m_var)(k);
 }
 
+Constant
+ConditionalBestfitWS::operator()(Context& k, Context& delta)
+{
+  return (*m_var)(k, delta);
+}
+
 }

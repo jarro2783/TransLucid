@@ -254,6 +254,9 @@ namespace TransLucid
     virtual Constant
     operator()(Context& k);
 
+    Constant
+    operator()(Context& kappa, Context& delta);
+
     #if 0
     virtual uuid
     addExpr(const Tuple& k, WS* h)
@@ -338,6 +341,9 @@ namespace TransLucid
 
     Constant
     operator()(Context& k);
+
+    Constant
+    operator()(Context& kappa, Context& delta);
 
     uuid
     addEquation
