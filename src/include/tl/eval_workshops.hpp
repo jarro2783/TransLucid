@@ -562,6 +562,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       System* m_system;
       u32string m_name;
@@ -605,6 +608,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       WS* m_lhs;
@@ -672,6 +678,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       System* m_system;
       u32string m_name;
@@ -714,6 +723,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       WS* m_lhs;

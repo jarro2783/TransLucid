@@ -20,10 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_FUNCTION_HPP_INCLUDED
 #define TYPES_FUNCTION_HPP_INCLUDED
 
+#include <tl/context.hpp>
+#include <tl/fixed_indexes.hpp>
+#include <tl/system.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types.hpp>
-#include <tl/context.hpp>
-#include <tl/system.hpp>
 
 #include <vector>
 #include <functional>
@@ -377,6 +379,34 @@ namespace TransLucid
 
     std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
   };
+
+  Constant
+  createValueFunction
+  (
+    System *system,
+    const u32string& name, 
+    dimension_index argDim, 
+    const std::vector<dimension_index>& scope,
+    const std::vector<std::pair<u32string, dimension_index>>& free,
+    WS* expr,
+    Context& kappa
+  );
+
+  //check for scope dimensions
+  //evaluate free variables, checking for demands
+  //then create the actual function
+  Constant
+  createValueFunctionCached
+  (
+    System *system,
+    const u32string& name, 
+    dimension_index argDim, 
+    const std::vector<dimension_index>& scope,
+    const std::vector<std::pair<u32string, dimension_index>>& free,
+    WS* expr,
+    Context& kappa,
+    Context& delta
+  );
   
   namespace Types
   {

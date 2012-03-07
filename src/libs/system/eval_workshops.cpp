@@ -639,6 +639,18 @@ BaseAbstractionWS::operator()(Context& k)
 Constant
 LambdaAbstractionWS::operator()(Context& k)
 {
+  return createValueFunction
+    (
+      m_system,
+      m_name,
+      m_argDim,
+      m_scope,
+      m_free,
+      m_rhs,
+      k
+    );
+
+  #if 0
   return Types::ValueFunction::create
   (
     ValueFunctionType
@@ -652,6 +664,44 @@ LambdaAbstractionWS::operator()(Context& k)
       k
     )
   );
+  #endif
+}
+
+Constant
+LambdaAbstractionWS::operator()(Context& kappa, Context& delta)
+{
+  //first verify that m_scope are all in delta
+
+  std::vector<dimension_index> demands;
+
+  //but evaluating the free variables needs to be done in a cached manner
+  return createValueFunctionCached
+    (
+      m_system,
+      m_name,
+      m_argDim,
+      m_scope,
+      m_free,
+      m_rhs,
+      kappa,
+      delta
+    );
+
+  #if 0
+  return Types::ValueFunction::create
+  (
+    ValueFunctionType
+    (
+      m_system,
+      m_name, 
+      m_argDim, 
+      m_scope,
+      m_free,
+      m_rhs, 
+      k
+    )
+  );
+  #endif
 }
 
 Constant
@@ -671,6 +721,30 @@ LambdaApplicationWS::operator()(Context& k)
   const ValueFunctionType& f = Types::ValueFunction::get(lhs);
 
   return f.apply(k, rhs);
+}
+
+Constant
+LambdaApplicationWS::operator()(Context& kappa, Context& delta)
+{
+  //evaluate the lhs, evaluate the rhs
+  //and pass the value to the function to evaluate
+
+  Constant lhs = (*m_lhs)(kappa, delta);
+  //first make sure that it is a function
+  if (lhs.index() == TYPE_INDEX_DEMAND)
+  {
+    return lhs;
+  }
+  else if (lhs.index() != TYPE_INDEX_VALUE_FUNCTION)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+
+  Constant rhs = (*m_rhs)(kappa, delta);
+  const ValueFunctionType& f = Types::ValueFunction::get(lhs);
+
+  return f.apply(kappa, rhs);
+
 }
 
 Constant

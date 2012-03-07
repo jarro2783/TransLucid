@@ -28,7 +28,9 @@ internal_strings.cpp lexertl.cpp lexer_util.cpp
 library.cpp line_tokenizer.cpp parser.cpp
 range.cpp rename.cpp system.cpp
 tree_printer.cpp
-tree_to_wstree.cpp types.cpp utility.cpp uuid.cpp
+tree_to_wstree.cpp 
+types/function.cpp
+types.cpp utility.cpp uuid.cpp
 workshop_builder.cpp
 )
 

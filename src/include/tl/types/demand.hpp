@@ -81,6 +81,7 @@ namespace TransLucid
       get(const Constant& c);
 
       //append the demands in d to dims
+      inline
       void
       append(const Constant& d, std::vector<dimension_index>& dims)
       {
