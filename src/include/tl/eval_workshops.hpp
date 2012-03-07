@@ -76,6 +76,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& k, Context& delta);
     };
 
     class DimensionWS : public WS
@@ -87,6 +90,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& k, Context& delta);
 
       private:
       Constant m_value;
@@ -102,12 +108,19 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& k, Context& delta);
+
       private:
       System::IdentifierLookup m_identifiers;
       u32string m_name;
 
       //don't delete this, it doesn't belong to you
       WS* m_e;
+
+      template <typename... Delta>
+      Constant
+      evaluate(Context& kappa, Delta&&... delta);
     };
 
     class VariableOpWS : public WS
@@ -313,6 +326,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& k, Context& kappa);
 
       private:
       System& m_system;

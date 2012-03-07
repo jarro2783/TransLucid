@@ -146,10 +146,21 @@ HashSymbolWS::operator()(Context& k)
 }
 
 Constant
+BoolConstWS::operator()(Context& k, Context& delta)
+{
+  return operator()(k);
+}
+
+Constant
 BoolConstWS::operator()(Context& k)
 {
-  //return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
   return m_value;
+}
+
+Constant
+TypeConstWS::operator()(Context& k, Context& delta)
+{
+  return operator()(k);
 }
 
 Constant
@@ -165,7 +176,26 @@ DimensionWS::operator()(Context& k)
 }
 
 Constant
+DimensionWS::operator()(Context& k, Context& delta)
+{
+  return operator()(delta);
+}
+
+Constant
+IdentWS::operator()(Context& kappa, Context& delta)
+{
+  return evaluate(kappa, delta);
+}
+
+Constant
 IdentWS::operator()(Context& k)
+{
+  return evaluate(k);
+}
+
+template <typename... Delta>
+Constant
+IdentWS::evaluate(Context& kappa, Delta&&... delta)
 {
   if (m_e == nullptr)
   {
@@ -174,7 +204,7 @@ IdentWS::operator()(Context& k)
 
   if (m_e != nullptr)
   {
-    return (*m_e)(k);
+    return (*m_e)(kappa, delta...);
   }
   else
   {
@@ -329,6 +359,13 @@ IfWS::operator()(Context& k)
 
 Constant
 HashWS::operator()(Context& k)
+{
+  Constant r = (*m_e)(k);
+  return lookup_context(m_system, r, k);
+}
+
+Constant
+HashWS::operator()(Context& k, Context& delta)
 {
   Constant r = (*m_e)(k);
   return lookup_context(m_system, r, k);

@@ -534,27 +534,34 @@ lookup_context(System& system, const Constant& v, const Context& k)
   }
 
   return Constant(k.lookup(index));
+}
 
-#if 0
-  Tuple::const_iterator iter = k.find(index);
-  if (iter != k.end())
+Constant
+lookup_context_cached
+(
+  System& system, 
+  const Constant& v, 
+  const Context& delta
+)
+{
+  dimension_index index;
+  if (v.index() == TYPE_INDEX_DIMENSION)
   {
-    return TaggedConstant(iter->second, k);
+    index = get_constant<dimension_index>(v);
   }
   else
   {
-    //find the all dimension
-    Tuple::const_iterator all = k.find(DIM_ALL);
-    if (all == k.end())
-    {
-      return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
-    }
-    else
-    {
-      return TaggedConstant(all->second, k);
-    }
+    index = system.getDimensionIndex(v);
   }
-#endif
+
+  if (delta.has_entry(index))
+  {
+    return Constant(delta.lookup(index));
+  }
+  else
+  {
+    return Types::Demand::create({index});
+  }
 }
 
 Tuple
