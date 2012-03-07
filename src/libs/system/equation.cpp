@@ -254,8 +254,9 @@ GuardWS::operator=(const GuardWS& rhs)
   return *this;
 }
 
+template <typename... Delta>
 Tuple
-GuardWS::evaluate(Context& k) const
+GuardWS::evaluate(Context& k, Delta&&... delta) const
 {
   m_demands.clear();
   tuple_t t = m_dimConstConst;
@@ -267,7 +268,7 @@ GuardWS::evaluate(Context& k) const
     //evaluate the ones left
     for (const auto& constNon : m_dimConstNon)
     {
-      Constant ord = constNon.second->operator()(k);
+      Constant ord = constNon.second->operator()(k, delta...);
 
       if (ord.index() == TYPE_INDEX_DEMAND)
       {
@@ -282,7 +283,7 @@ GuardWS::evaluate(Context& k) const
 
     for (const auto& nonConst : m_dimNonConst)
     {
-      Constant dim = nonConst.first->operator()(k);
+      Constant dim = nonConst.first->operator()(k, delta...);
 
       if (dim.index() == TYPE_INDEX_DEMAND)
       {
@@ -302,8 +303,8 @@ GuardWS::evaluate(Context& k) const
 
     for (const auto& nonNon : m_dimNonNon)
     {
-      Constant dim = nonNon.first->operator()(k);
-      Constant ord = nonNon.second->operator()(k);
+      Constant dim = nonNon.first->operator()(k, delta...);
+      Constant ord = nonNon.second->operator()(k, delta...);
 
       bool isdemand = false;
 
@@ -344,11 +345,118 @@ GuardWS makeGuardWithTime(const mpz_class& start)
   return g;
 }
 
-#if 0
-bool VariableWS::equationValid(const EquationWS& e, const Tuple& k)
+typedef std::tuple<Tuple, VariableWS::UUIDEquationMap::const_iterator> 
+  ApplicableTuple;
+typedef std::vector<ApplicableTuple> applicable_list;
+
+//how to bestfit with a cache
+//  until we find a priority that has valid equations and there are no demands
+//  for dimensions, do:
+//1. evaluate all the guards that are applicable to the current time
+//2. if there are any demands for dimensions then return
+//3. evaluate the booleans and guards for applicability
+//4. if any of that requires dimensions then return
+//5. then bestfit
+Constant
+VariableWS::operator()(Context& kappa, Context& delta)
 {
+  applicable_list applicable;
+  applicable_list potential;
+  applicable.reserve(m_equations.size());
+  std::vector<dimension_index> demands;
+
+  const mpz_class& theTime = Types::Intmp::get(kappa.lookup(DIM_TIME));
+
+  //find all the applicable ones
+
+  //for each priority...
+  //if nothing was found at this priority then look at the next one
+  for (auto priorityIter = m_priorityVars.rbegin();
+       priorityIter != m_priorityVars.rend() && applicable.empty();
+       ++priorityIter
+  )
+  {
+    //make sure there are no potentials from the previous priority
+    potential.clear();
+
+    //look at everything created before this time
+    const auto& thisPriority = priorityIter->second;
+    for (auto provenanceIter = thisPriority.begin();
+         provenanceIter != thisPriority.end() 
+           && provenanceIter->first <= theTime;
+         ++provenanceIter
+    )
+    {
+      const auto& eqn_i = provenanceIter->second;
+      int endTime = eqn_i->second.endTime();
+
+      //if it is valid in this instant
+      if (endTime == END_TIME_INFINITE || endTime > theTime)
+      {
+        //if it has a non-empty context guard
+        if (eqn_i->second.validContext())
+        {
+          const GuardWS& guard = eqn_i->second.validContext();
+          Tuple evalContext = guard.evaluate(kappa, delta);
+
+          std::copy(guard.demands().begin(), guard.demands().end(),
+            std::back_inserter(demands));
+
+          potential.push_back(ApplicableTuple(evalContext, eqn_i));
+        }
+        else
+        {
+          potential.push_back(ApplicableTuple(Tuple(), eqn_i));
+        }
+      }
+    }
+
+    if (demands.size() > 0)
+    {
+      return Types::Demand::create(demands);
+    }
+
+    //go through the potential equations and check their applicability
+    for (const auto& p : potential)
+    {
+      const auto& context = std::get<0>(p);
+      if (context.begin() == context.end())
+      {
+        if (std::get<1>(p)->second.provenance() <= theTime)
+        {
+          applicable.push_back(p);
+        }
+      }
+      else
+      {
+        //check that all the dimensions in context are in delta
+        for (const auto& index : context)
+        {
+          if (!delta.has_entry(index.first))
+          {
+            demands.push_back(index.first);
+          }
+        }
+      }
+      #if 0
+      if (tupleApplicable(evalContext, kappa)
+        && booleanTrue(guard, kappa)
+      )
+      {
+        applicable.push_back(ApplicableTuple(evalContext, eqn_i));
+      }
+
+      #endif
+    }
+
+    //stop if looking at the tuples generated demands
+    if (demands.size() > 0)
+    {
+      return Types::Demand::create(demands);
+    }
+
+  }
 }
-#endif
 
 Constant
 VariableWS::operator()(Context& k)
@@ -360,8 +468,6 @@ VariableWS::operator()(Context& k)
   //k.print(std::cerr);
   //std::cerr << std::endl;
 
-  typedef std::tuple<Tuple, UUIDEquationMap::const_iterator> ApplicableTuple;
-  typedef std::vector<ApplicableTuple> applicable_list;
   applicable_list applicable;
   applicable.reserve(m_equations.size());
 

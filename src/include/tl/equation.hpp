@@ -109,8 +109,9 @@ namespace TransLucid
      *
      * Returns a tuple of the dimensions and the evaluated AST.
      **/
+    template <typename... Delta>
     Tuple
-    evaluate(Context& k) const;
+    evaluate(Context& k, Delta&&... delta) const;
 
     /**
      * @brief Adds a system imposed dimension.
