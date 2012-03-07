@@ -221,7 +221,8 @@ macro(GettextTranslate)
           ${PO_FILE_NAME} ${TEMPLATE_FILE_ABS} 
           -o ${PO_FILE_NAME}.new
         COMMAND mv ${PO_FILE_NAME}.new ${PO_FILE_NAME}
-        DEPENDS ${MAKEVAR_DOMAIN}.pot-update
+        #DEPENDS ${MAKEVAR_DOMAIN}.pot-update
+        DEPENDS ${TEMPLATE_FILE_ABS}
       )
 
     endif()
