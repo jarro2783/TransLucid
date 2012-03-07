@@ -1139,7 +1139,7 @@ namespace TransLucid
     namespace Demand
     {
       Constant
-      create(std::vector<dimension_index>& dims)
+      create(const std::vector<dimension_index>& dims)
       {
         return make_constant_pointer(DemandType(dims), &demand_type_functions, 
           TYPE_INDEX_DEMAND);
