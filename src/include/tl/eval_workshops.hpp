@@ -142,57 +142,6 @@ namespace TransLucid
       u32string m_symbol;
     };
 
-    class IsSpecialWS : public WS
-    {
-      public:
-      IsSpecialWS(WS* system, const u32string& special, WS* e)
-      : m_special(special),
-      m_e(e)
-      {}
-
-      Constant
-      operator()(Context& k);
-
-      private:
-      WS* m_system;
-      u32string m_special;
-      WS* m_e;
-    };
-
-    class IsTypeWS : public WS
-    {
-      public:
-      IsTypeWS(WS* system, const u32string& type, WS* e)
-      : m_system(system), m_type(type), m_e(e)
-      {}
-
-      Constant
-      operator()(Context& k);
-
-      private:
-      WS* m_system;
-      u32string m_type;
-      WS* m_e;
-    };
-
-    //TODO work out what converting is
-    #if 0
-    class ConvertWS : public WS
-    {
-      public:
-      ConvertWS(const u32string& to, WS* e)
-      : m_to(to), m_e(e)
-      {}
-
-      Constant
-      operator()(const Tuple& k);
-
-      private:
-      u32string m_to;
-      WS* m_e;
-    };
-    #endif
-
     /**
      * A bang operation workshop. Evaluates a host function.
      */

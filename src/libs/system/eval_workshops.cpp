@@ -1,5 +1,5 @@
 /* Workshops generated from AST::Expr.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -144,6 +144,12 @@ Constant
 HashSymbolWS::operator()(Context& k)
 {
   return Types::Tuple::create(Tuple(k));
+}
+
+Constant
+HashSymbolWS::operator()(Context& kappa, Context& delta)
+{
+  return Types::Tuple::create(Tuple(kappa));
 }
 
 Constant
@@ -446,23 +452,21 @@ IntmpConstWS::operator()(Context& k)
 }
 
 Constant
-IsSpecialWS::operator()(Context& k)
+IntmpConstWS::operator()(Context& kappa, Context& delta)
 {
-  //this is going away, but to stop warnings
-  return Constant();
-}
-
-Constant
-IsTypeWS::operator()(Context& k)
-{
-  //this is going away, but to stop warnings
-  return Constant();
+  return operator()(kappa);
 }
 
 Constant
 SpecialConstWS::operator()(Context& k)
 {
-  return Constant(Special(m_value), TYPE_INDEX_SPECIAL);
+  return Types::Special::create(m_value);
+}
+
+Constant
+SpecialConstWS::operator()(Context& k, Context& delta)
+{
+  return operator()(k);
 }
 
 UStringConstWS::UStringConstWS(const u32string& s)
@@ -487,9 +491,21 @@ UStringConstWS::operator()(Context& k)
 }
 
 Constant
+UStringConstWS::operator()(Context& k, Context& delta)
+{
+  return operator()(k);
+}
+
+Constant
 UCharConstWS::operator()(Context& k)
 {
   return m_value;
+}
+
+Constant
+UCharConstWS::operator()(Context& kappa, Context& delta)
+{
+  return operator()(kappa);
 }
 
 Constant
@@ -744,12 +760,24 @@ LambdaApplicationWS::operator()(Context& kappa, Context& delta)
   const ValueFunctionType& f = Types::ValueFunction::get(lhs);
 
   return f.apply(kappa, rhs);
-
 }
 
 Constant
 NamedAbstractionWS::operator()(Context& k)
 {
+  return createNameFunction
+    (
+      m_system, 
+      m_name, 
+      m_argDim, 
+      m_odometerDim, 
+      m_scope, 
+      m_free, 
+      m_rhs, 
+      k
+    );
+
+  #if 0
   return Types::NameFunction::create
   (
     NameFunctionType
@@ -764,6 +792,24 @@ NamedAbstractionWS::operator()(Context& k)
       k
     )
   );
+  #endif
+}
+
+Constant
+NamedAbstractionWS::operator()(Context& kappa, Context& delta)
+{
+  return createNameFunctionCached
+    (
+      m_system, 
+      m_name, 
+      m_argDim, 
+      m_odometerDim, 
+      m_scope, 
+      m_free, 
+      m_rhs, 
+      kappa,
+      delta
+    );
 }
 
 Constant
@@ -783,6 +829,27 @@ NameApplicationWS::operator()(Context& k)
   return f.apply(k, rhs, m_Lall);
 }
 
+Constant
+NameApplicationWS::operator()(Context& kappa, Context& delta)
+{
+  Constant lhs = (*m_lhs)(kappa, delta);
+
+  if (lhs.index() == TYPE_INDEX_DEMAND)
+  {
+    return lhs;
+  }
+
+  if (lhs.index() != TYPE_INDEX_NAME_FUNCTION)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+
+  //named application passes a pointer to the intension
+  Constant rhs = Types::Workshop::create(m_rhs);
+  const NameFunctionType& f = Types::NameFunction::get(lhs);
+
+  return f.apply(kappa, rhs, m_Lall);
+}
 Constant
 AtTupleWS::operator()(Context& k)
 {
