@@ -257,6 +257,9 @@ namespace TransLucid
   {
     public:
     typedef std::map<uuid, EquationWS> UUIDEquationMap;
+    typedef std::tuple<Tuple, VariableWS::UUIDEquationMap::const_iterator> 
+      ApplicableTuple;
+    typedef std::vector<ApplicableTuple> applicable_list;
 
     VariableWS(const u32string& name, System& system);
     
@@ -267,6 +270,10 @@ namespace TransLucid
 
     Constant
     operator()(Context& kappa, Context& delta);
+
+    template <typename... Delta>
+    Constant
+    bestfit(const applicable_list& applicable, Context& k, Delta&&... delta);
 
     #if 0
     virtual uuid

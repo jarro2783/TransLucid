@@ -133,6 +133,16 @@ namespace TransLucid
   bool
   booleanTrue(const GuardWS& g, Context& c);
 
+  //the cached boolean true
+  bool
+  booleanTrue
+  (
+    const GuardWS& g, 
+    Context& c, 
+    Context& delta, 
+    std::vector<dimension_index>& demands
+  );
+
   //looks up a value in the current context and returns the value of the
   //all dimension if it exists, otherwise special<dim> if not found
   Constant

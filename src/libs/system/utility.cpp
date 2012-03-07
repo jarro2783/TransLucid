@@ -32,6 +32,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/equation.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
@@ -350,6 +351,41 @@ booleanTrue(const GuardWS& g, Context& k)
   {
     return true;
   }
+}
+
+//the cached boolean true
+bool
+booleanTrue
+(
+  const GuardWS& g, 
+  Context& kappa, 
+  Context& delta, 
+  std::vector<dimension_index>& demands
+)
+{
+  WS* b = g.boolean();
+
+  if (b)
+  {
+    Constant v = (*b)(kappa, delta);// = i.evaluate(g.boolean(), c);
+
+    if (v.index() == TYPE_INDEX_DEMAND)
+    {
+      const auto& newd = Types::Demand::get(v);
+      std::copy(newd.dims().begin(), newd.dims().end(), 
+        std::back_inserter(demands));
+
+      return false;
+    }
+
+    return v.index() == TYPE_INDEX_BOOL
+    && get_constant<bool>(v);
+  }
+  else
+  {
+    return true;
+  }
+
 }
 
 //these should go in charset.cpp

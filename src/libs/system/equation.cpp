@@ -345,10 +345,6 @@ GuardWS makeGuardWithTime(const mpz_class& start)
   return g;
 }
 
-typedef std::tuple<Tuple, VariableWS::UUIDEquationMap::const_iterator> 
-  ApplicableTuple;
-typedef std::vector<ApplicableTuple> applicable_list;
-
 //how to bestfit with a cache
 //  until we find a priority that has valid equations and there are no demands
 //  for dimensions, do:
@@ -430,23 +426,26 @@ VariableWS::operator()(Context& kappa, Context& delta)
       else
       {
         //check that all the dimensions in context are in delta
+        bool hasdemands = false;
         for (const auto& index : context)
         {
           if (!delta.has_entry(index.first))
           {
             demands.push_back(index.first);
+            hasdemands = true;
           }
         }
-      }
-      #if 0
-      if (tupleApplicable(evalContext, kappa)
-        && booleanTrue(guard, kappa)
-      )
-      {
-        applicable.push_back(ApplicableTuple(evalContext, eqn_i));
-      }
 
-      #endif
+        //don't bother doing this if there are dimensions not available
+        //booleanTrue returns false if there are demands
+        if (!hasdemands && tupleApplicable(context, kappa)
+          && booleanTrue(std::get<1>(p)->second.validContext(), kappa, delta,
+               demands)
+        )
+        {
+          applicable.push_back(p);
+        }
+      }
     }
 
     //stop if looking at the tuples generated demands
@@ -454,8 +453,10 @@ VariableWS::operator()(Context& kappa, Context& delta)
     {
       return Types::Demand::create(demands);
     }
-
   }
+
+  //now we have something valid and no demands are needed
+  return bestfit(applicable, kappa, delta);
 }
 
 Constant
@@ -519,6 +520,15 @@ VariableWS::operator()(Context& k)
       }
     }
   }
+
+  return bestfit(applicable, k);
+}
+
+template <typename... Delta>
+Constant
+VariableWS::bestfit(const applicable_list& applicable, Context& k, 
+  Delta&&... delta)
+{
 
   //for whichever priority something was chosen, they will have been added from
   //oldest to newest, so we now have a list in order of oldest to newest
