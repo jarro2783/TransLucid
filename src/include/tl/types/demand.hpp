@@ -79,6 +79,15 @@ namespace TransLucid
 
       const DemandType&
       get(const Constant& c);
+
+      //append the demands in d to dims
+      void
+      append(const Constant& d, std::vector<dimension_index>& dims)
+      {
+        const auto& demands = get(d);
+        std::copy(demands.dims().begin(), demands.dims().end(),
+          std::back_inserter(dims));
+      }
     }
   }
 }

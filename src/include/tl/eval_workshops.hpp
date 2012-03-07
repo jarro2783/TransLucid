@@ -241,6 +241,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       System& m_system;
       WS* m_name;
@@ -287,6 +290,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       //WS* m_system;
@@ -370,6 +376,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       System& m_system;
       std::list<std::pair<WS*, WS*>> m_elements;
@@ -434,6 +443,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       WS* e2;
@@ -739,6 +751,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       WS* m_e2;
