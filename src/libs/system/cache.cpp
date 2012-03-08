@@ -18,8 +18,47 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/cache.hpp>
+#include <tl/types/demand.hpp>
 
 namespace TransLucid
 {
+
+namespace
+{
+  struct cache_entry_visitor
+  {
+    typedef Constant result_type;
+
+    Constant
+    operator()(const Constant& c, Context& delta) const
+    {
+      return c;
+    }
+
+    Constant
+    operator()(const CacheLevel& l, Context& delta) const
+    {
+      std::vector<dimension_index> demands;
+      for (auto d : l.dims)
+      {
+        if (!delta.has_entry(d))
+        {
+          demands.push_back(d);
+        }
+      }
+
+      if (demands.size() > 0)
+      {
+        return Types::Demand::create(demands);
+      }
+    }
+  };
+}
+
+Constant
+Cache::get(Context& delta) const
+{
+  return apply_visitor(cache_entry_visitor(), m_entry, delta);
+}
 
 }

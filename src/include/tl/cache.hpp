@@ -35,11 +35,30 @@ namespace TransLucid
     recursive_wrapper<CacheLevel>
   > CacheEntry;
 
-  class CacheLevel;
+  struct CacheEntryMap;
+
+  typedef Variant
+  <
+    recursive_wrapper<CacheEntryMap>,
+    CacheEntry
+  > CacheLevelNode;
+
+  struct CacheEntryMap
+  {
+    std::map<Constant, CacheLevelNode> entry;
+  };
+
+  struct CacheLevel
+  {
+    std::vector<dimension_index> dims;
+    CacheLevelNode entry;
+  };
   
   class Cache
   {
     public:
+
+    Cache() = default;
     
     Constant
     get(Context& delta) const;
