@@ -17,38 +17,39 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef CACHE_HPP_INCLUDED
-#define CACHE_HPP_INCLUDED
+#ifndef TL_CACHE_HPP_INCLUDED
+#define TL_CACHE_HPP_INCLUDED
 
 #include <map>
+#include <tl/context.hpp>
 #include <tl/types.hpp>
+#include <tl/variant.hpp>
 
 namespace TransLucid
 {
-  class System;
+  class CacheLevel;
+  
+  typedef Variant
+  <
+    Constant,
+    recursive_wrapper<CacheLevel>
+  > CacheEntry;
 
-  class LazyWarehouse
+  class CacheLevel;
+  
+  class Cache
   {
     public:
-
-    LazyWarehouse(System& i)
-    : m_system(i)
-    {}
-
-    //looks up and if not found adds a calc entry
-    std::pair<bool, Constant>
-    lookupCalc(const u32string& name, const Tuple& c);
+    
+    Constant
+    get(Context& delta) const;
 
     void
-    add(const u32string& name, const Constant& value, const Tuple& c);
+    set(const Context& delta, const Constant& value);
 
     private:
-    typedef std::map<Tuple, Constant> TupleToValue;
-    typedef std::map<u32string, TupleToValue> CacheMapping;
-    CacheMapping m_cache;
-    System& m_system;
+    CacheEntry m_entry;
   };
-
 }
 
 #endif // CACHE_HPP_INCLUDED
