@@ -1,5 +1,5 @@
 /* Built-in types.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -308,6 +308,12 @@ namespace TransLucid
       {U"print_error", &print_error},
       {U"print_uuid", &print_uuid},
     };
+
+    bool
+    less_false(const Constant&, const Constant&)
+    {
+      return false;
+    }
   }
 
   Constant
@@ -341,42 +347,48 @@ namespace TransLucid
       {
         &Types::String::equality,
         &Types::String::hash,
-        &delete_ptr<u32string>
+        &delete_ptr<u32string>,
+        &Types::String::less
       };
 
     TypeFunctions base_function_type_functions =
       {
         &Types::BaseFunction::equality,
         &Types::BaseFunction::hash,
-        &delete_ptr<BaseFunctionType>
+        &delete_ptr<BaseFunctionType>,
+        &less_false
       };
 
     TypeFunctions value_function_type_functions =
       {
         &Types::ValueFunction::equality,
         &Types::ValueFunction::hash,
-        &delete_ptr<ValueFunctionType>
+        &delete_ptr<ValueFunctionType>,
+        &less_false
       };
 
     TypeFunctions name_function_type_functions =
       {
         &Types::NameFunction::equality,
         &Types::NameFunction::hash,
-        &delete_ptr<NameFunctionType>
+        &delete_ptr<NameFunctionType>,
+        &less_false
       };
 
     TypeFunctions range_type_functions =
       {
         &Types::Range::equality,
         &Types::Range::hash,
-        &delete_ptr<Range>
+        &delete_ptr<Range>,
+        &Types::Range::less
       };
 
     TypeFunctions tuple_type_functions =
       {
         &Types::Tuple::equality,
         &Types::Tuple::hash,
-        &delete_ptr<Tuple>
+        &delete_ptr<Tuple>,
+        &Types::Tuple::less
       };
 
     TypeFunctions intmp_type_functions = 
@@ -732,6 +744,12 @@ namespace TransLucid
         return lhs.data.ptr == rhs.data.ptr
           || get(lhs) == get(rhs);
       }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
+      }
     }
 
     namespace Boolean
@@ -934,6 +952,12 @@ namespace TransLucid
       {
         return String::create(U"range");
       }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
+      }
     }
 
     namespace Tuple
@@ -961,6 +985,12 @@ namespace TransLucid
       hash(const Constant& c)
       {
         return get(c).hash();
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
       }
     }
 

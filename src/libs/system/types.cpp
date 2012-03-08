@@ -45,6 +45,13 @@ equality(const Constant& lhs, const Constant& rhs)
 }
 
 template <typename T>
+bool
+less(const Constant& lhs, const Constant& rhs)
+{
+  return get_constant<T>(lhs) < get_constant<T>(rhs);
+}
+
+template <typename T>
 size_t
 hash_func(const Constant& c)
 {
@@ -66,6 +73,23 @@ bool (*equality_functions[TYPE_FIELD_PTR])(const Constant&, const Constant&) =
   &equality<uint64_t>,
   &equality<float>,
   &equality<double>
+};
+
+bool (*less_functions[TYPE_FIELD_PTR])(const Constant&, const Constant&) = 
+{ 
+  &less<Special>,
+  &less<bool>,
+  &less<char32_t>,
+  &less<int8_t>,
+  &less<uint8_t>,
+  &less<int16_t>,
+  &less<uint16_t>,
+  &less<int32_t>,
+  &less<uint32_t>,
+  &less<int64_t>,
+  &less<uint64_t>,
+  &less<float>,
+  &less<double>
 };
 
 size_t (*hash_functions[TYPE_FIELD_PTR])(const Constant&) =
@@ -93,6 +117,12 @@ bool
 constant_equality(const Constant& lhs, const Constant& rhs)
 {
   return (*equality_functions[lhs.data.field])(lhs, rhs);
+}
+
+bool
+constant_less(const Constant& lhs, const Constant& rhs)
+{
+  return (*less_functions[lhs.data.field])(lhs, rhs);
 }
 
 }
@@ -139,6 +169,50 @@ Tuple::print(std::ostream& os) const
     os << ", ";
   }
   os << "]";
+}
+
+bool
+Tuple::operator<(const Tuple& rhs) const
+{
+  auto iterl = begin();
+  auto iterr = rhs.begin();
+
+  while (iterl != end() && iterr != rhs.end())
+  {
+    if (iterl->first < iterr->first)
+    {
+      return true;
+    }
+    else if (iterr->first < iterl->first)
+    {
+      return false;
+    }
+    else if (iterl->second < iterr->second)
+    {
+      return true;
+    }
+    else if (iterr->second < iterl->second)
+    {
+      return false;
+    }
+    //this pair is equal, go to the next one
+    ++iterl;
+    ++iterr;
+  }
+
+  if (iterl == end() && iterr == rhs.end())
+  {
+    //they must be equal, so return false
+    return false;
+  }
+  else if (iterl == end())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 size_t

@@ -39,6 +39,9 @@ namespace TransLucid
 
       size_t
       hash(const Constant& c);
+
+      bool
+      less(const Constant& lhs, const Constant& rhs);
     }
   }
 }

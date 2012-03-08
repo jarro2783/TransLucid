@@ -25,6 +25,27 @@ namespace TransLucid
 
 namespace
 {
+  struct cache_level_visitor
+  {
+    typedef Constant result_type;
+
+    Constant
+    operator()
+    (
+      const CacheEntryMap& entry, 
+      std::vector<dimension_index>::const_iterator iter,
+      Context& delta
+    ) const;
+
+    Constant
+    operator()
+    (
+      const CacheEntry& entry, 
+      std::vector<dimension_index>::const_iterator iter,
+      Context& delta
+    ) const;
+  };
+
   struct cache_entry_visitor
   {
     typedef Constant result_type;
@@ -51,8 +72,41 @@ namespace
       {
         return Types::Demand::create(demands);
       }
+      else
+      {
+        return apply_visitor(cache_level_visitor(), l.entry, 
+          demands.begin(), delta);
+      }
     }
   };
+
+Constant
+cache_level_visitor::operator()
+(
+  const CacheEntryMap& entry, 
+  std::vector<dimension_index>::const_iterator iter,
+  Context& delta
+) const
+{
+  //this is the hard one
+  //find the value of the current dimension in the map
+
+  Constant c = delta.lookup(*iter);
+
+  //auto entryiter = entry.entry.find(c);
+}
+
+Constant
+cache_level_visitor::operator()
+(
+  const CacheEntry& entry, 
+  std::vector<dimension_index>::const_iterator iter,
+  Context& delta
+) const
+{
+  return apply_visitor(cache_entry_visitor(), entry, delta);
+}
+
 }
 
 Constant

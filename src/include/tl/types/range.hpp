@@ -45,6 +45,9 @@ namespace TransLucid
 
       Constant
       print(const Constant& c);
+
+      bool
+      less(const Constant& lhs, const Constant& rhs);
     }
   }
 }
