@@ -222,6 +222,117 @@ IdentWS::evaluate(Context& kappa, Delta&&... delta)
 Constant
 BangOpWS::operator()(Context& kappa, Context& delta)
 {
+  //lookup function in the system and call it
+
+  //evaluate name expr
+  Constant name = (*m_name)(kappa, delta);
+
+  if (name.index() == TYPE_INDEX_BASE_FUNCTION)
+  {
+    bool isSpecial = false;
+    bool isDemand = false;
+    std::vector<Constant> args;
+    for (auto ws : m_args)
+    {
+      args.push_back((*ws)(kappa, delta));
+
+      if (args.back().index() == TYPE_INDEX_SPECIAL)
+      {
+        isSpecial = true;
+      }
+
+      if (args.back().index() == TYPE_INDEX_DEMAND)
+      {
+        isDemand = true;
+      }
+    }
+
+    //deal with demands first
+    if (isDemand)
+    {
+      std::vector<dimension_index> demands;
+      for (const auto& c : args)
+      {
+        if (c.index() == TYPE_INDEX_DEMAND)
+        {
+          Types::Demand::append(c, demands);
+        }
+      }
+
+      return Types::Demand::create(demands);
+    }
+
+    if (isSpecial)
+    {
+      //combine all the specials with the special combiner
+      WS* combine = m_system.lookupIdentifiers().lookup(U"special_combine");
+      if (combine == nullptr)
+      {
+        throw "no default special combiner";
+      }
+
+      Constant fn = (*combine)(kappa, delta);
+      Constant currentValue;
+
+      //find the first special
+      auto iter = args.begin();
+      while (iter->index() != TYPE_INDEX_SPECIAL)
+      {
+        ++iter;
+      }
+
+      currentValue = *iter;
+
+      ++iter;
+      while (iter != args.end())
+      {
+        if (iter->index() == TYPE_INDEX_SPECIAL)
+        {
+          Constant fn2 = applyFunction(kappa, delta, fn, currentValue);
+          currentValue = applyFunction(kappa, delta, fn2, *iter);
+        }
+        ++iter;
+      }
+
+      return currentValue;
+    }
+    else
+    {
+      if (args.size() == 1)
+      {
+        //Constant arg = (*m_args[0])(kappa);
+        return Types::BaseFunction::get(name).apply(args.at(0));
+      }
+      else
+      {
+        return Types::BaseFunction::get(name).apply(args);
+      }
+    }
+  }
+  else if (name.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
+  {
+    //look up the appropriate dimension in the tuple
+    Constant rhs = (*m_args[0])(kappa, delta);
+    dimension_index dim = m_system.getDimensionIndex(rhs);
+    const Tuple& lhs = Types::Tuple::get(name);
+    auto iter = lhs.find(dim);
+    if (iter == lhs.end())
+    {
+      return Types::Special::create(SP_DIMENSION);
+    }
+    else
+    {
+      return iter->second;
+    }
+  }
+  else if (name.index() == TYPE_INDEX_DEMAND)
+  {
+    return name;
+  }
+  else
+  {
+    return Types::Special::create(SP_UNDEF);
+  }
 }
 
 Constant

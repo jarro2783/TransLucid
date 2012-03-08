@@ -197,6 +197,15 @@ namespace TransLucid
 
   Constant
   applyFunction(Context& k, const Constant& lhs, const Constant& rhs);
+
+  Constant
+  applyFunction
+  (
+    Context& kappa, 
+    Context& delta, 
+    const Constant& lhs, 
+    const Constant& rhs
+  );
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

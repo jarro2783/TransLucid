@@ -626,5 +626,25 @@ applyFunction(Context& k, const Constant& lhs, const Constant& rhs)
   }
 }
 
+Constant
+applyFunction
+(
+  Context& kappa, 
+  Context& delta, 
+  const Constant& lhs, 
+  const Constant& rhs
+)
+{
+  if (lhs.index() == TYPE_INDEX_VALUE_FUNCTION)
+  {
+    const auto& fnval = Types::ValueFunction::get(lhs);
+
+    return fnval.apply(kappa, delta, rhs);
+  }
+  else
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+}
 
 }
