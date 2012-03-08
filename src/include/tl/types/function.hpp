@@ -288,6 +288,9 @@ namespace TransLucid
     Constant
     apply(Context& k, const Constant& value) const;
 
+    Constant
+    apply(Context& kappa, Context& delta, const Constant& value) const;
+
     size_t
     hash() const
     {
@@ -320,6 +323,15 @@ namespace TransLucid
     apply
     (
       Context& k, 
+      const Constant& c, 
+      std::vector<dimension_index>& Lall
+    ) const;
+
+    Constant
+    apply
+    (
+      Context& kappa, 
+      Context& delta,
       const Constant& c, 
       std::vector<dimension_index>& Lall
     ) const;

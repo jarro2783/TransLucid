@@ -20,6 +20,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
+#include <tl/types/tuple.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid
 {
@@ -218,5 +220,110 @@ createNameFunctionCached
     )
   );
 }
+
+Constant
+ValueFunctionType::apply(Context& k, const Constant& value) const
+{
+  //set m_dim = value in the context and evaluate the expr
+  ContextPerturber p(k, {{m_dim, value}});
+  p.perturb(m_scopeDims);
+  auto r = (*m_expr)(k);
+
+  return r;
+}
+
+Constant
+ValueFunctionType::apply
+(
+  Context& kappa, 
+  Context& delta, 
+  const Constant& value
+) const
+{
+  //set m_dim = value in the context and evaluate the expr
+  ContextPerturber pkappa(kappa, {{m_dim, value}});
+  ContextPerturber pdelta(delta, {{m_dim, value}});
+
+  pkappa.perturb(m_scopeDims);
+  pdelta.perturb(m_scopeDims);
+
+  auto r = (*m_expr)(kappa, delta);
+
+  return r;
+}
+
+Constant
+NameFunctionType::apply
+(
+  Context& k, 
+  const Constant& c,
+  std::vector<dimension_index>& Lall
+) const
+{
+  //add to the list of our args
+  //pre: c is a workshop value
+
+  //add to the list of odometers
+  tuple_t odometer;
+  for (auto d : Lall)
+  {
+    odometer.insert(std::make_pair(d, k.lookup(d)));
+  }
+
+  //argdim = cons(c, #argdim)
+  Tuple argList = makeList(c, k.lookup(m_argDim));
+  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
+    k.lookup(m_odometerDim));
+
+  ContextPerturber p(k,
+  {
+    {m_argDim, Types::Tuple::create(argList)},
+    {m_odometerDim, Types::Tuple::create(odometerList)}
+  });
+
+  p.perturb(m_scopeDims);
+
+  return (*m_expr)(k);
+}
+
+Constant
+NameFunctionType::apply
+(
+  Context& kappa, 
+  Context& delta, 
+  const Constant& c,
+  std::vector<dimension_index>& Lall
+) const
+{
+  //add to the list of our args
+  //pre: c is a workshop value
+
+  //add to the list of odometers
+  tuple_t odometer;
+  for (auto d : Lall)
+  {
+    odometer.insert(std::make_pair(d, kappa.lookup(d)));
+  }
+
+  //argdim = cons(c, #argdim)
+  Tuple argList = makeList(c, kappa.lookup(m_argDim));
+  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
+    kappa.lookup(m_odometerDim));
+
+  std::initializer_list<std::pair<dimension_index, Constant>>
+  toChange = {
+    {m_argDim, Types::Tuple::create(argList)},
+    {m_odometerDim, Types::Tuple::create(odometerList)}
+  };
+
+  ContextPerturber pkappa(kappa, toChange);
+  ContextPerturber pdelta(delta, toChange);
+
+  pkappa.perturb(m_scopeDims);
+  pdelta.perturb(m_scopeDims);
+
+  return (*m_expr)(kappa, delta);
+}
+
 
 }

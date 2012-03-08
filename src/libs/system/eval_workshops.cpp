@@ -759,7 +759,7 @@ LambdaApplicationWS::operator()(Context& kappa, Context& delta)
   Constant rhs = (*m_rhs)(kappa, delta);
   const ValueFunctionType& f = Types::ValueFunction::get(lhs);
 
-  return f.apply(kappa, rhs);
+  return f.apply(kappa, delta, rhs);
 }
 
 Constant
@@ -848,7 +848,7 @@ NameApplicationWS::operator()(Context& kappa, Context& delta)
   Constant rhs = Types::Workshop::create(m_rhs);
   const NameFunctionType& f = Types::NameFunction::get(lhs);
 
-  return f.apply(kappa, rhs, m_Lall);
+  return f.apply(kappa, delta, rhs, m_Lall);
 }
 Constant
 AtTupleWS::operator()(Context& k)
