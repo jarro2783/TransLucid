@@ -1,5 +1,5 @@
 /* The warehouse.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -224,6 +224,27 @@ Cache::get(Context& delta)
 void
 Cache::set(const Context& delta, const Constant& value)
 {
+  //There is guaranteed to be an entry for the current delta which is set to
+  //calc. If value is a demand, that becomes the next level in the cache
+  //hierarchy.
+}
+
+namespace Workshops
+{
+
+Constant
+CacheWS::operator()(Context& kappa)
+{
+  //the link between cached and uncached code, the difference between this
+  //and the cached evaluator is that this one fills in all the dimensions
+  //requested from kappa and doesn't return them
+}
+
+Constant
+CacheWS::operator()(Context& kappa, Context& delta)
+{
+}
+
 }
 
 }
