@@ -162,7 +162,7 @@ set_calc
     CacheLevelNode node{CacheEntryMap()};
     auto inserted = entry.insert(std::make_pair(val, node));
 
-    set_calc
+    return set_calc
     (
       get<CacheEntryMap>(inserted.first->second.entry).entry,
       ++iter,

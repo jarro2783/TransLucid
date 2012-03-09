@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/context.hpp>
 #include <tl/types.hpp>
 #include <tl/variant.hpp>
+#include <tl/workshop.hpp>
 
 namespace TransLucid
 {
@@ -94,6 +95,26 @@ namespace TransLucid
     private:
     CacheEntry m_entry;
   };
+
+  namespace Workshops
+  {
+    class CacheWS : public WS
+    {
+      public:
+
+      CacheWS() = default;
+
+      Constant
+      operator()(Context& kappa);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+
+      Cache m_cache;
+    };
+  }
 }
 
 #endif // CACHE_HPP_INCLUDED
