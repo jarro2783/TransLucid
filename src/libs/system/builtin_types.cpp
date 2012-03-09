@@ -395,7 +395,8 @@ namespace TransLucid
       {
         &Types::Intmp::equality,
         &Types::Intmp::hash,
-        &delete_ptr<mpz_class>
+        &delete_ptr<mpz_class>,
+        &Types::Intmp::less
       };
 
     TypeFunctions hyperdaton_type_functions =
@@ -1085,6 +1086,12 @@ namespace TransLucid
         {
           return Types::String::create(to_u32string(z.get_str()));
         }
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
       }
     }
 

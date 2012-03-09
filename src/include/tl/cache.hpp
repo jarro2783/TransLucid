@@ -27,21 +27,46 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class CacheLevel;
+  //an actual cache entry, either a value or a single level in the cache
+  //hierarchy
+  struct CacheEntry;
+
+  //one level in the hierarchy, the relevant dimensions and
+  struct CacheLevel;
+  struct CacheEntryMap;
+  struct CacheLevelNode;
   
   typedef Variant
   <
     Constant,
     recursive_wrapper<CacheLevel>
-  > CacheEntry;
-
-  struct CacheEntryMap;
+  > CacheEntryVariant;
 
   typedef Variant
   <
     recursive_wrapper<CacheEntryMap>,
     CacheEntry
-  > CacheLevelNode;
+  > CacheLevelNodeVariant;
+
+  struct CacheEntry
+  {
+    CacheEntry(CacheEntryVariant&& v)
+    : entry(std::move(v))
+    {
+    }
+
+    CacheEntryVariant entry;
+  };
+
+  struct CacheLevelNode
+  {
+    CacheLevelNode(CacheLevelNodeVariant&& v)
+    : entry(std::move(v))
+    {
+    }
+
+    CacheLevelNodeVariant entry;
+  };
 
   struct CacheEntryMap
   {
@@ -51,7 +76,7 @@ namespace TransLucid
   struct CacheLevel
   {
     std::vector<dimension_index> dims;
-    CacheLevelNode entry;
+    CacheEntryMap entry;
   };
   
   class Cache
@@ -61,7 +86,7 @@ namespace TransLucid
     Cache() = default;
     
     Constant
-    get(Context& delta) const;
+    get(Context& delta);
 
     void
     set(const Context& delta, const Constant& value);

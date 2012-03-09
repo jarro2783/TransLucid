@@ -1,5 +1,5 @@
-/* The intmp type.
-   Copyright (C) 2011 Jarryd Beck and John Plaice
+/* The calc type.
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -17,42 +17,24 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TYPES_INTMP_HPP_INCLUDED
-#define TYPES_INTMP_HPP_INCLUDED
+#ifndef TL_TYPES_CALC_HPP_INCLUDED
+#define TL_TYPES_CALC_HPP_INCLUDED
 
-#include <tl/gmpxx_fwd.hpp>
 #include <tl/types.hpp>
+#include <tl/fixed_indexes.hpp>
 
 namespace TransLucid
 {
   namespace Types
   {
-    namespace Intmp
+    namespace Calc
     {
       Constant
-      create(const Constant& text);
-
-      Constant
-      create(const mpz_class& v);
-
-      Constant
-      create(int v);
-
-      const mpz_class&
-      get(const Constant& c);
-
-      bool 
-      equality(const Constant& lhs, const Constant& rhs);
-
-      size_t
-      hash(const Constant& c);
-
-      Constant
-      print(const Constant& c);
-
-      bool
-      less(const Constant& lhs, const Constant& rhs);
-    }
+      create()
+      {
+        return Constant(0, TYPE_INDEX_CALC);
+      }
+    };
   }
 }
 
