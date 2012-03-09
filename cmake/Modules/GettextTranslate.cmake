@@ -1,17 +1,27 @@
-# Copyright 2012 Jarryd Beck
+# Copyright (c) 2012, Jarryd Beck
+# All rights reserved.
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+# Redistributions in binary form must reproduce the above copyright notice, 
+# this list of conditions and the following disclaimer in the documentation 
+# and/or other materials provided with the distribution.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+
 
 # This module creates build rules for updating translation files made 
 # with gettext
@@ -48,6 +58,10 @@
 #
 # if you want update-gmo to be added to the "all" target, then define the
 # variable GettextTranslate_ALL before including this file
+#
+# by default, the gmo files are built in the source directory. If you want
+# them to be built in the binary directory, then define the variable
+# GettextTranslate_GMO_BINARY
 
 
 
@@ -110,6 +124,12 @@ mark_as_advanced(
 )
 
 macro(GettextTranslate)
+
+  if(GettextTranslate_GMO_BINARY)
+    set (GMO_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+  else()
+    set (GMO_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+  endif()
 
   if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in)
     message(FATAL_ERROR "There is no POTFILES.in in
@@ -184,7 +204,7 @@ macro(GettextTranslate)
 
   foreach(lang ${languages})
     set(PO_FILE_NAME "${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po")
-    set(GMO_FILE_NAME "${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo")
+    set(GMO_FILE_NAME "${GMO_BUILD_DIR}/${lang}.gmo")
     set(PO_TARGET "generate-${MAKEVAR_DOMAIN}-${lang}-po")
     set(GMO_TARGET "generate-${MAKEVAR_DOMAIN}-${lang}-gmo")
     list(APPEND po_files ${PO_TARGET})
@@ -221,7 +241,6 @@ macro(GettextTranslate)
           ${PO_FILE_NAME} ${TEMPLATE_FILE_ABS} 
           -o ${PO_FILE_NAME}.new
         COMMAND mv ${PO_FILE_NAME}.new ${PO_FILE_NAME}
-        #DEPENDS ${MAKEVAR_DOMAIN}.pot-update
         DEPENDS ${TEMPLATE_FILE_ABS}
       )
 
@@ -230,11 +249,12 @@ macro(GettextTranslate)
     add_custom_command(OUTPUT ${GMO_FILE_NAME}
       COMMAND ${GettextTranslate_MSGFMT_EXECUTABLE} -c --statistics --verbose 
         -o ${GMO_FILE_NAME} ${PO_FILE_NAME}
-        DEPENDS ${PO_FILE_NAME}
+        DEPENDS ${PO_TARGET}
     )
     add_custom_target(${GMO_TARGET} DEPENDS ${GMO_FILE_NAME})
 
     add_custom_target(${PO_TARGET} DEPENDS ${PO_FILE_NAME})
+    add_dependencies(${PO_TARGET} ${MAKEVAR_DOMAIN}.pot-update)
 
     install(FILES ${GMO_FILE_NAME} DESTINATION
       ${LOCALEDIR}/${lang}/LC_MESSAGES
