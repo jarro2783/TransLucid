@@ -72,6 +72,7 @@ TLText::TLText
  ,m_error(&std::cerr)
  ,m_inputName(U"<interactive>")
  ,m_initialOut(initOut)
+ ,m_system(cached)
  ,m_time(0)
  ,m_lastLibLoaded(0)
  ,m_argsHD(0)
