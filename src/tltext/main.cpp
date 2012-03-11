@@ -146,7 +146,10 @@ int main(int argc, char *argv[])
       po::value<std::vector<std::string>>()->multitoken(),
       /* TRANSLATORS: the help message for --args */
       _("arguments to pass to TransLucid in the CLARGS variable"))
-    ("debug,d", "debug mode")
+    /* TRANSLATORS: the help message for --cache */
+    ("cache", _("use cache"))
+    /* TRANSLATORS: the help message for --debug */
+    ("debug,d", _("debug mode"))
     /* TRANSLATORS: the help message for --help */
     ("help,h", _("show this message"))
     /* TRANSLATORS: the help message for --input */
@@ -200,7 +203,14 @@ int main(int argc, char *argv[])
 
   try
   {
-    TransLucid::TLText::TLText tltext(argv[0], "TLText...");
+    bool cached = false;
+
+    if (vm.count("cache"))
+    {
+      cached = true;
+    }
+
+    TransLucid::TLText::TLText tltext(argv[0], "TLText...", cached);
  
     for (const auto& s : options)
     {

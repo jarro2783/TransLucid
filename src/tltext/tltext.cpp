@@ -1,5 +1,5 @@
-/* Core TransLucid application implementation.
-   Copyright (C) 2011 Jarryd Beck and John Plaice
+/* TLText application implementation.
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -56,7 +56,12 @@ namespace TransLucid
 namespace TLText
 {
 
-TLText::TLText(const std::string& progname, const std::string& initOut)
+TLText::TLText
+(
+  const std::string& progname, 
+  const std::string& initOut,
+  bool cached
+)
 : 
   m_myname(progname)
  ,m_verbose(1)

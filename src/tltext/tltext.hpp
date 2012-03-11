@@ -1,5 +1,5 @@
-/* Core TransLucid application header.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+/* TLText application header.
+   Copyright (C) 2009, 2010, 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -125,7 +125,12 @@ namespace TransLucid
       /**
        * Construct the evaluator.
        */
-      TLText(const std::string& progname, const std::string& initOut);
+      TLText
+      (
+        const std::string& progname, 
+        const std::string& initOut,
+        bool cached = false
+      );
 
       ~TLText();
 
