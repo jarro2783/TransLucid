@@ -238,11 +238,43 @@ CacheWS::operator()(Context& kappa)
   //the link between cached and uncached code, the difference between this
   //and the cached evaluator is that this one fills in all the dimensions
   //requested from kappa and doesn't return them
+
+  //although maybe it can just call cached code with all the dimensions
+  return operator()(kappa, kappa);
 }
 
 Constant
 CacheWS::operator()(Context& kappa, Context& delta)
 {
+  Context subdelta;
+  ContextPerturber p(subdelta);
+
+  while (true)
+  {
+    Constant d = m_cache.get(subdelta);
+
+    if (d.index() == TYPE_INDEX_CALC)
+    {
+      d = (*m_expr)(kappa, subdelta);
+      m_cache.set(subdelta, d);
+    }
+
+    if (d.index() == TYPE_INDEX_DEMAND)
+    {
+      const auto& demands = Types::Demand::get(d);
+
+      for (auto dim : demands.dims())
+      {
+        p.perturb(dim, kappa.lookup(dim));
+      }
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  return m_cache.get(delta);
 }
 
 }

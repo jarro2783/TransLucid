@@ -51,6 +51,8 @@ namespace TransLucid
 
   struct CacheEntry
   {
+    CacheEntry() = default;
+
     CacheEntry(CacheEntryVariant&& v)
     : entry(std::move(v))
     {
@@ -102,7 +104,9 @@ namespace TransLucid
     {
       public:
 
-      CacheWS() = default;
+      CacheWS(WS* expr)
+      : m_expr(expr)
+      {}
 
       Constant
       operator()(Context& kappa);
@@ -113,6 +117,7 @@ namespace TransLucid
       private:
 
       Cache m_cache;
+      WS* m_expr;
     };
   }
 }
