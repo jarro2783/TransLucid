@@ -77,7 +77,7 @@ namespace TransLucid
   {
     public:
 
-    System(bool cached = false);
+    System();
     ~System();
 
     //don't want to copy
@@ -339,11 +339,6 @@ namespace TransLucid
     Tree::Expr
     toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
       Renames&&... renames);
-
-    //the variables start here
-
-    //cached must be set first and can't be changed
-    bool m_cached;
 
     DefinitionMap m_equations;
     UUIDDefinition m_equationUUIDs;
