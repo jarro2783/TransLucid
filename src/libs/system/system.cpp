@@ -57,6 +57,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unistd.h>
 
 #include <tl/builtin_types.hpp>
+#include <tl/cache.hpp>
 #include <tl/constws.hpp>
 #include <tl/context.hpp>
 #include <tl/eval_workshops.hpp>
@@ -2111,6 +2112,24 @@ System::printConstant(const Constant& c)
   }
 
   return Types::String::get(result);
+}
+
+void
+System::cacheVar(const u32string& name)
+{
+  //first find the variable in the equations
+  auto thevar = m_equations.find(name);
+
+  if (thevar == m_equations.end())
+  {
+    return;
+  }
+
+  std::unique_ptr<WS> cachews{new Workshops::CacheWS(thevar->second)};
+
+  m_cachedVars.insert({name, cachews.get()});
+
+  cachews.release();
 }
 
 } //namespace TransLucid
