@@ -203,14 +203,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    bool cached = false;
-
-    if (vm.count("cache"))
-    {
-      cached = true;
-    }
-
-    TransLucid::TLText::TLText tltext(argv[0], "TLText...", cached);
+    TransLucid::TLText::TLText tltext(argv[0], "TLText...");
  
     for (const auto& s : options)
     {
@@ -229,6 +222,11 @@ int main(int argc, char *argv[])
       }
     }
     
+    if (vm.count("cache"))
+    {
+      tltext.set_cached();
+    }
+
     if (vm.count("verbose"))
     {
       tltext.verbose(vm["verbose"].as<int>());

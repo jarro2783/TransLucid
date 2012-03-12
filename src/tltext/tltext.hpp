@@ -128,8 +128,7 @@ namespace TransLucid
       TLText
       (
         const std::string& progname, 
-        const std::string& initOut,
-        bool cached = false
+        const std::string& initOut
       );
 
       ~TLText();
@@ -222,12 +221,19 @@ namespace TransLucid
       void
       add_argument(const u32string& arg, const u32string& value);
 
+      void
+      set_cached(bool cached = true)
+      {
+        m_cached = cached;
+      }
+
       private:
       std::string m_myname;
 
       int m_verbose;
       bool m_uuids;
       bool m_debug;
+      bool m_cached;
 
       std::istream* m_is;
       std::ostream* m_os;

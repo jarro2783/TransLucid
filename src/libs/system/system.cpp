@@ -2125,11 +2125,26 @@ System::cacheVar(const u32string& name)
     return;
   }
 
-  std::unique_ptr<WS> cachews{new Workshops::CacheWS(thevar->second)};
+  //then make sure we haven't already cached it
+  auto cachevar = m_cachedVars.find(name);
 
-  m_cachedVars.insert({name, cachews.get()});
+  if (cachevar == m_cachedVars.end())
+  {
+    std::unique_ptr<WS> cachews{new Workshops::CacheWS(thevar->second)};
+    m_cachedVars.insert({name, cachews.get()});
+    cachews.release();
+  }
+}
 
-  cachews.release();
+void
+System::cacheIfVar(const uuid& id)
+{
+  auto uiter = m_equationUUIDs.find(id);
+
+  if (uiter != m_equationUUIDs.end())
+  {
+    cacheVar(uiter->second->first);
+  }
 }
 
 } //namespace TransLucid

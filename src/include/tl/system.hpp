@@ -243,6 +243,9 @@ namespace TransLucid
     void
     cacheVar(const u32string& name);
 
+    void
+    cacheIfVar(const uuid& id);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
