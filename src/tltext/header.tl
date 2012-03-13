@@ -2,6 +2,8 @@
 dim slot;;
 dim envvar;;
 
+data Infinite = infty | neginfty;;
+
 var sperror = special"sperror";;
 var spaccess = special"spaccess";;
 var sptypeerror = special"sptypeerror";;
@@ -36,7 +38,9 @@ op != = OpInfix."ne".false.AssocNon.25;;
 op && = OpInfix."bool_and".false.AssocLeft.20;;
 op || = OpInfix."bool_and".false.AssocLeft.20;;
 
-op .. = OpInfix."range_construct".AssocLeft.0;;
+op .. = OpInfix."range_construct".false.AssocLeft.0;;
+
+var ack [0 : 1..infty, 1 : 0] = 42;;
 
 fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun minus.a.b [a : intmp, b : intmp] = int_minus!(a,b);;
@@ -57,8 +61,6 @@ fun bool_and.a.b = if a then b else false fi;;
 fun bool_or.a.b = if a then true else b fi;;
 
 fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
-
-data Infinite = infty | neginfty;;
 
 fun range_construct.a.b [a : intmp, b : intmp] = make_range!(a,b);;
 fun range_construct.a.b [a : intmp, b : infty] = make_range_infty!b;;

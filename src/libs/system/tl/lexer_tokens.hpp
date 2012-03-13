@@ -36,7 +36,7 @@ namespace TransLucid
       TOKEN_COLON,
       TOKEN_COMMA,
       TOKEN_DBLPERCENT,
-      TOKEN_DBLSEMI,
+      TOKEN_DBLSEMI,      //10
       TOKEN_DBLSLASH,
       TOKEN_DECLID,
       TOKEN_DIM_IDENTIFIER,
@@ -46,7 +46,7 @@ namespace TransLucid
       TOKEN_END,
       TOKEN_EQUALS,
       TOKEN_FALSE,
-      TOKEN_FI,
+      TOKEN_FI,           //20
       TOKEN_HASH,
       TOKEN_IF,
       TOKEN_ID,
@@ -56,7 +56,7 @@ namespace TransLucid
       TOKEN_LPAREN,
       TOKEN_LSQUARE,
       TOKEN_OPERATOR, //don't match this, it's converted to the right op
-      TOKEN_PIPE,
+      TOKEN_PIPE,         //30
       TOKEN_RARROW,
       TOKEN_RBRACE,
       TOKEN_RPAREN,
@@ -66,7 +66,7 @@ namespace TransLucid
       TOKEN_TRUE,
       TOKEN_UCHAR,
       TOKEN_UNARY,
-      TOKEN_WHERE,
+      TOKEN_WHERE,        //40
 
       TOKEN_PREFIX_OP,
       TOKEN_BINARY_OP,
