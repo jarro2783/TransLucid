@@ -2,6 +2,18 @@
 dim slot;;
 dim envvar;;
 
+var sperror = special"sperror";;
+var spaccess = special"spaccess";;
+var sptypeerror = special"sptypeerror";;
+var spdim = special"spdim";;
+var sparith = special"sparith";;
+var spundef = special"spundef";;
+var spconst = special"spconst";;
+var spmultidef = special"spmultidef";;
+var sploop = special"sploop";;
+
+fun bestselect__.a.b = spmultidef;;
+
 data Assoc = AssocNon | AssocLeft | AssocRight;;
 data HostDecl = HostDim intmp | HostType intmp | HostFunc intmp;;
 data OpType = OpPostfix ustring bool
@@ -80,16 +92,6 @@ fun escape_string.s = escape_character.(string_at.s.0)
   + escape_string.(substring.s.1.infty)
 ;;
 fun escape_string.s [s : ""] = "";;
-
-var sperror = special"sperror";;
-var spaccess = special"spaccess";;
-var sptypeerror = special"sptypeerror";;
-var spdim = special"spdim";;
-var sparith = special"sparith";;
-var spundef = special"spundef";;
-var spconst = special"spconst";;
-var spmultidef = special"spmultidef";;
-var sploop = special"sploop";;
 
 fun print_special.c [c : sperror] = "sperror";;
 fun print_special.c [c : spaccess] = "spaccess";;
