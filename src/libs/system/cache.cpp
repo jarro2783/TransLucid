@@ -177,7 +177,7 @@ set_calc
     return set_calc
     (
       get<CacheEntryMap>(inserted.first->second.entry).entry,
-      ++iter,
+      iter,
       end,
       delta
     );
