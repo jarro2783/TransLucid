@@ -21,6 +21,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/calc.hpp>
 #include <tl/types/demand.hpp>
 
+#include <iostream>
+
 namespace TransLucid
 {
 
@@ -138,7 +140,7 @@ lookup_entry_map
   else
   {
     return apply_visitor(get_cache_level_visitor(), entryiter->second.entry,
-      iter, end, delta);
+      ++iter, end, delta);
   }
 }
 
@@ -200,7 +202,7 @@ get_cache_level_visitor::operator()
   }
 
   //otherwise increment iter and look again
-  return lookup_entry_map(++iter, end, entry.entry, delta);
+  return lookup_entry_map(iter, end, entry.entry, delta);
 }
 
 Constant
