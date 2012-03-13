@@ -133,10 +133,28 @@ namespace TransLucid
   bool
   booleanTrue(const GuardWS& g, Context& c);
 
-  //looks up a value in the current context and returns the value of the
-  //all dimension if it exists, otherwise special<dim> if not found
+  //the cached boolean true
+  bool
+  booleanTrue
+  (
+    const GuardWS& g, 
+    Context& c, 
+    Context& delta, 
+    std::vector<dimension_index>& demands
+  );
+
+  //looks up a value in the current context
   Constant
   lookup_context(System& system, const Constant& v, const Context& k);
+
+  //looks up a value in the current context, respecting the cache rules
+  Constant
+  lookup_context_cached
+  (
+    System& system, 
+    const Constant& v, 
+    const Context& delta
+  );
 
   //returns the hash of a dimension when we only have the index
   class HashIndexWS : public WS
@@ -179,6 +197,15 @@ namespace TransLucid
 
   Constant
   applyFunction(Context& k, const Constant& lhs, const Constant& rhs);
+
+  Constant
+  applyFunction
+  (
+    Context& kappa, 
+    Context& delta, 
+    const Constant& lhs, 
+    const Constant& rhs
+  );
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

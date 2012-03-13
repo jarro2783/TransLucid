@@ -17,38 +17,109 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef CACHE_HPP_INCLUDED
-#define CACHE_HPP_INCLUDED
+#ifndef TL_CACHE_HPP_INCLUDED
+#define TL_CACHE_HPP_INCLUDED
 
 #include <map>
+#include <tl/context.hpp>
 #include <tl/types.hpp>
+#include <tl/variant.hpp>
+#include <tl/workshop.hpp>
 
 namespace TransLucid
 {
-  class System;
+  //an actual cache entry, either a value or a single level in the cache
+  //hierarchy
+  struct CacheEntry;
 
-  class LazyWarehouse
+  //one level in the hierarchy, the relevant dimensions and
+  struct CacheLevel;
+  struct CacheEntryMap;
+  struct CacheLevelNode;
+  
+  typedef Variant
+  <
+    Constant,
+    recursive_wrapper<CacheLevel>
+  > CacheEntryVariant;
+
+  typedef Variant
+  <
+    recursive_wrapper<CacheEntryMap>,
+    CacheEntry
+  > CacheLevelNodeVariant;
+
+  struct CacheEntry
+  {
+    CacheEntry() = default;
+
+    CacheEntry(CacheEntryVariant&& v)
+    : entry(std::move(v))
+    {
+    }
+
+    CacheEntryVariant entry;
+  };
+
+  struct CacheLevelNode
+  {
+    CacheLevelNode(CacheLevelNodeVariant&& v)
+    : entry(std::move(v))
+    {
+    }
+
+    CacheLevelNodeVariant entry;
+  };
+
+  struct CacheEntryMap
+  {
+    std::map<Constant, CacheLevelNode> entry;
+  };
+
+  struct CacheLevel
+  {
+    std::vector<dimension_index> dims;
+    CacheEntryMap entry;
+  };
+  
+  class Cache
   {
     public:
 
-    LazyWarehouse(System& i)
-    : m_system(i)
-    {}
-
-    //looks up and if not found adds a calc entry
-    std::pair<bool, Constant>
-    lookupCalc(const u32string& name, const Tuple& c);
+    Cache();
+    
+    Constant
+    get(Context& delta);
 
     void
-    add(const u32string& name, const Constant& value, const Tuple& c);
+    set(const Context& delta, const Constant& value);
 
     private:
-    typedef std::map<Tuple, Constant> TupleToValue;
-    typedef std::map<u32string, TupleToValue> CacheMapping;
-    CacheMapping m_cache;
-    System& m_system;
+    CacheEntry m_entry;
   };
 
+  namespace Workshops
+  {
+    class CacheWS : public WS
+    {
+      public:
+
+      CacheWS(WS* expr)
+      : m_expr(expr)
+      {}
+
+      Constant
+      operator()(Context& kappa);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+
+      Cache m_cache;
+      WS* m_expr;
+    };
+  }
 }
 
 #endif // CACHE_HPP_INCLUDED

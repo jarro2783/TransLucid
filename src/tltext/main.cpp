@@ -146,7 +146,10 @@ int main(int argc, char *argv[])
       po::value<std::vector<std::string>>()->multitoken(),
       /* TRANSLATORS: the help message for --args */
       _("arguments to pass to TransLucid in the CLARGS variable"))
-    ("debug,d", "debug mode")
+    /* TRANSLATORS: the help message for --cache */
+    ("cache", _("use cache"))
+    /* TRANSLATORS: the help message for --debug */
+    ("debug,d", _("debug mode"))
     /* TRANSLATORS: the help message for --help */
     ("help,h", _("show this message"))
     /* TRANSLATORS: the help message for --input */
@@ -219,6 +222,11 @@ int main(int argc, char *argv[])
       }
     }
     
+    if (vm.count("cache"))
+    {
+      tltext.set_cached();
+    }
+
     if (vm.count("verbose"))
     {
       tltext.verbose(vm["verbose"].as<int>());

@@ -39,6 +39,9 @@ namespace TransLucid
 
       const u32string&
       get(const Constant& c);
+
+      bool
+      less(const Constant& lhs, const Constant& rhs);
     }
   }
 }

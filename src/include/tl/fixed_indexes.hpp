@@ -51,6 +51,8 @@ namespace TransLucid
     TYPE_INDEX_INHD,
     TYPE_INDEX_IOHD,
     TYPE_INDEX_OUTHD,
+    TYPE_INDEX_CALC,
+    TYPE_INDEX_DEMAND,
 
     //the last one
     TYPE_INDEX_LAST

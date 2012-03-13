@@ -20,10 +20,10 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TYPES_FUNCTION_HPP_INCLUDED
 #define TYPES_FUNCTION_HPP_INCLUDED
 
-#include <tl/types/special.hpp>
-#include <tl/types.hpp>
 #include <tl/context.hpp>
 #include <tl/system.hpp>
+#include <tl/types/special.hpp>
+#include <tl/types.hpp>
 
 #include <vector>
 #include <functional>
@@ -265,7 +265,7 @@ namespace TransLucid
       const u32string& name, 
       dimension_index argDim, 
       const std::vector<dimension_index>& scope,
-      const std::vector<std::pair<u32string, dimension_index>>& free,
+      const std::vector<std::pair<dimension_index, Constant>>& free,
       WS* expr,
       Context& k
     )
@@ -276,19 +276,7 @@ namespace TransLucid
         m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
       }
 
-      System::IdentifierLookup idents = system->lookupIdentifiers();
-
-      //evaluate all of the free variables
-      for (const auto& v : free)
-      {
-        auto var = idents.lookup(v.first);
-        Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-          : (*idents.lookup(v.first))(k);
-
-        m_scopeDims.push_back(std::make_pair(
-          v.second, value
-        ));
-      }
+      std::copy(free.begin(), free.end(), std::back_inserter(m_scopeDims));
     }
 
     ValueFunctionType*
@@ -299,6 +287,9 @@ namespace TransLucid
 
     Constant
     apply(Context& k, const Constant& value) const;
+
+    Constant
+    apply(Context& kappa, Context& delta, const Constant& value) const;
 
     size_t
     hash() const
@@ -323,36 +314,24 @@ namespace TransLucid
       dimension_index argDim, 
       dimension_index odometerDim, 
       const std::vector<dimension_index>& scope,
-      const std::vector<std::pair<u32string, dimension_index>>& free,
+      const std::vector<std::pair<dimension_index, Constant>>& free,
       WS* expr,
       Context& k
-    )
-    : m_name(name), m_argDim(argDim), m_odometerDim(odometerDim), m_expr(expr)
-    {
-      for (auto d : scope)
-      {
-        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
-      }
-
-      System::IdentifierLookup idents = system->lookupIdentifiers();
-
-      //evaluate all of the free variables
-      for (const auto& v : free)
-      {
-        auto var = idents.lookup(v.first);
-        Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-          : (*idents.lookup(v.first))(k);
-
-        m_scopeDims.push_back(std::make_pair(
-          v.second, value
-        ));
-      }
-    }
+    );
 
     Constant
     apply
     (
       Context& k, 
+      const Constant& c, 
+      std::vector<dimension_index>& Lall
+    ) const;
+
+    Constant
+    apply
+    (
+      Context& kappa, 
+      Context& delta,
       const Constant& c, 
       std::vector<dimension_index>& Lall
     ) const;
@@ -377,7 +356,65 @@ namespace TransLucid
 
     std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
   };
-  
+
+  Constant
+  createValueFunction
+  (
+    System *system,
+    const u32string& name, 
+    dimension_index argDim, 
+    const std::vector<dimension_index>& scope,
+    const std::vector<std::pair<u32string, dimension_index>>& free,
+    WS* expr,
+    Context& kappa
+  );
+
+  //check for scope dimensions
+  //evaluate free variables, checking for demands
+  //then create the actual function
+  Constant
+  createValueFunctionCached
+  (
+    System *system,
+    const u32string& name, 
+    dimension_index argDim, 
+    const std::vector<dimension_index>& scope,
+    const std::vector<std::pair<u32string, dimension_index>>& free,
+    WS* expr,
+    Context& kappa,
+    Context& delta
+  );
+
+  Constant
+  createNameFunction
+  (
+    System *system,
+    const u32string& name, 
+    dimension_index argDim, 
+    dimension_index odometerDim,
+    const std::vector<dimension_index>& scope,
+    const std::vector<std::pair<u32string, dimension_index>>& free,
+    WS* expr,
+    Context& kappa
+  );
+
+  //check for scope dimensions
+  //evaluate free variables, checking for demands
+  //then create the actual function
+  Constant
+  createNameFunctionCached
+  (
+    System *system,
+    const u32string& name, 
+    dimension_index argDim, 
+    dimension_index odometerDim,
+    const std::vector<dimension_index>& scope,
+    const std::vector<std::pair<u32string, dimension_index>>& free,
+    WS* expr,
+    Context& kappa,
+    Context& delta
+  );
+
   namespace Types
   {
     namespace BaseFunction
@@ -445,6 +482,12 @@ namespace TransLucid
     operator()(Context& k)
     {
       return Types::BaseFunction::create(*m_fn);
+    }
+
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      return operator()(kappa);
     }
 
     private:

@@ -30,9 +30,9 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid 
 {
   /** 
-   * @brief All of the hyperdatons.
+   * @brief All of the workshops.
    *
-   * The namespace that contains all of the hyperdatons which are
+   * The namespace that contains all of the workshops which are
    * in the system.
    */
   namespace Workshops
@@ -47,6 +47,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       Constant m_value;
@@ -68,6 +71,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       Constant m_value;
     };
@@ -81,6 +87,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       Special m_value;
@@ -96,6 +105,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       Constant m_value;
     };
@@ -110,6 +122,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       Constant m_value;
     };
@@ -121,6 +136,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       Constant m_value;

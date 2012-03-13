@@ -775,6 +775,12 @@ class FileInCreateWS : public WS
     return Types::BaseFunction::create(FileArrayInFn(m_system));
   }
 
+  Constant
+  operator()(Context& kappa, Context& delta)
+  {
+    return operator()(kappa);
+  }
+
   private:
   System& m_system;
 };
@@ -790,6 +796,12 @@ class FileOutCreateWS : public WS
   operator()(Context& k)
   {
     return Types::BaseFunction::create(FileArrayOutFn(m_system));
+  }
+
+  Constant
+  operator()(Context& kappa, Context& delta)
+  {
+    return operator()(kappa);
   }
 
   private:

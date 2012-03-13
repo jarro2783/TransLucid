@@ -109,8 +109,9 @@ namespace TransLucid
      *
      * Returns a tuple of the dimensions and the evaluated AST.
      **/
+    template <typename... Delta>
     Tuple
-    evaluate(Context& k) const;
+    evaluate(Context& k, Delta&&... delta) const;
 
     /**
      * @brief Adds a system imposed dimension.
@@ -136,6 +137,14 @@ namespace TransLucid
       return m_priority;
     }
 
+    //after a call to evaluate, these are reset to whatever demands evaluate
+    //produced
+    const std::vector<dimension_index>&
+    demands() const
+    {
+      return m_demands;
+    }
+
     private:
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
@@ -151,6 +160,8 @@ namespace TransLucid
     System* m_system;
 
     int m_priority;
+
+    mutable std::vector<dimension_index> m_demands;
   };
 
   class VariableWS;
@@ -205,6 +216,12 @@ namespace TransLucid
       return (*m_h)(k);
     }
 
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      return (*m_h)(kappa, delta);
+    }
+
     int
     provenance() const
     {
@@ -240,6 +257,9 @@ namespace TransLucid
   {
     public:
     typedef std::map<uuid, EquationWS> UUIDEquationMap;
+    typedef std::tuple<Tuple, VariableWS::UUIDEquationMap::const_iterator> 
+      ApplicableTuple;
+    typedef std::vector<ApplicableTuple> applicable_list;
 
     VariableWS(const u32string& name, System& system);
     
@@ -247,6 +267,13 @@ namespace TransLucid
 
     virtual Constant
     operator()(Context& k);
+
+    Constant
+    operator()(Context& kappa, Context& delta);
+
+    template <typename... Delta>
+    Constant
+    bestfit(const applicable_list& applicable, Context& k, Delta&&... delta);
 
     #if 0
     virtual uuid
@@ -332,6 +359,9 @@ namespace TransLucid
 
     Constant
     operator()(Context& k);
+
+    Constant
+    operator()(Context& kappa, Context& delta);
 
     uuid
     addEquation

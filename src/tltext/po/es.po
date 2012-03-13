@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-03-07 19:17+1100\n"
+"POT-Creation-Date: 2012-03-13 19:24+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Spanish <translucid@cse.unsw.edu.au>\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:232
+#: src/tltext/tltext.cpp:238
 msgid "// instant %1% beginning"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which demand we are printing
-#: src/tltext/tltext.cpp:239
+#: src/tltext/tltext.cpp:245
 msgid "// demand %1%"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:257
+#: src/tltext/tltext.cpp:263
 msgid "// instant %1% end"
 msgstr ""
 
@@ -45,32 +45,42 @@ msgstr ""
 msgid "arguments to pass to TransLucid in the CLARGS variable"
 msgstr ""
 
+#. TRANSLATORS: the help message for --cache
+#: src/tltext/main.cpp:150
+msgid "use cache"
+msgstr ""
+
+#. TRANSLATORS: the help message for --debug
+#: src/tltext/main.cpp:152
+msgid "debug mode"
+msgstr ""
+
 #. TRANSLATORS: the help message for --help
-#: src/tltext/main.cpp:151
+#: src/tltext/main.cpp:154
 msgid "show this message"
 msgstr ""
 
 #. TRANSLATORS: the help message for --input
-#: src/tltext/main.cpp:153
+#: src/tltext/main.cpp:156
 msgid "input file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --output
-#: src/tltext/main.cpp:155
+#: src/tltext/main.cpp:158
 msgid "output file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --uuid
-#: src/tltext/main.cpp:157
+#: src/tltext/main.cpp:160
 msgid "print uuids"
 msgstr ""
 
 #. TRANSLATORS: the help message for --verbose
-#: src/tltext/main.cpp:159
+#: src/tltext/main.cpp:162
 msgid "level of verbosity"
 msgstr ""
 
 #. TRANSLATORS: the help message for --version
-#: src/tltext/main.cpp:161
+#: src/tltext/main.cpp:164
 msgid "show version"
 msgstr ""

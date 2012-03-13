@@ -17,7 +17,7 @@ add_custom_target(generate_static_lexer DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp)
 
 set (SYSTEM_SOURCES
-ast.cpp bestfit.cpp builtin_types.cpp charset.cpp
+ast.cpp bestfit.cpp builtin_types.cpp cache.cpp charset.cpp
 context.cpp dimtranslator.cpp 
 equation.cpp
 eval_workshops.cpp
@@ -28,7 +28,9 @@ internal_strings.cpp lexertl.cpp lexer_util.cpp
 library.cpp line_tokenizer.cpp parser.cpp
 range.cpp rename.cpp system.cpp
 tree_printer.cpp
-tree_to_wstree.cpp types.cpp utility.cpp uuid.cpp
+tree_to_wstree.cpp 
+types/function.cpp
+types.cpp utility.cpp uuid.cpp
 workshop_builder.cpp
 )
 

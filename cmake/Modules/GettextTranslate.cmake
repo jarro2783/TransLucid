@@ -241,6 +241,10 @@ macro(GettextTranslate)
           ${PO_FILE_NAME} ${TEMPLATE_FILE_ABS} 
           -o ${PO_FILE_NAME}.new
         COMMAND mv ${PO_FILE_NAME}.new ${PO_FILE_NAME}
+        #there seems to be a race making multiple *.pot, neither of these
+        #makes a difference, although the first doesn't update my language
+        #files anymore
+        #DEPENDS ${MAKEVAR_DOMAIN}.pot-update
         DEPENDS ${TEMPLATE_FILE_ABS}
       )
 

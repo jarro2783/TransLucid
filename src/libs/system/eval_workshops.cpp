@@ -1,5 +1,5 @@
 /* Workshops generated from AST::Expr.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -31,6 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/internal_strings.hpp>
 #include <tl/system.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/special.hpp>
@@ -146,10 +147,27 @@ HashSymbolWS::operator()(Context& k)
 }
 
 Constant
+HashSymbolWS::operator()(Context& kappa, Context& delta)
+{
+  return Types::Tuple::create(Tuple(kappa));
+}
+
+Constant
+BoolConstWS::operator()(Context& k, Context& delta)
+{
+  return operator()(k);
+}
+
+Constant
 BoolConstWS::operator()(Context& k)
 {
-  //return TaggedConstant(Constant(Boolean(m_value), TYPE_INDEX_BOOL), k);
   return m_value;
+}
+
+Constant
+TypeConstWS::operator()(Context& k, Context& delta)
+{
+  return operator()(k);
 }
 
 Constant
@@ -165,7 +183,26 @@ DimensionWS::operator()(Context& k)
 }
 
 Constant
+DimensionWS::operator()(Context& k, Context& delta)
+{
+  return operator()(delta);
+}
+
+Constant
+IdentWS::operator()(Context& kappa, Context& delta)
+{
+  return evaluate(kappa, delta);
+}
+
+Constant
 IdentWS::operator()(Context& k)
+{
+  return evaluate(k);
+}
+
+template <typename... Delta>
+Constant
+IdentWS::evaluate(Context& kappa, Delta&&... delta)
 {
   if (m_e == nullptr)
   {
@@ -174,7 +211,123 @@ IdentWS::operator()(Context& k)
 
   if (m_e != nullptr)
   {
-    return (*m_e)(k);
+    return (*m_e)(kappa, delta...);
+  }
+  else
+  {
+    return Types::Special::create(SP_UNDEF);
+  }
+}
+
+Constant
+BangOpWS::operator()(Context& kappa, Context& delta)
+{
+  //lookup function in the system and call it
+
+  //evaluate name expr
+  Constant name = (*m_name)(kappa, delta);
+
+  if (name.index() == TYPE_INDEX_BASE_FUNCTION)
+  {
+    bool isSpecial = false;
+    bool isDemand = false;
+    std::vector<Constant> args;
+    for (auto ws : m_args)
+    {
+      args.push_back((*ws)(kappa, delta));
+
+      if (args.back().index() == TYPE_INDEX_SPECIAL)
+      {
+        isSpecial = true;
+      }
+
+      if (args.back().index() == TYPE_INDEX_DEMAND)
+      {
+        isDemand = true;
+      }
+    }
+
+    //deal with demands first
+    if (isDemand)
+    {
+      std::vector<dimension_index> demands;
+      for (const auto& c : args)
+      {
+        if (c.index() == TYPE_INDEX_DEMAND)
+        {
+          Types::Demand::append(c, demands);
+        }
+      }
+
+      return Types::Demand::create(demands);
+    }
+
+    if (isSpecial)
+    {
+      //combine all the specials with the special combiner
+      WS* combine = m_system.lookupIdentifiers().lookup(U"special_combine");
+      if (combine == nullptr)
+      {
+        throw "no default special combiner";
+      }
+
+      Constant fn = (*combine)(kappa, delta);
+      Constant currentValue;
+
+      //find the first special
+      auto iter = args.begin();
+      while (iter->index() != TYPE_INDEX_SPECIAL)
+      {
+        ++iter;
+      }
+
+      currentValue = *iter;
+
+      ++iter;
+      while (iter != args.end())
+      {
+        if (iter->index() == TYPE_INDEX_SPECIAL)
+        {
+          Constant fn2 = applyFunction(kappa, delta, fn, currentValue);
+          currentValue = applyFunction(kappa, delta, fn2, *iter);
+        }
+        ++iter;
+      }
+
+      return currentValue;
+    }
+    else
+    {
+      if (args.size() == 1)
+      {
+        //Constant arg = (*m_args[0])(kappa);
+        return Types::BaseFunction::get(name).apply(args.at(0));
+      }
+      else
+      {
+        return Types::BaseFunction::get(name).apply(args);
+      }
+    }
+  }
+  else if (name.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
+  {
+    //look up the appropriate dimension in the tuple
+    Constant rhs = (*m_args[0])(kappa, delta);
+    dimension_index dim = m_system.getDimensionIndex(rhs);
+    const Tuple& lhs = Types::Tuple::get(name);
+    auto iter = lhs.find(dim);
+    if (iter == lhs.end())
+    {
+      return Types::Special::create(SP_DIMENSION);
+    }
+    else
+    {
+      return iter->second;
+    }
+  }
+  else if (name.index() == TYPE_INDEX_DEMAND)
+  {
+    return name;
   }
   else
   {
@@ -328,7 +481,76 @@ IfWS::operator()(Context& k)
 }
 
 Constant
+IfWS::operator()(Context& kappa, Context& delta)
+{
+  Constant condv = (*m_condition)(kappa, delta);
+
+  if (condv.index() == TYPE_INDEX_DEMAND)
+  {
+    return condv;
+  }
+  else if (condv.index() == TYPE_INDEX_SPECIAL)
+  {
+    return condv;
+  }
+  else if (condv.index() == TYPE_INDEX_BOOL)
+  {
+    bool b = get_constant<bool>(condv);
+
+    if (b)
+    {
+      return (*m_then)(kappa, delta);
+      //result = makeValue(e->then->visit(this, d));
+    }
+    else
+    {
+      //run the elsifs and else
+      for (const auto& p : m_elsifs_2)
+      {
+        Constant cond = p.first->operator()(kappa, delta);
+
+        type_index index = cond.index();
+
+        if (index == TYPE_INDEX_DEMAND)
+        {
+          return cond;
+        }
+        else if (index == TYPE_INDEX_SPECIAL)
+        {
+          return cond;
+        }
+        else if (index == TYPE_INDEX_BOOL)
+        {
+          bool bcond = get_constant<bool>(cond);
+          if (bcond)
+          {
+            return p.second->operator()(kappa, delta);
+          }
+        }
+        else
+        {
+          return Types::Special::create(SP_TYPEERROR);
+        }
+      }
+
+      return (*m_else)(kappa, delta);
+    }
+  }
+  else
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+}
+
+Constant
 HashWS::operator()(Context& k)
+{
+  Constant r = (*m_e)(k);
+  return lookup_context(m_system, r, k);
+}
+
+Constant
+HashWS::operator()(Context& k, Context& delta)
 {
   Constant r = (*m_e)(k);
   return lookup_context(m_system, r, k);
@@ -341,23 +563,21 @@ IntmpConstWS::operator()(Context& k)
 }
 
 Constant
-IsSpecialWS::operator()(Context& k)
+IntmpConstWS::operator()(Context& kappa, Context& delta)
 {
-  //this is going away, but to stop warnings
-  return Constant();
-}
-
-Constant
-IsTypeWS::operator()(Context& k)
-{
-  //this is going away, but to stop warnings
-  return Constant();
+  return operator()(kappa);
 }
 
 Constant
 SpecialConstWS::operator()(Context& k)
 {
-  return Constant(Special(m_value), TYPE_INDEX_SPECIAL);
+  return Types::Special::create(m_value);
+}
+
+Constant
+SpecialConstWS::operator()(Context& k, Context& delta)
+{
+  return operator()(k);
 }
 
 UStringConstWS::UStringConstWS(const u32string& s)
@@ -382,9 +602,21 @@ UStringConstWS::operator()(Context& k)
 }
 
 Constant
+UStringConstWS::operator()(Context& k, Context& delta)
+{
+  return operator()(k);
+}
+
+Constant
 UCharConstWS::operator()(Context& k)
 {
   return m_value;
+}
+
+Constant
+UCharConstWS::operator()(Context& kappa, Context& delta)
+{
+  return operator()(kappa);
 }
 
 Constant
@@ -407,6 +639,53 @@ TupleWS::operator()(Context& k)
     }
   }
   return Types::Tuple::create(Tuple(kp));
+}
+
+Constant
+TupleWS::operator()(Context& kappa, Context& delta)
+{
+  std::vector<dimension_index> demands;
+  tuple_t kp;
+  for(auto& pair : m_elements)
+  {
+    bool hasdemands = false;
+    //const Pair& p = v.first.value<Pair>();
+    Constant left = (*pair.first)(kappa, delta);
+    Constant right = (*pair.second)(kappa, delta);
+
+    if (left.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(left, demands);
+      hasdemands = true;
+    }
+
+    if (right.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(right, demands);
+      hasdemands = true;
+    }
+
+    if (!hasdemands)
+    {
+      if (left.index() == TYPE_INDEX_DIMENSION)
+      {
+        kp[get_constant<dimension_index>(left)] = right;
+      }
+      else
+      {
+        kp[m_system.getDimensionIndex(left)] = right;
+      }
+    }
+  }
+
+  if (demands.size() == 0)
+  {
+    return Types::Tuple::create(Tuple(kp));
+  }
+  else
+  {
+    return Types::Demand::create(demands);
+  }
 }
 
 Constant
@@ -436,6 +715,39 @@ AtWS::operator()(Context& k)
 }
 
 Constant
+AtWS::operator()(Context& kappa, Context& delta)
+{
+  //tuple_t kNew = k.tuple();
+  Constant val1 = (*e1)(kappa, delta);
+
+  if (val1.index() == TYPE_INDEX_DEMAND)
+  {
+    return val1;
+  }
+
+  if (val1.index() != TYPE_INDEX_TUPLE)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+  else
+  {
+    //validate time
+    auto& t = Types::Tuple::get(val1);
+    auto& change = t.tuple();
+    const auto& dimTime = change.find(DIM_TIME);
+    if (dimTime != change.end() && Types::Intmp::get(dimTime->second) > 
+      Types::Intmp::get(kappa.lookup(DIM_TIME)))
+    {
+      return Types::Special::create(SP_ACCESS);
+    }
+
+    ContextPerturber pkappa(kappa, t);
+    ContextPerturber pdelta(delta, t);
+    return (*e2)(kappa, delta);
+  }
+}
+
+Constant
 BaseAbstractionWS::operator()(Context& k)
 {
   return Types::BaseFunction::create
@@ -454,6 +766,18 @@ BaseAbstractionWS::operator()(Context& k)
 Constant
 LambdaAbstractionWS::operator()(Context& k)
 {
+  return createValueFunction
+    (
+      m_system,
+      m_name,
+      m_argDim,
+      m_scope,
+      m_free,
+      m_rhs,
+      k
+    );
+
+  #if 0
   return Types::ValueFunction::create
   (
     ValueFunctionType
@@ -467,6 +791,44 @@ LambdaAbstractionWS::operator()(Context& k)
       k
     )
   );
+  #endif
+}
+
+Constant
+LambdaAbstractionWS::operator()(Context& kappa, Context& delta)
+{
+  //first verify that m_scope are all in delta
+
+  std::vector<dimension_index> demands;
+
+  //but evaluating the free variables needs to be done in a cached manner
+  return createValueFunctionCached
+    (
+      m_system,
+      m_name,
+      m_argDim,
+      m_scope,
+      m_free,
+      m_rhs,
+      kappa,
+      delta
+    );
+
+  #if 0
+  return Types::ValueFunction::create
+  (
+    ValueFunctionType
+    (
+      m_system,
+      m_name, 
+      m_argDim, 
+      m_scope,
+      m_free,
+      m_rhs, 
+      k
+    )
+  );
+  #endif
 }
 
 Constant
@@ -489,8 +851,44 @@ LambdaApplicationWS::operator()(Context& k)
 }
 
 Constant
+LambdaApplicationWS::operator()(Context& kappa, Context& delta)
+{
+  //evaluate the lhs, evaluate the rhs
+  //and pass the value to the function to evaluate
+
+  Constant lhs = (*m_lhs)(kappa, delta);
+  //first make sure that it is a function
+  if (lhs.index() == TYPE_INDEX_DEMAND)
+  {
+    return lhs;
+  }
+  else if (lhs.index() != TYPE_INDEX_VALUE_FUNCTION)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+
+  Constant rhs = (*m_rhs)(kappa, delta);
+  const ValueFunctionType& f = Types::ValueFunction::get(lhs);
+
+  return f.apply(kappa, delta, rhs);
+}
+
+Constant
 NamedAbstractionWS::operator()(Context& k)
 {
+  return createNameFunction
+    (
+      m_system, 
+      m_name, 
+      m_argDim, 
+      m_odometerDim, 
+      m_scope, 
+      m_free, 
+      m_rhs, 
+      k
+    );
+
+  #if 0
   return Types::NameFunction::create
   (
     NameFunctionType
@@ -505,6 +903,24 @@ NamedAbstractionWS::operator()(Context& k)
       k
     )
   );
+  #endif
+}
+
+Constant
+NamedAbstractionWS::operator()(Context& kappa, Context& delta)
+{
+  return createNameFunctionCached
+    (
+      m_system, 
+      m_name, 
+      m_argDim, 
+      m_odometerDim, 
+      m_scope, 
+      m_free, 
+      m_rhs, 
+      kappa,
+      delta
+    );
 }
 
 Constant
@@ -525,17 +941,39 @@ NameApplicationWS::operator()(Context& k)
 }
 
 Constant
+NameApplicationWS::operator()(Context& kappa, Context& delta)
+{
+  Constant lhs = (*m_lhs)(kappa, delta);
+
+  if (lhs.index() == TYPE_INDEX_DEMAND)
+  {
+    return lhs;
+  }
+
+  if (lhs.index() != TYPE_INDEX_NAME_FUNCTION)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+
+  //named application passes a pointer to the intension
+  Constant rhs = Types::Workshop::create(m_rhs);
+  const NameFunctionType& f = Types::NameFunction::get(lhs);
+
+  return f.apply(kappa, delta, rhs, m_Lall);
+}
+Constant
 AtTupleWS::operator()(Context& k)
 {
   //evaluate the tuple into a vector of fixed size
   //do some magic to initialise the vector with iterators that do the
   //evaluation all at once so that we only need one allocation
 
-  //this doesn't work when there are nested tuples
-  //there must be some way to avoid all those memory allocations
-  //static std::vector<std::pair<dimension_index, Constant>> tuple;
+  bool access = false;
 
-  auto evalTuple = [this, &k] (const std::pair<WS*, WS*>& entry)
+  const Constant& dimTime = k.lookup(DIM_TIME);
+
+  auto evalTuple = [this, &k, &access, &dimTime] 
+    (const std::pair<WS*, WS*>& entry)
     -> std::pair<dimension_index, Constant>
   {
     Constant lhs = (*entry.first)(k);
@@ -543,6 +981,12 @@ AtTupleWS::operator()(Context& k)
 
     if (lhs.index() == TYPE_INDEX_DIMENSION)
     {
+      if (get_constant<dimension_index>(lhs) == DIM_TIME &&
+          Types::Intmp::get(rhs) > Types::Intmp::get(dimTime))
+      {
+        access = true;
+      }
+
       return std::make_pair(get_constant<dimension_index>(lhs), rhs);
     }
     else
@@ -553,25 +997,75 @@ AtTupleWS::operator()(Context& k)
   }
   ;
 
-  #if 0
-  tuple.clear();
-
-  std::copy
+  std::vector<std::pair<dimension_index, Constant>> tuple
   (
     make_tuple_transform_iterator(m_tuple.begin(), evalTuple),
-    make_tuple_transform_iterator(m_tuple.end(), evalTuple),
-    std::back_inserter(tuple)
+    make_tuple_transform_iterator(m_tuple.end(), evalTuple)
   );
-  #endif
+
+  if (access)
+  {
+    return Types::Special::create(SP_ACCESS);
+  }
+  else
+  {
+    ContextPerturber p(k, tuple);
+    return (*m_e2)(k);
+  }
+}
+
+Constant
+AtTupleWS::operator()(Context& kappa, Context& delta)
+{
+  //evaluate the tuple into a vector of fixed size
+  //do some magic to initialise the vector with iterators that do the
+  //evaluation all at once so that we only need one allocation
+
+  bool access = false;
+
+  const Constant& dimTime = kappa.lookup(DIM_TIME);
+
+  auto evalTuple = [this, &kappa, &delta, &access, &dimTime] 
+    (const std::pair<WS*, WS*>& entry)
+    -> std::pair<dimension_index, Constant>
+  {
+    Constant lhs = (*entry.first)(kappa, delta);
+    Constant rhs = (*entry.second)(kappa, delta);
+
+    if (lhs.index() == TYPE_INDEX_DIMENSION)
+    {
+      if (get_constant<dimension_index>(lhs) == DIM_TIME &&
+          Types::Intmp::get(rhs) > Types::Intmp::get(dimTime))
+      {
+        access = true;
+      }
+
+      return std::make_pair(get_constant<dimension_index>(lhs), rhs);
+    }
+    else
+    {
+      return std::make_pair(this->m_system.getDimensionIndex(lhs), rhs);
+    }
+
+  }
+  ;
 
   std::vector<std::pair<dimension_index, Constant>> tuple
   (
     make_tuple_transform_iterator(m_tuple.begin(), evalTuple),
     make_tuple_transform_iterator(m_tuple.end(), evalTuple)
   );
-  
-  ContextPerturber p(k, tuple);
-  return (*m_e2)(k);
+
+  if (access)
+  {
+    return Types::Special::create(SP_ACCESS);
+  }
+  else
+  {
+    ContextPerturber pkappa(kappa, tuple);
+    ContextPerturber pdelta(delta, tuple);
+    return (*m_e2)(kappa, delta);
+  }
 }
 
 } //namespace Workshops
