@@ -86,7 +86,7 @@ namespace TransLucid
   {
     public:
 
-    Cache() = default;
+    Cache();
     
     Constant
     get(Context& delta);

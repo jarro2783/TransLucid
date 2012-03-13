@@ -1029,6 +1029,8 @@ System::System()
    {U"lambda", TYPE_INDEX_VALUE_FUNCTION},
    {U"phi", TYPE_INDEX_NAME_FUNCTION},
    {U"uuid", TYPE_INDEX_UUID},
+   {U"demand", TYPE_INDEX_DEMAND},
+   {U"calc", TYPE_INDEX_CALC},
   }
   )
 , m_time(0)

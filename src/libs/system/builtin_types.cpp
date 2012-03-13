@@ -1386,7 +1386,9 @@ init_builtin_types(System& s)
     U"typetype",
     U"uchar",
     U"range",
-    U"tuple"
+    U"tuple",
+    U"demand",
+    U"calc"
   };
 
   std::vector<u32string> type_names = to_print_types;

@@ -106,6 +106,16 @@ namespace
     }
   };
 
+  #if 0
+  struct set_cache_entry_visitor
+  {
+    typedef void result_type;
+
+    void
+    operator()(const Constant&
+  };
+  #endif
+
 Constant
 lookup_entry_map
 (
@@ -213,6 +223,97 @@ get_cache_level_visitor::operator()
   return apply_visitor(get_cache_entry_visitor(), entry.entry, delta);
 }
 
+void
+set_visit_top_entry
+(
+  CacheEntry& entry, 
+  const Context& delta,
+  const Constant& value
+);
+
+void
+set_traverse_level
+(
+  std::vector<dimension_index>::const_iterator begin,
+  std::vector<dimension_index>::const_iterator end,
+  CacheEntryMap& entry,
+  const Context& delta,
+  const Constant& value
+)
+{
+  auto iter = entry.entry.find(delta.lookup(*begin));
+
+  CacheEntry* nextentry = TransLucid::get<CacheEntry>(&iter->second.entry);
+  CacheEntryMap* nextmap = TransLucid::get<CacheEntryMap>(&iter->second.entry);
+
+  if (nextentry != nullptr)
+  {
+    set_visit_top_entry(*nextentry, delta, value);
+  }
+  else if (nextmap != nullptr)
+  {
+    //keep going down this level
+    set_traverse_level(++begin, end, *nextmap, delta, value);
+  }
+}
+
+//overwrites entry with value
+//but if value is a demand it becomes a new CacheLevel
+void
+set_cache_value
+(
+  CacheEntry& entry,
+  const Constant& value
+)
+{
+  if (value.index() == TYPE_INDEX_DEMAND)
+  {
+    const DemandType& demand = Types::Demand::get(value);
+    const auto& demandVector = demand.dims();
+
+    entry.entry = CacheLevel{demandVector};
+  }
+  else
+  {
+    entry.entry = value;
+  }
+}
+
+void
+set_visit_top_entry
+(
+  CacheEntry& entry, 
+  const Context& delta,
+  const Constant& value
+)
+{
+  //There is guaranteed to be an entry for the current delta which is set to
+  //calc. If value is a demand, that becomes the next level in the cache
+  //hierarchy.
+
+  //apply_visitor(set_cache_entry_visitor(), m_entry.entry, delta, value);
+
+  const Constant* c = TransLucid::get<Constant>(&entry.entry);
+  CacheLevel* level = TransLucid::get<CacheLevel>(&entry.entry);
+
+  if (c != nullptr)
+  {
+    //overwrite it
+    set_cache_value(entry, value);
+  }
+  else if (level != nullptr)
+  {
+    //traverse the level
+    set_traverse_level(level->dims.begin(), level->dims.end(), level->entry, 
+      delta, value);
+  }
+}
+
+}
+
+Cache::Cache()
+: m_entry(Types::Calc::create())
+{
 }
 
 Constant
@@ -224,9 +325,7 @@ Cache::get(Context& delta)
 void
 Cache::set(const Context& delta, const Constant& value)
 {
-  //There is guaranteed to be an entry for the current delta which is set to
-  //calc. If value is a demand, that becomes the next level in the cache
-  //hierarchy.
+  set_visit_top_entry(m_entry, delta, value);
 }
 
 namespace Workshops
@@ -240,7 +339,9 @@ CacheWS::operator()(Context& kappa)
   //requested from kappa and doesn't return them
 
   //although maybe it can just call cached code with all the dimensions
-  return operator()(kappa, kappa);
+  Constant c = operator()(kappa, kappa);
+
+  return c;
 }
 
 Constant
