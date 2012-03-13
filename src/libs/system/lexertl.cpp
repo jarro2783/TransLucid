@@ -659,8 +659,6 @@ nextToken
   //set the next StreamPosIterator position
   begin = results.end;
 
-  std::cerr << "read token with id: " << id << std::endl;
-
   return Token
   (
     Position

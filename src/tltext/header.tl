@@ -40,8 +40,6 @@ op || = OpInfix."bool_and".false.AssocLeft.20;;
 
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
-var ack [0 : 1..infty, 1 : 0] = 42;;
-
 fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun minus.a.b [a : intmp, b : intmp] = int_minus!(a,b);;
 fun times.a.b [a : intmp, b : intmp] = int_times!(a,b);;
