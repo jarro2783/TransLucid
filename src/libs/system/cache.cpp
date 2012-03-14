@@ -273,6 +273,14 @@ set_cache_value
     const DemandType& demand = Types::Demand::get(value);
     const auto& demandVector = demand.dims();
 
+    std::cerr << "adding demand cache level: ";
+
+    for (auto d : demandVector)
+    {
+      std::cerr << d << " ";
+    }
+    std::cerr << std::endl;
+
     entry.entry = CacheLevel{demandVector};
   }
   else

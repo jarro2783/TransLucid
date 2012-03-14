@@ -43,7 +43,7 @@ namespace TransLucid
     TYPE_INDEX_TUPLE,
     TYPE_INDEX_TYPE,
     TYPE_INDEX_RANGE,
-    TYPE_INDEX_BASE_FUNCTION,
+    TYPE_INDEX_BASE_FUNCTION,  //10
     TYPE_INDEX_VALUE_FUNCTION,
     TYPE_INDEX_NAME_FUNCTION,
     TYPE_INDEX_UUID,
@@ -55,7 +55,7 @@ namespace TransLucid
     TYPE_INDEX_DEMAND,
 
     //the last one
-    TYPE_INDEX_LAST
+    TYPE_INDEX_LAST //20
   };
 
   //if you change something here, make sure to update the names in

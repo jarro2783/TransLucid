@@ -560,6 +560,7 @@ lookup_context_cached
   }
   else
   {
+    std::cerr << "need dimension: " << index << std::endl;
     return Types::Demand::create({index});
   }
 }

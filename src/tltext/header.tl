@@ -113,6 +113,7 @@ fun print.c [c : uchar] = print_uchar!c;;
 fun print.c [c : range] = print_range!c;;
 fun print.c [c : tuple] = print_tuple!c;;
 fun print.c [c : uuid] = print_uuid!c;;
+fun print.c [c : demand] = "Cannot print demands";;
 
 fun print_typename.c = "unknown typename";;
 fun print_typename.c [c : intmp] = "intmp";;

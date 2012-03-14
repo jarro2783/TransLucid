@@ -544,7 +544,7 @@ VariableWS::bestfit(const applicable_list& applicable, Context& k,
   {
     //std::cerr << "running equation " << std::get<1>(applicable.front())->id()
     //<< std::endl;
-    return (*std::get<1>(applicable.front())->second.equation())(k);
+    return (*std::get<1>(applicable.front())->second.equation())(k, delta...);
   }
 
   //if there is more than applicable equation, find the best
@@ -588,7 +588,8 @@ VariableWS::bestfit(const applicable_list& applicable, Context& k,
     if (newestBest.size() == 1)
     {
       //std::cerr << m_name << ": One newest" << std::endl;
-      return (*std::get<1>(*newestBest.front())->second.equation())(k);
+      return (*std::get<1>(*newestBest.front())->second.equation())
+        (k, delta...);
     }
     else
     {
@@ -599,7 +600,8 @@ VariableWS::bestfit(const applicable_list& applicable, Context& k,
       for (const auto& best : newestBest)
       {
         //best is an applicable_list::const_iterator
-        bestEvaluated.push_back((*std::get<1>(*best)->second.equation())(k));
+        bestEvaluated.push_back((*std::get<1>(*best)->second.equation())
+          (k, delta...));
       }
 
       //find the bestselect

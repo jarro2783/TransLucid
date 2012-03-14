@@ -545,6 +545,7 @@ IfWS::operator()(Context& kappa, Context& delta)
 Constant
 HashWS::operator()(Context& k)
 {
+  std::cerr << "evaluating HashWS" << std::endl;
   Constant r = (*m_e)(k);
   return lookup_context(m_system, r, k);
 }
@@ -552,8 +553,14 @@ HashWS::operator()(Context& k)
 Constant
 HashWS::operator()(Context& k, Context& delta)
 {
-  Constant r = (*m_e)(k);
-  return lookup_context(m_system, r, k);
+  std::cerr << "evaluating HashWS cached" << std::endl;
+  Constant r = (*m_e)(k, delta);
+
+  if (r.index() == TYPE_INDEX_DEMAND)
+  {
+    return r;
+  }
+  return lookup_context_cached(m_system, r, delta);
 }
 
 Constant
@@ -868,6 +875,12 @@ LambdaApplicationWS::operator()(Context& kappa, Context& delta)
   }
 
   Constant rhs = (*m_rhs)(kappa, delta);
+
+  if (rhs.index() == TYPE_INDEX_DEMAND)
+  {
+    return rhs;
+  }
+
   const ValueFunctionType& f = Types::ValueFunction::get(lhs);
 
   return f.apply(kappa, delta, rhs);
