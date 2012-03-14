@@ -56,11 +56,13 @@ namespace TransLucid
     CacheEntry() = default;
 
     CacheEntry(CacheEntryVariant&& v)
-    : entry(std::move(v))
+    : entry(std::move(v)), age(0)
     {
     }
 
     CacheEntryVariant entry;
+
+    int age;
   };
 
   struct CacheLevelNode
@@ -100,6 +102,9 @@ namespace TransLucid
 
     void
     set(const Context& delta, const Constant& value);
+
+    void
+    garbageCollect();
 
     private:
     CacheEntry m_entry;
