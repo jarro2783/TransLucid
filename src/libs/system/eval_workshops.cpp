@@ -545,7 +545,6 @@ IfWS::operator()(Context& kappa, Context& delta)
 Constant
 HashWS::operator()(Context& k)
 {
-  std::cerr << "evaluating HashWS" << std::endl;
   Constant r = (*m_e)(k);
   return lookup_context(m_system, r, k);
 }
@@ -553,7 +552,6 @@ HashWS::operator()(Context& k)
 Constant
 HashWS::operator()(Context& k, Context& delta)
 {
-  std::cerr << "evaluating HashWS cached" << std::endl;
   Constant r = (*m_e)(k, delta);
 
   if (r.index() == TYPE_INDEX_DEMAND)

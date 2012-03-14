@@ -21,6 +21,8 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_CACHE_HPP_INCLUDED
 
 #include <map>
+#include <set>
+
 #include <tl/context.hpp>
 #include <tl/types.hpp>
 #include <tl/variant.hpp>
@@ -78,6 +80,11 @@ namespace TransLucid
 
   struct CacheLevel
   {
+    CacheLevel(const std::set<dimension_index>& dimset)
+    : dims(dimset.begin(), dimset.end())
+    {
+    }
+
     std::vector<dimension_index> dims;
     CacheEntryMap entry;
   };

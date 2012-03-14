@@ -271,17 +271,9 @@ set_cache_value
   if (value.index() == TYPE_INDEX_DEMAND)
   {
     const DemandType& demand = Types::Demand::get(value);
-    const auto& demandVector = demand.dims();
+    const auto& demandSet = demand.dims();
 
-    std::cerr << "adding demand cache level: ";
-
-    for (auto d : demandVector)
-    {
-      std::cerr << d << " ";
-    }
-    std::cerr << std::endl;
-
-    entry.entry = CacheLevel{demandVector};
+    entry.entry = CacheLevel{demandSet};
   }
   else
   {

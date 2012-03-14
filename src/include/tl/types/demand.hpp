@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_TYPES_DEMAND_HPP_INCLUDED
 
 #include <vector>
+#include <set>
 
 #include <tl/types.hpp>
 #include <functional>
@@ -31,11 +32,11 @@ namespace TransLucid
   {
     public:
     DemandType(const std::vector<dimension_index>& dims)
-    : m_dims(dims)
+    : m_dims(dims.begin(), dims.end())
     {
     }
 
-    const std::vector<dimension_index>&
+    const std::set<dimension_index>&
     dims() const
     {
       return m_dims;
@@ -61,7 +62,7 @@ namespace TransLucid
     }
 
     private:
-    std::vector<dimension_index> m_dims;
+    std::set<dimension_index> m_dims;
   };
 
   namespace Types
@@ -83,11 +84,18 @@ namespace TransLucid
       //append the demands in d to dims
       inline
       void
+      append(const Constant& d, std::set<dimension_index>& dims)
+      {
+        const auto& demands = get(d);
+        dims.insert(demands.dims().begin(), demands.dims().end());
+      }
+      
+      inline
+      void
       append(const Constant& d, std::vector<dimension_index>& dims)
       {
         const auto& demands = get(d);
-        std::copy(demands.dims().begin(), demands.dims().end(),
-          std::back_inserter(dims));
+        dims.insert(dims.end(), demands.dims().begin(), demands.dims().end());
       }
     }
   }
