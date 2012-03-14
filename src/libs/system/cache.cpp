@@ -315,6 +315,7 @@ set_visit_top_entry
 
 Cache::Cache()
 : m_entry(Types::Calc::create())
+, m_retirementAge(2)
 {
 }
 
@@ -328,6 +329,21 @@ void
 Cache::set(const Context& delta, const Constant& value)
 {
   set_visit_top_entry(m_entry, delta, value);
+}
+
+void
+Cache::garbageCollect()
+{
+  --m_retirementAge;
+}
+
+void
+Cache::updateRetirementAge(int ageSeen)
+{
+  if (ageSeen > m_retirementAge)
+  {
+    m_retirementAge = ageSeen;
+  }
 }
 
 namespace Workshops

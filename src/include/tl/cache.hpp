@@ -106,8 +106,13 @@ namespace TransLucid
     void
     garbageCollect();
 
+    void
+    updateRetirementAge(int ageSeen);
+
     private:
     CacheEntry m_entry;
+
+    int m_retirementAge;
   };
 
   namespace Workshops
