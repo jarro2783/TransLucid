@@ -82,10 +82,10 @@ There are a few special cases for strings:
     translated because they need to be quoted appropriately. So the token
     should be inserted verbatim but quoted according to the conventions of the
     language that you are translating for. These are identified by the 
-    translator note: token. Keywords are the same, they are identified by the 
-    note: keyword.
+    translator note: token. 
+  * Keywords are the same as tokens, they are identified by the note: keyword.
   * Token descriptions should be translated, these are things like "integer
-    literal", they are identified with the translator note "token description"
+    literal", they are identified with the translator note "token description".
   * The help strings for tltext might need special attention as they are not
-    complete sentences. They help string needs to be explained appropriately.
-    They are also mentioned in the translator notes.
+    complete sentences. The help string needs to be explained appropriately in
+    the translation. They are also mentioned in the translator notes.
