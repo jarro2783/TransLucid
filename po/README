@@ -79,9 +79,13 @@ All strings are C style strings and should be escaped appropriately.
 There are a few special cases for strings:
 
   * Tokens should not be translated. However, they have a string to be
-    translated because they need to be quoted appropriately. These are
-    identified by the translator note: token
+    translated because they need to be quoted appropriately. So the token
+    should be inserted verbatim but quoted according to the conventions of the
+    language that you are translating for. These are identified by the 
+    translator note: token. Keywords are the same, they are identified by the 
+    note: keyword.
   * Token descriptions should be translated, these are things like "integer
     literal", they are identified with the translator note "token description"
-  * The help strings for tltext might need special attention, they are also 
-    mentioned in the translator notes.
+  * The help strings for tltext might need special attention as they are not
+    complete sentences. They help string needs to be explained appropriately.
+    They are also mentioned in the translator notes.
