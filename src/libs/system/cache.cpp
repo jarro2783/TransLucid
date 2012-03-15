@@ -82,6 +82,7 @@ namespace
     Constant
     operator()(const Constant& c, Context& delta, Cache& cache) const
     {
+      cache.hit();
       return c;
     }
 
@@ -113,16 +114,6 @@ namespace
       }
     }
   };
-
-  #if 0
-  struct set_cache_entry_visitor
-  {
-    typedef void result_type;
-
-    void
-    operator()(const Constant&
-  };
-  #endif
 
   struct collect_level_node
   {
@@ -225,6 +216,7 @@ lookup_entry_map
 
   if (entryiter == entry.end())
   {
+    cache.miss();
     return set_calc(entry, iter, end, delta);
   }
   else

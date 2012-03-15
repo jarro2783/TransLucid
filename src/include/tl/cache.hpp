@@ -115,10 +115,37 @@ namespace TransLucid
       return m_retirementAge;
     }
 
+    void
+    miss()
+    {
+      ++m_misses;
+    }
+
+    void
+    hit()
+    {
+      ++m_hits;
+    }
+
+    int
+    misses() const
+    {
+      return m_misses;
+    }
+
+    int
+    hits() const
+    {
+      return m_hits;
+    }
+
     private:
     CacheEntry m_entry;
 
     int m_retirementAge;
+
+    int m_misses;
+    int m_hits;
   };
 
   namespace Workshops
@@ -141,6 +168,12 @@ namespace TransLucid
       garbageCollect()
       {
         return m_cache.garbageCollect();
+      }
+
+      const Cache&
+      getCache() const
+      {
+        return m_cache;
       }
 
       private:

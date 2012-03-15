@@ -1122,6 +1122,12 @@ System::go()
   //collect some garbage
   for (auto& cached : m_cachedVars)
   {
+    #if 0
+    std::cerr << cached.first << ": " 
+              << cached.second->getCache().hits() << " hits, and "
+              << cached.second->getCache().misses() << " misses"
+              << std::endl;
+    #endif
     cached.second->garbageCollect();
   }
 
