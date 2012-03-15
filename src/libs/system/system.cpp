@@ -1119,6 +1119,12 @@ System::go()
     }
   }
 
+  //collect some garbage
+  for (auto& cached : m_cachedVars)
+  {
+    cached.second->garbageCollect();
+  }
+
   //commit all of the hyperdatons
   for (auto outHD : m_outputHDs)
   {
@@ -2132,7 +2138,10 @@ System::cacheVar(const u32string& name)
 
   if (cachevar == m_cachedVars.end())
   {
-    std::unique_ptr<WS> cachews{new Workshops::CacheWS(thevar->second)};
+    std::unique_ptr<Workshops::CacheWS> cachews
+    {
+      new Workshops::CacheWS(thevar->second)
+    };
     m_cachedVars.insert({name, cachews.get()});
     cachews.release();
   }
@@ -2146,6 +2155,28 @@ System::cacheIfVar(const uuid& id)
   if (uiter != m_equationUUIDs.end())
   {
     cacheVar(uiter->second->first);
+  }
+}
+
+WS*
+System::IdentifierLookup::lookup(const u32string& name) const
+{
+  //first look for a cached version of this
+  auto cache = m_cached->find(name);
+
+  if (cache != m_cached->end())
+  {
+    return cache->second;
+  }
+
+  auto r = m_identifiers->find(name);
+  if (r != m_identifiers->end())
+  {
+    return r->second;
+  }
+  else
+  {
+    return nullptr;
   }
 }
 

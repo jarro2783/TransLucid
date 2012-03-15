@@ -68,6 +68,11 @@ namespace TransLucid
     GettextInit();
   };
 
+  namespace Workshops
+  {
+    class CacheWS;
+  }
+
   /**
    * @brief System base class.
    *
@@ -352,7 +357,7 @@ namespace TransLucid
     UUIDDefinition m_assignmentUUIDs;
 
     //the variables that we want to cache
-    std::unordered_map<u32string, WS*> m_cachedVars;
+    std::unordered_map<u32string, Workshops::CacheWS*> m_cachedVars;
 
     //maps of string to hds and the hds uuids
     OutputHDMap m_outputHDs;
@@ -467,26 +472,7 @@ namespace TransLucid
       }
 
       WS*
-      lookup(const u32string& name) const
-      {
-        //first look for a cached version of this
-        auto cache = m_cached->find(name);
-
-        if (cache != m_cached->end())
-        {
-          return cache->second;
-        }
-
-        auto r = m_identifiers->find(name);
-        if (r != m_identifiers->end())
-        {
-          return r->second;
-        }
-        else
-        {
-          return nullptr;
-        }
-      }
+      lookup(const u32string& name) const;
 
       private:
       DefinitionMap* m_identifiers;

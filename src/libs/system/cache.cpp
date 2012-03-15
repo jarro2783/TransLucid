@@ -34,7 +34,8 @@ namespace
     std::vector<dimension_index>::const_iterator iter,
     std::vector<dimension_index>::const_iterator end,
     decltype(CacheEntryMap::entry)& entry,
-    Context& delta
+    Context& delta,
+    Cache& cache
   );
 
   Constant
@@ -46,6 +47,9 @@ namespace
     Context& delta
   );
 
+  bool
+  collect_entry_map(CacheEntryMap& entrymap, Cache& cache);
+
   struct get_cache_level_visitor
   {
     typedef Constant result_type;
@@ -56,7 +60,8 @@ namespace
       CacheEntryMap& entry, 
       std::vector<dimension_index>::const_iterator iter,
       std::vector<dimension_index>::const_iterator end,
-      Context& delta
+      Context& delta,
+      Cache& cache
     ) const;
 
     Constant
@@ -65,7 +70,8 @@ namespace
       CacheEntry& entry, 
       std::vector<dimension_index>::const_iterator iter,
       std::vector<dimension_index>::const_iterator end,
-      Context& delta
+      Context& delta,
+      Cache& cache
     ) const;
   };
 
@@ -74,13 +80,13 @@ namespace
     typedef Constant result_type;
 
     Constant
-    operator()(const Constant& c, Context& delta) const
+    operator()(const Constant& c, Context& delta, Cache& cache) const
     {
       return c;
     }
 
     Constant
-    operator()(CacheLevel& l, Context& delta) const
+    operator()(CacheLevel& l, Context& delta, Cache& cache) const
     {
       std::vector<dimension_index> demands;
       for (auto d : l.dims)
@@ -100,7 +106,7 @@ namespace
         //l.entry is a CacheEntryMap
         //so look up the first dimension
         return lookup_entry_map(l.dims.begin(), l.dims.end(), l.entry.entry, 
-          delta);
+          delta, cache);
 
         //return apply_visitor(cache_level_visitor(), l.entry,
         //  demands.begin(), demands.end(), delta);
@@ -118,13 +124,97 @@ namespace
   };
   #endif
 
+  struct collect_level_node
+  {
+    typedef bool result_type;
+
+    bool
+    operator()(CacheEntry& entry, Cache& cache) const;
+
+    bool
+    operator()(CacheEntryMap& entrymap, Cache& cache) const
+    {
+      return collect_entry_map(entrymap, cache);
+    }
+  };
+
+  struct collect_entry
+  {
+    typedef bool result_type;
+
+    bool
+    operator()(const Constant& c, Cache& cache) const
+    {
+      //a constant can always be collected
+      return true;
+    }
+
+    bool
+    operator()(CacheLevel& level, Cache& cache) const
+    {
+      return collect_entry_map(level.entry, cache);
+    }
+  };
+
+bool
+collect_entry_map(CacheEntryMap& entrymap, Cache& cache)
+{
+  //visit every child in the map
+  auto iter = entrymap.entry.begin();
+
+  while (iter != entrymap.entry.end())
+  {
+    bool result = apply_visitor(collect_level_node(), iter->second.entry, 
+      cache);
+
+    if (result)
+    {
+      //the entry below can be collected so we can delete the entry
+      auto next = iter;
+      ++next;
+      entrymap.entry.erase(iter);
+      iter = next;
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+
+  //this node can be collected if it is empty
+  return entrymap.entry.empty();
+}
+
+bool
+collect_level_node::operator()(CacheEntry& entry, Cache& cache) const
+{
+  //we can collect this entry if its children can be collected and
+  //its age is greater than the retirement age
+
+  bool result = apply_visitor(collect_entry(), entry.entry, cache);
+  bool collect = false;
+
+  if (result && entry.age > cache.retirementAge())
+  {
+    collect = true;
+  }
+  else
+  {
+    //it survived
+    ++entry.age;
+  }
+
+  return collect;
+}
+
 Constant
 lookup_entry_map
 (
   std::vector<dimension_index>::const_iterator iter,
   std::vector<dimension_index>::const_iterator end,
   decltype(CacheEntryMap::entry)& entry,
-  Context& delta
+  Context& delta,
+  Cache& cache
 )
 {
   //find the value of the current dimension in the map
@@ -140,7 +230,7 @@ lookup_entry_map
   else
   {
     return apply_visitor(get_cache_level_visitor(), entryiter->second.entry,
-      ++iter, end, delta);
+      ++iter, end, delta, cache);
   }
 }
 
@@ -190,7 +280,8 @@ get_cache_level_visitor::operator()
   CacheEntryMap& entry, 
   std::vector<dimension_index>::const_iterator iter,
   std::vector<dimension_index>::const_iterator end,
-  Context& delta
+  Context& delta,
+  Cache& cache
 ) const
 {
   //we are ready to look at the next dimension
@@ -202,7 +293,7 @@ get_cache_level_visitor::operator()
   }
 
   //otherwise increment iter and look again
-  return lookup_entry_map(iter, end, entry.entry, delta);
+  return lookup_entry_map(iter, end, entry.entry, delta, cache);
 }
 
 Constant
@@ -211,7 +302,8 @@ get_cache_level_visitor::operator()
   CacheEntry& entry, 
   std::vector<dimension_index>::const_iterator iter,
   std::vector<dimension_index>::const_iterator end,
-  Context& delta
+  Context& delta,
+  Cache& cache
 ) const
 {
   if (iter != end)
@@ -220,9 +312,13 @@ get_cache_level_visitor::operator()
     //dimensions, something screwed up
     throw __FILE__ ": " STRING_(__LINE__) ": Cache error!";
   }
+
+  //update the age of this node
+  cache.updateRetirementAge(entry.age);
+  entry.age = 0;
   
   //otherwise we are ready to look at the next level
-  return apply_visitor(get_cache_entry_visitor(), entry.entry, delta);
+  return apply_visitor(get_cache_entry_visitor(), entry.entry, delta, cache);
 }
 
 void
@@ -322,7 +418,9 @@ Cache::Cache()
 Constant
 Cache::get(Context& delta)
 {
-  return apply_visitor(get_cache_entry_visitor(), m_entry.entry, delta);
+  updateRetirementAge(m_entry.age);
+  m_entry.age = 0;
+  return apply_visitor(get_cache_entry_visitor(), m_entry.entry, delta, *this);
 }
 
 void
@@ -334,6 +432,8 @@ Cache::set(const Context& delta, const Constant& value)
 void
 Cache::garbageCollect()
 {
+  apply_visitor(collect_entry(), m_entry.entry, *this);
+  //finally, decrease the retirement age
   --m_retirementAge;
 }
 

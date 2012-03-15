@@ -109,6 +109,12 @@ namespace TransLucid
     void
     updateRetirementAge(int ageSeen);
 
+    int
+    retirementAge()
+    {
+      return m_retirementAge;
+    }
+
     private:
     CacheEntry m_entry;
 
@@ -130,6 +136,12 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      void
+      garbageCollect()
+      {
+        return m_cache.garbageCollect();
+      }
 
       private:
 
