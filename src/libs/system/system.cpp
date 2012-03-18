@@ -57,6 +57,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unistd.h>
 
 #include <tl/builtin_types.hpp>
+#include <tl/cache.hpp>
 #include <tl/constws.hpp>
 #include <tl/context.hpp>
 #include <tl/eval_workshops.hpp>
@@ -66,6 +67,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/tree_printer.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/special.hpp>
@@ -209,33 +211,111 @@ namespace
     }
 
     Constant
-    operator()(Context& k)
+    operator()(Context& kappa, Context& delta)
     {
-      //this should always work, but it's a bit hacky
+      //make sure the necessary dimensions are there
+      //I should write this in TL
+      //
+      //args = eval_workshop.(#!#!psi) 
+      //         @ #!#!pi @ [#!psi <- tail.#!#!psi, #!pi <- #!#!pi]
 
-      //head of ##\psi
-      Constant hashPsi = k.lookup(DIM_PSI);
+      //we need to check if DIM_PSI and DIM_PI exist
+      //then look them up and check that their dims exist
+      //then we can call the normal operator()
+      
+      std::vector<dimension_index> needs;
+
+      if (!delta.has_entry(DIM_PSI))
+      {
+        needs.push_back(DIM_PSI);
+      }
+
+      if (!delta.has_entry(DIM_PI))
+      {
+        needs.push_back(DIM_PI);
+      }
+
+      if (needs.size() > 0)
+      {
+        return Types::Demand::create(needs);
+      }
+
+      //then we have the dimensions that we need
+      Constant hashPsi = delta.lookup(DIM_PSI);
 
       if (hashPsi.index() != TYPE_INDEX_DIMENSION)
       {
         throw "list dimension not a dimension";
       }
-
-      Constant hashHashPsi = k.lookup(get_constant<dimension_index>(hashPsi));
-
-      if (hashHashPsi.index() != TYPE_INDEX_TUPLE)
+      
+      auto d1 = get_constant<dimension_index>(hashPsi);
+      if (!delta.has_entry(d1))
       {
-        throw "list expected, type not a tuple";
+        needs.push_back(d1);
       }
 
-      Constant hashPi = k.lookup(DIM_PI);
+      Constant hashPi = delta.lookup(DIM_PI);
 
       if (hashPi.index() != TYPE_INDEX_DIMENSION)
       {
         throw "list dimension not a dimension";
       }
 
-      Constant hashHashPi = k.lookup(get_constant<dimension_index>(hashPi));
+      auto d2 = get_constant<dimension_index>(hashPi);
+      if (!delta.has_entry(d2))
+      {
+        needs.push_back(d2);
+      }
+
+      if (needs.size() > 0)
+      {
+        return Types::Demand::create(needs);
+      }
+
+      return evaluate(kappa, delta);
+    }
+
+    Constant
+    operator()(Context& k)
+    {
+      return evaluate(k);
+    }
+
+    //when this is called, delta will be setup correctly if it is the cached
+    //version, if not it just won't exist
+    //in which case it is always safe to read from the kappa
+    //then pass on kappa and delta if it exists as appropriate
+    template <typename... Delta>
+    Constant
+    evaluate(Context& kappa, Delta&&... delta)
+    {
+      //this should always work, but it's a bit hacky
+
+      //head of ##\psi
+      Constant hashPsi = kappa.lookup(DIM_PSI);
+
+      if (hashPsi.index() != TYPE_INDEX_DIMENSION)
+      {
+        throw "list dimension not a dimension";
+      }
+
+      Constant hashHashPsi = 
+        kappa.lookup(get_constant<dimension_index>(hashPsi));
+
+      if (hashHashPsi.index() != TYPE_INDEX_TUPLE)
+      {
+        throw "list expected, type not a tuple";
+      }
+
+      Constant hashPi = kappa.lookup(DIM_PI);
+
+      if (hashPi.index() != TYPE_INDEX_DIMENSION)
+      {
+        throw "list dimension not a dimension";
+      }
+
+      Constant hashHashPi = 
+        kappa.lookup(get_constant<dimension_index>(hashPi));
 
       if (hashHashPi.index() != TYPE_INDEX_TUPLE)
       {
@@ -250,7 +330,7 @@ namespace
       try
       {
 
-        ContextPerturber p(k,
+        ContextPerturber p(kappa,
           {
             {get_constant<dimension_index>(hashPsi), listTail(hashHashPsi)},
             {get_constant<dimension_index>(hashPi), listTail(hashHashPi)}
@@ -261,7 +341,7 @@ namespace
 
         WS* w = Types::Workshop::get(expr).ws();
 
-        return (*w)(k);
+        return (*w)(kappa, delta...);
       
       }
       catch (...)
@@ -279,6 +359,12 @@ namespace
   class MakeErrorWS : public WS
   {
     public:
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      return operator()(kappa);
+    }
+
     Constant
     operator()(Context& k)
     {
@@ -318,6 +404,30 @@ namespace detail
     operator()(Context& k)
     {
       return m_hd->get(k);
+    }
+
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      //check that the variance is in the delta
+      const auto& variance = m_hd->variance();
+
+      std::vector<dimension_index> needs;
+
+      for (const auto& d : variance)
+      {
+        if (!delta.has_entry(d.first))
+        {
+          needs.push_back(d.first);
+        }
+      }
+
+      if (needs.size() != 0)
+      {
+        return Types::Demand::create(needs);
+      }
+
+      return operator()(kappa);
     }
 
     private:
@@ -469,6 +579,8 @@ namespace detail
     Constant
     operator()(const Parser::ReplDecl& repl)
     {
+      //TODO implement repl
+      return Constant();
     }
 
     Constant
@@ -874,6 +986,18 @@ System::init_equations()
 
   //args = case hd(##\psi) of E @ [#\pi <- tl(##\pi), #\psi <- tl(##\psi)]
   //  @ hd(##\pi)
+
+  //add a function eval_workshop
+  #if 0
+  addEquation(Parser::Equation
+  (
+    U"eval_workshop",
+    Tree::Expr(),
+    Tree::Expr(),
+    Tree::LambdaExpr(U"x")
+  ));
+  #endif
+
   addEquation(U"args", GuardWS(), new ArgsWorkshop);
 
   addEquation(U"make_error", GuardWS(), new MakeErrorWS);
@@ -905,6 +1029,8 @@ System::System()
    {U"lambda", TYPE_INDEX_VALUE_FUNCTION},
    {U"phi", TYPE_INDEX_NAME_FUNCTION},
    {U"uuid", TYPE_INDEX_UUID},
+   {U"demand", TYPE_INDEX_DEMAND},
+   {U"calc", TYPE_INDEX_CALC},
   }
   )
 , m_time(0)
@@ -991,6 +1117,18 @@ System::go()
       //the demand could have ranges, so we need to enumerate them
       enumerateContextSet(ctxts, theContext, assign.second, hd->second);
     }
+  }
+
+  //collect some garbage
+  for (auto& cached : m_cachedVars)
+  {
+    #if 0
+    std::cerr << cached.first << ": " 
+              << cached.second->getCache().hits() << " hits, and "
+              << cached.second->getCache().misses() << " misses"
+              << std::endl;
+    #endif
+    cached.second->garbageCollect();
   }
 
   //commit all of the hyperdatons
@@ -1988,6 +2126,64 @@ System::printConstant(const Constant& c)
   }
 
   return Types::String::get(result);
+}
+
+void
+System::cacheVar(const u32string& name)
+{
+  //first find the variable in the equations
+  auto thevar = m_equations.find(name);
+
+  if (thevar == m_equations.end())
+  {
+    return;
+  }
+
+  //then make sure we haven't already cached it
+  auto cachevar = m_cachedVars.find(name);
+
+  if (cachevar == m_cachedVars.end())
+  {
+    std::unique_ptr<Workshops::CacheWS> cachews
+    {
+      new Workshops::CacheWS(thevar->second)
+    };
+    m_cachedVars.insert({name, cachews.get()});
+    cachews.release();
+  }
+}
+
+void
+System::cacheIfVar(const uuid& id)
+{
+  auto uiter = m_equationUUIDs.find(id);
+
+  if (uiter != m_equationUUIDs.end())
+  {
+    cacheVar(uiter->second->first);
+  }
+}
+
+WS*
+System::IdentifierLookup::lookup(const u32string& name) const
+{
+  //first look for a cached version of this
+  auto cache = m_cached->find(name);
+
+  if (cache != m_cached->end())
+  {
+    return cache->second;
+  }
+
+  auto r = m_identifiers->find(name);
+  if (r != m_identifiers->end())
+  {
+    return r->second;
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 } //namespace TransLucid

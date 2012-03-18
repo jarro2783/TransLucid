@@ -17,38 +17,171 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef CACHE_HPP_INCLUDED
-#define CACHE_HPP_INCLUDED
+#ifndef TL_CACHE_HPP_INCLUDED
+#define TL_CACHE_HPP_INCLUDED
 
 #include <map>
+#include <set>
+
+#include <tl/context.hpp>
 #include <tl/types.hpp>
+#include <tl/variant.hpp>
+#include <tl/workshop.hpp>
 
 namespace TransLucid
 {
-  class System;
+  //an actual cache entry, either a value or a single level in the cache
+  //hierarchy
+  struct CacheEntry;
 
-  class LazyWarehouse
+  //one level in the hierarchy, the relevant dimensions and
+  struct CacheLevel;
+  struct CacheEntryMap;
+  struct CacheLevelNode;
+  
+  typedef Variant
+  <
+    Constant,
+    recursive_wrapper<CacheLevel>
+  > CacheEntryVariant;
+
+  typedef Variant
+  <
+    recursive_wrapper<CacheEntryMap>,
+    CacheEntry
+  > CacheLevelNodeVariant;
+
+  struct CacheEntry
+  {
+    CacheEntry() = default;
+
+    CacheEntry(CacheEntryVariant&& v)
+    : entry(std::move(v)), age(0)
+    {
+    }
+
+    CacheEntryVariant entry;
+
+    int age;
+  };
+
+  struct CacheLevelNode
+  {
+    CacheLevelNode(CacheLevelNodeVariant&& v)
+    : entry(std::move(v))
+    {
+    }
+
+    CacheLevelNodeVariant entry;
+  };
+
+  struct CacheEntryMap
+  {
+    std::map<Constant, CacheLevelNode> entry;
+  };
+
+  struct CacheLevel
+  {
+    CacheLevel(const std::set<dimension_index>& dimset)
+    : dims(dimset.begin(), dimset.end())
+    {
+    }
+
+    std::vector<dimension_index> dims;
+    CacheEntryMap entry;
+  };
+  
+  class Cache
   {
     public:
 
-    LazyWarehouse(System& i)
-    : m_system(i)
-    {}
-
-    //looks up and if not found adds a calc entry
-    std::pair<bool, Constant>
-    lookupCalc(const u32string& name, const Tuple& c);
+    Cache();
+    
+    Constant
+    get(Context& delta);
 
     void
-    add(const u32string& name, const Constant& value, const Tuple& c);
+    set(const Context& delta, const Constant& value);
+
+    void
+    garbageCollect();
+
+    void
+    updateRetirementAge(int ageSeen);
+
+    int
+    retirementAge()
+    {
+      return m_retirementAge;
+    }
+
+    void
+    miss()
+    {
+      ++m_misses;
+    }
+
+    void
+    hit()
+    {
+      ++m_hits;
+    }
+
+    int
+    misses() const
+    {
+      return m_misses;
+    }
+
+    int
+    hits() const
+    {
+      return m_hits;
+    }
 
     private:
-    typedef std::map<Tuple, Constant> TupleToValue;
-    typedef std::map<u32string, TupleToValue> CacheMapping;
-    CacheMapping m_cache;
-    System& m_system;
+    CacheEntry m_entry;
+
+    int m_retirementAge;
+
+    int m_misses;
+    int m_hits;
   };
 
+  namespace Workshops
+  {
+    class CacheWS : public WS
+    {
+      public:
+
+      CacheWS(WS* expr)
+      : m_expr(expr)
+      {}
+
+      Constant
+      operator()(Context& kappa);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      void
+      garbageCollect()
+      {
+        return m_cache.garbageCollect();
+      }
+
+      const Cache&
+      getCache() const
+      {
+        return m_cache;
+      }
+
+      private:
+
+      Cache m_cache;
+      WS* m_expr;
+    };
+  }
 }
 
 #endif // CACHE_HPP_INCLUDED

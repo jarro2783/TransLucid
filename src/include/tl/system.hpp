@@ -68,6 +68,11 @@ namespace TransLucid
     GettextInit();
   };
 
+  namespace Workshops
+  {
+    class CacheWS;
+  }
+
   /**
    * @brief System base class.
    *
@@ -240,6 +245,12 @@ namespace TransLucid
     u32string
     printConstant(const Constant& c);
 
+    void
+    cacheVar(const u32string& name);
+
+    void
+    cacheIfVar(const uuid& id);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
@@ -345,6 +356,9 @@ namespace TransLucid
     DefinitionMap m_assignments;
     UUIDDefinition m_assignmentUUIDs;
 
+    //the variables that we want to cache
+    std::unordered_map<u32string, Workshops::CacheWS*> m_cachedVars;
+
     //maps of string to hds and the hds uuids
     OutputHDMap m_outputHDs;
     UUIDStringMap m_outputUUIDs;
@@ -438,8 +452,13 @@ namespace TransLucid
 
     struct IdentifierLookup
     {
-      IdentifierLookup(DefinitionMap& identifiers)
-      : m_identifiers(&identifiers)
+      IdentifierLookup
+      (
+        DefinitionMap& identifiers,
+        decltype(m_cachedVars)& cached
+      )
+      : m_identifiers(&identifiers),
+        m_cached(&cached)
       {
       }
 
@@ -453,26 +472,16 @@ namespace TransLucid
       }
 
       WS*
-      lookup(const u32string& name) const
-      {
-        auto r = m_identifiers->find(name);
-        if (r != m_identifiers->end())
-        {
-          return r->second;
-        }
-        else
-        {
-          return nullptr;
-        }
-      }
+      lookup(const u32string& name) const;
 
       private:
       DefinitionMap* m_identifiers;
+      decltype(m_cachedVars)* m_cached;
     };
 
     IdentifierLookup lookupIdentifiers()
     {
-      return IdentifierLookup(m_equations);
+      return IdentifierLookup(m_equations, m_cachedVars);
     }
 
     //template <size_t N>

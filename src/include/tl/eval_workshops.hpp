@@ -76,6 +76,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& k, Context& delta);
     };
 
     class DimensionWS : public WS
@@ -87,6 +90,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& k, Context& delta);
 
       private:
       Constant m_value;
@@ -102,12 +108,19 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& k, Context& delta);
+
       private:
       System::IdentifierLookup m_identifiers;
       u32string m_name;
 
       //don't delete this, it doesn't belong to you
       WS* m_e;
+
+      template <typename... Delta>
+      Constant
+      evaluate(Context& kappa, Delta&&... delta);
     };
 
     class VariableOpWS : public WS
@@ -128,57 +141,6 @@ namespace TransLucid
       const std::vector<WS*>& m_operands;
       u32string m_symbol;
     };
-
-    class IsSpecialWS : public WS
-    {
-      public:
-      IsSpecialWS(WS* system, const u32string& special, WS* e)
-      : m_special(special),
-      m_e(e)
-      {}
-
-      Constant
-      operator()(Context& k);
-
-      private:
-      WS* m_system;
-      u32string m_special;
-      WS* m_e;
-    };
-
-    class IsTypeWS : public WS
-    {
-      public:
-      IsTypeWS(WS* system, const u32string& type, WS* e)
-      : m_system(system), m_type(type), m_e(e)
-      {}
-
-      Constant
-      operator()(Context& k);
-
-      private:
-      WS* m_system;
-      u32string m_type;
-      WS* m_e;
-    };
-
-    //TODO work out what converting is
-    #if 0
-    class ConvertWS : public WS
-    {
-      public:
-      ConvertWS(const u32string& to, WS* e)
-      : m_to(to), m_e(e)
-      {}
-
-      Constant
-      operator()(const Tuple& k);
-
-      private:
-      u32string m_to;
-      WS* m_e;
-    };
-    #endif
 
     /**
      * A bang operation workshop. Evaluates a host function.
@@ -228,6 +190,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       System& m_system;
       WS* m_name;
@@ -275,6 +240,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       //WS* m_system;
       WS* m_condition;
@@ -313,6 +281,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& k, Context& kappa);
 
       private:
       System& m_system;
@@ -353,6 +324,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       System& m_system;
@@ -418,6 +392,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       WS* e2;
@@ -534,6 +511,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       System* m_system;
       u32string m_name;
@@ -577,6 +557,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       WS* m_lhs;
@@ -644,6 +627,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       System* m_system;
       u32string m_name;
@@ -687,6 +673,9 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
       WS* m_lhs;
       WS* m_rhs;
@@ -723,6 +712,9 @@ namespace TransLucid
        */
       Constant
       operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
 
       private:
       WS* m_e2;

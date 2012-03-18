@@ -1,5 +1,5 @@
 /* The warehouse.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -18,75 +18,476 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/cache.hpp>
-#include <tl/types.hpp>
-#include <tl/builtin_types.hpp>
-#include <tl/system.hpp>
+#include <tl/types/calc.hpp>
+#include <tl/types/demand.hpp>
 
-// TODO: This file is under construction.  It is not junk.
+#include <iostream>
 
 namespace TransLucid
 {
 
-std::pair<bool, Constant>
-LazyWarehouse::lookupCalc(const u32string& name, const Tuple& c)
+namespace
 {
-  #if 0
-  CacheMapping::iterator iter = m_cache.find(name);
-  if (iter == m_cache.end())
+  Constant
+  lookup_entry_map
+  (
+    std::vector<dimension_index>::const_iterator iter,
+    std::vector<dimension_index>::const_iterator end,
+    decltype(CacheEntryMap::entry)& entry,
+    Context& delta,
+    Cache& cache
+  );
+
+  Constant
+  set_calc
+  (
+    std::map<Constant, CacheLevelNode>& entry,
+    std::vector<dimension_index>::const_iterator iter,
+    std::vector<dimension_index>::const_iterator end,
+    Context& delta
+  );
+
+  bool
+  collect_entry_map(CacheEntryMap& entrymap, Cache& cache);
+
+  struct get_cache_level_visitor
   {
-    //add calc because it wasn't found
-    TupleToValue m;
-    m.insert(std::make_pair
-      (c, Constant(ValueCalc(), m_system.typeRegistry().indexCalc())));
-    m_cache.insert(std::make_pair(name, m));
-  }
-  else
+    typedef Constant result_type;
+
+    Constant
+    operator()
+    (
+      CacheEntryMap& entry, 
+      std::vector<dimension_index>::const_iterator iter,
+      std::vector<dimension_index>::const_iterator end,
+      Context& delta,
+      Cache& cache
+    ) const;
+
+    Constant
+    operator()
+    (
+      CacheEntry& entry, 
+      std::vector<dimension_index>::const_iterator iter,
+      std::vector<dimension_index>::const_iterator end,
+      Context& delta,
+      Cache& cache
+    ) const;
+  };
+
+  struct get_cache_entry_visitor
   {
-    TupleToValue& values = iter->second;
-    TupleToValue::iterator titer = values.find(c);
-    if (titer == values.end())
+    typedef Constant result_type;
+
+    Constant
+    operator()(const Constant& c, Context& delta, Cache& cache) const
     {
-      //add calc because it wasn't found
-      iter->second.insert
-        (std::make_pair
-          (c, Constant(ValueCalc(),
-                         m_system.typeRegistry().indexCalc())));
+      cache.hit();
+      return c;
+    }
+
+    Constant
+    operator()(CacheLevel& l, Context& delta, Cache& cache) const
+    {
+      std::vector<dimension_index> demands;
+      for (auto d : l.dims)
+      {
+        if (!delta.has_entry(d))
+        {
+          demands.push_back(d);
+        }
+      }
+
+      if (demands.size() > 0)
+      {
+        return Types::Demand::create(demands);
+      }
+      else
+      {
+        //l.entry is a CacheEntryMap
+        //so look up the first dimension
+        return lookup_entry_map(l.dims.begin(), l.dims.end(), l.entry.entry, 
+          delta, cache);
+
+        //return apply_visitor(cache_level_visitor(), l.entry,
+        //  demands.begin(), demands.end(), delta);
+      }
+    }
+  };
+
+  struct collect_level_node
+  {
+    typedef bool result_type;
+
+    bool
+    operator()(CacheEntry& entry, Cache& cache) const;
+
+    bool
+    operator()(CacheEntryMap& entrymap, Cache& cache) const
+    {
+      return collect_entry_map(entrymap, cache);
+    }
+  };
+
+  struct collect_entry
+  {
+    typedef bool result_type;
+
+    bool
+    operator()(const Constant& c, Cache& cache) const
+    {
+      //a constant can always be collected
+      return true;
+    }
+
+    bool
+    operator()(CacheLevel& level, Cache& cache) const
+    {
+      return collect_entry_map(level.entry, cache);
+    }
+  };
+
+bool
+collect_entry_map(CacheEntryMap& entrymap, Cache& cache)
+{
+  //visit every child in the map
+  auto iter = entrymap.entry.begin();
+
+  while (iter != entrymap.entry.end())
+  {
+    bool result = apply_visitor(collect_level_node(), iter->second.entry, 
+      cache);
+
+    if (result)
+    {
+      //the entry below can be collected so we can delete the entry
+      auto next = iter;
+      ++next;
+      entrymap.entry.erase(iter);
+      iter = next;
     }
     else
     {
-      //return the actual value
-      return std::make_pair(true, titer->second);
+      ++iter;
     }
   }
-  #endif
-  return std::make_pair(false, Constant());
+
+  //this node can be collected if it is empty
+  return entrymap.entry.empty();
+}
+
+bool
+collect_level_node::operator()(CacheEntry& entry, Cache& cache) const
+{
+  //we can collect this entry if its children can be collected and
+  //its age is greater than the retirement age
+
+  bool result = apply_visitor(collect_entry(), entry.entry, cache);
+  bool collect = false;
+
+  if (result && entry.age > cache.retirementAge())
+  {
+    collect = true;
+  }
+  else
+  {
+    //it survived
+    ++entry.age;
+  }
+
+  return collect;
+}
+
+Constant
+lookup_entry_map
+(
+  std::vector<dimension_index>::const_iterator iter,
+  std::vector<dimension_index>::const_iterator end,
+  decltype(CacheEntryMap::entry)& entry,
+  Context& delta,
+  Cache& cache
+)
+{
+  //find the value of the current dimension in the map
+
+  Constant c = delta.lookup(*iter);
+
+  auto entryiter = entry.find(c);
+
+  if (entryiter == entry.end())
+  {
+    cache.miss();
+    return set_calc(entry, iter, end, delta);
+  }
+  else
+  {
+    return apply_visitor(get_cache_level_visitor(), entryiter->second.entry,
+      ++iter, end, delta, cache);
+  }
+}
+
+Constant
+set_calc
+(
+  std::map<Constant, CacheLevelNode>& entry,
+  std::vector<dimension_index>::const_iterator iter,
+  std::vector<dimension_index>::const_iterator end,
+  Context& delta
+)
+{
+  //iter will be the current dimension to consider
+  //add an entry for delta(iter), we have already ensured that all the
+  //dimensions needed exist
+
+  Constant val = delta.lookup(*iter);
+
+  //if iter is the last thing, the end of this needs to be calc, otherwise
+  //it's another map, and repeat
+
+  ++iter;
+  if (iter == end)
+  {
+    Constant calc = Types::Calc::create();
+    entry.insert(std::make_pair(val, CacheLevelNode(CacheEntry(calc))));
+    return calc;
+  }
+  else
+  {
+    CacheLevelNode node{CacheEntryMap()};
+    auto inserted = entry.insert(std::make_pair(val, node));
+
+    return set_calc
+    (
+      get<CacheEntryMap>(inserted.first->second.entry).entry,
+      iter,
+      end,
+      delta
+    );
+  }
+}
+
+Constant
+get_cache_level_visitor::operator()
+(
+  CacheEntryMap& entry, 
+  std::vector<dimension_index>::const_iterator iter,
+  std::vector<dimension_index>::const_iterator end,
+  Context& delta,
+  Cache& cache
+) const
+{
+  //we are ready to look at the next dimension
+
+  //if iter == end then we have too many entries
+  if (iter == end)
+  {
+    throw __FILE__ ": " STRING_(__LINE__) ": Cache error!";
+  }
+
+  //otherwise increment iter and look again
+  return lookup_entry_map(iter, end, entry.entry, delta, cache);
+}
+
+Constant
+get_cache_level_visitor::operator()
+(
+  CacheEntry& entry, 
+  std::vector<dimension_index>::const_iterator iter,
+  std::vector<dimension_index>::const_iterator end,
+  Context& delta,
+  Cache& cache
+) const
+{
+  if (iter != end)
+  {
+    //somehow we got to the end of the entries without looking at all the
+    //dimensions, something screwed up
+    throw __FILE__ ": " STRING_(__LINE__) ": Cache error!";
+  }
+
+  //update the age of this node
+  cache.updateRetirementAge(entry.age);
+  entry.age = 0;
+  
+  //otherwise we are ready to look at the next level
+  return apply_visitor(get_cache_entry_visitor(), entry.entry, delta, cache);
 }
 
 void
-LazyWarehouse::add
-(const u32string& name, const Constant& value, const Tuple& c)
+set_visit_top_entry
+(
+  CacheEntry& entry, 
+  const Context& delta,
+  const Constant& value
+);
+
+void
+set_traverse_level
+(
+  std::vector<dimension_index>::const_iterator begin,
+  std::vector<dimension_index>::const_iterator end,
+  CacheEntryMap& entry,
+  const Context& delta,
+  const Constant& value
+)
 {
-  #if 0
-  CacheMapping::iterator iter = m_cache.find(name);
-  if (iter == m_cache.end())
+  auto iter = entry.entry.find(delta.lookup(*begin));
+
+  CacheEntry* nextentry = TransLucid::get<CacheEntry>(&iter->second.entry);
+  CacheEntryMap* nextmap = TransLucid::get<CacheEntryMap>(&iter->second.entry);
+
+  if (nextentry != nullptr)
   {
-    TupleToValue m;
-    m.insert(std::make_pair(c, value));
-    m_cache.insert(std::make_pair(name, m));
+    set_visit_top_entry(*nextentry, delta, value);
+  }
+  else if (nextmap != nullptr)
+  {
+    //keep going down this level
+    set_traverse_level(++begin, end, *nextmap, delta, value);
+  }
+}
+
+//overwrites entry with value
+//but if value is a demand it becomes a new CacheLevel
+void
+set_cache_value
+(
+  CacheEntry& entry,
+  const Constant& value
+)
+{
+  if (value.index() == TYPE_INDEX_DEMAND)
+  {
+    const DemandType& demand = Types::Demand::get(value);
+    const auto& demandSet = demand.dims();
+
+    entry.entry = CacheLevel{demandSet};
   }
   else
   {
-    TupleToValue::iterator titer = iter->second.find(c);
-    if (titer == iter->second.end())
+    entry.entry = value;
+  }
+}
+
+void
+set_visit_top_entry
+(
+  CacheEntry& entry, 
+  const Context& delta,
+  const Constant& value
+)
+{
+  //There is guaranteed to be an entry for the current delta which is set to
+  //calc. If value is a demand, that becomes the next level in the cache
+  //hierarchy.
+
+  //apply_visitor(set_cache_entry_visitor(), m_entry.entry, delta, value);
+
+  const Constant* c = TransLucid::get<Constant>(&entry.entry);
+  CacheLevel* level = TransLucid::get<CacheLevel>(&entry.entry);
+
+  if (c != nullptr)
+  {
+    //overwrite it
+    set_cache_value(entry, value);
+  }
+  else if (level != nullptr)
+  {
+    //traverse the level
+    set_traverse_level(level->dims.begin(), level->dims.end(), level->entry, 
+      delta, value);
+  }
+}
+
+}
+
+Cache::Cache()
+: m_entry(Types::Calc::create())
+, m_retirementAge(2)
+{
+}
+
+Constant
+Cache::get(Context& delta)
+{
+  updateRetirementAge(m_entry.age);
+  m_entry.age = 0;
+  return apply_visitor(get_cache_entry_visitor(), m_entry.entry, delta, *this);
+}
+
+void
+Cache::set(const Context& delta, const Constant& value)
+{
+  set_visit_top_entry(m_entry, delta, value);
+}
+
+void
+Cache::garbageCollect()
+{
+  apply_visitor(collect_entry(), m_entry.entry, *this);
+  //finally, decrease the retirement age
+  --m_retirementAge;
+}
+
+void
+Cache::updateRetirementAge(int ageSeen)
+{
+  if (ageSeen > m_retirementAge)
+  {
+    m_retirementAge = ageSeen;
+  }
+}
+
+namespace Workshops
+{
+
+Constant
+CacheWS::operator()(Context& kappa)
+{
+  //the link between cached and uncached code, the difference between this
+  //and the cached evaluator is that this one fills in all the dimensions
+  //requested from kappa and doesn't return them
+
+  //although maybe it can just call cached code with all the dimensions
+  Constant c = operator()(kappa, kappa);
+
+  return c;
+}
+
+Constant
+CacheWS::operator()(Context& kappa, Context& delta)
+{
+  Context subdelta;
+  ContextPerturber p(subdelta);
+
+  while (true)
+  {
+    Constant d = m_cache.get(subdelta);
+
+    if (d.index() == TYPE_INDEX_CALC)
     {
-      iter->second.insert(std::make_pair(c, value));
+      d = (*m_expr)(kappa, subdelta);
+      m_cache.set(subdelta, d);
+    }
+
+    if (d.index() == TYPE_INDEX_DEMAND)
+    {
+      const auto& demands = Types::Demand::get(d);
+
+      for (auto dim : demands.dims())
+      {
+        p.perturb(dim, kappa.lookup(dim));
+      }
     }
     else
     {
-      titer->second = value;
+      break;
     }
   }
-  #endif
+
+  return m_cache.get(delta);
+}
+
 }
 
 }

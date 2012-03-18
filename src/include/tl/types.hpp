@@ -71,6 +71,7 @@ namespace TransLucid
     bool (*equality)(const Constant&, const Constant&);
     size_t (*hash)(const Constant&);
     void (*destroy)(void*);
+    bool (*less)(const Constant&, const Constant&);
   };
 
   struct ConstantPointerValue
@@ -217,6 +218,30 @@ namespace TransLucid
     operator!=(const Constant& rhs) const
     {
       return !(*this == rhs);
+    }
+
+    bool
+    operator<(const Constant& rhs) const
+    {
+      if (index() < rhs.index())
+      {
+        return true;
+      }
+      else if (index() > rhs.index())
+      {
+        return false;
+      }
+      else
+      {
+        if (data.field == TYPE_FIELD_PTR)
+        {
+          return (*data.ptr->functions->less)(*this, rhs);
+        }
+        else
+        {
+          return detail::constant_less(*this, rhs);
+        }
+      }
     }
 
     type_index
@@ -383,6 +408,9 @@ namespace TransLucid
     {
       return *m_value == *rhs.m_value;
     }
+
+    bool
+    operator<(const Tuple& rhs) const;
 
     //void
     //print(const System& i, std::ostream& os, const Tuple& c) const;

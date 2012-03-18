@@ -59,6 +59,9 @@ namespace TransLucid
      */
     bool
     constant_equality(const Constant& lhs, const Constant& rhs);
+
+    bool
+    constant_less(const Constant& lhs, const Constant& rhs);
   }
 }
 

@@ -32,6 +32,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/equation.hpp>
 #include <tl/system.hpp>
 #include <tl/types.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
@@ -352,6 +353,41 @@ booleanTrue(const GuardWS& g, Context& k)
   }
 }
 
+//the cached boolean true
+bool
+booleanTrue
+(
+  const GuardWS& g, 
+  Context& kappa, 
+  Context& delta, 
+  std::vector<dimension_index>& demands
+)
+{
+  WS* b = g.boolean();
+
+  if (b)
+  {
+    Constant v = (*b)(kappa, delta);// = i.evaluate(g.boolean(), c);
+
+    if (v.index() == TYPE_INDEX_DEMAND)
+    {
+      const auto& newd = Types::Demand::get(v);
+      std::copy(newd.dims().begin(), newd.dims().end(), 
+        std::back_inserter(demands));
+
+      return false;
+    }
+
+    return v.index() == TYPE_INDEX_BOOL
+    && get_constant<bool>(v);
+  }
+  else
+  {
+    return true;
+  }
+
+}
+
 //these should go in charset.cpp
 //TODO fix these
 std::string
@@ -498,27 +534,34 @@ lookup_context(System& system, const Constant& v, const Context& k)
   }
 
   return Constant(k.lookup(index));
+}
 
-#if 0
-  Tuple::const_iterator iter = k.find(index);
-  if (iter != k.end())
+Constant
+lookup_context_cached
+(
+  System& system, 
+  const Constant& v, 
+  const Context& delta
+)
+{
+  dimension_index index;
+  if (v.index() == TYPE_INDEX_DIMENSION)
   {
-    return TaggedConstant(iter->second, k);
+    index = get_constant<dimension_index>(v);
   }
   else
   {
-    //find the all dimension
-    Tuple::const_iterator all = k.find(DIM_ALL);
-    if (all == k.end())
-    {
-      return TaggedConstant(Types::Special::create(SP_DIMENSION), k);
-    }
-    else
-    {
-      return TaggedConstant(all->second, k);
-    }
+    index = system.getDimensionIndex(v);
   }
-#endif
+
+  if (delta.has_entry(index))
+  {
+    return Constant(delta.lookup(index));
+  }
+  else
+  {
+    return Types::Demand::create({index});
+  }
 }
 
 Tuple
@@ -583,5 +626,25 @@ applyFunction(Context& k, const Constant& lhs, const Constant& rhs)
   }
 }
 
+Constant
+applyFunction
+(
+  Context& kappa, 
+  Context& delta, 
+  const Constant& lhs, 
+  const Constant& rhs
+)
+{
+  if (lhs.index() == TYPE_INDEX_VALUE_FUNCTION)
+  {
+    const auto& fnval = Types::ValueFunction::get(lhs);
+
+    return fnval.apply(kappa, delta, rhs);
+  }
+  else
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+}
 
 }

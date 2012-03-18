@@ -105,6 +105,27 @@ namespace TransLucid
     //virtual ~IOHD() = default;
   };
 
+  class HDSender
+  {
+    public:
+    virtual void
+    send(char* bytes, size_t length) = 0;
+  };
+
+  class HDWriter
+  {
+    virtual void
+    write(const InputHD& hd, HDSender& out) = 0;
+  };
+
+  class HDReader
+  {
+  };
+
+  class HDReceiver
+  {
+  };
+
   #if 0
   template <typename Array, typename First, typename... Location>
   auto 

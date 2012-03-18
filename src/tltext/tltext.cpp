@@ -1,5 +1,5 @@
-/* Core TransLucid application implementation.
-   Copyright (C) 2011 Jarryd Beck and John Plaice
+/* TLText application implementation.
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -29,6 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/boolean.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/string.hpp>
+#include <tl/types/uuid.hpp>
 #include <tl/types_util.hpp>
 #include <tl/system.hpp>
 
@@ -56,12 +57,17 @@ namespace TransLucid
 namespace TLText
 {
 
-TLText::TLText(const std::string& progname, const std::string& initOut)
+TLText::TLText
+(
+  const std::string& progname, 
+  const std::string& initOut
+)
 : 
   m_myname(progname)
  ,m_verbose(1)
  ,m_uuids(false)
  ,m_debug(false)
+ ,m_cached(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_error(&std::cerr)
@@ -317,6 +323,15 @@ TLText::processDefinitions
         {
           auto result = 
             m_system.parseLine(posbegin, posend, m_verbose, m_debug);
+
+          if (m_cached)
+          {
+            //how do I do this?
+            if (result.index() == TYPE_INDEX_UUID)
+            {
+              m_system.cacheIfVar(Types::UUID::get(result));
+            }
+          }
 
           if (m_uuids)
           {

@@ -246,6 +246,12 @@ namespace
         TransLucid::Tree::BinaryOperator
           {TransLucid::Tree::ASSOC_LEFT, U"modulus", U"%", 10}
       );
+
+      theSystem.addBinaryOperator(
+        TransLucid::Tree::BinaryOperator
+          {TransLucid::Tree::ASSOC_LEFT, U"range_construct", U"..", 0}
+      );
+
       initialized = true;
     }
 
@@ -888,13 +894,15 @@ TEST_CASE ( "mixed", "random test" )
 TEST_CASE ( "operators", "check arbitrary operators" )
 {
   INFO("testing the operator symbol");
-  TL::u32string input = U"4 % 5 - +";
+  TL::u32string input = U"4 % 5 - + ..";
   Checker checker({
     mpz_class(4),
     TL::Tree::BinaryOperator(TL::Tree::ASSOC_LEFT, U"modulus", U"%", 10),
     mpz_class(5),
     TL::Tree::UnaryOperator(U"minus", U"-", TL::Tree::UNARY_PREFIX),
-    TL::Tree::UnaryOperator(U"plus", U"+", TL::Tree::UNARY_POSTFIX)
+    TL::Tree::UnaryOperator(U"plus", U"+", TL::Tree::UNARY_POSTFIX),
+    TL::Tree::BinaryOperator(TL::Tree::ASSOC_LEFT, U"range_construct", 
+      U"..", 0)
   });
 
   check(input, checker);
@@ -1067,6 +1075,12 @@ TEST_CASE( "expr parser", "basic expression parser tests" )
     )
   );
 
+  s.addBinaryOperator(TL::Tree::BinaryOperator
+    (
+      TL::Tree::ASSOC_LEFT, U"range_construct", U"..", 0
+    )
+  );
+
   std::string input3("5 + 6 + 7");
 
   TL::Parser::StreamPosIterator rawbegin3
@@ -1121,4 +1135,32 @@ TEST_CASE( "expr parser", "basic expression parser tests" )
   CHECK(p.parse_expr(begin4, end4, result));
 
   CHECK(TL::Printer::print_expr_tree(result) == "5 * (6 + 7)");
+
+
+  std::string input5("1 .. 5");
+
+  TL::Parser::StreamPosIterator rawbegin5
+  (
+    TL::Parser::U32Iterator(
+      TL::Parser::makeUTF8Iterator(input5.begin())
+    ),
+    U"1 .. 5"
+  );
+
+  TL::Parser::StreamPosIterator rawend5
+  (
+    TL::Parser::makeUTF8Iterator(input5.end())
+  );
+
+  TL::Parser::LexerIterator begin5
+  {
+    rawbegin5,
+    rawend5,
+    s.getDefaultContext(),
+    s.lookupIdentifiers()
+  };
+  TL::Parser::LexerIterator end5 = begin5.makeEnd();
+  CHECK(p.parse_expr(begin5, end5, result));
+
+  CHECK(TL::Printer::print_expr_tree(result) == "1 .. 5");
 }

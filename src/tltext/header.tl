@@ -2,6 +2,20 @@
 dim slot;;
 dim envvar;;
 
+data Infinite = infty | neginfty;;
+
+var sperror = special"sperror";;
+var spaccess = special"spaccess";;
+var sptypeerror = special"sptypeerror";;
+var spdim = special"spdim";;
+var sparith = special"sparith";;
+var spundef = special"spundef";;
+var spconst = special"spconst";;
+var spmultidef = special"spmultidef";;
+var sploop = special"sploop";;
+
+fun bestselect__.a.b = spmultidef;;
+
 data Assoc = AssocNon | AssocLeft | AssocRight;;
 data HostDecl = HostDim intmp | HostType intmp | HostFunc intmp;;
 data OpType = OpPostfix ustring bool
@@ -24,7 +38,7 @@ op != = OpInfix."ne".false.AssocNon.25;;
 op && = OpInfix."bool_and".false.AssocLeft.20;;
 op || = OpInfix."bool_and".false.AssocLeft.20;;
 
-op .. = OpInfix."range_construct".AssocLeft.0;;
+op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
 fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun minus.a.b [a : intmp, b : intmp] = int_minus!(a,b);;
@@ -45,8 +59,6 @@ fun bool_and.a.b = if a then b else false fi;;
 fun bool_or.a.b = if a then true else b fi;;
 
 fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
-
-data Infinite = infty | neginfty;;
 
 fun range_construct.a.b [a : intmp, b : intmp] = make_range!(a,b);;
 fun range_construct.a.b [a : intmp, b : infty] = make_range_infty!b;;
@@ -81,16 +93,6 @@ fun escape_string.s = escape_character.(string_at.s.0)
 ;;
 fun escape_string.s [s : ""] = "";;
 
-var sperror = special"sperror";;
-var spaccess = special"spaccess";;
-var sptypeerror = special"sptypeerror";;
-var spdim = special"spdim";;
-var sparith = special"sparith";;
-var spundef = special"spundef";;
-var spconst = special"spconst";;
-var spmultidef = special"spmultidef";;
-var sploop = special"sploop";;
-
 fun print_special.c [c : sperror] = "sperror";;
 fun print_special.c [c : spaccess] = "spaccess";;
 fun print_special.c [c : sptypeerror] = "typeerror";;
@@ -111,6 +113,7 @@ fun print.c [c : uchar] = print_uchar!c;;
 fun print.c [c : range] = print_range!c;;
 fun print.c [c : tuple] = print_tuple!c;;
 fun print.c [c : uuid] = print_uuid!c;;
+fun print.c [c : demand] = "Cannot print demands";;
 
 fun print_typename.c = "unknown typename";;
 fun print_typename.c [c : intmp] = "intmp";;
@@ -122,6 +125,8 @@ fun print_typename.c [c : tuple] = "tuple";;
 fun print_typename.c [c : special] = "special";;
 fun print_typename.c [c : typetype] = "typetype";;
 fun print_typename.c [c : uuid] = "uuid";;
+fun print_typename.c [c : demand] = "demand";;
+fun print_typename.c [c : calc] = "calc";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;

@@ -1,5 +1,5 @@
 /* Built-in types.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -36,6 +36,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/types/boolean.hpp>
 #include <tl/types/char.hpp>
+#include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/intmp.hpp>
@@ -307,6 +308,12 @@ namespace TransLucid
       {U"print_error", &print_error},
       {U"print_uuid", &print_uuid},
     };
+
+    bool
+    less_false(const Constant&, const Constant&)
+    {
+      return false;
+    }
   }
 
   Constant
@@ -340,49 +347,56 @@ namespace TransLucid
       {
         &Types::String::equality,
         &Types::String::hash,
-        &delete_ptr<u32string>
+        &delete_ptr<u32string>,
+        &Types::String::less
       };
 
     TypeFunctions base_function_type_functions =
       {
         &Types::BaseFunction::equality,
         &Types::BaseFunction::hash,
-        &delete_ptr<BaseFunctionType>
+        &delete_ptr<BaseFunctionType>,
+        &less_false
       };
 
     TypeFunctions value_function_type_functions =
       {
         &Types::ValueFunction::equality,
         &Types::ValueFunction::hash,
-        &delete_ptr<ValueFunctionType>
+        &delete_ptr<ValueFunctionType>,
+        &less_false
       };
 
     TypeFunctions name_function_type_functions =
       {
         &Types::NameFunction::equality,
         &Types::NameFunction::hash,
-        &delete_ptr<NameFunctionType>
+        &delete_ptr<NameFunctionType>,
+        &less_false
       };
 
     TypeFunctions range_type_functions =
       {
         &Types::Range::equality,
         &Types::Range::hash,
-        &delete_ptr<Range>
+        &delete_ptr<Range>,
+        &Types::Range::less
       };
 
     TypeFunctions tuple_type_functions =
       {
         &Types::Tuple::equality,
         &Types::Tuple::hash,
-        &delete_ptr<Tuple>
+        &delete_ptr<Tuple>,
+        &Types::Tuple::less
       };
 
     TypeFunctions intmp_type_functions = 
       {
         &Types::Intmp::equality,
         &Types::Intmp::hash,
-        &delete_ptr<mpz_class>
+        &delete_ptr<mpz_class>,
+        &Types::Intmp::less
       };
 
     TypeFunctions hyperdaton_type_functions =
@@ -397,6 +411,13 @@ namespace TransLucid
         &Types::Workshop::equality,
         &Types::Workshop::hash,
         &delete_ptr<WorkshopType>
+      };
+
+    TypeFunctions demand_type_functions =
+      {
+        &Types::Demand::equality,
+        &Types::Demand::hash,
+        &delete_ptr<DemandType>
       };
 
     //copied and pasted from types.hpp, this should match the strings below
@@ -677,6 +698,16 @@ namespace TransLucid
         return new Tuple(t);
       }
     };
+
+    template <>
+    struct clone<DemandType>
+    {
+      DemandType*
+      operator()(const DemandType& d)
+      {
+        return new DemandType(d);
+      }
+    };
   }
 
   namespace Types
@@ -713,6 +744,12 @@ namespace TransLucid
         //same pointer means same string
         return lhs.data.ptr == rhs.data.ptr
           || get(lhs) == get(rhs);
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
       }
     }
 
@@ -916,6 +953,12 @@ namespace TransLucid
       {
         return String::create(U"range");
       }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
+      }
     }
 
     namespace Tuple
@@ -943,6 +986,12 @@ namespace TransLucid
       hash(const Constant& c)
       {
         return get(c).hash();
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
       }
     }
 
@@ -1038,6 +1087,12 @@ namespace TransLucid
           return Types::String::create(to_u32string(z.get_str()));
         }
       }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
+      }
     }
 
     namespace Dimension
@@ -1117,6 +1172,34 @@ namespace TransLucid
         return get(lhs).ws() == get(rhs).ws();
       }
     }
+
+    namespace Demand
+    {
+      Constant
+      create(const std::vector<dimension_index>& dims)
+      {
+        return make_constant_pointer(DemandType(dims), &demand_type_functions, 
+          TYPE_INDEX_DEMAND);
+      }
+
+      bool
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return get(c).hash();
+      }
+
+      const DemandType&
+      get(const Constant& c)
+      {
+        return get_constant_pointer<DemandType>(c);
+      }
+    }
   }
 }
 
@@ -1159,51 +1242,6 @@ BaseFunctionAbstraction::applyFn(const Constant& c) const
   p.perturb({{m_dim, c}});
 
   return (*m_expr)(newk);
-}
-
-Constant
-ValueFunctionType::apply(Context& k, const Constant& value) const
-{
-  //set m_dim = value in the context and evaluate the expr
-  ContextPerturber p(k, {{m_dim, value}});
-  p.perturb(m_scopeDims);
-  auto r = (*m_expr)(k);
-
-  return r;
-}
-
-Constant
-NameFunctionType::apply
-(
-  Context& k, 
-  const Constant& c,
-  std::vector<dimension_index>& Lall
-) const
-{
-  //add to the list of our args
-  //pre: c is a workshop value
-
-  //add to the list of odometers
-  tuple_t odometer;
-  for (auto d : Lall)
-  {
-    odometer.insert(std::make_pair(d, k.lookup(d)));
-  }
-
-  //argdim = cons(c, #argdim)
-  Tuple argList = makeList(c, k.lookup(m_argDim));
-  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
-    k.lookup(m_odometerDim));
-
-  ContextPerturber p(k,
-  {
-    {m_argDim, Types::Tuple::create(argList)},
-    {m_odometerDim, Types::Tuple::create(odometerList)}
-  });
-
-  p.perturb(m_scopeDims);
-
-  return (*m_expr)(k);
 }
 
 //everything that creates hyperdatons
@@ -1348,7 +1386,9 @@ init_builtin_types(System& s)
     U"typetype",
     U"uchar",
     U"range",
-    U"tuple"
+    U"tuple",
+    U"demand",
+    U"calc"
   };
 
   std::vector<u32string> type_names = to_print_types;
