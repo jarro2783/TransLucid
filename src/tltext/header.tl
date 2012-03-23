@@ -42,7 +42,8 @@ op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
 var pos = 1..infty;;
 var nat = 0..infty;;
-var neg = neginfty..0;;
+var neg = neginfty.. ~1;;
+var nonpos = neginfty..0;;
 var int = neginfty..infty;;
 
 fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
