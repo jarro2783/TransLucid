@@ -60,19 +60,21 @@ namespace TLText
 TLText::TLText
 (
   const std::string& progname, 
-  const std::string& initOut
+  const std::string& initOut,
+  bool cached
 )
 : 
   m_myname(progname)
  ,m_verbose(1)
  ,m_uuids(false)
  ,m_debug(false)
- ,m_cached(false)
+ ,m_cached(cached)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_error(&std::cerr)
  ,m_inputName(U"<interactive>")
  ,m_initialOut(initOut)
+ ,m_system(m_cached)
  ,m_time(0)
  ,m_lastLibLoaded(0)
  ,m_argsHD(0)
