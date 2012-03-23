@@ -1013,8 +1013,9 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
 }
 
 //TODO this type registry stuff should go somewhere that is easier to find
-System::System()
-: m_typeRegistry(m_nextTypeIndex,
+System::System(bool cached)
+: m_cached(cached),
+  m_typeRegistry(m_nextTypeIndex,
   std::vector<std::pair<u32string, type_index>>{
    {U"error", TYPE_INDEX_ERROR},
    {U"ustring", TYPE_INDEX_USTRING},
@@ -1958,8 +1959,6 @@ System::addFunction(const Parser::FnDecl& fn)
   //more duplication
   for (const auto& e : tows.newVars())
   {
-    //std::cerr << "adding extra equation:" << std::endl;
-    //std::cerr << Printer::printEquation(e) << std::endl;
     addDeclInternal(
       std::get<0>(e),
       GuardWS(compile.build_workshops(std::get<1>(e)),
@@ -1968,6 +1967,12 @@ System::addFunction(const Parser::FnDecl& fn)
       m_equations,
       m_equationUUIDs
     );
+
+    //cache this thing
+    if (m_cached)
+    {
+      cacheVar(std::get<0>(e));
+    }
   }
 
   return Types::UUID::create(u);

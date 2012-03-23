@@ -128,7 +128,8 @@ namespace TransLucid
       TLText
       (
         const std::string& progname, 
-        const std::string& initOut
+        const std::string& initOut,
+        bool cached = false
       );
 
       ~TLText();

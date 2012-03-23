@@ -203,7 +203,13 @@ int main(int argc, char *argv[])
 
   try
   {
-    TransLucid::TLText::TLText tltext(argv[0], "TLText...");
+    bool cached = false;
+    if (vm.count("cache"))
+    {
+      cached = true;
+    }
+
+    TransLucid::TLText::TLText tltext(argv[0], "TLText...", cached);
  
     for (const auto& s : options)
     {
