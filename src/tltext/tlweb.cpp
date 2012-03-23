@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
 
     std::ostringstream os;
 
-    TransLucid::TLText::TLText tl(argv[0], "TLWeb...", true);
+    TransLucid::TLText::TLText tl(argv[0], "TLWeb...");
 
     std::istringstream progstream(prog->second);
     tl.set_input(&progstream, "<web>");
