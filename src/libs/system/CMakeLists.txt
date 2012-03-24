@@ -34,6 +34,8 @@ types.cpp utility.cpp uuid.cpp
 workshop_builder.cpp
 )
 
+link_directories(${ICU_LIBRARY_DIRS})
+
 add_library(tlsystem SHARED ${SYSTEM_SOURCES})
 
 add_custom_command(
