@@ -4,6 +4,8 @@ set(RUN ${CMAKE_SOURCE_DIR}/src/tests/runbinary.sh)
 set(LIBDIR ${CMAKE_BINARY_DIR}/src/libs/int)
 set(BINDIR .)
 
+link_directories(${ICU_LIBRARY_DIRS})
+
 add_definitions(${TLCFLAGS})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/system)
