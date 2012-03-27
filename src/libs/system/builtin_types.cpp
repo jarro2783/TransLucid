@@ -364,7 +364,7 @@ namespace TransLucid
         &Types::ValueFunction::equality,
         &Types::ValueFunction::hash,
         &delete_ptr<ValueFunctionType>,
-        &less_false
+        &Types::ValueFunction::less
       };
 
     TypeFunctions name_function_type_functions =
@@ -372,7 +372,7 @@ namespace TransLucid
         &Types::NameFunction::equality,
         &Types::NameFunction::hash,
         &delete_ptr<NameFunctionType>,
-        &less_false
+        &Types::NameFunction::less
       };
 
     TypeFunctions range_type_functions =

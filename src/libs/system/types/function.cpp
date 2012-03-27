@@ -21,10 +21,63 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/tuple.hpp>
+#include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
 namespace TransLucid
 {
+
+namespace
+{
+
+bool function_less
+(
+  WS* lexpr,
+  WS* rexpr,
+  const std::vector<std::pair<dimension_index, Constant>>& lscope,
+  const std::vector<std::pair<dimension_index, Constant>>& rscope
+)
+{
+  //first compare the pointers
+  if (lexpr < rexpr)
+  {
+    return true;
+  }
+  else if (!(rexpr < lexpr))
+  {
+    //they are the same function so compare
+    //all the closure values
+    auto liter = lscope.begin();
+    auto riter = rscope.begin();
+
+    while (liter != lscope.end())
+    {
+      if (liter->second < riter->second)
+      {
+        return true;
+      }
+      else if (riter->second < liter->second)
+      {
+        //the rhs is bigger
+        return false;
+      }
+
+      ++liter;
+      ++riter;
+    }
+  }
+  else
+  {
+    //rhs is bigger so return false
+    return false;
+  }
+
+  //if we got here then they are equal
+  return false;
+}
+
+}
+
 NameFunctionType::NameFunctionType
 (
   System* system,
@@ -325,13 +378,31 @@ NameFunctionType::apply
   return (*m_expr)(kappa, delta);
 }
 
+bool
+ValueFunctionType::less(const ValueFunctionType& rhs) const
+{
+  return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
+}
+
+bool
+NameFunctionType::less(const NameFunctionType& rhs) const
+{
+  return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
+}
+
+namespace Types
+{
+
 namespace ValueFunction
 {
 
 bool
 less(const Constant& lhs, const Constant& rhs)
 {
-  return false;
+  const auto& flhs = get_constant_pointer<ValueFunctionType>(lhs);
+  const auto& frhs = get_constant_pointer<ValueFunctionType>(rhs);
+
+  return flhs.less(frhs);
 }
 
 }
@@ -342,7 +413,12 @@ namespace NameFunction
 bool
 less(const Constant& lhs, const Constant& rhs)
 {
-  return false;
+  const auto& flhs = get_constant_pointer<NameFunctionType>(lhs);
+  const auto& frhs = get_constant_pointer<NameFunctionType>(rhs);
+
+  return flhs.less(frhs);
+}
+
 }
 
 }
