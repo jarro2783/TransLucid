@@ -410,7 +410,8 @@ namespace TransLucid
       {
         &Types::Workshop::equality,
         &Types::Workshop::hash,
-        &delete_ptr<WorkshopType>
+        &delete_ptr<WorkshopType>,
+        &Types::Workshop::less
       };
 
     TypeFunctions demand_type_functions =
@@ -1170,6 +1171,12 @@ namespace TransLucid
       equality(const Constant& lhs, const Constant& rhs)
       {
         return get(lhs).ws() == get(rhs).ws();
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs).ws() < get(rhs).ws();
       }
     }
 

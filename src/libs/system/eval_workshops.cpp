@@ -550,9 +550,9 @@ HashWS::operator()(Context& k)
 }
 
 Constant
-HashWS::operator()(Context& k, Context& delta)
+HashWS::operator()(Context& kappa, Context& delta)
 {
-  Constant r = (*m_e)(k, delta);
+  Constant r = (*m_e)(kappa, delta);
 
   if (r.index() == TYPE_INDEX_DEMAND)
   {

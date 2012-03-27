@@ -17,9 +17,12 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/types_util.hpp>
+
 #include <tl/cache.hpp>
 #include <tl/types/calc.hpp>
 #include <tl/types/demand.hpp>
+#include <tl/types/special.hpp>
 
 #include <iostream>
 
@@ -450,6 +453,25 @@ CacheWS::operator()(Context& kappa)
 
   //although maybe it can just call cached code with all the dimensions
   Constant c = operator()(kappa, kappa);
+
+  if (c.index() == TYPE_INDEX_DEMAND)
+  {
+    ContextPerturber p{kappa};
+    //or not, we need to fill in the undefined dimensions and try again
+    while (c.index() == TYPE_INDEX_DEMAND)
+    {
+      //std::cerr << "a demand got through" << std::endl;
+
+      for (auto d : get_constant_pointer<DemandType>(c).dims())
+      {
+        p.perturb(d, Types::Special::create(SP_UNDEF));
+        //std::cerr << d << std::endl;
+        //std::cerr << "in context: " << kappa.has_entry(d) << std::endl;
+      }
+
+      c = operator()(kappa, kappa);
+    }
+  }
 
   return c;
 }
