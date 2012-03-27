@@ -325,5 +325,26 @@ NameFunctionType::apply
   return (*m_expr)(kappa, delta);
 }
 
+namespace ValueFunction
+{
+
+bool
+less(const Constant& lhs, const Constant& rhs)
+{
+  return false;
+}
+
+}
+
+namespace NameFunction
+{
+
+bool
+less(const Constant& lhs, const Constant& rhs)
+{
+  return false;
+}
+
+}
 
 }
