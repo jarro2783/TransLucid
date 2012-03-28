@@ -364,7 +364,7 @@ namespace TransLucid
         &Types::ValueFunction::equality,
         &Types::ValueFunction::hash,
         &delete_ptr<ValueFunctionType>,
-        &less_false
+        &Types::ValueFunction::less
       };
 
     TypeFunctions name_function_type_functions =
@@ -372,7 +372,7 @@ namespace TransLucid
         &Types::NameFunction::equality,
         &Types::NameFunction::hash,
         &delete_ptr<NameFunctionType>,
-        &less_false
+        &Types::NameFunction::less
       };
 
     TypeFunctions range_type_functions =
@@ -410,7 +410,8 @@ namespace TransLucid
       {
         &Types::Workshop::equality,
         &Types::Workshop::hash,
-        &delete_ptr<WorkshopType>
+        &delete_ptr<WorkshopType>,
+        &Types::Workshop::less
       };
 
     TypeFunctions demand_type_functions =
@@ -1170,6 +1171,12 @@ namespace TransLucid
       equality(const Constant& lhs, const Constant& rhs)
       {
         return get(lhs).ws() == get(rhs).ws();
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs).ws() < get(rhs).ws();
       }
     }
 
