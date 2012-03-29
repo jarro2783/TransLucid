@@ -561,7 +561,7 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
     w.whichDims.push_back(next);
     odometerDims.push_back
     (
-      std::make_pair(Tree::IdentExpr(v.first), v.second)
+      std::make_pair(Tree::IdentExpr(v.first), apply_visitor(*this, v.second))
     );
 
     //generate the dimExpr
