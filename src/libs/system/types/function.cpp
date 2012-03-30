@@ -358,6 +358,23 @@ NameFunctionType::apply
     odometer.insert(std::make_pair(d, kappa.lookup(d)));
   }
 
+  //first lookup the dimensions that we need
+  std::vector<dimension_index> demands;
+  if (!delta.has_entry(m_argDim))
+  {
+    demands.push_back(m_argDim);
+  }
+
+  if (!delta.has_entry(m_odometerDim))
+  {
+    demands.push_back(m_odometerDim);
+  }
+
+  if (!demands.empty())
+  {
+    return Types::Demand::create(demands);
+  }
+
   //argdim = cons(c, #argdim)
   Tuple argList = makeList(c, kappa.lookup(m_argDim));
   Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
