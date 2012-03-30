@@ -417,7 +417,8 @@ namespace TransLucid
       {
         &Types::Demand::equality,
         &Types::Demand::hash,
-        &delete_ptr<DemandType>
+        &delete_ptr<DemandType>,
+        &Types::Demand::less
       };
 
     //copied and pasted from types.hpp, this should match the strings below
@@ -1198,6 +1199,15 @@ namespace TransLucid
       get(const Constant& c)
       {
         return get_constant_pointer<DemandType>(c);
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        const auto& lhsd = get_constant_pointer<DemandType>(lhs);
+        const auto& rhsd = get_constant_pointer<DemandType>(rhs);
+
+        return lhsd.dims() < rhsd.dims();
       }
     }
   }
