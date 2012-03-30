@@ -255,9 +255,10 @@ GuardWS::operator=(const GuardWS& rhs)
 }
 
 template <typename... Delta>
-Tuple
+std::pair<bool, Tuple>
 GuardWS::evaluate(Context& k, Delta&&... delta) const
 {
+  bool nonspecial = true;
   m_demands.clear();
   tuple_t t = m_dimConstConst;
 
@@ -290,6 +291,10 @@ GuardWS::evaluate(Context& k, Delta&&... delta) const
         const auto& dims = Types::Demand::get(dim).dims();
         std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
       }
+      else if (dim.index() == TYPE_INDEX_SPECIAL)
+      {
+        nonspecial = false;
+      }
       else
       {
         dimension_index index =
@@ -305,6 +310,11 @@ GuardWS::evaluate(Context& k, Delta&&... delta) const
     {
       Constant dim = nonNon.first->operator()(k, delta...);
       Constant ord = nonNon.second->operator()(k, delta...);
+
+      if (dim.index() == TYPE_INDEX_SPECIAL)
+      {
+        nonspecial = false;
+      }
 
       bool isdemand = false;
 
@@ -334,7 +344,9 @@ GuardWS::evaluate(Context& k, Delta&&... delta) const
     }
   }
 
-  return Tuple(t);
+  //the tuple doesn't matter here if nonspecial is false, the false
+  //says ignore the result
+  return std::make_pair(nonspecial, Tuple(t));
 }
 
 GuardWS makeGuardWithTime(const mpz_class& start)
@@ -393,12 +405,16 @@ VariableWS::operator()(Context& kappa, Context& delta)
         if (eqn_i->second.validContext())
         {
           const GuardWS& guard = eqn_i->second.validContext();
-          Tuple evalContext = guard.evaluate(kappa, delta);
+          auto result = guard.evaluate(kappa, delta);
 
-          std::copy(guard.demands().begin(), guard.demands().end(),
-            std::back_inserter(demands));
+          if (result.first)
+          {
+            Tuple evalContext = result.second;
+            std::copy(guard.demands().begin(), guard.demands().end(),
+              std::back_inserter(demands));
 
-          potential.push_back(ApplicableTuple(evalContext, eqn_i));
+            potential.push_back(ApplicableTuple(evalContext, eqn_i));
+          }
         }
         else
         {
@@ -499,14 +515,14 @@ VariableWS::operator()(Context& k)
         if (eqn_i->second.validContext())
         {
           const GuardWS& guard = eqn_i->second.validContext();
-          Tuple evalContext = guard.evaluate(k);
+          auto result = guard.evaluate(k);
 
-          if (tupleApplicable(evalContext, k)
+          if (result.first && tupleApplicable(result.second, k)
             && booleanTrue(guard, k)
           )
           {
             applicable.push_back
-              (ApplicableTuple(evalContext, eqn_i));
+              (ApplicableTuple(result.second, eqn_i));
           }
         }
         else

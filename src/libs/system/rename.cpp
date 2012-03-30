@@ -138,7 +138,7 @@ RenameIdentifiers::makeVarUnique(RenameRules& newNames, RenameRules& shadowed,
   {
     unique = generateUnique(prefix);
     newIter = newNames.insert(std::make_pair(original, unique)).first;
-    
+
     //if it shadows an existing name, but we only care if it is the first
     //time that we have seen this variable
     auto rulesIter = m_rules.find(original);
