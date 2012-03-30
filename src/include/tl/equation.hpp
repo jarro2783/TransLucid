@@ -110,7 +110,7 @@ namespace TransLucid
      * Returns a tuple of the dimensions and the evaluated AST.
      **/
     template <typename... Delta>
-    Tuple
+    std::pair<bool, Tuple>
     evaluate(Context& k, Delta&&... delta) const;
 
     /**

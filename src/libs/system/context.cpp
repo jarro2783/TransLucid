@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
  * The context object.
  */
 
+#include <tl/fixed_indexes.hpp>
+
 #include <tl/context.hpp>
 #include <tl/types/special.hpp>
 
@@ -99,6 +101,13 @@ Context::perturb(const Tuple& t)
 void
 Context::perturb(dimension_index d, const Constant& c)
 {
+  if (c.index() == TYPE_INDEX_DEMAND)
+  {
+    std::cerr << "internal compiler error at " 
+              << __FILE__ << ": " << STRING_(__LINE__) << std::endl
+              << "context perturbed by a demand" << std::endl;
+  }
+
   //do we need to allocate some more slots
   //putting max first means that if the 0th is added first it will be pushed
   //back, this might be slightly better than pushing front first

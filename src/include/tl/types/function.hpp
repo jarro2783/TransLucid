@@ -297,6 +297,9 @@ namespace TransLucid
       return reinterpret_cast<size_t>(m_expr);
     }
 
+    bool
+    less(const ValueFunctionType& rhs) const;
+
     private:
     u32string m_name;
     dimension_index m_dim;
@@ -347,6 +350,9 @@ namespace TransLucid
     {
       return reinterpret_cast<size_t>(m_expr);
     }
+
+    bool
+    less(const NameFunctionType& rhs) const;
 
     private:
     u32string m_name;
@@ -445,6 +451,9 @@ namespace TransLucid
 
       size_t
       hash(const Constant& c);
+
+      bool
+      less(const Constant& lhs, const Constant& rhs);
     }
 
     namespace NameFunction
@@ -460,6 +469,9 @@ namespace TransLucid
 
       size_t
       hash(const Constant& c);
+
+      bool
+      less(const Constant& lhs, const Constant& rhs);
     }
   }
   

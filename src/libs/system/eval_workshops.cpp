@@ -550,9 +550,9 @@ HashWS::operator()(Context& k)
 }
 
 Constant
-HashWS::operator()(Context& k, Context& delta)
+HashWS::operator()(Context& kappa, Context& delta)
 {
-  Constant r = (*m_e)(k, delta);
+  Constant r = (*m_e)(kappa, delta);
 
   if (r.index() == TYPE_INDEX_DEMAND)
   {
@@ -638,6 +638,10 @@ TupleWS::operator()(Context& k)
     {
       kp[get_constant<dimension_index>(left)] = right;
     }
+    else if (left.index() == TYPE_INDEX_SPECIAL)
+    {
+      return left;
+    }
     else
     {
       kp[m_system.getDimensionIndex(left)] = right;
@@ -672,6 +676,11 @@ TupleWS::operator()(Context& kappa, Context& delta)
 
     if (!hasdemands)
     {
+      if (left.index() == TYPE_INDEX_SPECIAL)
+      {
+        return left;
+      }
+
       if (left.index() == TYPE_INDEX_DIMENSION)
       {
         kp[get_constant<dimension_index>(left)] = right;
