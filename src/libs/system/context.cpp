@@ -103,7 +103,9 @@ Context::perturb(dimension_index d, const Constant& c)
 {
   if (c.index() == TYPE_INDEX_DEMAND)
   {
-    std::cerr << "what the?" << std::endl;
+    std::cerr << "internal compiler error at " 
+              << __FILE__ << ": " << STRING_(__LINE__) << std::endl
+              << "context perturbed by a demand" << std::endl;
   }
 
   //do we need to allocate some more slots
