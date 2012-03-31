@@ -44,11 +44,23 @@ equality(const Constant& lhs, const Constant& rhs)
   return get_constant<T>(lhs) == get_constant<T>(rhs);
 }
 
+bool
+equality_true(const Constant& lhs, const Constant& rhs)
+{
+  return true;
+}
+
 template <typename T>
 bool
 less(const Constant& lhs, const Constant& rhs)
 {
   return get_constant<T>(lhs) < get_constant<T>(rhs);
+}
+
+bool
+less_false(const Constant& lhs, const Constant& rhs)
+{
+  return false;
 }
 
 template <typename T>
@@ -58,8 +70,15 @@ hash_func(const Constant& c)
   return std::hash<T>()(get_constant<T>(c));
 }
 
+size_t
+hash_zero(const Constant& c)
+{
+  return 0;
+}
+
 bool (*equality_functions[TYPE_FIELD_PTR])(const Constant&, const Constant&) = 
 { 
+  &equality_true,
   &equality<Special>,
   &equality<bool>,
   &equality<char32_t>,
@@ -77,6 +96,7 @@ bool (*equality_functions[TYPE_FIELD_PTR])(const Constant&, const Constant&) =
 
 bool (*less_functions[TYPE_FIELD_PTR])(const Constant&, const Constant&) = 
 { 
+  &less_false, //because all errors values are equal
   &less<Special>,
   &less<bool>,
   &less<char32_t>,
@@ -94,6 +114,7 @@ bool (*less_functions[TYPE_FIELD_PTR])(const Constant&, const Constant&) =
 
 size_t (*hash_functions[TYPE_FIELD_PTR])(const Constant&) =
 {
+  &hash_zero,
   &hash_func<Special>,
   &hash_func<bool>,
   &hash_func<int8_t>,
