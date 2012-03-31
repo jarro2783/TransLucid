@@ -352,14 +352,18 @@ NameFunctionType::apply
   //pre: c is a workshop value
 
   //add to the list of odometers
+  std::vector<dimension_index> demands;
   tuple_t odometer;
   for (auto d : Lall)
   {
+    if (!delta.has_entry(d))
+    {
+      demands.push_back(d);
+    }
     odometer.insert(std::make_pair(d, kappa.lookup(d)));
   }
 
   //first lookup the dimensions that we need
-  std::vector<dimension_index> demands;
   if (!delta.has_entry(m_argDim))
   {
     demands.push_back(m_argDim);
