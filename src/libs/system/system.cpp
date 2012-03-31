@@ -1111,12 +1111,16 @@ System::go()
       //const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
       const GuardWS& guard = assign.second.validContext();
 
-      Tuple ctxts = guard.evaluate(theContext);
+      auto ctxts = guard.evaluate(theContext);
 
       //ContextPerturber p(theContext, constraint);
 
-      //the demand could have ranges, so we need to enumerate them
-      enumerateContextSet(ctxts, theContext, assign.second, hd->second);
+      if (ctxts.first)
+      {
+        //the demand could have ranges, so we need to enumerate them
+        enumerateContextSet(ctxts.second, theContext, 
+          assign.second, hd->second);
+      }
     }
   }
 
