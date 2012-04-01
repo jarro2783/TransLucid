@@ -82,13 +82,21 @@ namespace TransLucid
 
   struct CacheLevel
   {
+    //a cache level with required dimensions, entry must be a map
     CacheLevel(const std::set<dimension_index>& dimset)
     : dims(dimset.begin(), dimset.end())
+    , entry(CacheEntryMap())
+    {
+    }
+
+    //a cache level with no dimensions, entry must be another CacheEntry
+    CacheLevel()
+    : entry(CacheEntry())
     {
     }
 
     std::vector<dimension_index> dims;
-    CacheEntryMap entry;
+    CacheLevelNode entry;
   };
   
   class Cache
@@ -140,7 +148,7 @@ namespace TransLucid
     }
 
     private:
-    CacheEntry m_entry;
+    CacheLevel m_entry;
 
     int m_retirementAge;
 

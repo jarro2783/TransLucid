@@ -116,13 +116,36 @@ namespace
       {
         //l.entry is a CacheEntryMap
         //so look up the first dimension
-        return lookup_entry_map(l.dims.begin(), l.dims.end(), l.entry.entry, 
-          delta, cache);
+        //return lookup_entry_map(l.dims.begin(), l.dims.end(), l.entry.entry, 
+        //  delta, cache);
 
-        //return apply_visitor(cache_level_visitor(), l.entry,
-        //  demands.begin(), demands.end(), delta);
+        return apply_visitor(get_cache_level_visitor(), l.entry.entry,
+          demands.begin(), demands.end(), delta, cache);
       }
     }
+  };
+
+  struct set_level_node
+  {
+    typedef void result_type;
+
+    void
+    operator()
+    (
+      CacheEntry& entry, 
+      const Context& delta, 
+      const Constant& value, 
+      Cache& cache
+    ) const;
+
+    void
+    operator()
+    (
+      CacheEntryMap& entrymap, 
+      const Context& delta, 
+      const Constant& value, 
+      Cache& cache
+    ) const;
   };
 
   struct collect_level_node
@@ -153,7 +176,7 @@ namespace
     bool
     operator()(CacheLevel& level, Cache& cache) const
     {
-      return collect_entry_map(level.entry, cache);
+      return apply_visitor(collect_level_node(), level.entry.entry, cache);
     }
   };
 
@@ -410,15 +433,16 @@ set_visit_top_entry
   else if (level != nullptr)
   {
     //traverse the level
-    set_traverse_level(level->dims.begin(), level->dims.end(), level->entry, 
-      delta, value);
+    //apply_visitor(
+    //set_traverse_level(level->dims.begin(), level->dims.end(), level->entry, 
+    //  delta, value);
   }
 }
 
 }
 
 Cache::Cache()
-: m_entry(Types::Calc::create())
+: m_entry(CacheLevel())
 , m_retirementAge(2)
 {
 }
@@ -426,21 +450,21 @@ Cache::Cache()
 Constant
 Cache::get(Context& delta)
 {
-  updateRetirementAge(m_entry.age);
-  m_entry.age = 0;
-  return apply_visitor(get_cache_entry_visitor(), m_entry.entry, delta, *this);
+  return get_cache_entry_visitor()(m_entry, 
+    delta, *this);
 }
 
 void
 Cache::set(const Context& delta, const Constant& value)
 {
-  set_visit_top_entry(m_entry, delta, value);
+  //set_visit_top_entry(m_entry, delta, value);
+  apply_visitor(set_level_node(), m_entry.entry.entry, delta, value, *this);
 }
 
 void
 Cache::garbageCollect()
 {
-  apply_visitor(collect_entry(), m_entry.entry, *this);
+  apply_visitor(collect_level_node(), m_entry.entry.entry, *this);
   //finally, decrease the retirement age
   --m_retirementAge;
 }
