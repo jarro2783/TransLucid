@@ -81,6 +81,9 @@ namespace TransLucid
       const DemandType&
       get(const Constant& c);
 
+      bool
+      less(const Constant& lhs, const Constant& rhs);
+
       //append the demands in d to dims
       inline
       void

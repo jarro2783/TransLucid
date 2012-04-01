@@ -253,7 +253,7 @@ TLText::run()
         else
         {
           output(*m_error, OUTPUT_SILENT) 
-            << "Error: PRINT didn't return a string" 
+            << "Error: canonical_print didn't return a string" 
             << std::endl;
           output(*m_error, OUTPUT_SILENT) << "Type index: " << c.index() 
             << std::endl;

@@ -86,6 +86,13 @@ namespace
     operator()(const Constant& c, Context& delta, Cache& cache) const
     {
       cache.hit();
+
+      #if 0
+      if (c.index() == TYPE_INDEX_CALC)
+      {
+        std::cerr << "calc already in cache" << std::endl;
+      }
+      #endif
       return c;
     }
 
@@ -287,7 +294,7 @@ get_cache_level_visitor::operator()
     throw __FILE__ ": " STRING_(__LINE__) ": Cache error!";
   }
 
-  //otherwise increment iter and look again
+  //otherwise look again at the next entry
   return lookup_entry_map(iter, end, entry.entry, delta, cache);
 }
 
@@ -335,6 +342,12 @@ set_traverse_level
 )
 {
   auto iter = entry.entry.find(delta.lookup(*begin));
+
+  if (iter == entry.entry.end())
+  {
+    throw __FILE__ ": " STRING_(__LINE__) 
+          ": Cache error, there isn't already a calc for this entry";
+  }
 
   CacheEntry* nextentry = TransLucid::get<CacheEntry>(&iter->second.entry);
   CacheEntryMap* nextmap = TransLucid::get<CacheEntryMap>(&iter->second.entry);
