@@ -9,7 +9,7 @@ set(TESTFILE ${CMAKE_SOURCE_DIR}/src/tltext/runtests.sh)
 set(TLTEXTFILE ${CMAKE_BINARY_DIR}/src/tltext/tltext)
 set(TESTPATH ${CMAKE_SOURCE_DIR}/src/tltext/tests)
 set(EXAMPLESPATH ${CMAKE_SOURCE_DIR}/src/tltext/examples)
-set(EXAMPLESPATH ${CMAKE_SOURCE_DIR}/src/tltext/cacheing)
+set(CACHEPATH ${CMAKE_SOURCE_DIR}/src/tltext/caching)
 
 if(COMMAND cmake_policy)
    cmake_policy(SET CMP0003 NEW)
