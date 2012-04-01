@@ -120,7 +120,7 @@ namespace
         //  delta, cache);
 
         return apply_visitor(get_cache_level_visitor(), l.entry.entry,
-          demands.begin(), demands.end(), delta, cache);
+          l.dims.begin(), l.dims.end(), delta, cache);
       }
     }
   };
@@ -134,8 +134,9 @@ namespace
     (
       CacheEntry& entry, 
       const Context& delta, 
-      const Constant& value, 
-      Cache& cache
+      const Constant& value,
+      std::vector<dimension_index>::const_iterator begin,
+      std::vector<dimension_index>::const_iterator end
     ) const;
 
     void
@@ -143,8 +144,9 @@ namespace
     (
       CacheEntryMap& entrymap, 
       const Context& delta, 
-      const Constant& value, 
-      Cache& cache
+      const Constant& value,
+      std::vector<dimension_index>::const_iterator begin,
+      std::vector<dimension_index>::const_iterator end
     ) const;
   };
 
@@ -354,38 +356,6 @@ set_visit_top_entry
   const Constant& value
 );
 
-void
-set_traverse_level
-(
-  std::vector<dimension_index>::const_iterator begin,
-  std::vector<dimension_index>::const_iterator end,
-  CacheEntryMap& entry,
-  const Context& delta,
-  const Constant& value
-)
-{
-  auto iter = entry.entry.find(delta.lookup(*begin));
-
-  if (iter == entry.entry.end())
-  {
-    throw __FILE__ ": " STRING_(__LINE__) 
-          ": Cache error, there isn't already a calc for this entry";
-  }
-
-  CacheEntry* nextentry = TransLucid::get<CacheEntry>(&iter->second.entry);
-  CacheEntryMap* nextmap = TransLucid::get<CacheEntryMap>(&iter->second.entry);
-
-  if (nextentry != nullptr)
-  {
-    set_visit_top_entry(*nextentry, delta, value);
-  }
-  else if (nextmap != nullptr)
-  {
-    //keep going down this level
-    set_traverse_level(++begin, end, *nextmap, delta, value);
-  }
-}
-
 //overwrites entry with value
 //but if value is a demand it becomes a new CacheLevel
 void
@@ -406,6 +376,54 @@ set_cache_value
   {
     entry.entry = value;
   }
+}
+
+void
+set_level_node::operator()
+(
+  CacheEntry& entry, 
+  const Context& delta, 
+  const Constant& value,
+  std::vector<dimension_index>::const_iterator begin,
+  std::vector<dimension_index>::const_iterator end
+) const
+{
+  //check consistency
+  if (begin != end)
+  {
+    throw __FILE__ ": " STRING_(__LINE__) 
+          ": Cache error, entry reached before dims ran out";
+  }
+
+  set_visit_top_entry(entry, delta, value);
+}
+
+
+void
+set_level_node::operator()
+(
+  CacheEntryMap& entrymap, 
+  const Context& delta, 
+  const Constant& value,
+  std::vector<dimension_index>::const_iterator begin,
+  std::vector<dimension_index>::const_iterator end
+) const
+{
+  if (begin == end)
+  {
+    throw __FILE__ ": " STRING_(__LINE__) 
+          ": Cache error, traversing map but no more dims";
+  }
+
+  auto iter = entrymap.entry.find(delta.lookup(*begin));
+
+  if (iter == entrymap.entry.end())
+  {
+    throw __FILE__ ": " STRING_(__LINE__) 
+          ": Cache error, there isn't already a calc for this entry";
+  }
+
+  apply_visitor(*this, iter->second.entry, delta, value, ++begin, end);
 }
 
 void
@@ -433,9 +451,8 @@ set_visit_top_entry
   else if (level != nullptr)
   {
     //traverse the level
-    //apply_visitor(
-    //set_traverse_level(level->dims.begin(), level->dims.end(), level->entry, 
-    //  delta, value);
+    apply_visitor(set_level_node(), level->entry.entry, delta, value,
+      level->dims.begin(), level->dims.end());
   }
 }
 
@@ -450,15 +467,22 @@ Cache::Cache()
 Constant
 Cache::get(Context& delta)
 {
-  return get_cache_entry_visitor()(m_entry, 
-    delta, *this);
+  return get_cache_entry_visitor()(m_entry, delta, *this);
 }
 
 void
 Cache::set(const Context& delta, const Constant& value)
 {
   //set_visit_top_entry(m_entry, delta, value);
-  apply_visitor(set_level_node(), m_entry.entry.entry, delta, value, *this);
+  apply_visitor
+  (
+    set_level_node(), 
+    m_entry.entry.entry, 
+    delta, 
+    value, 
+    m_entry.dims.begin(),
+    m_entry.dims.end()
+  );
 }
 
 void
@@ -476,6 +500,11 @@ Cache::updateRetirementAge(int ageSeen)
   {
     m_retirementAge = ageSeen;
   }
+}
+
+CacheLevel::CacheLevel()
+: entry(CacheEntry(Types::Calc::create()))
+{
 }
 
 namespace Workshops

@@ -90,10 +90,7 @@ namespace TransLucid
     }
 
     //a cache level with no dimensions, entry must be another CacheEntry
-    CacheLevel()
-    : entry(CacheEntry())
-    {
-    }
+    CacheLevel();
 
     std::vector<dimension_index> dims;
     CacheLevelNode entry;
