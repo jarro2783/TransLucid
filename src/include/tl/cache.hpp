@@ -145,7 +145,7 @@ namespace TransLucid
     }
 
     private:
-    CacheLevel m_entry;
+    CacheLevel *m_entry;
 
     int m_retirementAge;
 

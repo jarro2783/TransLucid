@@ -87,12 +87,11 @@ namespace
     {
       cache.hit();
 
-      #if 0
       if (c.index() == TYPE_INDEX_CALC)
       {
         std::cerr << "calc already in cache" << std::endl;
+        return Types::Special::create(SP_LOOP);
       }
-      #endif
       return c;
     }
 
@@ -459,7 +458,7 @@ set_visit_top_entry
 }
 
 Cache::Cache()
-: m_entry(CacheLevel())
+: m_entry(nullptr)
 , m_retirementAge(2)
 {
 }
@@ -467,30 +466,46 @@ Cache::Cache()
 Constant
 Cache::get(Context& delta)
 {
-  return get_cache_entry_visitor()(m_entry, delta, *this);
+  if (!m_entry)
+  {
+    m_entry = new CacheLevel;
+    return Types::Calc::create();
+  }
+  else
+  {
+    return get_cache_entry_visitor()(*m_entry, delta, *this);
+  }
 }
 
 void
 Cache::set(const Context& delta, const Constant& value)
 {
+  if (!m_entry)
+  {
+    throw __FILE__ ": " STRING_(__LINE__) ": Can't set empty cache";
+  }
+
   //set_visit_top_entry(m_entry, delta, value);
   apply_visitor
   (
     set_level_node(), 
-    m_entry.entry.entry, 
+    m_entry->entry.entry, 
     delta, 
     value, 
-    m_entry.dims.begin(),
-    m_entry.dims.end()
+    m_entry->dims.begin(),
+    m_entry->dims.end()
   );
 }
 
 void
 Cache::garbageCollect()
 {
-  apply_visitor(collect_level_node(), m_entry.entry.entry, *this);
-  //finally, decrease the retirement age
-  --m_retirementAge;
+  if (m_entry != nullptr)
+  {
+    apply_visitor(collect_level_node(), m_entry->entry.entry, *this);
+    //finally, decrease the retirement age
+    --m_retirementAge;
+  }
 }
 
 void
