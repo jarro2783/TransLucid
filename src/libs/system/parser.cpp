@@ -850,7 +850,7 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
       Tree::Expr e;
       expect(current, end, e, "expression", &Parser::parse_expr);
       expect(current, end, ")", TOKEN_RPAREN);
-      result = e;
+      result = Tree::ParenExpr(e);
       begin = current;
     }
     break;
