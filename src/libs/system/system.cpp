@@ -223,6 +223,7 @@ namespace
       //then look them up and check that their dims exist
       //then we can call the normal operator()
       
+      #if 0
       std::vector<dimension_index> needs;
 
       if (!delta.has_entry(DIM_PSI))
@@ -271,6 +272,7 @@ namespace
       {
         return Types::Demand::create(needs);
       }
+      #endif
 
       return evaluate(kappa, delta);
     }
