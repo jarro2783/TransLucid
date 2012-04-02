@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 
 #include <tl/cache.hpp>
+#include <tl/system.hpp>
 #include <tl/types/calc.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/special.hpp>
@@ -89,7 +90,7 @@ namespace
 
       if (c.index() == TYPE_INDEX_CALC)
       {
-        std::cerr << "calc already in cache" << std::endl;
+        //std::cerr << "calc already in cache" << std::endl;
         return Types::Special::create(SP_LOOP);
       }
       return c;
@@ -533,28 +534,36 @@ CacheWS::operator()(Context& kappa)
   //requested from kappa and doesn't return them
 
   //although maybe it can just call cached code with all the dimensions
-  Constant c = operator()(kappa, kappa);
-
-  if (c.index() == TYPE_INDEX_DEMAND)
+  if (m_system.cacheEnabled())
   {
-    ContextPerturber p{kappa};
-    //or not, we need to fill in the undefined dimensions and try again
-    while (c.index() == TYPE_INDEX_DEMAND)
+    Constant c = operator()(kappa, kappa);
+
+    if (c.index() == TYPE_INDEX_DEMAND)
     {
-      //std::cerr << "a demand got through" << std::endl;
-
-      for (auto d : get_constant_pointer<DemandType>(c).dims())
+      ContextPerturber p{kappa};
+      //or not, we need to fill in the undefined dimensions and try again
+      while (c.index() == TYPE_INDEX_DEMAND)
       {
-        p.perturb(d, Types::Special::create(SP_UNDEF));
-        //std::cerr << d << std::endl;
-        //std::cerr << "in context: " << kappa.has_entry(d) << std::endl;
+        //std::cerr << "a demand got through" << std::endl;
+
+        for (auto d : get_constant_pointer<DemandType>(c).dims())
+        {
+          p.perturb(d, Types::Special::create(SP_UNDEF));
+          //std::cerr << d << std::endl;
+          //std::cerr << "in context: " << kappa.has_entry(d) << std::endl;
+        }
+
+        c = operator()(kappa, kappa);
       }
-
-      c = operator()(kappa, kappa);
     }
-  }
 
-  return c;
+    return c;
+  }
+  else
+  {
+    //we're not using the cache at the moment
+    return (*m_expr)(kappa);
+  }
 }
 
 Constant

@@ -364,15 +364,15 @@ NameFunctionType::apply
   }
 
   //first lookup the dimensions that we need
-  if (!delta.has_entry(m_argDim))
-  {
-    demands.push_back(m_argDim);
-  }
+  //if (!delta.has_entry(m_argDim))
+  //{
+  //  demands.push_back(m_argDim);
+  //}
 
-  if (!delta.has_entry(m_odometerDim))
-  {
-    demands.push_back(m_odometerDim);
-  }
+  //if (!delta.has_entry(m_odometerDim))
+  //{
+  //  demands.push_back(m_odometerDim);
+  //}
 
   if (!demands.empty())
   {

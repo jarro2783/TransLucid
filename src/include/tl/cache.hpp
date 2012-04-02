@@ -159,8 +159,8 @@ namespace TransLucid
     {
       public:
 
-      CacheWS(WS* expr)
-      : m_expr(expr)
+      CacheWS(WS* expr, System& system)
+      : m_expr(expr), m_system(system)
       {}
 
       Constant
@@ -185,6 +185,9 @@ namespace TransLucid
 
       Cache m_cache;
       WS* m_expr;
+
+      //we need to hold onto the system to see if we should use the cache
+      System& m_system;
     };
   }
 }
