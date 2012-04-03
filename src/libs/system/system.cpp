@@ -305,10 +305,12 @@ namespace
       Constant hashHashPsi = 
         kappa.lookup(get_constant<dimension_index>(hashPsi));
 
+      #if 0
       if (hashHashPsi.index() != TYPE_INDEX_TUPLE)
       {
         throw "list expected, type not a tuple";
       }
+      #endif
 
       Constant hashPi = kappa.lookup(DIM_PI);
 
@@ -320,19 +322,22 @@ namespace
       Constant hashHashPi = 
         kappa.lookup(get_constant<dimension_index>(hashPi));
 
+      #if 0
       if (hashHashPi.index() != TYPE_INDEX_TUPLE)
       {
         throw "list expected, type not a tuple";
       }
+      #endif
 
       //hashHashPsi will be a list of workshop objects
 
       //expr is a workshop object
-      Constant expr = listHead(hashHashPsi);
+      Constant expr = hashHashPsi;
 
       try
       {
 
+        #if 0
         ContextPerturber p(kappa,
           {
             {get_constant<dimension_index>(hashPsi), listTail(hashHashPsi)},
@@ -341,6 +346,8 @@ namespace
         );
 
         p.perturb(Types::Tuple::get(listHead(hashHashPi)));
+        #endif
+        ContextPerturber p(kappa, Types::Tuple::get(hashHashPi));
 
         WS* w = Types::Workshop::get(expr).ws();
 

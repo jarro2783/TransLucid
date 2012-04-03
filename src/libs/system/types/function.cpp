@@ -324,14 +324,20 @@ NameFunctionType::apply
   }
 
   //argdim = cons(c, #argdim)
-  Tuple argList = makeList(c, k.lookup(m_argDim));
-  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
-    k.lookup(m_odometerDim));
+  //Tuple argList = makeList(c, k.lookup(m_argDim));
+  //Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
+  //  k.lookup(m_odometerDim));
+
+  //ContextPerturber p(k,
+  //{
+  //  {m_argDim, Types::Tuple::create(argList)},
+  //  {m_odometerDim, Types::Tuple::create(odometerList)}
+  //});
 
   ContextPerturber p(k,
   {
-    {m_argDim, Types::Tuple::create(argList)},
-    {m_odometerDim, Types::Tuple::create(odometerList)}
+    {m_argDim, c},
+    {m_odometerDim, Types::Tuple::create(Tuple(odometer))}
   });
 
   p.perturb(m_scopeDims);
@@ -380,14 +386,14 @@ NameFunctionType::apply
   }
 
   //argdim = cons(c, #argdim)
-  Tuple argList = makeList(c, kappa.lookup(m_argDim));
-  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
-    kappa.lookup(m_odometerDim));
+  //Tuple argList = makeList(c, kappa.lookup(m_argDim));
+  //Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
+  //  kappa.lookup(m_odometerDim));
 
   std::initializer_list<std::pair<dimension_index, Constant>>
   toChange = {
-    {m_argDim, Types::Tuple::create(argList)},
-    {m_odometerDim, Types::Tuple::create(odometerList)}
+    {m_argDim, c},
+    {m_odometerDim, Types::Tuple::create(Tuple(odometer))}
   };
 
   ContextPerturber pkappa(kappa, toChange);
