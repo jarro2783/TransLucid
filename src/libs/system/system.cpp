@@ -223,9 +223,10 @@ namespace
       //then look them up and check that their dims exist
       //then we can call the normal operator()
       
-      #if 0
       std::vector<dimension_index> needs;
 
+      //these two will always be set because of how args works
+      #if 0
       if (!delta.has_entry(DIM_PSI))
       {
         needs.push_back(DIM_PSI);
@@ -240,6 +241,7 @@ namespace
       {
         return Types::Demand::create(needs);
       }
+      #endif
 
       //then we have the dimensions that we need
       Constant hashPsi = delta.lookup(DIM_PSI);
@@ -272,7 +274,6 @@ namespace
       {
         return Types::Demand::create(needs);
       }
-      #endif
 
       return evaluate(kappa, delta);
     }
