@@ -1988,7 +1988,7 @@ System::addFunction(const Parser::FnDecl& fn)
     //cache this thing
     if (m_cached)
     {
-      cacheVar(std::get<0>(e));
+      //cacheVar(std::get<0>(e));
     }
   }
 
