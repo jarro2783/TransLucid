@@ -238,6 +238,11 @@ int main(int argc, char *argv[])
       tltext.verbose(vm["verbose"].as<int>());
     }
 
+    if (vm.count("debug"))
+    {
+      tltext.debug();
+    }
+
     if (vm.count("uuid"))
     {
       tltext.uuids(true);

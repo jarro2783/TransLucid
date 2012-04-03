@@ -225,6 +225,8 @@ namespace
       
       std::vector<dimension_index> needs;
 
+      //these two will always be set because of how args works
+      #if 0
       if (!delta.has_entry(DIM_PSI))
       {
         needs.push_back(DIM_PSI);
@@ -239,6 +241,7 @@ namespace
       {
         return Types::Demand::create(needs);
       }
+      #endif
 
       //then we have the dimensions that we need
       Constant hashPsi = delta.lookup(DIM_PSI);
@@ -1015,6 +1018,7 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
 //TODO this type registry stuff should go somewhere that is easier to find
 System::System(bool cached)
 : m_cached(cached),
+  m_cacheEnabled(cached),
   m_typeRegistry(m_nextTypeIndex,
   std::vector<std::pair<u32string, type_index>>{
    {U"error", TYPE_INDEX_ERROR},
@@ -2155,7 +2159,7 @@ System::cacheVar(const u32string& name)
   {
     std::unique_ptr<Workshops::CacheWS> cachews
     {
-      new Workshops::CacheWS(thevar->second)
+      new Workshops::CacheWS(thevar->second, *this)
     };
     m_cachedVars.insert({name, cachews.get()});
     cachews.release();
@@ -2193,6 +2197,24 @@ System::IdentifierLookup::lookup(const u32string& name) const
   {
     return nullptr;
   }
+}
+
+void
+System::disableCache()
+{
+  m_cacheEnabled = false;
+}
+
+void 
+System::enableCache()
+{
+  m_cacheEnabled = true;
+}
+
+bool
+System::cacheEnabled() const
+{
+  return m_cacheEnabled;
 }
 
 } //namespace TransLucid

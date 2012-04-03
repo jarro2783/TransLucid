@@ -169,6 +169,8 @@ TLText::run()
       );
 
       LineTokenizer tokens(begin, end);
+
+      m_system.disableCache();
       processDefinitions(tokens, utf8_to_utf32(h));
     }
   }
@@ -190,7 +192,13 @@ TLText::run()
   bool done = false;
   while (!done)
   {
+    m_system.disableCache();
     auto defs = processDefinitions(tokenizer, m_inputName);
+
+    if (m_cached)
+    {
+      m_system.enableCache();
+    }
 
     //only continue if the instant is valid
     if (defs.first)

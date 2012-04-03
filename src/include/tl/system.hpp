@@ -251,6 +251,15 @@ namespace TransLucid
     void
     cacheIfVar(const uuid& id);
 
+    void
+    disableCache();
+
+    void 
+    enableCache();
+
+    bool
+    cacheEnabled() const;
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
@@ -352,6 +361,7 @@ namespace TransLucid
       Renames&&... renames);
 
     bool m_cached;
+    bool m_cacheEnabled;
 
     DefinitionMap m_equations;
     UUIDDefinition m_equationUUIDs;

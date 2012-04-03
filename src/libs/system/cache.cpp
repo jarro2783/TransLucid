@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 
 #include <tl/cache.hpp>
+#include <tl/system.hpp>
 #include <tl/types/calc.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/special.hpp>
@@ -87,12 +88,11 @@ namespace
     {
       cache.hit();
 
-      #if 0
       if (c.index() == TYPE_INDEX_CALC)
       {
-        std::cerr << "calc already in cache" << std::endl;
+        //std::cerr << "calc already in cache" << std::endl;
+        return Types::Special::create(SP_LOOP);
       }
-      #endif
       return c;
     }
 
@@ -116,13 +116,38 @@ namespace
       {
         //l.entry is a CacheEntryMap
         //so look up the first dimension
-        return lookup_entry_map(l.dims.begin(), l.dims.end(), l.entry.entry, 
-          delta, cache);
+        //return lookup_entry_map(l.dims.begin(), l.dims.end(), l.entry.entry, 
+        //  delta, cache);
 
-        //return apply_visitor(cache_level_visitor(), l.entry,
-        //  demands.begin(), demands.end(), delta);
+        return apply_visitor(get_cache_level_visitor(), l.entry.entry,
+          l.dims.begin(), l.dims.end(), delta, cache);
       }
     }
+  };
+
+  struct set_level_node
+  {
+    typedef void result_type;
+
+    void
+    operator()
+    (
+      CacheEntry& entry, 
+      const Context& delta, 
+      const Constant& value,
+      std::vector<dimension_index>::const_iterator begin,
+      std::vector<dimension_index>::const_iterator end
+    ) const;
+
+    void
+    operator()
+    (
+      CacheEntryMap& entrymap, 
+      const Context& delta, 
+      const Constant& value,
+      std::vector<dimension_index>::const_iterator begin,
+      std::vector<dimension_index>::const_iterator end
+    ) const;
   };
 
   struct collect_level_node
@@ -153,7 +178,7 @@ namespace
     bool
     operator()(CacheLevel& level, Cache& cache) const
     {
-      return collect_entry_map(level.entry, cache);
+      return apply_visitor(collect_level_node(), level.entry.entry, cache);
     }
   };
 
@@ -331,38 +356,6 @@ set_visit_top_entry
   const Constant& value
 );
 
-void
-set_traverse_level
-(
-  std::vector<dimension_index>::const_iterator begin,
-  std::vector<dimension_index>::const_iterator end,
-  CacheEntryMap& entry,
-  const Context& delta,
-  const Constant& value
-)
-{
-  auto iter = entry.entry.find(delta.lookup(*begin));
-
-  if (iter == entry.entry.end())
-  {
-    throw __FILE__ ": " STRING_(__LINE__) 
-          ": Cache error, there isn't already a calc for this entry";
-  }
-
-  CacheEntry* nextentry = TransLucid::get<CacheEntry>(&iter->second.entry);
-  CacheEntryMap* nextmap = TransLucid::get<CacheEntryMap>(&iter->second.entry);
-
-  if (nextentry != nullptr)
-  {
-    set_visit_top_entry(*nextentry, delta, value);
-  }
-  else if (nextmap != nullptr)
-  {
-    //keep going down this level
-    set_traverse_level(++begin, end, *nextmap, delta, value);
-  }
-}
-
 //overwrites entry with value
 //but if value is a demand it becomes a new CacheLevel
 void
@@ -383,6 +376,54 @@ set_cache_value
   {
     entry.entry = value;
   }
+}
+
+void
+set_level_node::operator()
+(
+  CacheEntry& entry, 
+  const Context& delta, 
+  const Constant& value,
+  std::vector<dimension_index>::const_iterator begin,
+  std::vector<dimension_index>::const_iterator end
+) const
+{
+  //check consistency
+  if (begin != end)
+  {
+    throw __FILE__ ": " STRING_(__LINE__) 
+          ": Cache error, entry reached before dims ran out";
+  }
+
+  set_visit_top_entry(entry, delta, value);
+}
+
+
+void
+set_level_node::operator()
+(
+  CacheEntryMap& entrymap, 
+  const Context& delta, 
+  const Constant& value,
+  std::vector<dimension_index>::const_iterator begin,
+  std::vector<dimension_index>::const_iterator end
+) const
+{
+  if (begin == end)
+  {
+    throw __FILE__ ": " STRING_(__LINE__) 
+          ": Cache error, traversing map but no more dims";
+  }
+
+  auto iter = entrymap.entry.find(delta.lookup(*begin));
+
+  if (iter == entrymap.entry.end())
+  {
+    throw __FILE__ ": " STRING_(__LINE__) 
+          ": Cache error, there isn't already a calc for this entry";
+  }
+
+  apply_visitor(*this, iter->second.entry, delta, value, ++begin, end);
 }
 
 void
@@ -410,15 +451,15 @@ set_visit_top_entry
   else if (level != nullptr)
   {
     //traverse the level
-    set_traverse_level(level->dims.begin(), level->dims.end(), level->entry, 
-      delta, value);
+    apply_visitor(set_level_node(), level->entry.entry, delta, value,
+      level->dims.begin(), level->dims.end());
   }
 }
 
 }
 
 Cache::Cache()
-: m_entry(Types::Calc::create())
+: m_entry(nullptr)
 , m_retirementAge(2)
 {
 }
@@ -426,23 +467,46 @@ Cache::Cache()
 Constant
 Cache::get(Context& delta)
 {
-  updateRetirementAge(m_entry.age);
-  m_entry.age = 0;
-  return apply_visitor(get_cache_entry_visitor(), m_entry.entry, delta, *this);
+  if (!m_entry)
+  {
+    m_entry = new CacheLevel;
+    return Types::Calc::create();
+  }
+  else
+  {
+    return get_cache_entry_visitor()(*m_entry, delta, *this);
+  }
 }
 
 void
 Cache::set(const Context& delta, const Constant& value)
 {
-  set_visit_top_entry(m_entry, delta, value);
+  if (!m_entry)
+  {
+    throw __FILE__ ": " STRING_(__LINE__) ": Can't set empty cache";
+  }
+
+  //set_visit_top_entry(m_entry, delta, value);
+  apply_visitor
+  (
+    set_level_node(), 
+    m_entry->entry.entry, 
+    delta, 
+    value, 
+    m_entry->dims.begin(),
+    m_entry->dims.end()
+  );
 }
 
 void
 Cache::garbageCollect()
 {
-  apply_visitor(collect_entry(), m_entry.entry, *this);
-  //finally, decrease the retirement age
-  --m_retirementAge;
+  if (m_entry != nullptr)
+  {
+    apply_visitor(collect_level_node(), m_entry->entry.entry, *this);
+    //finally, decrease the retirement age
+    --m_retirementAge;
+  }
 }
 
 void
@@ -452,6 +516,11 @@ Cache::updateRetirementAge(int ageSeen)
   {
     m_retirementAge = ageSeen;
   }
+}
+
+CacheLevel::CacheLevel()
+: entry(CacheEntry(Types::Calc::create()))
+{
 }
 
 namespace Workshops
@@ -465,28 +534,36 @@ CacheWS::operator()(Context& kappa)
   //requested from kappa and doesn't return them
 
   //although maybe it can just call cached code with all the dimensions
-  Constant c = operator()(kappa, kappa);
-
-  if (c.index() == TYPE_INDEX_DEMAND)
+  if (m_system.cacheEnabled())
   {
-    ContextPerturber p{kappa};
-    //or not, we need to fill in the undefined dimensions and try again
-    while (c.index() == TYPE_INDEX_DEMAND)
+    Constant c = operator()(kappa, kappa);
+
+    if (c.index() == TYPE_INDEX_DEMAND)
     {
-      //std::cerr << "a demand got through" << std::endl;
-
-      for (auto d : get_constant_pointer<DemandType>(c).dims())
+      ContextPerturber p{kappa};
+      //or not, we need to fill in the undefined dimensions and try again
+      while (c.index() == TYPE_INDEX_DEMAND)
       {
-        p.perturb(d, Types::Special::create(SP_UNDEF));
-        //std::cerr << d << std::endl;
-        //std::cerr << "in context: " << kappa.has_entry(d) << std::endl;
+        //std::cerr << "a demand got through" << std::endl;
+
+        for (auto d : get_constant_pointer<DemandType>(c).dims())
+        {
+          p.perturb(d, Types::Special::create(SP_UNDEF));
+          //std::cerr << d << std::endl;
+          //std::cerr << "in context: " << kappa.has_entry(d) << std::endl;
+        }
+
+        c = operator()(kappa, kappa);
       }
-
-      c = operator()(kappa, kappa);
     }
-  }
 
-  return c;
+    return c;
+  }
+  else
+  {
+    //we're not using the cache at the moment
+    return (*m_expr)(kappa);
+  }
 }
 
 Constant
