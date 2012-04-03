@@ -505,14 +505,20 @@ namespace TransLucid
        * Construct a hash expression.
        * @param e The sub expression.
        */
-      HashExpr(const Expr& e)
-      : e(e)
+      HashExpr(const Expr& e, bool cached = true)
+      : e(e), cached(cached)
       {}
 
       /**
        * The sub expression.
        */
       Expr e;
+
+      /**
+       * Is the resulting dimension being considered for caching?
+       * If not, don't look at delta.
+       */
+      bool cached;
     };
 
     /**

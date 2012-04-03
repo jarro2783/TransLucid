@@ -297,7 +297,7 @@ TreeToWSTree::operator()(const Tree::IfExpr& e)
 Tree::Expr
 TreeToWSTree::operator()(const Tree::HashExpr& e)
 {
-  return Tree::HashExpr(apply_visitor(*this, e.e));
+  return Tree::HashExpr(apply_visitor(*this, e.e), e.cached);
 }
 
 Tree::Expr
@@ -551,7 +551,7 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
   for (dimension_index d : m_Lout)
   {
     outPairs.push_back(std::make_pair(Tree::DimensionExpr(d),
-      Tree::HashExpr(Tree::DimensionExpr(d))));
+      Tree::HashExpr(Tree::DimensionExpr(d), false)));
   }
 
   //generate a unique "which" for each dimension
@@ -591,7 +591,7 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
   Tree::Expr incOwnRaw = Tree::BinaryOpExpr
     (
       Tree::BinaryOperator(Tree::ASSOC_LEFT, U"plus", U"+", 0),
-      Tree::HashExpr(Tree::DimensionExpr(label)),
+      Tree::HashExpr(Tree::DimensionExpr(label), false),
       mpz_class(1)
     );
 

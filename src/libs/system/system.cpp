@@ -264,11 +264,13 @@ namespace
         throw "list dimension not a dimension";
       }
 
+      #if 0
       auto d2 = get_constant<dimension_index>(hashPi);
       if (!delta.has_entry(d2))
       {
         needs.push_back(d2);
       }
+      #endif
 
       if (needs.size() > 0)
       {

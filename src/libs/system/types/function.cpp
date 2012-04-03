@@ -358,14 +358,16 @@ NameFunctionType::apply
   //pre: c is a workshop value
 
   //add to the list of odometers
-  std::vector<dimension_index> demands;
+  //std::vector<dimension_index> demands;
   tuple_t odometer;
   for (auto d : Lall)
   {
+    #if 0
     if (!delta.has_entry(d))
     {
       demands.push_back(d);
     }
+    #endif
     odometer.insert(std::make_pair(d, kappa.lookup(d)));
   }
 
@@ -380,10 +382,12 @@ NameFunctionType::apply
   //  demands.push_back(m_odometerDim);
   //}
 
+  #if 0
   if (!demands.empty())
   {
     return Types::Demand::create(demands);
   }
+  #endif
 
   //argdim = cons(c, #argdim)
   //Tuple argList = makeList(c, kappa.lookup(m_argDim));

@@ -263,8 +263,8 @@ namespace TransLucid
        * @param system The system that we are working with.
        * @param e The expression to evaluate and lookup the result of.
        */
-      HashWS(System& system, WS* e)
-      : m_system(system), m_e(e)
+      HashWS(System& system, WS* e, bool cached = true)
+      : m_system(system), m_e(e), m_cached(cached)
       {}
 
       ~HashWS()
@@ -288,6 +288,7 @@ namespace TransLucid
       private:
       System& m_system;
       WS* m_e;
+      bool m_cached;
     };
 
     /**

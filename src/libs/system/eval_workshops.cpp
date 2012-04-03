@@ -558,7 +558,15 @@ HashWS::operator()(Context& kappa, Context& delta)
   {
     return r;
   }
-  return lookup_context_cached(m_system, r, delta);
+
+  if (m_cached)
+  {
+    return lookup_context_cached(m_system, r, delta);
+  }
+  else
+  {
+    return lookup_context(m_system, r, kappa);
+  }
 }
 
 Constant
