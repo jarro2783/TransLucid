@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <tl/types_util.hpp>
-
 #include <tl/cache.hpp>
 #include <tl/system.hpp>
 #include <tl/types/calc.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/special.hpp>
+#include <tl/types_util.hpp>
+
+#include <tl/output.hpp>
 
 #include <iostream>
 
@@ -578,18 +579,22 @@ CacheWS::operator()(Context& kappa, Context& delta)
 
     if (d.index() == TYPE_INDEX_CALC)
     {
+      std::cerr << "cache node: " << m_name << ": calc" << std::endl;
       d = (*m_expr)(kappa, subdelta);
       m_cache.set(subdelta, d);
     }
 
     if (d.index() == TYPE_INDEX_DEMAND)
     {
+      std::cerr << "cache node: " << m_name << ": demands:";
       const auto& demands = Types::Demand::get(d);
 
       for (auto dim : demands.dims())
       {
+        std::cerr << " " << dim;
         p.perturb(dim, kappa.lookup(dim));
       }
+      std::cerr << std::endl;
     }
     else
     {

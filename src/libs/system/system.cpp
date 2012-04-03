@@ -2168,7 +2168,7 @@ System::cacheVar(const u32string& name)
   {
     std::unique_ptr<Workshops::CacheWS> cachews
     {
-      new Workshops::CacheWS(thevar->second, *this)
+      new Workshops::CacheWS(thevar->second, name, *this)
     };
     m_cachedVars.insert({name, cachews.get()});
     cachews.release();
