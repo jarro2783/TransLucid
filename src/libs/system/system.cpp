@@ -86,6 +86,14 @@ namespace TransLucid
 namespace
 {
 
+  std::set<u32string> cacheExclude
+  {
+    //U"upon",
+    U"merge",
+    U"wvr",
+    U"fby"
+  };
+
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {
@@ -1972,6 +1980,12 @@ System::addFunction(const Parser::FnDecl& fn)
   //std::cerr << "guard is " << gws << std::endl;
   uuid u = fnws->addEquation(fn.name, GuardWS(gws, bws), ews, m_time);
 
+  bool cachethis = true;
+  if (cacheExclude.find(fn.name) != cacheExclude.end())
+  {
+    cachethis = false;
+  }
+
   //add all the new equations
   //more duplication
   for (const auto& e : tows.newVars())
@@ -1986,9 +2000,9 @@ System::addFunction(const Parser::FnDecl& fn)
     );
 
     //cache this thing
-    if (m_cached)
+    if (m_cached && cachethis)
     {
-      //cacheVar(std::get<0>(e));
+      cacheVar(std::get<0>(e));
     }
   }
 

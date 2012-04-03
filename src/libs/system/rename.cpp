@@ -21,6 +21,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/rename.hpp>
 
+#include <tl/output.hpp>
+
 namespace TransLucid
 {
 
@@ -138,6 +140,8 @@ RenameIdentifiers::makeVarUnique(RenameRules& newNames, RenameRules& shadowed,
   {
     unique = generateUnique(prefix);
     newIter = newNames.insert(std::make_pair(original, unique)).first;
+
+    std::cerr << "renaming " << original << " to " << unique << std::endl;
 
     //if it shadows an existing name, but we only care if it is the first
     //time that we have seen this variable
