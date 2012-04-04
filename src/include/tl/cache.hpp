@@ -102,6 +102,8 @@ namespace TransLucid
 
     Cache();
     
+    ~Cache();
+    
     Constant
     get(Context& delta);
 
@@ -159,8 +161,8 @@ namespace TransLucid
     {
       public:
 
-      CacheWS(WS* expr, System& system)
-      : m_expr(expr), m_system(system)
+      CacheWS(WS* expr, u32string name, System& system)
+      : m_expr(expr), m_name(std::move(name)), m_system(system)
       {}
 
       Constant
@@ -185,6 +187,7 @@ namespace TransLucid
 
       Cache m_cache;
       WS* m_expr;
+      u32string m_name;
 
       //we need to hold onto the system to see if we should use the cache
       System& m_system;

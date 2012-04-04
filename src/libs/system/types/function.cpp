@@ -164,10 +164,12 @@ createValueFunctionCached
     {
       Types::Demand::append(value, demands);
     }
-
-    freeValues.push_back(std::make_pair(
-      v.second, value
-    ));
+    else
+    {
+      freeValues.push_back(std::make_pair(
+        v.second, value
+      ));
+    }
   }
 
   if (demands.size() > 0)
@@ -324,14 +326,20 @@ NameFunctionType::apply
   }
 
   //argdim = cons(c, #argdim)
-  Tuple argList = makeList(c, k.lookup(m_argDim));
-  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
-    k.lookup(m_odometerDim));
+  //Tuple argList = makeList(c, k.lookup(m_argDim));
+  //Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
+  //  k.lookup(m_odometerDim));
+
+  //ContextPerturber p(k,
+  //{
+  //  {m_argDim, Types::Tuple::create(argList)},
+  //  {m_odometerDim, Types::Tuple::create(odometerList)}
+  //});
 
   ContextPerturber p(k,
   {
-    {m_argDim, Types::Tuple::create(argList)},
-    {m_odometerDim, Types::Tuple::create(odometerList)}
+    {m_argDim, c},
+    {m_odometerDim, Types::Tuple::create(Tuple(odometer))}
   });
 
   p.perturb(m_scopeDims);
@@ -352,14 +360,16 @@ NameFunctionType::apply
   //pre: c is a workshop value
 
   //add to the list of odometers
-  std::vector<dimension_index> demands;
+  //std::vector<dimension_index> demands;
   tuple_t odometer;
   for (auto d : Lall)
   {
+    #if 0
     if (!delta.has_entry(d))
     {
       demands.push_back(d);
     }
+    #endif
     odometer.insert(std::make_pair(d, kappa.lookup(d)));
   }
 
@@ -374,20 +384,22 @@ NameFunctionType::apply
   //  demands.push_back(m_odometerDim);
   //}
 
+  #if 0
   if (!demands.empty())
   {
     return Types::Demand::create(demands);
   }
+  #endif
 
   //argdim = cons(c, #argdim)
-  Tuple argList = makeList(c, kappa.lookup(m_argDim));
-  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
-    kappa.lookup(m_odometerDim));
+  //Tuple argList = makeList(c, kappa.lookup(m_argDim));
+  //Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
+  //  kappa.lookup(m_odometerDim));
 
   std::initializer_list<std::pair<dimension_index, Constant>>
   toChange = {
-    {m_argDim, Types::Tuple::create(argList)},
-    {m_odometerDim, Types::Tuple::create(odometerList)}
+    {m_argDim, c},
+    {m_odometerDim, Types::Tuple::create(Tuple(odometer))}
   };
 
   ContextPerturber pkappa(kappa, toChange);
