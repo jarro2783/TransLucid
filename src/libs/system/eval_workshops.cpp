@@ -224,10 +224,14 @@ BangOpWS::operator()(Context& kappa, Context& delta)
 {
   //lookup function in the system and call it
 
-  //evaluate name expr
-  Constant name = (*m_name)(kappa, delta);
-
-  if (name.index() == TYPE_INDEX_BASE_FUNCTION)
+  //evaluate fn expr
+  Constant fn = (*m_name)(kappa, delta);
+  
+  if (fn.index() == TYPE_INDEX_DEMAND)
+  {
+    return fn;
+  }
+  else if (fn.index() == TYPE_INDEX_BASE_FUNCTION)
   {
     bool isSpecial = false;
     bool isDemand = false;
@@ -301,20 +305,26 @@ BangOpWS::operator()(Context& kappa, Context& delta)
       if (args.size() == 1)
       {
         //Constant arg = (*m_args[0])(kappa);
-        return Types::BaseFunction::get(name).apply(args.at(0));
+        return Types::BaseFunction::get(fn).apply(args.at(0));
       }
       else
       {
-        return Types::BaseFunction::get(name).apply(args);
+        return Types::BaseFunction::get(fn).apply(args);
       }
     }
   }
-  else if (name.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
+  else if (fn.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
   {
     //look up the appropriate dimension in the tuple
     Constant rhs = (*m_args[0])(kappa, delta);
+
+    if (rhs.index() == TYPE_INDEX_DEMAND)
+    {
+      return rhs;
+    }
+
     dimension_index dim = m_system.getDimensionIndex(rhs);
-    const Tuple& lhs = Types::Tuple::get(name);
+    const Tuple& lhs = Types::Tuple::get(fn);
     auto iter = lhs.find(dim);
     if (iter == lhs.end())
     {
@@ -324,10 +334,6 @@ BangOpWS::operator()(Context& kappa, Context& delta)
     {
       return iter->second;
     }
-  }
-  else if (name.index() == TYPE_INDEX_DEMAND)
-  {
-    return name;
   }
   else
   {
@@ -558,7 +564,15 @@ HashWS::operator()(Context& kappa, Context& delta)
   {
     return r;
   }
-  return lookup_context_cached(m_system, r, delta);
+
+  if (m_cached)
+  {
+    return lookup_context_cached(m_system, r, delta);
+  }
+  else
+  {
+    return lookup_context(m_system, r, kappa);
+  }
 }
 
 Constant
@@ -811,10 +825,6 @@ LambdaAbstractionWS::operator()(Context& k)
 Constant
 LambdaAbstractionWS::operator()(Context& kappa, Context& delta)
 {
-  //first verify that m_scope are all in delta
-
-  std::vector<dimension_index> demands;
-
   //but evaluating the free variables needs to be done in a cached manner
   return createValueFunctionCached
     (
@@ -1108,6 +1118,16 @@ AtTupleWS::operator()(Context& kappa, Context& delta)
     ContextPerturber pkappa(kappa, tuple);
     ContextPerturber pdelta(delta, tuple);
     return (*m_e2)(kappa, delta);
+  }
+}
+
+AtTupleWS::~AtTupleWS()
+{
+  delete m_e2;
+  for (auto p : m_tuple)
+  {
+    delete p.first;
+    delete p.second;
   }
 }
 

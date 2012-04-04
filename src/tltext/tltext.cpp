@@ -113,6 +113,7 @@ TLText::~TLText()
   delete m_demands;
   delete m_argsHD;
   delete m_envHD;
+  delete m_returnhd;
 }
 
 VerboseOutput

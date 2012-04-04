@@ -179,7 +179,7 @@ WS*
 WorkshopBuilder::operator()(const Tree::HashExpr& e)
 {
   WS* expr = apply_visitor(*this, e.e);
-  return new Workshops::HashWS(*m_system, expr);
+  return new Workshops::HashWS(*m_system, expr, e.cached);
 }
 
 WS*

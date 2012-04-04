@@ -86,6 +86,14 @@ namespace TransLucid
 namespace
 {
 
+  std::set<u32string> cacheExclude
+  {
+    //U"upon",
+    //U"merge",
+    //U"wvr",
+    //U"fby"
+  };
+
   bool
   hasSpecial(const std::initializer_list<Constant>& c)
   {
@@ -264,11 +272,13 @@ namespace
         throw "list dimension not a dimension";
       }
 
+      #if 0
       auto d2 = get_constant<dimension_index>(hashPi);
       if (!delta.has_entry(d2))
       {
         needs.push_back(d2);
       }
+      #endif
 
       if (needs.size() > 0)
       {
@@ -305,10 +315,12 @@ namespace
       Constant hashHashPsi = 
         kappa.lookup(get_constant<dimension_index>(hashPsi));
 
+      #if 0
       if (hashHashPsi.index() != TYPE_INDEX_TUPLE)
       {
         throw "list expected, type not a tuple";
       }
+      #endif
 
       Constant hashPi = kappa.lookup(DIM_PI);
 
@@ -320,19 +332,22 @@ namespace
       Constant hashHashPi = 
         kappa.lookup(get_constant<dimension_index>(hashPi));
 
+      #if 0
       if (hashHashPi.index() != TYPE_INDEX_TUPLE)
       {
         throw "list expected, type not a tuple";
       }
+      #endif
 
       //hashHashPsi will be a list of workshop objects
 
       //expr is a workshop object
-      Constant expr = listHead(hashHashPsi);
+      Constant expr = hashHashPsi;
 
       try
       {
 
+        #if 0
         ContextPerturber p(kappa,
           {
             {get_constant<dimension_index>(hashPsi), listTail(hashHashPsi)},
@@ -341,6 +356,8 @@ namespace
         );
 
         p.perturb(Types::Tuple::get(listHead(hashHashPi)));
+        #endif
+        ContextPerturber p(kappa, Types::Tuple::get(hashHashPi));
 
         WS* w = Types::Workshop::get(expr).ws();
 
@@ -1086,6 +1103,12 @@ System::~System()
   for (auto& v : m_equations)
   {
     delete v.second;
+  }
+
+  //clean up cache nodes
+  for (auto& c : m_cachedVars)
+  {
+    delete c.second;
   }
 }
 
@@ -1963,6 +1986,12 @@ System::addFunction(const Parser::FnDecl& fn)
   //std::cerr << "guard is " << gws << std::endl;
   uuid u = fnws->addEquation(fn.name, GuardWS(gws, bws), ews, m_time);
 
+  bool cachethis = true;
+  if (cacheExclude.find(fn.name) != cacheExclude.end())
+  {
+    cachethis = false;
+  }
+
   //add all the new equations
   //more duplication
   for (const auto& e : tows.newVars())
@@ -1977,7 +2006,7 @@ System::addFunction(const Parser::FnDecl& fn)
     );
 
     //cache this thing
-    if (m_cached)
+    if (m_cached && cachethis)
     {
       cacheVar(std::get<0>(e));
     }
@@ -2159,7 +2188,7 @@ System::cacheVar(const u32string& name)
   {
     std::unique_ptr<Workshops::CacheWS> cachews
     {
-      new Workshops::CacheWS(thevar->second, *this)
+      new Workshops::CacheWS(thevar->second, name, *this)
     };
     m_cachedVars.insert({name, cachews.get()});
     cachews.release();
