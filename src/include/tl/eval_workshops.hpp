@@ -704,6 +704,8 @@ namespace TransLucid
       {
       }
 
+      ~AtTupleWS();
+
       /**
        * Evaluate @a e2 after changing the context to @a e1. This is done more
        * efficiently than building a tuple, it is done by evaluating the

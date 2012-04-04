@@ -1119,6 +1119,16 @@ AtTupleWS::operator()(Context& kappa, Context& delta)
   }
 }
 
+AtTupleWS::~AtTupleWS()
+{
+  delete m_e2;
+  for (auto p : m_tuple)
+  {
+    delete p.first;
+    delete p.second;
+  }
+}
+
 } //namespace Workshops
 
 } //namespace TransLucid

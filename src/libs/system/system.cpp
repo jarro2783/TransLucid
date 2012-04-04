@@ -1104,6 +1104,12 @@ System::~System()
   {
     delete v.second;
   }
+
+  //clean up cache nodes
+  for (auto& c : m_cachedVars)
+  {
+    delete c.second;
+  }
 }
 
 void

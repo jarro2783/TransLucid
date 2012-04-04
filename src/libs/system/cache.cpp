@@ -465,6 +465,11 @@ Cache::Cache()
 {
 }
 
+Cache::~Cache()
+{
+  delete m_entry;
+}
+
 Constant
 Cache::get(Context& delta)
 {

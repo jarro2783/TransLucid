@@ -102,6 +102,8 @@ namespace TransLucid
 
     Cache();
     
+    ~Cache();
+    
     Constant
     get(Context& delta);
 
