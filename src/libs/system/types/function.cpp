@@ -164,10 +164,12 @@ createValueFunctionCached
     {
       Types::Demand::append(value, demands);
     }
-
-    freeValues.push_back(std::make_pair(
-      v.second, value
-    ));
+    else
+    {
+      freeValues.push_back(std::make_pair(
+        v.second, value
+      ));
+    }
   }
 
   if (demands.size() > 0)

@@ -584,22 +584,22 @@ CacheWS::operator()(Context& kappa, Context& delta)
 
     if (d.index() == TYPE_INDEX_CALC)
     {
-      std::cerr << "cache node: " << m_name << ": calc" << std::endl;
+      //std::cerr << "cache node: " << m_name << ": calc" << std::endl;
       d = (*m_expr)(kappa, subdelta);
       m_cache.set(subdelta, d);
     }
 
     if (d.index() == TYPE_INDEX_DEMAND)
     {
-      std::cerr << "cache node: " << m_name << ": demands:";
+      //std::cerr << "cache node: " << m_name << ": demands:";
       const auto& demands = Types::Demand::get(d);
 
       for (auto dim : demands.dims())
       {
-        std::cerr << " " << dim;
+        //std::cerr << " " << dim;
         p.perturb(dim, kappa.lookup(dim));
       }
-      std::cerr << std::endl;
+      //std::cerr << std::endl;
     }
     else
     {
@@ -607,7 +607,14 @@ CacheWS::operator()(Context& kappa, Context& delta)
     }
   }
 
-  return m_cache.get(delta);
+  Constant v = m_cache.get(delta);
+
+  //if (v.index() == TYPE_INDEX_SPECIAL && get_constant<Special>(v) == SP_LOOP)
+  //{
+    //std::cerr << m_name << " loop" << std::endl;
+  //}
+
+  return v;
 }
 
 }

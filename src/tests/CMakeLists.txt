@@ -26,6 +26,7 @@ target_link_libraries(system tlsystem ${TLLIBS})
 target_link_libraries(parser tlsystem ${TLLIBS})
 target_link_libraries(variant ${TLLIBS})
 target_link_libraries(uuid ${TLLIBS})
+target_link_libraries(cache tlsystem)
 
 #add_test(iterator ./iterator)
 #add_test(printing ./printing)

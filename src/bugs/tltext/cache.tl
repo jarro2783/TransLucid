@@ -2,6 +2,8 @@
 //one of the relevant dimensions ... but which one?
 
 // The upon function, B is assumed to be Boolean.
+//fun upon.d X B = X @ [d <- T]
+//var upon = \d -> \\X -> \\B -> X @ [d <- T]
 fun upon.d X B = X @ [d <- T]
 where
   var T = fby.d 0 (if B then T+1 else T fi) ;;

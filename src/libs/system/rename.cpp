@@ -263,6 +263,9 @@ RenameIdentifiers::renameFunction(const T& f)
   //generate a new name
   u32string unique = generateUnique(U"uniquefn");
 
+  std::cerr << "renaming function: " << f.name << " to " 
+            << unique << std::endl;
+
   //if the name shadows an existing name then store it
   u32string shadowed;
 

@@ -89,9 +89,9 @@ namespace
   std::set<u32string> cacheExclude
   {
     //U"upon",
-    U"merge",
-    U"wvr",
-    U"fby"
+    //U"merge",
+    //U"wvr",
+    //U"fby"
   };
 
   bool
