@@ -377,7 +377,7 @@ TreeToWSTree::operator()(const Tree::LambdaExpr& e)
   m_scope.resize(m_scope.size() - replaced.size() - 1);
 
   //store the free variables to evaluate
-  expr.free = std::move(replaced);
+  expr.free.assign(replaced.begin(), replaced.end());
 
   return expr;
 }
@@ -453,7 +453,7 @@ TreeToWSTree::operator()(const Tree::PhiExpr& e)
   //we have two things to restore, the odometer and the two args
   m_scope.resize(m_scope.size() - replaced.size() - 2);
 
-  expr.free = std::move(replaced);
+  expr.free.assign(replaced.begin(), replaced.end());
 
   return expr;
 }
@@ -623,10 +623,11 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
 Tree::Expr 
 FreeVariableReplacer::operator()(const Tree::IdentExpr& e)
 {
-  if (m_bound.find(e.text) == m_bound.end())
+  if (m_bound.find(e.text) == m_bound.end() && 
+      m_replaced.find(e.text) == m_replaced.end())
   {
     dimension_index unique = m_system.nextHiddenDim();
-    m_replaced.push_back(std::make_pair(e.text, unique));
+    m_replaced.insert(std::make_pair(e.text, unique));
     return Tree::HashExpr(Tree::DimensionExpr(unique));
   }
   else
