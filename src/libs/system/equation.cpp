@@ -108,6 +108,7 @@ GuardWS::GuardWS(const GuardWS& other)
 , m_dimConstNon(other.m_dimConstNon)
 , m_dimNonConst(other.m_dimNonConst)
 , m_dimNonNon(other.m_dimNonNon)
+, m_compiled(other.m_compiled)
 , m_onlyConst(other.m_onlyConst)
 , m_system(other.m_system)
 , m_priority(other.m_priority)
@@ -135,11 +136,17 @@ GuardWS::GuardWS(const GuardWS& other)
 }
 
 GuardWS::GuardWS(WS* g, WS* b)
-: m_guard(g), m_boolean(b), m_onlyConst(false),
+: m_guard(g), m_boolean(b), m_compiled(false), m_onlyConst(false),
   m_system(nullptr), m_priority(0)
 {
-  if (g == nullptr)
+}
+
+void
+GuardWS::compile() const
+{
+  if (m_guard == nullptr)
   {
+    m_compiled = true;
     return;
   }
 
@@ -149,7 +156,7 @@ GuardWS::GuardWS(WS* g, WS* b)
   k.perturb(DIM_TIME, Types::Intmp::create(0));
 
   //some trickery to evaluate guards at compile time
-  Workshops::TupleWS* t = dynamic_cast<Workshops::TupleWS*>(g);
+  Workshops::TupleWS* t = dynamic_cast<Workshops::TupleWS*>(m_guard.get());
 
   //For now guards must be a literal tuple
   if (t != nullptr)
@@ -224,6 +231,8 @@ GuardWS::GuardWS(WS* g, WS* b)
         m_dimConstConst.erase(priorityIter);
       }
     }
+
+    m_compiled = true;
   }
   else
   {
@@ -245,6 +254,7 @@ GuardWS::operator=(const GuardWS& rhs)
     m_dimNonConst = rhs.m_dimNonConst;
     m_dimNonNon = rhs.m_dimNonNon;
 
+    m_compiled = rhs.m_compiled;
     m_onlyConst = rhs.m_onlyConst;
 
     m_priority = rhs.m_priority;
@@ -258,6 +268,11 @@ template <typename... Delta>
 std::pair<bool, Tuple>
 GuardWS::evaluate(Context& k, Delta&&... delta) const
 {
+  if (!m_compiled)
+  {
+    compile();
+  }
+
   bool nonspecial = true;
   m_demands.clear();
   tuple_t t = m_dimConstConst;

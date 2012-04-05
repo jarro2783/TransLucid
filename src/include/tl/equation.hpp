@@ -64,13 +64,14 @@ namespace TransLucid
      * dimensions can still be added.
      **/
     GuardWS()
-    : m_guard(nullptr), m_boolean(nullptr), m_system(nullptr)
+    : m_guard(nullptr), m_boolean(nullptr), m_compiled(true), 
+      m_system(nullptr)
     , m_priority(0)
     {
     }
 
     GuardWS(const Tuple& t)
-    : m_system(nullptr), m_priority(0)
+    : m_compiled(true), m_system(nullptr), m_priority(0)
     {
        for (Tuple::const_iterator iter = t.begin();
           iter != t.end();
@@ -146,20 +147,27 @@ namespace TransLucid
     }
 
     private:
+
+    void
+    compile() const;
+
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
 
-    std::map<dimension_index, Constant> m_dimConstConst;
-    std::map<dimension_index, WS*> m_dimConstNon;
+    mutable std::map<dimension_index, Constant> m_dimConstConst;
+    mutable std::map<dimension_index, WS*> m_dimConstNon;
 
-    std::map<WS*, Constant> m_dimNonConst;
-    std::map<WS*, WS*> m_dimNonNon;
+    mutable std::map<WS*, Constant> m_dimNonConst;
+    mutable std::map<WS*, WS*> m_dimNonNon;
 
-    bool m_onlyConst;
+    //have we compiled the guard?
+    mutable bool m_compiled;
 
-    System* m_system;
+    mutable bool m_onlyConst;
 
-    int m_priority;
+    mutable System* m_system;
+
+    mutable int m_priority;
 
     mutable std::vector<dimension_index> m_demands;
   };
