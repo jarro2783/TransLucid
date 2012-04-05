@@ -10,11 +10,8 @@ need to build all of these.  For the purposes of discussion, we
 assume that the version numbers referred to in the instructions
 below are the ones we are using.
 
-- GMP 4.3.2 or higher, we are using 5.0.2.
-- MPFR 2.4.2 or higher, we are using 3.0.1.
-- MPC 0.8.1 or higher, we are using 0.9.
 - GCC 4.7.0 or higher, we are using 4.7.0.
-- ICU 3 or higher, we are using 4_8_1.
+- ICU 4.6 or higher, we are using 4_8_1.
 - MPI 1.0.x or higher, we are using 1.5.4.
 - BOOST 1_46_0 or higher, we are using 1_48_0.
 - TransLucid, latest version.
@@ -26,12 +23,11 @@ Summary
 This is the full build sequence.  If you already have some of these
 prerequisites, then you will not need to build everything.
 
-- Install, in this order, GMP, MPFR and MPC. 
 - Set PATH and LD_LIBRARY_PATH variables.
-- Install GCC.
+- Ensure GCC is installed.
 - Ensure ICU and MPI are installed.
+- Ensure BOOST is installed.
 - Download TransLucid.
-- Install BOOST.
 - Install TransLucid.
 
 ===================================================================
@@ -40,10 +36,7 @@ Detailed Instructions
 
 TransLucid needs to be compiled with a C++ compiler which supports
 C++11, the new C++ standard.  We use GCC version 4.7.0, which
-provides a partial implementation of this standard.  Since this
-version of GCC is still experimental, you will need to install
-it explicitly on your system; before this can be done, you will
-need to compile updated versions of GMP, MPFR and MPC.
+provides a partial implementation of this standard.
 
 The compilation and running of TransLucid also uses a number of
 the BOOST libraries.  You will probably need to install a recent
@@ -74,122 +67,6 @@ Specifically, in the instructions below:
 
 -------------------------------------------------------------------
 
-GMP
-
-GMP, or the GNU Multiple Precision Arithmetic Library, can be
-downloaded from
-
-    http://gmplib.org/
-
-as a distribution tarball ($DOWNLOADS/gmp-5.0.2.tar.bz2).  For
-detailed installation instructions, read the INSTALL file in the
-root directory of the source. Here is the short version:
-
-    cd $SRC
-    tar xjf $DOWNLOADS/gmp-5.0.2.tar.bz2
-    cd gmp-5.0.2
-    ./configure --prefix="$PREFIX" \
-                --enable-cxx
-    make
-    make check
-    make install 
-
--------------------------------------------------------------------
-
-MPFR
-
-MPFR is a GNU C library for multiple-precision floating-point
-computations with correct rounding.  For it to be built, GMP must
-also be built.  MPFR can be downloaded from
-
-    http://www.mpfr.org/
-
-as a distribution tarball ($DOWNLOADS/mpfr-3.0.1.tar.bz2).  For
-detailed installation instructions, read the INSTALL file in the
-root directory of the source.  Here is a short version:
-
-    cd $SRC
-    tar xjf $DOWNLOADS/mpfr-3.0.1.tar.bz2  
-    cd mpfr-3.0.1
-    ./configure --prefix="$PREFIX" \
-                --with-gmp="$PREFIX"
-    make
-    make check
-    make install 
-
--------------------------------------------------------------------
-
-MPC
-
-MPC is a C library for the arithmetic of complex numbers with
-arbitrarily high precision and correct rounding of the result.
-For it to be built, GMP and MPFR must also be built.  MPC can
-be downloaded from
-
-    http://www.multiprecision.org/index.php?prog=mpc&page=download
-
-as a distribution tarball ($DOWNLOADS/mpc-0.9.tar.gz).  For
-detailed installation instructions, read the INSTALL file in the
-root directory of the source.  Here is a short version of the
-instructions:
-
-    cd $SRC
-    tar xzf $DOWNLOADS/mpc-0.9.tar.gz
-    cd mpc-0.9
-    ./configure --prefix="$PREFIX" \
-                --with-gmp="$PREFIX" \
-                --with-mpfr="$PREFIX"
-    make
-    make check
-    make install 
-
--------------------------------------------------------------------
-
-Setting the PATH and LD_LIBRARY_PATH variables
-
-From here on, the PATH and LD_LIBRARY_PATH environment variables
-must be set so that the already-built libraries and executables
-can be found:
-
-    export PATH="$PREFIX"/bin:$PATH
-    export LD_LIBRARY_PATH="$PREFIX"/lib:$LD_LIBRARY_PATH
-
--------------------------------------------------------------------
-
-GCC
-
-TransLucid requires GNU GCC version 4.7.0 or higher.  This is not
-an official release and it needs to be checked out from the SVN
-repository or the GIT mirror.  For the instructions below, we
-assume the use of SVN.  Detailed instructions for checking out
-from SVN can be found at
-
-    http://gcc.gnu.org/svn.html
-
-The latest revision that we have verified for use with TransLucid
-is 181339.  The following checkout command
-
-    cd $SRC
-    svn checkout -r 181339 svn://gcc.gnu.org/svn/gcc/trunk gcc-svn
-
-will place the source in gcc-svn.  Please note that GCC needs to
-be built in a different directory.  Here are the building instructions:
-
-    cd $SRC
-    mkdir gcc-build-latest
-    cd gcc-build-latest
-    `pwd`/../gcc-svn/configure \
-          --prefix="$PREFIX" \
-          --with-gmp="$PREFIX" \
-          --with-mpfr="$PREFIX" \
-          --with-mpc="$PREFIX" \
-          --disable-multilib \
-          --enable-languages=c,c++
-    make 
-    make install
-
--------------------------------------------------------------------
-
 ICU
 
 TransLucid requires BOOST to be compiled with ICU, which is a
@@ -206,7 +83,7 @@ of the instructions:
     cd $SRC
     tar xzf $DOWNLOADS/icu4c-4_8_1-src.tgz
     cd icu/source
-    ./configure --prefix="$PREFIX"
+    ./configure --prefix="$PREFIX" --enable-static
     make
     make install 
 
@@ -255,7 +132,7 @@ to be compiled in.  Here is the complete instruction sequence:
     tar xjf $DOWNLOADS/boost_1_48_0.tar.bz2 
     cd boost_1_48_0
     echo "using mpi ;" >> tools/build/v2/user-config.jam
-    ./bootstrap.sh --with-icu --prefix="$PREFIX"
+    ./bootstrap.sh --with-icu="$PREFIX" --prefix="$PREFIX"
     ./bjam install
 
 -------------------------------------------------------------------
@@ -278,17 +155,17 @@ you did it already!)
 To build TransLucid:
 
     cd $SRC
+    export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:"
     cd translucid-git
     ./bootstrap.sh
     ./configure --prefix="$PREFIX" \
                 --with-boost="$PREFIX" \
-                --disable-static \
-                CXXFLAGS=-O1
+                --disable-static
     make
     make install
 
-The --disable-static flag will make it compile faster.  The -O1
-(i.e., "dash capital-O one") flag is needed as there seems to be
-a bug in GCC: if TransLucid is compiled using -O2 or -O3, the
-generated code crashes on execution. 
+The PKG_CONFIG_PATH line allows the configure script
+to find the icu-uc package.
+As for the --disable-static flag,
+it will make TransLucid compile faster.
 
