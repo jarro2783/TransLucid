@@ -69,7 +69,7 @@ handleSignals(int signal)
   switch (signal)
   {
     case SIGSEGV:
-    std::cerr << _("TLText has encountered a segfault, goodbye...") 
+    std::cerr << _("TLtext has encountered a segfault, goodbye...") 
               << std::endl;
     exit(1);
     break;
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
       cached = true;
     }
 
-    TransLucid::TLText::TLText tltext(argv[0], "TLText...", cached);
+    TransLucid::TLText::TLText tltext(argv[0], "TLtext...", cached);
  
     for (const auto& s : options)
     {
