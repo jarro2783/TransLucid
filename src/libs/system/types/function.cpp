@@ -111,6 +111,7 @@ createValueFunction
   Context& kappa
 )
 {
+  #if 0
   std::vector<std::pair<dimension_index, Constant>> freeValues;
 
   System::IdentifierLookup idents = system->lookupIdentifiers();
@@ -126,9 +127,10 @@ createValueFunction
       v.second, value
     ));
   }
+  #endif
 
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, scope, freeValues, expr, kappa)
+    ValueFunctionType(system, name, argDim, scope, free, expr, kappa)
   );
 }
 
@@ -148,6 +150,7 @@ createValueFunctionCached
   Context& delta
 )
 {
+  #if 0
   std::vector<dimension_index> demands;
   std::vector<std::pair<dimension_index, Constant>> freeValues;
 
@@ -176,9 +179,10 @@ createValueFunctionCached
   {
     return Types::Demand::create(demands);
   }
+  #endif
 
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, scope, freeValues, expr, kappa)
+    ValueFunctionType(system, name, argDim, scope, free, expr, kappa)
   );
 }
 
@@ -282,6 +286,25 @@ ValueFunctionType::apply(Context& k, const Constant& value) const
   //set m_dim = value in the context and evaluate the expr
   ContextPerturber p(k, {{m_dim, value}});
   p.perturb(m_scopeDims);
+  
+  std::vector<std::pair<dimension_index, Constant>> freeValues;
+
+  System::IdentifierLookup idents = m_system->lookupIdentifiers();
+
+  //evaluate all of the free variables
+  for (const auto& v : m_free)
+  {
+    auto var = idents.lookup(v.first);
+    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
+      : (*idents.lookup(v.first))(k);
+
+    freeValues.push_back(std::make_pair(
+      v.second, value
+    ));
+  }
+
+  p.perturb(freeValues);
+
   auto r = (*m_expr)(k);
 
   return r;
