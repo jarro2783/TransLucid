@@ -76,6 +76,35 @@ bool function_less
   return false;
 }
 
+void
+evaluateFree
+(
+  System* system,
+  ContextPerturber& p,
+  const std::vector<std::pair<u32string, dimension_index>>& free,
+  Context& k
+)
+{
+  std::vector<std::pair<dimension_index, Constant>> freeValues;
+
+  System::IdentifierLookup idents = system->lookupIdentifiers();
+
+  //evaluate all of the free variables
+  for (const auto& v : free)
+  {
+    auto var = idents.lookup(v.first);
+    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
+      : (*idents.lookup(v.first))(k);
+
+    freeValues.push_back(std::make_pair(
+      v.second, value
+    ));
+  }
+
+  p.perturb(freeValues);
+
+}
+
 }
 
 NameFunctionType::NameFunctionType
@@ -287,24 +316,8 @@ ValueFunctionType::apply(Context& k, const Constant& value) const
   ContextPerturber p(k, {{m_dim, value}});
   p.perturb(m_scopeDims);
   
-  std::vector<std::pair<dimension_index, Constant>> freeValues;
-
-  System::IdentifierLookup idents = m_system->lookupIdentifiers();
-
-  //evaluate all of the free variables
-  for (const auto& v : m_free)
-  {
-    auto var = idents.lookup(v.first);
-    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-      : (*idents.lookup(v.first))(k);
-
-    freeValues.push_back(std::make_pair(
-      v.second, value
-    ));
-  }
-
-  p.perturb(freeValues);
-
+  evaluateFree(m_system, p, m_free, k);
+  
   auto r = (*m_expr)(k);
 
   return r;
