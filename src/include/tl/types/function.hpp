@@ -319,7 +319,7 @@ namespace TransLucid
       dimension_index argDim, 
       dimension_index odometerDim, 
       const std::vector<dimension_index>& scope,
-      const std::vector<std::pair<dimension_index, Constant>>& free,
+      const std::vector<std::pair<u32string, dimension_index>>& free,
       WS* expr,
       Context& k
     );
@@ -357,12 +357,16 @@ namespace TransLucid
     less(const NameFunctionType& rhs) const;
 
     private:
+    System* m_system;
     u32string m_name;
     dimension_index m_argDim;
     dimension_index m_odometerDim;
     WS* m_expr;
 
     std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
+    std::vector<std::pair<u32string, dimension_index>> m_free;
+
+    Tuple m_freeContext;
   };
 
   Constant
