@@ -24,6 +24,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
+#include <tl/output.hpp>
+
 namespace TransLucid
 {
 
@@ -92,6 +94,7 @@ evaluateFree
   //evaluate all of the free variables
   for (const auto& v : free)
   {
+    std::cerr << "free var: " << v.first << std::endl;
     auto var = idents.lookup(v.first);
     Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
       : (*idents.lookup(v.first))(k);
