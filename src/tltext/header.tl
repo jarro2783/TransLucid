@@ -184,5 +184,13 @@ fun asa.d X B = first.d (wvr.d X B) ;;
 fun rotate.d.dʹ X = X @ [d <- #!dʹ] ;;
 fun transpose.d.dʹ X = X @ [d <- #!dʹ, dʹ <- #!d] ;;
 
+// For divide-and-conquer computations.
 fun firstOfPair.d X = X @ [d <- #!d * 2] ;;
 fun secondOfPair.d X = X @ [d <- #!d * 2 + 1] ;;
+
+// The integer log function, for depth of divide-and-conquer.
+fun ilog.n = asa.d (#!d) (double > n)
+where
+  dim d <- 0 ;;
+  var double = fby.d 1 (double * 2) ;;
+end ;;
