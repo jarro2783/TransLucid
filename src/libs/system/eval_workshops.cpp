@@ -995,6 +995,7 @@ NameApplicationWS::operator()(Context& kappa, Context& delta)
 
   return f.apply(kappa, delta, rhs, m_Lall);
 }
+
 Constant
 AtTupleWS::operator()(Context& k)
 {
@@ -1006,36 +1007,47 @@ AtTupleWS::operator()(Context& k)
 
   const Constant& dimTime = k.lookup(DIM_TIME);
 
-  auto evalTuple = [this, &k, &access, &dimTime] 
-    (const std::pair<WS*, WS*>& entry)
-    -> std::pair<dimension_index, Constant>
+  std::vector<std::pair<dimension_index, Constant>> tuple;
+  std::vector<Constant> specials;
+
+  for (const auto& entry : m_tuple)
   {
     Constant lhs = (*entry.first)(k);
     Constant rhs = (*entry.second)(k);
 
-    if (lhs.index() == TYPE_INDEX_DIMENSION)
+    if (lhs.index() == TYPE_INDEX_SPECIAL)
     {
-      if (get_constant<dimension_index>(lhs) == DIM_TIME &&
-          Types::Intmp::get(rhs) > Types::Intmp::get(dimTime))
-      {
-        access = true;
-      }
-
-      return std::make_pair(get_constant<dimension_index>(lhs), rhs);
+      specials.push_back(lhs);
+    }
+    else if (rhs.index() == TYPE_INDEX_SPECIAL)
+    {
+      specials.push_back(rhs);
     }
     else
     {
-      return std::make_pair(this->m_system.getDimensionIndex(lhs), rhs);
+      if (lhs.index() == TYPE_INDEX_DIMENSION)
+      {
+        if (get_constant<dimension_index>(lhs) == DIM_TIME &&
+            Types::Intmp::get(rhs) > Types::Intmp::get(dimTime))
+        {
+          access = true;
+        }
+
+        tuple.push_back(
+          std::make_pair(get_constant<dimension_index>(lhs), rhs));
+      }
+      else
+      {
+        tuple.push_back(
+          std::make_pair(this->m_system.getDimensionIndex(lhs), rhs));
+      }
     }
-
   }
-  ;
-
-  std::vector<std::pair<dimension_index, Constant>> tuple
-  (
-    make_tuple_transform_iterator(m_tuple.begin(), evalTuple),
-    make_tuple_transform_iterator(m_tuple.end(), evalTuple)
-  );
+  
+  if (specials.size() > 0)
+  {
+    return specials.at(0);
+  }
 
   if (access)
   {
@@ -1059,20 +1071,24 @@ AtTupleWS::operator()(Context& kappa, Context& delta)
 
   const Constant& dimTime = kappa.lookup(DIM_TIME);
 
-  #if 0
-  auto evalTuple = [this, &kappa, &delta, &access, &dimTime] 
-    (const std::pair<WS*, WS*>& entry)
-    -> std::pair<dimension_index, Constant>
-  ;
-  #endif
-
   std::vector<std::pair<dimension_index, Constant>> tuple;
   std::set<dimension_index> demands;
+  std::vector<Constant> specials;
 
   for (const auto& entry : m_tuple)
   {
     Constant lhs = (*entry.first)(kappa, delta);
     Constant rhs = (*entry.second)(kappa, delta);
+
+    if (lhs.index() == TYPE_INDEX_SPECIAL)
+    {
+      specials.push_back(lhs);
+    }
+
+    if (rhs.index() == TYPE_INDEX_SPECIAL)
+    {
+      specials.push_back(rhs);
+    }
 
     if (lhs.index() == TYPE_INDEX_DEMAND || rhs.index() == TYPE_INDEX_DEMAND)
     {
@@ -1111,6 +1127,11 @@ AtTupleWS::operator()(Context& kappa, Context& delta)
   {
     return Types::Demand::create(
       std::vector<dimension_index>(demands.begin(), demands.end()));
+  }
+
+  if (specials.size() > 0)
+  {
+    return specials.at(0);
   }
 
   if (access)
