@@ -179,3 +179,10 @@ end ;;
 
 // The as-soon-as function, B is assumed to be Boolean.
 fun asa.d X B = first.d (wvr.d X B) ;;
+
+// Rotating and transposing.
+fun rotate.d.d′ X = X @ [d <- #!d′] ;;
+fun transpose.d.d′ X = X @ [d <- #!d′, d′ <- #!d] ;;
+
+fun firstOfPair.d X = X @ [d <- #!d * 2] ;;
+fun secondOfPair.d X = X @ [d <- #!d * 2 + 1] ;;
