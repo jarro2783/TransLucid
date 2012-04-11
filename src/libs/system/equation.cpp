@@ -144,6 +144,7 @@ GuardWS::GuardWS(WS* g, WS* b)
 void
 GuardWS::compile() const
 {
+  //everything goes into nonconst right now
   if (m_guard == nullptr)
   {
     m_compiled = true;
@@ -167,6 +168,7 @@ GuardWS::compile() const
 
     for (const auto& val : pairs)
     {
+      #if 0
       bool lhsConst = true;
       bool rhsConst = true;
       Constant lhs = val.first->operator()(k);
@@ -213,6 +215,8 @@ GuardWS::compile() const
           m_dimNonNon.insert(std::make_pair(val.first, val.second));
         }
       }
+      #endif
+      m_dimNonNon.insert(std::make_pair(val.first, val.second));
     }
 
     if (m_dimConstNon.size() == 0 && m_dimNonConst.size() == 0
