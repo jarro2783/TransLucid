@@ -371,6 +371,9 @@ namespace TransLucid
     //the variables that we want to cache
     std::unordered_map<u32string, Workshops::CacheWS*> m_cachedVars;
 
+    //functions from fun decls
+    std::unordered_map<u32string, WS*> m_functions;
+
     //maps of string to hds and the hds uuids
     OutputHDMap m_outputHDs;
     UUIDStringMap m_outputUUIDs;
@@ -415,12 +418,6 @@ namespace TransLucid
 
     std::unordered_map<u32string, std::tuple<BaseFunctionType*, uuid>>
       m_functionRegistry;
-
-    //std::map<u32string, size_t> builtin_name_to_index;
-
-    //give ourselves a function registry which can register functions of
-    //up to ten arguments
-    //FunctionRegistry<MAX_FUNCTION_PARAMETERS> m_functions;
 
     Context m_defaultk;
     size_t m_time;

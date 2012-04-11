@@ -1932,6 +1932,7 @@ System::addFunction(const Parser::FnDecl& fn)
     }
 
     addEquation(fn.name, absws);
+    m_functions.insert({{fn.name, absws}});
 
     //std::cerr << "adding function abstraction:" << std::endl;
     //std::cerr << Printer::print_expr_tree(absexpr) << std::endl;

@@ -515,6 +515,15 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      void
+      addFreeVariables
+      (
+        std::vector<std::pair<u32string, dimension_index>> free
+      )
+      {
+        m_free.insert(m_free.end(), free.begin(), free.end());
+      }
+
       private:
       System* m_system;
       u32string m_name;
@@ -630,6 +639,15 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      void
+      addFreeVariables
+      (
+        std::vector<std::pair<u32string, dimension_index>> free
+      )
+      {
+        m_free.insert(m_free.end(), free.begin(), free.end());
+      }
 
       private:
       System* m_system;
