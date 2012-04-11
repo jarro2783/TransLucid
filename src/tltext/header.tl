@@ -153,3 +153,29 @@ fun canonical_print.c = "cannot print this thing";;
 fun canonical_print.c [c : special] = print.c;;
 
 var RETURN = 0;;
+
+// The first function.
+fun first.d X = X @ [d <- 0] ;;
+
+// The whenever function, B is assumed to be Boolean.
+fun wvr.d X B = X @ [d <- T]
+where
+  var T = fby.d U (U @ [d <- T + 1]) ;;
+  var U = if B then #!d else next.d U fi ;;
+end ;;
+
+// The upon function, B is assumed to be Boolean.
+fun upon.d X B = X @ [d <- T]
+where
+  var T = fby.d 0 (if B then T+1 else T fi) ;;
+end ;;
+
+// The merge function, X and Y are assumed to be comparable.
+fun merge.d X Y = if Xʹ <= Yʹ then Xʹ else Yʹ fi
+where
+  var Xʹ = upon.d X (Xʹ <= Yʹ) ;;
+  var Yʹ = upon.d Y (Yʹ <= Xʹ) ;;
+end ;;
+
+// The as-soon-as function, B is assumed to be Boolean.
+fun asa.d X B = first.d (wvr.d X B) ;;
