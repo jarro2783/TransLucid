@@ -1859,6 +1859,7 @@ System::funWSTree
   }
 
   Tree::Expr freeReplaced = free.replaceFree(renamed);
+  //Tree::Expr freeReplaced = renamed;
 
   TreeToWSTree tows(this);
 
@@ -2039,11 +2040,11 @@ System::addFunction(const Parser::FnDecl& fn)
   Tree::Expr boolean = funWSTree(iter->second, fn, fn.boolean, abstraction);
   Tree::Expr expr = funWSTree(iter->second, fn, fn.expr, abstraction);
 
-  //std::cerr << "adding function definition:" << std::endl;
-  //std::cerr << Printer::print_expr_tree(guard) 
-  //          << " -> " 
-  //          << Printer::print_expr_tree(expr)
-  //          << std::endl;
+  std::cerr << "adding function definition:" << std::endl;
+  std::cerr << Printer::print_expr_tree(guard) 
+            << " -> " 
+            << Printer::print_expr_tree(expr)
+            << std::endl;
 
   WS* gws = compile.build_workshops(guard);
   WS* bws = compile.build_workshops(boolean);

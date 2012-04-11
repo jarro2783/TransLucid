@@ -523,7 +523,7 @@ u32_to_ascii(const u32string& s)
 Constant
 lookup_context(System& system, const Constant& v, const Context& k)
 {
-  size_t index;
+  dimension_index index;
   if (v.index() == TYPE_INDEX_DIMENSION)
   {
     index = get_constant<dimension_index>(v);
