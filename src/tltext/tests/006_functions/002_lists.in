@@ -1,0 +1,4 @@
+//this tests the fact that lists are needed to implement cbn
+var f = \\x -> if #!0 == 0 then x else (f x) @ [0 <- #!0 - 1] fi;;
+%%
+(f 10) @ [0 <- 5];;
