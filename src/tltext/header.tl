@@ -36,13 +36,13 @@ op >= = OpInfix."gte".false.AssocNon.50;;
 op == = OpInfix."eq".false.AssocNon.25;;
 op != = OpInfix."ne".false.AssocNon.25;;
 op && = OpInfix."bool_and".false.AssocLeft.20;;
-op || = OpInfix."bool_or".false.AssocLeft.15;;
+op || = OpInfix."bool_or".false.AssocLeft.20;;
 
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
 var pos = 1..infty;;
 var nat = 0..infty;;
-var neg = neginfty.. ~1;;
+var neg = neginfty .. ~1;;
 var nonpos = neginfty..0;;
 var int = neginfty..infty;;
 
