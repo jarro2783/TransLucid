@@ -448,7 +448,13 @@ namespace TransLucid
     friend class detail::InputHDWS;
 
     Tree::Expr
-    funWSTree(FnInfo& info, const Tree::Expr& expr, WS* abstraction);
+    funWSTree
+    (
+      FnInfo& info, 
+      const Parser::FnDecl& decl,
+      const Tree::Expr& expr, 
+      WS* abstraction
+    );
 
     public:
 

@@ -56,6 +56,12 @@ namespace TransLucid
       }
     }
 
+    void
+    addBound(const u32string& bound)
+    {
+      m_bound.insert(bound);
+    }
+
     const Replaced&
     getReplaced()
     {

@@ -1831,8 +1831,15 @@ fixupGuardArgs(const Tree::Expr& guard,
   return Tree::TupleExpr{rewritten};
 }
 
+
 Tree::Expr
-System::funWSTree(FnInfo& info, const Tree::Expr& expr, WS* abstraction)
+System::funWSTree
+(
+  FnInfo& info, 
+  const Parser::FnDecl& decl,
+  const Tree::Expr& expr, 
+  WS* abstraction
+)
 {
   //rename everything first
   //then replace the free variables
@@ -1844,6 +1851,13 @@ System::funWSTree(FnInfo& info, const Tree::Expr& expr, WS* abstraction)
   Tree::Expr renamed = rename(expr);
 
   FreeVariableReplacer& free = std::get<5>(info);
+
+  //add the arguments as bound
+  for (auto arg : decl.args)
+  {
+    free.addBound(arg.second);
+  }
+
   Tree::Expr freeReplaced = free.replaceFree(renamed);
 
   TreeToWSTree tows(this);
@@ -1868,12 +1882,19 @@ System::funWSTree(FnInfo& info, const Tree::Expr& expr, WS* abstraction)
     cbv->addFreeVariables(free.getReplaced());
   }
 
+  std::cerr << "free vars:" << std::endl;
+  for (auto v : free.getReplaced())
+  {
+    std::cerr << v.first << std::endl;
+  }
+
   return wstree;
 }
 
 Constant
 System::addFunction(const Parser::FnDecl& fn)
 {
+  std::cerr << "adding function: " << fn.name << std::endl;
   //first try to find the function
   auto iter = m_fndecls.find(fn.name);
 
@@ -2014,9 +2035,9 @@ System::addFunction(const Parser::FnDecl& fn)
   //Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
   //Tree::Expr boolean = toWSTreePlusExtras(fn.boolean, tows, toRename);
 
-  Tree::Expr guard = funWSTree(iter->second, guardFixed, abstraction);
-  Tree::Expr boolean = funWSTree(iter->second, fn.boolean, abstraction);
-  Tree::Expr expr = funWSTree(iter->second, fn.expr, abstraction);
+  Tree::Expr guard = funWSTree(iter->second, fn, guardFixed, abstraction);
+  Tree::Expr boolean = funWSTree(iter->second, fn, fn.boolean, abstraction);
+  Tree::Expr expr = funWSTree(iter->second, fn, fn.expr, abstraction);
 
   //std::cerr << "adding function definition:" << std::endl;
   //std::cerr << Printer::print_expr_tree(guard) 
