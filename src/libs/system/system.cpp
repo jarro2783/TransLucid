@@ -1717,13 +1717,9 @@ System::addInputHyperdaton
   }
 }
 
-template <typename... Renames>
-Tree::Expr
-System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows, 
-  Renames&&... renames)
+void
+System::addExtraVariables(TreeToWSTree& tows)
 {
-  Tree::Expr wstree = tows.toWSTree(e, renames...);
-
   //The L_in dims are set to 0 in the default context
   m_Lin.insert(m_Lin.end(), tows.getLin().begin(), tows.getLin().end());
 
@@ -1732,6 +1728,16 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
 
   m_fnLists.insert(m_fnLists.end(), 
     tows.getAllScopeOdometer().begin(), tows.getAllScopeOdometer().end());
+}
+
+template <typename... Renames>
+Tree::Expr
+System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows, 
+  Renames&&... renames)
+{
+  Tree::Expr wstree = tows.toWSTree(e, renames...);
+
+  addExtraVariables(tows);
 
   return wstree;
 }
@@ -1823,6 +1829,46 @@ fixupGuardArgs(const Tree::Expr& guard,
   }
 
   return Tree::TupleExpr{rewritten};
+}
+
+Tree::Expr
+System::funWSTree(FnInfo& info, const Tree::Expr& expr, WS* abstraction)
+{
+  //rename everything first
+  //then replace the free variables
+  //then turn into a wstree without renaming
+  //and add all the extra variables that resulted
+
+  RenameIdentifiers rename(*this, std::get<1>(info));
+
+  Tree::Expr renamed = rename(expr);
+
+  FreeVariableReplacer& free = std::get<5>(info);
+  Tree::Expr freeReplaced = free.replaceFree(renamed);
+
+  TreeToWSTree tows(this);
+
+  Tree::Expr wstree = tows.toWSTreeNoRename(freeReplaced);
+
+  addExtraVariables(tows);
+
+  //the abstraction is either LambdaAbstractionWS or NamedAbstractionWS
+  Workshops::NamedAbstractionWS* cbn = 
+    dynamic_cast<Workshops::NamedAbstractionWS*>(abstraction);
+
+  if (cbn != nullptr)
+  {
+    cbn->addFreeVariables(free.getReplaced());
+  }
+  else
+  {
+    Workshops::LambdaAbstractionWS* cbv = 
+      dynamic_cast<Workshops::LambdaAbstractionWS*>(abstraction);
+
+    cbv->addFreeVariables(free.getReplaced());
+  }
+
+  return wstree;
 }
 
 Constant
@@ -1956,7 +2002,7 @@ System::addFunction(const Parser::FnDecl& fn)
   //compile the expression
   //TODO I can probably remove this duplication
   //I need to rename in these two first somehow
-  const auto& toRename = std::get<1>(iter->second);
+  //const auto& toRename = std::get<1>(iter->second);
 
   //std::cerr << "Renaming in function body:" << std::endl;
   //for (auto& p : toRename)
@@ -1965,29 +2011,12 @@ System::addFunction(const Parser::FnDecl& fn)
   //}
 
   Tree::Expr guardFixed = fixupGuardArgs(fn.guard, std::get<2>(iter->second));
-  Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
-  Tree::Expr boolean = toWSTreePlusExtras(fn.boolean, tows, toRename);
+  //Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
+  //Tree::Expr boolean = toWSTreePlusExtras(fn.boolean, tows, toRename);
 
-  FreeVariableReplacer& freeReplacer = std::get<5>(iter->second);
-  Tree::Expr replaced = freeReplacer.replaceFree(fn.expr);
-
-  //the abstraction is either LambdaAbstractionWS or NamedAbstractionWS
-  Workshops::NamedAbstractionWS* cbn = 
-    dynamic_cast<Workshops::NamedAbstractionWS*>(abstraction);
-
-  if (cbn != nullptr)
-  {
-    cbn->addFreeVariables(freeReplacer.getReplaced());
-  }
-  else
-  {
-    Workshops::LambdaAbstractionWS* cbv = 
-      dynamic_cast<Workshops::LambdaAbstractionWS*>(abstraction);
-
-    cbv->addFreeVariables(freeReplacer.getReplaced());
-  }
-
-  Tree::Expr expr = toWSTreePlusExtras(replaced, tows, toRename);
+  Tree::Expr guard = funWSTree(iter->second, guardFixed, abstraction);
+  Tree::Expr boolean = funWSTree(iter->second, fn.boolean, abstraction);
+  Tree::Expr expr = funWSTree(iter->second, fn.expr, abstraction);
 
   //std::cerr << "adding function definition:" << std::endl;
   //std::cerr << Printer::print_expr_tree(guard) 

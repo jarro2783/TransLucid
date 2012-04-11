@@ -361,6 +361,9 @@ namespace TransLucid
     toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
       Renames&&... renames);
 
+    void
+    addExtraVariables(TreeToWSTree& tows);
+
     bool m_cached;
     bool m_cacheEnabled;
 
@@ -382,12 +385,7 @@ namespace TransLucid
     std::unordered_map<u32string, Tuple> m_outputHDDecls;
     std::unordered_map<u32string, Tuple> m_inputHDDecls;
 
-    //functions
-    //map from names to a tuple of
-    //(bestfitter, renamed arguments, args -> dim, definitions)
-    std::unordered_map
-    <
-      u32string, 
+    typedef
       std::tuple
       <
         ConditionalBestfitWS*, 
@@ -397,6 +395,16 @@ namespace TransLucid
         WS*,
         FreeVariableReplacer
       >
+    FnInfo;
+
+    //functions
+    //map from names to a tuple of
+    //(bestfitter, renamed arguments, args -> dim, definitions,
+    // top abstraction workshop, free var replacer)
+    std::unordered_map
+    <
+      u32string, 
+      FnInfo
     > m_fndecls;
 
     //---- the sets of all the uuids of objects ----
@@ -438,6 +446,9 @@ namespace TransLucid
     static GettextInit m_gettext;
 
     friend class detail::InputHDWS;
+
+    Tree::Expr
+    funWSTree(FnInfo& info, const Tree::Expr& expr, WS* abstraction);
 
     public:
 

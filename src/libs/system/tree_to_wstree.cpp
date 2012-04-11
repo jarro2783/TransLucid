@@ -59,6 +59,14 @@ TreeToWSTree::rename(const Tree::Expr& expr, Args&&... args)
 }
 
 Tree::Expr
+TreeToWSTree::toWSTreeNoRename(const Tree::Expr& expr)
+{
+  clear();
+
+  return apply_visitor(*this, expr);
+}
+
+Tree::Expr
 TreeToWSTree::toWSTree(const Tree::Expr& expr)
 {
   clear();
