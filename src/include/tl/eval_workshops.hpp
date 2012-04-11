@@ -480,7 +480,7 @@ namespace TransLucid
       , m_name(name)
       , m_argDim(dim)
       , m_scope(scope)
-      , m_free(free)
+      , m_free(free.begin(), free.end())
       , m_rhs(rhs)
       {
       }
@@ -515,13 +515,14 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      template <typename T>
       void
       addFreeVariables
       (
-        std::vector<std::pair<u32string, dimension_index>> free
+        const T& free
       )
       {
-        m_free.insert(m_free.end(), free.begin(), free.end());
+        m_free.insert(free.begin(), free.end());
       }
 
       private:
@@ -529,7 +530,7 @@ namespace TransLucid
       u32string m_name;
       dimension_index m_argDim;
       std::vector<dimension_index> m_scope;
-      std::vector<std::pair<u32string, dimension_index>> m_free;
+      std::map<u32string, dimension_index> m_free;
       WS* m_rhs;
     };
 
@@ -606,7 +607,7 @@ namespace TransLucid
       , m_argDim(argDim)
       , m_odometerDim(odometerDim)
       , m_scope(scope)
-      , m_free(free)
+      , m_free(free.begin(), free.end())
       , m_rhs(rhs)
       {
       }
@@ -640,13 +641,14 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      template <typename T>
       void
       addFreeVariables
       (
-        std::vector<std::pair<u32string, dimension_index>> free
+        const T& free
       )
       {
-        m_free.insert(m_free.end(), free.begin(), free.end());
+        m_free.insert(free.begin(), free.end());
       }
 
       private:
@@ -655,7 +657,7 @@ namespace TransLucid
       dimension_index m_argDim;
       dimension_index m_odometerDim;
       std::vector<dimension_index> m_scope;
-      std::vector<std::pair<u32string, dimension_index>> m_free;
+      std::map<u32string, dimension_index> m_free;
       WS* m_rhs;
     };
 

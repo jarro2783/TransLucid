@@ -33,6 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
 //#include <tl/function_registry.hpp>
+#include <tl/free_variables.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
@@ -371,9 +372,6 @@ namespace TransLucid
     //the variables that we want to cache
     std::unordered_map<u32string, Workshops::CacheWS*> m_cachedVars;
 
-    //functions from fun decls
-    std::unordered_map<u32string, WS*> m_functions;
-
     //maps of string to hds and the hds uuids
     OutputHDMap m_outputHDs;
     UUIDStringMap m_outputUUIDs;
@@ -395,7 +393,9 @@ namespace TransLucid
         ConditionalBestfitWS*, 
         std::map<u32string, u32string>,
         std::map<u32string, dimension_index>,
-        std::vector<Parser::FnDecl>
+        std::vector<Parser::FnDecl>,
+        WS*,
+        FreeVariableReplacer
       >
     > m_fndecls;
 

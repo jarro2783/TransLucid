@@ -79,6 +79,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/utility.hpp>
 
 #include "tl/gettext_internal.h"
+#include "tl/free_variables.hpp"
 
 namespace TransLucid
 {
@@ -1834,6 +1835,8 @@ System::addFunction(const Parser::FnDecl& fn)
   TreeToWSTree tows(this);
   WorkshopBuilder compile(this);
 
+  WS* abstraction = nullptr;
+
   if (iter == m_fndecls.end())
   {
     if (fn.args.size() == 0)
@@ -1868,18 +1871,21 @@ System::addFunction(const Parser::FnDecl& fn)
 
     findRenamedParams(abstractions, absexpr, renames, renamed_dims);
 
+    WS* absws = compile.build_workshops(absexpr);
+    abstraction = absws;
+
     iter = m_fndecls.insert(
       std::make_pair(fn.name, 
         std::make_tuple(
           fnws, 
           renames,
           renamed_dims,
-          std::vector<Parser::FnDecl>()
+          std::vector<Parser::FnDecl>(),
+          absws,
+          FreeVariableReplacer(*this)
         )
       )
     ).first;
-
-    WS* absws = compile.build_workshops(absexpr);
 
     //go through the workshops and stick fnws at the end
     WS* current = absws;
@@ -1925,7 +1931,6 @@ System::addFunction(const Parser::FnDecl& fn)
     }
 
     addEquation(fn.name, absws);
-    m_functions.insert({{fn.name, absws}});
 
     //std::cerr << "adding function abstraction:" << std::endl;
     //std::cerr << Printer::print_expr_tree(absexpr) << std::endl;
@@ -1941,6 +1946,8 @@ System::addFunction(const Parser::FnDecl& fn)
     //either it has no args or its args match, so we can continue
     //get the existing one
     fnws = std::get<0>(iter->second);
+
+    abstraction = std::get<4>(iter->second);
   }
 
   //if we get here then we have a valid function, and a valid pointer
@@ -1960,7 +1967,27 @@ System::addFunction(const Parser::FnDecl& fn)
   Tree::Expr guardFixed = fixupGuardArgs(fn.guard, std::get<2>(iter->second));
   Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
   Tree::Expr boolean = toWSTreePlusExtras(fn.boolean, tows, toRename);
-  Tree::Expr expr = toWSTreePlusExtras(fn.expr, tows, toRename);
+
+  FreeVariableReplacer& freeReplacer = std::get<5>(iter->second);
+  Tree::Expr replaced = freeReplacer.replaceFree(fn.expr);
+
+  //the abstraction is either LambdaAbstractionWS or NamedAbstractionWS
+  Workshops::NamedAbstractionWS* cbn = 
+    dynamic_cast<Workshops::NamedAbstractionWS*>(abstraction);
+
+  if (cbn != nullptr)
+  {
+    cbn->addFreeVariables(freeReplacer.getReplaced());
+  }
+  else
+  {
+    Workshops::LambdaAbstractionWS* cbv = 
+      dynamic_cast<Workshops::LambdaAbstractionWS*>(abstraction);
+
+    cbv->addFreeVariables(freeReplacer.getReplaced());
+  }
+
+  Tree::Expr expr = toWSTreePlusExtras(replaced, tows, toRename);
 
   //std::cerr << "adding function definition:" << std::endl;
   //std::cerr << Printer::print_expr_tree(guard) 

@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifndef TL_GENERIC_WALKER_HPP_INCLUDED
+#define TL_GENERIC_WALKER_HPP_INCLUDED
+
 #include <tl/ast.hpp>
 
 namespace TransLucid
@@ -163,3 +166,5 @@ namespace TransLucid
 
   };
 }
+
+#endif

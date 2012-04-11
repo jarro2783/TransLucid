@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifndef TL_FREE_VARIABLES_HPP_INCLUDED
+#define TL_FREE_VARIABLES_HPP_INCLUDED
+
 #include <vector>
 #include <unordered_set>
 #include <utility>
@@ -80,3 +83,5 @@ namespace TransLucid
     std::unordered_set<u32string> m_bound;
   };
 }
+
+#endif
