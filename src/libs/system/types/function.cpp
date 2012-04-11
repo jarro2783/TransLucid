@@ -76,6 +76,74 @@ bool function_less
   return false;
 }
 
+void
+evaluateFree
+(
+  System* system,
+  ContextPerturber& p,
+  const std::vector<std::pair<u32string, dimension_index>>& free,
+  Context& k
+)
+{
+  std::vector<std::pair<dimension_index, Constant>> freeValues;
+
+  System::IdentifierLookup idents = system->lookupIdentifiers();
+
+  //evaluate all of the free variables
+  for (const auto& v : free)
+  {
+    auto var = idents.lookup(v.first);
+    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
+      : (*idents.lookup(v.first))(k);
+
+    freeValues.push_back(std::make_pair(
+      v.second, value
+    ));
+  }
+
+  p.perturb(freeValues);
+}
+
+void
+evaluateFreeCached
+(
+  System* system,
+  ContextPerturber& pkappa,
+  ContextPerturber& pdelta,
+  const std::vector<std::pair<u32string, dimension_index>>& free,
+  Context& kappa,
+  Context& delta,
+  std::vector<dimension_index>& demands
+)
+{
+  std::vector<std::pair<dimension_index, Constant>> freeValues;
+
+  System::IdentifierLookup idents = system->lookupIdentifiers();
+
+  //evaluate all of the free variables
+  for (const auto& v : free)
+  {
+    auto var = idents.lookup(v.first);
+    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
+      : (*idents.lookup(v.first))(kappa, delta);
+
+    if (value.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(value, demands);
+    }
+
+    freeValues.push_back(std::make_pair(
+      v.second, value
+    ));
+  }
+
+  if (demands.size() == 0)
+  {
+    pkappa.perturb(freeValues);
+    pdelta.perturb(freeValues);
+  }
+}
+
 }
 
 NameFunctionType::NameFunctionType
@@ -85,18 +153,17 @@ NameFunctionType::NameFunctionType
   dimension_index argDim, 
   dimension_index odometerDim, 
   const std::vector<dimension_index>& scope,
-  const std::vector<std::pair<dimension_index, Constant>>& free,
+  const std::vector<std::pair<u32string, dimension_index>>& free,
   WS* expr,
   Context& k
 )
-: m_name(name), m_argDim(argDim), m_odometerDim(odometerDim), m_expr(expr)
+: m_system(system), m_name(name), m_argDim(argDim), 
+  m_odometerDim(odometerDim), m_expr(expr), m_free(free), m_freeContext(k)
 {
   for (auto d : scope)
   {
     m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
   }
-
-  std::copy(free.begin(), free.end(), std::back_inserter(m_scopeDims));
 }
 
 Constant
@@ -111,6 +178,7 @@ createValueFunction
   Context& kappa
 )
 {
+  #if 0
   std::vector<std::pair<dimension_index, Constant>> freeValues;
 
   System::IdentifierLookup idents = system->lookupIdentifiers();
@@ -126,9 +194,10 @@ createValueFunction
       v.second, value
     ));
   }
+  #endif
 
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, scope, freeValues, expr, kappa)
+    ValueFunctionType(system, name, argDim, scope, free, expr, kappa)
   );
 }
 
@@ -148,6 +217,7 @@ createValueFunctionCached
   Context& delta
 )
 {
+  #if 0
   std::vector<dimension_index> demands;
   std::vector<std::pair<dimension_index, Constant>> freeValues;
 
@@ -176,9 +246,10 @@ createValueFunctionCached
   {
     return Types::Demand::create(demands);
   }
+  #endif
 
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, scope, freeValues, expr, kappa)
+    ValueFunctionType(system, name, argDim, scope, free, expr, kappa)
   );
 }
 
@@ -195,25 +266,9 @@ createNameFunction
   Context& kappa
 )
 {
-  std::vector<std::pair<dimension_index, Constant>> freeValues;
-
-  System::IdentifierLookup idents = system->lookupIdentifiers();
-
-  //evaluate all of the free variables
-  for (const auto& v : free)
-  {
-    auto var = idents.lookup(v.first);
-    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-      : (*idents.lookup(v.first))(kappa);
-
-    freeValues.push_back(std::make_pair(
-      v.second, value
-    ));
-  }
-
   return Types::NameFunction::create(
     NameFunctionType(system, name, argDim, odometerDim, 
-      scope, freeValues, expr, kappa)
+      scope, free, expr, kappa)
   );
 }
 
@@ -256,11 +311,6 @@ createNameFunctionCached
     ));
   }
 
-  if (demands.size() > 0)
-  {
-    return Types::Demand::create(demands);
-  }
-
   return Types::NameFunction::create(
     NameFunctionType
     (
@@ -269,7 +319,7 @@ createNameFunctionCached
       argDim,
       odometerDim,
       scope,
-      freeValues,
+      free,
       expr,
       kappa
     )
@@ -282,6 +332,10 @@ ValueFunctionType::apply(Context& k, const Constant& value) const
   //set m_dim = value in the context and evaluate the expr
   ContextPerturber p(k, {{m_dim, value}});
   p.perturb(m_scopeDims);
+  
+  Context freeContext{m_freeContext};
+  evaluateFree(m_system, p, m_free, freeContext);
+  
   auto r = (*m_expr)(k);
 
   return r;
@@ -296,8 +350,14 @@ ValueFunctionType::apply
 ) const
 {
   //set m_dim = value in the context and evaluate the expr
-  ContextPerturber pkappa(kappa, {{m_dim, value}});
-  ContextPerturber pdelta(delta, {{m_dim, value}});
+  ContextPerturber pkappa{kappa};
+  ContextPerturber pdelta{delta};
+
+  std::vector<dimension_index> demands;
+  evaluateFreeCached(m_system, pkappa, pdelta, m_free, kappa, delta, demands);
+
+  pkappa.perturb({{m_dim, value}});
+  pdelta.perturb({{m_dim, value}});
 
   pkappa.perturb(m_scopeDims);
   pdelta.perturb(m_scopeDims);
@@ -343,6 +403,9 @@ NameFunctionType::apply
   });
 
   p.perturb(m_scopeDims);
+
+  Context freeContext{m_freeContext};
+  evaluateFree(m_system, p, m_free, freeContext);
 
   return (*m_expr)(k);
 }
@@ -396,14 +459,25 @@ NameFunctionType::apply
   //Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
   //  kappa.lookup(m_odometerDim));
 
+  ContextPerturber pkappa{kappa};
+  ContextPerturber pdelta{delta};
+
+  std::vector<dimension_index> demands;
+  evaluateFreeCached(m_system, pkappa, pdelta, m_free, kappa, delta, demands);
+
+  if (demands.size() > 0)
+  {
+    return Types::Demand::create(demands);
+  }
+
   std::initializer_list<std::pair<dimension_index, Constant>>
   toChange = {
     {m_argDim, c},
     {m_odometerDim, Types::Tuple::create(Tuple(odometer))}
   };
 
-  ContextPerturber pkappa(kappa, toChange);
-  ContextPerturber pdelta(delta, toChange);
+  pkappa.perturb(toChange);
+  pdelta.perturb(toChange);
 
   pkappa.perturb(m_scopeDims);
   pdelta.perturb(m_scopeDims);
