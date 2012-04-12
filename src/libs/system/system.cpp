@@ -1846,9 +1846,11 @@ System::funWSTree
   //then turn into a wstree without renaming
   //and add all the extra variables that resulted
 
-  RenameIdentifiers rename(*this, std::get<1>(info));
-
-  Tree::Expr renamed = rename(expr);
+  std::cerr << "to rename:" << std::endl;
+  for (const auto& v : std::get<1>(info))
+  {
+    std::cerr << v.first << " to " << v.second << std::endl;
+  }
 
   FreeVariableReplacer& free = std::get<5>(info);
 
@@ -1858,22 +1860,30 @@ System::funWSTree
     free.addBound(arg.second);
   }
 
-  Tree::Expr freeReplaced = free.replaceFree(renamed);
+  Tree::Expr freeReplaced = free.replaceFree(expr);
   //Tree::Expr freeReplaced = renamed;
+
+  RenameIdentifiers rename(*this, std::get<1>(info));
+
+  Tree::Expr renamed = rename.rename(freeReplaced);
+  std::cerr << "renamed expr:" << std::endl;
+  std::cerr << Printer::print_expr_tree(renamed) << std::endl;
 
   TreeToWSTree tows(this);
 
-  Tree::Expr wstree = tows.toWSTreeNoRename(freeReplaced);
+  Tree::Expr wstree = tows.toWSTreeNoRename(renamed);
 
   addExtraVariables(tows);
 
   //the abstraction is either LambdaAbstractionWS or NamedAbstractionWS
+  WS* nextws = nullptr;
   Workshops::NamedAbstractionWS* cbn = 
     dynamic_cast<Workshops::NamedAbstractionWS*>(abstraction);
 
   if (cbn != nullptr)
   {
     cbn->addFreeVariables(free.getReplaced());
+    nextws = cbn->rhs();
   }
   else
   {
@@ -1881,12 +1891,44 @@ System::funWSTree
       dynamic_cast<Workshops::LambdaAbstractionWS*>(abstraction);
 
     cbv->addFreeVariables(free.getReplaced());
+    nextws = cbv->rhs();
+  }
+
+  std::vector<dimension_index> scope;
+
+  for (const auto& v : free.getReplaced())
+  {
+    scope.push_back(v.second);
+  }
+
+  //then add the scope to all the children
+  while (true)
+  {
+    Workshops::LambdaAbstractionWS* cbv = 
+      dynamic_cast<Workshops::LambdaAbstractionWS*>(nextws);
+    Workshops::NamedAbstractionWS* cbn = 
+      dynamic_cast<Workshops::NamedAbstractionWS*>(nextws);
+
+    if (cbv)
+    {
+      cbv->addScope(scope);
+      nextws = cbv->rhs();
+    }
+    else if (cbn)
+    {
+      cbn->addScope(scope);
+      nextws = cbn->rhs();
+    }
+    else
+    {
+      break;
+    }
   }
 
   std::cerr << "free vars:" << std::endl;
   for (auto v : free.getReplaced())
   {
-    std::cerr << v.first << std::endl;
+    std::cerr << v.first << " : " << v.second << std::endl;
   }
 
   return wstree;

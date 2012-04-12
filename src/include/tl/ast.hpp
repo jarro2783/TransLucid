@@ -344,7 +344,7 @@ namespace TransLucid
        * Construct a parenthesised expression.
        * @param e The inside expression.
        */
-      ParenExpr(const Expr& e)
+      explicit ParenExpr(const Expr& e)
       : e(e)
       {
       }
@@ -505,7 +505,7 @@ namespace TransLucid
        * Construct a hash expression.
        * @param e The sub expression.
        */
-      HashExpr(const Expr& e, bool cached = true)
+      explicit HashExpr(const Expr& e, bool cached = true)
       : e(e), cached(cached)
       {}
 

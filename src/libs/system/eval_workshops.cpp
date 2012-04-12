@@ -799,7 +799,7 @@ LambdaAbstractionWS::operator()(Context& k)
       m_system,
       m_name,
       m_argDim,
-      m_scope,
+      std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
       std::vector<std::pair<u32string, dimension_index>>
         (m_free.begin(), m_free.end()),
       m_rhs,
@@ -832,7 +832,7 @@ LambdaAbstractionWS::operator()(Context& kappa, Context& delta)
       m_system,
       m_name,
       m_argDim,
-      m_scope,
+      std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
       std::vector<std::pair<u32string, dimension_index>>
         (m_free.begin(), m_free.end()),
       m_rhs,
@@ -914,7 +914,7 @@ NamedAbstractionWS::operator()(Context& k)
       m_name, 
       m_argDim, 
       m_odometerDim, 
-      m_scope, 
+      std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
       std::vector<std::pair<u32string, dimension_index>>
         (m_free.begin(), m_free.end()), 
       m_rhs, 
@@ -948,7 +948,7 @@ NamedAbstractionWS::operator()(Context& kappa, Context& delta)
       m_name, 
       m_argDim, 
       m_odometerDim, 
-      m_scope, 
+      std::vector<dimension_index>(m_scope.begin(), m_scope.end()), 
       std::vector<std::pair<u32string, dimension_index>>
         (m_free.begin(), m_free.end()), 
       m_rhs, 

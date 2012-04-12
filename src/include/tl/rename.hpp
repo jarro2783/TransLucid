@@ -48,6 +48,50 @@ namespace TransLucid
       return e;
     }
 
+    #if 0
+    Tree::Expr
+    operator()(const Tree::nil& e) const
+    {
+      return e;
+    }
+
+    Tree::Expr
+    operator()(bool b) const
+    {
+      return b;
+    }
+
+    Tree::Expr
+    operator()(const Special s) const
+    {
+      return s;
+    }
+
+    Tree::Expr
+    operator()(const mpz_class& z) const
+    {
+      return z;
+    }
+
+    Tree::Expr
+    operator()(const Tree::LiteralExpr& l) const
+    {
+      return l;
+    }
+
+    Tree::Expr
+    operator()(const Tree::DimensionExpr& d) const
+    {
+      return d;
+    }
+
+    Tree::Expr
+    operator()(const Tree::HashSymbol& h) const
+    {
+      return h;
+    }
+    #endif
+
     Tree::Expr
     operator()(const Tree::IdentExpr& e);
 

@@ -33,6 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/workshop.hpp>
 
 #include <list>
+#include <set>
 
 //Some of these functors are constructed with the system, some are not.
 //The ones that are make a demand of the system.
@@ -479,7 +480,7 @@ namespace TransLucid
       : m_system(system)
       , m_name(name)
       , m_argDim(dim)
-      , m_scope(scope)
+      , m_scope(scope.begin(), scope.end())
       , m_free(free.begin(), free.end())
       , m_rhs(rhs)
       {
@@ -525,11 +526,18 @@ namespace TransLucid
         m_free.insert(free.begin(), free.end());
       }
 
+      template <typename T>
+      void
+      addScope(const T& scope)
+      {
+        m_scope.insert(scope.begin(), scope.end());
+      }
+
       private:
       System* m_system;
       u32string m_name;
       dimension_index m_argDim;
-      std::vector<dimension_index> m_scope;
+      std::set<dimension_index> m_scope;
       std::map<u32string, dimension_index> m_free;
       WS* m_rhs;
     };
@@ -606,7 +614,7 @@ namespace TransLucid
       , m_name(name)
       , m_argDim(argDim)
       , m_odometerDim(odometerDim)
-      , m_scope(scope)
+      , m_scope(scope.begin(), scope.end())
       , m_free(free.begin(), free.end())
       , m_rhs(rhs)
       {
@@ -651,12 +659,19 @@ namespace TransLucid
         m_free.insert(free.begin(), free.end());
       }
 
+      template <typename T>
+      void
+      addScope(const T& scope)
+      {
+        m_scope.insert(scope.begin(), scope.end());
+      }
+
       private:
       System* m_system;
       u32string m_name;
       dimension_index m_argDim;
       dimension_index m_odometerDim;
-      std::vector<dimension_index> m_scope;
+      std::set<dimension_index> m_scope;
       std::map<u32string, dimension_index> m_free;
       WS* m_rhs;
     };

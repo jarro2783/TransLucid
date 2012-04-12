@@ -15,6 +15,7 @@ var spmultidef = special"spmultidef";;
 var sploop = special"sploop";;
 
 fun bestselect__.a.b = spmultidef;;
+fun special_combine.a.b = a;;
 
 data Assoc = AssocNon | AssocLeft | AssocRight;;
 data HostDecl = HostDim intmp | HostType intmp | HostFunc intmp;;
