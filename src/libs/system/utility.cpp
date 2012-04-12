@@ -127,11 +127,8 @@ namespace
   subset_of_range(const Constant& c)
   {
     //at the moment we can only do ranges of integers
-    if (c.index() != TYPE_INDEX_INTMP)
-    {
-      return &issubset_false;
-    }
-    else
+    
+    if (c.index() == TYPE_INDEX_INTMP)
     {
       //lambda functions to the rescue
       return [] (const Constant& a, const Constant& b)
@@ -140,6 +137,19 @@ namespace
           return Types::Range::get(b).within(Types::Intmp::get(a));
         }
       ;
+    }
+    else if (c.index() == TYPE_INDEX_RANGE)
+    {
+      return [] (const Constant& a, const Constant& b)
+        {
+          //a is a range, b is a range
+          return Types::Range::get(b).within(Types::Range::get(a));
+        }
+      ;
+    }
+    else
+    {
+      return &issubset_false;
     }
   }
 
