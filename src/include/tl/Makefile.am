@@ -26,7 +26,7 @@ includes_HEADERS = ast.hpp ast_fwd.hpp bestfit.hpp builtin_types.hpp \
   eval_workshops.hpp fixed_indexes.hpp function_registry.hpp \
   gmpxx_fwd.hpp header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer_util.hpp library.hpp \
-  line_parser.hpp line_tokenizer.hpp mpl.hpp \
+  line_tokenizer.hpp mpl.hpp \
   object_registry.hpp output.hpp \
   parser_api.hpp parser_defs.hpp parser_header.hpp parser_iterator.hpp \
   range.hpp registries.hpp rename.hpp \
