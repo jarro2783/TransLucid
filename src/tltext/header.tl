@@ -36,7 +36,7 @@ op >= = OpInfix."gte".false.AssocNon.50;;
 op == = OpInfix."eq".false.AssocNon.25;;
 op != = OpInfix."ne".false.AssocNon.25;;
 op && = OpInfix."bool_and".true.AssocLeft.20;;
-op || = OpInfix."bool_or".true.AssocLeft.20;;
+op || = OpInfix."bool_or".true.AssocLeft.15;;
 
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
