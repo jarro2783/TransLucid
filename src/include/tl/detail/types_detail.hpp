@@ -157,6 +157,28 @@ namespace TransLucid
     };
 
     template <>
+    struct set_constant_func<float>
+    {
+      void
+      operator()(Constant& c, float v)
+      {
+        c.data.f32 = v;
+        c.data.field = TYPE_FIELD_F32;
+      }
+    };
+
+    template <>
+    struct set_constant_func<double>
+    {
+      void
+      operator()(Constant& c, double v)
+      {
+        c.data.f64 = v;
+        c.data.field = TYPE_FIELD_F64;
+      }
+    };
+
+    template <>
     struct get_constant_func<Special>
     {
       Special

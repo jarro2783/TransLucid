@@ -25,6 +25,17 @@ along with TransLucid; see the file COPYING.  If not see
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#define TI_UI8 (TL::TYPE_INDEX_LAST + 1)
+#define TI_SI8 (TL::TYPE_INDEX_LAST + 2)
+#define TI_SI16 (TL::TYPE_INDEX_LAST + 3)
+#define TI_UI16 (TL::TYPE_INDEX_LAST + 4)
+#define TI_SI32 (TL::TYPE_INDEX_LAST + 5)
+#define TI_UI32 (TL::TYPE_INDEX_LAST + 6)
+#define TI_SI64 (TL::TYPE_INDEX_LAST + 7)
+#define TI_UI64 (TL::TYPE_INDEX_LAST + 8)
+#define TI_FLOAT (TL::TYPE_INDEX_LAST + 9)
+#define TI_DOUBLE (TL::TYPE_INDEX_LAST + 10)
+
 namespace TL = TransLucid;
 
 template <typename T>
@@ -98,18 +109,19 @@ test_character()
   test_constant(0x100518, TL::TYPE_INDEX_UCHAR);
 }
 
+template <typename T>
+void
+test_float(TL::type_index ti)
+{
+  test_constant<T>(1, ti);
+  test_constant<T>(1.5, ti);
+  test_constant<T>(2.5, ti);
+  test_constant<T>(100.6, ti);
+}
+
 TEST_CASE ( "get set", "get_constant and set_constant work for all types" )
 {
   test_bool();
-
-  #define TI_UI8 (TL::TYPE_INDEX_LAST + 1)
-  #define TI_SI8 (TL::TYPE_INDEX_LAST + 2)
-  #define TI_SI16 (TL::TYPE_INDEX_LAST + 3)
-  #define TI_UI16 (TL::TYPE_INDEX_LAST + 4)
-  #define TI_SI32 (TL::TYPE_INDEX_LAST + 5)
-  #define TI_UI32 (TL::TYPE_INDEX_LAST + 6)
-  #define TI_SI64 (TL::TYPE_INDEX_LAST + 7)
-  #define TI_UI64 (TL::TYPE_INDEX_LAST + 8)
 
   test_integer<int8_t>(TI_UI8);
   test_integer<uint8_t>(TI_SI8);
@@ -121,4 +133,7 @@ TEST_CASE ( "get set", "get_constant and set_constant work for all types" )
   test_integer<uint64_t>(TI_SI64);
 
   test_character();
+
+  test_float<float>(TI_FLOAT);
+  test_float<double>(TI_DOUBLE);
 }
