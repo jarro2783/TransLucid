@@ -165,9 +165,9 @@ fun canonical_print.c [c : uchar]   = "'" + escape_string.(print.c) + "'";;
 fun canonical_print.c [c : bool]    = print.c;;
 fun canonical_print.c [c : range]   = print.c;;
 fun canonical_print.c [c : tuple]   = "[I don't know how to print a tuple]";;
-//fun canonical_print.c               = print_typename.c + `"` + 
-//                                      escape_string.(print.c) + `"`;;
-fun canonical_print.c = "cannot print this thing";;
+fun canonical_print.c               = print_typename.c + `"` + 
+                                      escape_string.(print.c) + `"`;;
+//fun canonical_print.c = "cannot print this thing";;
 fun canonical_print.c [c : special] = print.c;;
 
 var RETURN = 0;;
