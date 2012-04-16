@@ -137,3 +137,7 @@ TEST_CASE ( "get set", "get_constant and set_constant work for all types" )
   test_get_float<float>(TI_FLOAT);
   test_get_float<double>(TI_DOUBLE);
 }
+
+TEST_CASE ( "equality", "constant equality" )
+{
+}

@@ -35,7 +35,7 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   internal_strings.cpp lexertl.cpp lexer_util.cpp library.cpp \
   line_tokenizer.cpp parser.cpp range.cpp rename.cpp \
   system.cpp tree_printer.cpp tree_to_wstree.cpp \
-  types/function.cpp \
+  types/function.cpp types/integer.cpp \
   types.cpp utility.cpp uuid.cpp workshop_builder.cpp
 
 libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \
