@@ -28,11 +28,43 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
   //add two functions, print and print_typename
   //print.c [c : type] = basefn!c;;
   //print_typename [c : type] = "type";;
+
+  s.addFunction
+  (
+    Parser::FnDecl
+    {
+      U"print",
+      {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
+      Tree::TupleExpr({{Tree::IdentExpr(U"c"), type}}),
+      Tree::Expr(),
+      Tree::BangAppExpr(Tree::IdentExpr(basefn), Tree::IdentExpr(U"c"))
+    }
+  );
+
+  s.addFunction
+  (
+    Parser::FnDecl
+    {
+      U"print_typename",
+      {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
+      Tree::TupleExpr({{Tree::IdentExpr(U"c"), type}}),
+      Tree::Expr(),
+      type
+    }
+  );
+
 }
 
 void
 addConstructor(System& s, const u32string& type, const u32string& basefn)
 {
+}
+
+void
+addTypeEquation(System& s, const u32string& type)
+{
+  s.addEquation(Parser::Equation{U"type", Tree::Expr(), Tree::Expr(),
+    Tree::LiteralExpr(U"type", type)});
 }
 
 }

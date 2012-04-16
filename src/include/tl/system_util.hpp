@@ -27,6 +27,9 @@ namespace TransLucid
   class System;
 
   void
+  addTypeEquation(System& s, const u32string& type);
+
+  void
   addPrinter(System& s, const u32string& type, const u32string& basefn);
 
   void

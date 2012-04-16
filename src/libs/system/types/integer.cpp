@@ -45,6 +45,10 @@ class FixedInteger
 
     makeEquation(s, U"construct_" + name, &FixedInteger::construct);
     makeEquation(s, U"print_" + name, &FixedInteger::print);
+
+    addPrinter(s, name, U"print_" + name); 
+
+    addTypeEquation(s, name);
   }
 
   Constant
