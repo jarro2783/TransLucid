@@ -1,5 +1,5 @@
-/* The intmp type.
-   Copyright (C) 2011, 2012 Jarryd Beck
+/* System utility functions
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -17,43 +17,23 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TYPES_INTMP_HPP_INCLUDED
-#define TYPES_INTMP_HPP_INCLUDED
+#ifndef TL_SYSTEM_UTIL_HPP_INCLUDED
+#define TL_SYSTEM_UTIL_HPP_INCLUDED
 
-#include <tl/gmpxx_fwd.hpp>
 #include <tl/types.hpp>
 
 namespace TransLucid
 {
-  namespace Types
-  {
-    namespace Intmp
-    {
-      Constant
-      create(const Constant& text);
+  class System;
 
-      Constant
-      create(const mpz_class& v);
+  void
+  addTypeEquation(System& s, const u32string& type);
 
-      Constant
-      create(int v);
+  void
+  addPrinter(System& s, const u32string& type, const u32string& basefn);
 
-      const mpz_class&
-      get(const Constant& c);
-
-      bool 
-      equality(const Constant& lhs, const Constant& rhs);
-
-      size_t
-      hash(const Constant& c);
-
-      Constant
-      print(const Constant& c);
-
-      bool
-      less(const Constant& lhs, const Constant& rhs);
-    }
-  }
+  void
+  addConstructor(System& s, const u32string& type, const u32string& basefn);
 }
 
 #endif
