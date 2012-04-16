@@ -35,8 +35,8 @@ op > = OpInfix."gt".false.AssocNon.50;;
 op >= = OpInfix."gte".false.AssocNon.50;;
 op == = OpInfix."eq".false.AssocNon.25;;
 op != = OpInfix."ne".false.AssocNon.25;;
-op && = OpInfix."bool_and".false.AssocLeft.20;;
-op || = OpInfix."bool_or".false.AssocLeft.20;;
+op && = OpInfix."bool_and".true.AssocLeft.20;;
+op || = OpInfix."bool_or".true.AssocLeft.20;;
 
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
@@ -61,8 +61,8 @@ fun ne.a.b [a : intmp, b : intmp] = int_ne!(a,b);;
 
 fun eq.a.b [a : bool, b : bool] = bool_eq!(a,b);;
 
-fun bool_and.a.b = if a then b else false fi;;
-fun bool_or.a.b = if a then true else b fi;;
+fun bool_and a b = if a then b else false fi;;
+fun bool_or a b = if a then true else b fi;;
 
 fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
 
