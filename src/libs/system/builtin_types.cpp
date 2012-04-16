@@ -39,6 +39,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
+#include <tl/types/integer.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/string.hpp>
@@ -1427,6 +1428,8 @@ init_builtin_types(System& s)
   add_base_functions(s);
 
   add_file_io(s);
+
+  registerIntegers(s);
 }
 
 } //namespace TransLucid
