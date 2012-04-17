@@ -335,6 +335,25 @@ BangOpWS::operator()(Context& kappa, Context& delta)
       return iter->second;
     }
   }
+  else if (m_args.size() == 1)
+  {
+    Constant rhs = (*m_args[0])(kappa, delta);
+
+    System::IdentifierLookup lookup = m_system.lookupIdentifiers();
+    WS* constant_bang = lookup.lookup(U"constant_bang");
+
+    if (constant_bang == nullptr)
+    {
+      return Types::Special::create(SP_UNDEF);
+    }
+
+    Constant theFun = (*constant_bang)(kappa, delta);
+
+    return applyFunction(kappa, delta,
+      applyFunction(kappa, delta, theFun, fn),
+      rhs
+    );
+  }
   else
   {
     return Types::Special::create(SP_UNDEF);
@@ -425,6 +444,25 @@ BangOpWS::operator()(Context& k)
     {
       return iter->second;
     }
+  }
+  else if (m_args.size() == 1)
+  {
+    Constant rhs = (*m_args[0])(k);
+
+    System::IdentifierLookup lookup = m_system.lookupIdentifiers();
+    WS* constant_bang = lookup.lookup(U"constant_bang");
+
+    if (constant_bang == nullptr)
+    {
+      return Types::Special::create(SP_UNDEF);
+    }
+
+    Constant theFun = (*constant_bang)(k);
+
+    return applyFunction(k,
+      applyFunction(k, theFun, name),
+      rhs
+    );
   }
   else
   {
@@ -647,14 +685,18 @@ TupleWS::operator()(Context& k)
     //const Pair& p = v.first.value<Pair>();
     Constant left = (*pair.first)(k);
     Constant right = (*pair.second)(k);
-
-    if (left.index() == TYPE_INDEX_DIMENSION)
-    {
-      kp[get_constant<dimension_index>(left)] = right;
-    }
-    else if (left.index() == TYPE_INDEX_SPECIAL)
+    
+    if (left.index() == TYPE_INDEX_SPECIAL)
     {
       return left;
+    }
+    else if (right.index() == TYPE_INDEX_SPECIAL)
+    {
+      return right;
+    }
+    else if (left.index() == TYPE_INDEX_DIMENSION)
+    {
+      kp[get_constant<dimension_index>(left)] = right;
     }
     else
     {
@@ -693,6 +735,15 @@ TupleWS::operator()(Context& kappa, Context& delta)
       if (left.index() == TYPE_INDEX_SPECIAL)
       {
         return left;
+      }
+
+      if (left.index() == TYPE_INDEX_SPECIAL)
+      {
+        return left;
+      }
+      else if (right.index() == TYPE_INDEX_SPECIAL)
+      {
+        return right;
       }
 
       if (left.index() == TYPE_INDEX_DIMENSION)

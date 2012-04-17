@@ -46,20 +46,63 @@ var neg = neginfty .. ~1;;
 var nonpos = neginfty..0;;
 var int = neginfty..infty;;
 
-//var int_plus [prec : 8, signed : true] = int_s8_plus;;
-//var int_plus [prec : 16] = int_plus_16;;
+var int_plus [prec : 8, signed : true] = sint8_plus;;
+var int_plus [prec : 8, signed : false] = uint8_plus;;
 
-fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
-//fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
-//fun plus.a.b [a : int, b : int] | a!prec == b!prec && a!signed == b!signed 
-//  = (int_plus @ [prec <- a!prec, signed <- a!signed])!(a,b);;
-fun minus.a.b [a : intmp, b : intmp] = int_minus!(a,b);;
-fun times.a.b [a : intmp, b : intmp] = int_times!(a,b);;
-fun divide.a.b [a : intmp, b : intmp] = int_divide!(a,b);;
-fun modulus.a.b [a : intmp, b : intmp] = int_modulus!(a,b);;
+var int_plus [prec : 16, signed : true] = sint16_plus;;
+var int_plus [prec : 16, signed : false] = uint16_plus;;
+
+var int_plus [prec : 32, signed : true] = sint32_plus;;
+var int_plus [prec : 32, signed : false] = uint32_plus;;
+
+var int_plus [prec : 64, signed : true] = sint64_plus;;
+var int_plus [prec : 64, signed : false] = uint64_plus;;
+
+//fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
+fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
+fun plus.a.b [a : int, b : int] 
+  | a!prec == b!prec && a!is_signed == b!is_signed 
+  = (int_plus @ [prec <- a!prec, is_signed <- a!is_signed])!(a,b);;
+fun minus.a.b [a : intmp, b : intmp] = intmp_minus!(a,b);;
+fun times.a.b [a : intmp, b : intmp] = intmp_times!(a,b);;
+fun divide.a.b [a : intmp, b : intmp] = intmp_divide!(a,b);;
+fun modulus.a.b [a : intmp, b : intmp] = intmp_modulus!(a,b);;
 
 //version 2
 //fun plus.a.b [a : float, b : float] | a!prec == b!prec = float_plus!(a,b);;
+
+fun constant_bang.a.b [a : sint8] = sint8_bang.b;;
+fun constant_bang.a.b [a : uint8] = uint8_bang.b;;
+fun constant_bang.a.b [a : sint16] = sint16_bang.b;;
+fun constant_bang.a.b [a : uint16] = uint16_bang.b;;
+fun constant_bang.a.b [a : sint32] = sint32_bang.b;;
+fun constant_bang.a.b [a : uint32] = uint32_bang.b;;
+fun constant_bang.a.b [a : sint64] = sint64_bang.b;;
+fun constant_bang.a.b [a : uint64] = uint64_bang.b;;
+
+fun sint8_bang.a [a : prec] = 8;;
+fun sint8_bang.a [a : is_signed] = true;;
+
+fun uint8_bang.a [a : prec] = 8;;
+fun uint8_bang.a [a : is_signed] = false;;
+
+fun sint16_bang.a [a : prec] = 16;;
+fun sint16_bang.a [a : is_signed] = true;;
+
+fun uint16_bang.a [a : prec] = 16;;
+fun uint16_bang.a [a : is_signed] = false;;
+
+fun sint32_bang.a [a : prec] = 32;;
+fun sint32_bang.a [a : is_signed] = true;;
+
+fun uint32_bang.a [a : prec] = 32;;
+fun uint32_bang.a [a : is_signed] = false;;
+
+fun sint64_bang.a [a : prec] = 64;;
+fun sint64_bang.a [a : is_signed] = true;;
+
+fun uint64_bang.a [a : prec] = 64;;
+fun uint64_bang.a [a : is_signed] = false;;
 
 //fun uint8_bang.a.b [a : prec] = uint8_precision!b;;
 //fun uint8_bang.a.b [a : signed] = false;;
@@ -67,15 +110,15 @@ fun modulus.a.b [a : intmp, b : intmp] = int_modulus!(a,b);;
 //fun sint8_bang.a.b [a : prec] = sint8_precision!b;;
 //fun sint8_bang.a.b [a : signed] = true;;
 
-fun lte.a.b [a : intmp, b : intmp] = int_lte!(a,b);;
-fun lt.a.b [a : intmp, b : intmp] = int_lt!(a,b);;
-fun gte.a.b [a : intmp, b : intmp] = int_gte!(a,b);;
-fun gt.a.b [a : intmp, b : intmp] = int_gt!(a,b);;
-fun eq.a.b [a : intmp, b : intmp] = int_eq!(a,b);;
+fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
+fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
+fun gte.a.b [a : intmp, b : intmp] = intmp_gte!(a,b);;
+fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
+fun eq.a.b [a : intmp, b : intmp] = intmp_eq!(a,b);;
 //fun eq.a.b [a : int, b : int] 
 //  | constant_equals!(a!prec, b!prec) && constant_equals!(a!signed, b!signed)
 //  = (int_eq @ [prec <- a!prec, signed <- a!signed])!(a,b);;
-fun ne.a.b [a : intmp, b : intmp] = int_ne!(a,b);;
+fun ne.a.b [a : intmp, b : intmp] = intmp_ne!(a,b);;
 
 fun eq.a.b [a : bool, b : bool] = bool_eq!(a,b);;
 
@@ -152,6 +195,7 @@ fun print_typename.c [c : typetype] = "typetype";;
 fun print_typename.c [c : uuid] = "uuid";;
 fun print_typename.c [c : demand] = "demand";;
 fun print_typename.c [c : calc] = "calc";;
+fun print_typename.c [c : basefun] = "basefun";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;

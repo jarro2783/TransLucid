@@ -31,8 +31,76 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
   template <typename T>
+  struct read_value
+  {
+    T 
+    operator()(const u32string& s)
+    {
+      T value;
+      std::istringstream is(utf32_to_utf8(s));
+      is >> value;
+
+      return value;
+    }
+  };
+
+  template <>
+  struct read_value<int8_t>
+  {
+    int8_t
+    operator()(const u32string& s)
+    {
+      return read_value<int16_t>()(s);
+    }
+  };
+
+  template <>
+  struct read_value<uint8_t>
+  {
+    uint8_t
+    operator()(const u32string& s)
+    {
+      return read_value<uint16_t>()(s);
+    }
+  };
+
+  template <typename T>
+  struct write_value
+  {
+    std::string
+    operator()(T value)
+    {
+      std::ostringstream os;
+      os << value;
+      return os.str();
+    }
+  };
+
+  template <>
+  struct write_value<int8_t>
+  {
+    std::string
+    operator()(int8_t value)
+    {
+      return write_value<int16_t>()(value);
+    }
+  };
+
+  template <>
+  struct write_value<uint8_t>
+  {
+    std::string
+    operator()(uint8_t value)
+    {
+      return write_value<uint16_t>()(value);
+    }
+  };
+
+  template <typename T>
   class FixedInteger
   {
+    struct yes {};
+    struct no {};
     public:
 
     void
@@ -43,8 +111,24 @@ namespace TransLucid
 
       makeEquation(s, U"construct_" + name, &FixedInteger::construct);
       makeEquation(s, U"print_" + name, &FixedInteger::print);
+      makeEquation(s, name + U"_plus", &FixedInteger::plus);
+      makeEquation(s, name + U"_minus", &FixedInteger::minus);
+      makeEquation(s, name + U"_times", &FixedInteger::times);
+      makeEquation(s, name + U"_divide", &FixedInteger::divide);
+
+      registerModulus(s, name, 
+        typename std::conditional<
+          std::is_floating_point<T>::value, no, yes>::type());
+
+      makeEquation(s, name + U"_eq", &FixedInteger::eq);
+      makeEquation(s, name + U"_ne", &FixedInteger::ne);
+      makeEquation(s, name + U"_lt", &FixedInteger::lt);
+      makeEquation(s, name + U"_gt", &FixedInteger::gt);
+      makeEquation(s, name + U"_lteq", &FixedInteger::leq);
+      makeEquation(s, name + U"_gteq", &FixedInteger::geq);
 
       addPrinter(s, name, U"print_" + name); 
+      addConstructor(s, name, U"construct_" + name);
 
       addTypeEquation(s, name);
     }
@@ -56,15 +140,14 @@ namespace TransLucid
 
       if (c.index() != TYPE_INDEX_USTRING)
       {
-        return Types::Special::create(SP_UNDEF);
+        return Types::Special::create(SP_TYPEERROR);
       }
 
       const u32string& s = Types::String::get(c);
 
-      std::istringstream is(utf32_to_utf8(s));
-      is >> value;
+      value = read_value<T>()(s);
 
-      return Constant(value, m_index);
+      return Constant(static_cast<T>(value), m_index);
     }
 
     Constant
@@ -72,9 +155,146 @@ namespace TransLucid
     {
       T value = get_constant<T>(c);
 
-      std::ostringstream os;
-      os << value;
-      return Types::String::create(u32string(os.str().begin(), os.str().end()));
+      auto str = write_value<T>()(value);
+      return Types::String::create
+        (u32string(str.begin(), str.end()));
+    }
+
+    Constant
+    plus(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) + get_constant<T>(rhs), m_index);
+    }
+
+    Constant
+    minus(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) - get_constant<T>(rhs), m_index);
+    }
+
+    Constant
+    times(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) * get_constant<T>(rhs), m_index);
+    }
+
+    Constant
+    divide(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      if (get_constant<T>(rhs) == 0)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) / get_constant<T>(rhs), m_index);
+    }
+
+    Constant
+    modulus(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      if (get_constant<T>(rhs) == 0)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) % get_constant<T>(rhs), m_index);
+    }
+
+    Constant
+    eq(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) == get_constant<T>(rhs), 
+        TYPE_INDEX_BOOL);
+    }
+
+    Constant
+    ne(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) != get_constant<T>(rhs), 
+        TYPE_INDEX_BOOL);
+    }
+
+    Constant
+    lt(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) < get_constant<T>(rhs), 
+        TYPE_INDEX_BOOL);
+    }
+
+    Constant
+    gt(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) > get_constant<T>(rhs), 
+        TYPE_INDEX_BOOL);
+    }
+
+    Constant
+    leq(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) <= get_constant<T>(rhs), 
+        TYPE_INDEX_BOOL);
+    }
+
+    Constant
+    geq(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      return Constant(get_constant<T>(lhs) >= get_constant<T>(rhs), 
+        TYPE_INDEX_BOOL);
     }
 
     private:
@@ -82,6 +302,37 @@ namespace TransLucid
     typedef 
     std::function<Constant(const Constant&)>
     UnaryFunction;
+
+    typedef 
+    std::function<Constant(const Constant&, const Constant&)>
+    BinaryFunction;
+
+    void
+    registerModulus(System& s, const u32string& name, no n)
+    {
+    }
+
+    void
+    registerModulus(System& s, const u32string& name, yes y)
+    {
+      makeEquation(s, name + U"_modulus", &FixedInteger::modulus);
+    }
+
+    UnaryFunction
+    createFunction(Constant (FixedInteger<T>::*f)(const Constant&))
+    {
+      using std::placeholders::_1;
+      return std::bind(std::mem_fn(f), this, _1);
+    }
+
+    BinaryFunction
+    createFunction(Constant (FixedInteger<T>::*f)
+      (const Constant&, const Constant&))
+    {
+      using std::placeholders::_1;
+      using std::placeholders::_2;
+      return std::bind(std::mem_fn(f), this, _1, _2);
+    }
 
     template <typename Ret, typename... Args>
     void
@@ -94,19 +345,12 @@ namespace TransLucid
     {
       std::unique_ptr<BuiltinBaseFunction<sizeof...(Args)>> 
         fn(new BuiltinBaseFunction<sizeof...(Args)>
-        (createUnaryFunction(&FixedInteger::construct))
+          (createFunction(f))
       );
       std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));
       fn.release();
       s.addEquation(name, ws.get());
       ws.release();
-    }
-
-    UnaryFunction
-    createUnaryFunction(Constant (FixedInteger<T>::*f)(const Constant&))
-    {
-      using std::placeholders::_1;
-      return std::bind(std::mem_fun(f), this, _1);
     }
 
     type_index m_index;

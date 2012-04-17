@@ -33,14 +33,15 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/internal_strings.hpp>
 #include <tl/output.hpp>
 #include <tl/system.hpp>
+#include <tl/system_util.hpp>
 #include <tl/types.hpp>
 #include <tl/types/boolean.hpp>
 #include <tl/types/char.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
-#include <tl/types/integer.hpp>
 #include <tl/types/intmp.hpp>
+#include <tl/types/numbers.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
@@ -273,17 +274,17 @@ namespace TransLucid
 
     constexpr BuiltinFunction fn_table[] =
     {
-      {U"int_plus", &integer_plus},
-      {U"int_minus", &integer_minus},
-      {U"int_times", &integer_times},
-      {U"int_divide", &integer_divide},
-      {U"int_modulus", &integer_modulus},
-      {U"int_lte", &integer_lte},
-      {U"int_lt", &integer_lt},
-      {U"int_gte", &integer_gte},
-      {U"int_gt", &integer_gt},
-      {U"int_eq", &integer_eq},
-      {U"int_ne", &integer_ne},
+      {U"intmp_plus", &integer_plus},
+      {U"intmp_minus", &integer_minus},
+      {U"intmp_times", &integer_times},
+      {U"intmp_divide", &integer_divide},
+      {U"intmp_modulus", &integer_modulus},
+      {U"intmp_lte", &integer_lte},
+      {U"intmp_lt", &integer_lt},
+      {U"intmp_gte", &integer_gte},
+      {U"intmp_gt", &integer_gt},
+      {U"intmp_eq", &integer_eq},
+      {U"intmp_ne", &integer_ne},
       {U"bool_eq", &boolean_eq},
       {U"ustring_plus", &ustring_plus_fn},
       {U"make_range", &range_create},
@@ -1283,18 +1284,6 @@ add_one_base_function(System& s, const u32string& name, BaseFunctionType* fn)
 
 inline
 void
-addTypeEquation(System& s, const u32string& type)
-{
-  s.addEquation(Parser::Equation(
-    type,
-    Tree::Expr(),
-    Tree::Expr(),
-    Tree::LiteralExpr(U"typetype", type)
-  ));
-}
-
-inline
-void
 addTypeNames(System& s, const std::vector<u32string>& types)
 {
   for (auto t : types)
@@ -1411,6 +1400,7 @@ init_builtin_types(System& s)
 
   std::vector<u32string> type_names = to_print_types;
   type_names.push_back(U"ustring");
+  type_names.push_back(U"basefun");
   type_names.push_back(U"lambda");
   type_names.push_back(U"phi");
   type_names.push_back(U"uuid");
