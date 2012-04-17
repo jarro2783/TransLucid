@@ -46,15 +46,15 @@ TEST_CASE ("type registry", "test the type registry index allocation")
 {
   TL::System s;
 
-  CHECK(s.getTypeIndex(U"int8") == -1);
-  CHECK(s.getTypeIndex(U"int16") == -2);
-  CHECK(s.getTypeIndex(U"int32") == -3);
-  CHECK(s.getTypeIndex(U"int64") == -4);
+  CHECK(s.getTypeIndex(U"type1") == -9);
+  CHECK(s.getTypeIndex(U"type2") == -10);
+  CHECK(s.getTypeIndex(U"type3") == -11);
+  CHECK(s.getTypeIndex(U"type4") == -12);
 
-  CHECK(s.getTypeIndex(U"int8") == -1);
-  CHECK(s.getTypeIndex(U"int16") == -2);
-  CHECK(s.getTypeIndex(U"int32") == -3);
-  CHECK(s.getTypeIndex(U"int64") == -4);
+  CHECK(s.getTypeIndex(U"type1") == -9);
+  CHECK(s.getTypeIndex(U"type2") == -10);
+  CHECK(s.getTypeIndex(U"type3") == -11);
+  CHECK(s.getTypeIndex(U"type4") == -12);
 }
 
 TEST_CASE ( "utf8 iterator comparison", 
