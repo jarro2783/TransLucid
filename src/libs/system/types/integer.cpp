@@ -37,6 +37,8 @@ FixedInteger<int32_t> s32;
 FixedInteger<uint32_t> u32;
 FixedInteger<int64_t> s64;
 FixedInteger<uint64_t> u64;
+FixedInteger<float> f32;
+FixedInteger<double> f64;
 
 }
 
@@ -51,6 +53,9 @@ registerIntegers(System& s)
   u32.init(s, U"uint32");
   s64.init(s, U"sint64");
   u64.init(s, U"uint64");
+
+  f32.init(s, U"float32");
+  f64.init(s, U"float64");
 }
 
 }
