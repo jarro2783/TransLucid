@@ -32,11 +32,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/intmp.hpp>
 #include <tl/system.hpp>
 
-#if 0
-#include <boost/spirit/include/classic_multi_pass.hpp>
-#include <boost/spirit/include/support_istream_iterator.hpp>
-#endif
-
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -46,15 +41,17 @@ TEST_CASE ("type registry", "test the type registry index allocation")
 {
   TL::System s;
 
-  CHECK(s.getTypeIndex(U"type1") == -9);
-  CHECK(s.getTypeIndex(U"type2") == -10);
-  CHECK(s.getTypeIndex(U"type3") == -11);
-  CHECK(s.getTypeIndex(U"type4") == -12);
+  TL::type_index start = -10;
 
-  CHECK(s.getTypeIndex(U"type1") == -9);
-  CHECK(s.getTypeIndex(U"type2") == -10);
-  CHECK(s.getTypeIndex(U"type3") == -11);
-  CHECK(s.getTypeIndex(U"type4") == -12);
+  CHECK(s.getTypeIndex(U"type1") == start-1);
+  CHECK(s.getTypeIndex(U"type2") == start-2);
+  CHECK(s.getTypeIndex(U"type3") == start-3);
+  CHECK(s.getTypeIndex(U"type4") == start-4);
+
+  CHECK(s.getTypeIndex(U"type1") == start-1);
+  CHECK(s.getTypeIndex(U"type2") == start-2);
+  CHECK(s.getTypeIndex(U"type3") == start-3);
+  CHECK(s.getTypeIndex(U"type4") == start-4);
 }
 
 TEST_CASE ( "utf8 iterator comparison", 
@@ -139,183 +136,6 @@ TEST_CASE ( "utf8 iterator non-ascii",
   CHECK(c == U'\u00e9');
 }
 
-//not doing streams anymore
-#if 0
-TEST_CASE ( "utf8 iterator stream", 
-  "does the iterator read from a stream correctly" )
-{
-  std::istringstream is("%%\n%%\n5;;");
-  is >> std::noskipws;
-
-  TL::Parser::U32Iterator pos
-  (
-    TL::Parser::makeUTF8Iterator
-    (
-      boost::spirit::istream_iterator(is)
-    ),
-    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
-  );
-
-  TL::Parser::U32Iterator end;
-
-  TL::u32string s;
-  while (pos != end)
-  {
-    s += *pos;
-    ++pos;
-  }
-
-  CHECK(s == TL::u32string(U"%%\n%%\n5;;"));
-}
-
-TEST_CASE( "utf8 iterator stream increment", 
-  "read from a stream and increment" )
-{
-  std::istringstream is("1234567890");
-  is >> std::noskipws;
-
-  boost::spirit::istream_iterator iter(is);
-
-  TL::Parser::U32Iterator pos_original
-  (
-    TL::Parser::makeUTF8Iterator
-    (
-      iter
-    ),
-    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
-  );
-
-  TL::Parser::U32Iterator pos1 = pos_original;
-  TL::Parser::U32Iterator pos = pos1;
-  TL::Parser::U32Iterator pos2 = pos1;
-  TL::Parser::U32Iterator end;
-
-  CHECK(pos != end);
-
-  CHECK(*pos++ == U'1');
-  pos2 = pos;
-  CHECK(pos != end);
-
-  CHECK(*pos++ == U'2');
-  pos2 = pos;
-  CHECK(pos != end);
-
-  CHECK(*pos++ == U'3');
-  pos2 = pos;
-  CHECK(pos != end);
-
-  CHECK(*pos++ == U'4');
-  pos2 = pos;
-  CHECK(pos != end);
-
-  CHECK(*pos++ == U'5');
-  pos2 = pos;
-  CHECK(pos != end);
-
-  CHECK(*pos++ == U'6');
-  pos2 = pos;
-  CHECK(pos != end);
-}
-
-TEST_CASE( "utf8 iterator stream weird", 
-  "some convoluted iterator stream test" )
-{
-  std::istringstream is("%%%%5;;");
-  is >> std::noskipws;
-
-  boost::spirit::istream_iterator iter(is);
-
-  TL::Parser::U32Iterator pos
-  (
-    TL::Parser::makeUTF8Iterator
-    (
-      iter
-    ),
-    TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
-  );
-
-  CHECK(*pos++ == U'%');
-  CHECK(*pos++ == U'%');
-  CHECK(*pos++ == U'%');
-  CHECK(*pos++ == U'%');
-  CHECK(*pos++ == U'5');
-  CHECK(*pos++ == U';');
-  CHECK(*pos++ == U';');
-  CHECK(pos == TL::Parser::U32Iterator());
-}
-
-TEST_CASE( "utf8 iterator multi_pass", "iterator with multi_pass" )
-{
-  std::istringstream is("abcdefghijklmnop");
-  boost::spirit::classic::multi_pass<TL::Parser::U32Iterator> pos
-  (
-    TL::Parser::U32Iterator
-    (
-      TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator(is)),
-      TL::Parser::makeUTF8Iterator(boost::spirit::istream_iterator())
-    )
-  );
-
-  auto pos2 = pos;
-  auto segment_begin = pos;
-  CHECK(*pos == U'a');
-
-  for (int i = 0; i != 7; ++i)
-  {
-    ++pos;
-  }
-
-  CHECK(*pos == U'h');
-  auto segment_end = pos;
-
-  TL::u32string result;
-  for (int i = 0; i != 16; ++i)
-  {
-    result += *pos2;
-    ++pos2;
-  }
-
-  CHECK(result == TL::u32string(U"abcdefghijklmnop"));
-
-  CHECK(pos2 == 
-    boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
-
-  result.clear();
-  for (int i = 0; i != 8; ++i)
-  {
-    result += *pos;
-    ++pos;
-  }
-
-  result += *pos;
-  CHECK(pos !=
-    boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
-
-  CHECK(result == TL::u32string(U"hijklmnop"));
-
-  ++pos;
-  CHECK(pos == 
-    boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
-
-  CHECK(TL::u32string(segment_begin, segment_end) ==
-    TL::u32string(U"abcdefg"));
-}
-#endif
-
-#if 0
-TEST_CASE ( comparison )
-{
-  TL::u32string s(U"test");
-  TL::Parser::U32Iterator iter1(TL::Parser::makeUTF32Iterator(s.begin()));
-  TL::Parser::U32Iterator iter2(TL::Parser::makeUTF32Iterator(s.begin()));
-  CHECK(iter1 == iter2);
-
-  TL::Parser::U32Iterator iter3(TL::Parser::makeUTF32Iterator(s.end()));
-  TL::Parser::U32Iterator iter4(TL::Parser::makeUTF32Iterator(s.end()));
-  CHECK(iter3 == iter4);
-}
-#endif
-
 TEST_CASE ( "utf32 iterator end", "the end iterator" )
 {
   TL::u32string s = U"ab";
@@ -345,55 +165,6 @@ TEST_CASE ( "utf32 iterator copying", "can we copy them" )
 
   CHECK(s == result);
 }
-
-//need to test this since lex uses multipass
-//no more multipass
-#if 0
-TEST_CASE( "utf32 iterator multi_pass", "can we use it with multi_pass" )
-{
-  TL::u32string s = U"abcdefghijklmnop";
-  boost::spirit::classic::multi_pass<TL::Parser::U32Iterator> pos
-  (
-    TL::Parser::U32Iterator
-    (
-      TL::Parser::makeUTF32Iterator(s.begin()),
-      TL::Parser::makeUTF32Iterator(s.end())
-    )
-  );
-
-  auto pos2 = pos;
-  CHECK(*pos == U'a');
-
-  for (int i = 0; i != 7; ++i)
-  {
-    ++pos;
-  }
-
-  CHECK(*pos == U'h');
-
-  TL::u32string result;
-  for (int i = 0; i != 16; ++i)
-  {
-    result += *pos2;
-    ++pos2;
-  }
-
-  CHECK(result == TL::u32string(U"abcdefghijklmnop"));
-
-  CHECK(pos2 == 
-    boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
-
-  result.clear();
-  for (int i = 0; i != 9; ++i)
-  {
-    result += *pos;
-    ++pos;
-  }
-  CHECK(result == TL::u32string(U"hijklmnop"));
-  CHECK(pos == 
-    boost::spirit::classic::multi_pass<TL::Parser::U32Iterator>());
-}
-#endif
 
 TEST_CASE( "utf32 iterator copy", "copy the iterator")
 { 

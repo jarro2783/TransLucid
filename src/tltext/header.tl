@@ -49,14 +49,14 @@ var int = neginfty..infty;;
 //var int_plus [prec : 8, signed : true] = int_s8_plus;;
 //var int_plus [prec : 16] = int_plus_16;;
 
-fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
-//fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
+//fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
+fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
 //fun plus.a.b [a : int, b : int] | a!prec == b!prec && a!signed == b!signed 
 //  = (int_plus @ [prec <- a!prec, signed <- a!signed])!(a,b);;
-fun minus.a.b [a : intmp, b : intmp] = int_minus!(a,b);;
-fun times.a.b [a : intmp, b : intmp] = int_times!(a,b);;
-fun divide.a.b [a : intmp, b : intmp] = int_divide!(a,b);;
-fun modulus.a.b [a : intmp, b : intmp] = int_modulus!(a,b);;
+fun minus.a.b [a : intmp, b : intmp] = intmp_minus!(a,b);;
+fun times.a.b [a : intmp, b : intmp] = intmp_times!(a,b);;
+fun divide.a.b [a : intmp, b : intmp] = intmp_divide!(a,b);;
+fun modulus.a.b [a : intmp, b : intmp] = intmp_modulus!(a,b);;
 
 //version 2
 //fun plus.a.b [a : float, b : float] | a!prec == b!prec = float_plus!(a,b);;
@@ -100,15 +100,15 @@ fun uint64_bang.a [a : is_signed] = false;;
 //fun sint8_bang.a.b [a : prec] = sint8_precision!b;;
 //fun sint8_bang.a.b [a : signed] = true;;
 
-fun lte.a.b [a : intmp, b : intmp] = int_lte!(a,b);;
-fun lt.a.b [a : intmp, b : intmp] = int_lt!(a,b);;
-fun gte.a.b [a : intmp, b : intmp] = int_gte!(a,b);;
-fun gt.a.b [a : intmp, b : intmp] = int_gt!(a,b);;
-fun eq.a.b [a : intmp, b : intmp] = int_eq!(a,b);;
+fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
+fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
+fun gte.a.b [a : intmp, b : intmp] = intmp_gte!(a,b);;
+fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
+fun eq.a.b [a : intmp, b : intmp] = intmp_eq!(a,b);;
 //fun eq.a.b [a : int, b : int] 
 //  | constant_equals!(a!prec, b!prec) && constant_equals!(a!signed, b!signed)
 //  = (int_eq @ [prec <- a!prec, signed <- a!signed])!(a,b);;
-fun ne.a.b [a : intmp, b : intmp] = int_ne!(a,b);;
+fun ne.a.b [a : intmp, b : intmp] = intmp_ne!(a,b);;
 
 fun eq.a.b [a : bool, b : bool] = bool_eq!(a,b);;
 
