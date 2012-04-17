@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system_util.hpp>
 #include <tl/types/fixed_number.hpp>
 #include <tl/types/function.hpp>
-#include <tl/types/integer.hpp>
+#include <tl/types/numbers.hpp>
 #include <tl/types/string.hpp>
 
 namespace TransLucid

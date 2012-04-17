@@ -40,8 +40,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
-#include <tl/types/integer.hpp>
 #include <tl/types/intmp.hpp>
+#include <tl/types/numbers.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
