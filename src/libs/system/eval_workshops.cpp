@@ -685,14 +685,18 @@ TupleWS::operator()(Context& k)
     //const Pair& p = v.first.value<Pair>();
     Constant left = (*pair.first)(k);
     Constant right = (*pair.second)(k);
-
-    if (left.index() == TYPE_INDEX_DIMENSION)
-    {
-      kp[get_constant<dimension_index>(left)] = right;
-    }
-    else if (left.index() == TYPE_INDEX_SPECIAL)
+    
+    if (left.index() == TYPE_INDEX_SPECIAL)
     {
       return left;
+    }
+    else if (right.index() == TYPE_INDEX_SPECIAL)
+    {
+      return right;
+    }
+    else if (left.index() == TYPE_INDEX_DIMENSION)
+    {
+      kp[get_constant<dimension_index>(left)] = right;
     }
     else
     {
@@ -731,6 +735,15 @@ TupleWS::operator()(Context& kappa, Context& delta)
       if (left.index() == TYPE_INDEX_SPECIAL)
       {
         return left;
+      }
+
+      if (left.index() == TYPE_INDEX_SPECIAL)
+      {
+        return left;
+      }
+      else if (right.index() == TYPE_INDEX_SPECIAL)
+      {
+        return right;
       }
 
       if (left.index() == TYPE_INDEX_DIMENSION)

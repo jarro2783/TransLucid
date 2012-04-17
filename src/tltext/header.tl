@@ -46,13 +46,23 @@ var neg = neginfty .. ~1;;
 var nonpos = neginfty..0;;
 var int = neginfty..infty;;
 
-//var int_plus [prec : 8, signed : true] = int_s8_plus;;
-//var int_plus [prec : 16] = int_plus_16;;
+var int_plus [prec : 8, signed : true] = sint8_plus;;
+var int_plus [prec : 8, signed : false] = uint8_plus;;
+
+var int_plus [prec : 16, signed : true] = sint16_plus;;
+var int_plus [prec : 16, signed : false] = uint16_plus;;
+
+var int_plus [prec : 32, signed : true] = sint32_plus;;
+var int_plus [prec : 32, signed : false] = uint32_plus;;
+
+var int_plus [prec : 64, signed : true] = sint64_plus;;
+var int_plus [prec : 64, signed : false] = uint64_plus;;
 
 //fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
-//fun plus.a.b [a : int, b : int] | a!prec == b!prec && a!signed == b!signed 
-//  = (int_plus @ [prec <- a!prec, signed <- a!signed])!(a,b);;
+fun plus.a.b [a : int, b : int] 
+  | a!prec == b!prec && a!is_signed == b!is_signed 
+  = (int_plus @ [prec <- a!prec, is_signed <- a!is_signed])!(a,b);;
 fun minus.a.b [a : intmp, b : intmp] = intmp_minus!(a,b);;
 fun times.a.b [a : intmp, b : intmp] = intmp_times!(a,b);;
 fun divide.a.b [a : intmp, b : intmp] = intmp_divide!(a,b);;
