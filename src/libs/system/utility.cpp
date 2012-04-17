@@ -158,6 +158,10 @@ namespace
   {
     return [] (const Constant& a, const Constant& b)
       {
+        if (a.index() == TYPE_INDEX_TYPE)
+        {
+          return a == b;
+        }
         //b is a type, a is anything
         return (a.index() == get_constant<type_index>(b));
       }

@@ -61,6 +61,39 @@ fun modulus.a.b [a : intmp, b : intmp] = int_modulus!(a,b);;
 //version 2
 //fun plus.a.b [a : float, b : float] | a!prec == b!prec = float_plus!(a,b);;
 
+fun constant_bang.a.b [a : sint8] = sint8_bang.b;;
+fun constant_bang.a.b [a : uint8] = uint8_bang.b;;
+fun constant_bang.a.b [a : sint16] = sint16_bang.b;;
+fun constant_bang.a.b [a : uint16] = uint16_bang.b;;
+fun constant_bang.a.b [a : sint32] = sint32_bang.b;;
+fun constant_bang.a.b [a : uint32] = uint32_bang.b;;
+fun constant_bang.a.b [a : sint64] = sint64_bang.b;;
+fun constant_bang.a.b [a : uint64] = uint64_bang.b;;
+
+fun sint8_bang.a [a : prec] = 8;;
+fun sint8_bang.a [a : is_signed] = true;;
+
+fun uint8_bang.a [a : prec] = 8;;
+fun uint8_bang.a [a : is_signed] = false;;
+
+fun sint16_bang.a [a : prec] = 16;;
+fun sint16_bang.a [a : is_signed] = true;;
+
+fun uint16_bang.a [a : prec] = 16;;
+fun uint16_bang.a [a : is_signed] = false;;
+
+fun sint32_bang.a [a : prec] = 32;;
+fun sint32_bang.a [a : is_signed] = true;;
+
+fun uint32_bang.a [a : prec] = 32;;
+fun uint32_bang.a [a : is_signed] = false;;
+
+fun sint64_bang.a [a : prec] = 64;;
+fun sint64_bang.a [a : is_signed] = true;;
+
+fun uint64_bang.a [a : prec] = 64;;
+fun uint64_bang.a [a : is_signed] = false;;
+
 //fun uint8_bang.a.b [a : prec] = uint8_precision!b;;
 //fun uint8_bang.a.b [a : signed] = false;;
 

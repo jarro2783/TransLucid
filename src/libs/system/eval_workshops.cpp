@@ -335,6 +335,25 @@ BangOpWS::operator()(Context& kappa, Context& delta)
       return iter->second;
     }
   }
+  else if (m_args.size() == 1)
+  {
+    Constant rhs = (*m_args[0])(kappa, delta);
+
+    System::IdentifierLookup lookup = m_system.lookupIdentifiers();
+    WS* constant_bang = lookup.lookup(U"constant_bang");
+
+    if (constant_bang == nullptr)
+    {
+      return Types::Special::create(SP_UNDEF);
+    }
+
+    Constant theFun = (*constant_bang)(kappa, delta);
+
+    return applyFunction(kappa, delta,
+      applyFunction(kappa, delta, theFun, fn),
+      rhs
+    );
+  }
   else
   {
     return Types::Special::create(SP_UNDEF);
@@ -425,6 +444,25 @@ BangOpWS::operator()(Context& k)
     {
       return iter->second;
     }
+  }
+  else if (m_args.size() == 1)
+  {
+    Constant rhs = (*m_args[0])(k);
+
+    System::IdentifierLookup lookup = m_system.lookupIdentifiers();
+    WS* constant_bang = lookup.lookup(U"constant_bang");
+
+    if (constant_bang == nullptr)
+    {
+      return Types::Special::create(SP_UNDEF);
+    }
+
+    Constant theFun = (*constant_bang)(k);
+
+    return applyFunction(k,
+      applyFunction(k, theFun, name),
+      rhs
+    );
   }
   else
   {

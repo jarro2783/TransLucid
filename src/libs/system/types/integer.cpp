@@ -56,6 +56,9 @@ registerIntegers(System& s)
 
   f32.init(s, U"float32");
   f64.init(s, U"float64");
+
+  s.addDimension(U"prec");
+  s.addDimension(U"is_signed");
 }
 
 }
