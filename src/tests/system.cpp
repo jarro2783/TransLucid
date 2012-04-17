@@ -1,5 +1,5 @@
 /* System tests.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -30,16 +30,32 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
 #include <tl/types/intmp.hpp>
+#include <tl/system.hpp>
 
+#if 0
 #include <boost/spirit/include/classic_multi_pass.hpp>
 #include <boost/spirit/include/support_istream_iterator.hpp>
+#endif
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 namespace TL = TransLucid;
 
-//first some iterator tests
+TEST_CASE ("type registry", "test the type registry index allocation")
+{
+  TL::System s;
+
+  CHECK(s.getTypeIndex(U"int8") == -1);
+  CHECK(s.getTypeIndex(U"int16") == -2);
+  CHECK(s.getTypeIndex(U"int32") == -3);
+  CHECK(s.getTypeIndex(U"int64") == -4);
+
+  CHECK(s.getTypeIndex(U"int8") == -1);
+  CHECK(s.getTypeIndex(U"int16") == -2);
+  CHECK(s.getTypeIndex(U"int32") == -3);
+  CHECK(s.getTypeIndex(U"int64") == -4);
+}
 
 TEST_CASE ( "utf8 iterator comparison", 
   "two constructed iterators compare equal" )

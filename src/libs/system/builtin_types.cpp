@@ -33,6 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/internal_strings.hpp>
 #include <tl/output.hpp>
 #include <tl/system.hpp>
+#include <tl/system_util.hpp>
 #include <tl/types.hpp>
 #include <tl/types/boolean.hpp>
 #include <tl/types/char.hpp>
@@ -1283,18 +1284,6 @@ add_one_base_function(System& s, const u32string& name, BaseFunctionType* fn)
 
 inline
 void
-addTypeEquation(System& s, const u32string& type)
-{
-  s.addEquation(Parser::Equation(
-    type,
-    Tree::Expr(),
-    Tree::Expr(),
-    Tree::LiteralExpr(U"typetype", type)
-  ));
-}
-
-inline
-void
 addTypeNames(System& s, const std::vector<u32string>& types)
 {
   for (auto t : types)
@@ -1411,6 +1400,7 @@ init_builtin_types(System& s)
 
   std::vector<u32string> type_names = to_print_types;
   type_names.push_back(U"ustring");
+  type_names.push_back(U"basefun");
   type_names.push_back(U"lambda");
   type_names.push_back(U"phi");
   type_names.push_back(U"uuid");

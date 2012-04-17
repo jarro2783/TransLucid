@@ -35,7 +35,7 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
     {
       U"print",
       {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
-      Tree::TupleExpr({{Tree::IdentExpr(U"c"), type}}),
+      Tree::TupleExpr({{Tree::IdentExpr(U"c"), Tree::IdentExpr(type)}}),
       Tree::Expr(),
       Tree::BangAppExpr(Tree::IdentExpr(basefn), Tree::IdentExpr(U"c"))
     }
@@ -47,7 +47,7 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
     {
       U"print_typename",
       {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
-      Tree::TupleExpr({{Tree::IdentExpr(U"c"), type}}),
+      Tree::TupleExpr({{Tree::IdentExpr(U"c"), Tree::IdentExpr(type)}}),
       Tree::Expr(),
       type
     }
@@ -58,13 +58,27 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
 void
 addConstructor(System& s, const u32string& type, const u32string& basefn)
 {
+  s.addFunction
+  (
+    Parser::FnDecl
+    {
+      U"construct_literal",
+      {
+        {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"t"},
+        {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"v"}
+      },
+      Tree::TupleExpr({{Tree::IdentExpr(U"t"), type}}),
+      Tree::Expr(),
+      Tree::BangAppExpr(Tree::IdentExpr(basefn), Tree::IdentExpr(U"v"))
+    }
+  );
 }
 
 void
 addTypeEquation(System& s, const u32string& type)
 {
-  s.addEquation(Parser::Equation{U"type", Tree::Expr(), Tree::Expr(),
-    Tree::LiteralExpr(U"type", type)});
+  s.addEquation(Parser::Equation{type, Tree::Expr(), Tree::Expr(),
+    Tree::LiteralExpr(U"typetype", type)});
 }
 
 }

@@ -31,6 +31,72 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
   template <typename T>
+  struct read_value
+  {
+    T 
+    operator()(const u32string& s)
+    {
+      T value;
+      std::istringstream is(utf32_to_utf8(s));
+      is >> value;
+
+      return value;
+    }
+  };
+
+  template <>
+  struct read_value<int8_t>
+  {
+    int8_t
+    operator()(const u32string& s)
+    {
+      return read_value<int16_t>()(s);
+    }
+  };
+
+  template <>
+  struct read_value<uint8_t>
+  {
+    uint8_t
+    operator()(const u32string& s)
+    {
+      return read_value<uint16_t>()(s);
+    }
+  };
+
+  template <typename T>
+  struct write_value
+  {
+    std::string
+    operator()(T value)
+    {
+      std::ostringstream os;
+      os << value;
+      return os.str();
+    }
+  };
+
+  template <>
+  struct write_value<int8_t>
+  {
+    std::string
+    operator()(int8_t value)
+    {
+      return write_value<int16_t>()(value);
+    }
+  };
+
+  template <>
+  struct write_value<uint8_t>
+  {
+    std::string
+    operator()(uint8_t value)
+    {
+      return write_value<uint16_t>()(value);
+    }
+  };
+
+  template <typename T>
   class FixedInteger
   {
     public:
@@ -45,6 +111,7 @@ namespace TransLucid
       makeEquation(s, U"print_" + name, &FixedInteger::print);
 
       addPrinter(s, name, U"print_" + name); 
+      addConstructor(s, name, U"construct_" + name);
 
       addTypeEquation(s, name);
     }
@@ -61,10 +128,9 @@ namespace TransLucid
 
       const u32string& s = Types::String::get(c);
 
-      std::istringstream is(utf32_to_utf8(s));
-      is >> value;
+      value = read_value<T>()(s);
 
-      return Constant(value, m_index);
+      return Constant(static_cast<T>(value), m_index);
     }
 
     Constant
@@ -72,9 +138,9 @@ namespace TransLucid
     {
       T value = get_constant<T>(c);
 
-      std::ostringstream os;
-      os << value;
-      return Types::String::create(u32string(os.str().begin(), os.str().end()));
+      auto str = write_value<T>()(value);
+      return Types::String::create
+        (u32string(str.begin(), str.end()));
     }
 
     private:
@@ -94,7 +160,7 @@ namespace TransLucid
     {
       std::unique_ptr<BuiltinBaseFunction<sizeof...(Args)>> 
         fn(new BuiltinBaseFunction<sizeof...(Args)>
-        (createUnaryFunction(&FixedInteger::construct))
+        (createUnaryFunction(f))
       );
       std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));
       fn.release();

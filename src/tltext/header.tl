@@ -152,6 +152,7 @@ fun print_typename.c [c : typetype] = "typetype";;
 fun print_typename.c [c : uuid] = "uuid";;
 fun print_typename.c [c : demand] = "demand";;
 fun print_typename.c [c : calc] = "calc";;
+fun print_typename.c [c : basefun] = "basefun";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;

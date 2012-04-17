@@ -1029,6 +1029,7 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
 System::System(bool cached)
 : m_cached(cached),
   m_cacheEnabled(cached),
+  m_nextTypeIndex(-1),
   m_typeRegistry(m_nextTypeIndex,
   std::vector<std::pair<u32string, type_index>>{
    {U"error", TYPE_INDEX_ERROR},
@@ -1046,6 +1047,7 @@ System::System(bool cached)
    {U"uuid", TYPE_INDEX_UUID},
    {U"demand", TYPE_INDEX_DEMAND},
    {U"calc", TYPE_INDEX_CALC},
+   {U"basefun", TYPE_INDEX_BASE_FUNCTION}
   }
   )
 , m_time(0)

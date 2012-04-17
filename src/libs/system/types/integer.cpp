@@ -30,13 +30,27 @@ namespace
 {
 
 FixedInteger<int8_t> s8;
+FixedInteger<uint8_t> u8;
+FixedInteger<int16_t> s16;
+FixedInteger<uint16_t> u16;
+FixedInteger<int32_t> s32;
+FixedInteger<uint32_t> u32;
+FixedInteger<int64_t> s64;
+FixedInteger<uint64_t> u64;
 
 }
 
 void
 registerIntegers(System& s)
 {
-  s8.init(s, U"int8");
+  s8.init(s, U"sint8");
+  u8.init(s, U"uint8");
+  s16.init(s, U"sint16");
+  u16.init(s, U"uint16");
+  s32.init(s, U"sint32");
+  u32.init(s, U"uint32");
+  s64.init(s, U"sint64");
+  u64.init(s, U"uint64");
 }
 
 }
