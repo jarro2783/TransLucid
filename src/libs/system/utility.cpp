@@ -172,9 +172,9 @@ namespace
   bool subset_union_constant(const Constant& a, const Constant& b)
   {
     //a is a union
-    const UnionType& u = Types::Union::get(a);
+    const UnionType& u = Types::Union::get(b);
 
-    return u.contains(b);
+    return u.contains(a);
   }
 
   bool subset_union_union(const Constant& a, const Constant& b)
