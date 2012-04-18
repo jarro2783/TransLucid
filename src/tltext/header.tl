@@ -40,6 +40,9 @@ op || = OpInfix."bool_or".true.AssocLeft.15;;
 
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
+op \/ = OpInfix."union_construct".false.AssocLeft.~100;;
+op ∪ = OpInfix."union_construct".false.AssocLeft.~100;;
+
 var pos = 1..infty;;
 var nat = 0..infty;;
 var neg = neginfty .. ~1;;
@@ -131,6 +134,8 @@ fun range_construct.a.b [a : intmp, b : intmp] = make_range!(a,b);;
 fun range_construct.a.b [a : intmp, b : infty] = make_range_infty!a;;
 fun range_construct.a.b [a : neginfty, b : intmp] = make_range_neginfty!b;;
 fun range_construct.a.b [a : neginfty, b : infty] = make_range_infinite;;
+
+fun union_construct.a.b = make_union!(a,b);;
 
 var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
