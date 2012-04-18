@@ -39,6 +39,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
+#include <tl/types/union.hpp>
 
 #ifdef ICONV_CONVERT
 #include <iconv.h>
@@ -168,6 +169,32 @@ namespace
     ;
   }
 
+  bool subset_union_constant(const Constant& a, const Constant& b)
+  {
+    //a is a union
+    const UnionType& u = Types::Union::get(a);
+
+    return u.contains(b);
+  }
+
+  bool subset_union_union(const Constant& a, const Constant& b)
+  {
+    return false;
+  }
+
+  IsSubsetFn
+  subset_of_union(const Constant& c)
+  {
+    if (c.index() == TYPE_INDEX_UNION)
+    {
+      return &subset_union_union;
+    }
+    else
+    {
+      return &subset_union_constant;
+    }
+  }
+
   class TypeComparators
   {
     public:
@@ -185,7 +212,8 @@ namespace
           &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
           &subset_of_tuple,
           &subset_of_type,
-          &subset_of_range
+          &subset_of_range,
+          &subset_of_union
         };
     }
 
@@ -208,7 +236,7 @@ namespace
     }
 
     private:
-    static const int NUM_FUNS = TYPE_INDEX_RANGE + 1;
+    static const int NUM_FUNS = TYPE_INDEX_UNION + 1;
     IsSubsetOf* m_funs;
   };
 

@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/union.hpp>
 #include <tl/types_util.hpp>
 #include <tl/types.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid
 {
@@ -98,6 +99,7 @@ void
 UnionType::append(const UnionType& u)
 {
   m_types.insert(u.m_types.begin(), u.m_types.end());
+  m_hasIntmp = m_hasIntmp || u.m_hasIntmp;
 }
 
 void
@@ -109,6 +111,11 @@ UnionType::append(const Constant& c)
   }
   else
   {
+    if (c.index() == TYPE_INDEX_TYPE && 
+        get_constant<type_index>(c) == TYPE_INDEX_INTMP)
+    {
+      m_hasIntmp = true;
+    }
     m_types.insert(c);
   }
 }
@@ -125,6 +132,28 @@ UnionType::hash() const
   }
      
   return h;
+}
+
+bool
+UnionType::contains(const Constant& a) const
+{
+  if (a.index() == TYPE_INDEX_RANGE)
+  {
+    if (m_hasIntmp)
+    {
+      return true;
+    }
+  }
+
+  for (const auto& v : m_types)
+  {
+    if (valueRefines(a, v))
+    {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 }

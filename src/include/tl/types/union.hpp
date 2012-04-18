@@ -30,6 +30,9 @@ namespace TransLucid
   {
     public:
 
+    UnionType()
+    : m_hasIntmp(false) {}
+
     void
     append(const UnionType& u);
 
@@ -51,8 +54,12 @@ namespace TransLucid
     size_t
     hash() const;
 
+    bool
+    contains(const Constant& a) const;
+
     private:
     std::set<Constant> m_types;
+    bool m_hasIntmp;
   };
 
   namespace Types

@@ -40,14 +40,18 @@ op || = OpInfix."bool_or".true.AssocLeft.15;;
 
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
-op \/ = OpInfix."union_construct".false.AssocLeft.~100;;
-op ∪ = OpInfix."union_construct".false.AssocLeft.~100;;
+op ∪ = OpInfix."union_construct".false.AssocLeft. ~100;;
+//op \/ = OpInfix."union_construct".false.AssocLeft.~100;;
+
+var sint = sint8 ∪ sint16 ∪ sint32 ∪ sint64;;
+var uint = uint8 ∪ uint16 ∪ uint32 ∪ uint64;;
+var int = sint ∪ uint;;
 
 var pos = 1..infty;;
 var nat = 0..infty;;
 var neg = neginfty .. ~1;;
 var nonpos = neginfty..0;;
-var int = neginfty..infty;;
+//var int = neginfty..infty;;
 
 var int_plus [prec : 8, signed : true] = sint8_plus;;
 var int_plus [prec : 8, signed : false] = uint8_plus;;
