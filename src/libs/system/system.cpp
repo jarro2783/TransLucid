@@ -1047,7 +1047,8 @@ System::System(bool cached)
    {U"uuid", TYPE_INDEX_UUID},
    {U"demand", TYPE_INDEX_DEMAND},
    {U"calc", TYPE_INDEX_CALC},
-   {U"basefun", TYPE_INDEX_BASE_FUNCTION}
+   {U"basefun", TYPE_INDEX_BASE_FUNCTION},
+   {U"union", TYPE_INDEX_UNION}
   }
   )
 , m_time(0)

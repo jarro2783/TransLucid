@@ -1,4 +1,4 @@
-/* The intmp type.
+/* The union type.
    Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
@@ -17,28 +17,59 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TL_TYPES_INTMP_HPP_INCLUDED
-#define TL_TYPES_INTMP_HPP_INCLUDED
+#ifndef TL_TYPES_UNION_HPP_INCLUDED
+#define TL_TYPES_UNION_HPP_INCLUDED
 
-#include <tl/gmpxx_fwd.hpp>
 #include <tl/types.hpp>
+
+#include <set>
 
 namespace TransLucid
 {
+  class UnionType
+  {
+    public:
+
+    UnionType()
+    : m_hasIntmp(false) {}
+
+    void
+    append(const UnionType& u);
+
+    void
+    append(const Constant& c);
+
+    bool
+    operator==(const UnionType& rhs) const
+    {
+      return m_types == rhs.m_types;
+    }
+
+    bool
+    operator<(const UnionType& rhs) const
+    {
+      return m_types < rhs.m_types;
+    }
+
+    size_t
+    hash() const;
+
+    bool
+    contains(const Constant& a) const;
+
+    private:
+    std::set<Constant> m_types;
+    bool m_hasIntmp;
+  };
+
   namespace Types
   {
-    namespace Intmp
+    namespace Union
     {
       Constant
-      create(const Constant& text);
+      create(const Constant& lhs, const Constant& rhs);
 
-      Constant
-      create(const mpz_class& v);
-
-      Constant
-      create(int v);
-
-      const mpz_class&
+      const UnionType&
       get(const Constant& c);
 
       bool 
@@ -46,9 +77,6 @@ namespace TransLucid
 
       size_t
       hash(const Constant& c);
-
-      Constant
-      print(const Constant& c);
 
       bool
       less(const Constant& lhs, const Constant& rhs);

@@ -46,6 +46,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
+#include <tl/types/union.hpp>
 #include <tl/types/uuid.hpp>
 #include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
@@ -266,6 +267,8 @@ namespace TransLucid
       }
     };
 
+    BuiltinBaseFunction<2> construct_union{&Types::Union::create};
+
     struct BuiltinFunction
     {
       const char32_t* op_name;
@@ -309,6 +312,7 @@ namespace TransLucid
       {U"print_typetype", &print_typetype},
       {U"print_error", &print_error},
       {U"print_uuid", &print_uuid},
+      {U"make_union", &construct_union},
     };
 
     bool

@@ -21,6 +21,7 @@ includesdir = $(prefix)/include/tl/types
 includes_HEADERS = boolean.hpp char.hpp dimension.hpp function.hpp \
 hyperdatons.hpp \
 intmp.hpp numbers.hpp \
-range.hpp special.hpp string.hpp tuple.hpp type.hpp uuid.hpp workshop.hpp
+range.hpp special.hpp string.hpp tuple.hpp type.hpp union.hpp \
+uuid.hpp workshop.hpp
 
 EXTRA_DIST = CMakeLists.txt

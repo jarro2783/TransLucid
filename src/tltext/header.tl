@@ -40,23 +40,30 @@ op || = OpInfix."bool_or".true.AssocLeft.15;;
 
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
+op ∪ = OpInfix."union_construct".false.AssocLeft. ~100;;
+//op \/ = OpInfix."union_construct".false.AssocLeft.~100;;
+
+var sint = sint8 ∪ sint16 ∪ sint32 ∪ sint64;;
+var uint = uint8 ∪ uint16 ∪ uint32 ∪ uint64;;
+var int = sint ∪ uint;;
+
 var pos = 1..infty;;
 var nat = 0..infty;;
 var neg = neginfty .. ~1;;
 var nonpos = neginfty..0;;
-var int = neginfty..infty;;
+//var int = neginfty..infty;;
 
-var int_plus [prec : 8, signed : true] = sint8_plus;;
-var int_plus [prec : 8, signed : false] = uint8_plus;;
+var int_plus [prec : 8, is_signed : true] = sint8_plus;;
+var int_plus [prec : 8, is_signed : false] = uint8_plus;;
 
-var int_plus [prec : 16, signed : true] = sint16_plus;;
-var int_plus [prec : 16, signed : false] = uint16_plus;;
+var int_plus [prec : 16, is_signed : true] = sint16_plus;;
+var int_plus [prec : 16, is_signed : false] = uint16_plus;;
 
-var int_plus [prec : 32, signed : true] = sint32_plus;;
-var int_plus [prec : 32, signed : false] = uint32_plus;;
+var int_plus [prec : 32, is_signed : true] = sint32_plus;;
+var int_plus [prec : 32, is_signed : false] = uint32_plus;;
 
-var int_plus [prec : 64, signed : true] = sint64_plus;;
-var int_plus [prec : 64, signed : false] = uint64_plus;;
+var int_plus [prec : 64, is_signed : true] = sint64_plus;;
+var int_plus [prec : 64, is_signed : false] = uint64_plus;;
 
 //fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
@@ -131,6 +138,8 @@ fun range_construct.a.b [a : intmp, b : intmp] = make_range!(a,b);;
 fun range_construct.a.b [a : intmp, b : infty] = make_range_infty!a;;
 fun range_construct.a.b [a : neginfty, b : intmp] = make_range_neginfty!b;;
 fun range_construct.a.b [a : neginfty, b : infty] = make_range_infinite;;
+
+fun union_construct.a.b = make_union!(a,b);;
 
 var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
