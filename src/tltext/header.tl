@@ -45,7 +45,7 @@ op ∪ = OpInfix."union_construct".false.AssocLeft. ~100;;
 
 var sint = sint8 ∪ sint16 ∪ sint32 ∪ sint64;;
 var uint = uint8 ∪ uint16 ∪ uint32 ∪ uint64;;
-var int = sint ∪ uint;;
+//var int = sint ∪ uint;;
 
 var pos = 1..infty;;
 var nat = 0..infty;;
