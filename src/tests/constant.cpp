@@ -17,10 +17,12 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/range.hpp>
 #include <tl/types.hpp>
 #include <tl/fixed_indexes.hpp>
 
 #include <limits>
+#include <gmpxx.h>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -140,4 +142,27 @@ TEST_CASE ( "get set", "get_constant and set_constant work for all types" )
 
 TEST_CASE ( "equality", "constant equality" )
 {
+}
+
+TEST_CASE ( "range", "range tests" )
+{
+  mpz_class a(1);
+  mpz_class b(9);
+
+  TL::Range r1(&a, &b);
+
+  mpz_class c(5);
+  mpz_class d(15);
+
+  TL::Range r2(&c, &d);
+
+  CHECK(r1.overlaps(r2));
+
+  TL::Range r3 = r1.join(r2);
+
+  REQUIRE(r3.lower() != nullptr);
+  CHECK(*r3.lower() == 1);
+
+  REQUIRE(r3.upper() != nullptr);
+  CHECK(*r3.upper() == 15);
 }

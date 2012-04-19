@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/fixed_indexes.hpp>
+#include <tl/types/range.hpp>
 #include <tl/types/union.hpp>
 #include <tl/types_util.hpp>
 #include <tl/types.hpp>
@@ -108,6 +109,37 @@ UnionType::append(const Constant& c)
   if (c.index() == TYPE_INDEX_UNION)
   {
     append(get_constant_pointer<UnionType>(c));
+  }
+  else if (c.index() == TYPE_INDEX_RANGE)
+  {
+    //search everything and see if we can join up an overlap
+    //build a new range out of all the overlaps
+    //then insert it at the end
+    Range r = Types::Range::get(c);
+    auto iter = m_types.begin();
+    while (iter != m_types.end())
+    {
+      if (iter->index() == TYPE_INDEX_RANGE)
+      {
+        const Range& inSet = Types::Range::get(*iter);
+
+        if (inSet.overlaps(r))
+        {
+          iter = m_types.erase(iter);
+          r = inSet.join(r);
+        }
+        else
+        {
+          ++iter;
+        }
+      }
+      else
+      {
+        ++iter;
+      }
+    }
+
+    m_types.insert(Types::Range::create(r));
   }
   else
   {

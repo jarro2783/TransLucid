@@ -1,5 +1,5 @@
 /* Range type.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -269,6 +269,48 @@ Range::within(const Range& other) const
   &&
   (m_upper == nullptr
   || (other.m_upper != nullptr && *m_upper >= *other.m_upper));
+}
+
+bool
+Range::overlaps(const Range& other) const
+{
+  return ((!m_upper || (!other.m_lower || *m_upper > *other.m_lower))
+      &&
+      (!other.m_upper || (!m_lower || *other.m_upper > *m_lower))
+  );
+}
+
+Range
+Range::join(const Range& rhs) const
+{
+  const mpz_class* lower = nullptr;
+  const mpz_class* upper = nullptr;
+
+  if (m_lower && rhs.m_lower)
+  {
+    if (*m_lower < *rhs.m_lower)
+    {
+      lower = m_lower;
+    }
+    else
+    {
+      lower = rhs.m_lower;
+    }
+  }
+
+  if (m_upper && rhs.m_upper)
+  {
+    if (*m_upper > *rhs.m_upper)
+    {
+      upper = m_upper;
+    }
+    else
+    {
+      upper = rhs.m_upper;
+    }
+  }
+
+  return Range(lower, upper);
 }
 
 }
