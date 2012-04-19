@@ -98,7 +98,7 @@ namespace TransLucid
 
   template <bool is_signed, int size>
   void
-  addNumericFunction(System& s, const u32string& op, const u32string& bang)
+  addNumericFunction(System& s, const u32string& name, const u32string& op)
   {
     s.addFunction
     (
@@ -108,9 +108,13 @@ namespace TransLucid
         {
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"a"}
         },
+        Tree::TupleExpr(
+        {
+          {Tree::DimensionExpr(U"is_signed"), is_signed},
+          {Tree::DimensionExpr(U"prec"), mpz_class(size)}
+        }),
         Tree::Expr(),
-        Tree::Expr(),
-        Tree::IdentExpr(bang)
+        Tree::IdentExpr(name + op)
       }
     );
   }
@@ -143,8 +147,8 @@ namespace TransLucid
       makeEquation(s, name + U"_ne", &FixedInteger::ne);
       makeEquation(s, name + U"_lt", &FixedInteger::lt);
       makeEquation(s, name + U"_gt", &FixedInteger::gt);
-      makeEquation(s, name + U"_lteq", &FixedInteger::leq);
-      makeEquation(s, name + U"_gteq", &FixedInteger::geq);
+      makeEquation(s, name + U"_leq", &FixedInteger::leq);
+      makeEquation(s, name + U"_geq", &FixedInteger::geq);
 
       addPrinter(s, name, U"print_" + name); 
       addConstructor(s, name, U"construct_" + name);
@@ -152,10 +156,65 @@ namespace TransLucid
       addTypeEquation(s, name);
 
       //add the function for each op
+
       addNumericFunction<
         std::is_signed<T>::value,
-        sizeof(T)
-      > (s, U"_plus", name + U"_plus");
+        sizeof(T) * 8
+      > (s, name, U"_plus");
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_minus");
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_times");
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_divide");
+
+      if (!std::is_floating_point<T>::value)
+      {
+        addNumericFunction<
+          std::is_signed<T>::value,
+          sizeof(T) * 8
+        > (s, name, U"_modulus");
+      }
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_eq");
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_ne");
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_lt");
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_gt");
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_leq");
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, U"_geq");
+
     }
 
     Constant
