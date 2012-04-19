@@ -96,6 +96,25 @@ namespace TransLucid
     }
   };
 
+  template <bool is_signed, int size>
+  void
+  addNumericFunction(System& s, const u32string& op, const u32string& bang)
+  {
+    s.addFunction
+    (
+      Parser::FnDecl
+      {
+        U"numeric" + op,
+        {
+          {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"a"}
+        },
+        Tree::Expr(),
+        Tree::Expr(),
+        Tree::IdentExpr(bang)
+      }
+    );
+  }
+
   template <typename T>
   class FixedInteger
   {
@@ -131,6 +150,12 @@ namespace TransLucid
       addConstructor(s, name, U"construct_" + name);
 
       addTypeEquation(s, name);
+
+      //add the function for each op
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T)
+      > (s, U"_plus", name + U"_plus");
     }
 
     Constant
