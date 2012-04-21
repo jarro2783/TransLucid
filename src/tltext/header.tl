@@ -45,7 +45,9 @@ op ∪ = OpInfix."union_construct".false.AssocLeft. ~100;;
 
 var sint = sint8 ∪ sint16 ∪ sint32 ∪ sint64;;
 var uint = uint8 ∪ uint16 ∪ uint32 ∪ uint64;;
-var int = sint ∪ uint;;
+var int = sint ∪ uint ∪ intmp;;
+var float = float32 ∪ float64;;
+var numeric = float ∪ int;;
 
 var pos = 1..infty;;
 var nat = 0..infty;;
@@ -53,27 +55,31 @@ var neg = neginfty .. ~1;;
 var nonpos = neginfty..0;;
 //var int = neginfty..infty;;
 
-var int_plus [prec : 8, is_signed : true] = sint8_plus;;
-var int_plus [prec : 8, is_signed : false] = uint8_plus;;
-
-var int_plus [prec : 16, is_signed : true] = sint16_plus;;
-var int_plus [prec : 16, is_signed : false] = uint16_plus;;
-
-var int_plus [prec : 32, is_signed : true] = sint32_plus;;
-var int_plus [prec : 32, is_signed : false] = uint32_plus;;
-
-var int_plus [prec : 64, is_signed : true] = sint64_plus;;
-var int_plus [prec : 64, is_signed : false] = uint64_plus;;
-
 //fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
 fun plus.a.b [a : int, b : int] 
-  | a!prec == b!prec && a!is_signed == b!is_signed 
-  = (int_plus @ [prec <- a!prec, is_signed <- a!is_signed])!(a,b);;
+  | a!prec == b!prec && a!is_signed == b!is_signed
+  = (numeric_plus.(a!prec).(a!is_signed))!(a,b);;
+
 fun minus.a.b [a : intmp, b : intmp] = intmp_minus!(a,b);;
+fun minus.a.b [a : int, b : int] 
+  | a!prec == b!prec && a!is_signed == b!is_signed
+  = (numeric_minus.(a!prec).(a!is_signed))!(a,b);;
+
 fun times.a.b [a : intmp, b : intmp] = intmp_times!(a,b);;
+fun times.a.b [a : int, b : int] 
+  | a!prec == b!prec && a!is_signed == b!is_signed
+  = (numeric_times.(a!prec).(a!is_signed))!(a,b);;
+
 fun divide.a.b [a : intmp, b : intmp] = intmp_divide!(a,b);;
+fun divide.a.b [a : int, b : int] 
+  | a!prec == b!prec && a!is_signed == b!is_signed
+  = (numeric_divide.(a!prec).(a!is_signed))!(a,b);;
+
 fun modulus.a.b [a : intmp, b : intmp] = intmp_modulus!(a,b);;
+fun modulus.a.b [a : int, b : int] 
+  | a!prec == b!prec && a!is_signed == b!is_signed
+  = (numeric_modulus.(a!prec).(a!is_signed))!(a,b);;
 
 //version 2
 //fun plus.a.b [a : float, b : float] | a!prec == b!prec = float_plus!(a,b);;
@@ -205,6 +211,8 @@ fun print_typename.c [c : uuid] = "uuid";;
 fun print_typename.c [c : demand] = "demand";;
 fun print_typename.c [c : calc] = "calc";;
 fun print_typename.c [c : basefun] = "basefun";;
+fun print_typename.c [c : lambda] = "lambda";;
+fun print_typename.c [c : phi] = "phi";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;

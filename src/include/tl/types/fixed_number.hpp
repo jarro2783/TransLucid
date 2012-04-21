@@ -106,12 +106,13 @@ namespace TransLucid
       {
         U"numeric" + op,
         {
-          {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"a"}
+          {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
+          {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"is_signed"}
         },
         Tree::TupleExpr(
         {
-          {Tree::DimensionExpr(U"is_signed"), is_signed},
-          {Tree::DimensionExpr(U"prec"), mpz_class(size)}
+          {Tree::IdentExpr(U"prec"), mpz_class(size)},
+          {Tree::IdentExpr(U"is_signed"), is_signed},
         }),
         Tree::Expr(),
         Tree::IdentExpr(name + op)
@@ -134,21 +135,23 @@ namespace TransLucid
 
       makeEquation(s, U"construct_" + name, &FixedInteger::construct);
       makeEquation(s, U"print_" + name, &FixedInteger::print);
-      makeEquation(s, name + U"_plus", &FixedInteger::plus);
-      makeEquation(s, name + U"_minus", &FixedInteger::minus);
-      makeEquation(s, name + U"_times", &FixedInteger::times);
-      makeEquation(s, name + U"_divide", &FixedInteger::divide);
+      //makeEquation(s, name + U"_plus", &FixedInteger::plus);
+
+      registerOperation(s, name, U"_plus", &FixedInteger::plus);
+      registerOperation(s, name, U"_minus", &FixedInteger::minus);
+      registerOperation(s, name, U"_times", &FixedInteger::times);
+      registerOperation(s, name, U"_divide", &FixedInteger::divide);
 
       registerModulus(s, name, 
         typename std::conditional<
           std::is_floating_point<T>::value, no, yes>::type());
 
-      makeEquation(s, name + U"_eq", &FixedInteger::eq);
-      makeEquation(s, name + U"_ne", &FixedInteger::ne);
-      makeEquation(s, name + U"_lt", &FixedInteger::lt);
-      makeEquation(s, name + U"_gt", &FixedInteger::gt);
-      makeEquation(s, name + U"_leq", &FixedInteger::leq);
-      makeEquation(s, name + U"_geq", &FixedInteger::geq);
+      registerOperation(s, name, U"_eq", &FixedInteger::eq);
+      registerOperation(s, name, U"_ne", &FixedInteger::ne);
+      registerOperation(s, name, U"_lt", &FixedInteger::lt);
+      registerOperation(s, name, U"_gt", &FixedInteger::gt);
+      registerOperation(s, name, U"_leq", &FixedInteger::leq);
+      registerOperation(s, name, U"_geq", &FixedInteger::geq);
 
       addPrinter(s, name, U"print_" + name); 
       addConstructor(s, name, U"construct_" + name);
@@ -156,65 +159,6 @@ namespace TransLucid
       addTypeEquation(s, name);
 
       //add the function for each op
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_plus");
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_minus");
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_times");
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_divide");
-
-      if (!std::is_floating_point<T>::value)
-      {
-        addNumericFunction<
-          std::is_signed<T>::value,
-          sizeof(T) * 8
-        > (s, name, U"_modulus");
-      }
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_eq");
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_ne");
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_lt");
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_gt");
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_leq");
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, U"_geq");
-
     }
 
     Constant
@@ -399,7 +343,25 @@ namespace TransLucid
     void
     registerModulus(System& s, const u32string& name, yes y)
     {
-      makeEquation(s, name + U"_modulus", &FixedInteger::modulus);
+      registerOperation(s, name, U"_modulus", &FixedInteger::modulus);
+    }
+
+    template <typename Fun>
+    void
+    registerOperation
+    (
+      System& s,
+      const u32string& name,
+      const u32string& op,
+      Fun f
+    )
+    {
+      makeEquation(s, name + op, f);
+
+      addNumericFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, name, op);
     }
 
     UnaryFunction
