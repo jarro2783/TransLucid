@@ -150,8 +150,8 @@ namespace TransLucid
       registerOperation(s, name, U"_ne", &FixedNumeric::ne);
       registerOperation(s, name, U"_lt", &FixedNumeric::lt);
       registerOperation(s, name, U"_gt", &FixedNumeric::gt);
-      registerOperation(s, name, U"_leq", &FixedNumeric::leq);
-      registerOperation(s, name, U"_geq", &FixedNumeric::geq);
+      registerOperation(s, name, U"_lte", &FixedNumeric::leq);
+      registerOperation(s, name, U"_gte", &FixedNumeric::geq);
 
       addPrinter(s, name, U"print_" + name); 
       addConstructor(s, name, U"construct_" + name);

@@ -127,19 +127,27 @@ fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
 fun lte.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed 
   = numeric_lte.(a!prec).(a!is_signed)!(a,b);;
+
+fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
 fun lt.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
   = numeric_lt.(a!prec).(a!is_signed)!(a,b);;
+
+fun gte.a.b [a : intmp, b : intmp] = intmp_gte!(a,b);;
 fun gte.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
   = numeric_gte.(a!prec).(a!is_signed)!(a,b);;
+
+fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
 fun gt.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
   = numeric_gt.(a!prec).(a!is_signed)!(a,b);;
+
 fun eq.a.b [a : intmp, b : intmp] = intmp_eq!(a,b);;
-//fun eq.a.b [a : fint, b : fint] 
-//  | intmp_eq!(a!prec, b!prec) && bool_eq!(a!is_signed, b!is_signed)
-//  = (numeric_eq.(a!prec).(a!is_signed))!(a,b);;
+fun eq.a.b [a : fint, b : fint] 
+  | intmp_eq!(a!prec, b!prec) && bool_eq!(a!is_signed, b!is_signed)
+  = (numeric_eq.(a!prec).(a!is_signed))!(a,b);;
+
 fun ne.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
   = numeric_ne.(a!prec).(a!is_signed)!(a,b);;
