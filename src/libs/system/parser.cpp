@@ -651,6 +651,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
         {
           expect(listIter, end, element, "expression", &Parser::parse_expr);
           exprList.push_back(std::move(element));
+          element = Tree::nil();
 
           if (listIter->getType() != TOKEN_COMMA) { makingList = false; }
           else { ++listIter; }
