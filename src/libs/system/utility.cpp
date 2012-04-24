@@ -209,6 +209,7 @@ namespace
           &isSubsetAtomic<TYPE_INDEX_INTMP>,
           &isSubsetAtomic<TYPE_INDEX_UCHAR>,
           &isSubsetAtomic<TYPE_INDEX_USTRING>,
+          &isSubsetAtomic<TYPE_INDEX_FLOATMP>,
           &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
           &subset_of_tuple,
           &subset_of_type,

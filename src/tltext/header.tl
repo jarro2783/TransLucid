@@ -207,6 +207,7 @@ fun print_special.c [c : sploop] = "sploop";;
 fun print.c = "I don't know how to print this type";;
 fun print.c [c : ustring] = c;;
 fun print.c [c : intmp] = print_intmp!c;;
+fun print.c [c : floatmp] = print_floatmp!c;;
 fun print.c [c : bool] = print_bool!c;;
 fun print.c [c : special] = print_special.c;;
 fun print.c [c : typetype] = print_typetype!c;;
@@ -232,11 +233,13 @@ fun print_typename.c [c : calc] = "calc";;
 fun print_typename.c [c : basefun] = "basefun";;
 fun print_typename.c [c : lambda] = "lambda";;
 fun print_typename.c [c : phi] = "phi";;
+fun print_typename.c [c : floatmp] = "floatmp";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;
 fun construct_literal.t.v [t : "typetype"] = construct_typetype!v;;
 fun construct_literal.t.v [t : "uuid"] = construct_uuid!v;;
+fun construct_literal.t.v [t : "floatmp"] = construct_floatmp!v;;
 
 //the print equations
 fun canonical_print.c [c : intmp]   = print.c;;

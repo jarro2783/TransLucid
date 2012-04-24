@@ -10,4 +10,8 @@ template <> class __gmp_expr<mpz_t, mpz_t>;
 
 typedef __gmp_expr<mpz_t, mpz_t> mpz_class;
 
+template <> class __gmp_expr<mpf_t, mpf_t>;
+
+typedef __gmp_expr<mpf_t, mpf_t> mpf_class;
+
 #endif
