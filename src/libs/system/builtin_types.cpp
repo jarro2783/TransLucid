@@ -103,6 +103,17 @@ namespace TransLucid
     BuiltinBaseFunction<2> integer_eq{&mpz_eq};
     BuiltinBaseFunction<2> integer_ne{&mpz_ne};
 
+    BuiltinBaseFunction<2> float_plus{&mpf_plus};
+    BuiltinBaseFunction<2> float_minus{&mpf_minus};
+    BuiltinBaseFunction<2> float_times{&mpf_times};
+    BuiltinBaseFunction<2> float_divide{&mpf_divide};
+    BuiltinBaseFunction<2> float_lte{&mpf_lte};
+    BuiltinBaseFunction<2> float_lt{&mpf_lt};
+    BuiltinBaseFunction<2> float_gte{&mpf_gte};
+    BuiltinBaseFunction<2> float_gt{&mpf_gt};
+    BuiltinBaseFunction<2> float_eq{&mpf_eq};
+    BuiltinBaseFunction<2> float_ne{&mpf_ne};
+
     BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus};
 
     BuiltinBaseFunction<2> boolean_eq{&bool_eq};
@@ -294,6 +305,18 @@ namespace TransLucid
       {U"intmp_gt", &integer_gt},
       {U"intmp_eq", &integer_eq},
       {U"intmp_ne", &integer_ne},
+      
+      {U"floatmp_plus", &float_plus},
+      {U"floatmp_minus", &float_minus},
+      {U"floatmp_times", &float_times},
+      {U"floatmp_divide", &float_divide},
+      {U"floatmp_lte", &float_lte},
+      {U"floatmp_lt", &float_lt},
+      {U"floatmp_gte", &float_gte},
+      {U"floatmp_gt", &float_gt},
+      {U"floatmp_eq", &float_eq},
+      {U"floatmp_ne", &float_ne},
+
       {U"bool_eq", &boolean_eq},
       {U"ustring_plus", &ustring_plus_fn},
       {U"make_range", &range_create},
@@ -606,6 +629,93 @@ namespace TransLucid
       ;
     }
 
+    Constant
+    mpf_plus(const Constant& a, const Constant& b)
+    {
+      return Types::Floatmp::create(get_constant_pointer<mpf_class>(a) +
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_minus(const Constant& a, const Constant& b)
+    {
+      return Types::Floatmp::create(get_constant_pointer<mpf_class>(a) -
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_times(const Constant& a, const Constant& b)
+    {
+      return Types::Floatmp::create(get_constant_pointer<mpf_class>(a) *
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_divide(const Constant& a, const Constant& b)
+    {
+      mpf_class bval = get_constant_pointer<mpf_class>(b);
+      if (bval == 0)
+      {
+        return Types::Special::create(Special::SP_ARITH);
+      }
+      else
+      {
+        return Types::Floatmp::create(get_constant_pointer<mpf_class>(a) /
+          bval);
+      }
+      ;
+    }
+
+    Constant
+    mpf_lte(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) <=
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_lt(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) <
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_gte(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) >=
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_gt(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) >
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_eq(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) ==
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_ne(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) !=
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
     Constant
     bool_eq(const Constant& a, const Constant& b)
     {

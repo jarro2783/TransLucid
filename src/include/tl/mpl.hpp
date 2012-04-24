@@ -1,5 +1,5 @@
 /* Meta-programming utility.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <type_traits>
 #include <cstdlib>
+#include <utility>
 
 namespace TransLucid
 {
@@ -95,6 +96,25 @@ namespace TransLucid
     public:
     static constexpr m_size_type value = m_helper::value;
     typedef typename m_helper::type type;
+  };
+
+  template <typename F>
+  struct count_args
+  {
+    static constexpr size_t value =
+      count_args<decltype(&F::operator())>::value;
+  };
+
+  template <typename Ret, typename... Args>
+  struct count_args<Ret(Args...)>
+  {
+    static constexpr size_t value = sizeof...(Args);
+  };
+
+  template <typename C, typename Ret, typename... Args>
+  struct count_args<Ret (C::*)(Args...)>
+  {
+    static constexpr size_t value = sizeof...(Args);
   };
 }
 

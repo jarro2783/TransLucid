@@ -120,6 +120,31 @@ namespace TransLucid
     );
   }
 
+  template <typename T, template <typename> class Op>
+  class NumericOperation
+  {
+    public:
+    NumericOperation(type_index index)
+    : m_index(index)
+    {
+    }
+
+    T
+    operator()(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+      return Constant(m_op(get_constant<T>(lhs), get_constant<T>(rhs)), 
+                      m_index);
+    }
+
+    private:
+    Op<T> m_op;
+    type_index m_index;
+  };
+
   template <typename T>
   class FixedNumeric
   {
@@ -137,6 +162,7 @@ namespace TransLucid
       makeEquation(s, U"print_" + name, &FixedNumeric::print);
       //makeEquation(s, name + U"_plus", &FixedNumeric::plus);
 
+      //registerFixedOperation<std::plus>(s, name, U"_plus");
       registerOperation(s, name, U"_plus", &FixedNumeric::plus);
       registerOperation(s, name, U"_minus", &FixedNumeric::minus);
       registerOperation(s, name, U"_times", &FixedNumeric::times);
@@ -157,6 +183,18 @@ namespace TransLucid
       addConstructor(s, name, U"construct_" + name);
 
       addTypeEquation(s, name);
+    }
+
+    template <template <typename> class F>
+    void
+    registerFixedOperation
+    (
+      System& s,
+      const u32string& name,
+      const u32string& op
+    )
+    {
+      //makeEquation(s, name + op, F<T>());
     }
 
     Constant
@@ -378,17 +416,29 @@ namespace TransLucid
       return std::bind(std::mem_fn(f), this, _1, _2);
     }
 
-    template <typename Ret, typename... Args>
+    #if 0
+    template <typename F>
+    auto
+    createFunction(F f)
+    {
+      return std::function<>(f);
+    }
+    #endif
+
+    //template <typename Ret, typename... Args>
+    template <typename F>
     void
     makeEquation
     (
       System& s, 
       const u32string& name, 
-      Ret (FixedNumeric<T>::*f)(Args...)
+      F f
+      //Ret (FixedNumeric<T>::*f)(Args...)
     )
     {
-      std::unique_ptr<BuiltinBaseFunction<sizeof...(Args)>> 
-        fn(new BuiltinBaseFunction<sizeof...(Args)>
+      static constexpr size_t numargs = count_args<F>::value;
+      std::unique_ptr<BuiltinBaseFunction<numargs>> 
+        fn(new BuiltinBaseFunction<numargs>
           (createFunction(f))
       );
       std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));

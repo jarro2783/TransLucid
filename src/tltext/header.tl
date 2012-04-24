@@ -57,6 +57,7 @@ var nonpos = neginfty..0;;
 
 //fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
+fun plus.a.b [a : floatmp, b : floatmp] = floatmp_plus!(a,b);;
 fun plus.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (numeric_plus.(a!prec).(a!is_signed))!(a,b);;
