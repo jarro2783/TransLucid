@@ -29,16 +29,16 @@ namespace TransLucid
 namespace
 {
 
-FixedInteger<int8_t> s8;
-FixedInteger<uint8_t> u8;
-FixedInteger<int16_t> s16;
-FixedInteger<uint16_t> u16;
-FixedInteger<int32_t> s32;
-FixedInteger<uint32_t> u32;
-FixedInteger<int64_t> s64;
-FixedInteger<uint64_t> u64;
-FixedInteger<float> f32;
-FixedInteger<double> f64;
+FixedNumeric<int8_t> s8;
+FixedNumeric<uint8_t> u8;
+FixedNumeric<int16_t> s16;
+FixedNumeric<uint16_t> u16;
+FixedNumeric<int32_t> s32;
+FixedNumeric<uint32_t> u32;
+FixedNumeric<int64_t> s64;
+FixedNumeric<uint64_t> u64;
+FixedNumeric<float> f32;
+FixedNumeric<double> f64;
 
 }
 

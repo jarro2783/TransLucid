@@ -45,7 +45,7 @@ op ∪ = OpInfix."union_construct".false.AssocLeft. ~100;;
 
 var sint = sint8 ∪ sint16 ∪ sint32 ∪ sint64;;
 var uint = uint8 ∪ uint16 ∪ uint32 ∪ uint64;;
-var int = sint ∪ uint ∪ intmp;;
+var fint = sint ∪ uint;;
 var float = float32 ∪ float64;;
 var numeric = float ∪ int;;
 
@@ -57,27 +57,28 @@ var nonpos = neginfty..0;;
 
 //fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
-fun plus.a.b [a : int, b : int] 
+fun plus.a.b [a : floatmp, b : floatmp] = floatmp_plus!(a,b);;
+fun plus.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (numeric_plus.(a!prec).(a!is_signed))!(a,b);;
 
 fun minus.a.b [a : intmp, b : intmp] = intmp_minus!(a,b);;
-fun minus.a.b [a : int, b : int] 
+fun minus.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (numeric_minus.(a!prec).(a!is_signed))!(a,b);;
 
 fun times.a.b [a : intmp, b : intmp] = intmp_times!(a,b);;
-fun times.a.b [a : int, b : int] 
+fun times.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (numeric_times.(a!prec).(a!is_signed))!(a,b);;
 
 fun divide.a.b [a : intmp, b : intmp] = intmp_divide!(a,b);;
-fun divide.a.b [a : int, b : int] 
+fun divide.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (numeric_divide.(a!prec).(a!is_signed))!(a,b);;
 
 fun modulus.a.b [a : intmp, b : intmp] = intmp_modulus!(a,b);;
-fun modulus.a.b [a : int, b : int] 
+fun modulus.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (numeric_modulus.(a!prec).(a!is_signed))!(a,b);;
 
@@ -124,14 +125,33 @@ fun uint64_bang.a [a : is_signed] = false;;
 //fun sint8_bang.a.b [a : signed] = true;;
 
 fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
+fun lte.a.b [a : fint, b : fint] 
+  | a!prec == b!prec && a!is_signed == b!is_signed 
+  = numeric_lte.(a!prec).(a!is_signed)!(a,b);;
+
 fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
+fun lt.a.b [a : fint, b : fint]
+  | a!prec == b!prec && a!is_signed == b!is_signed 
+  = numeric_lt.(a!prec).(a!is_signed)!(a,b);;
+
 fun gte.a.b [a : intmp, b : intmp] = intmp_gte!(a,b);;
+fun gte.a.b [a : fint, b : fint]
+  | a!prec == b!prec && a!is_signed == b!is_signed 
+  = numeric_gte.(a!prec).(a!is_signed)!(a,b);;
+
 fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
+fun gt.a.b [a : fint, b : fint]
+  | a!prec == b!prec && a!is_signed == b!is_signed 
+  = numeric_gt.(a!prec).(a!is_signed)!(a,b);;
+
 fun eq.a.b [a : intmp, b : intmp] = intmp_eq!(a,b);;
-//fun eq.a.b [a : int, b : int] 
-//  | constant_equals!(a!prec, b!prec) && constant_equals!(a!signed, b!signed)
-//  = (int_eq @ [prec <- a!prec, signed <- a!signed])!(a,b);;
-fun ne.a.b [a : intmp, b : intmp] = intmp_ne!(a,b);;
+fun eq.a.b [a : fint, b : fint] 
+  | intmp_eq!(a!prec, b!prec) && bool_eq!(a!is_signed, b!is_signed)
+  = (numeric_eq.(a!prec).(a!is_signed))!(a,b);;
+
+fun ne.a.b [a : fint, b : fint]
+  | a!prec == b!prec && a!is_signed == b!is_signed 
+  = numeric_ne.(a!prec).(a!is_signed)!(a,b);;
 
 fun eq.a.b [a : bool, b : bool] = bool_eq!(a,b);;
 
@@ -188,6 +208,7 @@ fun print_special.c [c : sploop] = "sploop";;
 fun print.c = "I don't know how to print this type";;
 fun print.c [c : ustring] = c;;
 fun print.c [c : intmp] = print_intmp!c;;
+fun print.c [c : floatmp] = print_floatmp!c;;
 fun print.c [c : bool] = print_bool!c;;
 fun print.c [c : special] = print_special.c;;
 fun print.c [c : typetype] = print_typetype!c;;
@@ -213,11 +234,13 @@ fun print_typename.c [c : calc] = "calc";;
 fun print_typename.c [c : basefun] = "basefun";;
 fun print_typename.c [c : lambda] = "lambda";;
 fun print_typename.c [c : phi] = "phi";;
+fun print_typename.c [c : floatmp] = "floatmp";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;
 fun construct_literal.t.v [t : "typetype"] = construct_typetype!v;;
 fun construct_literal.t.v [t : "uuid"] = construct_uuid!v;;
+fun construct_literal.t.v [t : "floatmp"] = construct_floatmp!v;;
 
 //the print equations
 fun canonical_print.c [c : intmp]   = print.c;;

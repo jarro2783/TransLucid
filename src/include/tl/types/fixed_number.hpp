@@ -120,8 +120,33 @@ namespace TransLucid
     );
   }
 
+  template <typename T, template <typename> class Op>
+  class NumericOperation
+  {
+    public:
+    NumericOperation(type_index index)
+    : m_index(index)
+    {
+    }
+
+    T
+    operator()(const Constant& lhs, const Constant& rhs)
+    {
+      if (lhs.index() != m_index || rhs.index() != m_index)
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+      return Constant(m_op(get_constant<T>(lhs), get_constant<T>(rhs)), 
+                      m_index);
+    }
+
+    private:
+    Op<T> m_op;
+    type_index m_index;
+  };
+
   template <typename T>
-  class FixedInteger
+  class FixedNumeric
   {
     struct yes {};
     struct no {};
@@ -133,32 +158,43 @@ namespace TransLucid
       m_index = s.getTypeIndex(name);
       m_typename = name;
 
-      makeEquation(s, U"construct_" + name, &FixedInteger::construct);
-      makeEquation(s, U"print_" + name, &FixedInteger::print);
-      //makeEquation(s, name + U"_plus", &FixedInteger::plus);
+      makeEquation(s, U"construct_" + name, &FixedNumeric::construct);
+      makeEquation(s, U"print_" + name, &FixedNumeric::print);
+      //makeEquation(s, name + U"_plus", &FixedNumeric::plus);
 
-      registerOperation(s, name, U"_plus", &FixedInteger::plus);
-      registerOperation(s, name, U"_minus", &FixedInteger::minus);
-      registerOperation(s, name, U"_times", &FixedInteger::times);
-      registerOperation(s, name, U"_divide", &FixedInteger::divide);
+      //registerFixedOperation<std::plus>(s, name, U"_plus");
+      registerOperation(s, name, U"_plus", &FixedNumeric::plus);
+      registerOperation(s, name, U"_minus", &FixedNumeric::minus);
+      registerOperation(s, name, U"_times", &FixedNumeric::times);
+      registerOperation(s, name, U"_divide", &FixedNumeric::divide);
 
       registerModulus(s, name, 
         typename std::conditional<
           std::is_floating_point<T>::value, no, yes>::type());
 
-      registerOperation(s, name, U"_eq", &FixedInteger::eq);
-      registerOperation(s, name, U"_ne", &FixedInteger::ne);
-      registerOperation(s, name, U"_lt", &FixedInteger::lt);
-      registerOperation(s, name, U"_gt", &FixedInteger::gt);
-      registerOperation(s, name, U"_leq", &FixedInteger::leq);
-      registerOperation(s, name, U"_geq", &FixedInteger::geq);
+      registerOperation(s, name, U"_eq", &FixedNumeric::eq);
+      registerOperation(s, name, U"_ne", &FixedNumeric::ne);
+      registerOperation(s, name, U"_lt", &FixedNumeric::lt);
+      registerOperation(s, name, U"_gt", &FixedNumeric::gt);
+      registerOperation(s, name, U"_lte", &FixedNumeric::leq);
+      registerOperation(s, name, U"_gte", &FixedNumeric::geq);
 
       addPrinter(s, name, U"print_" + name); 
       addConstructor(s, name, U"construct_" + name);
 
       addTypeEquation(s, name);
+    }
 
-      //add the function for each op
+    template <template <typename> class F>
+    void
+    registerFixedOperation
+    (
+      System& s,
+      const u32string& name,
+      const u32string& op
+    )
+    {
+      //makeEquation(s, name + op, F<T>());
     }
 
     Constant
@@ -343,7 +379,7 @@ namespace TransLucid
     void
     registerModulus(System& s, const u32string& name, yes y)
     {
-      registerOperation(s, name, U"_modulus", &FixedInteger::modulus);
+      registerOperation(s, name, U"_modulus", &FixedNumeric::modulus);
     }
 
     template <typename Fun>
@@ -365,14 +401,14 @@ namespace TransLucid
     }
 
     UnaryFunction
-    createFunction(Constant (FixedInteger<T>::*f)(const Constant&))
+    createFunction(Constant (FixedNumeric<T>::*f)(const Constant&))
     {
       using std::placeholders::_1;
       return std::bind(std::mem_fn(f), this, _1);
     }
 
     BinaryFunction
-    createFunction(Constant (FixedInteger<T>::*f)
+    createFunction(Constant (FixedNumeric<T>::*f)
       (const Constant&, const Constant&))
     {
       using std::placeholders::_1;
@@ -380,17 +416,29 @@ namespace TransLucid
       return std::bind(std::mem_fn(f), this, _1, _2);
     }
 
-    template <typename Ret, typename... Args>
+    #if 0
+    template <typename F>
+    auto
+    createFunction(F f)
+    {
+      return std::function<>(f);
+    }
+    #endif
+
+    //template <typename Ret, typename... Args>
+    template <typename F>
     void
     makeEquation
     (
       System& s, 
       const u32string& name, 
-      Ret (FixedInteger<T>::*f)(Args...)
+      F f
+      //Ret (FixedNumeric<T>::*f)(Args...)
     )
     {
-      std::unique_ptr<BuiltinBaseFunction<sizeof...(Args)>> 
-        fn(new BuiltinBaseFunction<sizeof...(Args)>
+      static constexpr size_t numargs = count_args<F>::value;
+      std::unique_ptr<BuiltinBaseFunction<numargs>> 
+        fn(new BuiltinBaseFunction<numargs>
           (createFunction(f))
       );
       std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));

@@ -1035,6 +1035,7 @@ System::System(bool cached)
    {U"error", TYPE_INDEX_ERROR},
    {U"ustring", TYPE_INDEX_USTRING},
    {U"intmp", TYPE_INDEX_INTMP},
+   {U"floatmp", TYPE_INDEX_FLOATMP},
    {U"bool", TYPE_INDEX_BOOL},
    {U"special", TYPE_INDEX_SPECIAL},
    {U"uchar", TYPE_INDEX_UCHAR},

@@ -125,8 +125,8 @@ UnionType::append(const Constant& c)
 
         if (inSet.overlaps(r))
         {
-          iter = m_types.erase(iter);
           r = inSet.join(r);
+          iter = m_types.erase(iter);
         }
         else
         {
