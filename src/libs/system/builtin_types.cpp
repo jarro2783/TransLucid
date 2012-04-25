@@ -113,6 +113,7 @@ namespace TransLucid
     BuiltinBaseFunction<2> float_gt{&mpf_gt};
     BuiltinBaseFunction<2> float_eq{&mpf_eq};
     BuiltinBaseFunction<2> float_ne{&mpf_ne};
+    BuiltinBaseFunction<1> float_sqrt{&mpf_sqrt};
 
     BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus};
 
@@ -316,6 +317,7 @@ namespace TransLucid
       {U"floatmp_gt", &float_gt},
       {U"floatmp_eq", &float_eq},
       {U"floatmp_ne", &float_ne},
+      {U"floatmp_sqrt", &float_sqrt},
 
       {U"bool_eq", &boolean_eq},
       {U"ustring_plus", &ustring_plus_fn},
@@ -716,6 +718,16 @@ namespace TransLucid
         get_constant_pointer<mpf_class>(b))
       ;
     }
+
+    Constant
+    mpf_sqrt(const Constant& f)
+    {
+      return Types::Floatmp::create(sqrt(Types::Floatmp::get(f)));
+      //return Types::Boolean::create(get_constant_pointer<mpf_class>(a) !=
+      //  get_constant_pointer<mpf_class>(b))
+      //;
+    }
+
     Constant
     bool_eq(const Constant& a, const Constant& b)
     {
@@ -1228,7 +1240,16 @@ namespace TransLucid
         std::string result;
 
         std::ostringstream os;
-        os << s << "e" << exp;
+
+        if (s[0] == '-')
+        {
+          os << "-0." << s.substr(1, std::string::npos);
+        }
+        else
+        {
+          os << "0." << s;
+        }
+        os << "e" << exp;
         result = os.str();
 
         #if 0
