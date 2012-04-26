@@ -82,6 +82,8 @@ fun modulus.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (numeric_modulus.(a!prec).(a!is_signed))!(a,b);;
 
+fun sqrt.a [a : floatmp] = floatmp_sqrt!a;;
+
 //version 2
 //fun plus.a.b [a : float, b : float] | a!prec == b!prec = float_plus!(a,b);;
 
