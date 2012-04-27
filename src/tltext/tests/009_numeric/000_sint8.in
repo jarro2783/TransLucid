@@ -21,3 +21,6 @@ sint8"15" <= sint8"16";;
 sint8"15" <= sint8"15";;
 sint8"15" == sint8"15";;
 sint8"15" == sint8"16";;
+
+sint8"5"!prec;;
+sint8"5"!is_signed;;

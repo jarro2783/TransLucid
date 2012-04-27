@@ -99,11 +99,7 @@ namespace TransLucid
   };
 
   template <typename F>
-  struct count_args
-  {
-    static constexpr size_t value =
-      count_args<decltype(&F::operator())>::value;
-  };
+  struct count_args;
 
   template <typename Ret, typename... Args>
   struct count_args<Ret(Args...)>
@@ -115,6 +111,18 @@ namespace TransLucid
   struct count_args<Ret (C::*)(Args...)>
   {
     static constexpr size_t value = sizeof...(Args);
+  };
+
+  template 
+  <
+    typename F, 
+    typename Dummy = 
+      typename std::enable_if<!std::is_function<F>::value, F>::type
+  >
+  struct count_args<F, Dummy>
+  {
+    static constexpr size_t value =
+      count_args<decltype(&F::operator())>::value;
   };
 }
 

@@ -98,7 +98,7 @@ namespace TransLucid
 
   template <bool is_signed, int size>
   void
-  addNumericFunction(System& s, const u32string& name, const u32string& op)
+  addIntegerFunction(System& s, const u32string& name, const u32string& op)
   {
     s.addFunction
     (
@@ -146,7 +146,7 @@ namespace TransLucid
   };
 
   template <typename T>
-  class FixedNumeric
+  class FixedInteger
   {
     struct yes {};
     struct no {};
@@ -158,26 +158,40 @@ namespace TransLucid
       m_index = s.getTypeIndex(name);
       m_typename = name;
 
-      makeEquation(s, U"construct_" + name, &FixedNumeric::construct);
-      makeEquation(s, U"print_" + name, &FixedNumeric::print);
-      //makeEquation(s, name + U"_plus", &FixedNumeric::plus);
+      makeEquation(s, U"construct_" + name, &FixedInteger::construct);
+      makeEquation(s, U"print_" + name, &FixedInteger::print);
+      //makeEquation(s, name + U"_plus", &FixedInteger::plus);
 
-      //registerFixedOperation<std::plus>(s, name, U"_plus");
-      registerOperation(s, name, U"_plus", &FixedNumeric::plus);
-      registerOperation(s, name, U"_minus", &FixedNumeric::minus);
-      registerOperation(s, name, U"_times", &FixedNumeric::times);
-      registerOperation(s, name, U"_divide", &FixedNumeric::divide);
+      registerFixedOperation<std::plus>(s, name, U"_plus");
+      registerFixedOperation<std::minus>(s, name, U"_minus");
+      registerFixedOperation<std::multiplies>(s, name, U"_times");
+      registerFixedOperation<std::divides>(s, name, U"_divide");
+      registerFixedOperation<std::modulus>(s, name, U"_modulus");
+
+      registerFixedOperation<std::equal_to>(s, name, U"_eq");
+      registerFixedOperation<std::not_equal_to>(s, name, U"_ne");
+      registerFixedOperation<std::less>(s, name, U"_lt");
+      registerFixedOperation<std::greater>(s, name, U"_gt");
+      registerFixedOperation<std::less_equal>(s, name, U"_lte");
+      registerFixedOperation<std::greater_equal>(s, name, U"_gte");
+
+      #if 0
+      registerOperation(s, name, U"_plus", &FixedInteger::plus);
+      registerOperation(s, name, U"_minus", &FixedInteger::minus);
+      registerOperation(s, name, U"_times", &FixedInteger::times);
+      registerOperation(s, name, U"_divide", &FixedInteger::divide);
 
       registerModulus(s, name, 
         typename std::conditional<
           std::is_floating_point<T>::value, no, yes>::type());
 
-      registerOperation(s, name, U"_eq", &FixedNumeric::eq);
-      registerOperation(s, name, U"_ne", &FixedNumeric::ne);
-      registerOperation(s, name, U"_lt", &FixedNumeric::lt);
-      registerOperation(s, name, U"_gt", &FixedNumeric::gt);
-      registerOperation(s, name, U"_lte", &FixedNumeric::leq);
-      registerOperation(s, name, U"_gte", &FixedNumeric::geq);
+      registerOperation(s, name, U"_eq", &FixedInteger::eq);
+      registerOperation(s, name, U"_ne", &FixedInteger::ne);
+      registerOperation(s, name, U"_lt", &FixedInteger::lt);
+      registerOperation(s, name, U"_gt", &FixedInteger::gt);
+      registerOperation(s, name, U"_lte", &FixedInteger::leq);
+      registerOperation(s, name, U"_gte", &FixedInteger::geq);
+      #endif
 
       addPrinter(s, name, U"print_" + name); 
       addConstructor(s, name, U"construct_" + name);
@@ -194,7 +208,7 @@ namespace TransLucid
       const u32string& op
     )
     {
-      //makeEquation(s, name + op, F<T>());
+      makeEquation(s, name + op, F<T>());
     }
 
     Constant
@@ -379,7 +393,7 @@ namespace TransLucid
     void
     registerModulus(System& s, const u32string& name, yes y)
     {
-      registerOperation(s, name, U"_modulus", &FixedNumeric::modulus);
+      registerOperation(s, name, U"_modulus", &FixedInteger::modulus);
     }
 
     template <typename Fun>
@@ -394,21 +408,21 @@ namespace TransLucid
     {
       makeEquation(s, name + op, f);
 
-      addNumericFunction<
+      addIntegerFunction<
         std::is_signed<T>::value,
         sizeof(T) * 8
       > (s, name, op);
     }
 
     UnaryFunction
-    createFunction(Constant (FixedNumeric<T>::*f)(const Constant&))
+    createFunction(Constant (FixedInteger<T>::*f)(const Constant&))
     {
       using std::placeholders::_1;
       return std::bind(std::mem_fn(f), this, _1);
     }
 
     BinaryFunction
-    createFunction(Constant (FixedNumeric<T>::*f)
+    createFunction(Constant (FixedInteger<T>::*f)
       (const Constant&, const Constant&))
     {
       using std::placeholders::_1;
@@ -416,14 +430,12 @@ namespace TransLucid
       return std::bind(std::mem_fn(f), this, _1, _2);
     }
 
-    #if 0
     template <typename F>
-    auto
+    F
     createFunction(F f)
     {
-      return std::function<>(f);
+      return f;
     }
-    #endif
 
     //template <typename Ret, typename... Args>
     template <typename F>
@@ -433,7 +445,7 @@ namespace TransLucid
       System& s, 
       const u32string& name, 
       F f
-      //Ret (FixedNumeric<T>::*f)(Args...)
+      //Ret (FixedInteger<T>::*f)(Args...)
     )
     {
       static constexpr size_t numargs = count_args<F>::value;
