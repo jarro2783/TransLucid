@@ -1,0 +1,24 @@
+%%
+sint32"0";;
+sint32"-2147483648";;
+sint32"2147483647";;
+
+sint32"-500" + sint32"1000";;
+sint32"-500" - sint32"1000";;
+sint32"500" * sint32"1000";;
+sint32"-500" * sint32"1000";;
+sint32"50" / sint32"10";;
+sint32"50" / sint32"9";;
+sint32"50" % sint32"8";;
+
+sint32"0" < sint32"56";;
+sint32"0" < sint32"0";;
+sint32"0" <= sint32"56";;
+sint32"0" <= sint32"0";;
+sint32"0" > sint32"56";;
+sint32"0" >= sint32"56";;
+sint32"56" >= sint32"56";;
+sint32"0" == sint32"56";;
+sint32"56" == sint32"56";;
+sint32"0" != sint32"56";;
+sint32"56" != sint32"56";;
