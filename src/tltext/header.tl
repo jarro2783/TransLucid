@@ -216,6 +216,9 @@ fun range_construct.a.b [a : neginfty, b : infty] = make_range_infinite;;
 
 fun union_construct.a.b = make_union!(a,b);;
 
+//convert to a from b
+fun convert.a.b [a : floatmp, b : intmp] = floatmp_convert_intmp!b;;
+
 var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
