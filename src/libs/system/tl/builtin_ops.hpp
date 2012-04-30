@@ -72,6 +72,12 @@ namespace TransLucid
     mpf_abs(const Constant& f);
 
     Constant
+    mpf_uminus(const Constant& f);
+
+    Constant
+    mpf_convert_intmp(const Constant& i);
+
+    Constant
     bool_eq(const Constant& a, const Constant& b);
 
     Constant

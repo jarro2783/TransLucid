@@ -101,6 +101,8 @@ fun times.a.b [a : float, b : float] | a!prec == b!prec
 fun divide.a.b [a : float, b : float] | a!prec == b!prec 
   = (float_divide.(a!prec))!(a,b);;
 
+fun uminus.a [a : floatmp] = floatmp_uminus!a;;
+
 fun constant_bang.a.b [a : sint8] = sint8_bang.b;;
 fun constant_bang.a.b [a : uint8] = uint8_bang.b;;
 fun constant_bang.a.b [a : sint16] = sint16_bang.b;;
@@ -213,6 +215,9 @@ fun range_construct.a.b [a : neginfty, b : intmp] = make_range_neginfty!b;;
 fun range_construct.a.b [a : neginfty, b : infty] = make_range_infinite;;
 
 fun union_construct.a.b = make_union!(a,b);;
+
+//convert to a from b
+fun convert.a.b [a : floatmp, b : intmp] = floatmp_convert_intmp!b;;
 
 var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
