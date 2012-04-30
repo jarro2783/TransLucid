@@ -65,16 +65,19 @@ fun plus.a.b [a : fint, b : fint]
   = (fint_plus.(a!prec).(a!is_signed))!(a,b);;
 
 fun minus.a.b [a : intmp, b : intmp] = intmp_minus!(a,b);;
+fun minus.a.b [a : floatmp, b : floatmp] = floatmp_minus!(a,b);;
 fun minus.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (fint_minus.(a!prec).(a!is_signed))!(a,b);;
 
 fun times.a.b [a : intmp, b : intmp] = intmp_times!(a,b);;
+fun times.a.b [a : floatmp, b : floatmp] = floatmp_times!(a,b);;
 fun times.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (fint_times.(a!prec).(a!is_signed))!(a,b);;
 
 fun divide.a.b [a : intmp, b : intmp] = intmp_divide!(a,b);;
+fun divide.a.b [a : floatmp, b : floatmp] = floatmp_divide!(a,b);;
 fun divide.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
   = (fint_divide.(a!prec).(a!is_signed))!(a,b);;
