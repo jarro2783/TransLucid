@@ -177,6 +177,7 @@ fun eq.a.b [a : fint, b : fint]
   | intmp_eq!(a!prec, b!prec) && bool_eq!(a!is_signed, b!is_signed)
   = (fint_eq.(a!prec).(a!is_signed))!(a,b);;
 
+fun ne.a.b [a : intmp, b : intmp] = intmp_ne!(a,b);;
 fun ne.a.b [a : floatmp, b : floatmp] = floatmp_ne!(a,b);;
 fun ne.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
