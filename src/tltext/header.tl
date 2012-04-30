@@ -196,6 +196,8 @@ fun bool_or a b = if a then true else b fi;;
 
 fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
 
+fun abs.a [a : floatmp] = floatmp_abs!a;;
+
 fun range_construct.a.b [a : intmp, b : intmp] = make_range!(a,b);;
 fun range_construct.a.b [a : intmp, b : infty] = make_range_infty!a;;
 fun range_construct.a.b [a : neginfty, b : intmp] = make_range_neginfty!b;;
