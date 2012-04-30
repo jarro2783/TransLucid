@@ -101,6 +101,8 @@ fun times.a.b [a : float, b : float] | a!prec == b!prec
 fun divide.a.b [a : float, b : float] | a!prec == b!prec 
   = (float_divide.(a!prec))!(a,b);;
 
+fun uminus.a [a : floatmp] = floatmp_uminus!a;;
+
 fun constant_bang.a.b [a : sint8] = sint8_bang.b;;
 fun constant_bang.a.b [a : uint8] = uint8_bang.b;;
 fun constant_bang.a.b [a : sint16] = sint16_bang.b;;

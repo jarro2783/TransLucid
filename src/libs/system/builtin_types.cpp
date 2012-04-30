@@ -115,6 +115,7 @@ namespace TransLucid
     BuiltinBaseFunction<2> float_ne{&mpf_ne};
     BuiltinBaseFunction<1> float_sqrt{&mpf_sqrt};
     BuiltinBaseFunction<1> float_abs{&mpf_abs};
+    BuiltinBaseFunction<1> float_uminus{&mpf_uminus};
 
     BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus};
 
@@ -320,6 +321,7 @@ namespace TransLucid
       {U"floatmp_ne", &float_ne},
       {U"floatmp_sqrt", &float_sqrt},
       {U"floatmp_abs", &float_abs},
+      {U"floatmp_uminus", &float_uminus},
 
       {U"bool_eq", &boolean_eq},
       {U"ustring_plus", &ustring_plus_fn},
@@ -731,6 +733,12 @@ namespace TransLucid
     mpf_abs(const Constant& f)
     {
       return Types::Floatmp::create(abs(Types::Floatmp::get(f)));
+    }
+
+    Constant
+    mpf_uminus(const Constant& f)
+    {
+      return Types::Floatmp::create(-Types::Floatmp::get(f));
     }
 
     Constant
