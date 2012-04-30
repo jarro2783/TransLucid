@@ -97,33 +97,6 @@ namespace TransLucid
     static constexpr m_size_type value = m_helper::value;
     typedef typename m_helper::type type;
   };
-
-  template <typename F>
-  struct count_args;
-
-  template <typename Ret, typename... Args>
-  struct count_args<Ret(Args...)>
-  {
-    static constexpr size_t value = sizeof...(Args);
-  };
-
-  template <typename C, typename Ret, typename... Args>
-  struct count_args<Ret (C::*)(Args...)>
-  {
-    static constexpr size_t value = sizeof...(Args);
-  };
-
-  template 
-  <
-    typename F, 
-    typename Dummy = 
-      typename std::enable_if<!std::is_function<F>::value, F>::type
-  >
-  struct count_args<F, Dummy>
-  {
-    static constexpr size_t value =
-      count_args<decltype(&F::operator())>::value;
-  };
 }
 
 #endif
