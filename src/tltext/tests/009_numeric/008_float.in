@@ -1,0 +1,30 @@
+%%
+float32"5";;
+float32"10";;
+float32"15";;
+float32"15" + float32"14";;
+float32"15" - float32"14";;
+float32"15" * float32"14";;
+float32"30" / float32"2";;
+
+float32"30" > float32"20";;
+float32"30" < float32"20";;
+float32"30" >= float32"20";;
+float32"30" <= float32"20";;
+float32"30" == float32"20";;
+float32"30" != float32"20";;
+
+float64"5";;
+float64"10";;
+float64"15";;
+float64"15" + float64"14";;
+float64"15" - float64"14";;
+float64"15" * float64"14";;
+float64"30" / float64"2";;
+
+float64"30" > float64"20";;
+float64"30" < float64"20";;
+float64"30" >= float64"20";;
+float64"30" <= float64"20";;
+float64"30" == float64"20";;
+float64"30" != float64"20";;

@@ -98,13 +98,13 @@ namespace TransLucid
 
   template <bool is_signed, int size>
   void
-  addNumericFunction(System& s, const u32string& name, const u32string& op)
+  addIntegerFunction(System& s, const u32string& name, const u32string& op)
   {
     s.addFunction
     (
       Parser::FnDecl
       {
-        U"numeric" + op,
+        U"fint" + op,
         {
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"is_signed"}
@@ -120,81 +120,83 @@ namespace TransLucid
     );
   }
 
+  template <int size>
+  void
+  addFloatFunction(System& s, const u32string& name, const u32string& op)
+  {
+    s.addFunction
+    (
+      Parser::FnDecl
+      {
+        U"float" + op,
+        {
+          {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
+        },
+        Tree::TupleExpr(
+        {
+          {Tree::IdentExpr(U"prec"), mpz_class(size)},
+        }),
+        Tree::Expr(),
+        Tree::IdentExpr(name + op)
+      }
+    );
+  }
+
   template <typename T, template <typename> class Op>
   class NumericOperation
   {
     public:
-    NumericOperation(type_index index)
-    : m_index(index)
+    NumericOperation(type_index input, type_index output)
+    : m_input(input), m_output(output)
     {
     }
 
-    T
+    Constant
     operator()(const Constant& lhs, const Constant& rhs)
     {
-      if (lhs.index() != m_index || rhs.index() != m_index)
+      if (lhs.index() != m_input || rhs.index() != m_input)
       {
         return Types::Special::create(SP_TYPEERROR);
       }
       return Constant(m_op(get_constant<T>(lhs), get_constant<T>(rhs)), 
-                      m_index);
+                      m_output);
     }
 
     private:
     Op<T> m_op;
-    type_index m_index;
+    type_index m_input;
+    type_index m_output;
   };
 
   template <typename T>
   class FixedNumeric
   {
-    struct yes {};
-    struct no {};
     public:
 
     void
-    init(System& s, const u32string& name)
+    init(type_index index, const u32string& name)
     {
-      m_index = s.getTypeIndex(name);
+      m_index = index;
       m_typename = name;
-
-      makeEquation(s, U"construct_" + name, &FixedNumeric::construct);
-      makeEquation(s, U"print_" + name, &FixedNumeric::print);
-      //makeEquation(s, name + U"_plus", &FixedNumeric::plus);
-
-      //registerFixedOperation<std::plus>(s, name, U"_plus");
-      registerOperation(s, name, U"_plus", &FixedNumeric::plus);
-      registerOperation(s, name, U"_minus", &FixedNumeric::minus);
-      registerOperation(s, name, U"_times", &FixedNumeric::times);
-      registerOperation(s, name, U"_divide", &FixedNumeric::divide);
-
-      registerModulus(s, name, 
-        typename std::conditional<
-          std::is_floating_point<T>::value, no, yes>::type());
-
-      registerOperation(s, name, U"_eq", &FixedNumeric::eq);
-      registerOperation(s, name, U"_ne", &FixedNumeric::ne);
-      registerOperation(s, name, U"_lt", &FixedNumeric::lt);
-      registerOperation(s, name, U"_gt", &FixedNumeric::gt);
-      registerOperation(s, name, U"_lte", &FixedNumeric::leq);
-      registerOperation(s, name, U"_gte", &FixedNumeric::geq);
-
-      addPrinter(s, name, U"print_" + name); 
-      addConstructor(s, name, U"construct_" + name);
-
-      addTypeEquation(s, name);
     }
 
-    template <template <typename> class F>
+    template <size_t N, typename F>
     void
-    registerFixedOperation
+    makeEquation
     (
-      System& s,
-      const u32string& name,
-      const u32string& op
+      System& s, 
+      const u32string& name, 
+      F f
     )
     {
-      //makeEquation(s, name + op, F<T>());
+      std::unique_ptr<BuiltinBaseFunction<N>> 
+        fn(new BuiltinBaseFunction<N>
+          (createFunction(f))
+      );
+      std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));
+      fn.release();
+      s.addEquation(name, ws.get());
+      ws.release();
     }
 
     Constant
@@ -224,143 +226,6 @@ namespace TransLucid
         (u32string(str.begin(), str.end()));
     }
 
-    Constant
-    plus(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) + get_constant<T>(rhs), m_index);
-    }
-
-    Constant
-    minus(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) - get_constant<T>(rhs), m_index);
-    }
-
-    Constant
-    times(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) * get_constant<T>(rhs), m_index);
-    }
-
-    Constant
-    divide(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      if (get_constant<T>(rhs) == 0)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) / get_constant<T>(rhs), m_index);
-    }
-
-    Constant
-    modulus(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      if (get_constant<T>(rhs) == 0)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) % get_constant<T>(rhs), m_index);
-    }
-
-    Constant
-    eq(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) == get_constant<T>(rhs), 
-        TYPE_INDEX_BOOL);
-    }
-
-    Constant
-    ne(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) != get_constant<T>(rhs), 
-        TYPE_INDEX_BOOL);
-    }
-
-    Constant
-    lt(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) < get_constant<T>(rhs), 
-        TYPE_INDEX_BOOL);
-    }
-
-    Constant
-    gt(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) > get_constant<T>(rhs), 
-        TYPE_INDEX_BOOL);
-    }
-
-    Constant
-    leq(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) <= get_constant<T>(rhs), 
-        TYPE_INDEX_BOOL);
-    }
-
-    Constant
-    geq(const Constant& lhs, const Constant& rhs)
-    {
-      if (lhs.index() != m_index || rhs.index() != m_index)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      return Constant(get_constant<T>(lhs) >= get_constant<T>(rhs), 
-        TYPE_INDEX_BOOL);
-    }
-
     private:
 
     typedef 
@@ -371,44 +236,17 @@ namespace TransLucid
     std::function<Constant(const Constant&, const Constant&)>
     BinaryFunction;
 
-    void
-    registerModulus(System& s, const u32string& name, no n)
-    {
-    }
-
-    void
-    registerModulus(System& s, const u32string& name, yes y)
-    {
-      registerOperation(s, name, U"_modulus", &FixedNumeric::modulus);
-    }
-
-    template <typename Fun>
-    void
-    registerOperation
-    (
-      System& s,
-      const u32string& name,
-      const u32string& op,
-      Fun f
-    )
-    {
-      makeEquation(s, name + op, f);
-
-      addNumericFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, op);
-    }
-
+    template <typename C>
     UnaryFunction
-    createFunction(Constant (FixedNumeric<T>::*f)(const Constant&))
+    createFunction(Constant (C::*f)(const Constant&))
     {
       using std::placeholders::_1;
       return std::bind(std::mem_fn(f), this, _1);
     }
 
+    template <typename C>
     BinaryFunction
-    createFunction(Constant (FixedNumeric<T>::*f)
+    createFunction(Constant (C::*f)
       (const Constant&, const Constant&))
     {
       using std::placeholders::_1;
@@ -416,39 +254,181 @@ namespace TransLucid
       return std::bind(std::mem_fn(f), this, _1, _2);
     }
 
-    #if 0
     template <typename F>
-    auto
+    F
     createFunction(F f)
     {
-      return std::function<>(f);
-    }
-    #endif
-
-    //template <typename Ret, typename... Args>
-    template <typename F>
-    void
-    makeEquation
-    (
-      System& s, 
-      const u32string& name, 
-      F f
-      //Ret (FixedNumeric<T>::*f)(Args...)
-    )
-    {
-      static constexpr size_t numargs = count_args<F>::value;
-      std::unique_ptr<BuiltinBaseFunction<numargs>> 
-        fn(new BuiltinBaseFunction<numargs>
-          (createFunction(f))
-      );
-      std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));
-      fn.release();
-      s.addEquation(name, ws.get());
-      ws.release();
+      return f;
     }
 
     type_index m_index;
     u32string m_typename;
+  };
+
+  template <typename T>
+  class FixedInteger : private FixedNumeric<T>
+  {
+    public:
+
+    void
+    init(System& s, const u32string& name)
+    {
+      m_index = s.getTypeIndex(name);
+      m_typename = name;
+      m_n.init(m_index, m_typename);
+
+      m_n. template 
+        makeEquation<1>(s, U"construct_" + name, &FixedNumeric<T>::construct);
+      m_n. template 
+        makeEquation<1>(s, U"print_" + name, &FixedNumeric<T>::print);
+
+      registerArithmeticOperation<2, std::plus>(s, U"_plus");
+      registerArithmeticOperation<2, std::minus>(s, U"_minus");
+      registerArithmeticOperation<2, std::multiplies>(s, U"_times");
+      registerArithmeticOperation<2, std::divides>(s, U"_divide");
+      registerArithmeticOperation<2, std::modulus>(s, U"_modulus");
+
+      registerBoolOperation<2, std::equal_to>(s, U"_eq");
+      registerBoolOperation<2, std::not_equal_to>(s, U"_ne");
+      registerBoolOperation<2, std::less>(s, U"_lt");
+      registerBoolOperation<2, std::greater>(s, U"_gt");
+      registerBoolOperation<2, std::less_equal>(s, U"_lte");
+      registerBoolOperation<2, std::greater_equal>(s, U"_gte");
+
+      addPrinter(s, name, U"print_" + name); 
+      addConstructor(s, name, U"construct_" + name);
+
+      addTypeEquation(s, name);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerBoolOperation
+    (
+      System& s,
+      const u32string& op
+    )
+    {
+      registerFixedOperation<N, F>(s, 
+        op, m_index, TYPE_INDEX_BOOL);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerFixedOperation
+    (
+      System& s,
+      const u32string& op,
+      type_index inIndex,
+      type_index outIndex
+    )
+    {
+      m_n. template makeEquation<N>(s, m_typename + op, 
+        NumericOperation<T, F>(inIndex, outIndex));
+
+      addIntegerFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, m_typename, op);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerArithmeticOperation
+    (
+      System& s,
+      const u32string& op
+    )
+    {
+      registerFixedOperation<N, F>(s, op, m_index, m_index);
+    }
+
+
+    type_index m_index;
+    u32string m_typename;
+    FixedNumeric<T> m_n;
+  };
+
+  template <typename T>
+  class FixedFloat
+  {
+    public:
+
+    void
+    init(System& s, const u32string& name)
+    {
+      m_index = s.getTypeIndex(name);
+      m_typename = name;
+      m_n.init(m_index, m_typename);
+
+      m_n. template 
+        makeEquation<1>(s, U"construct_" + name, &FixedNumeric<T>::construct);
+      m_n. template 
+        makeEquation<1>(s, U"print_" + name, &FixedNumeric<T>::print);
+
+      registerArithmeticOperation<2, std::plus>(s, U"_plus");
+      registerArithmeticOperation<2, std::minus>(s, U"_minus");
+      registerArithmeticOperation<2, std::multiplies>(s, U"_times");
+      registerArithmeticOperation<2, std::divides>(s, U"_divide");
+      //registerArithmeticOperation<2, std::modulus>(s, U"_modulus");
+
+      registerBoolOperation<2, std::equal_to>(s, U"_eq");
+      registerBoolOperation<2, std::not_equal_to>(s, U"_ne");
+      registerBoolOperation<2, std::less>(s, U"_lt");
+      registerBoolOperation<2, std::greater>(s, U"_gt");
+      registerBoolOperation<2, std::less_equal>(s, U"_lte");
+      registerBoolOperation<2, std::greater_equal>(s, U"_gte");
+
+      addPrinter(s, name, U"print_" + name); 
+      addConstructor(s, name, U"construct_" + name);
+
+      addTypeEquation(s, name);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerBoolOperation
+    (
+      System& s,
+      const u32string& op
+    )
+    {
+      registerFixedOperation<N, F>(s, 
+        op, m_index, TYPE_INDEX_BOOL);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerFixedOperation
+    (
+      System& s,
+      const u32string& op,
+      type_index inIndex,
+      type_index outIndex
+    )
+    {
+      m_n. template makeEquation<N>(s, m_typename + op, 
+        NumericOperation<T, F>(inIndex, outIndex));
+
+      addFloatFunction<
+        sizeof(T) * 8
+      > (s, m_typename, op);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerArithmeticOperation
+    (
+      System& s,
+      const u32string& op
+    )
+    {
+      registerFixedOperation<N, F>(s, op, m_index, m_index);
+    }
+
+    type_index m_index;
+    u32string m_typename;
+    FixedNumeric<T> m_n;
   };
 }
 
