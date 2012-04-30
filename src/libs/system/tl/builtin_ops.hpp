@@ -69,6 +69,9 @@ namespace TransLucid
     mpf_sqrt(const Constant& f);
 
     Constant
+    mpf_abs(const Constant& f);
+
+    Constant
     bool_eq(const Constant& a, const Constant& b);
 
     Constant
