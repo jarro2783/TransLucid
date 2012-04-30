@@ -41,7 +41,7 @@ TEST_CASE ("type registry", "test the type registry index allocation")
 {
   TL::System s;
 
-  TL::type_index start = -8;
+  TL::type_index start = -10;
 
   CHECK(s.getTypeIndex(U"type1") == start-1);
   CHECK(s.getTypeIndex(U"type2") == start-2);

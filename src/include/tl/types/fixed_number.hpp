@@ -104,7 +104,7 @@ namespace TransLucid
     (
       Parser::FnDecl
       {
-        U"numeric" + op,
+        U"fint" + op,
         {
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"is_signed"}
@@ -113,6 +113,28 @@ namespace TransLucid
         {
           {Tree::IdentExpr(U"prec"), mpz_class(size)},
           {Tree::IdentExpr(U"is_signed"), is_signed},
+        }),
+        Tree::Expr(),
+        Tree::IdentExpr(name + op)
+      }
+    );
+  }
+
+  template <int size>
+  void
+  addFloatFunction(System& s, const u32string& name, const u32string& op)
+  {
+    s.addFunction
+    (
+      Parser::FnDecl
+      {
+        U"float" + op,
+        {
+          {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
+        },
+        Tree::TupleExpr(
+        {
+          {Tree::IdentExpr(U"prec"), mpz_class(size)},
         }),
         Tree::Expr(),
         Tree::IdentExpr(name + op)
@@ -147,81 +169,34 @@ namespace TransLucid
   };
 
   template <typename T>
-  class FixedInteger
+  class FixedNumeric
   {
-    struct yes {};
-    struct no {};
     public:
 
     void
-    init(System& s, const u32string& name)
+    init(type_index index, const u32string& name)
     {
-      m_index = s.getTypeIndex(name);
+      m_index = index;
       m_typename = name;
-
-      makeEquation<1>(s, U"construct_" + name, &FixedInteger::construct);
-      makeEquation<1>(s, U"print_" + name, &FixedInteger::print);
-
-      registerArithmeticOperation<2, std::plus>(s, name, U"_plus");
-      registerArithmeticOperation<2, std::minus>(s, name, U"_minus");
-      registerArithmeticOperation<2, std::multiplies>(s, name, U"_times");
-      registerArithmeticOperation<2, std::divides>(s, name, U"_divide");
-      registerArithmeticOperation<2, std::modulus>(s, name, U"_modulus");
-
-      registerBoolOperation<2, std::equal_to>(s, name, U"_eq");
-      registerBoolOperation<2, std::not_equal_to>(s, name, U"_ne");
-      registerBoolOperation<2, std::less>(s, name, U"_lt");
-      registerBoolOperation<2, std::greater>(s, name, U"_gt");
-      registerBoolOperation<2, std::less_equal>(s, name, U"_lte");
-      registerBoolOperation<2, std::greater_equal>(s, name, U"_gte");
-
-      addPrinter(s, name, U"print_" + name); 
-      addConstructor(s, name, U"construct_" + name);
-
-      addTypeEquation(s, name);
     }
 
-    template <size_t N, template <typename> class F>
+    template <size_t N, typename F>
     void
-    registerBoolOperation
+    makeEquation
     (
-      System& s,
-      const u32string& name,
-      const u32string& op
+      System& s, 
+      const u32string& name, 
+      F f
     )
     {
-      registerFixedOperation<N, F>(s, name, op, m_index, TYPE_INDEX_BOOL);
-    }
-
-    template <size_t N, template <typename> class F>
-    void
-    registerFixedOperation
-    (
-      System& s,
-      const u32string& name,
-      const u32string& op,
-      type_index inIndex,
-      type_index outIndex
-    )
-    {
-      makeEquation<N>(s, name + op, NumericOperation<T, F>(inIndex, outIndex));
-
-      addIntegerFunction<
-        std::is_signed<T>::value,
-        sizeof(T) * 8
-      > (s, name, op);
-    }
-
-    template <size_t N, template <typename> class F>
-    void
-    registerArithmeticOperation
-    (
-      System& s,
-      const u32string& name,
-      const u32string& op
-    )
-    {
-      registerFixedOperation<N, F>(s, name, op, m_index, m_index);
+      std::unique_ptr<BuiltinBaseFunction<N>> 
+        fn(new BuiltinBaseFunction<N>
+          (createFunction(f))
+      );
+      std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));
+      fn.release();
+      s.addEquation(name, ws.get());
+      ws.release();
     }
 
     Constant
@@ -261,15 +236,17 @@ namespace TransLucid
     std::function<Constant(const Constant&, const Constant&)>
     BinaryFunction;
 
+    template <typename C>
     UnaryFunction
-    createFunction(Constant (FixedInteger<T>::*f)(const Constant&))
+    createFunction(Constant (C::*f)(const Constant&))
     {
       using std::placeholders::_1;
       return std::bind(std::mem_fn(f), this, _1);
     }
 
+    template <typename C>
     BinaryFunction
-    createFunction(Constant (FixedInteger<T>::*f)
+    createFunction(Constant (C::*f)
       (const Constant&, const Constant&))
     {
       using std::placeholders::_1;
@@ -284,27 +261,174 @@ namespace TransLucid
       return f;
     }
 
-    template <size_t N, typename F>
+    type_index m_index;
+    u32string m_typename;
+  };
+
+  template <typename T>
+  class FixedInteger : private FixedNumeric<T>
+  {
+    public:
+
     void
-    makeEquation
+    init(System& s, const u32string& name)
+    {
+      m_index = s.getTypeIndex(name);
+      m_typename = name;
+      m_n.init(m_index, m_typename);
+
+      m_n. template 
+        makeEquation<1>(s, U"construct_" + name, &FixedNumeric<T>::construct);
+      m_n. template 
+        makeEquation<1>(s, U"print_" + name, &FixedNumeric<T>::print);
+
+      registerArithmeticOperation<2, std::plus>(s, U"_plus");
+      registerArithmeticOperation<2, std::minus>(s, U"_minus");
+      registerArithmeticOperation<2, std::multiplies>(s, U"_times");
+      registerArithmeticOperation<2, std::divides>(s, U"_divide");
+      registerArithmeticOperation<2, std::modulus>(s, U"_modulus");
+
+      registerBoolOperation<2, std::equal_to>(s, U"_eq");
+      registerBoolOperation<2, std::not_equal_to>(s, U"_ne");
+      registerBoolOperation<2, std::less>(s, U"_lt");
+      registerBoolOperation<2, std::greater>(s, U"_gt");
+      registerBoolOperation<2, std::less_equal>(s, U"_lte");
+      registerBoolOperation<2, std::greater_equal>(s, U"_gte");
+
+      addPrinter(s, name, U"print_" + name); 
+      addConstructor(s, name, U"construct_" + name);
+
+      addTypeEquation(s, name);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerBoolOperation
     (
-      System& s, 
-      const u32string& name, 
-      F f
+      System& s,
+      const u32string& op
     )
     {
-      std::unique_ptr<BuiltinBaseFunction<N>> 
-        fn(new BuiltinBaseFunction<N>
-          (createFunction(f))
-      );
-      std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));
-      fn.release();
-      s.addEquation(name, ws.get());
-      ws.release();
+      registerFixedOperation<N, F>(s, 
+        op, m_index, TYPE_INDEX_BOOL);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerFixedOperation
+    (
+      System& s,
+      const u32string& op,
+      type_index inIndex,
+      type_index outIndex
+    )
+    {
+      m_n. template makeEquation<N>(s, m_typename + op, 
+        NumericOperation<T, F>(inIndex, outIndex));
+
+      addIntegerFunction<
+        std::is_signed<T>::value,
+        sizeof(T) * 8
+      > (s, m_typename, op);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerArithmeticOperation
+    (
+      System& s,
+      const u32string& op
+    )
+    {
+      registerFixedOperation<N, F>(s, op, m_index, m_index);
+    }
+
+
+    type_index m_index;
+    u32string m_typename;
+    FixedNumeric<T> m_n;
+  };
+
+  template <typename T>
+  class FixedFloat
+  {
+    public:
+
+    void
+    init(System& s, const u32string& name)
+    {
+      m_index = s.getTypeIndex(name);
+      m_typename = name;
+      m_n.init(m_index, m_typename);
+
+      m_n. template 
+        makeEquation<1>(s, U"construct_" + name, &FixedNumeric<T>::construct);
+      m_n. template 
+        makeEquation<1>(s, U"print_" + name, &FixedNumeric<T>::print);
+
+      registerArithmeticOperation<2, std::plus>(s, U"_plus");
+      registerArithmeticOperation<2, std::minus>(s, U"_minus");
+      registerArithmeticOperation<2, std::multiplies>(s, U"_times");
+      registerArithmeticOperation<2, std::divides>(s, U"_divide");
+      //registerArithmeticOperation<2, std::modulus>(s, U"_modulus");
+
+      registerBoolOperation<2, std::equal_to>(s, U"_eq");
+      registerBoolOperation<2, std::not_equal_to>(s, U"_ne");
+      registerBoolOperation<2, std::less>(s, U"_lt");
+      registerBoolOperation<2, std::greater>(s, U"_gt");
+      registerBoolOperation<2, std::less_equal>(s, U"_lte");
+      registerBoolOperation<2, std::greater_equal>(s, U"_gte");
+
+      addPrinter(s, name, U"print_" + name); 
+      addConstructor(s, name, U"construct_" + name);
+
+      addTypeEquation(s, name);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerBoolOperation
+    (
+      System& s,
+      const u32string& op
+    )
+    {
+      registerFixedOperation<N, F>(s, 
+        op, m_index, TYPE_INDEX_BOOL);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerFixedOperation
+    (
+      System& s,
+      const u32string& op,
+      type_index inIndex,
+      type_index outIndex
+    )
+    {
+      m_n. template makeEquation<N>(s, m_typename + op, 
+        NumericOperation<T, F>(inIndex, outIndex));
+
+      addFloatFunction<
+        sizeof(T) * 8
+      > (s, m_typename, op);
+    }
+
+    template <size_t N, template <typename> class F>
+    void
+    registerArithmeticOperation
+    (
+      System& s,
+      const u32string& op
+    )
+    {
+      registerFixedOperation<N, F>(s, op, m_index, m_index);
     }
 
     type_index m_index;
     u32string m_typename;
+    FixedNumeric<T> m_n;
   };
 }
 

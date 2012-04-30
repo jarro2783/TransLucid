@@ -60,32 +60,41 @@ fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
 fun plus.a.b [a : floatmp, b : floatmp] = floatmp_plus!(a,b);;
 fun plus.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
-  = (numeric_plus.(a!prec).(a!is_signed))!(a,b);;
+  = (fint_plus.(a!prec).(a!is_signed))!(a,b);;
 
 fun minus.a.b [a : intmp, b : intmp] = intmp_minus!(a,b);;
 fun minus.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
-  = (numeric_minus.(a!prec).(a!is_signed))!(a,b);;
+  = (fint_minus.(a!prec).(a!is_signed))!(a,b);;
 
 fun times.a.b [a : intmp, b : intmp] = intmp_times!(a,b);;
 fun times.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
-  = (numeric_times.(a!prec).(a!is_signed))!(a,b);;
+  = (fint_times.(a!prec).(a!is_signed))!(a,b);;
 
 fun divide.a.b [a : intmp, b : intmp] = intmp_divide!(a,b);;
 fun divide.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
-  = (numeric_divide.(a!prec).(a!is_signed))!(a,b);;
+  = (fint_divide.(a!prec).(a!is_signed))!(a,b);;
 
 fun modulus.a.b [a : intmp, b : intmp] = intmp_modulus!(a,b);;
 fun modulus.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed
-  = (numeric_modulus.(a!prec).(a!is_signed))!(a,b);;
+  = (fint_modulus.(a!prec).(a!is_signed))!(a,b);;
 
 fun sqrt.a [a : floatmp] = floatmp_sqrt!a;;
 
-//version 2
-//fun plus.a.b [a : float, b : float] | a!prec == b!prec = float_plus!(a,b);;
+fun plus.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_plus.(a!prec))!(a,b);;
+
+fun minus.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_minus.(a!prec))!(a,b);;
+
+fun times.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_times.(a!prec))!(a,b);;
+
+fun divide.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_divide.(a!prec))!(a,b);;
 
 fun constant_bang.a.b [a : sint8] = sint8_bang.b;;
 fun constant_bang.a.b [a : uint8] = uint8_bang.b;;
@@ -95,6 +104,11 @@ fun constant_bang.a.b [a : sint32] = sint32_bang.b;;
 fun constant_bang.a.b [a : uint32] = uint32_bang.b;;
 fun constant_bang.a.b [a : sint64] = sint64_bang.b;;
 fun constant_bang.a.b [a : uint64] = uint64_bang.b;;
+fun constant_bang.a.b [a : float32] = float32_bang.b;;
+fun constant_bang.a.b [a : float64] = float64_bang.b;;
+
+fun float32_bang.a [a : prec] = 32;;
+fun float64_bang.a [a : prec] = 64;;
 
 fun sint8_bang.a [a : prec] = 8;;
 fun sint8_bang.a [a : is_signed] = true;;
@@ -129,33 +143,51 @@ fun uint64_bang.a [a : is_signed] = false;;
 fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
 fun lte.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed 
-  = numeric_lte.(a!prec).(a!is_signed)!(a,b);;
+  = fint_lte.(a!prec).(a!is_signed)!(a,b);;
 
 fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
 fun lt.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
-  = numeric_lt.(a!prec).(a!is_signed)!(a,b);;
+  = fint_lt.(a!prec).(a!is_signed)!(a,b);;
 
 fun gte.a.b [a : intmp, b : intmp] = intmp_gte!(a,b);;
 fun gte.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
-  = numeric_gte.(a!prec).(a!is_signed)!(a,b);;
+  = fint_gte.(a!prec).(a!is_signed)!(a,b);;
 
 fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
 fun gt.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
-  = numeric_gt.(a!prec).(a!is_signed)!(a,b);;
+  = fint_gt.(a!prec).(a!is_signed)!(a,b);;
 
 fun eq.a.b [a : intmp, b : intmp] = intmp_eq!(a,b);;
 fun eq.a.b [a : fint, b : fint] 
   | intmp_eq!(a!prec, b!prec) && bool_eq!(a!is_signed, b!is_signed)
-  = (numeric_eq.(a!prec).(a!is_signed))!(a,b);;
+  = (fint_eq.(a!prec).(a!is_signed))!(a,b);;
 
 fun ne.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
-  = numeric_ne.(a!prec).(a!is_signed)!(a,b);;
+  = fint_ne.(a!prec).(a!is_signed)!(a,b);;
 
 fun eq.a.b [a : bool, b : bool] = bool_eq!(a,b);;
+
+fun lt.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_lt.(a!prec))!(a,b);;
+
+fun lte.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_lte.(a!prec))!(a,b);;
+
+fun gt.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_gt.(a!prec))!(a,b);;
+
+fun gte.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_gte.(a!prec))!(a,b);;
+
+fun eq.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_eq.(a!prec))!(a,b);;
+
+fun ne.a.b [a : float, b : float] | a!prec == b!prec 
+  = (float_ne.(a!prec))!(a,b);;
 
 fun bool_and a b = if a then b else false fi;;
 fun bool_or a b = if a then true else b fi;;
