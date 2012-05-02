@@ -102,6 +102,7 @@ fun divide.a.b [a : float, b : float] | a!prec == b!prec
   = (float_divide.(a!prec))!(a,b);;
 
 fun uminus.a [a : floatmp] = floatmp_uminus!a;;
+fun uminus.a [a : intmp] = intmp_uminus!a;;
 
 fun constant_bang.a.b [a : sint8] = sint8_bang.b;;
 fun constant_bang.a.b [a : uint8] = uint8_bang.b;;

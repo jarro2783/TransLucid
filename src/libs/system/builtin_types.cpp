@@ -102,6 +102,7 @@ namespace TransLucid
     BuiltinBaseFunction<2> integer_gt{&mpz_gt};
     BuiltinBaseFunction<2> integer_eq{&mpz_eq};
     BuiltinBaseFunction<2> integer_ne{&mpz_ne};
+    BuiltinBaseFunction<1> integer_uminus{&mpz_uminus};
 
     BuiltinBaseFunction<2> float_plus{&mpf_plus};
     BuiltinBaseFunction<2> float_minus{&mpf_minus};
@@ -309,6 +310,7 @@ namespace TransLucid
       {U"intmp_gt", &integer_gt},
       {U"intmp_eq", &integer_eq},
       {U"intmp_ne", &integer_ne},
+      {U"intmp_uminus", &integer_uminus},
       
       {U"floatmp_plus", &float_plus},
       {U"floatmp_minus", &float_minus},
@@ -635,6 +637,12 @@ namespace TransLucid
       return Types::Boolean::create(get_constant_pointer<mpz_class>(a) !=
         get_constant_pointer<mpz_class>(b))
       ;
+    }
+
+    Constant
+    mpz_uminus(const Constant& a)
+    {
+      return Types::Intmp::create(-Types::Intmp::get(a));
     }
 
     Constant

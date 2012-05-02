@@ -36,6 +36,9 @@ namespace TransLucid
     mpz_ne(const Constant& a, const Constant& b);
 
     Constant
+    mpz_uminus(const Constant& a);
+
+    Constant
     mpf_plus(const Constant& a, const Constant& b);
 
     Constant
