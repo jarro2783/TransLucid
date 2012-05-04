@@ -355,3 +355,28 @@ fun runningSum.d X = S
 where
   var S = fby.d X (next.d X + S) ;;
 end ;;
+
+fun default₁.d.m.n.val X = f
+where
+  var f [d : m..n] = X ;;
+  var f [d : nat] = val ;;
+end ;;
+
+fun default₂.d₁.m₁.n₁.d₂.m₂.n₂.val X = f
+where
+  var f [d₁ : m₁..n₁, d₂ : m₂..n₂] = X ;;
+  var f [d₁ : nat, d₂ : nat] = val ;;
+end ;;
+
+fun tournamentOp₁.d.n.g A = B @ [d <- 0]
+where
+  dim t <- ilog.n ;;
+  var B = fby.t A (g.(firstOfPair.d B).(secondOfPair.d B)) ;;
+end ;;
+
+fun tournamentOp₂.d₁.d₂.n.g A = B @ [d <- 0]
+where
+  dim t <- ilog.n ;;
+  var B = fby.t A (g.(NWofQuad.d₁.d₂ B).(NEofQuad.d₁.d₂ B).
+                     (SWofQuad.d₁.d₂ B).(SEofQuad.d₁.d₂ B)) ;;
+end ;;
