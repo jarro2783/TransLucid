@@ -152,7 +152,9 @@ fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
 fun lte.a.b [a : intmp, b : infty] = true;;
 fun lte.a.b [a : infty, b : intmp] = false;;
 fun lte.a.b [a : infty, b : infty] = true;;
+fun lte.a.b [a : neginfty, b : neginfty] = true;;
 fun lte.a.b [a : neginfty, b : intmp] = true;;
+fun lte.a.b [a : intmp, b : neginfty] = false;;
 fun lte.a.b [a : floatmp, b : floatmp] = floatmp_lte!(a,b);;
 fun lte.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed 
@@ -314,6 +316,8 @@ fun canonical_print.c               = print_typename.c + `"` +
                                       escape_string.(print.c) + `"`;;
 //fun canonical_print.c = "cannot print this thing";;
 fun canonical_print.c [c : special] = print.c;;
+fun canonical_print.c [c : infty] = "infty";;
+fun canonical_print.c [c : neginfty] = "neginfty";;
 
 var RETURN = 0;;
 
