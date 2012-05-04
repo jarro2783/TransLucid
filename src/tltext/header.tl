@@ -149,6 +149,8 @@ fun uint64_bang.a [a : is_signed] = false;;
 //fun sint8_bang.a.b [a : signed] = true;;
 
 fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
+fun lte.a.b [a : intmp, b : infty] = true;;
+fun lte.a.b [a : neginfty, b : intmp] = true;;
 fun lte.a.b [a : floatmp, b : floatmp] = floatmp_lte!(a,b);;
 fun lte.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed 
