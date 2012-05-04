@@ -350,3 +350,8 @@ where
   dim d <- 0 ;;
   var double = fby.d 1 (double * 2) ;;
 end ;;
+
+fun runningSum.d X = S
+where
+  var S = fby.d X (next.d X + S) ;;
+end ;;
