@@ -155,6 +155,8 @@ fun lte.a.b [a : fint, b : fint]
   = fint_lte.(a!prec).(a!is_signed)!(a,b);;
 
 fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
+fun lt.a.b [a : intmp, b : infty] = true;;
+fun lt.a.b [a : neginfty, b : intmp] = true;;
 fun lt.a.b [a : floatmp, b : floatmp] = floatmp_lt!(a,b);;
 fun lt.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
@@ -166,6 +168,7 @@ fun gte.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
   = fint_gte.(a!prec).(a!is_signed)!(a,b);;
 
+fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
 fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
 fun gt.a.b [a : floatmp, b : floatmp] = floatmp_gt!(a,b);;
 fun gt.a.b [a : fint, b : fint]
