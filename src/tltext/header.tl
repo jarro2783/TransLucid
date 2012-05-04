@@ -356,9 +356,9 @@ where
   var double = fby.d 1 (double * 2) ;;
 end ;;
 
-fun runningSum.d X = S
+fun runningOp.d.g X = S
 where
-  var S = fby.d X (next.d X + S) ;;
+  var S = fby.d X (g.(next.d X).S) ;;
 end ;;
 
 fun default₁.d.m.n.val X = f
