@@ -171,7 +171,6 @@ fun gte.a.b [a : fint, b : fint]
   = fint_gte.(a!prec).(a!is_signed)!(a,b);;
 
 fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
-fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
 fun gt.a.b [a : floatmp, b : floatmp] = floatmp_gt!(a,b);;
 fun gt.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
