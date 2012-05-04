@@ -163,7 +163,10 @@ fun lte.a.b [a : fint, b : fint]
 fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
 fun lt.a.b [a : intmp, b : infty] = true;;
 fun lt.a.b [a : infty, b : intmp] = false;;
+fun lt.a.b [a : infty, b : infty] = false;;
+fun lt.a.b [a : neginfty, b : neginfty] = false;;
 fun lt.a.b [a : neginfty, b : intmp] = true;;
+fun lt.a.b [a : intmp, b : neginfty] = false;;
 fun lt.a.b [a : floatmp, b : floatmp] = floatmp_lt!(a,b);;
 fun lt.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
