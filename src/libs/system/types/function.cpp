@@ -158,11 +158,16 @@ NameFunctionType::NameFunctionType
   Context& k
 )
 : m_system(system), m_name(name), m_argDim(argDim), 
-  m_odometerDim(odometerDim), m_expr(expr), m_free(free), m_freeContext(k)
+  m_odometerDim(odometerDim), m_expr(expr), m_free(free)
 {
   for (auto d : scope)
   {
     m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+  }
+
+  if (!m_free.empty())
+  {
+    m_freeContext = k;
   }
 }
 
