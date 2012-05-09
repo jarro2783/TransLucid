@@ -270,11 +270,16 @@ namespace TransLucid
       Context& k
     )
     : m_system(system), m_name(name), m_dim(argDim),
-      m_free(free), m_freeContext(k), m_expr(expr)
+      m_free(free), m_expr(expr)
     {
       for (auto d : scope)
       {
         m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      if (!free.empty())
+      {
+        m_freeContext = k;
       }
     }
 

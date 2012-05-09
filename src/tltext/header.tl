@@ -394,3 +394,41 @@ where
   var B = fby.t A (g.(NWofQuad.d₁.d₂ B).(NEofQuad.d₁.d₂ B).
                      (SWofQuad.d₁.d₂ B).(SEofQuad.d₁.d₂ B)) ;;
 end ;;
+
+
+// Define lists and functions over lists.
+
+// The List data type and the Cons and Nil constructors.
+data List a = Cons a (List a) | Nil ;;
+
+// Two infix operators defined over lists.
+op :: = OpInfix."cons_list".false.AssocRight.(~10) ;;
+op <> = OpInfix."append_list".false.AssocRight.(~10) ;;
+
+// The cons_list function corresponding to operator "::".
+fun cons_list.a.b [b : [type <- "List"]] = Cons.a.b ;;
+
+// The append_list function corresponding to operator "<>".
+fun append_list.l₁.l₂
+  [l₁ : Nil, l₂ : [type <- "List"]] = l₂ ;;
+fun append_list.l₁.l₂
+  [l₁ : [type <- "List"], l₂ : [type <- "List"]]
+  = head.l₁ :: append_list.(tail.l₁).l₂ ;;
+
+// True if l is a List.
+fun isList.l [l : [type <- "List"]] = true ;;
+fun isList.l = false ;;
+
+// True if l is Nil.
+fun isNil.l [l : Nil] = true ;;
+fun isNil.l = false ;;
+
+// The head of non-empty list l.
+fun head.l [l : [type <- "List", cons <- "Cons"]] = l!arg0;;
+
+// The tail of non-empty list l.
+fun tail.l [l : [type <- "List", cons <- "Cons"]] = l!arg1;;
+
+// The length of a list.
+fun length.l [l : Nil] = 0 ;;
+fun length.l [l : [type <- "List"]] = 1 + length.(tail.l) ;;
