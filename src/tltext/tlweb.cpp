@@ -33,6 +33,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #define _(String) String
 
+#define CPU_TIME_LIMIT 119
+
 //This runs the main web app interface to tltext.
 //We are using the POST method for html.
 
@@ -266,7 +268,7 @@ int main(int argc, char* argv[])
 
     //kill the program if it runs too long
     signal(SIGVTALRM, timeoutHandler);
-    itimerval timer{{0, 0}, {5, 0}};
+    itimerval timer{{0, 0}, {CPU_TIME_LIMIT, 0}};
     setitimer(ITIMER_VIRTUAL, &timer, 0);
 
     tl.add_header(HEADERDIR "/header.tl");
