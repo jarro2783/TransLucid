@@ -25,8 +25,36 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_TREE_REWRITER_HPP_INCLUDED
 #define TL_TREE_REWRITER_HPP_INCLUDED
 
+#include <tl/ast.hpp>
+
 namespace TransLucid
 {
+  class TreeRewriter
+  {
+    Tree::Expr operator()(const Tree::nil& n);
+    Tree::Expr operator()(bool b);
+    Tree::Expr operator()(Special s);
+    Tree::Expr operator()(const mpz_class& i);
+    Tree::Expr operator()(char32_t c);
+    Tree::Expr operator()(const u32string& s);
+    Tree::Expr operator()(const Tree::HashSymbol& e);
+    Tree::Expr operator()(const Tree::LiteralExpr& e);
+    Tree::Expr operator()(const Tree::DimensionExpr& e);
+    Tree::Expr operator()(const Tree::IdentExpr& e);
+    Tree::Expr operator()(const Tree::ParenExpr& e);
+    Tree::Expr operator()(const Tree::UnaryOpExpr& e);
+    Tree::Expr operator()(const Tree::BinaryOpExpr& e);
+    Tree::Expr operator()(const Tree::IfExpr& e);
+    Tree::Expr operator()(const Tree::HashExpr& e);
+    Tree::Expr operator()(const Tree::TupleExpr& e);
+    Tree::Expr operator()(const Tree::AtExpr& e);
+    Tree::Expr operator()(const Tree::LambdaExpr& e);
+    Tree::Expr operator()(const Tree::PhiExpr& e);
+    Tree::Expr operator()(const Tree::BangAppExpr& e);
+    Tree::Expr operator()(const Tree::LambdaAppExpr& e);
+    Tree::Expr operator()(const Tree::PhiAppExpr& e);
+    Tree::Expr operator()(const Tree::WhereExpr& e);
+  };
 }
 
 #endif

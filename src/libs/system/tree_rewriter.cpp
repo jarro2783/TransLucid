@@ -25,4 +25,127 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::nil& n)
+{
+  return n;
+}
+
+Tree::Expr 
+TreeRewriter::operator()(bool b)
+{
+  return b;
+}
+
+Tree::Expr 
+TreeRewriter::operator()(Special s)
+{
+  return s;
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const mpz_class& i)
+{
+  return i;
+}
+
+Tree::Expr 
+TreeRewriter::operator()(char32_t c)
+{
+  return c;
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const u32string& s)
+{
+  return s;
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::HashSymbol& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::LiteralExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::DimensionExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::IdentExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::ParenExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::UnaryOpExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::BinaryOpExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::IfExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::HashExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::TupleExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::AtExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::LambdaExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::PhiExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::BangAppExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::LambdaAppExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::PhiAppExpr& e)
+{
+}
+
+Tree::Expr 
+TreeRewriter::operator()(const Tree::WhereExpr& e)
+{
+}
+
+
 }
