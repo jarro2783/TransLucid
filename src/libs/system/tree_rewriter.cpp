@@ -198,11 +198,13 @@ TreeRewriter::operator()(const Tree::AtExpr& e)
 Tree::Expr 
 TreeRewriter::operator()(const Tree::LambdaExpr& e)
 {
+  return Tree::LambdaExpr(e.name, apply_visitor(*this, e.rhs));
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::PhiExpr& e)
 {
+  return Tree::PhiExpr(e.name, apply_visitor(*this, e.rhs));
 }
 
 Tree::Expr 
@@ -231,11 +233,21 @@ TreeRewriter::operator()(const Tree::BangAppExpr& e)
 Tree::Expr 
 TreeRewriter::operator()(const Tree::LambdaAppExpr& e)
 {
+  return Tree::LambdaAppExpr
+  (
+    apply_visitor(*this, e.lhs),
+    apply_visitor(*this, e.rhs)
+  );
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::PhiAppExpr& e)
 {
+  return Tree::PhiAppExpr
+  (
+    apply_visitor(*this, e.lhs),
+    apply_visitor(*this, e.rhs)
+  );
 }
 
 Tree::Expr 
