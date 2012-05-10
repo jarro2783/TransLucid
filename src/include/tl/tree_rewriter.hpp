@@ -31,6 +31,9 @@ namespace TransLucid
 {
   class TreeRewriter
   {
+    public:
+    typedef Tree::Expr result_type;
+
     Tree::Expr operator()(const Tree::nil& n);
     Tree::Expr operator()(bool b);
     Tree::Expr operator()(Special s);

@@ -65,56 +65,134 @@ TreeRewriter::operator()(const u32string& s)
 Tree::Expr 
 TreeRewriter::operator()(const Tree::HashSymbol& e)
 {
+  return e;
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::LiteralExpr& e)
 {
+  return 
+    Tree::LambdaAppExpr( 
+      Tree::LambdaAppExpr(Tree::IdentExpr(U"construct_literal"), e.type),
+      e.text);
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::DimensionExpr& e)
 {
+  return e;
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::IdentExpr& e)
 {
+  return e;
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::ParenExpr& e)
 {
+  //we can drop the parens now
+  return apply_visitor(*this, e.e);
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::UnaryOpExpr& e)
 {
+  //(FN1 ! (#arg0)) @ [fnname <- e.op.op, arg0 <- T(e.e)]
+
+  Tree::Expr expr = apply_visitor(*this, e.e);
+
+  Tree::Expr result = Tree::LambdaAppExpr
+  (
+    Tree::IdentExpr(e.op.op),
+    expr
+  );
+
+  return apply_visitor(*this, result);
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::BinaryOpExpr& e)
 {
+  //(e.op.op) . (e.lhs) . (e.rhs)
+  //(FN2 ! (#arg0, #arg1))
+  //  @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)]
+
+  Tree::Expr elhs = apply_visitor(*this, e.lhs);
+  Tree::Expr erhs = apply_visitor(*this, e.rhs);
+
+  Tree::Expr result;
+    
+  if (e.op.cbn)
+  {
+    result = Tree::PhiAppExpr
+    (
+      Tree::PhiAppExpr(Tree::IdentExpr(e.op.op), e.lhs),
+      e.rhs
+    );
+  }
+  else
+  {
+    result = Tree::LambdaAppExpr
+    (
+      Tree::LambdaAppExpr(Tree::IdentExpr(e.op.op), e.lhs),
+      e.rhs
+    );
+  }
+
+  return apply_visitor(*this, result);
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::IfExpr& e)
 {
+  //do the elseifs
+  std::vector<std::pair<Tree::Expr, Tree::Expr>> else_ifs;
+  for (auto p : e.else_ifs)
+  {
+    else_ifs.push_back(std::make_pair(
+      apply_visitor(*this, p.first),
+      apply_visitor(*this, p.second)
+    ));
+  }
+
+  return Tree::IfExpr(
+    apply_visitor(*this, e.condition),
+    apply_visitor(*this, e.then),
+    else_ifs,
+    apply_visitor(*this, e.else_)
+  );
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::HashExpr& e)
 {
+  return Tree::HashExpr(apply_visitor(*this, e.e), e.cached);
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::TupleExpr& e)
 {
+  std::vector<std::pair<Tree::Expr, Tree::Expr>> tuple;
+  for (auto p : e.pairs)
+  {
+    tuple.push_back(std::make_pair(
+      apply_visitor(*this, p.first),
+      apply_visitor(*this, p.second)
+    ));
+  }
+
+  return Tree::TupleExpr(tuple);
 }
 
 Tree::Expr 
 TreeRewriter::operator()(const Tree::AtExpr& e)
 {
+  return Tree::AtExpr(
+    apply_visitor(*this, e.lhs),
+    apply_visitor(*this, e.rhs)
+  );
 }
 
 Tree::Expr 
@@ -130,6 +208,24 @@ TreeRewriter::operator()(const Tree::PhiExpr& e)
 Tree::Expr 
 TreeRewriter::operator()(const Tree::BangAppExpr& e)
 {
+  //first check if it is #!E
+  if (get<Tree::HashSymbol>(&e.name) != nullptr)
+  {
+    Tree::Expr rhs = apply_visitor(*this, e.args.at(0));
+    return Tree::HashExpr(rhs);
+  }
+  else
+  {
+    Tree::Expr name = apply_visitor(*this, e.name);
+    std::vector<Tree::Expr> args;
+
+    for (auto expr : e.args)
+    {
+      args.push_back(apply_visitor(*this, expr));
+    }
+
+    return Tree::BangAppExpr(name, args);
+  }
 }
 
 Tree::Expr 
