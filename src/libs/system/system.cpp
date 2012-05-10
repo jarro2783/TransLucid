@@ -1,5 +1,5 @@
 /* The System.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -1030,11 +1030,13 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
 System::System(bool cached)
 : m_cached(cached),
   m_cacheEnabled(cached),
+  m_nextTypeIndex(-1),
   m_typeRegistry(m_nextTypeIndex,
   std::vector<std::pair<u32string, type_index>>{
    {U"error", TYPE_INDEX_ERROR},
    {U"ustring", TYPE_INDEX_USTRING},
    {U"intmp", TYPE_INDEX_INTMP},
+   {U"floatmp", TYPE_INDEX_FLOATMP},
    {U"bool", TYPE_INDEX_BOOL},
    {U"special", TYPE_INDEX_SPECIAL},
    {U"uchar", TYPE_INDEX_UCHAR},
@@ -1047,6 +1049,8 @@ System::System(bool cached)
    {U"uuid", TYPE_INDEX_UUID},
    {U"demand", TYPE_INDEX_DEMAND},
    {U"calc", TYPE_INDEX_CALC},
+   {U"basefun", TYPE_INDEX_BASE_FUNCTION},
+   {U"union", TYPE_INDEX_UNION}
   }
   )
 , m_time(0)

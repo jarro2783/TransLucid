@@ -168,7 +168,6 @@ GuardWS::compile() const
 
     for (const auto& val : pairs)
     {
-      #if 0
       bool lhsConst = true;
       bool rhsConst = true;
       Constant lhs = val.first->operator()(k);
@@ -215,8 +214,9 @@ GuardWS::compile() const
           m_dimNonNon.insert(std::make_pair(val.first, val.second));
         }
       }
-      #endif
+      #if 0
       m_dimNonNon.insert(std::make_pair(val.first, val.second));
+      #endif
     }
 
     if (m_dimConstNon.size() == 0 && m_dimNonConst.size() == 0

@@ -1,0 +1,11 @@
+%%
+floatmp"5";;
+floatmp"5" + floatmp"6";;
+floatmp"5" * floatmp"6";;
+floatmp"4" / floatmp"2";;
+floatmp"5" < floatmp"6";;
+floatmp"5" > floatmp"6";;
+floatmp"5" <= floatmp"6";;
+floatmp"5" >= floatmp"6";;
+floatmp"5" == floatmp"6";;
+floatmp"5" != floatmp"6";;

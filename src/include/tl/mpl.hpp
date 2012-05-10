@@ -1,5 +1,5 @@
 /* Meta-programming utility.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <type_traits>
 #include <cstdlib>
+#include <utility>
 
 namespace TransLucid
 {

@@ -101,13 +101,15 @@ namespace TransLucid
         m_rules.add(UR"(\\)", TOKEN_SLASH);
 
         m_rules.add(U"{IDENT}", TOKEN_ID);
-        m_rules.add(U"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))", TOKEN_INTEGER);
 
         m_rules.add(U"([ \\r\\n\\t])|(\\/\\/([^\\n]*)\\n)", 
           m_state_machine.skip());
         
         m_rules.add(UR"**([\p{S}!%\*\-\.&/:]+)**", 
           TOKEN_OPERATOR);
+
+        //int ~ has higher priority than as an operator
+        m_rules.add(U"0|(~?({intDEC}|{intNONDEC}|{intUNARY}))", TOKEN_INTEGER);
         //, spaces(U"[ \\n\\t]")
         //, binary_op_(U".", OpTokens::TOK_BINARY_OP)
         //, prefix_op_(U".", OpTokens::TOK_PREFIX_OP)

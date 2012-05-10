@@ -39,6 +39,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
+#include <tl/types/union.hpp>
 
 #ifdef ICONV_CONVERT
 #include <iconv.h>
@@ -127,11 +128,8 @@ namespace
   subset_of_range(const Constant& c)
   {
     //at the moment we can only do ranges of integers
-    if (c.index() != TYPE_INDEX_INTMP)
-    {
-      return &issubset_false;
-    }
-    else
+    
+    if (c.index() == TYPE_INDEX_INTMP)
     {
       //lambda functions to the rescue
       return [] (const Constant& a, const Constant& b)
@@ -141,6 +139,19 @@ namespace
         }
       ;
     }
+    else if (c.index() == TYPE_INDEX_RANGE)
+    {
+      return [] (const Constant& a, const Constant& b)
+        {
+          //a is a range, b is a range
+          return Types::Range::get(b).within(Types::Range::get(a));
+        }
+      ;
+    }
+    else
+    {
+      return &issubset_false;
+    }
   }
 
   IsSubsetFn
@@ -148,10 +159,40 @@ namespace
   {
     return [] (const Constant& a, const Constant& b)
       {
+        if (a.index() == TYPE_INDEX_TYPE)
+        {
+          return a == b;
+        }
         //b is a type, a is anything
         return (a.index() == get_constant<type_index>(b));
       }
     ;
+  }
+
+  bool subset_union_constant(const Constant& a, const Constant& b)
+  {
+    //a is a union
+    const UnionType& u = Types::Union::get(b);
+
+    return u.contains(a);
+  }
+
+  bool subset_union_union(const Constant& a, const Constant& b)
+  {
+    return false;
+  }
+
+  IsSubsetFn
+  subset_of_union(const Constant& c)
+  {
+    if (c.index() == TYPE_INDEX_UNION)
+    {
+      return &subset_union_union;
+    }
+    else
+    {
+      return &subset_union_constant;
+    }
   }
 
   class TypeComparators
@@ -168,10 +209,12 @@ namespace
           &isSubsetAtomic<TYPE_INDEX_INTMP>,
           &isSubsetAtomic<TYPE_INDEX_UCHAR>,
           &isSubsetAtomic<TYPE_INDEX_USTRING>,
+          &isSubsetAtomic<TYPE_INDEX_FLOATMP>,
           &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
           &subset_of_tuple,
           &subset_of_type,
-          &subset_of_range
+          &subset_of_range,
+          &subset_of_union
         };
     }
 
@@ -194,7 +237,7 @@ namespace
     }
 
     private:
-    static const int NUM_FUNS = TYPE_INDEX_RANGE + 1;
+    static const int NUM_FUNS = TYPE_INDEX_UNION + 1;
     IsSubsetOf* m_funs;
   };
 

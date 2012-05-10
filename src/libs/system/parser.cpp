@@ -651,6 +651,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
         {
           expect(listIter, end, element, "expression", &Parser::parse_expr);
           exprList.push_back(std::move(element));
+          element = Tree::nil();
 
           if (listIter->getType() != TOKEN_COMMA) { makingList = false; }
           else { ++listIter; }
@@ -693,10 +694,12 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
     Tree::Expr rhs;
     expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
 
-    auto op = find_unary_operator(
-      get<u32string>(begin->getValue()), 
-      m_idents, DIM_SYMBOL, m_context, 
-      Tree::UNARY_PREFIX);
+    //auto op = find_unary_operator(
+    //  get<Tree::UnaryOperator>(begin->getValue()), 
+    //  m_idents, DIM_SYMBOL, m_context, 
+    //  Tree::UNARY_PREFIX);
+
+    auto op = get<Tree::UnaryOperator>(begin->getValue());
     result = Tree::UnaryOpExpr(op, rhs);
 
     begin = current;

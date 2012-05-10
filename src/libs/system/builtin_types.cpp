@@ -33,17 +33,21 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/internal_strings.hpp>
 #include <tl/output.hpp>
 #include <tl/system.hpp>
+#include <tl/system_util.hpp>
 #include <tl/types.hpp>
 #include <tl/types/boolean.hpp>
 #include <tl/types/char.hpp>
 #include <tl/types/demand.hpp>
+#include <tl/types/floatmp.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/intmp.hpp>
+#include <tl/types/numbers.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
+#include <tl/types/union.hpp>
 #include <tl/types/uuid.hpp>
 #include <tl/types/workshop.hpp>
 #include <tl/types_util.hpp>
@@ -73,6 +77,10 @@ namespace TransLucid
       static_cast<Constant (*)(const Constant&)>(&Types::UUID::create)
     };
 
+    BuiltinBaseFunction<1> construct_floatmp {
+      static_cast<Constant (*)(const Constant&)>(&Types::Floatmp::create)
+    };
+
     BuiltinBaseFunction<1> print_intmp{&Types::Intmp::print};
     BuiltinBaseFunction<1> print_uchar{&Types::UChar::print};
     //BuiltinBaseFunction<1> print_special_base{&Types::Special::print};
@@ -81,6 +89,7 @@ namespace TransLucid
     BuiltinBaseFunction<1> print_typetype{&Types::Type::print};
     BuiltinBaseFunction<1> print_error{&print_error_value};
     BuiltinBaseFunction<1> print_uuid{&Types::UUID::print};
+    BuiltinBaseFunction<1> print_floatmp{&Types::Floatmp::print};
 
     BuiltinBaseFunction<2> integer_plus{&mpz_plus};
     BuiltinBaseFunction<2> integer_minus{&mpz_minus};
@@ -93,6 +102,22 @@ namespace TransLucid
     BuiltinBaseFunction<2> integer_gt{&mpz_gt};
     BuiltinBaseFunction<2> integer_eq{&mpz_eq};
     BuiltinBaseFunction<2> integer_ne{&mpz_ne};
+    BuiltinBaseFunction<1> integer_uminus{&mpz_uminus};
+
+    BuiltinBaseFunction<2> float_plus{&mpf_plus};
+    BuiltinBaseFunction<2> float_minus{&mpf_minus};
+    BuiltinBaseFunction<2> float_times{&mpf_times};
+    BuiltinBaseFunction<2> float_divide{&mpf_divide};
+    BuiltinBaseFunction<2> float_lte{&mpf_lte};
+    BuiltinBaseFunction<2> float_lt{&mpf_lt};
+    BuiltinBaseFunction<2> float_gte{&mpf_gte};
+    BuiltinBaseFunction<2> float_gt{&mpf_gt};
+    BuiltinBaseFunction<2> float_eq{&mpf_eq};
+    BuiltinBaseFunction<2> float_ne{&mpf_ne};
+    BuiltinBaseFunction<1> float_sqrt{&mpf_sqrt};
+    BuiltinBaseFunction<1> float_abs{&mpf_abs};
+    BuiltinBaseFunction<1> float_uminus{&mpf_uminus};
+    BuiltinBaseFunction<1> float_convert_intmp{&mpf_convert_intmp};
 
     BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus};
 
@@ -264,6 +289,8 @@ namespace TransLucid
       }
     };
 
+    BuiltinBaseFunction<2> construct_union{&Types::Union::create};
+
     struct BuiltinFunction
     {
       const char32_t* op_name;
@@ -272,17 +299,34 @@ namespace TransLucid
 
     constexpr BuiltinFunction fn_table[] =
     {
-      {U"int_plus", &integer_plus},
-      {U"int_minus", &integer_minus},
-      {U"int_times", &integer_times},
-      {U"int_divide", &integer_divide},
-      {U"int_modulus", &integer_modulus},
-      {U"int_lte", &integer_lte},
-      {U"int_lt", &integer_lt},
-      {U"int_gte", &integer_gte},
-      {U"int_gt", &integer_gt},
-      {U"int_eq", &integer_eq},
-      {U"int_ne", &integer_ne},
+      {U"intmp_plus", &integer_plus},
+      {U"intmp_minus", &integer_minus},
+      {U"intmp_times", &integer_times},
+      {U"intmp_divide", &integer_divide},
+      {U"intmp_modulus", &integer_modulus},
+      {U"intmp_lte", &integer_lte},
+      {U"intmp_lt", &integer_lt},
+      {U"intmp_gte", &integer_gte},
+      {U"intmp_gt", &integer_gt},
+      {U"intmp_eq", &integer_eq},
+      {U"intmp_ne", &integer_ne},
+      {U"intmp_uminus", &integer_uminus},
+      
+      {U"floatmp_plus", &float_plus},
+      {U"floatmp_minus", &float_minus},
+      {U"floatmp_times", &float_times},
+      {U"floatmp_divide", &float_divide},
+      {U"floatmp_lte", &float_lte},
+      {U"floatmp_lt", &float_lt},
+      {U"floatmp_gte", &float_gte},
+      {U"floatmp_gt", &float_gt},
+      {U"floatmp_eq", &float_eq},
+      {U"floatmp_ne", &float_ne},
+      {U"floatmp_sqrt", &float_sqrt},
+      {U"floatmp_abs", &float_abs},
+      {U"floatmp_uminus", &float_uminus},
+      {U"floatmp_convert_intmp", &float_convert_intmp},
+
       {U"bool_eq", &boolean_eq},
       {U"ustring_plus", &ustring_plus_fn},
       {U"make_range", &range_create},
@@ -292,6 +336,7 @@ namespace TransLucid
       {U"construct_intmp", &construct_integer},
       {U"construct_special", &construct_special},
       {U"construct_uuid", &construct_uuid},
+      {U"construct_floatmp", &construct_floatmp},
       {U"is_printable", &icu_is_printable},
       {U"string_at_base", &string_at_base},
       {U"substring_base", &substring_base},
@@ -307,6 +352,8 @@ namespace TransLucid
       {U"print_typetype", &print_typetype},
       {U"print_error", &print_error},
       {U"print_uuid", &print_uuid},
+      {U"print_floatmp", &print_floatmp},
+      {U"make_union", &construct_union},
     };
 
     bool
@@ -332,6 +379,18 @@ namespace std
     operator()(const mpz_class& v) const
     {
       return std::hash<std::string>()(v.get_str());
+    }
+  };
+
+  template <>
+  struct hash<mpf_class>
+  {
+    size_t
+    operator()(const mpf_class& f) const
+    {
+      mp_exp_t exp;
+      std::string s = f.get_str(exp);
+      return std::hash<std::string>()(s);
     }
   };
 }
@@ -397,6 +456,14 @@ namespace TransLucid
         &Types::Intmp::hash,
         &delete_ptr<mpz_class>,
         &Types::Intmp::less
+      };
+
+    TypeFunctions floatmp_type_functions = 
+      {
+        &Types::Floatmp::equality,
+        &Types::Floatmp::hash,
+        &delete_ptr<mpf_class>,
+        &Types::Floatmp::less
       };
 
     TypeFunctions hyperdaton_type_functions =
@@ -573,6 +640,124 @@ namespace TransLucid
     }
 
     Constant
+    mpz_uminus(const Constant& a)
+    {
+      return Types::Intmp::create(-Types::Intmp::get(a));
+    }
+
+    Constant
+    mpf_plus(const Constant& a, const Constant& b)
+    {
+      return Types::Floatmp::create(get_constant_pointer<mpf_class>(a) +
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_minus(const Constant& a, const Constant& b)
+    {
+      return Types::Floatmp::create(get_constant_pointer<mpf_class>(a) -
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_times(const Constant& a, const Constant& b)
+    {
+      return Types::Floatmp::create(get_constant_pointer<mpf_class>(a) *
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_divide(const Constant& a, const Constant& b)
+    {
+      mpf_class bval = get_constant_pointer<mpf_class>(b);
+      if (bval == 0)
+      {
+        return Types::Special::create(Special::SP_ARITH);
+      }
+      else
+      {
+        return Types::Floatmp::create(get_constant_pointer<mpf_class>(a) /
+          bval);
+      }
+      ;
+    }
+
+    Constant
+    mpf_lte(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) <=
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_lt(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) <
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_gte(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) >=
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_gt(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) >
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_eq(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) ==
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_ne(const Constant& a, const Constant& b)
+    {
+      return Types::Boolean::create(get_constant_pointer<mpf_class>(a) !=
+        get_constant_pointer<mpf_class>(b))
+      ;
+    }
+
+    Constant
+    mpf_sqrt(const Constant& f)
+    {
+      return Types::Floatmp::create(sqrt(Types::Floatmp::get(f)));
+    }
+
+    Constant
+    mpf_abs(const Constant& f)
+    {
+      return Types::Floatmp::create(abs(Types::Floatmp::get(f)));
+    }
+
+    Constant
+    mpf_uminus(const Constant& f)
+    {
+      return Types::Floatmp::create(-Types::Floatmp::get(f));
+    }
+
+    Constant
+    mpf_convert_intmp(const Constant& i)
+    {
+      return Types::Floatmp::create(Types::Intmp::get(i));
+    }
+
+    Constant
     bool_eq(const Constant& a, const Constant& b)
     {
       return Types::Boolean::create(get_constant<bool>(a) ==
@@ -688,6 +873,16 @@ namespace TransLucid
       operator()(const mpz_class& i)
       {
         return new mpz_class(i);
+      }
+    };
+
+    template <>
+    struct clone<mpf_class>
+    {
+      mpf_class*
+      operator()(const mpf_class& i)
+      {
+        return new mpf_class(i);
       }
     };
 
@@ -1014,6 +1209,107 @@ namespace TransLucid
       }
     }
 
+    namespace Floatmp
+    {
+      const mpf_class&
+      get(const Constant& c)
+      {
+        return get_constant_pointer<mpf_class>(c);
+      }
+
+      Constant
+      create(const mpf_class& f)
+      {
+        return make_constant_pointer
+          (f, &floatmp_type_functions, TYPE_INDEX_FLOATMP);
+      }
+
+      Constant
+      create(const Constant& text)
+      {
+        if (text.index() == TYPE_INDEX_USTRING)
+        {
+          try {
+            return create(mpf_class(
+              u32_to_ascii(get_constant_pointer<u32string>(text))));
+          }
+          catch (...)
+          {
+            return Types::Special::create(SP_CONST);
+          }
+        }
+        else
+        {
+          return Types::Special::create(SP_CONST);
+        }
+      }
+      
+      bool 
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+        return std::hash<mpf_class>()(get(c));
+      }
+
+      Constant
+      print(const Constant& c)
+      {
+        const mpf_class& f = get(c);
+
+        std::string s;
+        mp_exp_t exp;
+
+        s = f.get_str(exp);
+
+        std::string result;
+
+        std::ostringstream os;
+
+        if (s[0] == '-')
+        {
+          os << "-0." << s.substr(1, std::string::npos);
+        }
+        else
+        {
+          os << "0." << s;
+        }
+        os << "e" << exp;
+        result = os.str();
+
+        #if 0
+        if (exp == 0)
+        {
+          result = s;
+        }
+        else if (exp > 0)
+        {
+          result.append(s.begin(), s.begin() + exp);
+          result.push_back('.');
+          result.append(s.begin() + exp + 1, s.end());
+        }
+        else
+        {
+          result.append("0.");
+          result.append(exp, '0');
+          result.append(s);
+        }
+        #endif
+
+        return Types::String::create(u32string(result.begin(), result.end()));
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) < get(rhs);
+      }
+    }
+
     namespace Intmp
     {
       Constant
@@ -1282,18 +1578,6 @@ add_one_base_function(System& s, const u32string& name, BaseFunctionType* fn)
 
 inline
 void
-addTypeEquation(System& s, const u32string& type)
-{
-  s.addEquation(Parser::Equation(
-    type,
-    Tree::Expr(),
-    Tree::Expr(),
-    Tree::LiteralExpr(U"typetype", type)
-  ));
-}
-
-inline
-void
 addTypeNames(System& s, const std::vector<u32string>& types)
 {
   for (auto t : types)
@@ -1405,11 +1689,13 @@ init_builtin_types(System& s)
     U"range",
     U"tuple",
     U"demand",
-    U"calc"
+    U"calc",
+    U"floatmp"
   };
 
   std::vector<u32string> type_names = to_print_types;
   type_names.push_back(U"ustring");
+  type_names.push_back(U"basefun");
   type_names.push_back(U"lambda");
   type_names.push_back(U"phi");
   type_names.push_back(U"uuid");
@@ -1427,6 +1713,8 @@ init_builtin_types(System& s)
   add_base_functions(s);
 
   add_file_io(s);
+
+  registerIntegers(s);
 }
 
 } //namespace TransLucid

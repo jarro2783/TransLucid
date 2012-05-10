@@ -30,6 +30,8 @@ namespace TransLucid
 {
 
   //predefined unique indexes
+  //if you change these, then you must also
+  //change the bestfitting function table TypeComparators in utility.cpp
   enum TypeIndexes
   {
     //types
@@ -39,10 +41,12 @@ namespace TransLucid
     TYPE_INDEX_INTMP,
     TYPE_INDEX_UCHAR,
     TYPE_INDEX_USTRING,
+    TYPE_INDEX_FLOATMP,
     TYPE_INDEX_DIMENSION,
     TYPE_INDEX_TUPLE,
     TYPE_INDEX_TYPE,
     TYPE_INDEX_RANGE,
+    TYPE_INDEX_UNION,
     TYPE_INDEX_BASE_FUNCTION,  //10
     TYPE_INDEX_VALUE_FUNCTION,
     TYPE_INDEX_NAME_FUNCTION,

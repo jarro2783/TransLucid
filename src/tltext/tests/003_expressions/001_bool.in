@@ -1,0 +1,14 @@
+%%
+true || true;;
+true || false;;
+false || false;;
+false || true;;
+
+true || spundef;;
+
+true && true;;
+true && false;;
+false && false;;
+false && true;;
+
+false && spundef;;

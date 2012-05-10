@@ -222,11 +222,24 @@ TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
   Tree::Expr elhs = apply_visitor(*this, e.lhs);
   Tree::Expr erhs = apply_visitor(*this, e.rhs);
 
-  Tree::Expr result = Tree::LambdaAppExpr
-  (
-    Tree::LambdaAppExpr(Tree::IdentExpr(e.op.op), e.lhs),
-    e.rhs
-  );
+  Tree::Expr result;
+    
+  if (e.op.cbn)
+  {
+    result = Tree::PhiAppExpr
+    (
+      Tree::PhiAppExpr(Tree::IdentExpr(e.op.op), e.lhs),
+      e.rhs
+    );
+  }
+  else
+  {
+    result = Tree::LambdaAppExpr
+    (
+      Tree::LambdaAppExpr(Tree::IdentExpr(e.op.op), e.lhs),
+      e.rhs
+    );
+  }
 
   return apply_visitor(*this, result);
 

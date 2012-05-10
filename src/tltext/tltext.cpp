@@ -354,7 +354,8 @@ TLText::processDefinitions
         catch (TransLucid::Parser::ParseError& e)
         {
           const Parser::Position& pos = e.m_pos;
-          output(*m_error, OUTPUT_SILENT) << m_myname << m_inputName << ":" 
+          output(*m_error, OUTPUT_SILENT) << m_myname << ":" << 
+            streamName << ":" 
             << pos.line << ":" 
             << pos.character << ":" << e.what() << std::endl;
         }

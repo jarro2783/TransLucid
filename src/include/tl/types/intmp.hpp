@@ -1,5 +1,5 @@
 /* The intmp type.
-   Copyright (C) 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TYPES_INTMP_HPP_INCLUDED
-#define TYPES_INTMP_HPP_INCLUDED
+#ifndef TL_TYPES_INTMP_HPP_INCLUDED
+#define TL_TYPES_INTMP_HPP_INCLUDED
 
 #include <tl/gmpxx_fwd.hpp>
 #include <tl/types.hpp>

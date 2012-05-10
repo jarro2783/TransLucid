@@ -1,0 +1,56 @@
+%%
+sint8"0";;
+sint8"1";;
+sint8"12";;
+sint8"127";;
+sint8"-128";;
+
+sint8"0" + sint8"0";;
+sint8"15" + sint8"0";;
+sint8"0" + sint8"15";;
+sint8"8" + sint8"5";;
+sint8"-128" + sint8"130";;
+sint8"-128" + sint8"5";;
+
+sint8"0" - sint8"0";;
+sint8"10" - sint8"0";;
+sint8"0" - sint8"10";;
+sint8"15" - sint8"3";;
+
+sint8"6" * sint8"1";;
+sint8"6" * sint8"0";;
+sint8"-5" * sint8"4";;
+sint8"-5" * sint8"-4";;
+
+sint8"5" / sint8"1";;
+sint8"23" / sint8"5";;
+sint8"-10" / sint8"2";;
+
+sint8"7" % sint8"4";;
+
+sint8"0" < sint8"1";;
+sint8"1" < sint8"1";;
+sint8"2" < sint8"1";;
+
+sint8"0" <= sint8"1";;
+sint8"1" <= sint8"1";;
+sint8"2" <= sint8"1";;
+
+sint8"0" > sint8"1";;
+sint8"1" > sint8"1";;
+sint8"2" > sint8"1";;
+
+sint8"0" >= sint8"1";;
+sint8"1" >= sint8"1";;
+sint8"2" >= sint8"1";;
+
+sint8"0" == sint8"1";;
+sint8"1" == sint8"1";;
+sint8"2" == sint8"1";;
+
+sint8"0" != sint8"1";;
+sint8"1" != sint8"1";;
+sint8"2" != sint8"1";;
+
+sint8"5"!prec;;
+sint8"5"!is_signed;;
