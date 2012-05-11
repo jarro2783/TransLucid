@@ -97,11 +97,11 @@ FreeVariableReplacer::operator()(const Tree::LambdaExpr& e)
 
   m_bound.insert(e.name);
 
-  Tree::Expr e2 = apply_visitor(*this, expr.rhs);
+  expr.rhs = apply_visitor(*this, expr.rhs);
 
   m_bound.erase(e.name);
 
-  return e2;
+  return expr;
 }
 
 Tree::Expr
@@ -113,11 +113,11 @@ FreeVariableReplacer::operator()(const Tree::PhiExpr& e)
 
   m_bound.insert(e.name);
 
-  Tree::Expr e2 = apply_visitor(*this, expr.rhs);
+  expr.rhs = apply_visitor(*this, expr.rhs);
 
   m_bound.erase(e.name);
 
-  return e2;
+  return expr;
 }
 
 Tree::Expr 
