@@ -30,7 +30,7 @@ libtlsystem_la_LIBADD = -lgmpxx -lgmp \
 libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   cache.cpp charset.cpp context.cpp \
   dimtranslator.cpp equation.cpp \
-  eval_workshops.cpp \
+  eval_workshops.cpp free_variables.cpp \
   hyperdatons/arrayhd.cpp hyperdatons/envhd.cpp hyperdatons/filehd.cpp \
   internal_strings.cpp lexertl.cpp lexer_util.cpp library.cpp \
   line_tokenizer.cpp parser.cpp range.cpp rename.cpp \

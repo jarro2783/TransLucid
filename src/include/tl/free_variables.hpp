@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_FREE_VARIABLES_HPP_INCLUDED
 #define TL_FREE_VARIABLES_HPP_INCLUDED
 
-#include <vector>
+#include <map>
 #include <unordered_set>
 #include <utility>
 
@@ -38,7 +38,6 @@ namespace TransLucid
     public:
     using GenericTreeWalker<FreeVariableReplacer>::operator();
 
-    //typedef std::vector<std::pair<u32string, dimension_index>> Replaced;
     typedef std::map<u32string, dimension_index> Replaced;
 
     typedef Tree::Expr result_type;
@@ -78,10 +77,8 @@ namespace TransLucid
       return e;
     }
 
-    Tree::Expr operator()(const Tree::IdentExpr& e);
     Tree::Expr operator()(const Tree::LambdaExpr& e);
     Tree::Expr operator()(const Tree::PhiExpr& e);
-    Tree::Expr operator()(const Tree::WhereExpr& e);
 
     private:
     System& m_system;

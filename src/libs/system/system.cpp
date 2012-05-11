@@ -65,6 +65,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 #include <tl/parser.hpp>
 #include <tl/parser_iterator.hpp>
+#include <tl/tree_rewriter.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/demand.hpp>
@@ -1744,6 +1745,16 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
   addExtraVariables(tows);
 
   return wstree;
+}
+
+Tree::Expr
+System::fixupTree(const Tree::Expr& e)
+{
+  TreeRewriter rewriter;
+  RenameIdentifiers renamer(*this);
+
+  Tree::Expr e1 = rewriter.rewrite(e);
+  Tree::Expr e2 = renamer.rename(e1);
 }
 
 //the two trees must be identical abstractions except for parameter names

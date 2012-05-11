@@ -34,6 +34,9 @@ namespace TransLucid
     public:
     typedef Tree::Expr result_type;
 
+    Tree::Expr
+    rewrite(const Tree::Expr& e);
+
     Tree::Expr operator()(const Tree::nil& n);
     Tree::Expr operator()(bool b);
     Tree::Expr operator()(Special s);

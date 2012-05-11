@@ -26,6 +26,12 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+Tree::Expr
+TreeRewriter::rewrite(const Tree::Expr& e)
+{
+  return apply_visitor(*this, e);
+}
+
 Tree::Expr 
 TreeRewriter::operator()(const Tree::nil& n)
 {
@@ -253,6 +259,29 @@ TreeRewriter::operator()(const Tree::PhiAppExpr& e)
 Tree::Expr 
 TreeRewriter::operator()(const Tree::WhereExpr& e)
 {
+  Tree::WhereExpr where;
+
+  where.e = e.e;
+
+  //replace everything in the dimension expressions
+  for (const auto& dim : e.dims)
+  {
+    where.dims.push_back(std::make_pair(dim.first,
+      apply_visitor(*this, dim.second)));
+  }
+
+  //replace everything in the var expressions
+  for (const auto& var : e.vars)
+  {
+    where.vars.push_back(std::make_tuple(
+      std::get<0>(var),
+      apply_visitor(*this, std::get<1>(var)),
+      apply_visitor(*this, std::get<2>(var)),
+      apply_visitor(*this, std::get<3>(var))
+    ));
+  }
+
+  return where;
 }
 
 

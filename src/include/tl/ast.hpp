@@ -1,5 +1,5 @@
 /* Abstract syntax tree.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -198,9 +198,9 @@ namespace TransLucid
     };
 
     /**
-     * Nothing. An nothing node in the AST, it is an error to have a node
-     * of this type, but necessary for functioning of the parser.
-     */
+     * Nothing. A nothing node in the AST, this will occur whenever there
+     * is no tree for a particular entity.
+     */ 
     struct nil
     {
     };

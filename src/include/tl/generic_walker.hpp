@@ -141,7 +141,32 @@ namespace TransLucid
       );
     }
 
-    Tree::Expr operator()(const Tree::WhereExpr& e);
+    Tree::Expr operator()(const Tree::WhereExpr& e)
+    {
+      Tree::WhereExpr where;
+
+      where.e = e.e;
+
+      //do the dims
+      for (const auto& dim : e.dims)
+      {
+        where.dims.push_back(std::make_pair(dim.first,
+          apply_visitor(*reinterpret_cast<Derived*>(this), dim.second)));
+      }
+
+      //do the vars
+      for (const auto& var : e.vars)
+      {
+        where.vars.push_back(std::make_tuple(
+          std::get<0>(var),
+          apply_visitor(*reinterpret_cast<Derived*>(this), std::get<1>(var)),
+          apply_visitor(*reinterpret_cast<Derived*>(this), std::get<2>(var)),
+          apply_visitor(*reinterpret_cast<Derived*>(this), std::get<3>(var))
+        ));
+      }
+
+      return where;
+    }
 
     std::vector<std::pair<Tree::Expr, Tree::Expr>>
     visit_list
