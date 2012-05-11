@@ -91,11 +91,33 @@ FreeVariableReplacer::replaceFree(const Tree::Expr& expr)
 Tree::Expr
 FreeVariableReplacer::operator()(const Tree::LambdaExpr& e)
 {
+  FreeVariableReplacer replacer(m_system);
+  replacer.addBound(m_bound);
+  Tree::LambdaExpr expr = get<Tree::LambdaExpr>(replacer.replaceFree(e));
+
+  m_bound.insert(e.name);
+
+  Tree::Expr e2 = apply_visitor(*this, expr.rhs);
+
+  m_bound.erase(e.name);
+
+  return e2;
 }
 
 Tree::Expr
 FreeVariableReplacer::operator()(const Tree::PhiExpr& e)
 {
+  FreeVariableReplacer replacer(m_system);
+  replacer.addBound(m_bound);
+  Tree::PhiExpr expr = get<Tree::PhiExpr>(replacer.replaceFree(e));
+
+  m_bound.insert(e.name);
+
+  Tree::Expr e2 = apply_visitor(*this, expr.rhs);
+
+  m_bound.erase(e.name);
+
+  return e2;
 }
 
 Tree::Expr 
