@@ -149,12 +149,24 @@ fun uint64_bang.a [a : is_signed] = false;;
 //fun sint8_bang.a.b [a : signed] = true;;
 
 fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
+fun lte.a.b [a : intmp, b : infty] = true;;
+fun lte.a.b [a : infty, b : intmp] = false;;
+fun lte.a.b [a : infty, b : infty] = true;;
+fun lte.a.b [a : neginfty, b : neginfty] = true;;
+fun lte.a.b [a : neginfty, b : intmp] = true;;
+fun lte.a.b [a : intmp, b : neginfty] = false;;
 fun lte.a.b [a : floatmp, b : floatmp] = floatmp_lte!(a,b);;
 fun lte.a.b [a : fint, b : fint] 
   | a!prec == b!prec && a!is_signed == b!is_signed 
   = fint_lte.(a!prec).(a!is_signed)!(a,b);;
 
 fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
+fun lt.a.b [a : intmp, b : infty] = true;;
+fun lt.a.b [a : infty, b : intmp] = false;;
+fun lt.a.b [a : infty, b : infty] = false;;
+fun lt.a.b [a : neginfty, b : neginfty] = false;;
+fun lt.a.b [a : neginfty, b : intmp] = true;;
+fun lt.a.b [a : intmp, b : neginfty] = false;;
 fun lt.a.b [a : floatmp, b : floatmp] = floatmp_lt!(a,b);;
 fun lt.a.b [a : fint, b : fint]
   | a!prec == b!prec && a!is_signed == b!is_signed 
@@ -307,6 +319,8 @@ fun canonical_print.c               = print_typename.c + `"` +
                                       escape_string.(print.c) + `"`;;
 //fun canonical_print.c = "cannot print this thing";;
 fun canonical_print.c [c : special] = print.c;;
+fun canonical_print.c [c : infty] = "infty";;
+fun canonical_print.c [c : neginfty] = "neginfty";;
 
 var RETURN = 0;;
 
@@ -350,3 +364,71 @@ where
   dim d <- 0 ;;
   var double = fby.d 1 (double * 2) ;;
 end ;;
+
+fun runningOp.d.g X = S
+where
+  var S = fby.d X (g.(next.d X).S) ;;
+end ;;
+
+fun default₁.d.m.n.val X = f
+where
+  var f [d : m..n] = X ;;
+  var f [d : nat] = val ;;
+end ;;
+
+fun default₂.d₁.m₁.n₁.d₂.m₂.n₂.val X = f
+where
+  var f [d₁ : m₁..n₁, d₂ : m₂..n₂] = X ;;
+  var f [d₁ : nat, d₂ : nat] = val ;;
+end ;;
+
+fun tournamentOp₁.d.n.g A = B @ [d <- 0]
+where
+  dim t <- ilog.n ;;
+  var B = fby.t A (g.(firstOfPair.d B).(secondOfPair.d B)) ;;
+end ;;
+
+fun tournamentOp₂.d₁.d₂.n.g A = B @ [d <- 0]
+where
+  dim t <- ilog.n ;;
+  var B = fby.t A (g.(NWofQuad.d₁.d₂ B).(NEofQuad.d₁.d₂ B).
+                     (SWofQuad.d₁.d₂ B).(SEofQuad.d₁.d₂ B)) ;;
+end ;;
+
+
+// Define lists and functions over lists.
+
+// The List data type and the Cons and Nil constructors.
+data List a = Cons a (List a) | Nil ;;
+
+// Two infix operators defined over lists.
+op :: = OpInfix."cons_list".false.AssocRight.(~10) ;;
+op <> = OpInfix."append_list".false.AssocRight.(~10) ;;
+
+// The cons_list function corresponding to operator "::".
+fun cons_list.a.b [b : [type <- "List"]] = Cons.a.b ;;
+
+// The append_list function corresponding to operator "<>".
+fun append_list.l₁.l₂
+  [l₁ : Nil, l₂ : [type <- "List"]] = l₂ ;;
+fun append_list.l₁.l₂
+  [l₁ : [type <- "List"], l₂ : [type <- "List"]]
+  = head.l₁ :: append_list.(tail.l₁).l₂ ;;
+
+// True if l is a List.
+fun isList.l [l : [type <- "List"]] = true ;;
+fun isList.l = false ;;
+
+// True if l is Nil.
+fun isNil.l [l : Nil] = true ;;
+fun isNil.l = false ;;
+
+// The head of non-empty list l.
+fun head.l [l : [type <- "List", cons <- "Cons"]] = l!arg0;;
+
+// The tail of non-empty list l.
+fun tail.l [l : [type <- "List", cons <- "Cons"]] = l!arg1;;
+
+// The length of a list.
+fun length.l [l : Nil] = 0 ;;
+fun length.l [l : [type <- "List"]] = 1 + length.(tail.l) ;;
