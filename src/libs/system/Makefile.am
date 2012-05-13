@@ -33,7 +33,7 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   eval_workshops.cpp free_variables.cpp \
   hyperdatons/arrayhd.cpp hyperdatons/envhd.cpp hyperdatons/filehd.cpp \
   internal_strings.cpp lexertl.cpp lexer_util.cpp library.cpp \
-  line_tokenizer.cpp parser.cpp range.cpp rename.cpp \
+  line_tokenizer.cpp parser.cpp range.cpp rename.cpp semantic_transform.cpp \
   system.cpp system_util.cpp tree_printer.cpp tree_rewriter.cpp \
   tree_to_wstree.cpp \
   types/function.cpp types/numbers.cpp types/union.cpp \
