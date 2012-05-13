@@ -134,6 +134,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
       mpz_class(1)
     );
 
+  //need to do the whole tree fixup here
   Tree::Expr incOwn = apply_visitor(*this, incOwnRaw);
 
   w.e = Tree::AtExpr
