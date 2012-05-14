@@ -75,6 +75,9 @@ namespace TransLucid
     std::vector<dimension_index> m_scope;
 
     std::vector<u32string> m_scopeNames;
+
+    std::vector<dimension_index> m_namedAllScopeArgs;
+    std::vector<dimension_index> m_namedAllScopeOdometers;
   };
 }
 

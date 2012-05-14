@@ -361,9 +361,6 @@ namespace TransLucid
     toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
       Renames&&... renames);
 
-    Tree::Expr
-    fixupTree(const Tree::Expr& e);
-
     void
     addExtraVariables(TreeToWSTree& tows);
 

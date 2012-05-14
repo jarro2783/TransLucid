@@ -28,9 +28,11 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iostream>
 
-#include <tl/utility.hpp>
 #include <tl/equation.hpp>
+#include <tl/rename.hpp>
+#include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
+#include <tl/tree_rewriter.hpp>
 #include <tl/types.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
@@ -40,6 +42,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
 #include <tl/types/union.hpp>
+#include <tl/utility.hpp>
 
 #ifdef ICONV_CONVERT
 #include <iconv.h>
@@ -688,6 +691,17 @@ applyFunction
   {
     return Types::Special::create(SP_TYPEERROR);
   }
+}
+
+Tree::Expr
+fixupTree(System& s, const Tree::Expr& e)
+{
+  TreeRewriter rewriter;
+  RenameIdentifiers renamer(s);
+  SemanticTransform transform(s);
+
+  Tree::Expr e1 = rewriter.rewrite(e);
+  Tree::Expr e2 = renamer.rename(e1);
 }
 
 }

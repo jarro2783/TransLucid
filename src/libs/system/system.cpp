@@ -1474,9 +1474,14 @@ System::addDeclInternal
   TreeToWSTree tows(this);
 
   //simplify, turn into workshops
-  Tree::Expr guard   = toWSTreePlusExtras(std::get<1>(eqn), tows);
-  Tree::Expr boolean = toWSTreePlusExtras(std::get<2>(eqn), tows);
-  Tree::Expr expr    = toWSTreePlusExtras(std::get<3>(eqn), tows);
+  //Tree::Expr guard   = toWSTreePlusExtras(std::get<1>(eqn), tows);
+  //Tree::Expr boolean = toWSTreePlusExtras(std::get<2>(eqn), tows);
+  //Tree::Expr expr    = toWSTreePlusExtras(std::get<3>(eqn), tows);
+
+  //simplify, turn into workshops
+  Tree::Expr guard   = fixupTree(*this, std::get<1>(eqn));
+  Tree::Expr boolean = fixupTree(*this, std::get<2>(eqn));
+  Tree::Expr expr    = fixupTree(*this, std::get<3>(eqn));
 
   if (m_debug)
   {
@@ -1748,16 +1753,6 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
   return wstree;
 }
 
-Tree::Expr
-System::fixupTree(const Tree::Expr& e)
-{
-  TreeRewriter rewriter;
-  RenameIdentifiers renamer(*this);
-
-  Tree::Expr e1 = rewriter.rewrite(e);
-  Tree::Expr e2 = renamer.rename(e1);
-}
-
 //the two trees must be identical abstractions except for parameter names
 //makes a rename map from the difference
 //rename_dims is a map from the lhs name to the rhs dimension
@@ -1885,11 +1880,16 @@ System::funWSTree
   std::cerr << "renamed expr:" << std::endl;
   std::cerr << Printer::print_expr_tree(renamed) << std::endl;
 
+  #if 0
   TreeToWSTree tows(this);
 
   Tree::Expr wstree = tows.toWSTreeNoRename(renamed);
 
   addExtraVariables(tows);
+  #endif
+
+  SemanticTransform transform(*this);
+  Tree::Expr wstree = transform.transform(renamed);
 
   //the abstraction is either LambdaAbstractionWS or NamedAbstractionWS
   WS* nextws = nullptr;
@@ -1990,7 +1990,8 @@ System::addFunction(const Parser::FnDecl& fn)
     }
 
     //need to save the renamed variables here somehow
-    Tree::Expr absexpr = toWSTreePlusExtras(abstractions, tows);
+    //Tree::Expr absexpr = toWSTreePlusExtras(abstractions, tows);
+    Tree::Expr absexpr = fixupTree(*this, abstractions);
 
     RenameIdentifiers::RenameRules renames; 
     std::map<u32string, dimension_index> renamed_dims;

@@ -206,6 +206,9 @@ namespace TransLucid
     const Constant& lhs, 
     const Constant& rhs
   );
+
+  Tree::Expr
+  fixupTree(System& s, const Tree::Expr& e);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED
