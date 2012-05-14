@@ -702,6 +702,9 @@ fixupTree(System& s, const Tree::Expr& e)
 
   Tree::Expr e1 = rewriter.rewrite(e);
   Tree::Expr e2 = renamer.rename(e1);
+  Tree::Expr e3 = transform.transform(e2);
+
+  return e3;
 }
 
 }
