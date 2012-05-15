@@ -1471,7 +1471,7 @@ System::addDeclInternal
   UUIDDefinition& uuids
 )
 {
-  TreeToWSTree tows(this);
+  //TreeToWSTree tows(this);
 
   //simplify, turn into workshops
   //Tree::Expr guard   = toWSTreePlusExtras(std::get<1>(eqn), tows);
@@ -1479,10 +1479,11 @@ System::addDeclInternal
   //Tree::Expr expr    = toWSTreePlusExtras(std::get<3>(eqn), tows);
 
   //simplify, turn into workshops
-  Tree::Expr guard   = fixupTree(*this, std::get<1>(eqn));
-  Tree::Expr boolean = fixupTree(*this, std::get<2>(eqn));
-  Tree::Expr expr    = fixupTree(*this, std::get<3>(eqn));
+  Tree::Expr guard   = fixupTreeAndAdd(std::get<1>(eqn));
+  Tree::Expr boolean = fixupTreeAndAdd(std::get<2>(eqn));
+  Tree::Expr expr    = fixupTreeAndAdd(std::get<3>(eqn));
 
+  #if 0
   if (m_debug)
   {
     //print everything
@@ -1497,6 +1498,7 @@ System::addDeclInternal
       std::cout << Printer::printEquation(e) << std::endl;
     }
   }
+  #endif
 
   WorkshopBuilder compile(this);
 
@@ -1510,6 +1512,7 @@ System::addDeclInternal
   );
 
   //add all the new equations
+  #if 0
   for (const auto& e : tows.newVars())
   {
     addDeclInternal(
@@ -1521,6 +1524,7 @@ System::addDeclInternal
       uuids
     );
   }
+  #endif
 
   return Types::UUID::create(u);
 }
@@ -1729,18 +1733,34 @@ System::addInputHyperdaton
 }
 
 void
-System::addExtraVariables(TreeToWSTree& tows)
+System::addDefaultDimensions(const SemanticTransform& t)
 {
   //The L_in dims are set to 0 in the default context
-  m_Lin.insert(m_Lin.end(), tows.getLin().begin(), tows.getLin().end());
+  m_Lin.insert(m_Lin.end(), t.getLin().begin(), t.getLin().end());
+
+  //function lists must have a nil element set
+  m_fnLists.insert(m_fnLists.end(), 
+    t.getAllScopeArgs().begin(), t.getAllScopeArgs().end());
 
   m_fnLists.insert(m_fnLists.end(), 
-    tows.getAllScopeArgs().begin(), tows.getAllScopeArgs().end());
-
-  m_fnLists.insert(m_fnLists.end(), 
-    tows.getAllScopeOdometer().begin(), tows.getAllScopeOdometer().end());
+    t.getAllScopeOdometer().begin(), t.getAllScopeOdometer().end());
 }
 
+void
+System::addDefaultDimensions  
+(                             
+  const std::vector<dimension_index>& zeros,
+  const std::vector<dimension_index>& nils
+)                             
+{                             
+  //The L_in dims are set to 0 in the default context
+  m_Lin.insert(m_Lin.end(), zeros.begin(), zeros.end());
+                              
+  //function lists must have a nil element set
+  m_fnLists.insert(m_fnLists.end(), nils.begin(), nils.end());                  
+}
+
+#if 0
 template <typename... Renames>
 Tree::Expr
 System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows, 
@@ -1752,6 +1772,7 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
 
   return wstree;
 }
+#endif
 
 //the two trees must be identical abstractions except for parameter names
 //makes a rename map from the difference
@@ -1857,28 +1878,35 @@ System::funWSTree
   //then turn into a wstree without renaming
   //and add all the extra variables that resulted
 
-  std::cerr << "to rename:" << std::endl;
-  for (const auto& v : std::get<1>(info))
-  {
-    std::cerr << v.first << " to " << v.second << std::endl;
-  }
+  //std::cerr << "to rename:" << std::endl;
+  //for (const auto& v : std::get<1>(info))
+  //{
+  //  std::cerr << v.first << " to " << v.second << std::endl;
+  //}
 
-  FreeVariableReplacer& free = std::get<5>(info);
+  auto& renameRules = std::get<1>(info);
 
-  //add the arguments as bound
+  TreeRewriter rewriter;
+  RenameIdentifiers rename(*this, std::get<1>(info));
+  FreeVariableHelper& free = std::get<5>(info);
+
+  //bind the renamed arguments
+  std::cerr << "bound:" << std::endl;
   for (auto arg : decl.args)
   {
-    free.addBound(arg.second);
+    std::cerr << renameRules.find(arg.second)->second << std::endl;
+    free.addBound(renameRules.find(arg.second)->second);
   }
 
-  Tree::Expr freeReplaced = free.replaceFree(expr);
+  Tree::Expr rewritten = rewriter.rewrite(expr);
+
+  Tree::Expr renamed = rename.rename(rewritten);
+
+  Tree::Expr freeReplaced = free.replaceFree(renamed);
   //Tree::Expr freeReplaced = renamed;
 
-  RenameIdentifiers rename(*this, std::get<1>(info));
-
-  Tree::Expr renamed = rename.rename(freeReplaced);
   std::cerr << "renamed expr:" << std::endl;
-  std::cerr << Printer::print_expr_tree(renamed) << std::endl;
+  std::cerr << Printer::print_expr_tree(freeReplaced) << std::endl;
 
   #if 0
   TreeToWSTree tows(this);
@@ -1889,7 +1917,11 @@ System::funWSTree
   #endif
 
   SemanticTransform transform(*this);
-  Tree::Expr wstree = transform.transform(renamed);
+  Tree::Expr wstree = transform.transform(freeReplaced);
+
+  addTransformedEquations(transform.newVars());
+
+  addDefaultDimensions(transform);
 
   //the abstraction is either LambdaAbstractionWS or NamedAbstractionWS
   WS* nextws = nullptr;
@@ -1958,7 +1990,7 @@ System::addFunction(const Parser::FnDecl& fn)
   auto iter = m_fndecls.find(fn.name);
 
   ConditionalBestfitWS* fnws = nullptr;
-  TreeToWSTree tows(this);
+  //TreeToWSTree tows(this);
   WorkshopBuilder compile(this);
 
   WS* abstraction = nullptr;
@@ -1991,7 +2023,7 @@ System::addFunction(const Parser::FnDecl& fn)
 
     //need to save the renamed variables here somehow
     //Tree::Expr absexpr = toWSTreePlusExtras(abstractions, tows);
-    Tree::Expr absexpr = fixupTree(*this, abstractions);
+    Tree::Expr absexpr = fixupTreeAndAdd(abstractions);
 
     RenameIdentifiers::RenameRules renames; 
     std::map<u32string, dimension_index> renamed_dims;
@@ -2009,7 +2041,7 @@ System::addFunction(const Parser::FnDecl& fn)
           renamed_dims,
           std::vector<Parser::FnDecl>(),
           absws,
-          FreeVariableReplacer(*this)
+          FreeVariableHelper(*this)
         )
       )
     ).first;
@@ -2019,7 +2051,7 @@ System::addFunction(const Parser::FnDecl& fn)
     
     //there can't possibly be zero arguments here so this is safe
     auto iterAhead = fn.args.begin();
-    auto iter = fn.args.begin();
+    auto argsiter = fn.args.begin();
     ++iterAhead;
 
     while (true)
@@ -2027,7 +2059,7 @@ System::addFunction(const Parser::FnDecl& fn)
       if (iterAhead == fn.args.end())
       {
         //we're on the last one
-        if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
+        if (argsiter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
         {
           dynamic_cast<Workshops::LambdaAbstractionWS*>
             (current)->set_rhs(fnws);
@@ -2041,7 +2073,7 @@ System::addFunction(const Parser::FnDecl& fn)
       }
       else
       {
-        if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
+        if (argsiter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
         {
           current = dynamic_cast<Workshops::LambdaAbstractionWS*>
             (current)->rhs();
@@ -2053,7 +2085,7 @@ System::addFunction(const Parser::FnDecl& fn)
         }
       }
 
-      ++iter;
+      ++argsiter;
       ++iterAhead;
     }
 
@@ -2117,6 +2149,7 @@ System::addFunction(const Parser::FnDecl& fn)
   //std::cerr << "guard is " << gws << std::endl;
   uuid u = fnws->addEquation(fn.name, GuardWS(gws, bws), ews, m_time);
 
+  #if 0
   bool cachethis = true;
   if (cacheExclude.find(fn.name) != cacheExclude.end())
   {
@@ -2142,6 +2175,7 @@ System::addFunction(const Parser::FnDecl& fn)
       cacheVar(std::get<0>(e));
     }
   }
+  #endif
 
   return Types::UUID::create(u);
 }
@@ -2200,8 +2234,11 @@ System::addEnvVars()
     std::string var = *envvar;
     size_t equals = var.find('=');
 
+    //std::cerr << "variable: " << var << std::endl;
+    //std::cerr << "equals is at " << equals << std::endl;
     std::string varname = var.substr(0, equals);
     std::string varvalue = var.substr(equals + 1, std::string::npos);
+    //std::cerr << "read in: " << varname << ", " << varvalue << std::endl;
 
     u32string u32name(varname.begin(), varname.end());
 
@@ -2375,6 +2412,40 @@ bool
 System::cacheEnabled() const
 {
   return m_cacheEnabled;
+}
+
+void
+System::addTransformedEquations
+(
+  const std::vector<Parser::Equation>& newVars
+)
+{
+  WorkshopBuilder compile(this);
+
+  //add all the new equations
+  //std::cerr << "adding extra equations" << std::endl;
+  for (const auto& e : newVars)
+  {
+    //std::cerr << std::get<0>(e) << std::endl;
+    addDeclInternal(
+      std::get<0>(e),
+      GuardWS(compile.build_workshops(std::get<1>(e)),
+        compile.build_workshops(std::get<2>(e))),
+      compile.build_workshops(std::get<3>(e)),
+      m_equations,
+      m_equationUUIDs
+    );
+  }
+}
+
+Tree::Expr
+System::fixupTreeAndAdd(const Tree::Expr& e)
+{
+  auto result = fixupTree(*this, e);
+  addTransformedEquations(result.second.equations);
+  addDefaultDimensions(result.second.defaultZeros, result.second.defaultNils);
+
+  return result.first;
 }
 
 } //namespace TransLucid

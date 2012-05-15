@@ -261,7 +261,7 @@ TreeRewriter::operator()(const Tree::WhereExpr& e)
 {
   Tree::WhereExpr where;
 
-  where.e = e.e;
+  where.e = apply_visitor(*this, e.e);
 
   //replace everything in the dimension expressions
   for (const auto& dim : e.dims)

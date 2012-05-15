@@ -18,8 +18,8 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 /**
- * @file iterator.cpp
- * Iterator tests.
+ * @file cache.cpp
+ * Cache tests.
  */
 
 #include <tl/cache.hpp>

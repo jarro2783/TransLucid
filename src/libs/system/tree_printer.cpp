@@ -385,7 +385,7 @@ class TreePrinter
   print_tuple_pair(const Pair& p)
   {
     apply_visitor(*this, p.first);
-    m_os << " : ";
+    m_os << " <- ";
     apply_visitor(*this, p.second);
   }
 

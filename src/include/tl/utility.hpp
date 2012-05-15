@@ -207,7 +207,18 @@ namespace TransLucid
     const Constant& rhs
   );
 
-  Tree::Expr
+  struct ExtraTreeInformation
+  {
+    std::vector<Parser::Equation> equations;
+    std::vector<dimension_index> defaultZeros;
+    std::vector<dimension_index> defaultNils;
+  };
+
+  std::pair
+  <
+    Tree::Expr,
+    ExtraTreeInformation
+  >
   fixupTree(System& s, const Tree::Expr& e);
 }
 

@@ -142,7 +142,10 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     );
 
   //need to do the whole tree fixup here
-  Tree::Expr incOwn = fixupTree(m_system, incOwnRaw);
+  auto fixed = fixupTree(m_system, incOwnRaw);
+  Tree::Expr& incOwn = fixed.first;
+  m_newVars.insert(m_newVars.end(), 
+    fixed.second.equations.begin(), fixed.second.equations.end());
 
   w.e = Tree::AtExpr
     (

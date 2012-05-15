@@ -22,62 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-
-  class FreeVariableHelper : private GenericTreeWalker<FreeVariableHelper>
-  {
-    public:
-    using GenericTreeWalker<FreeVariableHelper>::operator();
-
-    typedef std::map<u32string, dimension_index> Replaced;
-
-    typedef Tree::Expr result_type;
-
-    FreeVariableHelper(System& system)
-    : m_system(system) {}
-
-    template <typename Container>
-    void
-    addBound(const Container& c)
-    {
-      for (const auto& val : c)
-      {
-        m_bound.insert(val);
-      }
-    }
-
-    void
-    addBound(const u32string& bound)
-    {
-      m_bound.insert(bound);
-    }
-
-    const Replaced&
-    getReplaced()
-    {
-      return m_replaced;
-    }
-
-    Tree::Expr
-    replaceFree(const Tree::Expr& expr);
-
-    template <typename T>
-    Tree::Expr
-    operator()(const T& e)
-    {
-      return e;
-    }
-
-    Tree::Expr operator()(const Tree::IdentExpr& e);
-    Tree::Expr operator()(const Tree::LambdaExpr& e);
-    Tree::Expr operator()(const Tree::PhiExpr& e);
-    Tree::Expr operator()(const Tree::WhereExpr& e);
-
-    private:
-    System& m_system;
-    Replaced m_replaced;
-    std::unordered_set<u32string> m_bound;
-  };
-
 //the free variable replacer code
 //whenever this is called everything has been renamed, so there is
 //no problem with name clashes
@@ -91,7 +35,7 @@ FreeVariableReplacer::replaceFree(const Tree::Expr& expr)
 Tree::Expr
 FreeVariableReplacer::operator()(const Tree::LambdaExpr& e)
 {
-  FreeVariableReplacer replacer(m_system);
+  FreeVariableHelper replacer(m_system);
   replacer.addBound(m_bound);
   Tree::LambdaExpr expr = get<Tree::LambdaExpr>(replacer.replaceFree(e));
 
@@ -111,7 +55,7 @@ FreeVariableReplacer::operator()(const Tree::LambdaExpr& e)
 Tree::Expr
 FreeVariableReplacer::operator()(const Tree::PhiExpr& e)
 {
-  FreeVariableReplacer replacer(m_system);
+  FreeVariableHelper replacer(m_system);
   replacer.addBound(m_bound);
   Tree::PhiExpr expr = get<Tree::PhiExpr>(replacer.replaceFree(e));
 
@@ -131,11 +75,18 @@ FreeVariableReplacer::operator()(const Tree::PhiExpr& e)
 Tree::Expr 
 FreeVariableHelper::operator()(const Tree::IdentExpr& e)
 {
-  if (m_bound.find(e.text) == m_bound.end() && 
-      m_replaced.find(e.text) == m_replaced.end())
+  if (m_bound.find(e.text) == m_bound.end())
   {
-    dimension_index unique = m_system.nextHiddenDim();
-    m_replaced.insert(std::make_pair(e.text, unique));
+    dimension_index unique;
+    if (m_replaced.find(e.text) == m_replaced.end())
+    {
+      unique = m_system.nextHiddenDim();
+      m_replaced.insert(std::make_pair(e.text, unique));
+    }
+    else
+    {
+      unique = m_replaced.find(e.text)->second;
+    }
     return Tree::HashExpr(Tree::DimensionExpr(unique));
   }
   else
@@ -182,7 +133,7 @@ FreeVariableHelper::operator()(const Tree::WhereExpr& e)
   
   Tree::WhereExpr where;
 
-  where.e = e.e;
+  where.e = expr;
 
   //replace everything in the dimension expressions
   for (const auto& dim : e.dims)

@@ -693,18 +693,38 @@ applyFunction
   }
 }
 
-Tree::Expr
+std::pair
+<
+  Tree::Expr,
+  ExtraTreeInformation
+>
 fixupTree(System& s, const Tree::Expr& e)
 {
   TreeRewriter rewriter;
   RenameIdentifiers renamer(s);
+  FreeVariableReplacer free(s);
   SemanticTransform transform(s);
 
   Tree::Expr e1 = rewriter.rewrite(e);
   Tree::Expr e2 = renamer.rename(e1);
-  Tree::Expr e3 = transform.transform(e2);
+  Tree::Expr e3 = free.replaceFree(e2);
+  Tree::Expr e4 = transform.transform(e3);
 
-  return e3;
+  const auto& scope = transform.getAllScopeArgs();
+  const auto& odo = transform.getAllScopeOdometer();
+
+  std::vector<dimension_index> nils(scope.begin(), scope.end());
+  nils.insert(nils.end(), odo.begin(), odo.end());
+
+  return 
+  {
+    e4, 
+    {
+      transform.newVars(),
+      transform.getLin(),
+      nils
+    }
+  };
 }
 
 }

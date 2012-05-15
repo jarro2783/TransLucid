@@ -85,6 +85,63 @@ namespace TransLucid
     Replaced m_replaced;
     std::unordered_set<u32string> m_bound;
   };
+
+  class FreeVariableHelper : private GenericTreeWalker<FreeVariableHelper>
+  {
+    public:
+    using GenericTreeWalker<FreeVariableHelper>::operator();
+
+    typedef std::map<u32string, dimension_index> Replaced;
+
+    typedef Tree::Expr result_type;
+
+    FreeVariableHelper(System& system)
+    : m_system(system) {}
+
+    template <typename Container>
+    void
+    addBound(const Container& c)
+    {
+      for (const auto& val : c)
+      {
+        m_bound.insert(val);
+      }
+    }
+
+    void
+    addBound(const u32string& bound)
+    {
+      m_bound.insert(bound);
+    }
+
+    const Replaced&
+    getReplaced()
+    {
+      return m_replaced;
+    }
+
+    Tree::Expr
+    replaceFree(const Tree::Expr& expr);
+
+    template <typename T>
+    Tree::Expr
+    operator()(const T& e)
+    {
+      return e;
+    }
+
+    Tree::Expr operator()(const Tree::IdentExpr& e);
+    Tree::Expr operator()(const Tree::LambdaExpr& e);
+    Tree::Expr operator()(const Tree::PhiExpr& e);
+    Tree::Expr operator()(const Tree::WhereExpr& e);
+
+    private:
+    System& m_system;
+    Replaced m_replaced;
+    std::unordered_set<u32string> m_bound;
+  };
+
+
 }
 
 #endif

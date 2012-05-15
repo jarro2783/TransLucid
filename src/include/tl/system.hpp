@@ -61,6 +61,7 @@ namespace TransLucid
 
   class Translator;
   class TreeToWSTree;
+  class SemanticTransform;
 
   class BaseFunctionType;
 
@@ -223,6 +224,12 @@ namespace TransLucid
       Tree::Expr& expr);
 
     void
+    addTransformedEquations
+    (
+      const std::vector<Parser::Equation>& newVars
+    );
+
+    void
     loadLibrary(const u32string& s);
 
     void
@@ -362,7 +369,17 @@ namespace TransLucid
       Renames&&... renames);
 
     void
-    addExtraVariables(TreeToWSTree& tows);
+    addDefaultDimensions
+    (
+      const std::vector<dimension_index>& zeros,
+      const std::vector<dimension_index>& nils
+    );
+
+    void
+    addDefaultDimensions(const SemanticTransform& t);
+
+    Tree::Expr
+    fixupTreeAndAdd(const Tree::Expr& e);
 
     bool m_cached;
     bool m_cacheEnabled;
@@ -393,7 +410,7 @@ namespace TransLucid
         std::map<u32string, dimension_index>,
         std::vector<Parser::FnDecl>,
         WS*,
-        FreeVariableReplacer
+        FreeVariableHelper
       >
     FnInfo;
 

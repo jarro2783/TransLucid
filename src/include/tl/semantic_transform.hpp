@@ -63,6 +63,27 @@ namespace TransLucid
     Tree::Expr
     operator()(const Tree::PhiExpr& e);
 
+    const std::vector<Parser::Equation>& 
+    newVars() const
+    {
+      return m_newVars;
+    }
+
+    const std::vector<dimension_index>& getLin() const
+    {
+      return m_Lin;
+    }
+
+    const std::vector<dimension_index>& getAllScopeArgs() const
+    {
+      return m_namedAllScopeArgs;
+    }
+
+    const std::vector<dimension_index>& getAllScopeOdometer() const
+    {
+      return m_namedAllScopeOdometers;
+    }
+
     private:
     System& m_system;
 
