@@ -268,6 +268,9 @@ namespace TransLucid
     bool
     cacheEnabled() const;
 
+    Tree::Expr
+    fixupTreeAndAdd(const Tree::Expr& e);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
@@ -377,9 +380,6 @@ namespace TransLucid
 
     void
     addDefaultDimensions(const SemanticTransform& t);
-
-    Tree::Expr
-    fixupTreeAndAdd(const Tree::Expr& e);
 
     bool m_cached;
     bool m_cacheEnabled;

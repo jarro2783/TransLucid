@@ -317,6 +317,7 @@ namespace TransLucid
      * Abstract syntax tree node. A single expression node in the 
      * abstract syntax tree which is created by the parser.
      */
+    #if 0
     typedef Variant
     <
       nil,
@@ -344,6 +345,7 @@ namespace TransLucid
       recursive_wrapper<PhiAppExpr>,
       recursive_wrapper<WhereExpr>
     > Expr;
+    #endif
 
     /**
      * A parenthesised expression.

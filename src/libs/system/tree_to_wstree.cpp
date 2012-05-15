@@ -1,3 +1,4 @@
+#if 0
 /* Simplifies the Expr trees.
    Copyright (C) 2011,2012 Jarryd Beck
 
@@ -638,3 +639,4 @@ TreeToWSTree::operator()(const Tree::WhereExpr& e)
 }
 
 }
+#endif

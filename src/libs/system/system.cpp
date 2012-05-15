@@ -113,13 +113,11 @@ namespace
   Constant
   compile_and_evaluate(const Tree::Expr& expr, System& system)
   {
-    TreeToWSTree tows(&system);
-
-    Tree::Expr wsTree = tows.toWSTree(expr);
+    Tree::Expr transformed = system.fixupTreeAndAdd(expr);
 
     WorkshopBuilder compiler(&system);
 
-    std::auto_ptr<WS> ws(compiler.build_workshops(wsTree));
+    std::auto_ptr<WS> ws(compiler.build_workshops(transformed));
 
     return (*ws)(system.getDefaultContext());
   }

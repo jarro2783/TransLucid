@@ -92,6 +92,12 @@ WorkshopBuilder::operator()(const Tree::HashSymbol& s)
   return new Workshops::HashSymbolWS();
 }
 
+WS* 
+WorkshopBuilder::operator()(const Tree::BaseAbstraction& e)
+{
+  return nullptr;
+}
+
 WS*
 WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 {

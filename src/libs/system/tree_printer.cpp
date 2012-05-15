@@ -252,6 +252,12 @@ class TreePrinter
   }
 
   void
+  operator()(const Tree::BaseAbstraction& b)
+  {
+    m_os << U"⊥" << b.name;
+  }
+
+  void
   operator()(const Tree::ParenExpr& p)
   {
     //pass on the paren info without modification

@@ -26,13 +26,16 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_TREE_REWRITER_HPP_INCLUDED
 
 #include <tl/ast.hpp>
+#include <tl/generic_walker.hpp>
 
 namespace TransLucid
 {
-  class TreeRewriter
+  class TreeRewriter : private GenericTreeWalker<TreeRewriter>
   {
     public:
     typedef Tree::Expr result_type;
+
+    using GenericTreeWalker::operator();
 
     Tree::Expr
     rewrite(const Tree::Expr& e);
