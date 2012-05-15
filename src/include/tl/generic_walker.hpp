@@ -77,6 +77,12 @@ namespace TransLucid
         apply_visitor(*reinterpret_cast<Derived*>(this), e.e));
     }
 
+    Tree::Expr
+    operator()(const BaseAbstraction& e)
+    {
+      return e;
+    }
+
     Tree::Expr operator()(const Tree::TupleExpr& e)
     {
       std::vector<std::pair<Tree::Expr, Tree::Expr>> visited;

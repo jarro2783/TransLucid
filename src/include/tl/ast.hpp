@@ -280,6 +280,17 @@ namespace TransLucid
       u32string text; /**< The name of the identifier.*/
     };
 
+    struct BaseAbstraction
+    {
+      BaseAbstraction() = default;
+
+      BaseAbstraction(const u32string& name)
+      : name(name)
+      {}
+
+      u32string name;
+    };
+
     struct HashSymbol
     {
     };
@@ -318,6 +329,7 @@ namespace TransLucid
       DimensionExpr,
       IdentExpr,
       HashSymbol,
+      BaseAbstraction,
       recursive_wrapper<ParenExpr>,
       recursive_wrapper<UnaryOpExpr>,
       recursive_wrapper<BinaryOpExpr>,
