@@ -92,21 +92,19 @@ evaluateFree
   System::IdentifierLookup idents = system->lookupIdentifiers();
 
   //evaluate all of the free variables
-  #if 0
   std::cerr << "== evaluating free vars ==" << std::endl;
   for (const auto& v : free)
   {
     std::cerr << "free var: " << v.first << " : " << v.second << std::endl;
   }
   std::cerr << "== evaluating free vars ==" << std::endl;
-  #endif
   for (const auto& v : free)
   {
     auto var = idents.lookup(v.first);
     Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
       : (*idents.lookup(v.first))(k);
 
-    //std::cerr << v.first << " has type index: " << value.index() << std::endl;
+    std::cerr << v.first << " has type index: " << value.index() << std::endl;
     freeValues.push_back(std::make_pair(
       v.second, value
     ));
