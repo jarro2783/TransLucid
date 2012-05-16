@@ -4,17 +4,17 @@ dim envvar;;
 
 data Infinite = infty | neginfty;;
 
-var sperror = special"sperror";;
-var spaccess = special"spaccess";;
-var sptypeerror = special"sptypeerror";;
-var spdim = special"spdim";;
-var sparith = special"sparith";;
-var spundef = special"spundef";;
-var spconst = special"spconst";;
-var spmultidef = special"spmultidef";;
-var sploop = special"sploop";;
+var sperror = construct_special!"sperror";;
+var spaccess = construct_special!"spaccess";;
+var sptypeerror = construct_special!"sptypeerror";;
+var spdim = construct_special!"spdim";;
+var sparith = construct_special!"sparith";;
+var spundef = construct_special!"spundef";;
+var spconst = construct_special!"spconst";;
+var spmultidef = construct_special!"spmultidef";;
+var sploop = construct_special!"sploop";;
 
-fun bestselect__.a.b = spmultidef;;
+//fun bestselect__.a.b = spmultidef;;
 fun special_combine.a.b = a;;
 
 data Assoc = AssocNon | AssocLeft | AssocRight;;
@@ -234,7 +234,8 @@ fun union_construct.a.b = make_union!(a,b);;
 //convert to a from b
 fun convert.a.b [a : floatmp, b : intmp] = floatmp_convert_intmp!b;;
 
-var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
+//var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
+fun fby.d X Y = if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;

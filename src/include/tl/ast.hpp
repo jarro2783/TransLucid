@@ -280,11 +280,11 @@ namespace TransLucid
       u32string text; /**< The name of the identifier.*/
     };
 
-    struct BaseAbstraction
+    struct BaseAbstractionExpr
     {
-      BaseAbstraction() = default;
+      BaseAbstractionExpr() = default;
 
-      BaseAbstraction(const u32string& name)
+      BaseAbstractionExpr(const u32string& name)
       : name(name)
       {}
 

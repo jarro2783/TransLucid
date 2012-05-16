@@ -2446,4 +2446,18 @@ System::fixupTreeAndAdd(const Tree::Expr& e)
   return result.first;
 }
 
+BaseFunctionType*
+System::lookupBaseFunction(const u32string& name)
+{
+  auto iter = m_functionRegistry.find(name);
+  if (iter == m_functionRegistry.end())
+  {
+    return nullptr;
+  }
+  else
+  {
+    return std::get<0>(iter->second);
+  }
+}
+
 } //namespace TransLucid

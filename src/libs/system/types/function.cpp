@@ -100,6 +100,7 @@ evaluateFree
   std::cerr << "== evaluating free vars ==" << std::endl;
   for (const auto& v : free)
   {
+    std::cerr << "free var: " << v.first << std::endl;
     auto var = idents.lookup(v.first);
     Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
       : (*idents.lookup(v.first))(k);

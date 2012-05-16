@@ -271,6 +271,9 @@ namespace TransLucid
     Tree::Expr
     fixupTreeAndAdd(const Tree::Expr& e);
 
+    BaseFunctionType*
+    lookupBaseFunction(const u32string& name);
+
     private:
     //definitions of Equations
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;

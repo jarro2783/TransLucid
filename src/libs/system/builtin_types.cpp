@@ -1561,7 +1561,7 @@ BaseFunctionAbstraction::applyFn(const Constant& c) const
 void
 add_file_io(System& s)
 {
-  init_file_hds(s);
+  //init_file_hds(s);
 }
 
 void
@@ -1571,7 +1571,9 @@ add_one_base_function(System& s, const u32string& name, BaseFunctionType* fn)
     op(new BangAbstractionWS(fn->clone()));
 
   //add equation fn.op_name = bang abstraction workshop with fn.fn
-  s.addEquation(name, op.get());
+  //s.addEquation(name, op.get());
+
+  s.addHostFunction(name, fn, fn->arity());
 
   op.release();
 }

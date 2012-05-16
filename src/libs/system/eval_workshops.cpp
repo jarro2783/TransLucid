@@ -204,6 +204,7 @@ template <typename... Delta>
 Constant
 IdentWS::evaluate(Context& kappa, Delta&&... delta)
 {
+  std::cerr << "evaluating variable: " << m_name << std::endl;
   if (m_e == nullptr)
   {
     m_e = m_identifiers.lookup(m_name);
@@ -829,17 +830,25 @@ AtWS::operator()(Context& kappa, Context& delta)
 Constant
 BaseAbstractionWS::operator()(Context& k)
 {
-  return Types::BaseFunction::create
-  (
-    BaseFunctionAbstraction
-    (
-      //m_name, 
-      m_argDim, 
-      m_scope,
-      m_rhs, 
-      k
-    )
-  );
+  if (m_function == nullptr)
+  {
+    m_function = m_system.lookupBaseFunction(m_name);
+  }
+
+  if (m_function == nullptr)
+  {
+    return Types::Special::create(SP_CONST);
+  }
+  else
+  {
+    return Types::BaseFunction::create(*m_function);
+  }
+}
+
+Constant
+BaseAbstractionWS::operator()(Context& kappa, Context& delta)
+{
+  return operator()(kappa);
 }
 
 Constant

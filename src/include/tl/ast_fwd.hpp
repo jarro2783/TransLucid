@@ -48,7 +48,7 @@ namespace TransLucid
     class UnaryOpExpr;
     class BinaryOpExpr;
     class HashExpr;
-    class BaseAbstraction;
+    class BaseAbstractionExpr;
     class TupleExpr;
     class IfExpr;
     class AtExpr;
@@ -75,7 +75,7 @@ namespace TransLucid
       DimensionExpr,
       IdentExpr,
       HashSymbol,
-      BaseAbstraction,
+      BaseAbstractionExpr,
       recursive_wrapper<ParenExpr>,
       recursive_wrapper<UnaryOpExpr>,
       recursive_wrapper<BinaryOpExpr>,

@@ -93,9 +93,9 @@ WorkshopBuilder::operator()(const Tree::HashSymbol& s)
 }
 
 WS* 
-WorkshopBuilder::operator()(const Tree::BaseAbstraction& e)
+WorkshopBuilder::operator()(const Tree::BaseAbstractionExpr& e)
 {
-  return nullptr;
+  return new Workshops::BaseAbstractionWS(*m_system, e.name);
 }
 
 WS*

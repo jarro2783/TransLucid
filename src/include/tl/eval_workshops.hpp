@@ -284,12 +284,32 @@ namespace TransLucid
       operator()(Context& k);
 
       Constant
-      operator()(Context& k, Context& kappa);
+      operator()(Context& kappa, Context& delta);
 
       private:
       System& m_system;
       WS* m_e;
       bool m_cached;
+    };
+
+    class BaseAbstractionWS : public WS
+    {
+      public:
+      BaseAbstractionWS(System& s, const u32string& name)
+      : m_system(s), m_name(name), m_function(nullptr)
+      {
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+      System& m_system;
+      u32string m_name;
+      BaseFunctionType* m_function;
     };
 
     /**
@@ -403,6 +423,7 @@ namespace TransLucid
       WS* e1;
     };
 
+#if 0
     /**
      * A base function abstraction workshop.
      * Creates a base function abstraction.
@@ -452,6 +473,7 @@ namespace TransLucid
       std::vector<dimension_index> m_scope;
       WS* m_rhs;
     };
+#endif
 
     /**
      * A call-by-value abstraction workshop.

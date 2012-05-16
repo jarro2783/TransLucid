@@ -78,7 +78,7 @@ namespace TransLucid
     }
 
     Tree::Expr
-    operator()(const Tree::BaseAbstraction& e)
+    operator()(const Tree::BaseAbstractionExpr& e)
     {
       return e;
     }

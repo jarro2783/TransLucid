@@ -252,9 +252,9 @@ class TreePrinter
   }
 
   void
-  operator()(const Tree::BaseAbstraction& b)
+  operator()(const Tree::BaseAbstractionExpr& b)
   {
-    m_os << U"⊥" << b.name;
+    m_os << u32string(U"⊥") << b.name;
   }
 
   void

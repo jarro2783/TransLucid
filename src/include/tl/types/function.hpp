@@ -67,6 +67,9 @@ namespace TransLucid
       return reinterpret_cast<size_t>(this);
     }
 
+    virtual size_t
+    arity() const = 0;
+
     private:
     virtual Constant
     applyFn(const Constant& c) const = 0;
@@ -99,6 +102,12 @@ namespace TransLucid
     }
 
     ~BaseFunctionAbstraction() throw() {}
+
+    size_t
+    arity() const
+    {
+      return 1;
+    }
 
     private:
     Constant
@@ -205,6 +214,12 @@ namespace TransLucid
     cloneSelf() const
     {
       return new BuiltinBaseFunction(*this);
+    }
+
+    size_t
+    arity() const
+    {
+      return NumArgs;
     }
 
     #if 0

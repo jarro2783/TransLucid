@@ -134,12 +134,21 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   }
 
   //increment our own dim
+  #if 0
   Tree::Expr incOwnRaw = Tree::BinaryOpExpr
     (
       Tree::BinaryOperator(Tree::ASSOC_LEFT, U"plus", U"+", 0),
       Tree::HashExpr(Tree::DimensionExpr(label), false),
       mpz_class(1)
     );
+  #endif
+  Tree::Expr incOwnRaw = Tree::BangAppExpr(
+    Tree::BaseAbstractionExpr(U"intmp_plus"),
+    {
+      Tree::HashExpr(Tree::DimensionExpr(label), false),
+      mpz_class(1)
+    }
+  );
 
   //need to do the whole tree fixup here
   auto fixed = fixupTree(m_system, incOwnRaw);
@@ -189,6 +198,12 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   m_scope.push_back(argDim);
   m_scopeNames.push_back(e.name);
 
+  //add our free variables to the scope
+  for (const auto& free : e.free)
+  {
+    m_scope.push_back(free.second);
+  }
+
   //4. visit the child
   expr.rhs = apply_visitor(*this, expr.rhs);
 
@@ -205,8 +220,8 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   );
 
   //6. restore the scope
-  m_scope.pop_back();
-  //m_scope.resize(m_scope.size() - replaced.size() - 1);
+  //m_scope.pop_back();
+  m_scope.resize(m_scope.size() - e.free.size() - 1);
 
   return expr;
 }
@@ -242,6 +257,12 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
   m_namedAllScopeArgs.push_back(argDim);
   m_namedAllScopeOdometers.push_back(odometerDim);
 
+  //add our free variables to the scope
+  for (const auto& free : e.free)
+  {
+    m_scope.push_back(free.second);
+  }
+
   //4. visit the child
   expr.rhs = apply_visitor(*this, expr.rhs);
 
@@ -271,8 +292,9 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
   //6. restore the scope
   //we have two things to restore, the odometer and the two args
   //m_scope.resize(m_scope.size() - replaced.size() - 2);
-  m_scope.resize(m_scope.size() - 2);
+  //m_scope.resize(m_scope.size() - 2);
   //m_scope.pop_back();
+  m_scope.resize(m_scope.size() - e.free.size() - 1);
 
   return expr;
 }
