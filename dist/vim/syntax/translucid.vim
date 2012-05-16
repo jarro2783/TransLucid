@@ -29,9 +29,6 @@ sy match        cleared            /;;/
 
 hi def link     tlRawString        String
 
-sy match        tlOpSymbol         "[:.\~\$%<>=&!|+\-\*/]\+"
-hi def link     tlOpSymbol         Special
-
 sy match        tlReservedSymbol   ":"
 sy match        tlReservedSymbol   "\["
 sy match        tlReservedSymbol   "\]"
@@ -40,6 +37,13 @@ sy match        tlReservedSymbol   "@"
 sy match        tlReservedSymbol   "<-"
 sy match        tlReservedSymbol   "#"
 sy match        tlReservedSymbol   "!"
+sy match        tlReservedSymbol   "\."
+sy match        tlReservedSymbol   "\<,\>"
+sy match        tlReservedSymbol   "%%"
+sy match        tlReservedSymbol   "\$\$"
+sy match        tlReservedSymbol   "("
+sy match        tlReservedSymbol   ")"
+sy match        tlReservedSymbol   "|"
 
 hi              tlReservedSymbol   ctermfg=DarkGrey
 
