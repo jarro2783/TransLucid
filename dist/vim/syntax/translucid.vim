@@ -11,3 +11,7 @@ hi def link     tlDecl             Statement
 hi def link     tlConditional      Conditional
 
 sy match        Number             "\([1-9]\+\)\|\(0\([2-9a-zA-Z][0-9a-zA-Z]\+\)\?\)"
+
+sy match        String             /"[^\_$]*"/
+sy match        String             /`\_.*`/
+sy match        Error              /"[^"]*$/
