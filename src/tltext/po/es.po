@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-03-13 19:24+1100\n"
+"POT-Creation-Date: 2012-05-17 20:55+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Spanish <translucid@cse.unsw.edu.au>\n"
@@ -17,22 +17,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:238
+#: src/tltext/tltext.cpp:249
 msgid "// instant %1% beginning"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which demand we are printing
-#: src/tltext/tltext.cpp:245
+#: src/tltext/tltext.cpp:256
 msgid "// demand %1%"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:263
+#: src/tltext/tltext.cpp:274
 msgid "// instant %1% end"
 msgstr ""
 
 #: src/tltext/main.cpp:72
-msgid "TLText has encountered a segfault, goodbye..."
+msgid "TLtext has encountered a segfault, goodbye..."
 msgstr ""
 
 #. TRANSLATORS: the options description name in the help message
@@ -60,27 +60,37 @@ msgstr ""
 msgid "show this message"
 msgstr ""
 
-#. TRANSLATORS: the help message for --input
+#. TRANSLATORS: the help message for --no-builtin-header
 #: src/tltext/main.cpp:156
+msgid "don't use the standard header"
+msgstr ""
+
+#. TRANSLATORS: the help message for --header
+#: src/tltext/main.cpp:158
+msgid "load another header"
+msgstr ""
+
+#. TRANSLATORS: the help message for --input
+#: src/tltext/main.cpp:160
 msgid "input file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --output
-#: src/tltext/main.cpp:158
+#: src/tltext/main.cpp:162
 msgid "output file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --uuid
-#: src/tltext/main.cpp:160
+#: src/tltext/main.cpp:164
 msgid "print uuids"
 msgstr ""
 
 #. TRANSLATORS: the help message for --verbose
-#: src/tltext/main.cpp:162
+#: src/tltext/main.cpp:166
 msgid "level of verbosity"
 msgstr ""
 
 #. TRANSLATORS: the help message for --version
-#: src/tltext/main.cpp:164
+#: src/tltext/main.cpp:168
 msgid "show version"
 msgstr ""

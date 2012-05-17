@@ -7,4 +7,4 @@ Name: libtl
 Description: TransLucid runtime library 
 Version: @VERSION@
 Libs: -L${libdir} -ltlsystem
-Cflags: -I${includedir} @BOOST_CPPFLAGS@
+Cflags: -I${includedir} @BOOST_CPPFLAGS@ -std=gnu++11

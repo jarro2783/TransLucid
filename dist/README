@@ -1,5 +1,5 @@
 This directory contains various utilities for external programs, including a
-vim syntax highlighter and a latex package for typesetting TransLucid.
+vim syntax highlighter. 
 
 == Vim ==
 

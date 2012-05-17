@@ -32,3 +32,7 @@ clean up exception handling and parse error handling
 m4 macros should be created to look for the tl libraries and includes,
   in order that other applications can use tl,
   or maybe we can set up pkg-config for tl.
+
+-- tl-0.2 --
+
+latex pretty printer
