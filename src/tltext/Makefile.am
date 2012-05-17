@@ -43,7 +43,9 @@ TESTS_ENVIRONMENT = TLTEXT=$(top_builddir)/src/tltext/tltext \
   TESTDIR=$(top_srcdir)/src/tltext/tests \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh \
   RUNTESTS=$(top_srcdir)/src/tltext/runtests.sh \
-  LIBPATH=$(top_builddir)/src/libs/int:$(top_builddir)/src/libs/string $(SHELL) -x
+  LIBPATH=$(top_builddir)/src/libs/int:$(top_builddir)/src/libs/string \
+  EXTRA_ARGS="--no-builtin-header --header=$(top_srcdir)/src/tltext/header.tl" \
+  $(SHELL) -x
 
 tltextdatadir = $(pkgdatadir)/tltext
 dist_tltextdata_DATA = header.tl

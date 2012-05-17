@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.1.0\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-05-17 14:18+1000\n"
-"PO-Revision-Date: 2012-05-17 14:18+1000\n"
+"POT-Creation-Date: 2012-05-17 20:55+1000\n"
+"PO-Revision-Date: 2012-05-17 20:55+1000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"
@@ -86,27 +86,37 @@ msgstr "debug mode"
 msgid "show this message"
 msgstr "show this message"
 
-#. TRANSLATORS: the help message for --input
+#. TRANSLATORS: the help message for --no-builtin-header
 #: src/tltext/main.cpp:156
+msgid "don't use the standard header"
+msgstr "don't use the standard header"
+
+#. TRANSLATORS: the help message for --header
+#: src/tltext/main.cpp:158
+msgid "load another header"
+msgstr "load another header"
+
+#. TRANSLATORS: the help message for --input
+#: src/tltext/main.cpp:160
 msgid "input file"
 msgstr "input file"
 
 #. TRANSLATORS: the help message for --output
-#: src/tltext/main.cpp:158
+#: src/tltext/main.cpp:162
 msgid "output file"
 msgstr "output file"
 
 #. TRANSLATORS: the help message for --uuid
-#: src/tltext/main.cpp:160
+#: src/tltext/main.cpp:164
 msgid "print uuids"
 msgstr "print uuids"
 
 #. TRANSLATORS: the help message for --verbose
-#: src/tltext/main.cpp:162
+#: src/tltext/main.cpp:166
 msgid "level of verbosity"
 msgstr "level of verbosity"
 
 #. TRANSLATORS: the help message for --version
-#: src/tltext/main.cpp:164
+#: src/tltext/main.cpp:168
 msgid "show version"
 msgstr "show version"
