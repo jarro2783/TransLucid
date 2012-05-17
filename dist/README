@@ -1,0 +1,7 @@
+This directory contains various utilities for external programs, including a
+vim syntax highlighter and a latex package for typesetting TransLucid.
+
+== Vim ==
+
+Copy the contents of the vim directory into ~/.vim and you will have syntax
+highlighting for TransLucid source.

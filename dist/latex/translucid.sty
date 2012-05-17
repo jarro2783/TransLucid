@@ -1,0 +1,520 @@
+\ProvidesPackage{translucid}
+
+\usepackage[utf8]{inputenc}
+%\usepackage{a4wide}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{xypic}
+\usepackage{graphicx}
+\usepackage{epiolmec}
+\usepackage{color}
+\usepackage{epsfig}
+\usepackage[francais,english]{babel}
+
+\DeclareUnicodeCharacter{00B0}{$^\circ$}
+\DeclareUnicodeCharacter{0115}{\u{e}}
+\DeclareUnicodeCharacter{014D}{\=o}
+\DeclareUnicodeCharacter{03C0}{$\pi$}
+\DeclareUnicodeCharacter{03B5}{$\epsilon$}
+\DeclareUnicodeCharacter{03C1}{$\rho$}
+\DeclareUnicodeCharacter{03B9}{$\iota$}
+\DeclareUnicodeCharacter{03B2}{$\beta$}
+\DeclareUnicodeCharacter{03AC}{$\acute{\alpha}$}
+\DeclareUnicodeCharacter{03BB}{$\lambda$}
+\DeclareUnicodeCharacter{03BF}{$o$}
+\DeclareUnicodeCharacter{03BD}{$\nu$}
+
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{Bprogram}{thp}{lop}
+\floatname{Bprogram}{Program}
+
+\newcommand{\todo}{\par\bigskip\noindent\textbf{\Huge TODO:}\quad}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{programexample}[theorem]{Program}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\newcommand{\dbrackets}[1]{\llbracket #1\rrbracket}
+\newcommand{\dBrackets}[1]{\bigl\llbracket #1\bigr\rrbracket}
+\newcommand{\dbracketss}[1]{\llbracket #1\rrbracket^*}
+\newcommand{\dBracketss}[1]{\bigl\llbracket #1\bigr\rrbracket^*}
+
+\newcommand{\llbrace}{\{\hspace*{-0.75mm}\{}
+\newcommand{\rrbrace}{\}\hspace*{-0.75mm}\}}
+\newcommand{\LLbrace}{\bigl\{\!\!\bigl\{}
+\newcommand{\RRbrace}{\bigr\}\!\!\bigr\}}
+\newcommand{\dbraces}[1]{\llbrace #1\rrbrace}
+\newcommand{\dBraces}[1]{\LLbrace #1\RRbrace}
+\newcommand{\dbracess}[1]{\llbrace #1\rrbrace^*}
+\newcommand{\dBracess}[1]{\LLbrace #1\RRbrace^*}
+
+\newcommand{\llangle}{\langle\hspace*{-0.7mm}\langle}
+\newcommand{\rrangle}{\rangle\hspace*{-0.7mm}\rangle}
+\newcommand{\LLangle}{\bigl\langle\hspace*{-0.9mm}\bigl\langle}
+\newcommand{\RRangle}{\bigr\rangle\hspace*{-0.9mm}\bigr\rangle}
+\newcommand{\dangles}[1]{\llangle #1\rrangle}
+\newcommand{\dAngles}[1]{\LLangle #1\RRangle}
+\newcommand{\dangless}[1]{\llangle #1\rrangle^*}
+\newcommand{\dAngless}[1]{\LLangle #1\RRangle^*}
+
+\newcommand{\qletrm}[1]{\qquad\text{let}\;\;#1\;\;\text{in}}
+\newcommand{\letrm}[1]{\text{let}\;\;#1\;\;\text{in}}
+\newcommand{\eqsp}{=\;}
+\newcommand{\geqsp}{::=\;}
+\newcommand{\midsp}{\mid\;\;}
+
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\bset}[1]{\bigl\{#1\bigr\}}
+\newcommand{\Bset}[1]{\Bigl\{#1\Bigr\}}
+\newcommand{\parens}[1]{(#1)}
+\newcommand{\bparens}[1]{\bigl(#1\bigr)}
+\newcommand{\Bparens}[1]{\Bigl(#1\Bigr)}
+\newcommand{\bbparens}[1]{\biggl(#1\biggr)}
+\newcommand{\angles}[1]{\langle #1\rangle}
+\newcommand{\bangles}[1]{\bigl\langle #1\bigr\rangle}
+\newcommand{\Bangles}[1]{\Bigl\langle #1\Bigr\rangle}
+\newcommand{\bbrackets}[1]{\bigl[#1\bigr]}
+\newcommand{\Bbrackets}[1]{\Bigl[#1\Bigr]}
+\newcommand{\bbbrackets}[1]{\biggl[#1\biggr]}
+
+\newcommand{\Exp}{\mathrm{Exp}}
+\newcommand{\Lu}{\mathrm{Lu}}
+
+\newcommand{\Lif}{\mathtt{if}}
+\newcommand{\Lthen}{\mathtt{then}}
+\newcommand{\Lelsif}{\mathtt{elsif}}
+\newcommand{\Lelse}{\mathtt{else}}
+\newcommand{\Lfi}{\mathtt{fi}}
+\newcommand{\Lyes}{\mathtt{yes}}
+\newcommand{\Lno}{\mathtt{no}}
+\newcommand{\Lfalse}{\mathtt{false}}
+\newcommand{\Ltrue}{\mathtt{true}}
+\newcommand{\Loutput}{\mathtt{output}}
+\newcommand{\Linput}{\mathtt{input}}
+\newcommand{\Lset}{\mathtt{set}}
+\newcommand{\Ldim}{\mathtt{dim}}
+\newcommand{\Lvar}{\mathtt{var}}
+\newcommand{\Lfun}{\mathtt{fun}}
+
+\newcommand{\Lhash}{\texttt{\char35}}
+\newcommand{\Lat}{\texttt{\char64}}
+\newcommand{\Latat}{\texttt{\char64\char64}}
+\newcommand{\Lindex}{\mathit{index}}
+\newcommand{\Lfirst}{\mathit{first}}
+\newcommand{\Lprev}{\mathit{prev}}
+\newcommand{\Lnext}{\mathit{next}}
+\newcommand{\Lfby}{\mathit{fby}}
+\newcommand{\LLfby}{\mathtt{followed}\;\mathtt{by}}
+\newcommand{\Lasa}{\mathtt{asa}}
+\newcommand{\LLasa}{\mathtt{as}\;\mathtt{soon}\;\mathtt{as}}
+\newcommand{\Lwvr}{\mathit{wvr}}
+\newcommand{\LLwvr}{\mathtt{whenever}}
+\newcommand{\Liscurrent}{\mathtt{iscurrent}}
+\newcommand{\LLiscurrent}{\mathtt{is}\;\mathtt{current}}
+\newcommand{\Lleftchild}{\mathtt{leftchild}}
+\newcommand{\Lrightchild}{\mathtt{rightchild}}
+\newcommand{\Linitial}{\mathtt{initial}}
+\newcommand{\Lrest}{\mathtt{rest}}
+\newcommand{\Lcby}{\mathtt{cby}}
+\newcommand{\Lsucc}{\mathtt{succ}}
+\newcommand{\Lsby}{\mathtt{sby}}
+\newcommand{\Lall}{\mathtt{all}}
+\newcommand{\Lelt}{\mathtt{elt}}
+\newcommand{\Lactive}{\mathtt{active}}
+\newcommand{\Lcontemp}{\mathtt{contemp}}
+\newcommand{\Lcurrent}{\mathtt{current}}
+\newcommand{\Lremaining}{\mathtt{remaining}}
+\newcommand{\Lside}{\mathtt{side}}
+\newcommand{\Lright}{\mathtt{right}}
+\newcommand{\Lleft}{\mathtt{left}}
+\newcommand{\Lhsby}{\mathtt{hsby}}
+\newcommand{\Lhbf}{\mathtt{hbf}}
+\newcommand{\Lroot}{\mathtt{root}}
+\newcommand{\Lchild}{\mathtt{child}}
+\newcommand{\Lparent}{\mathtt{parent}}
+\newcommand{\Lnextsib}{\mathtt{nextsib}}
+
+\newcommand{\Leq}{\mathtt{eq}}
+\newcommand{\Lis}{\mathtt{is}}
+\newcommand{\Ldimension}{\mathtt{dimension}}
+\newcommand{\Lbefore}{\mathtt{before}}
+\newcommand{\Lupon}{\mathtt{upon}}
+\newcommand{\Lhitherto}{\mathtt{hitherto}}
+\newcommand{\Leventually}{\mathtt{eventually}}
+\newcommand{\Lhenceforth}{\mathtt{henceforth}}
+\newcommand{\Lsometime}{\mathtt{sometime}}
+\newcommand{\Llatest}{\mathtt{latest}}
+\newcommand{\Lattime}{\mathtt{attime}}
+\newcommand{\Linteger}{\mathtt{integer}}
+\newcommand{\Lpre}{\mathtt{pre}}
+\newcommand{\Lundefined}{\mathtt{undefined}}
+
+\newcommand{\Lcenter}{\mathtt{center}}
+\newcommand{\Lnorth}{\mathtt{north}}
+\newcommand{\Lsouth}{\mathtt{south}}
+\newcommand{\Least}{\mathtt{east}}
+\newcommand{\Lwest}{\mathtt{west}}
+
+\newcommand{\Lcall}{\mathtt{call}}
+\newcommand{\Lactuals}{\mathtt{actuals}}
+
+\newcommand{\Llet}{\mathtt{let}}
+\newcommand{\Lbe}{\mathtt{be}}
+\newcommand{\Lin}{\mathtt{in}}
+\newcommand{\Lof}{\texttt{of}}
+\newcommand{\Lusing}{\mathtt{using}}
+
+\newcommand{\Lstart}{\mathtt{start}}
+
+\newcommand{\Lwhere}{\mathtt{where}}
+\newcommand{\Lcase}{\texttt{case}}
+\newcommand{\Lcompute}{\mathtt{compute}}
+\newcommand{\Lfunction}{\mathtt{function}}
+\newcommand{\Lmapping}{\mathtt{mapping}}
+\newcommand{\Lproduce}{\mathtt{produce}}
+\newcommand{\Lprogram}{\mathtt{program}}
+\newcommand{\Lbegin}{\mathtt{begin}}
+\newcommand{\Lend}{\mathtt{end}}
+
+\newcommand{\Lprocedure}{\mathtt{procedure}}
+\newcommand{\Lvalue}{\mathtt{value}}
+\newcommand{\Lreal}{\mathtt{real}}
+\newcommand{\Larray}{\mathtt{array}}
+\newcommand{\Lcomment}{\mathtt{comment}}
+\newcommand{\LBoolean}{\mathtt{Boolean}}
+\newcommand{\Lfor}{\mathtt{for}}
+\newcommand{\Lstep}{\mathtt{step}}
+\newcommand{\Luntil}{\mathtt{until}}
+\newcommand{\Ldo}{\mathtt{do}}
+\newcommand{\Lgoto}{\mathtt{go\;to}}
+
+\newenvironment
+ {program}{\begin{equation*}\begin{array}{@{}l@{}}}{\end{array}\end{equation*}}
+\newenvironment{subprogram}{\begin{array}[t]{@{}l@{}}}{\end{array}}
+\newenvironment{case}[1]%
+  {\begin{subprogram}\Lcase\;#1\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogram}}
+\newenvironment{compute}[1]%
+  {\begin{subprogram}\Lcompute\;#1\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogram}}
+\newenvironment{function}[1]%
+  {\begin{subprogram}\Lfunction\;#1\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogram}}
+\newenvironment{mapping}[1]%
+  {\begin{subprogram}\Lmapping\;#1\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogram}}
+\newenvironment{produce}[1]%
+  {\begin{subprogram}\Lproduce\;#1\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogram}}
+\newenvironment{programclause}[1]%
+  {\begin{subprogram}\Lprogram\;#1\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogram}}
+\newenvironment{beginclause}%
+  {\begin{subprogram}\Lbegin\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogram}}
+\newenvironment{where}%
+  {\begin{subprogram}\Lwhere\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogram}}
+\newenvironment{valof}%
+  {\begin{subprogram}\mathtt{valof}\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\end\end{subprogram}}
+\newenvironment{subprograma}{\begin{array}[t]{@{}l|l@{}}}{\end{array}}
+\newenvironment{valofa}%
+  {\begin{subprogram}\mathtt{valof}\\\quad\begin{subprograma}}%
+  {\end{subprograma}\\\Lend\end{subprogram}}
+\newenvironment{subprogramc}{\begin{array}{@{}l@{}}}{\end{array}}
+\newenvironment{valofc}%
+  {\begin{subprogramc}\mathtt{valof}\\\quad\begin{subprogram}}%
+  {\end{subprogram}\\\Lend\end{subprogramc}}
+
+\newcommand{\Xarrow}{\stackrel{\rightarrow}{X}}
+\newcommand{\Yarrow}{\stackrel{\rightarrow}{Y}}
+\newcommand{\earrow}{\stackrel{\rightarrow}{e}}
+\newcommand{\tarrow}{\stackrel{\rightarrow}{t}}
+\newcommand{\EVAL}{\mathbf{EVAL}}
+\newcommand{\uhat}{\hat{u}}
+
+\newcommand{\modellss}{\,\,|\!\!\approx}
+\newcommand{\mathcomment}[1]{\notag&\text{\hspace*{5cm}#1.}\\}
+
+\newcommand{\Acal}{\mathcal{A}}
+\newcommand{\Bcal}{\mathcal{B}}
+\newcommand{\Ccal}{\mathcal{C}}
+\newcommand{\Dcal}{\mathcal{D}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\Fcal}{\mathcal{F}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Hcal}{\mathcal{H}}
+\newcommand{\Ical}{\mathcal{I}}
+\newcommand{\Jcal}{\mathcal{J}}
+\newcommand{\Kcal}{\mathcal{K}}
+\newcommand{\Lcal}{\mathcal{L}}
+\newcommand{\Mcal}{\mathcal{M}}
+\newcommand{\Ncal}{\mathcal{N}}
+\newcommand{\Ocal}{\mathcal{O}}
+\newcommand{\Pcal}{\mathcal{P}}
+\newcommand{\Qcal}{\mathcal{Q}}
+\newcommand{\Rcal}{\mathcal{R}}
+\newcommand{\Scal}{\mathcal{S}}
+\newcommand{\Tcal}{\mathcal{T}}
+\newcommand{\Ucal}{\mathcal{U}}
+\newcommand{\Vcal}{\mathcal{V}}
+\newcommand{\Wcal}{\mathcal{W}}
+\newcommand{\Xcal}{\mathcal{X}}
+\newcommand{\Ycal}{\mathcal{Y}}
+\newcommand{\Zcal}{\mathcal{Z}}
+
+\newcommand{\Abb}{\mathbb{A}}
+%\newcommand{\Bbb}{\mathbb{B}} % Cannot be used
+\newcommand{\Cbb}{\mathbb{C}}
+\newcommand{\Dbb}{\mathbb{D}}
+\newcommand{\Ebb}{\mathbb{E}}
+\newcommand{\Fbb}{\mathbb{F}}
+\newcommand{\Gbb}{\mathbb{G}}
+\newcommand{\Hbb}{\mathbb{H}}
+\newcommand{\Ibb}{\mathbb{I}}
+\newcommand{\Jbb}{\mathbb{J}}
+\newcommand{\Kbb}{\mathbb{K}}
+\newcommand{\Lbb}{\mathbb{L}}
+\newcommand{\Mbb}{\mathbb{M}}
+\newcommand{\Nbb}{\mathbb{N}}
+\newcommand{\Obb}{\mathbb{O}}
+\newcommand{\Pbb}{\mathbb{P}}
+\newcommand{\Qbb}{\mathbb{Q}}
+\newcommand{\Rbb}{\mathbb{R}}
+\newcommand{\Sbb}{\mathbb{S}}
+\newcommand{\Tbb}{\mathbb{T}}
+\newcommand{\Ubb}{\mathbb{U}}
+\newcommand{\Vbb}{\mathbb{V}}
+\newcommand{\Wbb}{\mathbb{W}}
+\newcommand{\Xbb}{\mathbb{X}}
+\newcommand{\Ybb}{\mathbb{Y}}
+\newcommand{\Zbb}{\mathbb{Z}}
+
+\newcommand{\Abf}{\mathbf{A}}
+\newcommand{\Bbf}{\mathbf{B}}
+\newcommand{\Cbf}{\mathbf{C}}
+\newcommand{\Dbf}{\mathbf{D}}
+\newcommand{\Ebf}{\mathbf{E}}
+\newcommand{\Fbf}{\mathbf{F}}
+\newcommand{\Gbf}{\mathbf{G}}
+\newcommand{\Hbf}{\mathbf{H}}
+\newcommand{\Ibf}{\mathbf{I}}
+\newcommand{\Jbf}{\mathbf{J}}
+\newcommand{\Kbf}{\mathbf{K}}
+\newcommand{\Lbf}{\mathbf{L}}
+\newcommand{\Mbf}{\mathbf{M}}
+\newcommand{\Nbf}{\mathbf{N}}
+\newcommand{\Obf}{\mathbf{O}}
+\newcommand{\Pbf}{\mathbf{P}}
+\newcommand{\Qbf}{\mathbf{Q}}
+\newcommand{\Rbf}{\mathbf{R}}
+\newcommand{\Sbf}{\mathbf{S}}
+\newcommand{\Tbf}{\mathbf{T}}
+\newcommand{\Ubf}{\mathbf{U}}
+\newcommand{\Vbf}{\mathbf{V}}
+\newcommand{\Wbf}{\mathbf{W}}
+\newcommand{\Xbf}{\mathbf{X}}
+\newcommand{\Ybf}{\mathbf{Y}}
+\newcommand{\Zbf}{\mathbf{Z}}
+
+\newcommand{\abf}{\mathbf{a}}
+\newcommand{\bbf}{\mathbf{b}}
+\newcommand{\cbf}{\mathbf{c}}
+\newcommand{\dbf}{\mathbf{d}}
+\newcommand{\ebf}{\mathbf{e}}
+\newcommand{\fbf}{\mathbf{f}}
+\newcommand{\gbf}{\mathbf{g}}
+\newcommand{\hbf}{\mathbf{h}}
+\newcommand{\ibf}{\mathbf{i}}
+\newcommand{\jbf}{\mathbf{j}}
+\newcommand{\kbf}{\mathbf{k}}
+\newcommand{\lbf}{\mathbf{l}}
+\newcommand{\mbf}{\mathbf{m}}
+\newcommand{\nbf}{\mathbf{n}}
+\newcommand{\obf}{\mathbf{o}}
+\newcommand{\pbf}{\mathbf{p}}
+\newcommand{\qbf}{\mathbf{q}}
+\newcommand{\rbf}{\mathbf{r}}
+\newcommand{\sbf}{\mathbf{s}}
+\newcommand{\tbf}{\mathbf{t}}
+\newcommand{\ubf}{\mathbf{u}}
+\newcommand{\vbf}{\mathbf{v}}
+\newcommand{\wbf}{\mathbf{w}}
+\newcommand{\xbf}{\mathbf{x}}
+\newcommand{\ybf}{\mathbf{y}}
+\newcommand{\zbf}{\mathbf{z}}
+
+\newcommand{\Att}{\mathtt{A}}
+\newcommand{\Btt}{\mathtt{B}}
+\newcommand{\Ctt}{\mathtt{C}}
+\newcommand{\Dtt}{\mathtt{D}}
+\newcommand{\Ett}{\mathtt{E}}
+\newcommand{\Ftt}{\mathtt{F}}
+\newcommand{\Gtt}{\mathtt{G}}
+\newcommand{\Htt}{\mathtt{H}}
+\newcommand{\Itt}{\mathtt{I}}
+\newcommand{\Jtt}{\mathtt{J}}
+\newcommand{\Ktt}{\mathtt{K}}
+\newcommand{\Ltt}{\mathtt{L}}
+\newcommand{\Mtt}{\mathtt{M}}
+\newcommand{\Ntt}{\mathtt{N}}
+\newcommand{\Ott}{\mathtt{O}}
+\newcommand{\Ptt}{\mathtt{P}}
+\newcommand{\Qtt}{\mathtt{Q}}
+\newcommand{\Rtt}{\mathtt{R}}
+\newcommand{\Stt}{\mathtt{S}}
+\newcommand{\Ttt}{\mathtt{T}}
+\newcommand{\Utt}{\mathtt{U}}
+\newcommand{\Vtt}{\mathtt{V}}
+\newcommand{\Wtt}{\mathtt{W}}
+\newcommand{\Xtt}{\mathtt{X}}
+\newcommand{\Ytt}{\mathtt{Y}}
+\newcommand{\Ztt}{\mathtt{Z}}
+
+\newcommand{\att}{\mathtt{a}}
+\newcommand{\btt}{\mathtt{b}}
+\newcommand{\ctt}{\mathtt{c}}
+\newcommand{\dtt}{\mathtt{d}}
+\newcommand{\ett}{\mathtt{e}}
+\newcommand{\ftt}{\mathtt{f}}
+\newcommand{\gtt}{\mathtt{g}}
+\newcommand{\htt}{\mathtt{h}}
+\newcommand{\itt}{\mathtt{i}}
+\newcommand{\jtt}{\mathtt{j}}
+\newcommand{\ktt}{\mathtt{k}}
+\newcommand{\ltt}{\mathtt{l}}
+\newcommand{\mtt}{\mathtt{m}}
+\newcommand{\ntt}{\mathtt{n}}
+\newcommand{\ott}{\mathtt{o}}
+\newcommand{\ptt}{\mathtt{p}}
+\newcommand{\qtt}{\mathtt{q}}
+\newcommand{\rtt}{\mathtt{r}}
+\newcommand{\stt}{\mathtt{s}}
+\newcommand{\ttt}{\mathtt{t}}
+\newcommand{\utt}{\mathtt{u}}
+\newcommand{\vtt}{\mathtt{v}}
+\newcommand{\wtt}{\mathtt{w}}
+\newcommand{\xtt}{\mathtt{x}}
+\newcommand{\ytt}{\mathtt{y}}
+\newcommand{\ztt}{\mathtt{z}}
+
+\newcommand{\tbar}{{\bar{t}}}
+\newcommand{\Xbar}{{\bar{X}}}
+\newcommand{\alphabar}{{\bar{\alpha}}}
+\newcommand{\powerNN}{{\Ncal^\Ncal}}
+
+\newcommand{\NAT}{\mathit{NAT}}
+\newcommand{\even}{\mathit{even}}
+\newcommand{\pos}{\mathit{pos}}
+\newcommand{\nat}{\mathit{nat}}
+\newcommand{\Nint}{\mathit{int}}
+\newcommand{\real}{\mathit{real}}
+\newcommand{\Ns}{s}
+\newcommand{\Na}{a}
+\newcommand{\Nz}{0}
+\newcommand{\Nplus}{+}
+\newcommand{\eqeq}{=\!=}
+\newcommand{\SNAT}{\mathit{STACK}\textit{-}\mathit{OF}\textit{-}\mathit{NAT}}
+\newcommand{\nstk}{\mathit{nstk}}
+\newcommand{\stk}{\mathit{stk}}
+\newcommand{\Snil}{\mathit{stknil}}
+\newcommand{\Stop}{\mathit{top}}
+\newcommand{\Spop}{\mathit{pop}}
+\newcommand{\Spush}{\mathit{push}}
+\newcommand{\Lifthenelse}{\mathtt{if}\textrm{--}\mathtt{then}\textrm{--}\mathtt{else}}
+\newcommand{\Lbeginend}{\mathtt{begin}\textrm{--}\mathtt{end}}
+\newcommand{\true}{\mathtt{true}}
+\newcommand{\op}{\mathtt{op}}
+\newcommand{\var}{\mathtt{var}}
+\newcommand{\obj}{\mathtt{obj}}
+\newcommand{\jbo}{\mathtt{jbo}}
+\newcommand{\is}{\mathtt{is}}
+\newcommand{\protecting}{\mathtt{protecting}}
+\newcommand{\sorts}{\mathtt{sorts}}
+\newcommand{\subsorts}{\mathtt{subsorts}}
+\newcommand{\eq}{\mathtt{eq}}
+\newcommand{\Isqrt}{\mathit{sqrt}}
+\newcommand{\front}{\mathit{front}}
+\newcommand{\llbr}{[\![}
+\newcommand{\rrbr}{]\!]}
+\newcommand{\llrr}[1]{\llbr #1 \rrbr}
+
+\newcommand{\tlhash}{\texttt{\#}}
+\newcommand{\tlat}{\texttt{@}}
+\newcommand{\tlsemi}{\texttt{;}}
+\newcommand{\tlcom}{\texttt{,}}
+\newcommand{\tleq}{\texttt{=}}
+\newcommand{\emdash}{\thinspace---\thinspace}
+\newcommand{\onett}{\texttt{1}}
+\newcommand{\twott}{\texttt{2}}
+\newcommand{\threett}{\texttt{3}}
+\newcommand{\fourtt}{\texttt{4}}
+\newcommand{\fivett}{\texttt{5}}
+\newcommand{\sixtt}{\texttt{6}}
+\newcommand{\seventt}{\texttt{7}}
+\newcommand{\Lor}{\texttt{|}}
+\newcommand{\Lamp}{\texttt{\&}}
+\newcommand{\Ldeps}{\rightarrow}
+
+\newcommand{\ifExpr}
+  {\texttt{if}\;E_1\;\texttt{then}\;E_2\;\texttt{else}\;E_3\;\texttt{fi}}
+
+\newcommand{\atExpr}
+  {E_2\;\texttt{@}\;E_1}
+
+\newcommand{\hashExpr}
+  {\texttt{\#}E}
+\newcommand{\tupleExpr}
+  {[E_{i1}\leftarrow E_{i2}]_{i=1..m}}
+\newcommand{\lambdaBaseExpr}
+  {\lambda^\mathrm{b} (x_{i=1..m}) \rightarrow E}
+\newcommand{\applyBaseExpr}
+  {E!(E_{i=1..m})}
+\newcommand{\whereExprSimple}
+  {E\;\Lwhere\begin{array}[t]{l}
+               \mathtt{dim}\;x^\mathrm{d}_{i=1..m} \leftarrow E^\mathrm{d}_i \\
+               \mathtt{var}\;x^\mathrm{v}_{j=1..n}=E^\mathrm{v}_j \;
+               \mathtt{end}\end{array}}
+\newcommand{\whereExprSimpleLong}
+  {E\;\Lwhere(\ell,L^\mathrm{out},L^\mathrm{in})\;
+               \mathtt{dim}\;x^\mathrm{d}_{i=1..m} \leftarrow E^\mathrm{d}_i \;
+               \mathtt{var}\;x^\mathrm{v}_{j=1..n}=E^\mathrm{v}_j \;
+               \mathtt{end}}
+\newcommand{\whereExprLabel}
+  {E\;\Lwhere(\ell,L^\mathrm{out},L^\mathrm{in})\;
+   \begin{array}[t]{@{}l}
+   \texttt{dim}\;x^\mathrm{d}_{i=1..m} \leftarrow E^\mathrm{d}_i \\
+   \mathtt{var}\;x^\mathrm{v}_{j=1..n}=E^\mathrm{v}_j \;
+   \mathtt{end}\end{array}}
+\newcommand{\lambdaValueExpr}
+  {\lambda^\mathrm{v} x\; \{x^\mathrm{f}_{i=1..m}\} \rightarrow E}
+%\newcommand{\LlambdaValueExpr}
+  %{\lambda^\mathrm{v}_\ell\,E}
+\newcommand{\lambdaValueExprLabel}
+  {\lambda^\mathrm{v} (\ell,L^\mathrm{v},L^\mathrm{n})\;
+   x_\ell\; \{x^\mathrm{f}_{\ell,i=1..m}\} \rightarrow E}
+\newcommand{\applyValueExpr}
+  {E_1.E_2}
+\newcommand{\applyValueExprLabel}
+  {\mathtt{apply}^\mathrm{v} (E_1,E_2)}
+\newcommand{\lambdaNameExpr}
+  {\lambda^\mathrm{n} x\; \{x^\mathrm{f}_{i=1..m}\} \rightarrow E}
+\newcommand{\lambdaNameExprLabel}
+  {\lambda^\mathrm{n} (\ell,L^\mathrm{v},L^\mathrm{n})\;
+   x_\ell\; \{x^\mathrm{f}_{\ell,i=1..m}\} \rightarrow E}
+%\newcommand{\LlambdaNameExpr}
+  %{\lambda^\mathrm{n}_\ell\,E}
+\newcommand{\applyNameExpr}
+  {E_1\;E_2}
+\newcommand{\applyNameExprLabel}
+  {\mathtt{apply}^\mathrm{n} (E_1,E_2,L)}
