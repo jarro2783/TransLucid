@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-03-13 19:24+1100\n"
+"POT-Creation-Date: 2012-05-17 14:18+1000\n"
 "PO-Revision-Date: 2012-02-08 11:56+11\n"
 "Last-Translator: Jarryd Beck <jarrydb@cse.unsw.edu.au>\n"
 "Language-Team: French <translucid@cse.unsw.edu.au>\n"
@@ -242,25 +242,25 @@ msgid "missing token: %s, found token: %s"
 msgstr "jeton manquant: %s, jeton trouvé: %s"
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:753 src/libs/system/parser.cpp:768
+#: src/libs/system/parser.cpp:756 src/libs/system/parser.cpp:771
 msgid "'then'"
 msgstr ""
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:777
+#: src/libs/system/parser.cpp:780
 msgid "'else'"
 msgstr ""
 
 #. TRANSLATORS: keyword
-#: src/libs/system/parser.cpp:783
+#: src/libs/system/parser.cpp:786
 msgid "'fi'"
 msgstr ""
 
-#: src/libs/system/system.cpp:2104
+#: src/libs/system/system.cpp:2156
 msgid "no print function defined"
 msgstr ""
 
-#: src/libs/system/system.cpp:2113
+#: src/libs/system/system.cpp:2165
 msgid "canonical_print didn't return a string"
 msgstr ""
 

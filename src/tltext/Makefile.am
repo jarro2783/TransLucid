@@ -48,7 +48,7 @@ TESTS_ENVIRONMENT = TLTEXT=$(top_builddir)/src/tltext/tltext \
 tltextdatadir = $(pkgdatadir)/tltext
 dist_tltextdata_DATA = header.tl
 
-EXTRA_DIST = CMakeLists.txt tltext-tests.sh runtests.sh gettext.h
+EXTRA_DIST = CMakeLists.txt tltext-tests.sh runtests.sh gettext.h tests
 
 TESTS = tltext-tests.sh
 
