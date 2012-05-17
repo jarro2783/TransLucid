@@ -17,7 +17,7 @@
 #   <http://www.gnu.org/licenses/>.
 EXTRA_DIST=CMakeLists.txt runtest runbinary.sh catch.hpp
 
-BUILD_TEST=variant parser system_test
+BUILD_TEST=variant parser system_test constant cache
 BUILD_NOTEST=uuid
 
 check_PROGRAMS = $(BUILD_TEST) $(BUILD_NOTEST)
@@ -34,6 +34,8 @@ system_test_SOURCES = system.cpp
 variant_SOURCES = variant.cpp
 parser_SOURCES = parser.cpp
 uuid_SOURCES = uuid.cpp
+constant_SOURCES = constant.cpp
+cache_SOURCES = cache.cpp
 
 TESTS_ENVIRONMENT = LIBRARY_PATH=$(top_builddir)/src/libs/int \
   RUNBINARY=$(top_srcdir)/src/tests/runbinary.sh $(SHELL) -x
