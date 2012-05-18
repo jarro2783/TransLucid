@@ -1,4 +1,4 @@
-EXTRA_DIST=examples
+EXTRA_DIST=examples CMakeLists.txt
 
 doc: Doxyfile
 	doxygen
