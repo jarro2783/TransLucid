@@ -29,10 +29,10 @@ namespace TransLucid
   {
     class GenerateLexer
     {
-      typedef lexertl::basic_rules<char32_t> lexrules;
+      typedef lexertl::basic_rules<char32_t, uint32_t> lexrules;
       lexrules m_rules;
 
-      typedef lexertl::basic_state_machine<char32_t> lexstate;
+      typedef lexertl::basic_state_machine<char32_t, uint32_t> lexstate;
       lexstate m_state_machine;
 
       typedef lexertl::basic_generator<lexrules, lexstate> generator;
