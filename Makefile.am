@@ -17,8 +17,8 @@
 #   <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS= po src checks doc dist
-EXTRA_DIST=CMakeLists.txt INSTALL-tl
+SUBDIRS= po src checks doc dist cmake
+EXTRA_DIST=CMakeLists.txt INSTALL-tl config.h.cmake
 
 PO_SUBDIRS=src
 include Makefile.pot

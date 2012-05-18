@@ -206,5 +206,7 @@ AC_CONFIG_FILES([po/Makefile
                  src/libs/system/Makefile
                  src/tests/Makefile
                  src/tltext/Makefile
+                 cmake/Makefile
+                 cmake/Modules/Makefile
                  ])
 AC_OUTPUT

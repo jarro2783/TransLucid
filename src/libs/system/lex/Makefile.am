@@ -3,7 +3,7 @@ $(builddir)/generate_lexer: lexertl.cpp
   -I$(srcdir)/.. $< -o $@
 
 BUILT_SOURCES=$(srcdir)/static_lexer.hpp
-EXTRA_DIST=$(BUILT_SOURCES) lexertl.cpp
+EXTRA_DIST=$(BUILT_SOURCES) lexertl.cpp CMakeLists.txt
 MAINTAINERCLEAN=$(BUILT_SOURCES)
 
 generate_lexer_CPPFLAGS = -I$(top_srcdir)/src/include $(TL_CFLAGS) -Wall \
