@@ -18,7 +18,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS= po src checks doc dist
-EXTRA_DIST=CMakeLists.txt
+EXTRA_DIST=CMakeLists.txt INSTALL-tl
 
 PO_SUBDIRS=src
 include Makefile.pot
