@@ -11,6 +11,8 @@ To do this, type:
 For utilities for external programs, such as vim, see the dist
 directory.
 
+The latest user manual is in the doc directory.
+
 == Translators ==
 
 Look in po/README for instructions.
