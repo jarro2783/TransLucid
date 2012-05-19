@@ -18,7 +18,7 @@
 
 SUBDIRS = lex tl . po
 
-EXTRA_DIST = CMakeLists.txt
+EXTRA_DIST = CMakeLists.txt po/CMakeLists.txt
 
 lib_LTLIBRARIES = libtlsystem.la
 

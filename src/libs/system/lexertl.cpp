@@ -615,7 +615,7 @@ nextToken
   System::IdentifierLookup& idents
 )
 {
-  lexertl::basic_match_results<StreamPosIterator, size_t> results(begin, end);
+  lexertl::basic_match_results<StreamPosIterator, uint32_t> results(begin, end);
 
   translucid_lex(results);
 

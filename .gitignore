@@ -11,9 +11,6 @@ Makefile.in
 /install-sh
 /ltmain.sh
 .*.swp
-*.aux
-*.log
-*.pdf
 Makefile.in.in
 Rules-quot
 boldquot.sed
