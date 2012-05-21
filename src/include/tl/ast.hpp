@@ -553,12 +553,14 @@ namespace TransLucid
       {}
     };
 
-    struct CaseExpr
+    struct BestofExpr
     {
-      CaseExpr() = default;
+      BestofExpr() = default;
 
       //region, boolean, expr
       std::vector<std::tuple<Expr, Expr, Expr>> expressions;
+
+      u32string name;
     };
 
     /**
