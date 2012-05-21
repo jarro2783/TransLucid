@@ -553,6 +553,14 @@ namespace TransLucid
       {}
     };
 
+    struct CaseExpr
+    {
+      CaseExpr() = default;
+
+      //region, boolean, expr
+      std::vector<std::tuple<Expr, Expr, Expr>> expressions;
+    };
+
     /**
      * A context change expression. E1 @ E2, evaluate E1 with the tuple
      * returned by E2 as the new context.
