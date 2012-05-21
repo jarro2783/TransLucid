@@ -30,10 +30,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: tl 0.1.0\n"
+"Project-Id-Version: tl 0.2.0\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-05-17 20:55+1000\n"
-"PO-Revision-Date: 2012-05-17 20:55+1000\n"
+"POT-Creation-Date: 2012-05-21 15:57+1000\n"
+"PO-Revision-Date: 2012-05-21 15:57+1000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"
