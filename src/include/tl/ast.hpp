@@ -314,7 +314,6 @@ namespace TransLucid
     class RangeExpr;
 
     //defined in ast_fwd.hpp
-    #if 0
     /**
      * Abstract syntax tree node. A single expression node in the 
      * abstract syntax tree which is created by the parser.
