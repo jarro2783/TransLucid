@@ -437,6 +437,20 @@ namespace TransLucid
       Expr& rhs
     );
 
+    struct MakeIntenExpr
+    {
+      MakeIntenExpr() = default;
+
+      Expr expr;
+    };
+
+    struct EvalIntenExpr
+    {
+      EvalIntenExpr() = default;
+
+      Expr expr;
+    };
+
     /**
      * Host operation. Evaluates an operation that has been provided
      * in the host environment. It is strict and there is no partial
