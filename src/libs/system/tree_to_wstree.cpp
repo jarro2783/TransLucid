@@ -267,6 +267,7 @@ TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
 Tree::Expr 
 TreeToWSTree::operator()(const Tree::EvalIntenExpr& e)
 {
+  return Tree::Expr();
 }
 
 Tree::Expr

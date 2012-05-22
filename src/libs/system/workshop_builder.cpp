@@ -178,6 +178,7 @@ WorkshopBuilder::operator()(const Tree::IfExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::EvalIntenExpr& e)
 {
+  return nullptr;
 }
 
 WS*
