@@ -11,9 +11,6 @@ Makefile.in
 /install-sh
 /ltmain.sh
 .*.swp
-*.aux
-*.log
-*.pdf
 Makefile.in.in
 Rules-quot
 boldquot.sed
@@ -22,3 +19,4 @@ en@quot.header
 insert-header.sin
 quot.sed
 remove-potcdate.sin
+/CTestConfig.cmake

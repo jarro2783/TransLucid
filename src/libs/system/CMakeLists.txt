@@ -39,6 +39,11 @@ link_directories(${ICU_LIBRARY_DIRS})
 
 add_library(tlsystem SHARED ${SYSTEM_SOURCES})
 
+set_target_properties(tlsystem PROPERTIES
+  SOVERSION 2
+  VERSION 2.0.0
+)
+
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/lex/generate-lexer >

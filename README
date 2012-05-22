@@ -8,6 +8,11 @@ To do this, type:
 
   cmake -DCMAKE_CXXFLAGS=-O1
 
+For utilities for external programs, such as vim, see the dist
+directory.
+
+The latest user manual is in the doc directory.
+
 == Translators ==
 
 Look in po/README for instructions.

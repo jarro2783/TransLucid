@@ -152,6 +152,10 @@ int main(int argc, char *argv[])
     ("debug,d", _("debug mode"))
     /* TRANSLATORS: the help message for --help */
     ("help,h", _("show this message"))
+    /* TRANSLATORS: the help message for --no-builtin-header */
+    ("no-builtin-header", _("don't use the standard header"))
+    /* TRANSLATORS: the help message for --header */
+    ("header", po::value<std::vector<std::string>>(), _("load another header"))
     /* TRANSLATORS: the help message for --input */
     ("input,i", po::value<std::string>(), _("input file"))
     /* TRANSLATORS: the help message for --output */
@@ -268,7 +272,21 @@ int main(int argc, char *argv[])
       tltext.set_clargs(vm["args"].as<std::vector<std::string>>());
     }
     
-    tltext.add_header(PREFIX "/share/tl/tltext/header.tl");
+    if (vm.count("no-builtin-header") == 0)
+    {
+      tltext.add_header(PREFIX "/share/tl/tltext/header.tl");
+    }
+
+    if (vm.count("header") > 0)
+    {
+      std::vector<std::string> headers = vm["header"].
+        as<std::vector<std::string>>();
+
+      for (const auto& header : headers)
+      {
+        tltext.add_header(header);
+      }
+    }
 
     tltext.run();
   }
