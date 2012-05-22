@@ -175,6 +175,11 @@ WorkshopBuilder::operator()(const Tree::IfExpr& e)
   return new Workshops::IfWS(condition, then, else_ifs, else_);
 }
 
+WS* 
+WorkshopBuilder::operator()(const Tree::EvalIntenExpr& e)
+{
+}
+
 WS*
 WorkshopBuilder::operator()(const Tree::HashExpr& e)
 {

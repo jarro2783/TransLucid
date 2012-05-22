@@ -90,6 +90,15 @@ namespace TransLucid
       return Tree::TupleExpr{visited};
     }
 
+    Tree::Expr
+    operator()(const Tree::EvalIntenExpr& e)
+    {
+      return Tree::EvalIntenExpr
+      {
+        apply_visitor(*reinterpret_cast<Derived*>(this), e.expr), 
+      };
+    }
+
     Tree::Expr operator()(const Tree::AtExpr& e)
     {
       return Tree::AtExpr

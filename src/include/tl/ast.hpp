@@ -442,6 +442,8 @@ namespace TransLucid
       MakeIntenExpr() = default;
 
       Expr expr;
+
+      std::vector<dimension_index> scope;
     };
 
     struct EvalIntenExpr
