@@ -1,5 +1,5 @@
 /* Simplifies the Expr trees.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -69,6 +69,7 @@ namespace TransLucid
     Tree::Expr operator()(const Tree::ParenExpr& e);
     Tree::Expr operator()(const Tree::UnaryOpExpr& e);
     Tree::Expr operator()(const Tree::BinaryOpExpr& e);
+    Tree::Expr operator()(const Tree::EvalIntenExpr& e);
     Tree::Expr operator()(const Tree::IfExpr& e);
     Tree::Expr operator()(const Tree::HashExpr& e);
     Tree::Expr operator()(const Tree::TupleExpr& e);

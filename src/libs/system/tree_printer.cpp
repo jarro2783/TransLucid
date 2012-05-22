@@ -351,6 +351,13 @@ class TreePrinter
   }
 
   void
+  operator()(const Tree::EvalIntenExpr& e)
+  {
+    m_os << u32string(U"↓");
+    apply_visitor(*this, e.expr);
+  }
+
+  void
   operator()(const Tree::IfExpr& ife)
   {
     m_os << "if ";
