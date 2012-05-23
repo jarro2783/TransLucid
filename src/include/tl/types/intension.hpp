@@ -42,6 +42,13 @@ namespace TransLucid
       return m_ws;
     }
 
+    Constant
+    operator()(Context& k) const
+    {
+      ContextPerturber p(k, m_scope);
+      return (*m_ws)(k);
+    }
+
     private:
     WS* m_ws;
     std::vector<std::pair<dimension_index, Constant>> m_scope;

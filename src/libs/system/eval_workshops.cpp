@@ -497,6 +497,9 @@ EvalIntenWS::operator()(Context& k)
   {
     return Types::Special::create(SP_TYPEERROR);
   }
+
+  const IntensionType& inten = Types::Intension::get(rhs);
+  return inten(k);
 }
 
 Constant
