@@ -475,10 +475,10 @@ namespace TransLucid
 
     TypeFunctions workshop_type_functions =
       {
-        &Types::Workshop::equality,
-        &Types::Workshop::hash,
-        &delete_ptr<WorkshopType>,
-        &Types::Workshop::less
+        &Types::Intension::equality,
+        &Types::Intension::hash,
+        &delete_ptr<IntensionType>,
+        &Types::Intension::less
       };
 
     TypeFunctions demand_type_functions =
@@ -1439,23 +1439,27 @@ namespace TransLucid
       }
     }
 
-    namespace Workshop
+    namespace Intension
     {
       Constant
-      create(const WS* ws)
+      create
+      (
+        WS* ws, 
+        const std::vector<std::pair<dimension_index, Constant>>& scope
+      )
       {
         ConstantPointerValue* p =
           new ConstantPointerValue(
             &workshop_type_functions,
-            new WorkshopType(const_cast<WS*>(ws)));
+            new IntensionType(const_cast<WS*>(ws), scope));
 
         return Constant(p, TYPE_INDEX_WS);
       }
 
-      const WorkshopType&
+      const IntensionType&
       get(const Constant& w)
       {
-        return get_constant_pointer<WorkshopType>(w);
+        return get_constant_pointer<IntensionType>(w);
       }
 
       size_t

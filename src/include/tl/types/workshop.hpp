@@ -1,5 +1,5 @@
-/* Workshop type, stores a pointer to workshop in a Constant.
-   Copyright (C) 2011 Jarryd Beck.
+/* Intension type, stores a pointer to workshop with scope in a Constant.
+   Copyright (C) 2011, 2012 Jarryd Beck.
 
 This file is part of TransLucid.
 
@@ -25,10 +25,14 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
-  class WorkshopType
+  class IntensionType
   {
     public:
-    WorkshopType(WS* ws)
+    IntensionType
+    (
+      WS* ws, 
+      const std::vector<std::pair<dimension_index, Constant>>& scope
+    )
     : m_ws(ws)
     {
     }
@@ -40,16 +44,21 @@ namespace TransLucid
 
     private:
     WS* m_ws;
+    std::vector<std::pair<dimension_index, Constant>> m_scope;
   };
 
   namespace Types
   {
-    namespace Workshop
+    namespace Intension
     {
       Constant
-      create(const WS* ws);
+      create
+      (
+        WS* ws, 
+        const std::vector<std::pair<dimension_index, Constant>>& scope
+      );
 
-      const WorkshopType&
+      const IntensionType&
       get(const Constant& c);
 
       bool 

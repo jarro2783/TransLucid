@@ -1,5 +1,5 @@
 /* Workshops generated from AST::Expr.
-   Copyright (C) 2009--2012 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -469,6 +469,39 @@ BangOpWS::operator()(Context& k)
   {
     return Types::Special::create(SP_UNDEF);
   }
+}
+
+Constant
+MakeIntenWS::operator()(Context& k)
+{
+  std::vector<std::pair<dimension_index, Constant>> scope;
+
+  for (auto d : m_scope)
+  {
+    scope.push_back({d, k.lookup(d)});
+  }
+  return Types::Intension::create(m_rhs, scope);
+}
+
+Constant
+MakeIntenWS::operator()(Context& kappa, Context& delta)
+{
+}
+
+Constant
+EvalIntenWS::operator()(Context& k)
+{
+  Constant rhs = (*m_rhs)(k);
+
+  if (rhs.index() != TYPE_INDEX_INTENSION)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+}
+
+Constant
+EvalIntenWS::operator()(Context& kappa, Context& delta)
+{
 }
 
 Constant
@@ -1017,9 +1050,11 @@ NamedAbstractionWS::operator()(Context& kappa, Context& delta)
     );
 }
 
+#warning this goes away
 Constant
 NameApplicationWS::operator()(Context& k)
 {
+  #if 0
   Constant lhs = (*m_lhs)(k);
 
   if (lhs.index() != TYPE_INDEX_NAME_FUNCTION)
@@ -1028,15 +1063,17 @@ NameApplicationWS::operator()(Context& k)
   }
 
   //named application passes a pointer to the intension
-  Constant rhs = Types::Workshop::create(m_rhs);
+  Constant rhs = Types::Intension::create(m_rhs);
   const NameFunctionType& f = Types::NameFunction::get(lhs);
 
   return f.apply(k, rhs, m_Lall);
+  #endif
 }
 
 Constant
 NameApplicationWS::operator()(Context& kappa, Context& delta)
 {
+  #if 0
   Constant lhs = (*m_lhs)(kappa, delta);
 
   if (lhs.index() == TYPE_INDEX_DEMAND)
@@ -1050,10 +1087,11 @@ NameApplicationWS::operator()(Context& kappa, Context& delta)
   }
 
   //named application passes a pointer to the intension
-  Constant rhs = Types::Workshop::create(m_rhs);
+  Constant rhs = Types::Intension::create(m_rhs);
   const NameFunctionType& f = Types::NameFunction::get(lhs);
 
   return f.apply(kappa, delta, rhs, m_Lall);
+  #endif
 }
 
 Constant

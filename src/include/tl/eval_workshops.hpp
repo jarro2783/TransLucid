@@ -1,5 +1,5 @@
 /* Workshops generated from AST::Expr.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef SET_EVALUATOR_HPP_INCLUDED
-#define SET_EVALUATOR_HPP_INCLUDED
+#ifndef TL_EVAL_WORKSHOP_HPP_INCLUDED
+#define TL_EVAL_WORKSHOP_HPP_INCLUDED
 
 /**
  * @file compiled_functors.hpp
@@ -43,7 +43,7 @@ along with TransLucid; see the file COPYING.  If not see
 //On the other hand, IdentWS is used whenever an arbitrary identifier is 
 //referred to.
 //For an identifier x:
-//IdentWS makes the demand system([id : "x"]) & k
+//IdentWS gets x from the system and evaluates it in the current context
 
 namespace TransLucid
 {
@@ -203,6 +203,59 @@ namespace TransLucid
 
     class BangOpSingleWS : public WS
     {
+    };
+
+    class MakeIntenWS : public WS
+    {
+      public:
+
+      MakeIntenWS
+      (
+        WS* rhs,
+        const std::vector<dimension_index>& scope
+      )
+      : m_rhs(rhs), m_scope(scope)
+      {
+      }
+
+      ~MakeIntenWS()
+      {
+        delete m_rhs;
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+      WS* m_rhs;
+      std::vector<dimension_index> m_scope;
+    };
+
+    class EvalIntenWS : public WS
+    {
+      public:
+
+      EvalIntenWS(WS* rhs)
+      : m_rhs(rhs)
+      {
+      }
+
+      ~EvalIntenWS()
+      {
+        delete m_rhs;
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+      WS* m_rhs;
     };
 
     /**
@@ -784,4 +837,4 @@ namespace TransLucid
   }
 }
 
-#endif // SET_EVALUATOR_HPP_INCLUDED
+#endif // TL_EVAL_WORKSHOP_HPP_INCLUDED

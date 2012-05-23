@@ -47,6 +47,7 @@ namespace TransLucid
     class ParenExpr;
     class UnaryOpExpr;
     class BinaryOpExpr;
+    class MakeIntenExpr;
     class EvalIntenExpr;
     class HashExpr;
     class BaseAbstractionExpr;
@@ -80,6 +81,7 @@ namespace TransLucid
       recursive_wrapper<ParenExpr>,
       recursive_wrapper<UnaryOpExpr>,
       recursive_wrapper<BinaryOpExpr>,
+      recursive_wrapper<MakeIntenExpr>,
       recursive_wrapper<EvalIntenExpr>,
       recursive_wrapper<IfExpr>,
       recursive_wrapper<HashExpr>,

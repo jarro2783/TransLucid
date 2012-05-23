@@ -1,5 +1,5 @@
 /* Tree walk when not much changes.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -97,6 +97,16 @@ namespace TransLucid
       }
 
       return Tree::TupleExpr{visited};
+    }
+
+    Tree::Expr
+    operator()(const Tree::MakeIntenExpr& e)
+    {
+      return Tree::MakeIntenExpr
+      {
+        apply_visitor(*reinterpret_cast<Derived*>(this), e.expr), 
+        e.scope
+      };
     }
 
     Tree::Expr

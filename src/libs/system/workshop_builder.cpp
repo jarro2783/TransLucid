@@ -182,8 +182,19 @@ WorkshopBuilder::operator()(const Tree::IfExpr& e)
 }
 
 WS* 
+WorkshopBuilder::operator()(const Tree::MakeIntenExpr& e)
+{
+  WS* rhs = apply_visitor(*this, e.expr);
+  WS* result = new Workshops::MakeIntenWS(rhs, e.scope);
+}
+
+WS* 
 WorkshopBuilder::operator()(const Tree::EvalIntenExpr& e)
 {
+  WS* rhs = apply_visitor(*this, e.expr);
+  WS* result = new Workshops::EvalIntenWS(rhs);
+
+  return result;
 }
 
 WS*
