@@ -1,5 +1,5 @@
 /* Utility functions.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -29,6 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 
 #include <tl/equation.hpp>
+#include <tl/remove_cbn.hpp>
 #include <tl/rename.hpp>
 #include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
@@ -702,13 +703,15 @@ fixupTree(System& s, const Tree::Expr& e)
 {
   TreeRewriter rewriter;
   RenameIdentifiers renamer(s);
+  RemoveCBN cbn;
   FreeVariableReplacer free(s);
   SemanticTransform transform(s);
 
   Tree::Expr e1 = rewriter.rewrite(e);
   Tree::Expr e2 = renamer.rename(e1);
-  Tree::Expr e3 = free.replaceFree(e2);
-  Tree::Expr e4 = transform.transform(e3);
+  Tree::Expr e3 = cbn.remove(e2);
+  Tree::Expr e4 = free.replaceFree(e3);
+  Tree::Expr e5 = transform.transform(e4);
 
   const auto& scope = transform.getAllScopeArgs();
   const auto& odo = transform.getAllScopeOdometer();
@@ -718,7 +721,7 @@ fixupTree(System& s, const Tree::Expr& e)
 
   return 
   {
-    e4, 
+    e5, 
     {
       transform.newVars(),
       transform.getLin(),

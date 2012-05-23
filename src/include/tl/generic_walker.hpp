@@ -127,7 +127,20 @@ namespace TransLucid
       );
     }
 
-    Tree::Expr operator()(const Tree::LambdaExpr& e);
+    Tree::Expr operator()(const Tree::LambdaExpr& e)
+    {
+      Tree::LambdaExpr le
+      (
+        e.name,
+        apply_visitor(*reinterpret_cast<Derived*>(this), e.rhs)
+      );
+
+      le.argDim = e.argDim;
+      le.scope = e.scope;
+      le.free = e.free;
+
+      return le;
+    }
 
     Tree::Expr operator()(const Tree::PhiExpr& e);
 

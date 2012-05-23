@@ -453,6 +453,14 @@ namespace TransLucid
     {
       MakeIntenExpr() = default;
 
+      MakeIntenExpr(Expr e)
+      : expr(e)
+      {}
+
+      MakeIntenExpr(Expr e, std::vector<dimension_index> scope)
+      : expr(e), scope(scope)
+      {}
+
       Expr expr;
 
       std::vector<dimension_index> scope;
@@ -461,6 +469,11 @@ namespace TransLucid
     struct EvalIntenExpr
     {
       EvalIntenExpr() = default;
+
+      EvalIntenExpr(const Tree::Expr& rhs)
+      : expr(rhs)
+      {
+      }
 
       Expr expr;
     };

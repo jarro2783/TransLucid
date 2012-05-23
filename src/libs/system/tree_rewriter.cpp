@@ -18,7 +18,8 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 /** @file tree_rewriter.cpp
- * Rewrites an expression tree to remove operators and literals.
+ * Rewrites an expression tree to remove operators, literals, and
+ * call-by-name expressions.
  */
 
 #include <tl/tree_rewriter.hpp>
@@ -254,6 +255,16 @@ TreeRewriter::operator()(const Tree::PhiAppExpr& e)
     apply_visitor(*this, e.lhs),
     apply_visitor(*this, e.rhs)
   );
+
+  //cbv application with ↑E
+  //we don't want to do this here, it is done after renaming
+  #if 0
+  return Tree::LambdaAppExpr
+  (
+    apply_visitor(*this, e.lhs),
+    Tree::MakeIntenExpr(apply_visitor(*this, e.rhs))
+  );
+  #endif
 }
 
 Tree::Expr 
