@@ -28,7 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/demand.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/intmp.hpp>
-#include <tl/types/workshop.hpp>
+#include <tl/types/intension.hpp>
 
 #include <gmpxx.h>
 

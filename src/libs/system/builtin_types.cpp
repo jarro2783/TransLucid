@@ -49,7 +49,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/type.hpp>
 #include <tl/types/union.hpp>
 #include <tl/types/uuid.hpp>
-#include <tl/types/workshop.hpp>
+#include <tl/types/intension.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
