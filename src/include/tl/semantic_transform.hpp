@@ -35,6 +35,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/ast.hpp>
 #include <tl/generic_walker.hpp>
 
+#include <map>
+
 namespace TransLucid
 {
   class System;
@@ -53,9 +55,15 @@ namespace TransLucid
 
     Tree::Expr
     transform(const Tree::Expr& e);
+    
+    Tree::Expr 
+    operator()(const Tree::IdentExpr& e);
 
     Tree::Expr
     operator()(const Tree::WhereExpr& where);
+
+    Tree::Expr
+    operator()(const Tree::MakeIntenExpr& e);
 
     Tree::Expr
     operator()(const Tree::LambdaExpr& e);
@@ -85,6 +93,8 @@ namespace TransLucid
     }
 
     private:
+    typedef std::map<u32string, dimension_index> LambdaReplaced;
+
     System& m_system;
 
     std::vector<dimension_index> m_Lout;
@@ -99,6 +109,8 @@ namespace TransLucid
 
     std::vector<dimension_index> m_namedAllScopeArgs;
     std::vector<dimension_index> m_namedAllScopeOdometers;
+
+    LambdaReplaced m_lambdaScope;
   };
 }
 

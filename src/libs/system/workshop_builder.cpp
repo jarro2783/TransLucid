@@ -186,6 +186,8 @@ WorkshopBuilder::operator()(const Tree::MakeIntenExpr& e)
 {
   WS* rhs = apply_visitor(*this, e.expr);
   WS* result = new Workshops::MakeIntenWS(rhs, e.scope);
+
+  return result;
 }
 
 WS* 
@@ -259,6 +261,8 @@ WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::PhiExpr& e)
 {
+  throw "error: WorkshopBuilder(PhiExpr) reached";
+  #if 0
   WS* rhs = apply_visitor(*this, e.rhs);
 
   return new Workshops::NamedAbstractionWS
@@ -271,6 +275,7 @@ WorkshopBuilder::operator()(const Tree::PhiExpr& e)
     e.free,
     rhs
   );
+  #endif
 }
 
 WS* 

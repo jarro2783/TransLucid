@@ -123,13 +123,6 @@ namespace TransLucid
     Tree::Expr
     replaceFree(const Tree::Expr& expr);
 
-    template <typename T>
-    Tree::Expr
-    operator()(const T& e)
-    {
-      return e;
-    }
-
     Tree::Expr operator()(const Tree::IdentExpr& e);
     Tree::Expr operator()(const Tree::LambdaExpr& e);
     Tree::Expr operator()(const Tree::PhiExpr& e);

@@ -176,19 +176,45 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 }
 
 Tree::Expr
+SemanticTransform::operator()(const Tree::IdentExpr& e)
+{
+  auto iter = m_lambdaScope.find(e.text);
+  if (iter != m_lambdaScope.end())
+  {
+    return Tree::HashExpr(Tree::DimensionExpr(iter->second));
+  }
+  else
+  {
+    return e;
+  }
+}
+
+Tree::Expr
+SemanticTransform::operator()(const Tree::MakeIntenExpr& e)
+{
+  Tree::MakeIntenExpr inten;
+  inten.expr = apply_visitor(*this, e.expr);
+  inten.scope = m_Lin;
+  inten.scope.insert(inten.scope.end(), m_Lout.begin(), m_Lout.end());
+
+  return inten;
+}
+
+Tree::Expr
 SemanticTransform::operator()(const Tree::LambdaExpr& e)
 {
   //1. generate a new dimension
   //2. store our scope dimensions
   //3. add ourselves to the scope
   //4. visit the child
-  //5. add a new equation param = #dim
-  //6. restore the scope
+  //5. restore the scope
 
   Tree::LambdaExpr expr = e;
 
   //1. generate a new dimension
   dimension_index argDim = m_system.nextHiddenDim();
+
+  m_lambdaScope.insert({e.name, argDim});
 
   //2. store our scope dimensions and ourself
   expr.scope = m_scope;
@@ -207,21 +233,10 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   //4. visit the child
   expr.rhs = apply_visitor(*this, expr.rhs);
 
-  //5. add a new equation param = #dim
-  m_newVars.push_back
-  (
-    std::make_tuple
-    (
-      e.name,
-      Tree::Expr(),
-      Tree::Expr(),
-      Tree::HashExpr(Tree::DimensionExpr(argDim))
-    )
-  );
-
-  //6. restore the scope
+  //5. restore the scope
   //m_scope.pop_back();
   m_scope.resize(m_scope.size() - e.free.size() - 1);
+  m_lambdaScope.erase(e.name);
 
   return expr;
 }
@@ -229,74 +244,7 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
 Tree::Expr
 SemanticTransform::operator()(const Tree::PhiExpr& e)
 {
-  //1. generate a new dimension
-  //2. store our scope dimensions and ourself
-  //3. add ourselves to the scope
-  //4. visit the child
-  //5. add a new equation name = args @ [stuff]
-  //6. restore the scope
-
-  Tree::PhiExpr expr = e;
-
-  //1. generate new dimensions
-  dimension_index argDim = m_system.nextHiddenDim();
-  dimension_index odometerDim = m_system.nextHiddenDim();
-
-  //2. store our scope dimensions and ourself
-  expr.scope = m_scope;
-
-  expr.argDim = argDim;
-  expr.odometerDim = odometerDim;
-
-  //3. add ourselves to the scope
-  m_scopeNames.push_back(e.name);
-  m_scope.push_back(argDim);
-  m_scope.push_back(odometerDim);
-
-  //also the all scope
-  m_namedAllScopeArgs.push_back(argDim);
-  m_namedAllScopeOdometers.push_back(odometerDim);
-
-  //add our free variables to the scope
-  for (const auto& free : e.free)
-  {
-    m_scope.push_back(free.second);
-  }
-
-  //4. visit the child
-  expr.rhs = apply_visitor(*this, expr.rhs);
-
-  //5. add a new equation name = args @ [stuff]
-  m_newVars.push_back(Parser::Equation
-  (
-    e.name,
-    Tree::Expr(),
-    Tree::Expr(),
-    Tree::AtExpr(
-      Tree::IdentExpr(U"args"),
-      Tree::TupleExpr(Tree::TupleExpr::TuplePairs
-      {
-        {
-          Tree::DimensionExpr(DIM_PI), 
-          Tree::DimensionExpr(odometerDim)
-        },
-        {
-          Tree::DimensionExpr(DIM_PSI),
-          Tree::DimensionExpr(argDim)
-        }
-      }
-      )
-    )
-  ));
-
-  //6. restore the scope
-  //we have two things to restore, the odometer and the two args
-  //m_scope.resize(m_scope.size() - replaced.size() - 2);
-  //m_scope.resize(m_scope.size() - 2);
-  //m_scope.pop_back();
-  m_scope.resize(m_scope.size() - e.free.size() - 1);
-
-  return expr;
+  throw "error: SemanticTransform(PhiExpr) reached";
 }
 
 }
