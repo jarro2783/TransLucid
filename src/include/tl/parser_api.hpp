@@ -1,5 +1,5 @@
 /* Parser forward declarations.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -23,7 +23,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/ast.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
-#include <tl/system.hpp>
 
 /**
  * @file parser_api.hpp

@@ -1,5 +1,5 @@
 /* The System.
-   Copyright (C) 2009-2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -32,12 +32,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/dimtranslator.hpp>
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
-//#include <tl/function_registry.hpp>
 #include <tl/free_variables.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
+#include <tl/system_object.hpp>
 
 namespace TransLucid
 {
@@ -83,6 +83,8 @@ namespace TransLucid
   class System : public TypeRegistry, public DimensionRegistry
   {
     public:
+    typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
+    typedef std::unordered_map<uuid, SystemObject*> ObjectMap;
 
     System(bool cached = false);
     ~System();
@@ -276,7 +278,6 @@ namespace TransLucid
 
     private:
     //definitions of Equations
-    typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
     typedef std::unordered_map<uuid, DefinitionMap::iterator> UUIDDefinition;
 
     //output hyperdatons
@@ -387,6 +388,7 @@ namespace TransLucid
     bool m_cached;
     bool m_cacheEnabled;
 
+    ObjectMap m_objects;
     DefinitionMap m_equations;
     UUIDDefinition m_equationUUIDs;
     DefinitionMap m_assignments;

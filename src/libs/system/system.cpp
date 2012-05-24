@@ -227,6 +227,25 @@ namespace
       return Constant();
     }
   };
+
+  class VariableObject : public SystemObject
+  {
+    public:
+
+    void
+    del();
+
+    void
+    repl(const Parser::Line& line);
+
+    private:
+    System::DefinitionMap::iterator m_var;
+
+    public:
+    VariableObject(decltype(m_var) var)
+    : m_var(var)
+    {}
+  };
 }
 
 GettextInit System::m_gettext;
