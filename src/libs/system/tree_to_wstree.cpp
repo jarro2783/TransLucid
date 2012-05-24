@@ -1,5 +1,5 @@
 /* Simplifies the Expr trees.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -261,6 +261,13 @@ TreeToWSTree::operator()(const Tree::BinaryOpExpr& e)
     )
   );
   #endif
+}
+
+
+Tree::Expr 
+TreeToWSTree::operator()(const Tree::EvalIntenExpr& e)
+{
+  return Tree::Expr();
 }
 
 Tree::Expr

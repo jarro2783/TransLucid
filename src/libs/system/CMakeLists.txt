@@ -39,8 +39,8 @@ link_directories(${ICU_LIBRARY_DIRS})
 add_library(tlsystem SHARED ${SYSTEM_SOURCES})
 
 set_target_properties(tlsystem PROPERTIES
-  SOVERSION 1
-  VERSION 1.0.0
+  SOVERSION 2
+  VERSION 2.0.0
 )
 
 add_custom_command(

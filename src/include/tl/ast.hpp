@@ -302,6 +302,8 @@ namespace TransLucid
     class OpExpr;
     class RangeExpr;
 
+    //defined in ast_fwd.hpp
+    #if 0
     /**
      * Abstract syntax tree node. A single expression node in the 
      * abstract syntax tree which is created by the parser.
@@ -332,6 +334,7 @@ namespace TransLucid
       recursive_wrapper<PhiAppExpr>,
       recursive_wrapper<WhereExpr>
     > Expr;
+    #endif
 
     /**
      * A parenthesised expression.
@@ -433,6 +436,22 @@ namespace TransLucid
       Expr& lhs,
       Expr& rhs
     );
+
+    struct MakeIntenExpr
+    {
+      MakeIntenExpr() = default;
+
+      Expr expr;
+
+      std::vector<dimension_index> scope;
+    };
+
+    struct EvalIntenExpr
+    {
+      EvalIntenExpr() = default;
+
+      Expr expr;
+    };
 
     /**
      * Host operation. Evaluates an operation that has been provided
@@ -548,6 +567,16 @@ namespace TransLucid
       TupleExpr(const TuplePairs& p)
       : pairs(p)
       {}
+    };
+
+    struct BestofExpr
+    {
+      BestofExpr() = default;
+
+      //region, boolean, expr
+      std::vector<std::tuple<Expr, Expr, Expr>> expressions;
+
+      u32string name;
     };
 
     /**
