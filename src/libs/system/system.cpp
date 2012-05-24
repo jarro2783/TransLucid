@@ -2322,6 +2322,36 @@ System::lookupBaseFunction(const u32string& name)
 Constant
 System::addDeclaration(const Parser::RawInput& input)
 {
+  //create a U32Iterator for the input
+  Parser::U32Iterator inputBegin(
+    Parser::makeUTF32Iterator(input.text.begin())
+  );
+  Parser::U32Iterator inputEnd(
+    Parser::makeUTF32Iterator(input.text.end())
+  );
+
+  //create a stream pos iterator for the U32Iterator
+  Parser::StreamPosIterator posbegin(inputBegin, input.source,
+    input.line, input.character);
+  Parser::StreamPosIterator posend(inputEnd);
+
+  //create a lexer iterator
+  Parser::LexerIterator lexit(posbegin, posend, m_defaultk, 
+    lookupIdentifiers());
+  Parser::LexerIterator lexend = lexit.makeEnd();
+
+  //get the first token
+  auto start = *lexit;
+
+  if (start.getType() != Parser::TOKEN_DECLID)
+  {
+  }
+  
+  u32string token = get<u32string>(start.getValue());
+
+  if (token == U"var")
+  {
+  }
 }
 
 } //namespace TransLucid
