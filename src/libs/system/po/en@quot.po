@@ -29,8 +29,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.2.0\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-05-21 15:57+1000\n"
-"PO-Revision-Date: 2012-05-21 15:57+1000\n"
+"POT-Creation-Date: 2012-05-24 17:30+1000\n"
+"PO-Revision-Date: 2012-05-24 17:30+1000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@quot\n"
@@ -279,10 +279,10 @@ msgstr "'else'"
 msgid "'fi'"
 msgstr "'fi'"
 
-#: src/libs/system/system.cpp:2156
+#: src/libs/system/system.cpp:2183
 msgid "no print function defined"
 msgstr "no print function defined"
 
-#: src/libs/system/system.cpp:2165
+#: src/libs/system/system.cpp:2192
 msgid "canonical_print didn't return a string"
 msgstr "canonical_print didn't return a string"
