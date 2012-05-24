@@ -21,11 +21,12 @@ along with TransLucid; see the file COPYING.  If not see
 #define EQUATION_HPP_INCLUDED
 
 #include <tl/ast_fwd.hpp>
-#include <tl/exception.hpp>
 #include <tl/bestfit.hpp>
-#include <tl/workshop.hpp>
+#include <tl/exception.hpp>
+#include <tl/parser_api.hpp>
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
+#include <tl/workshop.hpp>
 
 #include <list>
 #include <memory>
@@ -319,9 +320,11 @@ namespace TransLucid
       return m_equations;
     }
 
-    protected:
-
-    VariableMap m_variables;
+    void
+    addUnparsed(const Parser::RawInput& input)
+    {
+      m_unparsed.push_back(input);
+    }
 
     private:
 
@@ -334,6 +337,8 @@ namespace TransLucid
     //belonging to a uuid
     typedef std::map<uuid, VariableWS*> UUIDVarMap;
 
+    typedef std::vector<Parser::RawInput> UnparsedEquations;
+
     UUIDEquationMap m_equations;
 
     u32string m_name;
@@ -344,6 +349,8 @@ namespace TransLucid
     CompileBestFit *m_compileBestFit;
 
     PriorityList m_priorityVars;
+
+    UnparsedEquations m_unparsed;
   };
 
   class ConditionalBestfitWS : public WS

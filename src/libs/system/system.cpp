@@ -2342,6 +2342,7 @@ System::addDeclaration(const Parser::RawInput& input)
 
   //get the first token
   auto start = *lexit;
+  ++lexit;
 
   if (start.getType() != Parser::TOKEN_DECLID)
   {
@@ -2351,7 +2352,36 @@ System::addDeclaration(const Parser::RawInput& input)
 
   if (token == U"var")
   {
+    return addVariableDecl(input, lexit);
   }
+}
+
+Constant
+System::addVariableDecl
+(
+  const Parser::RawInput& input, 
+  const Parser::LexerIterator& iter
+)
+{
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+  }
+
+  u32string name = get<u32string>(iter->getValue());
+
+  uuid u = generate_uuid();
+
+  auto equationIter = m_equations.find(name);
+
+  if (equationIter == m_equations.end())
+  {
+  }
+  else
+  {
+    equationIter->second->addUnparsed(input);
+  }
+
+  return Types::UUID::create(u);
 }
 
 } //namespace TransLucid

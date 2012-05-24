@@ -483,6 +483,13 @@ namespace TransLucid
     Constant
     addDeclaration(const Parser::RawInput& input);
 
+    Constant
+    addVariableDecl
+    (
+      const Parser::RawInput& input, 
+      const Parser::LexerIterator& iter
+    );
+
     size_t
     nextVarIndex()
     {
