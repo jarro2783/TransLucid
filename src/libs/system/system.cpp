@@ -2319,4 +2319,9 @@ System::lookupBaseFunction(const u32string& name)
   }
 }
 
+Constant
+System::addDeclaration(const Parser::RawInput& input)
+{
+}
+
 } //namespace TransLucid

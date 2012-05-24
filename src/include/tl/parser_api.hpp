@@ -172,6 +172,17 @@ namespace TransLucid
       U32Iterator begin;
       U32Iterator end;
     };
+
+    struct RawInput
+    {
+      //where it came from
+      u32string source;
+      int line;
+      int character;
+
+      //the actual input
+      u32string text;
+    };
      
     class ParseError : public std::exception
     {

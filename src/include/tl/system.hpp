@@ -480,6 +480,9 @@ namespace TransLucid
 
     public:
 
+    Constant
+    addDeclaration(const Parser::RawInput& input);
+
     size_t
     nextVarIndex()
     {
