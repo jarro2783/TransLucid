@@ -1,5 +1,5 @@
 /* Equations (ident = expr)
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -30,6 +30,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <list>
 #include <memory>
+#include <unordered_map>
 
 namespace TransLucid
 {
@@ -254,10 +255,41 @@ namespace TransLucid
     GuardWS m_validContext;
     std::shared_ptr<WS> m_h;
     uuid m_id;
-    Tree::Expr* m_ast;
+    //Tree::Expr* m_ast;
     int m_provenance;
     int m_endTime;
     int m_priority;
+  };
+
+  class Equation
+  {
+    public:
+    Equation
+    (
+      int provenance,
+      Parser::RawInput definition
+    )
+    : m_provenance(provenance)
+    , m_endTime(-1)
+    , m_definition(definition)
+    {
+    }
+
+    bool
+    translated() const
+    {
+      return m_translated.get();
+    }
+
+    void
+    compile(System& system);
+
+    private:
+
+    int m_provenance;
+    int m_endTime;
+    Parser::RawInput m_definition;
+    std::shared_ptr<Tree::Expr> m_translated;
   };
 
   //represents all definitions of a variable, is responsible for
@@ -274,7 +306,7 @@ namespace TransLucid
     
     ~VariableWS();
 
-    virtual Constant
+    Constant
     operator()(Context& k);
 
     Constant
@@ -321,9 +353,8 @@ namespace TransLucid
     }
 
     void
-    addUnparsed(const Parser::RawInput& input)
+    addUnparsed(const Parser::RawInput& input, int time)
     {
-      m_unparsed.push_back(input);
     }
 
     private:
@@ -331,26 +362,31 @@ namespace TransLucid
     typedef std::list<std::pair<int, UUIDEquationMap::iterator>> 
       ProvenanceList;
 
+    typedef std::list<Equation> EquationList;
+    typedef std::unordered_map<uuid, EquationList::iterator> UUIDEquations;
+    typedef std::list<EquationList::iterator> EquationPointerList;
+
     typedef std::map<int, ProvenanceList> PriorityList;
-
-    //maps uuid to variables so that we know which child owns the equation
-    //belonging to a uuid
-    typedef std::map<uuid, VariableWS*> UUIDVarMap;
-
-    typedef std::vector<Parser::RawInput> UnparsedEquations;
 
     UUIDEquationMap m_equations;
 
     u32string m_name;
     System& m_system;
-    bool storeuuid;
+    //bool storeuuid;
 
-    BestFittable m_bestFit;
-    CompileBestFit *m_compileBestFit;
+    //BestFittable m_bestFit;
+    //CompileBestFit *m_compileBestFit;
 
     PriorityList m_priorityVars;
 
-    UnparsedEquations m_unparsed;
+    //a list of all equations
+    EquationList m_equationList;
+
+    //uuids pointing to the list of equations
+    UUIDEquations m_uuidEquations;
+
+    //pointers to the uncompiled equations
+    EquationPointerList m_uncompiled;
   };
 
   class ConditionalBestfitWS : public WS

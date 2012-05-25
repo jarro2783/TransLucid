@@ -2378,7 +2378,7 @@ System::addVariableDecl
   }
   else
   {
-    equationIter->second->addUnparsed(input);
+    equationIter->second->addUnparsed(input, m_time);
   }
 
   return Types::UUID::create(u);
