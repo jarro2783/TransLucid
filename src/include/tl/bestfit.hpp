@@ -1,5 +1,5 @@
 /* Equations (ident = expr)
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -20,7 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef BESTFIT_HPP_INCLUDED
 #define BESTFIT_HPP_INCLUDED
 
+#include <tl/parser_api.hpp>
 #include <tl/types.hpp>
+#include <tl/uuid.hpp>
+
+#include <list>
+#include <unordered_map>
 
 /**
  * @file bestfit.hpp
@@ -103,6 +108,54 @@ namespace TransLucid
 
   class SingleDefinitionBestFit : public BestFit
   {
+  };
+
+  class Equation
+  {
+    public:
+    Equation
+    (
+      int provenance,
+      Parser::RawInput definition
+    )
+    : m_provenance(provenance)
+    , m_endTime(-1)
+    , m_definition(definition)
+    {
+    }
+
+    bool
+    translated() const
+    {
+      return m_translated.get();
+    }
+
+    void
+    compile(System& system);
+
+    private:
+
+    int m_provenance;
+    int m_endTime;
+    Parser::RawInput m_definition;
+    std::shared_ptr<Tree::Expr> m_translated;
+  };
+
+  class BestfitGroup
+  {
+    typedef std::list<Equation> EquationList;
+    typedef std::unordered_map<uuid, EquationList::iterator> UUIDEquations;
+    typedef std::list<EquationList::iterator> EquationPointerList;
+
+    //a list of all equations
+    EquationList m_equationList;
+
+    //uuids pointing to the list of equations
+    UUIDEquations m_uuidEquations;
+
+    //pointers to the uncompiled equations
+    EquationPointerList m_uncompiled;
+
   };
 }
 

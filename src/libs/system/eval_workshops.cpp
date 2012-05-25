@@ -1053,50 +1053,6 @@ NamedAbstractionWS::operator()(Context& kappa, Context& delta)
     );
 }
 
-#warning this goes away
-Constant
-NameApplicationWS::operator()(Context& k)
-{
-  #if 0
-  Constant lhs = (*m_lhs)(k);
-
-  if (lhs.index() != TYPE_INDEX_NAME_FUNCTION)
-  {
-    return Types::Special::create(SP_TYPEERROR);
-  }
-
-  //named application passes a pointer to the intension
-  Constant rhs = Types::Intension::create(m_rhs);
-  const NameFunctionType& f = Types::NameFunction::get(lhs);
-
-  return f.apply(k, rhs, m_Lall);
-  #endif
-}
-
-Constant
-NameApplicationWS::operator()(Context& kappa, Context& delta)
-{
-  #if 0
-  Constant lhs = (*m_lhs)(kappa, delta);
-
-  if (lhs.index() == TYPE_INDEX_DEMAND)
-  {
-    return lhs;
-  }
-
-  if (lhs.index() != TYPE_INDEX_NAME_FUNCTION)
-  {
-    return Types::Special::create(SP_TYPEERROR);
-  }
-
-  //named application passes a pointer to the intension
-  Constant rhs = Types::Intension::create(m_rhs);
-  const NameFunctionType& f = Types::NameFunction::get(lhs);
-
-  return f.apply(kappa, delta, rhs, m_Lall);
-  #endif
-}
-
 Constant
 AtTupleWS::operator()(Context& k)
 {

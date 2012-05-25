@@ -290,9 +290,7 @@ WorkshopBuilder::operator()(const Tree::LambdaAppExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::PhiAppExpr& e)
 {
-  WS* lhs = apply_visitor(*this, e.lhs);
-  WS* rhs = apply_visitor(*this, e.rhs);
-  return new Workshops::NameApplicationWS(lhs, rhs);
+  throw "WorkshopBuilder::operator()(PhiAppExpr)";
 }
 
 WS* 

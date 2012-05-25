@@ -752,49 +752,6 @@ namespace TransLucid
     };
 
     /**
-     * The call-by-name application workshop. Evaluates a call by name
-     * function application.
-     */
-    class NameApplicationWS : public WS
-    {
-      public:
-      /**
-       * Constructs a call by name application workshop.
-       * @param lhs The lhs argument.
-       * @param rhs The rhs argument.
-       */
-      NameApplicationWS(WS* lhs, WS* rhs)
-      : m_lhs(lhs)
-      , m_rhs(rhs)
-      {
-      }
-
-      ~NameApplicationWS()
-      {
-        delete m_lhs;
-        delete m_rhs;
-      }
-
-      /**
-       * Evaluates a call by name application. If the lhs evaluates to a call
-       * by name abstraction, it evaluates the abstraction passing the rhs as
-       * an intension.
-       * @param k The current context.
-       */
-      Constant
-      operator()(Context& k);
-
-      Constant
-      operator()(Context& kappa, Context& delta);
-
-      private:
-      WS* m_lhs;
-      WS* m_rhs;
-
-      std::vector<dimension_index> m_Lall;
-    };
-
-    /**
      * Evaluates an at expression when the rhs is a tuple expression. This
      * allows us to make an optimisation by not building tuples all the time.
      */

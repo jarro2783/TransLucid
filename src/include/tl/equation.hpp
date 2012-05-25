@@ -261,37 +261,6 @@ namespace TransLucid
     int m_priority;
   };
 
-  class Equation
-  {
-    public:
-    Equation
-    (
-      int provenance,
-      Parser::RawInput definition
-    )
-    : m_provenance(provenance)
-    , m_endTime(-1)
-    , m_definition(definition)
-    {
-    }
-
-    bool
-    translated() const
-    {
-      return m_translated.get();
-    }
-
-    void
-    compile(System& system);
-
-    private:
-
-    int m_provenance;
-    int m_endTime;
-    Parser::RawInput m_definition;
-    std::shared_ptr<Tree::Expr> m_translated;
-  };
-
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
   class VariableWS : public WS
@@ -362,10 +331,6 @@ namespace TransLucid
     typedef std::list<std::pair<int, UUIDEquationMap::iterator>> 
       ProvenanceList;
 
-    typedef std::list<Equation> EquationList;
-    typedef std::unordered_map<uuid, EquationList::iterator> UUIDEquations;
-    typedef std::list<EquationList::iterator> EquationPointerList;
-
     typedef std::map<int, ProvenanceList> PriorityList;
 
     UUIDEquationMap m_equations;
@@ -378,15 +343,6 @@ namespace TransLucid
     //CompileBestFit *m_compileBestFit;
 
     PriorityList m_priorityVars;
-
-    //a list of all equations
-    EquationList m_equationList;
-
-    //uuids pointing to the list of equations
-    UUIDEquations m_uuidEquations;
-
-    //pointers to the uncompiled equations
-    EquationPointerList m_uncompiled;
   };
 
   class ConditionalBestfitWS : public WS
