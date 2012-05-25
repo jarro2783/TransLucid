@@ -321,11 +321,6 @@ namespace TransLucid
       return m_equations;
     }
 
-    void
-    addUnparsed(const Parser::RawInput& input, int time)
-    {
-    }
-
     private:
 
     typedef std::list<std::pair<int, UUIDEquationMap::iterator>> 

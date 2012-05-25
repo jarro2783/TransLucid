@@ -125,9 +125,9 @@ namespace TransLucid
     }
 
     bool
-    translated() const
+    parsed() const
     {
-      return m_translated.get();
+      return m_parsed.get();
     }
 
     void
@@ -138,11 +138,20 @@ namespace TransLucid
     int m_provenance;
     int m_endTime;
     Parser::RawInput m_definition;
-    std::shared_ptr<Tree::Expr> m_translated;
+    std::shared_ptr<Tree::Expr> m_parsed;
   };
 
   class BestfitGroup
   {
+    public:
+
+    void
+    addUnparsed(const Parser::RawInput& input, int time)
+    {
+    }
+
+    private:
+
     typedef std::list<Equation> EquationList;
     typedef std::unordered_map<uuid, EquationList::iterator> UUIDEquations;
     typedef std::list<EquationList::iterator> EquationPointerList;
@@ -155,7 +164,6 @@ namespace TransLucid
 
     //pointers to the uncompiled equations
     EquationPointerList m_uncompiled;
-
   };
 }
 
