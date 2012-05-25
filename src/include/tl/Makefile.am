@@ -28,7 +28,7 @@ includes_HEADERS = ast.hpp ast_fwd.hpp bestfit.hpp builtin_types.hpp \
   internal_strings.hpp lexer_util.hpp library.hpp \
   line_tokenizer.hpp mpl.hpp \
   object_registry.hpp output.hpp \
-  parser_api.hpp parser_defs.hpp parser_header.hpp parser_iterator.hpp \
+  parser_api.hpp parser_defs.hpp parser_iterator.hpp \
   range.hpp registries.hpp rename.hpp semantic_transform.hpp \
   set_types.hpp system.hpp system_object.hpp system_util.hpp \
   tree_printer.hpp tree_rewriter.hpp tree_to_wstree.hpp \
