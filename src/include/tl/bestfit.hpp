@@ -110,48 +110,123 @@ namespace TransLucid
   {
   };
 
-  class Equation
+  template <typename T>
+  class EquationDefinition
   {
     public:
-    Equation
+
+    EquationDefinition
     (
-      int provenance,
-      Parser::RawInput definition
+      uuid id,
+      int start,
+      int end,
+      T definition
     )
-    : m_provenance(provenance)
-    , m_endTime(-1)
+    : m_uuid(id)
+    , m_start(start)
+    , m_end(end)
     , m_definition(definition)
     {
     }
 
-    bool
-    parsed() const
+    uuid
+    id() const
     {
-      return m_parsed.get();
+      return m_uuid;
+    }
+
+    int
+    start() const
+    {
+      return m_start;
+    }
+
+    int 
+    end() const
+    {
+      return m_end;
+    }
+
+    T
+    definition() const
+    {
+      return m_definition;
     }
 
     void
+    setEnd(int end)
+    {
+      m_end = end;
+    }
+
+    private:
+    uuid m_uuid;
+    int m_start;
+    int m_end;
+    T m_definition;
+  };
+
+  typedef EquationDefinition<Parser::RawInput> RawDefinition; 
+  typedef EquationDefinition<Parser::Line> ParsedDefinition; 
+
+  class UnparsedEquations
+  {
+    public:
+
+    UnparsedEquations()
+    : m_parsed(0)
+    {
+    }
+
+    void
+    addEquation
+    (
+      RawDefinition definition
+    )
+    {
+      m_definitions.push_back(definition);
+      
+      auto iter = m_uuids.find(definition.id());
+
+      if (iter == m_uuids.end())
+      {
+        m_uuids.insert(
+        {
+          definition.id(), 
+          std::list<size_t>{m_definitions.size() - 1}
+        });
+      }
+      else
+      {
+        iter->second.push_back(m_definitions.size() - 1);
+      }
+    }
+
+    bool
+    has_unparsed() const
+    {
+      return m_parsed == m_definitions.size();
+    }
+
+    std::vector<ParsedDefinition>
     compile(System& system);
 
     private:
 
-    int m_provenance;
-    int m_endTime;
-    Parser::RawInput m_definition;
-    std::shared_ptr<Tree::Expr> m_parsed;
+    std::vector<EquationDefinition<Parser::RawInput>> m_definitions;
+
+    //a map from uuid to a list of all the definitions for that uuid
+    std::map<uuid, std::list<size_t>> m_uuids;
+    size_t m_parsed;
   };
 
   class BestfitGroup
   {
     public:
 
-    void
-    addUnparsed(const Parser::RawInput& input, int time)
-    {
-    }
-
     private:
 
+    #if 0
     typedef std::list<Equation> EquationList;
     typedef std::unordered_map<uuid, EquationList::iterator> UUIDEquations;
     typedef std::list<EquationList::iterator> EquationPointerList;
@@ -164,6 +239,7 @@ namespace TransLucid
 
     //pointers to the uncompiled equations
     EquationPointerList m_uncompiled;
+    #endif
   };
 }
 

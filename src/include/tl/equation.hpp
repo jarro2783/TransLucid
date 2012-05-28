@@ -338,6 +338,9 @@ namespace TransLucid
     //CompileBestFit *m_compileBestFit;
 
     PriorityList m_priorityVars;
+
+    UnparsedEquations m_unparsed;
+    BestfitGroup m_bestfit;
   };
 
   class ConditionalBestfitWS : public WS
