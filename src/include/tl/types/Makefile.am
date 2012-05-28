@@ -1,4 +1,4 @@
-#   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+#   Copyright (C) 2009--2012 Jarryd Beck
 #
 #   This file is part of TransLucid.
 #
@@ -22,6 +22,6 @@ includes_HEADERS = boolean.hpp calc.hpp char.hpp demand.hpp dimension.hpp \
 fixed_number.hpp floatmp.hpp function.hpp hyperdatons.hpp \
 intmp.hpp numbers.hpp \
 range.hpp special.hpp string.hpp tuple.hpp type.hpp union.hpp \
-uuid.hpp workshop.hpp
+uuid.hpp
 
 EXTRA_DIST = CMakeLists.txt
