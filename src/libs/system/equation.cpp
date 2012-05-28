@@ -742,31 +742,14 @@ VariableWS::addEquation
 }
 
 bool
-VariableWS::delexpr(uuid id, size_t time)
+VariableWS::del(uuid id, size_t time)
 {
-  UUIDEquationMap::iterator iter = m_equations.find(id);
-
-  if (iter != m_equations.end())
-  {
-    iter->second.del(time);
-  }
-  return true;
+  m_unparsed.del(id, time);
 }
 
 bool
-VariableWS::replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr)
+VariableWS::repl(uuid id, size_t time, const GuardWS& guard, WS* expr)
 {
-  UUIDEquationMap::iterator iter = m_equations.find(id);
-
-  if (iter != m_equations.end())
-  {
-    //not sure how to do this yet, but how about we turn off that warning
-    return true;
-  }
-  else
-  {
-    return false;
-  }
 }
 
 void

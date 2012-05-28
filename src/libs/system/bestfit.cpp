@@ -35,6 +35,11 @@ TaggedConstant CompileBestFit::operator()(const Tuple& k)
   return (*b)(k);
 }
 
+bool
+UnparsedEquations::del(uuid id, int time)
+{
+}
+
 Constant
 BestfitGroup::operator()(Context& k)
 {

@@ -209,6 +209,10 @@ namespace TransLucid
       return m_parsed == m_definitions.size();
     }
 
+    //delete the given uuid at the given time
+    bool
+    del(uuid id, int time);
+
     std::vector<ParsedDefinition>
     compile(System& system);
 

@@ -2170,7 +2170,8 @@ System::deleteEntity(const uuid& u)
     return false;
   }
 
-  return iter->second->second->delexpr(u, m_time);
+  return false;
+  //return iter->second->second->delexpr(u, m_time);
 }
 
 u32string

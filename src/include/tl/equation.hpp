@@ -306,10 +306,10 @@ namespace TransLucid
     );
 
     virtual bool 
-    delexpr(uuid id, size_t time);
+    del(uuid id, size_t time);
 
     virtual bool 
-    replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr);
+    repl(uuid id, size_t time, const GuardWS& guard, WS* expr);
 
     /**
      * The equations belonging directly to this variable. Returns the map of
