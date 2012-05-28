@@ -45,7 +45,7 @@ find_package(PkgConfig REQUIRED)
 
 set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
 
-set(TLCFLAGS -Wall -Wno-unused-local-typedefs -std=gnu++0x 
+set(TLCFLAGS -Wall -Wno-unused-local-typedefs -std=gnu++11 
   -DPACKAGE_VERSION=\"${VERSION}\"
   -DHAVE_CONFIG_H)
 
