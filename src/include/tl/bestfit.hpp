@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef BESTFIT_HPP_INCLUDED
 #define BESTFIT_HPP_INCLUDED
 
+#include <tl/context.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
@@ -223,6 +224,9 @@ namespace TransLucid
   class BestfitGroup
   {
     public:
+
+    Constant
+    operator()(Context& k);
 
     private:
 

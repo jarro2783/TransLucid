@@ -376,6 +376,22 @@ GuardWS makeGuardWithTime(const mpz_class& start)
   return g;
 }
 
+Constant
+VariableWS::operator()(Context& k)
+{
+  if (m_unparsed.has_unparsed())
+  {
+  }
+
+  return m_bestfit(k);
+}
+
+Constant
+VariableWS::operator()(Context& kappa, Context& delta)
+{
+}
+
+#if 0
 //how to bestfit with a cache
 //  until we find a priority that has valid equations and there are no demands
 //  for dimensions, do:
@@ -684,6 +700,7 @@ VariableWS::bestfit(const applicable_list& applicable, Context& k,
     return Types::Special::create(SP_MULTIDEF);
   }
 }
+#endif
 
 uuid
 VariableWS::addEquation(EquationWS* e, size_t time)
@@ -769,5 +786,9 @@ ConditionalBestfitWS::operator()(Context& k, Context& delta)
 {
   return (*m_var)(k, delta);
 }
+
+template
+std::pair<bool, Tuple>
+GuardWS::evaluate(Context& k) const;
 
 }

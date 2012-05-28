@@ -35,4 +35,9 @@ TaggedConstant CompileBestFit::operator()(const Tuple& k)
   return (*b)(k);
 }
 
+Constant
+BestfitGroup::operator()(Context& k)
+{
+}
+
 } //namespace TransLucid
