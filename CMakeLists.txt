@@ -45,7 +45,8 @@ find_package(PkgConfig REQUIRED)
 
 set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
 
-set(TLCFLAGS -Wall -std=gnu++0x -DPACKAGE_VERSION=\"${VERSION}\"
+set(TLCFLAGS -Wall -Wno-unused-local-typedefs -std=gnu++0x 
+  -DPACKAGE_VERSION=\"${VERSION}\"
   -DHAVE_CONFIG_H)
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
