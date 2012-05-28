@@ -151,11 +151,9 @@ if test "x$enable_static" = "xyes"; then
 
 fi
 
-TL_LDFLAGS="-std=gnu++0x"
+TL_LDFLAGS="-std=gnu++11"
 TL_LIBS="${ICU_LIBS}"
-TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing -DBOOST_SPIRIT_UNICODE \
-  -DBOOST_MPL_LIMIT_LIST_SIZE=30 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS \
-  ${ICU_CFLAGS}"
+TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing ${ICU_CFLAGS}"
 
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_LIBS)

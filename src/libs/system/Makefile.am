@@ -22,12 +22,11 @@ EXTRA_DIST = CMakeLists.txt po/CMakeLists.txt
 
 lib_LTLIBRARIES = libtlsystem.la
 
-libtlsystem_la_LDFLAGS = -version-info 2:0:0 \
-$(BOOST_LDFLAGS) $(TL_LDFLAGS)
-libtlsystem_la_LIBADD = -lgmpxx -lgmp \
--lltdl $(TL_LIBS) -lrt
+libtlsystem_la_LDFLAGS = -version-info 2:0:0 $(BOOST_LDFLAGS) $(TL_LDFLAGS)
+libtlsystem_la_LIBADD = -lgmpxx -lgmp -lltdl $(TL_LIBS) -lrt
 
-libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
+libtlsystem_la_SOURCES = \
+  ast.cpp bestfit.cpp builtin_types.cpp \
   cache.cpp charset.cpp context.cpp \
   dimtranslator.cpp equation.cpp \
   eval_workshops.cpp free_variables.cpp \
@@ -39,9 +38,10 @@ libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
   types/function.cpp types/numbers.cpp types/union.cpp \
   types.cpp utility.cpp uuid.cpp workshop_builder.cpp
 
-libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \
--DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) \
--DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"$(localedir)\"
+libtlsystem_la_CPPFLAGS = \
+  -I$(top_srcdir)/src/include \
+  -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) \
+  -DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"$(localedir)\"
 
 systemdatadir = $(pkgdatadir)
 dist_systemdata_DATA = system_header.tl
