@@ -40,6 +40,9 @@ namespace TransLucid
 
 namespace
 {
+  //just to instantiate something for now
+  bool bool_guard_hack = false;
+
   //-1 represents no end time
   constexpr int END_TIME_INFINITE = -1;
 
@@ -381,6 +384,13 @@ VariableWS::operator()(Context& k)
 {
   if (m_unparsed.has_unparsed())
   {
+  }
+
+  //sort out an undefined reference for now
+  if (bool_guard_hack)
+  {
+    GuardWS g;
+    g.evaluate(k);
   }
 
   return m_bestfit(k);
@@ -770,8 +780,8 @@ ConditionalBestfitWS::operator()(Context& k, Context& delta)
   return (*m_var)(k, delta);
 }
 
-template
-std::pair<bool, Tuple>
-GuardWS::evaluate(Context& k) const;
+//template
+//std::pair<bool, Tuple>
+//GuardWS::evaluate(Context& k) const;
 
 }
