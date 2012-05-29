@@ -133,14 +133,16 @@ BestfitGroup::compileInstant(int time)
   //look for everything that is valid at time and compile it into one
   //expression
 
-  std::vector<ParsedDefinition> valid;
+  std::list<Parser::Line> valid;
   for (auto i = m_definitions.begin(); i != m_definitions.end(); ++i)
   {
     if (i->start() <= time && (i->end() == -1 || i->end() < time))
     {
-      valid.push_back(*i);
+      valid.push_back(i->definition());
     }
   }
+
+  Tree::Expr conglomerated = m_grouper->group(valid);
 }
 
 Constant
