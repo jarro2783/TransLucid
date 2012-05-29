@@ -289,6 +289,13 @@ namespace TransLucid
 
     private:
 
+    void
+    compile(Context& k);
+
+    //compiles all the equations valid for the instant time
+    Tree::Expr
+    compileInstant(int time);
+
     struct CompiledDefinition
     {
       int start;
@@ -306,7 +313,7 @@ namespace TransLucid
 
     //record when things change, and recompile the whole lot
     //every time a change occurs
-    std::list<int> m_changes;
+    std::vector<int> m_changes;
 
     //a list of compiled definitions in order of valid times
     std::vector<CompiledDefinition> m_evaluators;

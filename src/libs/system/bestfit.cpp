@@ -76,6 +76,73 @@ UnparsedEquations::parse(System& system, Context& k)
   return defs;
 }
 
+void
+BestfitGroup::compile(Context& k)
+{
+  auto defs = m_unparsed.parse(m_system, k);
+
+  for (auto& definition : defs)
+  {
+    m_definitions.push_back(definition);
+
+    auto iter = m_uuids.find(definition.id());
+
+    if (iter == m_uuids.end())
+    {
+      m_uuids[definition.id()] = 
+        std::list<size_t>{m_definitions.size() - 1};
+    }
+    else
+    {
+      iter->second.push_back(m_definitions.size() - 1);
+    }
+  }
+
+  //add in the extra definitions for that which has changed
+  if (m_changes.size() > m_evaluators.size())
+  {
+    size_t change = m_evaluators.size();
+
+    while (change != m_changes.size())
+    {
+      //the start is where that change was
+      int start = m_changes[change];
+      //there is no end
+      int end = -1;
+
+      if (change != 0)
+      {
+        //the previous should end one before the current time
+        m_evaluators[change-1].end = m_changes[change] - 1;
+      }
+
+      //compile one group of definitions
+      Tree::Expr expression = compileInstant(m_changes[change]);
+
+      ++change;
+    }
+  }
+
+  //compile the new stuff together
+  //Tree::Expr expr = m_grouper->group(defs);
+}
+
+Tree::Expr
+BestfitGroup::compileInstant(int time)
+{
+  //look for everything that is valid at time and compile it into one
+  //expression
+
+  std::vector<ParsedDefinition> valid;
+  for (auto i = m_definitions.begin(); i != m_definitions.end(); ++i)
+  {
+    if (i->start() <= time && (i->end() == -1 || i->end() < time))
+    {
+      valid.push_back(*i);
+    }
+  }
+}
+
 Constant
 BestfitGroup::operator()(Context& k)
 {
@@ -83,28 +150,7 @@ BestfitGroup::operator()(Context& k)
   {
     try
     {
-      auto defs = m_unparsed.parse(m_system, k);
-
-      for (auto& definition : defs)
-      {
-        m_definitions.push_back(definition);
-
-        auto iter = m_uuids.find(definition.id());
-
-        if (iter == m_uuids.end())
-        {
-          m_uuids[definition.id()] = 
-            std::list<size_t>{m_definitions.size() - 1};
-        }
-        else
-        {
-          iter->second.push_back(m_definitions.size() - 1);
-        }
-      }
-
-      //compile the new stuff together
-
-      //Tree::Expr expr = m_grouper->group(defs);
+      compile(k);
     }
     catch (...)
     {
