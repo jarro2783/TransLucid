@@ -263,7 +263,7 @@ namespace TransLucid
 
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
-  class VariableWS : public WS
+  class VariableWS : public WS, public DefinitionGrouper
   {
     public:
     typedef std::map<uuid, EquationWS> UUIDEquationMap;
@@ -320,6 +320,9 @@ namespace TransLucid
     {
       return m_equations;
     }
+
+    Tree::Expr
+    group(const std::list<Parser::Line>& lines);
 
     private:
 

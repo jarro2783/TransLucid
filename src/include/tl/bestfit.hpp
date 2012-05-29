@@ -148,7 +148,7 @@ namespace TransLucid
       return m_end;
     }
 
-    T
+    const T&
     definition() const
     {
       return m_definition;
@@ -214,40 +214,102 @@ namespace TransLucid
     del(uuid id, int time);
 
     std::vector<ParsedDefinition>
-    compile(System& system);
+    parse(System& system, Context& k);
 
     private:
 
-    std::vector<EquationDefinition<Parser::RawInput>> m_definitions;
+    std::vector<RawDefinition> m_definitions;
 
     //a map from uuid to a list of all the definitions for that uuid
     std::map<uuid, std::list<size_t>> m_uuids;
     size_t m_parsed;
   };
 
+  class DefinitionGrouper
+  {
+    public:
+    virtual Tree::Expr
+    group(const std::list<Parser::Line>&) = 0;
+  };
+
   class BestfitGroup
   {
     public:
+
+    BestfitGroup(DefinitionGrouper* grouper, System& system)
+    : m_grouper(grouper), m_system(system)
+    {
+    }
+
+    void
+    addEquation
+    (
+      RawDefinition definition
+    )
+    {
+      m_unparsed.addEquation(definition);
+      if (m_changes.empty() || m_changes.back() != definition.start())
+      {
+        m_changes.push_back(definition.start());
+      }
+    }
+
+    bool
+    del(uuid id, int time)
+    {
+      if (m_changes.empty() || m_changes.back() != time)
+      {
+        m_changes.push_back(time);
+      }
+
+      auto iter = m_uuids.find(id);
+
+      if (iter == m_uuids.end())
+      {
+        return false;
+      }
+
+      auto last = iter->second.back();
+
+      //if it's already been deleted then don't try to delete it again
+      if (m_definitions[last].end() != -1)
+      {
+        return false;
+      }
+      else
+      {
+        m_definitions[last].setEnd(time);
+      }
+
+      return true;
+    }
 
     Constant
     operator()(Context& k);
 
     private:
 
-    #if 0
-    typedef std::list<Equation> EquationList;
-    typedef std::unordered_map<uuid, EquationList::iterator> UUIDEquations;
-    typedef std::list<EquationList::iterator> EquationPointerList;
+    struct CompiledDefinition
+    {
+      int start;
+      int end;
+      WS* evaluator;
+    };
 
-    //a list of all equations
-    EquationList m_equationList;
+    DefinitionGrouper* m_grouper;
+    UnparsedEquations m_unparsed;
 
-    //uuids pointing to the list of equations
-    UUIDEquations m_uuidEquations;
+    System& m_system;
 
-    //pointers to the uncompiled equations
-    EquationPointerList m_uncompiled;
-    #endif
+    std::vector<ParsedDefinition> m_definitions;
+    std::map<uuid, std::list<size_t>> m_uuids;
+
+    //record when things change, and recompile the whole lot
+    //every time a change occurs
+    std::list<int> m_changes;
+
+    //a list of compiled definitions in order of valid times
+    std::vector<CompiledDefinition> m_evaluators;
   };
 }
 

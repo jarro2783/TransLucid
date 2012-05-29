@@ -85,7 +85,7 @@ EquationWS::~EquationWS()
 }
 
 VariableWS::VariableWS(const u32string& name, System& system)
-: m_name(name), m_system(system)
+: m_name(name), m_system(system), m_bestfit(this, system)
 #if 0
  ,m_compileBestFit
   (
@@ -382,10 +382,6 @@ GuardWS makeGuardWithTime(const mpz_class& start)
 Constant
 VariableWS::operator()(Context& k)
 {
-  if (m_unparsed.has_unparsed())
-  {
-  }
-
   //sort out an undefined reference for now
   if (bool_guard_hack)
   {
@@ -760,6 +756,19 @@ VariableWS::del(uuid id, size_t time)
 bool
 VariableWS::repl(uuid id, size_t time, const GuardWS& guard, WS* expr)
 {
+}
+
+Tree::Expr
+VariableWS::group(const std::list<Parser::Line>& lines)
+{
+  for (auto& l : lines)
+  {
+    auto eqn = get<Parser::Equation>(&l);
+
+    if (eqn == nullptr)
+    {
+    }
+  }
 }
 
 void
