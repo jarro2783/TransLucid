@@ -293,6 +293,9 @@ namespace TransLucid
     }
     #endif
 
+    void
+    addUnparsed(uuid id, Parser::RawInput input, int time);
+
     uuid
     addEquation(EquationWS* e, size_t time);
 

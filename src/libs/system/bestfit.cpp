@@ -217,12 +217,13 @@ BestfitGroup::evaluate(Context& k)
     {
       if (time < current->start)
       {
-        current = begin + (current - begin) / 2;
+        end = current;
       }
       else
       {
-        current = current + (end - current) / 2;
+        begin = current + 1;
       }
+      current = begin + (end - begin) / 2;
     }
 
     //current is the match

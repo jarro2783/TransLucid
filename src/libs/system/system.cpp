@@ -2372,15 +2372,19 @@ System::addVariableDecl
 
   uuid u = generate_uuid();
 
-  auto equationIter = m_equations.find(name);
+  auto equationIter = m_variables.find(name);
 
-  if (equationIter == m_equations.end())
+  std::shared_ptr<VariableWS> var;
+  if (equationIter == m_variables.end())
   {
+    var = std::make_shared<VariableWS>(name, *this);
+    m_variables.insert({name, var});
   }
   else
   {
-    //equationIter->second->addUnparsed(input, m_time);
+    var = equationIter->second;
   }
+  var->addUnparsed(u, input, m_time);
 
   return Types::UUID::create(u);
 }

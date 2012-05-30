@@ -85,6 +85,8 @@ namespace TransLucid
     public:
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
     typedef std::unordered_map<uuid, SystemObject*> ObjectMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<VariableWS>> 
+      VariableMap;
 
     System(bool cached = false);
     ~System();
@@ -389,7 +391,12 @@ namespace TransLucid
     bool m_cacheEnabled;
 
     ObjectMap m_objects;
+
+    VariableMap m_variables;
+
+    //TODO deprecating
     DefinitionMap m_equations;
+
     UUIDDefinition m_equationUUIDs;
     DefinitionMap m_assignments;
     UUIDDefinition m_assignmentUUIDs;

@@ -747,6 +747,12 @@ VariableWS::addEquation
   //return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
 }
 
+void
+VariableWS::addUnparsed(uuid id, Parser::RawInput input, int time)
+{
+  m_bestfit.addEquation(id, input, time);
+}
+
 bool
 VariableWS::del(uuid id, size_t time)
 {
