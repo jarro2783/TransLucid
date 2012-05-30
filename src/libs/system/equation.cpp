@@ -750,7 +750,7 @@ VariableWS::addEquation
 bool
 VariableWS::del(uuid id, size_t time)
 {
-  m_unparsed.del(id, time);
+  m_bestfit.del(id, time);
 }
 
 bool

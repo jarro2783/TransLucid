@@ -342,7 +342,6 @@ namespace TransLucid
 
     PriorityList m_priorityVars;
 
-    UnparsedEquations m_unparsed;
     BestfitGroup m_bestfit;
   };
 

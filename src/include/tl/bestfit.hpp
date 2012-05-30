@@ -111,7 +111,6 @@ namespace TransLucid
   {
   };
 
-  template <typename T>
   class EquationDefinition
   {
     public:
@@ -120,13 +119,11 @@ namespace TransLucid
     (
       uuid id,
       int start,
-      int end,
-      T definition
+      int end
     )
     : m_uuid(id)
     , m_start(start)
     , m_end(end)
-    , m_definition(definition)
     {
     }
 
@@ -148,81 +145,44 @@ namespace TransLucid
       return m_end;
     }
 
-    const T&
-    definition() const
-    {
-      return m_definition;
-    }
-
     void
     setEnd(int end)
     {
       m_end = end;
     }
 
+    void
+    setRaw(Parser::RawInput raw)
+    {
+      m_raw = std::make_shared<Parser::RawInput>(raw);
+    }
+
+    void
+    setParsed(Parser::Line parsed)
+    {
+      m_parsed = std::make_shared<Parser::Line>(parsed);
+    }
+
     private:
     uuid m_uuid;
     int m_start;
     int m_end;
-    T m_definition;
-  };
+    std::shared_ptr<Parser::RawInput> m_raw;
+    std::shared_ptr<Parser::Line> m_parsed;
 
-  typedef EquationDefinition<Parser::RawInput> RawDefinition; 
-  typedef EquationDefinition<Parser::Line> ParsedDefinition; 
-
-  class UnparsedEquations
-  {
     public:
 
-    UnparsedEquations()
-    : m_parsed(0)
+    decltype(m_raw)
+    raw() const
     {
+      return m_raw;
     }
 
-    void
-    addEquation
-    (
-      RawDefinition definition
-    )
+    decltype(m_parsed)
+    parsed() const
     {
-      m_definitions.push_back(definition);
-      
-      auto iter = m_uuids.find(definition.id());
-
-      if (iter == m_uuids.end())
-      {
-        m_uuids.insert(
-        {
-          definition.id(), 
-          std::list<size_t>{m_definitions.size() - 1}
-        });
-      }
-      else
-      {
-        iter->second.push_back(m_definitions.size() - 1);
-      }
+      return m_parsed;
     }
-
-    bool
-    has_unparsed() const
-    {
-      return m_parsed == m_definitions.size();
-    }
-
-    //delete the given uuid at the given time
-    bool
-    del(uuid id, int time);
-
-    std::vector<ParsedDefinition>
-    parse(System& system, Context& k);
-
-    private:
-
-    std::vector<RawDefinition> m_definitions;
-
-    //a map from uuid to a list of all the definitions for that uuid
-    std::map<uuid, std::list<size_t>> m_uuids;
-    size_t m_parsed;
   };
 
   class DefinitionGrouper
@@ -237,21 +197,36 @@ namespace TransLucid
     public:
 
     BestfitGroup(DefinitionGrouper* grouper, System& system)
-    : m_grouper(grouper), m_system(system)
+    : m_grouper(grouper)
+    , m_system(system)
+    , m_parsed(0)
     {
     }
 
     void
     addEquation
     (
-      RawDefinition definition
+      uuid id,
+      Parser::RawInput input,
+      int time
     )
     {
-      m_unparsed.addEquation(definition);
-      if (m_changes.empty() || m_changes.back() != definition.start())
-      {
-        m_changes.push_back(definition.start());
-      }
+      m_definitions.push_back(EquationDefinition{id, time, -1});
+      m_definitions.back().setRaw(input);
+      change(time);
+    }
+
+    void
+    addEquation
+    (
+      uuid id,
+      Parser::Line definition,
+      int time
+    )
+    {
+      m_definitions.push_back(EquationDefinition{id, time, -1});
+      m_definitions.back().setParsed(definition);
+      change(time);
     }
 
     bool
@@ -290,26 +265,62 @@ namespace TransLucid
     private:
 
     void
+    parse(Context& k);
+
+    void
+    adduuid(uuid id, int time)
+    {
+      auto iter = m_uuids.find(id);
+
+      if (iter == m_uuids.end())
+      {
+        m_uuids.insert(
+        {
+          id, 
+          std::list<size_t>{m_definitions.size() - 1}
+        });
+      }
+      else
+      {
+        iter->second.push_back(m_definitions.size() - 1);
+      }
+    }
+
+    void
+    change(int time)
+    {
+      if (m_changes.empty() || m_changes.back() != time)
+      {
+        m_changes.push_back(time);
+      }
+    }
+
+    void
     compile(Context& k);
 
     //compiles all the equations valid for the instant time
     Tree::Expr
     compileInstant(int time);
 
+    std::shared_ptr<WS>
+    compileExpression(const Tree::Expr& expr);
+
+    Constant
+    evaluate(Context& k);
+
     struct CompiledDefinition
     {
       int start;
       int end;
-      WS* evaluator;
+      std::shared_ptr<WS> evaluator;
     };
 
     DefinitionGrouper* m_grouper;
-    UnparsedEquations m_unparsed;
 
     System& m_system;
 
-    std::vector<ParsedDefinition> m_definitions;
     std::map<uuid, std::list<size_t>> m_uuids;
+    std::vector<EquationDefinition> m_definitions;
 
     //record when things change, and recompile the whole lot
     //every time a change occurs
@@ -317,6 +328,8 @@ namespace TransLucid
 
     //a list of compiled definitions in order of valid times
     std::vector<CompiledDefinition> m_evaluators;
+
+    size_t m_parsed;
   };
 }
 

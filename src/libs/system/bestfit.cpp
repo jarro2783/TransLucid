@@ -18,7 +18,12 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/bestfit.hpp>
+#include <tl/utility.hpp>
+#include <tl/workshop_builder.hpp>
+
 #include "tl/parser.hpp"
+
+static constexpr size_t LINEAR_SEARCH_MAX_SIZE = 7;
 
 namespace TransLucid
 {
@@ -36,67 +41,50 @@ TaggedConstant CompileBestFit::operator()(const Tuple& k)
   return (*b)(k);
 }
 
-bool
-UnparsedEquations::del(uuid id, int time)
+void
+BestfitGroup::parse(Context& k)
 {
-}
+  Parser::Parser p(m_system);
 
-std::vector<ParsedDefinition>
-UnparsedEquations::parse(System& system, Context& k)
-{
-  Parser::Parser p(system);
-
-  std::vector<ParsedDefinition> defs;
   while (m_parsed != m_definitions.size())
   {
     auto& definition = m_definitions.at(m_parsed);
-    auto& text = definition.definition();
 
-    Parser::U32Iterator ubegin(Parser::makeUTF32Iterator(text.text.begin()));
-    Parser::U32Iterator uend(Parser::makeUTF32Iterator(text.text.end()));
-
-    Parser::StreamPosIterator posbegin(ubegin, text.source, 
-      text.line, text.character);
-    Parser::StreamPosIterator posend(uend);
-
-    Parser::LexerIterator lexbegin(posbegin, posend, k, 
-      system.lookupIdentifiers());
-    Parser::LexerIterator lexend = lexbegin.makeEnd();
-
-    Parser::Line result;
-    bool success = p.parse_decl(lexbegin, lexend, result);
-
-    if (!success)
+    if (definition.raw() != nullptr)
     {
+      auto& text = *definition.raw();
+
+      Parser::U32Iterator ubegin(Parser::makeUTF32Iterator(text.text.begin()));
+      Parser::U32Iterator uend(Parser::makeUTF32Iterator(text.text.end()));
+
+      Parser::StreamPosIterator posbegin(ubegin, text.source, 
+        text.line, text.character);
+      Parser::StreamPosIterator posend(uend);
+
+      Parser::LexerIterator lexbegin(posbegin, posend, k, 
+        m_system.lookupIdentifiers());
+      Parser::LexerIterator lexend = lexbegin.makeEnd();
+
+      Parser::Line result;
+      bool success = p.parse_decl(lexbegin, lexend, result);
+
+      if (!success)
+      {
+      }
+      else
+      {
+        definition.setParsed(result);
+      }
     }
 
     ++m_parsed;
   }
-
-  return defs;
 }
 
 void
 BestfitGroup::compile(Context& k)
 {
-  auto defs = m_unparsed.parse(m_system, k);
-
-  for (auto& definition : defs)
-  {
-    m_definitions.push_back(definition);
-
-    auto iter = m_uuids.find(definition.id());
-
-    if (iter == m_uuids.end())
-    {
-      m_uuids[definition.id()] = 
-        std::list<size_t>{m_definitions.size() - 1};
-    }
-    else
-    {
-      iter->second.push_back(m_definitions.size() - 1);
-    }
-  }
+  parse(k);
 
   //add in the extra definitions for that which has changed
   if (m_changes.size() > m_evaluators.size())
@@ -119,12 +107,27 @@ BestfitGroup::compile(Context& k)
       //compile one group of definitions
       Tree::Expr expression = compileInstant(m_changes[change]);
 
+      //make this into a workshop
+      std::shared_ptr<WS> evaluator = compileExpression(expression);
+
+      m_evaluators.push_back(CompiledDefinition{start, end, evaluator});
+
       ++change;
     }
   }
+}
 
-  //compile the new stuff together
-  //Tree::Expr expr = m_grouper->group(defs);
+std::shared_ptr<WS>
+BestfitGroup::compileExpression(const Tree::Expr& expr)
+{
+  //fixup the ast
+  Tree::Expr fixed = m_system.fixupTreeAndAdd(expr);
+
+  //compile the tree into a workshop
+  WorkshopBuilder compile(&m_system);
+  std::shared_ptr<WS> ws(compile.build_workshops(fixed));
+
+  return ws;
 }
 
 Tree::Expr
@@ -134,21 +137,22 @@ BestfitGroup::compileInstant(int time)
   //expression
 
   std::list<Parser::Line> valid;
-  for (auto i = m_definitions.begin(); i != m_definitions.end(); ++i)
+  for (auto i = m_definitions.begin(); i != m_definitions.end(); 
+    ++i)
   {
     if (i->start() <= time && (i->end() == -1 || i->end() < time))
     {
-      valid.push_back(i->definition());
+      valid.push_back(*i->parsed());
     }
   }
 
-  Tree::Expr conglomerated = m_grouper->group(valid);
+  return m_grouper->group(valid);
 }
 
 Constant
 BestfitGroup::operator()(Context& k)
 {
-  if (m_unparsed.has_unparsed())
+  if (m_parsed != m_definitions.size())
   {
     try
     {
@@ -158,6 +162,42 @@ BestfitGroup::operator()(Context& k)
     {
       //special parse error
     }
+  }
+
+  return evaluate(k);
+}
+
+Constant
+BestfitGroup::evaluate(Context& k)
+{
+  auto dimtime = k.lookup(DIM_TIME);
+  int time = 0;
+
+  if (dimtime.index() == TYPE_INDEX_INTMP)
+  {
+    time = Types::Intmp::get(dimtime).get_si();
+  }
+
+  //first check the last definition
+  auto& last = m_evaluators.back();
+  if (time >= last.start && time <= last.end)
+  {
+    return (*last.evaluator)(k);
+  }
+
+  //otherwise do a linear search backwards if small, binary search if big
+  if (m_evaluators.size() <= LINEAR_SEARCH_MAX_SIZE)
+  {
+    for (auto i = m_evaluators.rbegin(); i != m_evaluators.rend(); ++i)
+    {
+      if (time >= i->start && time <= i->end)
+      {
+        return (*i->evaluator)(k);
+      }
+    }
+  }
+  else
+  {
   }
 }
 
