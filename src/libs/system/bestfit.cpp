@@ -180,9 +180,15 @@ BestfitGroup::evaluate(Context& k)
 
   //first check the last definition
   auto& last = m_evaluators.back();
-  if (time >= last.start && time <= last.end)
+  if (time >= last.start && (last.end == -1 || time <= last.end))
   {
     return (*last.evaluator)(k);
+  }
+
+  //make sure that it's not bigger than the last and smaller than the first
+  if (time > last.start || time < m_evaluators.front().start)
+  {
+    return Types::Special::create(SP_UNDEF);
   }
 
   //otherwise do a linear search backwards if small, binary search if big
@@ -195,9 +201,32 @@ BestfitGroup::evaluate(Context& k)
         return (*i->evaluator)(k);
       }
     }
+    //if we got here then something broke
+    return Types::Special::create(SP_UNDEF);
   }
   else
   {
+    //binary search the rest
+    auto begin = m_evaluators.begin();
+    auto end = m_evaluators.end();
+    --end;
+    auto current = begin + (end - begin) / 2;
+
+    //this is guaranteed to find a match now
+    while (!(time >= current->start && time <= current->end))
+    {
+      if (time < current->start)
+      {
+        current = begin + (current - begin) / 2;
+      }
+      else
+      {
+        current = current + (end - current) / 2;
+      }
+    }
+
+    //current is the match
+    return (*current->evaluator)(k);
   }
 }
 
