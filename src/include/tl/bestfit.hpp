@@ -190,7 +190,7 @@ namespace TransLucid
   {
     public:
     virtual Tree::Expr
-    group(const std::list<Parser::Line>&) = 0;
+    group(const std::list<EquationDefinition>&) = 0;
   };
 
   class BestfitGroup
@@ -294,7 +294,7 @@ namespace TransLucid
     void
     change(int time)
     {
-      if (m_changes.empty() || m_changes.back() != time)
+      if (m_changes.empty() || m_changes.back() < time)
       {
         m_changes.push_back(time);
       }

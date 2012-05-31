@@ -1,5 +1,5 @@
 /* Equations (ident = expr)
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -136,13 +136,13 @@ BestfitGroup::compileInstant(int time)
   //look for everything that is valid at time and compile it into one
   //expression
 
-  std::list<Parser::Line> valid;
+  std::list<EquationDefinition> valid;
   for (auto i = m_definitions.begin(); i != m_definitions.end(); 
     ++i)
   {
     if (i->start() <= time && (i->end() == -1 || i->end() < time))
     {
-      valid.push_back(*i->parsed());
+      valid.push_back(*i);
     }
   }
 

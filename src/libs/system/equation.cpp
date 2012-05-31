@@ -769,20 +769,32 @@ VariableWS::repl(uuid id, size_t time, Parser::Line line)
 }
 
 Tree::Expr
-VariableWS::group(const std::list<Parser::Line>& lines)
+VariableWS::group(const std::list<EquationDefinition>& lines)
 {
+  //all the definitions in lines are guaranteed to have a parsed
+  //definition
+
   //create a conditional best fitter of all these equations
+  Tree::ConditionalBestfitExpr best;
   for (auto& l : lines)
   {
-    auto eqn = get<Parser::Equation>(&l);
+    auto eqn = get<Parser::Equation>(l.parsed().get());
 
     if (eqn == nullptr)
     {
       throw "internal compiler error: " __FILE__ ":" XSTRING(__LINE__);
     }
+
+    best.declarations.push_back(std::make_tuple
+    (
+      l.start(),
+      std::get<1>(*eqn),
+      std::get<2>(*eqn),
+      std::get<3>(*eqn)
+    ));
   }
 
-  Tree::ConditionalBestfitExpr best;
+  return best;
 }
 
 void

@@ -544,11 +544,11 @@ class TreePrinter
 
     for (auto& decl : c.declarations)
     {
-      apply_visitor(*this, std::get<0>(decl));
-      m_os << " | ";
       apply_visitor(*this, std::get<1>(decl));
-      m_os << " = ";
+      m_os << " | ";
       apply_visitor(*this, std::get<2>(decl));
+      m_os << " = ";
+      apply_visitor(*this, std::get<3>(decl));
       m_os << ";;";
     }
 

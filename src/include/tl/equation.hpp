@@ -325,7 +325,7 @@ namespace TransLucid
     }
 
     Tree::Expr
-    group(const std::list<Parser::Line>& lines);
+    group(const std::list<EquationDefinition>& lines);
 
     private:
 

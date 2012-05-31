@@ -747,8 +747,8 @@ namespace TransLucid
 
     struct ConditionalBestfitExpr
     {
-      //[...] | boolean = expr
-      typedef std::tuple<Expr, Expr, Expr> Declaration;
+      //provenance [...] | boolean = expr
+      typedef std::tuple<int, Expr, Expr, Expr> Declaration;
 
       std::vector<Declaration> declarations;
     };
