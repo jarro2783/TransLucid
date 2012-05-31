@@ -33,11 +33,11 @@ namespace TransLucid
   {
     public:
 
-    virtual void
-    del() = 0;
+    virtual bool
+    del(uuid id, int time) = 0;
 
-    virtual void
-    repl(const Parser::Line& line) = 0;
+    virtual bool
+    repl(uuid id, int time, const Parser::Line& line) = 0;
   };
 }
 

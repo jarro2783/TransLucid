@@ -295,24 +295,6 @@ namespace TransLucid
     {
     };
 
-    class ParenExpr;
-    class UnaryOpExpr;
-    class BinaryOpExpr;
-    class HashExpr;
-    class TupleExpr;
-    class IfExpr;
-    class AtExpr;
-    class LambdaExpr;
-    class PhiExpr;
-    class BangAppExpr;
-    class LambdaAppExpr;
-    class PhiAppExpr;
-    class WhereExpr;
-
-    // Not defined in ast.hpp
-    class OpExpr;
-    class RangeExpr;
-
     //defined in ast_fwd.hpp
     /**
      * Abstract syntax tree node. A single expression node in the 
@@ -763,6 +745,14 @@ namespace TransLucid
       std::vector<size_t> whichDims;
     };
 
+    struct ConditionalBestfitExpr
+    {
+      //[...] | boolean = expr
+      typedef std::tuple<Expr, Expr, Expr> Declaration;
+
+      std::vector<Declaration> declarations;
+    };
+
     /**
      * Creates a binary operation from the op and the left and right hand
      * sides. Inserts one into the tree of the other depending on the
@@ -807,6 +797,7 @@ namespace TransLucid
     PRINT_NODE(LambdaAppExpr)
     PRINT_NODE(PhiAppExpr)
     PRINT_NODE(WhereExpr)
+    PRINT_NODE(ConditionalBestfitExpr)
     #endif
   }
 

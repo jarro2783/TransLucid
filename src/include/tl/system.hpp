@@ -84,7 +84,8 @@ namespace TransLucid
   {
     public:
     typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
-    typedef std::unordered_map<uuid, SystemObject*> ObjectMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<WS>> IdentifierMap;
+    typedef std::unordered_map<uuid, std::shared_ptr<SystemObject>> ObjectMap;
     typedef std::unordered_map<u32string, std::shared_ptr<VariableWS>> 
       VariableMap;
 

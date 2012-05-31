@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_api.hpp>
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
+#include <tl/workshop.hpp>
 
 #include <list>
 #include <unordered_map>
@@ -232,11 +233,6 @@ namespace TransLucid
     bool
     del(uuid id, int time)
     {
-      if (m_changes.empty() || m_changes.back() != time)
-      {
-        m_changes.push_back(time);
-      }
-
       auto iter = m_uuids.find(id);
 
       if (iter == m_uuids.end())
@@ -256,7 +252,16 @@ namespace TransLucid
         m_definitions[last].setEnd(time);
       }
 
+      change(time);
+
       return true;
+    }
+
+    bool
+    repl(uuid id, size_t time, Parser::Line line)
+    {
+      //TODO implement me
+      return false;
     }
 
     Constant
@@ -330,6 +335,29 @@ namespace TransLucid
     std::vector<CompiledDefinition> m_evaluators;
 
     size_t m_parsed;
+  };
+
+  class ConditionalBestfitWS : public WS
+  {
+    public:
+    ConditionalBestfitWS(u32string name, System& system)
+    {
+    }
+
+    ConditionalBestfitWS(const ConditionalBestfitWS&) = delete;
+    ConditionalBestfitWS(ConditionalBestfitWS&) = delete;
+
+    ~ConditionalBestfitWS()
+    {
+    }
+
+    Constant
+    operator()(Context& k);
+
+    Constant
+    operator()(Context& kappa, Context& delta);
+
+    private:
   };
 }
 

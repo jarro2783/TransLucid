@@ -312,7 +312,7 @@ namespace TransLucid
     del(uuid id, size_t time);
 
     virtual bool 
-    repl(uuid id, size_t time, const GuardWS& guard, WS* expr);
+    repl(uuid id, size_t time, Parser::Line line);
 
     /**
      * The equations belonging directly to this variable. Returns the map of
@@ -346,47 +346,6 @@ namespace TransLucid
     PriorityList m_priorityVars;
 
     BestfitGroup m_bestfit;
-  };
-
-  class ConditionalBestfitWS : public WS
-  {
-    public:
-    template <typename String, typename Enable = 
-      std::enable_if<std::is_same<String, u32string>::value>
-    >
-    ConditionalBestfitWS(String&& name, System& system)
-    {
-      m_var = new VariableWS(U"fun_" + name, system);
-    }
-
-    ConditionalBestfitWS(const ConditionalBestfitWS&) = delete;
-    ConditionalBestfitWS(ConditionalBestfitWS&) = delete;
-
-    ~ConditionalBestfitWS()
-    {
-      delete m_var;
-    }
-
-    Constant
-    operator()(Context& k);
-
-    Constant
-    operator()(Context& kappa, Context& delta);
-
-    uuid
-    addEquation
-    (
-      const u32string& name, 
-      GuardWS guard, 
-      WS* e, 
-      size_t time
-    )
-    {
-      return m_var->addEquation(name, guard, e, time);
-    }
-
-    private:
-    VariableWS *m_var;
   };
 };
 

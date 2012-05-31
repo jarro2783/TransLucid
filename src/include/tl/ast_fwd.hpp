@@ -60,6 +60,7 @@ namespace TransLucid
     class LambdaAppExpr;
     class PhiAppExpr;
     class WhereExpr;
+    class ConditionalBestfitExpr;
 
    /**
      * Abstract syntax tree node. A single expression node in the 
@@ -92,7 +93,8 @@ namespace TransLucid
       recursive_wrapper<BangAppExpr>,
       recursive_wrapper<LambdaAppExpr>,
       recursive_wrapper<PhiAppExpr>,
-      recursive_wrapper<WhereExpr>
+      recursive_wrapper<WhereExpr>,
+      recursive_wrapper<ConditionalBestfitExpr>
     > Expr;
 
     class BinaryOperator;

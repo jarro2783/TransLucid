@@ -70,6 +70,7 @@ namespace TransLucid
     WS* operator()(const Tree::LambdaAppExpr& e);
     WS* operator()(const Tree::PhiAppExpr& e);
     WS* operator()(const Tree::WhereExpr& e);
+    WS* operator()(const Tree::ConditionalBestfitExpr& e);
 
     private:
     //the system to compile with

@@ -232,14 +232,20 @@ namespace
   {
     public:
 
-    void
-    del();
+    bool
+    del(uuid id, int time)
+    {
+      return m_var->second->del(id, time);
+    }
 
-    void
-    repl(const Parser::Line& line);
+    bool
+    repl(uuid id, int time, const Parser::Line& line)
+    {
+      return m_var->second->repl(id, time, line);
+    }
 
     private:
-    System::DefinitionMap::iterator m_var;
+    System::VariableMap::iterator m_var;
 
     public:
     VariableObject(decltype(m_var) var)
@@ -2004,7 +2010,7 @@ System::addFunction(const Parser::FnDecl& fn)
   //add it as an equation to the conditional
   //std::cerr << "adding function equation to " << fn.name << std::endl;
   //std::cerr << "guard is " << gws << std::endl;
-  uuid u = fnws->addEquation(fn.name, GuardWS(gws, bws), ews, m_time);
+  //uuid u = fnws->addEquation(fn.name, GuardWS(gws, bws), ews, m_time);
 
   #if 0
   bool cachethis = true;
@@ -2034,7 +2040,7 @@ System::addFunction(const Parser::FnDecl& fn)
   }
   #endif
 
-  return Types::UUID::create(u);
+  //return Types::UUID::create(u);
 }
 
 Constant
@@ -2378,7 +2384,10 @@ System::addVariableDecl
   if (equationIter == m_variables.end())
   {
     var = std::make_shared<VariableWS>(name, *this);
-    m_variables.insert({name, var});
+    auto variter = m_variables.insert({name, var});
+
+    //create a new VariableObject to manage the uuid
+    m_objects.insert({u, std::make_shared<VariableObject>(variter.first)});
   }
   else
   {

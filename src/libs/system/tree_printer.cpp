@@ -1,5 +1,5 @@
 /* Tree printer.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -535,6 +535,24 @@ class TreePrinter
     m_os << "end" << std::endl;
 
     pp(')', Precedence::WHERE_CLAUSE);
+  }
+
+  void
+  operator()(const Tree::ConditionalBestfitExpr& c)
+  {
+    m_os << "bestof";
+
+    for (auto& decl : c.declarations)
+    {
+      apply_visitor(*this, std::get<0>(decl));
+      m_os << " | ";
+      apply_visitor(*this, std::get<1>(decl));
+      m_os << " = ";
+      apply_visitor(*this, std::get<2>(decl));
+      m_os << ";;";
+    }
+
+    m_os << "end";
   }
 };
 

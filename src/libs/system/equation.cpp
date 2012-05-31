@@ -35,6 +35,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <vector>
 
+#define XSTRING(x) STRING(x)
+#define STRING(x) #x
+
 namespace TransLucid
 {
 
@@ -756,25 +759,30 @@ VariableWS::addUnparsed(uuid id, Parser::RawInput input, int time)
 bool
 VariableWS::del(uuid id, size_t time)
 {
-  m_bestfit.del(id, time);
+  return m_bestfit.del(id, time);
 }
 
 bool
-VariableWS::repl(uuid id, size_t time, const GuardWS& guard, WS* expr)
+VariableWS::repl(uuid id, size_t time, Parser::Line line)
 {
+  return m_bestfit.repl(id, time, line);
 }
 
 Tree::Expr
 VariableWS::group(const std::list<Parser::Line>& lines)
 {
+  //create a conditional best fitter of all these equations
   for (auto& l : lines)
   {
     auto eqn = get<Parser::Equation>(&l);
 
     if (eqn == nullptr)
     {
+      throw "internal compiler error: " __FILE__ ":" XSTRING(__LINE__);
     }
   }
+
+  Tree::ConditionalBestfitExpr best;
 }
 
 void
@@ -786,13 +794,11 @@ EquationWS::del(size_t time)
 Constant
 ConditionalBestfitWS::operator()(Context& k)
 {
-  return (*m_var)(k);
 }
 
 Constant
 ConditionalBestfitWS::operator()(Context& k, Context& delta)
 {
-  return (*m_var)(k, delta);
 }
 
 //template
