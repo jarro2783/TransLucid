@@ -1848,6 +1848,7 @@ System::funWSTree
 Constant
 System::addFunction(const Parser::FnDecl& fn)
 {
+#if 0
   std::cerr << "adding function: " << fn.name << std::endl;
   //first try to find the function
   auto iter = m_fndecls.find(fn.name);
@@ -2041,6 +2042,7 @@ System::addFunction(const Parser::FnDecl& fn)
   #endif
 
   //return Types::UUID::create(u);
+#endif
 }
 
 Constant

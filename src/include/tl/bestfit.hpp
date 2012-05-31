@@ -337,10 +337,195 @@ namespace TransLucid
     size_t m_parsed;
   };
 
+  /**
+   * @brief Represents the guard of an equation.
+   *
+   * The tuple and boolean parts of an equation.
+   **/
+  class EquationGuard
+  {
+    public:
+
+    /**
+     * @brief Constructs a guard from an AST.
+     *
+     * Specifies the AST to use for the guard.
+     **/
+    EquationGuard(WS* g, WS* b);
+
+    /**
+     * @brief Creates a guard with no AST.
+     *
+     * There are no user dimensions in the guard. System imposed
+     * dimensions can still be added.
+     **/
+    EquationGuard()
+    : m_guard(nullptr), m_boolean(nullptr), m_compiled(true), 
+      m_system(nullptr)
+    , m_priority(0)
+    {
+    }
+
+    EquationGuard(const Tuple& t)
+    : m_compiled(true), m_system(nullptr), m_priority(0)
+    {
+       for (Tuple::const_iterator iter = t.begin();
+          iter != t.end();
+          ++iter)
+       {
+          addDimension(iter->first, iter->second);
+       }
+    }
+
+    EquationGuard(const EquationGuard&);
+
+    ~EquationGuard() = default;
+
+    EquationGuard& operator=(const EquationGuard&);
+
+    /**
+     * @brief Determines if there are any dimensions in the guard.
+     *
+     * @return false if there are no user or system imposed dimensions,
+     * true otherwise.
+     **/
+    operator bool() const
+    {
+       return 
+          m_guard != nullptr
+       || m_boolean != nullptr
+       || m_dimConstConst.size() != 0
+       || m_dimConstNon.size() != 0
+       || m_dimNonConst.size() != 0
+       || m_dimNonNon.size() != 0
+       ;
+    }
+
+    /**
+     * @brief Evaluate the guard.
+     *
+     * Returns a tuple of the dimensions and the evaluated AST.
+     **/
+    template <typename... Delta>
+    std::pair<bool, Tuple>
+    evaluate(Context& k, Delta&&... delta) const;
+
+    /**
+     * @brief Adds a system imposed dimension.
+     *
+     * The system can add dimensions to the guard which the user can't
+     * change.
+     **/
+    void
+    addDimension(size_t dim, const Constant& v)
+    {
+       m_dimConstConst[dim] = v;
+    }
+
+    WS*
+    boolean() const
+    {
+       return m_boolean.get();
+    }
+
+    int
+    priority() const
+    {
+      return m_priority;
+    }
+
+    //after a call to evaluate, these are reset to whatever demands evaluate
+    //produced
+    const std::vector<dimension_index>&
+    demands() const
+    {
+      return m_demands;
+    }
+
+    private:
+
+    void
+    compile() const;
+
+    std::shared_ptr<WS> m_guard;
+    std::shared_ptr<WS> m_boolean;
+
+    mutable std::map<dimension_index, Constant> m_dimConstConst;
+    mutable std::map<dimension_index, WS*> m_dimConstNon;
+
+    mutable std::map<WS*, Constant> m_dimNonConst;
+    mutable std::map<WS*, WS*> m_dimNonNon;
+
+    //have we compiled the guard?
+    mutable bool m_compiled;
+
+    mutable bool m_onlyConst;
+
+    mutable System* m_system;
+
+    mutable int m_priority;
+
+    mutable std::vector<dimension_index> m_demands;
+  };
+
+
+  class CompiledEquation : public WS
+  {
+    public:
+    CompiledEquation
+    (
+      const EquationGuard& valid, 
+      std::shared_ptr<WS> evaluator,
+      int provenance
+    );
+
+    CompiledEquation();
+
+    ~CompiledEquation();
+
+    const EquationGuard&
+    validContext() const
+    {
+       return m_validContext;
+    }
+
+    Constant
+    operator()(Context& k)
+    {
+      return (*m_h)(k);
+    }
+
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      return (*m_h)(kappa, delta);
+    }
+
+    int
+    provenance() const
+    {
+      return m_provenance;
+    }
+
+    int
+    priority() const
+    {
+      return m_priority;
+    }
+
+    private:
+    EquationGuard m_validContext;
+    std::shared_ptr<WS> m_h;
+    int m_provenance;
+    int m_priority;
+  };
+
   class ConditionalBestfitWS : public WS
   {
     public:
-    ConditionalBestfitWS(u32string name, System& system)
+    typedef std::vector<CompiledEquation> Equations;
+    ConditionalBestfitWS(Equations e)
+    : m_equations(e)
     {
     }
 
@@ -358,6 +543,7 @@ namespace TransLucid
     operator()(Context& kappa, Context& delta);
 
     private:
+    Equations m_equations;
   };
 }
 
