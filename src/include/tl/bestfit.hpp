@@ -543,7 +543,22 @@ namespace TransLucid
     operator()(Context& kappa, Context& delta);
 
     private:
+    typedef std::tuple<Tuple, Equations::iterator> 
+      ApplicableTuple;
+    typedef std::vector<ApplicableTuple> applicable_list;
+
+    typedef std::list<std::pair<int, Equations::iterator>> 
+      ProvenanceList;
+
+    typedef std::map<int, ProvenanceList> PriorityList;
+
+    template <typename... Delta>
+    Constant
+    bestfit(const applicable_list& applicable, Context& k, 
+      Delta&&... delta);
+
     Equations m_equations;
+    PriorityList m_priorityVars;
   };
 }
 

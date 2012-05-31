@@ -978,6 +978,8 @@ System::~System()
 void
 System::go()
 {
+  #warning fix the go function
+  #if 0
   for (const auto& ident : m_assignments)
   {
     auto hd = m_outputHDs.find(ident.first);
@@ -1034,6 +1036,7 @@ System::go()
 
   ++m_time;
   setDefaultContext();
+  #endif
 }
 
 uuid

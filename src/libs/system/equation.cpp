@@ -274,106 +274,6 @@ GuardWS::operator=(const GuardWS& rhs)
   return *this;
 }
 
-template <typename... Delta>
-std::pair<bool, Tuple>
-GuardWS::evaluate(Context& k, Delta&&... delta) const
-{
-  if (!m_compiled)
-  {
-    compile();
-  }
-
-  bool nonspecial = true;
-  m_demands.clear();
-  tuple_t t = m_dimConstConst;
-
-  if (m_guard)
-  {
-    //start with the const dimensions and evaluate the non-const ones
-
-    //evaluate the ones left
-    for (const auto& constNon : m_dimConstNon)
-    {
-      Constant ord = constNon.second->operator()(k, delta...);
-
-      if (ord.index() == TYPE_INDEX_DEMAND)
-      {
-        const auto& dims = Types::Demand::get(ord).dims();
-        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
-      }
-      else
-      {
-        t.insert(std::make_pair(constNon.first, ord));
-      }
-    }
-
-    for (const auto& nonConst : m_dimNonConst)
-    {
-      Constant dim = nonConst.first->operator()(k, delta...);
-
-      if (dim.index() == TYPE_INDEX_DEMAND)
-      {
-        const auto& dims = Types::Demand::get(dim).dims();
-        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
-      }
-      else if (dim.index() == TYPE_INDEX_SPECIAL)
-      {
-        nonspecial = false;
-      }
-      else
-      {
-        dimension_index index =
-          dim.index() == TYPE_INDEX_DIMENSION 
-          ? get_constant<dimension_index>(dim)
-          : m_system->getDimensionIndex(dim);
-
-        t.insert(std::make_pair(index, nonConst.second));
-      }
-    }
-
-    for (const auto& nonNon : m_dimNonNon)
-    {
-      Constant dim = nonNon.first->operator()(k, delta...);
-      Constant ord = nonNon.second->operator()(k, delta...);
-
-      if (dim.index() == TYPE_INDEX_SPECIAL)
-      {
-        nonspecial = false;
-      }
-
-      bool isdemand = false;
-
-      if (ord.index() == TYPE_INDEX_DEMAND)
-      {
-        const auto& dims = Types::Demand::get(ord).dims();
-        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
-        isdemand = true;
-      }
-
-      if (dim.index() == TYPE_INDEX_DEMAND)
-      {
-        const auto& dims = Types::Demand::get(dim).dims();
-        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
-        isdemand = true;
-      }
-
-      if (!isdemand)
-      {
-        dimension_index index =
-          dim.index() == TYPE_INDEX_DIMENSION 
-          ? get_constant<dimension_index>(dim)
-          : m_system->getDimensionIndex(dim);
-
-        t.insert(std::make_pair(index, ord));
-      }
-    }
-  }
-
-  //the tuple doesn't matter here if nonspecial is false, the false
-  //says ignore the result
-  return std::make_pair(nonspecial, Tuple(t));
-}
-
 GuardWS makeGuardWithTime(const mpz_class& start)
 {
   GuardWS g;
@@ -388,8 +288,8 @@ VariableWS::operator()(Context& k)
   //sort out an undefined reference for now
   if (bool_guard_hack)
   {
-    GuardWS g;
-    g.evaluate(k);
+    //GuardWS g;
+    //g.evaluate(k);
   }
 
   return m_bestfit(k);
@@ -801,16 +701,6 @@ void
 EquationWS::del(size_t time)
 {
   m_endTime = time;
-}
-
-Constant
-ConditionalBestfitWS::operator()(Context& k)
-{
-}
-
-Constant
-ConditionalBestfitWS::operator()(Context& k, Context& delta)
-{
 }
 
 //template

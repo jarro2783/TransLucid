@@ -131,13 +131,13 @@ namespace TransLucid
   valueRefines(const Constant& a, const Constant& b);
 
   bool
-  booleanTrue(const GuardWS& g, Context& c);
+  booleanTrue(const EquationGuard& g, Context& c);
 
   //the cached boolean true
   bool
   booleanTrue
   (
-    const GuardWS& g, 
+    const EquationGuard& g, 
     Context& c, 
     Context& delta, 
     std::vector<dimension_index>& demands

@@ -107,6 +107,7 @@ namespace TransLucid
        ;
     }
 
+    #if 0
     /**
      * @brief Evaluate the guard.
      *
@@ -115,6 +116,7 @@ namespace TransLucid
     template <typename... Delta>
     std::pair<bool, Tuple>
     evaluate(Context& k, Delta&&... delta) const;
+    #endif
 
     /**
      * @brief Adds a system imposed dimension.

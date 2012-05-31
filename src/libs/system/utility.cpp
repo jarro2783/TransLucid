@@ -383,7 +383,7 @@ tupleRefines(const Tuple& a, const Tuple& b, bool canequal)
 }
 
 bool
-booleanTrue(const GuardWS& g, Context& k)
+booleanTrue(const EquationGuard& g, Context& k)
 {
   WS* b = g.boolean();
 
@@ -404,7 +404,7 @@ booleanTrue(const GuardWS& g, Context& k)
 bool
 booleanTrue
 (
-  const GuardWS& g, 
+  const EquationGuard& g, 
   Context& kappa, 
   Context& delta, 
   std::vector<dimension_index>& demands
