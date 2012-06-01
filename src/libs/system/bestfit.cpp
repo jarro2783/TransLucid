@@ -627,6 +627,20 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
   return bestfit(applicable, kappa, delta);
 }
 
+EquationGuard::EquationGuard(const EquationGuard& other)
+: m_guard(other.m_guard)
+, m_boolean(other.m_boolean)
+, m_dimConstConst(other.m_dimConstConst)
+, m_dimConstNon(other.m_dimConstNon)
+, m_dimNonConst(other.m_dimNonConst)
+, m_dimNonNon(other.m_dimNonNon)
+, m_compiled(other.m_compiled)
+, m_onlyConst(other.m_onlyConst)
+, m_system(other.m_system)
+, m_priority(other.m_priority)
+{
+}
+
 void
 EquationGuard::compile() const
 {
@@ -729,6 +743,36 @@ EquationGuard::compile() const
     std::cerr << "guard is not a tuple" << std::endl;
     throw "guard is not a tuple";
   }
+}
+
+ConditionalBestfitWS::ConditionalBestfitWS(Equations e)
+: m_equations(e)
+{
+  Context emptyk;
+  for (auto uiter = m_equations.begin(); uiter != m_equations.end(); ++uiter)
+  {
+    auto& eqn = *uiter;
+    //force the equation to be compiled and get the priority
+    eqn.validContext().evaluate(emptyk);
+
+    int time = eqn.provenance();
+    
+    int priority = eqn.priority();
+    
+    auto iter = m_priorityVars.find(priority);
+
+    if (iter == m_priorityVars.end())
+    {
+      iter = m_priorityVars.insert(std::make_pair(priority, ProvenanceList()))
+        .first;
+    }
+
+    iter->second.push_back(std::make_pair(time, uiter));
+  }
+  #if 0
+
+  //insert in the priority list
+    #endif
 }
 
 } //namespace TransLucid

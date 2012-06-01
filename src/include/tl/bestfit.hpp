@@ -479,9 +479,9 @@ namespace TransLucid
       int provenance
     );
 
-    CompiledEquation();
+    CompiledEquation() = default;
 
-    ~CompiledEquation();
+    ~CompiledEquation() = default;
 
     const EquationGuard&
     validContext() const
@@ -524,10 +524,8 @@ namespace TransLucid
   {
     public:
     typedef std::vector<CompiledEquation> Equations;
-    ConditionalBestfitWS(Equations e)
-    : m_equations(e)
-    {
-    }
+
+    ConditionalBestfitWS(Equations e);
 
     ConditionalBestfitWS(const ConditionalBestfitWS&) = delete;
     ConditionalBestfitWS(ConditionalBestfitWS&) = delete;
