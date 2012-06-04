@@ -33,6 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
 #include <tl/free_variables.hpp>
+#include <tl/function.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
@@ -88,6 +89,8 @@ namespace TransLucid
     typedef std::unordered_map<uuid, std::shared_ptr<SystemObject>> ObjectMap;
     typedef std::unordered_map<u32string, std::shared_ptr<VariableWS>> 
       VariableMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<FunctionWS>> 
+      FunctionMap;
 
     System(bool cached = false);
     ~System();
@@ -392,8 +395,10 @@ namespace TransLucid
     bool m_cacheEnabled;
 
     ObjectMap m_objects;
+    IdentifierMap m_identifiers;
 
     VariableMap m_variables;
+    FunctionMap m_functions;
 
     //TODO deprecating
     DefinitionMap m_equations;
@@ -486,13 +491,36 @@ namespace TransLucid
       WS* abstraction
     );
 
+    template <typename Input>
+    Constant
+    addVariableDeclInternal
+    (
+      const u32string& name,
+      Input&& decl
+    );
+
+    template <typename Input>
+    Constant
+    addFunDeclInternal
+    (
+      const u32string& name,
+      Input&& decl
+    );
+
     public:
 
     Constant
     addDeclaration(const Parser::RawInput& input);
 
     Constant
-    addVariableDecl
+    addFunDeclRaw
+    (
+      const Parser::RawInput& input, 
+      const Parser::LexerIterator& iter
+    );
+
+    Constant
+    addVariableDeclRaw
     (
       const Parser::RawInput& input, 
       const Parser::LexerIterator& iter

@@ -228,28 +228,29 @@ namespace
     }
   };
 
-  class VariableObject : public SystemObject
+  template <typename Iterator>
+  class GenericObject : public SystemObject
   {
     public:
 
     bool
     del(uuid id, int time)
     {
-      return m_var->second->del(id, time);
+      return m_object->second->del(id, time);
     }
 
     bool
     repl(uuid id, int time, const Parser::Line& line)
     {
-      return m_var->second->repl(id, time, line);
+      return m_object->second->repl(id, time, line);
     }
 
     private:
-    System::VariableMap::iterator m_var;
+    Iterator m_object;
 
     public:
-    VariableObject(decltype(m_var) var)
-    : m_var(var)
+    GenericObject(decltype(m_object) object)
+    : m_object(object)
     {}
   };
 }
@@ -735,6 +736,75 @@ namespace detail
   };
 }
 
+//private template  functions go at the top, but after the local
+//definitions
+
+template <typename Input>
+Constant
+System::addVariableDeclInternal
+(
+  const u32string& name,
+  Input&& decl
+)
+{
+  uuid u = generate_uuid();
+
+  auto equationIter = m_variables.find(name);
+
+  std::shared_ptr<VariableWS> var;
+  if (equationIter == m_variables.end())
+  {
+    var = std::make_shared<VariableWS>(name, *this);
+    auto variter = m_variables.insert({name, var});
+
+    //create a new VariableObject to manage the uuid
+    m_objects.insert({u, std::make_shared<
+      GenericObject<VariableMap::iterator>>(variter.first)});
+  }
+  else
+  {
+    var = equationIter->second;
+  }
+  var->addEquation(u, decl, m_time);
+
+  m_identifiers.insert({name, var});
+
+  return Types::UUID::create(u);
+}
+
+template <typename Input>
+Constant
+System::addFunDeclInternal
+(
+  const u32string& name,
+  Input&& decl
+)
+{
+  uuid u = generate_uuid();
+
+  auto funIter = m_functions.find(name);
+
+  std::shared_ptr<FunctionWS> fun;
+  if (funIter == m_functions.end())
+  {
+    fun = std::make_shared<FunctionWS>(name, *this);
+    auto funAddIter = m_functions.insert({name, fun});
+
+    m_objects.insert({u, std::make_shared<
+      GenericObject<FunctionMap::iterator>>(funAddIter.first)});
+  }
+  else
+  {
+    fun = funIter->second;
+  }
+
+  fun->addEquation(u, decl, m_time);
+
+  m_identifiers.insert({name, fun});
+
+  return Types::UUID::create(u);
+}
+
 //adds eqn | [symbol : "s"] = value;;
 template <typename T>
 Constant
@@ -751,52 +821,6 @@ System::addSymbolInfo
     Tree::Expr(),
     value
   ));
-}
-
-
-template <typename T>
-WS*
-System::buildConstantWS(size_t index)
-{
-  WS* h = new T(this);
-
-  #if 0
-  tuple_t guard =
-  {
-    {
-      DIM_TYPE,
-      Constant(String(T::name), TYPE_INDEX_USTRING)
-    }
-  };
-  #endif
-
-  //sets the following
-
-  //CONST | [type : ustring<name>]
-  //addEquation(U"CONST", GuardWS(Tuple(guard)), h);
-
-  addEquation(Parser::Equation
-    (
-      U"LITERAL", 
-      Tree::TupleExpr(Tree::TupleExpr::TuplePairs{{U"DIM_TYPE", T::name}}), 
-      Tree::Expr(),
-      h
-    )
-  );
-
-  #if 0
-  //TYPE_INDEX | [type : ustring<name>] = index;;
-  addEquation
-  (
-    U"TYPE_INDEX", 
-    GuardWS(Tuple(guard)), 
-    new Hyperdatons::IntmpConstWS(index)
-  );
-  #endif
-
-  //TODO: sort out the default literals
-
-  return h;
 }
 
 template <typename... Args>
@@ -848,11 +872,6 @@ System::init_equations()
   addDecl(*this, U"assign", U"DECLID");
   addDecl(*this, U"in", U"DECLID");
   addDecl(*this, U"out", U"DECLID");
-  addDecl(*this, U"infixl", U"DECLID");
-  addDecl(*this, U"infixr", U"DECLID");
-  addDecl(*this, U"infixn", U"DECLID");
-  addDecl(*this, U"prefix", U"DECLID");
-  addDecl(*this, U"postfix", U"DECLID");
   addDecl(*this, U"data", U"DECLID");
   addDecl(*this, U"fun", U"DECLID");
   addDecl(*this, U"op", U"DECLID");
@@ -2358,18 +2377,25 @@ System::addDeclaration(const Parser::RawInput& input)
 
   if (start.getType() != Parser::TOKEN_DECLID)
   {
+    return Types::Special::create(SP_ERROR);
   }
   
   u32string token = get<u32string>(start.getValue());
 
   if (token == U"var")
   {
-    return addVariableDecl(input, lexit);
+    return addVariableDeclRaw(input, lexit);
   }
+  else if (token == U"fun")
+  {
+    return addFunDeclRaw(input, lexit);
+  }
+
+  return Constant();
 }
 
 Constant
-System::addVariableDecl
+System::addVariableDeclRaw
 (
   const Parser::RawInput& input, 
   const Parser::LexerIterator& iter
@@ -2377,30 +2403,29 @@ System::addVariableDecl
 {
   if (iter->getType() != Parser::TOKEN_ID)
   {
+    return Types::Special::create(SP_ERROR);
   }
 
   u32string name = get<u32string>(iter->getValue());
 
-  uuid u = generate_uuid();
+  return addVariableDeclInternal(name, input);
+}
 
-  auto equationIter = m_variables.find(name);
-
-  std::shared_ptr<VariableWS> var;
-  if (equationIter == m_variables.end())
+Constant
+System::addFunDeclRaw
+(
+  const Parser::RawInput& input, 
+  const Parser::LexerIterator& iter
+)
+{
+  if (iter->getType() != Parser::TOKEN_ID)
   {
-    var = std::make_shared<VariableWS>(name, *this);
-    auto variter = m_variables.insert({name, var});
-
-    //create a new VariableObject to manage the uuid
-    m_objects.insert({u, std::make_shared<VariableObject>(variter.first)});
+    return Types::Special::create(SP_ERROR);
   }
-  else
-  {
-    var = equationIter->second;
-  }
-  var->addUnparsed(u, input, m_time);
 
-  return Types::UUID::create(u);
+  u32string name = get<u32string>(iter->getValue());
+
+  return addFunDeclInternal(name, input);
 }
 
 } //namespace TransLucid

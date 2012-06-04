@@ -42,6 +42,25 @@ Token LexerIterator::m_endToken(Position(), TokenValue(), 0);
 
 namespace
 {
+
+  template <typename T>
+  bool
+  is_decl(T&& name)
+  {
+    static std::set<u32string> decls =
+    {
+      U"op",
+      U"var",
+      U"fun",
+      U"del",
+      U"repl",
+      U"host",
+      U"hd"
+    };
+
+    return decls.find(name) != decls.end();
+  }
+
   class ValueBuilder
   {
     public:
@@ -119,34 +138,15 @@ namespace
     )
     {
       u32string ident(begin, end);
-      //lookup ID_TYPE
-      WS* lookup = idents.lookup(U"ID_TYPE");
 
-      if (lookup)
+      //first check if it is an argN
+      if (ident.find(U"arg") == 0)
       {
-        ContextPerturber p(context, {{DIM_ARG0, Types::String::create(ident)}});
-        Constant c = (*lookup)(context);
-        
-        if (c.index() != TYPE_INDEX_USTRING)
-        {
-          throw "internal compiler error at: " __FILE__ ":" XSTRING(__LINE__);
-        }
-
-        const u32string& type = get_constant_pointer<u32string>(c);
-
-        //first check if it is an argN
-        if (ident.find(U"arg") == 0)
-        {
-          id = TOKEN_DIM_IDENTIFIER;
-        }
-        else if (type == U"DECLID")
-        {
-          id = TOKEN_DECLID;
-        }
+        id = TOKEN_DIM_IDENTIFIER;
       }
-      else
+      else if (is_decl(ident))
       {
-        std::cerr << "Could not lookup ID_TYPE" << std::endl;
+        id = TOKEN_DECLID;
       }
 
       return ident;

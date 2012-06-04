@@ -651,7 +651,7 @@ VariableWS::addEquation
 }
 
 void
-VariableWS::addUnparsed(uuid id, Parser::RawInput input, int time)
+VariableWS::addEquation(uuid id, Parser::RawInput input, int time)
 {
   m_bestfit.addEquation(id, input, time);
 }

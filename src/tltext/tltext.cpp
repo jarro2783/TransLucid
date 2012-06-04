@@ -320,6 +320,7 @@ TLText::processDefinitions
       case LineType::LINE:
       //parse a line with the system
       {
+        #if 0
         Parser::U32Iterator lineBegin(
           Parser::makeUTF32Iterator(line.text.begin()));
         Parser::U32Iterator lineEnd(
@@ -329,11 +330,22 @@ TLText::processDefinitions
         Parser::StreamPosIterator posbegin(lineBegin, streamName,
           line.line,line.character);
         Parser::StreamPosIterator posend(lineEnd);
+        #endif
 
         try
         {
-          auto result = 
-            m_system.parseLine(posbegin, posend, m_verbose, m_debug);
+          //auto result = 
+          //  m_system.parseLine(posbegin, posend, m_verbose, m_debug);
+          auto result = m_system.addDeclaration(
+            Parser::RawInput
+            {
+              streamName,
+              line.line,
+              line.character,
+              line.text
+            }
+          );
+
 
           if (m_cached)
           {
