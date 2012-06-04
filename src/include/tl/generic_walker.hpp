@@ -206,6 +206,28 @@ namespace TransLucid
       return where;
     }
 
+    Tree::Expr
+    operator()(const Tree::ConditionalBestfitExpr& e)
+    {
+      Tree::ConditionalBestfitExpr cond;
+
+      for (auto eqn : e.declarations)
+      {
+        cond.declarations.push_back
+        (
+          std::make_tuple
+          (
+            std::get<0>(eqn),
+            apply_visitor(*reinterpret_cast<Derived*>(this), std::get<1>(eqn)),
+            apply_visitor(*reinterpret_cast<Derived*>(this), std::get<2>(eqn)),
+            apply_visitor(*reinterpret_cast<Derived*>(this), std::get<3>(eqn))
+          )
+        );
+      }
+
+      return cond;
+    }
+
     std::vector<std::pair<Tree::Expr, Tree::Expr>>
     visit_list
     (

@@ -627,6 +627,12 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
   return bestfit(applicable, kappa, delta);
 }
 
+EquationGuard::EquationGuard(WS* g, WS* b)
+: m_guard(g), m_boolean(b), m_compiled(false), m_onlyConst(false),
+  m_system(nullptr), m_priority(0)
+{
+}
+
 EquationGuard::EquationGuard(const EquationGuard& other)
 : m_guard(other.m_guard)
 , m_boolean(other.m_boolean)
@@ -773,6 +779,19 @@ ConditionalBestfitWS::ConditionalBestfitWS(Equations e)
 
   //insert in the priority list
     #endif
+}
+
+CompiledEquationWS::CompiledEquationWS
+(
+  const EquationGuard& valid, 
+  std::shared_ptr<WS> evaluator,
+  int provenance
+)
+: m_validContext(valid)
+, m_eqn(evaluator)
+, m_provenance(provenance)
+, m_priority(0)
+{
 }
 
 } //namespace TransLucid

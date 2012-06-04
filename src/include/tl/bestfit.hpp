@@ -469,19 +469,19 @@ namespace TransLucid
   };
 
 
-  class CompiledEquation : public WS
+  class CompiledEquationWS : public WS
   {
     public:
-    CompiledEquation
+    CompiledEquationWS
     (
       const EquationGuard& valid, 
       std::shared_ptr<WS> evaluator,
       int provenance
     );
 
-    CompiledEquation() = default;
+    CompiledEquationWS() = default;
 
-    ~CompiledEquation() = default;
+    ~CompiledEquationWS() = default;
 
     const EquationGuard&
     validContext() const
@@ -492,13 +492,13 @@ namespace TransLucid
     Constant
     operator()(Context& k)
     {
-      return (*m_h)(k);
+      return (*m_eqn)(k);
     }
 
     Constant
     operator()(Context& kappa, Context& delta)
     {
-      return (*m_h)(kappa, delta);
+      return (*m_eqn)(kappa, delta);
     }
 
     int
@@ -515,7 +515,7 @@ namespace TransLucid
 
     private:
     EquationGuard m_validContext;
-    std::shared_ptr<WS> m_h;
+    std::shared_ptr<WS> m_eqn;
     int m_provenance;
     int m_priority;
   };
@@ -523,7 +523,7 @@ namespace TransLucid
   class ConditionalBestfitWS : public WS
   {
     public:
-    typedef std::vector<CompiledEquation> Equations;
+    typedef std::vector<CompiledEquationWS> Equations;
 
     ConditionalBestfitWS(Equations e);
 

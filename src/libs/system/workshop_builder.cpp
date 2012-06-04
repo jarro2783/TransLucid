@@ -305,6 +305,31 @@ WorkshopBuilder::operator()(const Tree::WhereExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::ConditionalBestfitExpr& e)
 {
+  std::vector<CompiledEquationWS> compiled;
+  for (auto equation : e.declarations)
+  {
+    auto guard = apply_visitor(*this, std::get<1>(equation));
+    auto boolean = apply_visitor(*this, std::get<2>(equation));
+    auto expr = apply_visitor(*this, std::get<3>(equation));
+
+    compiled.push_back
+    (
+      CompiledEquationWS
+      (
+        EquationGuard
+        (
+          guard, boolean
+        ),
+        std::shared_ptr<WS>(expr),
+        std::get<0>(equation)
+      )
+    );
+  }
+
+  auto bestfit = std::unique_ptr<ConditionalBestfitWS>(
+    new ConditionalBestfitWS(compiled));
+
+  return bestfit.release();
 }
 
 } //namespace TransLucid
