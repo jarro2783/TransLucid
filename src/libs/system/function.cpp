@@ -24,6 +24,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/function.hpp>
 
+#define STRING(x) #x
+#define XSTRING(x) STRING(x)
+
 namespace TransLucid
 {
 
@@ -59,6 +62,45 @@ FunctionWS::repl(uuid id, size_t time, Parser::Line line)
 Tree::Expr
 FunctionWS::group(const std::list<EquationDefinition>& defs)
 {
+  //for each function definition, rename the parameters in the guard
+  //and then build up a conditional bestfit from the resulting expression
+  //also make sure that the types of parameters are consistent for all
+  //definitions
+
+  std::vector<Parser::FnDecl::ArgType> params;
+
+  for (auto& eqn : defs)
+  {
+    auto& line = *eqn.parsed();
+    auto fundecl = get<Parser::FnDecl>(&line);
+
+    if (fundecl == nullptr)
+    {
+      throw "Internal compiler error: " __FILE__ ":" XSTRING(__LINE__);
+    }
+
+    if (params.size() == 0)
+    {
+      //create the parameters
+      for (auto p : fundecl->args)
+      {
+        params.push_back(p.first);
+      }
+    }
+    else
+    {
+      //check that the parameters are consistent
+      auto paramIter = params.begin();
+      auto declIter = fundecl->args.begin();
+      while (declIter != fundecl->args.end() && paramIter != params.end())
+      {
+        if (*paramIter != declIter->first)
+        {
+          //throw a parse error here
+        }
+      }
+    }
+  }
 }
 
 }
