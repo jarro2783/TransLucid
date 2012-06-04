@@ -267,6 +267,9 @@ namespace TransLucid
     Constant
     operator()(Context& k);
 
+    Constant
+    operator()(Context& kappa, Context& delta);
+
     private:
 
     void

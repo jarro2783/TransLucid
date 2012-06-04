@@ -170,6 +170,11 @@ BestfitGroup::operator()(Context& k)
 }
 
 Constant
+BestfitGroup::operator()(Context& kappa, Context& delta)
+{
+}
+
+Constant
 BestfitGroup::evaluate(Context& k)
 {
   auto dimtime = k.lookup(DIM_TIME);

@@ -298,6 +298,7 @@ VariableWS::operator()(Context& k)
 Constant
 VariableWS::operator()(Context& kappa, Context& delta)
 {
+  return m_bestfit(kappa, delta);
 }
 
 #if 0

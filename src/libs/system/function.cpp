@@ -30,11 +30,13 @@ namespace TransLucid
 Constant
 FunctionWS::operator()(Context& k)
 {
+  return m_bestfit(k);
 }
 
 Constant
 FunctionWS::operator()(Context& kappa, Context& delta)
 {
+  return m_bestfit(kappa, delta);
 }
 
 void
@@ -45,10 +47,17 @@ FunctionWS::addEquation(uuid id, Parser::RawInput input, int time)
 bool 
 FunctionWS::del(uuid id, size_t time)
 {
+  return m_bestfit.del(id, time);
 }
 
 bool 
 FunctionWS::repl(uuid id, size_t time, Parser::Line line)
+{
+  return m_bestfit.repl(id, time, line);
+}
+
+Tree::Expr
+FunctionWS::group(const std::list<EquationDefinition>& defs)
 {
 }
 

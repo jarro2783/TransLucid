@@ -31,7 +31,7 @@ namespace TransLucid
 {
   class System;
 
-  class FunctionWS : public WS
+  class FunctionWS : public WS, public DefinitionGrouper
   {
     public:
 
@@ -54,6 +54,9 @@ namespace TransLucid
 
     bool 
     repl(uuid id, size_t time, Parser::Line line);
+
+    Tree::Expr
+    group(const std::list<EquationDefinition>& defs);
 
     private:
     u32string m_name;
