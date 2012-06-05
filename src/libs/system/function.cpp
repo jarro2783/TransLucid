@@ -67,7 +67,9 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
   //also make sure that the types of parameters are consistent for all
   //definitions
 
-  std::vector<Parser::FnDecl::ArgType> params;
+  std::vector<std::pair<Parser::FnDecl::ArgType, u32string>> params;
+
+  Tree::ConditionalBestfitExpr cond;
 
   for (auto& eqn : defs)
   {
@@ -84,7 +86,7 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
       //create the parameters
       for (auto p : fundecl->args)
       {
-        params.push_back(p.first);
+        params.push_back({p.first, p.second});
       }
     }
     else
@@ -94,13 +96,42 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
       auto declIter = fundecl->args.begin();
       while (declIter != fundecl->args.end() && paramIter != params.end())
       {
-        if (*paramIter != declIter->first)
+        if (paramIter->first != declIter->first)
         {
           //throw a parse error here
         }
       }
+
+      //then create the conditional bestfit
+      cond.declarations.push_back(
+      std::make_tuple(
+        eqn.start(),
+        fundecl->guard,
+        fundecl->boolean,
+        fundecl->expr
+      ));
     }
   }
+
+  Tree::Expr abstractions = cond;
+
+  //then build up the function abstractions backwards
+  auto iter = params.rbegin();
+  while (iter != params.rend())
+  {
+    if (iter->first == Parser::FnDecl::ArgType::CALL_BY_NAME)
+    {
+      abstractions = Tree::PhiExpr(iter->second, abstractions);
+    }
+    else
+    {
+      abstractions = Tree::LambdaExpr(iter->second, abstractions);
+    }
+
+    ++iter;
+  }
+
+  return abstractions;
 }
 
 }
