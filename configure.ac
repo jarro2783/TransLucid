@@ -105,56 +105,20 @@ if test "x$enable_static" = "xyes"; then
   PKG_CONFIG="${PKG_CONFIG} --static"
 fi
 
-PKG_CHECK_MODULES([ICU], [icu-uc])
+PKG_CHECK_MODULES([ICU], [icu-uc],,
+  [ICU_LIBS="-licuuc -licudata"]
+)
 
 AC_SUBST([ICU_CFLAGS])
 AC_SUBST([ICU_LIBS])
 
 # we have to look for lots of versions of is_print in icuuc
 
-if test "x$enable_static" = "xyes"; then
+TL_CHECK_ICU
 
-  AC_MSG_NOTICE([checking that ICU is linkable statically])
-  ICU_FOUND=no
-
-  AC_CHECK_LIB([icuuc], [u_isprint], ICU_FOUND=yes,
-  ,
-  [${ICU_LIBS} -static])
-
-  if test "x$ICU_FOUND" = "xno"; then
-    AC_CHECK_LIB([icuuc], [u_isprint_49], ICU_FOUND=yes,
-    ,
-    [${ICU_LIBS} -static])
-  fi
-
-  if test "x$ICU_FOUND" = "xno"; then
-    AC_CHECK_LIB([icuuc], [u_isprint_48], ICU_FOUND=yes,
-    ,
-    [${ICU_LIBS} -static])
-  fi
-
-  if test "x$ICU_FOUND" = "xno"; then
-    AC_CHECK_LIB([icuuc], [u_isprint_47], ICU_FOUND=yes,
-    ,
-    [${ICU_LIBS} -static])
-  fi
-
-  if test "x$ICU_FOUND" = "xno"; then
-    AC_CHECK_LIB([icuuc], [u_isprint_46], ICU_FOUND=yes,
-    ,
-    [${ICU_LIBS} -static])
-  fi
-
-  if test "x$ICU_FOUND" = "xno"; then
-    AC_MSG_FAILURE([Cannot find the ICU static libraries])
-  fi
-
-fi
-
-TL_LDFLAGS="-std=gnu++0x"
+TL_LDFLAGS="-std=gnu++11"
 TL_LIBS="${ICU_LIBS}"
-TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing -DBOOST_SPIRIT_UNICODE \
-  -DBOOST_MPL_LIMIT_LIST_SIZE=30 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS \
+TL_CFLAGS="-std=gnu++11 -fno-strict-aliasing -Wno-unused-local-typedefs \
   ${ICU_CFLAGS}"
 
 AC_SUBST(TL_LDFLAGS)
