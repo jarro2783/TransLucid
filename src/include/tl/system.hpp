@@ -567,7 +567,7 @@ namespace TransLucid
     {
       IdentifierLookup
       (
-        DefinitionMap& identifiers,
+        IdentifierMap& identifiers,
         decltype(m_cachedVars)& cached
       )
       : m_identifiers(&identifiers),
@@ -588,13 +588,13 @@ namespace TransLucid
       lookup(const u32string& name) const;
 
       private:
-      DefinitionMap* m_identifiers;
+      IdentifierMap* m_identifiers;
       decltype(m_cachedVars)* m_cached;
     };
 
     IdentifierLookup lookupIdentifiers()
     {
-      return IdentifierLookup(m_equations, m_cachedVars);
+      return IdentifierLookup(m_identifiers, m_cachedVars);
     }
 
     //template <size_t N>

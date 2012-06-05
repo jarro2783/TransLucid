@@ -36,6 +36,19 @@ OpDefWS::addEquation(uuid id, Parser::RawInput input, int time)
 Tree::Expr
 OpDefWS::group(const std::list<EquationDefinition>& defs)
 {
+  if (defs.size() != 1)
+  {
+    throw "more than one operator definition";
+  }
+
+  auto decl = get<Parser::OpDecl>(&*defs.front().parsed());
+
+  if (decl == nullptr)
+  {
+    throw "operator definition not an operator";
+  }
+
+  return decl->expr;
 }
 
 }

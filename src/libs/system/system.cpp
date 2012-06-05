@@ -2306,7 +2306,7 @@ System::IdentifierLookup::lookup(const u32string& name) const
   auto r = m_identifiers->find(name);
   if (r != m_identifiers->end())
   {
-    return r->second;
+    return r->second.get();
   }
   else
   {
