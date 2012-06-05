@@ -26,7 +26,7 @@ hyperdatons/arrayhd.cpp
 hyperdatons/envhd.cpp
 hyperdatons/filehd.cpp
 internal_strings.cpp lexertl.cpp lexer_util.cpp 
-library.cpp line_tokenizer.cpp parser.cpp
+library.cpp line_tokenizer.cpp opdef.cpp parser.cpp
 range.cpp rename.cpp semantic_transform.cpp 
 system.cpp system_util.cpp
 tree_printer.cpp tree_rewriter.cpp

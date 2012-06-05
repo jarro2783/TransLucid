@@ -612,7 +612,8 @@ nextToken
   StreamPosIterator& begin, 
   const StreamPosIterator& end,
   Context& context,
-  System::IdentifierLookup& idents
+  System::IdentifierLookup& idents,
+  bool interpret
 )
 {
   lexertl::basic_match_results<StreamPosIterator, uint32_t> results(begin, end);
@@ -642,17 +643,23 @@ nextToken
 
   if (id != 0)
   {
-    
-    try
+    if (interpret)
     {
-      //build up the token
-      tokVal = build_value(id, results.start, results.end,
-        id, context, idents);
+      try
+      {
+        //build up the token
+        tokVal = build_value(id, results.start, results.end,
+          id, context, idents);
+      }
+      catch(...)
+      {
+        //if there is an invalid token then deal with it
+        id = 0;
+      }
     }
-    catch(...)
+    else
     {
-      //if there is an invalid token then deal with it
-      id = 0;
+      tokVal = u32string(results.start, results.end);
     }
   }
 

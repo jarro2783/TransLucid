@@ -1,4 +1,4 @@
-/* Function workshop code
+/* Op declarations code.
    Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
@@ -18,25 +18,24 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 /**
- * @file function.hpp
- * Function definition workshop.
+ * @file opdef.hpp
+ * Operator declarations.
  */
 
+#ifndef TL_OPDEF_HPP_INCLUDED
+#define TL_OPDEF_HPP_INCLUDED
+
 #include <tl/bestfit.hpp>
-#include <tl/parser_api.hpp>
-#include <tl/uuid.hpp>
 #include <tl/workshop.hpp>
 
 namespace TransLucid
 {
-  class System;
-
-  class FunctionWS : public WS, public DefinitionGrouper
+  class OpDefWS : public WS, public DefinitionGrouper
   {
     public:
 
-    FunctionWS(const u32string& name, System& system)
-    : m_name(name), m_system(system), m_bestfit(this, system)
+    OpDefWS(const u32string& text, System& system)
+    : m_bestfit(this, system), m_text(text)
     {
     }
 
@@ -59,8 +58,10 @@ namespace TransLucid
     group(const std::list<EquationDefinition>& defs);
 
     private:
-    u32string m_name;
-    System& m_system;
+
     BestfitGroup m_bestfit;
+    u32string m_text;
   };
 }
+
+#endif

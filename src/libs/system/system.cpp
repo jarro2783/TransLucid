@@ -62,6 +62,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/context.hpp>
 #include <tl/eval_workshops.hpp>
 #include <tl/function_registry.hpp>
+#include <tl/opdef.hpp>
 #include <tl/output.hpp>
 #include <tl/parser.hpp>
 #include <tl/parser_iterator.hpp>
@@ -801,6 +802,35 @@ System::addFunDeclInternal
   fun->addEquation(u, decl, m_time);
 
   m_identifiers.insert({name, fun});
+
+  return Types::UUID::create(u);
+}
+
+template <typename Input>
+Constant
+System::addOpDeclInternal
+(
+  const u32string& name,
+  Input&& decl
+)
+{
+  uuid u = generate_uuid();
+
+  auto opIter = m_operators.find(name);
+
+  if (opIter != m_operators.end())
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  auto opdef = std::make_shared<OpDefWS>(name, *this);
+
+  opdef->addEquation(u, decl, m_time);
+
+  auto opadded = m_operators.insert({name, opdef});
+
+  m_objects.insert({u, std::make_shared<
+    GenericObject<OperatorMap::iterator>>(opadded.first)});
 
   return Types::UUID::create(u);
 }
@@ -2373,7 +2403,6 @@ System::addDeclaration(const Parser::RawInput& input)
 
   //get the first token
   auto start = *lexit;
-  ++lexit;
 
   if (start.getType() != Parser::TOKEN_DECLID)
   {
@@ -2390,6 +2419,10 @@ System::addDeclaration(const Parser::RawInput& input)
   {
     return addFunDeclRaw(input, lexit);
   }
+  else if (token == U"op")
+  {
+    return addOpDeclRaw(input, lexit);
+  }
 
   return Constant();
 }
@@ -2398,9 +2431,10 @@ Constant
 System::addVariableDeclRaw
 (
   const Parser::RawInput& input, 
-  const Parser::LexerIterator& iter
+  Parser::LexerIterator& iter
 )
 {
+  ++iter;
   if (iter->getType() != Parser::TOKEN_ID)
   {
     return Types::Special::create(SP_ERROR);
@@ -2415,9 +2449,10 @@ Constant
 System::addFunDeclRaw
 (
   const Parser::RawInput& input, 
-  const Parser::LexerIterator& iter
+  Parser::LexerIterator& iter
 )
 {
+  ++iter;
   if (iter->getType() != Parser::TOKEN_ID)
   {
     return Types::Special::create(SP_ERROR);
@@ -2426,6 +2461,26 @@ System::addFunDeclRaw
   u32string name = get<u32string>(iter->getValue());
 
   return addFunDeclInternal(name, input);
+}
+
+Constant
+System::addOpDeclRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  iter.interpret(false);
+  ++iter;
+
+  if (iter->getType() != Parser::TOKEN_OPERATOR)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string text = get<u32string>(iter->getValue());
+
+  return addOpDeclInternal(text, input);
 }
 
 } //namespace TransLucid

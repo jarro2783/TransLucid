@@ -1500,7 +1500,7 @@ Parser::nextToken(LexerIterator& begin)
 void
 LexerIterator::readOne()
 {
-  Token t = nextToken(*m_next, *m_end, *m_context, m_idents);
+  Token t = nextToken(*m_next, *m_end, *m_context, m_idents, m_interpret);
 
   if (t != 0)
   {

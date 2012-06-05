@@ -35,6 +35,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/free_variables.hpp>
 #include <tl/function.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/opdef.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
@@ -91,6 +92,8 @@ namespace TransLucid
       VariableMap;
     typedef std::unordered_map<u32string, std::shared_ptr<FunctionWS>> 
       FunctionMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<OpDefWS>> 
+      OperatorMap;
 
     System(bool cached = false);
     ~System();
@@ -399,6 +402,7 @@ namespace TransLucid
 
     VariableMap m_variables;
     FunctionMap m_functions;
+    OperatorMap m_operators;
 
     //TODO deprecating
     DefinitionMap m_equations;
@@ -507,23 +511,38 @@ namespace TransLucid
       Input&& decl
     );
 
+    template <typename Input>
+    Constant
+    addOpDeclInternal
+    (
+      const u32string& name,
+      Input&& decl
+    );
+
     public:
 
     Constant
     addDeclaration(const Parser::RawInput& input);
 
     Constant
+    addOpDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
     addFunDeclRaw
     (
       const Parser::RawInput& input, 
-      const Parser::LexerIterator& iter
+      Parser::LexerIterator& iter
     );
 
     Constant
     addVariableDeclRaw
     (
       const Parser::RawInput& input, 
-      const Parser::LexerIterator& iter
+      Parser::LexerIterator& iter
     );
 
     size_t
