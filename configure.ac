@@ -151,9 +151,9 @@ if test "x$enable_static" = "xyes"; then
 
 fi
 
-TL_LDFLAGS="-std=gnu++11 -Wno-unused-local-typedefs"
+TL_LDFLAGS="-std=gnu++11"
 TL_LIBS="${ICU_LIBS}"
-TL_CFLAGS="-std=gnu++11 -fno-strict-aliasing ${ICU_CFLAGS}"
+TL_CFLAGS="-std=gnu++11 -fno-strict-aliasing ${ICU_CFLAGS} -Wno-unused-local-typedefs"
 
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_LIBS)
