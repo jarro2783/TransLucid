@@ -118,7 +118,8 @@ TL_CHECK_ICU
 
 TL_LDFLAGS="-std=gnu++11"
 TL_LIBS="${ICU_LIBS}"
-TL_CFLAGS="-std=gnu++11 -fno-strict-aliasing ${ICU_CFLAGS}"
+TL_CFLAGS="-std=gnu++11 -fno-strict-aliasing -Wno-unused-local-typedefs \
+  ${ICU_CFLAGS}"
 
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_LIBS)
