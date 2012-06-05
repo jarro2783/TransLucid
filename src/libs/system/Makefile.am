@@ -35,7 +35,7 @@ libtlsystem_la_SOURCES = \
   line_tokenizer.cpp parser.cpp range.cpp rename.cpp semantic_transform.cpp \
   system.cpp system_util.cpp tree_printer.cpp tree_rewriter.cpp \
   tree_to_wstree.cpp \
-  types/function.cpp types/numbers.cpp types/union.cpp \
+  types/function_type.cpp types/numbers.cpp types/union.cpp \
   types.cpp utility.cpp uuid.cpp workshop_builder.cpp
 
 libtlsystem_la_CPPFLAGS = \
