@@ -49,6 +49,12 @@ namespace TransLucid
     void
     addEquation(uuid id, Parser::RawInput input, int time);
 
+    void
+    addEquation(uuid id, Parser::Line input, int time)
+    {
+      m_bestfit.addEquation(id, input, time);
+    }
+
     bool 
     del(uuid id, size_t time);
 
