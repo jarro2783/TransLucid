@@ -105,9 +105,14 @@ if test "x$enable_static" = "xyes"; then
   PKG_CONFIG="${PKG_CONFIG} --static"
 fi
 
-PKG_CHECK_MODULES([ICU], [icu-uc])
+PKG_CHECK_MODULES([ICU], [icu-uc],,
+  [
+    AX_CHECK_ICU([4.6])
+  ]
+)
 
 AC_SUBST([ICU_CFLAGS])
+AC_SUBST([ICU_CXXFLAGS])
 AC_SUBST([ICU_LIBS])
 
 # we have to look for lots of versions of is_print in icuuc
@@ -155,7 +160,7 @@ TL_LDFLAGS="-std=gnu++0x"
 TL_LIBS="${ICU_LIBS}"
 TL_CFLAGS="-std=gnu++0x -fno-strict-aliasing -DBOOST_SPIRIT_UNICODE \
   -DBOOST_MPL_LIMIT_LIST_SIZE=30 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS \
-  ${ICU_CFLAGS}"
+  ${ICU_CFLAGS} ${ICU_CXXFLAGS}"
 
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_LIBS)
