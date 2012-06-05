@@ -7,7 +7,7 @@ AC_DEFUN([TL_CHECK_ICU_HELPER], [
 
   AC_CHECK_LIB([icuuc], [u_isprint], ICU_FOUND=yes,
   ,
-  [${LINK_METHOD}])
+  [$1])
 
   if test "x$ICU_FOUND" = "xno"; then
     AC_CHECK_LIB([icuuc], [u_isprint_49], ICU_FOUND=yes,
