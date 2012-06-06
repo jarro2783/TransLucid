@@ -529,6 +529,12 @@ namespace TransLucid
     );
 
     Constant
+    addFunDeclParsed
+    (
+      Parser::FnDecl decl
+    );
+
+    Constant
     addFunDeclRaw
     (
       const Parser::RawInput& input, 

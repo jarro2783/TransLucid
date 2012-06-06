@@ -29,7 +29,7 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
   //print.c [c : type] = basefn!c;;
   //print_typename [c : type] = "type";;
 
-  s.addFunction
+  s.addFunDeclParsed
   (
     Parser::FnDecl
     {
@@ -44,7 +44,7 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
     }
   );
 
-  s.addFunction
+  s.addFunDeclParsed
   (
     Parser::FnDecl
     {
@@ -64,7 +64,7 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
 void
 addConstructor(System& s, const u32string& type, const u32string& basefn)
 {
-  s.addFunction
+  s.addFunDeclParsed
   (
     Parser::FnDecl
     {

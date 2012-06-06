@@ -2233,6 +2233,15 @@ System::addFunDeclRaw
 }
 
 Constant
+System::addFunDeclParsed
+(
+  Parser::FnDecl decl
+)
+{
+  addFunDeclInternal(decl.name, decl);
+}
+
+Constant
 System::addOpDeclRaw
 (
   const Parser::RawInput& input, 

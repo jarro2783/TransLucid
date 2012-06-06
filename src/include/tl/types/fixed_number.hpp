@@ -100,7 +100,7 @@ namespace TransLucid
   void
   addIntegerFunction(System& s, const u32string& name, const u32string& op)
   {
-    s.addFunction
+    s.addFunDeclParsed
     (
       Parser::FnDecl
       {
@@ -124,7 +124,7 @@ namespace TransLucid
   void
   addFloatFunction(System& s, const u32string& name, const u32string& op)
   {
-    s.addFunction
+    s.addFunDeclParsed
     (
       Parser::FnDecl
       {
