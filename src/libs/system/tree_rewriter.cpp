@@ -34,66 +34,12 @@ TreeRewriter::rewrite(const Tree::Expr& e)
 }
 
 Tree::Expr 
-TreeRewriter::operator()(const Tree::nil& n)
-{
-  return n;
-}
-
-Tree::Expr 
-TreeRewriter::operator()(bool b)
-{
-  return b;
-}
-
-Tree::Expr 
-TreeRewriter::operator()(Special s)
-{
-  return s;
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const mpz_class& i)
-{
-  return i;
-}
-
-Tree::Expr 
-TreeRewriter::operator()(char32_t c)
-{
-  return c;
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const u32string& s)
-{
-  return s;
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::HashSymbol& e)
-{
-  return e;
-}
-
-Tree::Expr 
 TreeRewriter::operator()(const Tree::LiteralExpr& e)
 {
   return 
     Tree::LambdaAppExpr( 
       Tree::LambdaAppExpr(Tree::IdentExpr(U"construct_literal"), e.type),
       e.text);
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::DimensionExpr& e)
-{
-  return e;
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::IdentExpr& e)
-{
-  return e;
 }
 
 Tree::Expr 
@@ -152,69 +98,6 @@ TreeRewriter::operator()(const Tree::BinaryOpExpr& e)
 }
 
 Tree::Expr 
-TreeRewriter::operator()(const Tree::IfExpr& e)
-{
-  //do the elseifs
-  std::vector<std::pair<Tree::Expr, Tree::Expr>> else_ifs;
-  for (auto p : e.else_ifs)
-  {
-    else_ifs.push_back(std::make_pair(
-      apply_visitor(*this, p.first),
-      apply_visitor(*this, p.second)
-    ));
-  }
-
-  return Tree::IfExpr(
-    apply_visitor(*this, e.condition),
-    apply_visitor(*this, e.then),
-    else_ifs,
-    apply_visitor(*this, e.else_)
-  );
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::HashExpr& e)
-{
-  return Tree::HashExpr(apply_visitor(*this, e.e), e.cached);
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::TupleExpr& e)
-{
-  std::vector<std::pair<Tree::Expr, Tree::Expr>> tuple;
-  for (auto p : e.pairs)
-  {
-    tuple.push_back(std::make_pair(
-      apply_visitor(*this, p.first),
-      apply_visitor(*this, p.second)
-    ));
-  }
-
-  return Tree::TupleExpr(tuple);
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::AtExpr& e)
-{
-  return Tree::AtExpr(
-    apply_visitor(*this, e.lhs),
-    apply_visitor(*this, e.rhs)
-  );
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::LambdaExpr& e)
-{
-  return Tree::LambdaExpr(e.name, apply_visitor(*this, e.rhs));
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::PhiExpr& e)
-{
-  return Tree::PhiExpr(e.name, apply_visitor(*this, e.rhs));
-}
-
-Tree::Expr 
 TreeRewriter::operator()(const Tree::BangAppExpr& e)
 {
   //first check if it is #!E
@@ -235,36 +118,6 @@ TreeRewriter::operator()(const Tree::BangAppExpr& e)
 
     return Tree::BangAppExpr(name, args);
   }
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::LambdaAppExpr& e)
-{
-  return Tree::LambdaAppExpr
-  (
-    apply_visitor(*this, e.lhs),
-    apply_visitor(*this, e.rhs)
-  );
-}
-
-Tree::Expr 
-TreeRewriter::operator()(const Tree::PhiAppExpr& e)
-{
-  return Tree::PhiAppExpr
-  (
-    apply_visitor(*this, e.lhs),
-    apply_visitor(*this, e.rhs)
-  );
-
-  //cbv application with ↑E
-  //we don't want to do this here, it is done after renaming
-  #if 0
-  return Tree::LambdaAppExpr
-  (
-    apply_visitor(*this, e.lhs),
-    Tree::MakeIntenExpr(apply_visitor(*this, e.rhs))
-  );
-  #endif
 }
 
 Tree::Expr 

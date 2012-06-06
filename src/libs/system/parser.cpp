@@ -1293,11 +1293,14 @@ Parser::parse_op_decl(LexerIterator& begin, const LexerIterator& end,
   OpDecl decl;
 
   LexerIterator current = begin;
+  current.interpret(false);
   ++current;
 
   expect_no_advance(current, end, "operator", TOKEN_OPERATOR);
 
   decl.optext = get<u32string>(current->getValue());
+
+  current.interpret();
 
   ++current;
 

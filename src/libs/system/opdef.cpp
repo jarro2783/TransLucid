@@ -1,4 +1,30 @@
+/* Op declarations code.
+   Copyright (C) 2012 Jarryd Beck
+
+This file is part of TransLucid.
+
+TransLucid is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+TransLucid is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TransLucid; see the file COPYING.  If not see
+<http://www.gnu.org/licenses/>.  */
+
+/**
+ * @file opdef.cpp
+ * Operator declarations implementation.
+ */
+
+#include <tl/function.hpp>
 #include <tl/opdef.hpp>
+#include <tl/system.hpp>
 
 namespace TransLucid
 {
@@ -36,19 +62,40 @@ OpDefWS::addEquation(uuid id, Parser::RawInput input, int time)
 Tree::Expr
 OpDefWS::group(const std::list<EquationDefinition>& defs)
 {
-  if (defs.size() != 1)
+  //build a function abstraction
+  // \op -> bestof defs
+
+  Tree::ConditionalBestfitExpr best;
+
+  for (auto eqn : defs)
   {
-    throw "more than one operator definition";
+    auto decl = get<Parser::OpDecl>(&*eqn.parsed());
+
+    if (decl == nullptr)
+    {
+      throw "operator definition not an operator";
+    }
+
+    auto dim = m_system.nextHiddenDim();
+
+    std::map<u32string, dimension_index> rewrites{{U"op", dim}};
+
+    auto guard = Tree::TupleExpr({{Tree::IdentExpr(U"op"), decl->optext}});
+    auto guardFixed = fixupGuardArgs(guard, rewrites);
+
+    best.declarations.push_back
+    (
+      std::make_tuple
+      (
+        eqn.start(),
+        guardFixed,
+        Tree::Expr(),
+        decl->expr
+      )
+    );
   }
 
-  auto decl = get<Parser::OpDecl>(&*defs.front().parsed());
-
-  if (decl == nullptr)
-  {
-    throw "operator definition not an operator";
-  }
-
-  return decl->expr;
+  return Tree::LambdaExpr(U"op", best);
 }
 
 }

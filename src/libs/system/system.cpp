@@ -237,13 +237,13 @@ namespace
     bool
     del(uuid id, int time)
     {
-      return m_object->second->del(id, time);
+      return m_object->del(id, time);
     }
 
     bool
     repl(uuid id, int time, const Parser::Line& line)
     {
-      return m_object->second->repl(id, time, line);
+      return m_object->repl(id, time, line);
     }
 
     private:
@@ -254,6 +254,13 @@ namespace
     : m_object(object)
     {}
   };
+
+  template <typename Object>
+  std::shared_ptr<GenericObject<Object>>
+  make_generic_object(Object&& o)
+  {
+    return std::make_shared<GenericObject<Object>>(std::forward<Object>(o));
+  }
 }
 
 GettextInit System::m_gettext;
@@ -759,8 +766,7 @@ System::addVariableDeclInternal
     auto variter = m_variables.insert({name, var});
 
     //create a new VariableObject to manage the uuid
-    m_objects.insert({u, std::make_shared<
-      GenericObject<VariableMap::iterator>>(variter.first)});
+    m_objects.insert({u, make_generic_object(variter.first->second)});
   }
   else
   {
@@ -791,8 +797,7 @@ System::addFunDeclInternal
     fun = std::make_shared<FunctionWS>(name, *this);
     auto funAddIter = m_functions.insert({name, fun});
 
-    m_objects.insert({u, std::make_shared<
-      GenericObject<FunctionMap::iterator>>(funAddIter.first)});
+    m_objects.insert({u, make_generic_object(funAddIter.first->second)});
   }
   else
   {
@@ -816,21 +821,21 @@ System::addOpDeclInternal
 {
   uuid u = generate_uuid();
 
-  auto opIter = m_operators.find(name);
+  auto opident = m_identifiers.find(U"operator");
 
-  if (opIter != m_operators.end())
+  if (opident == m_identifiers.end())
   {
-    return Types::Special::create(SP_ERROR);
+    m_operators = std::make_shared<OpDefWS>(*this);
+    m_identifiers.insert({U"operator", m_operators});
   }
 
-  auto opdef = std::make_shared<OpDefWS>(name, *this);
+  m_operators->addEquation(u, decl, m_time);
 
-  opdef->addEquation(u, decl, m_time);
-
-  auto opadded = m_operators.insert({name, opdef});
-
-  m_objects.insert({u, std::make_shared<
-    GenericObject<OperatorMap::iterator>>(opadded.first)});
+  m_objects.insert(
+  {
+    u, 
+    make_generic_object(m_operators)
+  });
 
   return Types::UUID::create(u);
 }
@@ -1734,48 +1739,6 @@ findRenamedParams(const Tree::Expr& original, const Tree::Expr& renamed,
     }
   }
 
-}
-
-Tree::Expr
-fixupGuardArgs(const Tree::Expr& guard,
-  const std::map<u32string, dimension_index>& rewrites
-)
-{
-  //first check if it is nil
-  const Tree::nil* n = get<Tree::nil>(&guard);
-  if (n != nullptr)
-  {
-    return guard;
-  }
-
-  //the guard must be a tuple
-  const Tree::TupleExpr& tuple = get<Tree::TupleExpr>(guard);
-
-  decltype(tuple.pairs) rewritten;
-
-  for (auto& p : tuple.pairs)
-  {
-    const Tree::IdentExpr* id = get<Tree::IdentExpr>(&p.first);
-    if (id != nullptr)
-    {
-      auto iter = rewrites.find(id->text);
-      if (iter != rewrites.end())
-      {
-        rewritten.push_back(std::make_pair(
-          Tree::DimensionExpr(iter->second), p.second));
-      }
-      else
-      {
-        rewritten.push_back((p));
-      }
-    }
-    else
-    {
-      rewritten.push_back((p));
-    }
-  }
-
-  return Tree::TupleExpr{rewritten};
 }
 
 

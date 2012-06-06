@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/function.hpp>
+#include <tl/system.hpp>
 
 #define STRING(x) #x
 #define XSTRING(x) STRING(x)
@@ -68,9 +69,19 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
   //also make sure that the types of parameters are consistent for all
   //definitions
 
-  std::vector<std::pair<Parser::FnDecl::ArgType, u32string>> params;
+  std::vector
+  <
+    std::tuple
+    <
+      Parser::FnDecl::ArgType,
+      u32string,
+      dimension_index
+    >
+  > params;
 
   Tree::ConditionalBestfitExpr cond;
+
+  std::map<u32string, dimension_index> rewrites;
 
   for (auto& eqn : defs)
   {
@@ -87,7 +98,9 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
       //create the parameters
       for (auto p : fundecl->args)
       {
-        params.push_back({p.first, p.second});
+        auto dim = m_system.nextHiddenDim();
+        rewrites.insert({p.second, dim});
+        params.push_back(std::make_tuple(p.first, p.second, dim));
       }
     }
     else
@@ -97,17 +110,19 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
       auto declIter = fundecl->args.begin();
       while (declIter != fundecl->args.end() && paramIter != params.end())
       {
-        if (paramIter->first != declIter->first)
+        if (std::get<0>(*paramIter) != declIter->first)
         {
           //throw a parse error here
         }
       }
 
+      auto guardFixed = fixupGuardArgs(fundecl->guard, rewrites);
+
       //then create the conditional bestfit
       cond.declarations.push_back(
       std::make_tuple(
         eqn.start(),
-        fundecl->guard,
+        guardFixed,
         fundecl->boolean,
         fundecl->expr
       ));
@@ -120,19 +135,65 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
   auto iter = params.rbegin();
   while (iter != params.rend())
   {
-    if (iter->first == Parser::FnDecl::ArgType::CALL_BY_NAME)
+    if (std::get<0>(*iter) == Parser::FnDecl::ArgType::CALL_BY_NAME)
     {
-      abstractions = Tree::PhiExpr(iter->second, abstractions);
+      auto phi = Tree::PhiExpr(std::get<1>(*iter), abstractions);
+      phi.argDim = std::get<2>(*iter);
+      abstractions = std::move(phi);
     }
     else
     {
-      abstractions = Tree::LambdaExpr(iter->second, abstractions);
+      auto lambda = Tree::LambdaExpr(std::get<1>(*iter), abstractions);
+      lambda.argDim = std::get<2>(*iter);
+      abstractions = std::move(lambda);
     }
 
     ++iter;
   }
 
   return abstractions;
+}
+
+Tree::Expr
+fixupGuardArgs(const Tree::Expr& guard,
+  const std::map<u32string, dimension_index>& rewrites
+)
+{
+  //first check if it is nil
+  const Tree::nil* n = get<Tree::nil>(&guard);
+  if (n != nullptr)
+  {
+    return guard;
+  }
+
+  //the guard must be a tuple
+  const Tree::TupleExpr& tuple = get<Tree::TupleExpr>(guard);
+
+  decltype(tuple.pairs) rewritten;
+
+  for (auto& p : tuple.pairs)
+  {
+    const Tree::IdentExpr* id = get<Tree::IdentExpr>(&p.first);
+    if (id != nullptr)
+    {
+      auto iter = rewrites.find(id->text);
+      if (iter != rewrites.end())
+      {
+        rewritten.push_back(std::make_pair(
+          Tree::DimensionExpr(iter->second), p.second));
+      }
+      else
+      {
+        rewritten.push_back((p));
+      }
+    }
+    else
+    {
+      rewritten.push_back((p));
+    }
+  }
+
+  return Tree::TupleExpr{rewritten};
 }
 
 }

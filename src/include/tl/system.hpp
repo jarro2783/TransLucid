@@ -402,7 +402,7 @@ namespace TransLucid
 
     VariableMap m_variables;
     FunctionMap m_functions;
-    OperatorMap m_operators;
+    std::shared_ptr<OpDefWS> m_operators;
 
     //TODO deprecating
     DefinitionMap m_equations;

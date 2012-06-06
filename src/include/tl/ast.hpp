@@ -621,7 +621,9 @@ namespace TransLucid
      */
     struct LambdaExpr
     {
-      LambdaExpr() = default;
+      LambdaExpr() 
+      : argDim(0)
+      {}
 
       /**
        * Construct a LambdaExpr.
@@ -634,7 +636,7 @@ namespace TransLucid
         const u32string& name, 
         RExpr&& rhs
       )
-      : name(name), rhs(std::forward<RExpr>(rhs))
+      : name(name), rhs(std::forward<RExpr>(rhs)), argDim(0)
       {
       }
 
@@ -651,10 +653,12 @@ namespace TransLucid
     //TODO: fix TreeToWSTree when I implement this
     struct PhiExpr
     {
-      PhiExpr() = default;
+      PhiExpr()
+      : argDim(0)
+      {}
 
       PhiExpr(const u32string& name, const Expr& rhs)
-      : name(name), rhs(rhs)
+      : name(name), rhs(rhs), argDim(0)
       {
       }
 
@@ -663,7 +667,6 @@ namespace TransLucid
       Expr rhs;
 
       dimension_index argDim;
-      dimension_index odometerDim;
       std::vector<dimension_index> scope;
 
       //the free variables to evaluate

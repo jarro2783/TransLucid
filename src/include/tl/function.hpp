@@ -22,6 +22,9 @@ along with TransLucid; see the file COPYING.  If not see
  * Function definition workshop.
  */
 
+#ifndef TL_FUNCTION_HPP_INCLUDED
+#define TL_FUNCTION_HPP_INCLUDED
+
 #include <tl/bestfit.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/uuid.hpp>
@@ -69,4 +72,11 @@ namespace TransLucid
     System& m_system;
     BestfitGroup m_bestfit;
   };
+
+  Tree::Expr
+  fixupGuardArgs(const Tree::Expr& guard,
+    const std::map<u32string, dimension_index>& rewrites
+  );
 }
+
+#endif

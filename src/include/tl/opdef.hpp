@@ -34,8 +34,8 @@ namespace TransLucid
   {
     public:
 
-    OpDefWS(const u32string& text, System& system)
-    : m_bestfit(this, system), m_text(text)
+    OpDefWS(System& system)
+    : m_bestfit(this, system), m_system(system)
     {
     }
 
@@ -60,7 +60,7 @@ namespace TransLucid
     private:
 
     BestfitGroup m_bestfit;
-    u32string m_text;
+    System& m_system;
   };
 }
 
