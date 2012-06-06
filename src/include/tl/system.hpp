@@ -171,9 +171,6 @@ namespace TransLucid
     Constant
     addAssignment(const Parser::Equation& eqn);
 
-    Constant
-    addFunction(const Parser::FnDecl& fn);
-
     Constant 
     addDimension(const u32string& dimension);
 

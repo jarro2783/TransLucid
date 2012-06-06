@@ -735,7 +735,7 @@ namespace detail
     Constant
     operator()(const Parser::FnDecl& fn)
     {
-      return m_system.addFunction(fn);
+      return Constant();
     }
 
     private:
@@ -1861,206 +1861,6 @@ System::funWSTree
 }
 
 Constant
-System::addFunction(const Parser::FnDecl& fn)
-{
-#if 0
-  std::cerr << "adding function: " << fn.name << std::endl;
-  //first try to find the function
-  auto iter = m_fndecls.find(fn.name);
-
-  ConditionalBestfitWS* fnws = nullptr;
-  //TreeToWSTree tows(this);
-  WorkshopBuilder compile(this);
-
-  WS* abstraction = nullptr;
-
-  if (iter == m_fndecls.end())
-  {
-    if (fn.args.size() == 0)
-    {
-      //error
-      return Types::Special::create(SP_CONST);
-    }
-    //add a new one
-    fnws = new ConditionalBestfitWS(fn.name, *this);
-
-    //create a new equation for this thing
-    //build up the parameters and end with fnws
-
-    Tree::Expr abstractions;
-    for (auto iter = fn.args.rbegin(); iter != fn.args.rend(); ++iter)
-    {
-      if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
-      {
-        abstractions = Tree::LambdaExpr(iter->second, std::move(abstractions));
-      }
-      else
-      {
-        abstractions = Tree::PhiExpr(iter->second, std::move(abstractions));
-      }
-    }
-
-    //need to save the renamed variables here somehow
-    //Tree::Expr absexpr = toWSTreePlusExtras(abstractions, tows);
-    Tree::Expr absexpr = fixupTreeAndAdd(abstractions);
-
-    RenameIdentifiers::RenameRules renames; 
-    std::map<u32string, dimension_index> renamed_dims;
-
-    findRenamedParams(abstractions, absexpr, renames, renamed_dims);
-
-    WS* absws = compile.build_workshops(absexpr);
-    abstraction = absws;
-
-    iter = m_fndecls.insert(
-      std::make_pair(fn.name, 
-        std::make_tuple(
-          fnws, 
-          renames,
-          renamed_dims,
-          std::vector<Parser::FnDecl>(),
-          absws,
-          FreeVariableHelper(*this)
-        )
-      )
-    ).first;
-
-    //go through the workshops and stick fnws at the end
-    WS* current = absws;
-    
-    //there can't possibly be zero arguments here so this is safe
-    auto iterAhead = fn.args.begin();
-    auto argsiter = fn.args.begin();
-    ++iterAhead;
-
-    while (true)
-    {
-      if (iterAhead == fn.args.end())
-      {
-        //we're on the last one
-        if (argsiter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
-        {
-          dynamic_cast<Workshops::LambdaAbstractionWS*>
-            (current)->set_rhs(fnws);
-        }
-        else
-        {
-          dynamic_cast<Workshops::NamedAbstractionWS*>
-            (current)->set_rhs(fnws);
-        }
-        break;
-      }
-      else
-      {
-        if (argsiter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
-        {
-          current = dynamic_cast<Workshops::LambdaAbstractionWS*>
-            (current)->rhs();
-        }
-        else
-        {
-          current = dynamic_cast<Workshops::NamedAbstractionWS*>
-            (current)->rhs();
-        }
-      }
-
-      ++argsiter;
-      ++iterAhead;
-    }
-
-    addEquation(fn.name, absws);
-
-    //std::cerr << "adding function abstraction:" << std::endl;
-    //std::cerr << Printer::print_expr_tree(absexpr) << std::endl;
-  }
-  else
-  {
-    if (fn.args.size() != 0 && fn.args !=
-      std::get<3>(iter->second).front().args)
-    {
-      //error
-      return Types::Special::create(SP_CONST);
-    }
-    //either it has no args or its args match, so we can continue
-    //get the existing one
-    fnws = std::get<0>(iter->second);
-
-    abstraction = std::get<4>(iter->second);
-  }
-
-  //if we get here then we have a valid function, and a valid pointer
-  //to a ConditionalBestfitWS, so add it to the system
-
-  //compile the expression
-  //TODO I can probably remove this duplication
-  //I need to rename in these two first somehow
-  //const auto& toRename = std::get<1>(iter->second);
-
-  //std::cerr << "Renaming in function body:" << std::endl;
-  //for (auto& p : toRename)
-  //{
-  //  std::cerr << p.first << " -> " << p.second << std::endl;
-  //}
-
-  Tree::Expr guardFixed = fixupGuardArgs(fn.guard, std::get<2>(iter->second));
-  //Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
-  //Tree::Expr boolean = toWSTreePlusExtras(fn.boolean, tows, toRename);
-
-  Tree::Expr guard = funWSTree(iter->second, fn, guardFixed, abstraction);
-  Tree::Expr boolean = funWSTree(iter->second, fn, fn.boolean, abstraction);
-  Tree::Expr expr = funWSTree(iter->second, fn, fn.expr, abstraction);
-
-  std::cerr << "adding function definition:" << std::endl;
-  std::cerr << Printer::print_expr_tree(guard) 
-            << " -> " 
-            << Printer::print_expr_tree(expr)
-            << std::endl;
-
-  WS* gws = compile.build_workshops(guard);
-  WS* bws = compile.build_workshops(boolean);
-  WS* ews = compile.build_workshops(expr);
-
-  //add the definition to the end of the vector of functions
-  std::get<3>(iter->second).push_back(fn);
-
-  //add it as an equation to the conditional
-  //std::cerr << "adding function equation to " << fn.name << std::endl;
-  //std::cerr << "guard is " << gws << std::endl;
-  //uuid u = fnws->addEquation(fn.name, GuardWS(gws, bws), ews, m_time);
-
-  #if 0
-  bool cachethis = true;
-  if (cacheExclude.find(fn.name) != cacheExclude.end())
-  {
-    cachethis = false;
-  }
-
-  //add all the new equations
-  //more duplication
-  for (const auto& e : tows.newVars())
-  {
-    addDeclInternal(
-      std::get<0>(e),
-      GuardWS(compile.build_workshops(std::get<1>(e)),
-        compile.build_workshops(std::get<2>(e))),
-      compile.build_workshops(std::get<3>(e)),
-      m_equations,
-      m_equationUUIDs
-    );
-
-    //cache this thing
-    if (m_cached && cachethis)
-    {
-      cacheVar(std::get<0>(e));
-    }
-  }
-  #endif
-
-  //return Types::UUID::create(u);
-#endif
-}
-
-Constant
 System::evalExpr(const Tree::Expr& e)
 {
   return compile_and_evaluate(e, *this);
@@ -2385,6 +2185,12 @@ System::addDeclaration(const Parser::RawInput& input)
   else if (token == U"op")
   {
     return addOpDeclRaw(input, lexit);
+  }
+  else if (token == U"data")
+  {
+  }
+  else if (token == U"constructor")
+  {
   }
 
   return Constant();
