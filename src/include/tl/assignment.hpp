@@ -22,9 +22,36 @@ along with TransLucid; see the file COPYING.  If not see
  * Assignment declarations.
  */
 
+#include <tl/workshop.hpp>
+
+#include <memory>
+
 namespace TransLucid
 {
   class Assignment
   {
+    public:
+
+    Assignment() = default;
+
+    void
+    addDefinition
+    (
+      std::shared_ptr<WS> guard,
+      std::shared_ptr<WS> boolean,
+      std::shared_ptr<WS> expr
+    );
+
+    private:
+
+    typedef std::tuple
+    <
+      std::shared_ptr<WS>,
+      std::shared_ptr<WS>,
+      std::shared_ptr<WS>
+    >
+    Definition;
+
+    std::vector<Definition> m_definitions;
   };
 }
