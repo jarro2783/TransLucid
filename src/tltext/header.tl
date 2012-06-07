@@ -415,7 +415,9 @@ end ;;
 // Define lists and functions over lists.
 
 // The List data type and the Cons and Nil constructors.
-data List a = Cons a (List a) | Nil ;;
+data List;;
+constructor Cons a b [b : List] = List;;
+constructor Nil = List;;
 
 // Two infix operators defined over lists.
 op :: = OpInfix."cons_list".false.AssocRight.(~10) ;;
