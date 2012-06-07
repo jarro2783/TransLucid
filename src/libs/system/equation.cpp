@@ -652,6 +652,12 @@ VariableWS::addEquation
 }
 
 void
+VariableWS::addEquation(uuid id, Parser::Variable eqn, int time)
+{
+  m_bestfit.addEquation(id, eqn, time);
+}
+
+void
 VariableWS::addEquation(uuid id, Parser::RawInput input, int time)
 {
   m_bestfit.addEquation(id, input, time);

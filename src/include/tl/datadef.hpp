@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
  * Data and constructor declarations.
  */
 
+#include <tl/bestfit.hpp>
+
 namespace TransLucid
 {
   class DataDefWS : public WS, public DefinitionGrouper

@@ -32,6 +32,11 @@ along with TransLucid; see the file COPYING.  If not see
 #include <memory>
 #include <unordered_map>
 
+/**
+ * @file equation.hpp
+ * Variables.
+ */
+
 namespace TransLucid
 {
   class System;
@@ -297,6 +302,9 @@ namespace TransLucid
 
     void
     addEquation(uuid id, Parser::RawInput input, int time);
+
+    void
+    addEquation(uuid id, Parser::Variable eqn, int time);
 
     uuid
     addEquation(EquationWS* e, size_t time);

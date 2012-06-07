@@ -31,7 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 /**
  * @file bestfit.hpp
- * The optimisation of best fitting.
+ * Bestfitting implementation.
  */
 
 namespace TransLucid 

@@ -29,6 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_map>
 
 #include <tl/ast_fwd.hpp>
+#include <tl/datadef.hpp>
 #include <tl/dimtranslator.hpp>
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
@@ -94,6 +95,8 @@ namespace TransLucid
       FunctionMap;
     typedef std::unordered_map<u32string, std::shared_ptr<OpDefWS>> 
       OperatorMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<ConsDefWS>> 
+      ConstructorMap;
 
     System(bool cached = false);
     ~System();
@@ -400,6 +403,7 @@ namespace TransLucid
     VariableMap m_variables;
     FunctionMap m_functions;
     std::shared_ptr<OpDefWS> m_operators;
+    ConstructorMap m_constructors;
 
     //TODO deprecating
     DefinitionMap m_equations;
@@ -516,6 +520,14 @@ namespace TransLucid
       Input&& decl
     );
 
+    template <typename Input>
+    Constant
+    addConstructorInternal
+    (
+      const u32string& name,
+      Input&& decl
+    );
+
     public:
 
     Constant
@@ -543,6 +555,26 @@ namespace TransLucid
 
     Constant
     addVariableDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    addVariableDeclParsed
+    (
+      Parser::Equation decl
+    );
+
+    Constant
+    addDataDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    addConstructorRaw
     (
       const Parser::RawInput& input, 
       Parser::LexerIterator& iter

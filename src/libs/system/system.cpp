@@ -772,7 +772,7 @@ System::addVariableDeclInternal
   {
     var = equationIter->second;
   }
-  var->addEquation(u, decl, m_time);
+  var->addEquation(u, std::forward<Input>(decl), m_time);
 
   m_identifiers.insert({name, var});
 
@@ -838,6 +838,25 @@ System::addOpDeclInternal
   });
 
   return Types::UUID::create(u);
+}
+
+template <typename Input>
+Constant
+System::addConstructorInternal
+(
+  const u32string& name,
+  Input&& decl
+)
+{
+  uuid u = generate_uuid();
+
+  //this name cannot already exist
+  auto consIter = m_constructors.find(name);
+
+  if (consIter != m_constructors.end())
+  {
+    return Types::Special::create(SP_ERROR);
+  }
 }
 
 //adds eqn | [symbol : "s"] = value;;
@@ -2188,9 +2207,11 @@ System::addDeclaration(const Parser::RawInput& input)
   }
   else if (token == U"data")
   {
+    return addDataDeclRaw(input, lexit);
   }
   else if (token == U"constructor")
   {
+    return addConstructorRaw(input, lexit);
   }
 
   return Constant();
@@ -2212,6 +2233,15 @@ System::addVariableDeclRaw
   u32string name = get<u32string>(iter->getValue());
 
   return addVariableDeclInternal(name, input);
+}
+
+Constant
+System::addVariableDeclParsed
+(
+  Parser::Equation decl
+)
+{
+  return addVariableDeclInternal(std::get<0>(decl), Parser::Variable(decl));
 }
 
 Constant
@@ -2259,6 +2289,48 @@ System::addOpDeclRaw
   u32string text = get<u32string>(iter->getValue());
 
   return addOpDeclInternal(text, input);
+}
+
+Constant
+System::addDataDeclRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  ++iter;
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string name = get<u32string>(iter->getValue());
+
+  return addVariableDeclParsed(Parser::Equation
+  (
+    name,
+    Tree::Expr(),
+    Tree::Expr(),
+    Tree::TupleExpr(Tree::TupleExpr::TuplePairs({
+      {Tree::DimensionExpr{DIM_TYPE}, name}
+    }))
+  ));
+}
+
+Constant
+System::addConstructorRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  ++iter;
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string name = get<u32string>(iter->getValue());
 }
 
 } //namespace TransLucid

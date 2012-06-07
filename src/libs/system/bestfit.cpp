@@ -25,6 +25,11 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "tl/parser.hpp"
 
+/**
+ * @file bestfit.cpp
+ * The implementation of bestfitting.
+ */
+
 static constexpr size_t LINEAR_SEARCH_MAX_SIZE = 7;
 
 namespace TransLucid
