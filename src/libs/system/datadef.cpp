@@ -23,6 +23,10 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/datadef.hpp>
+#include <tl/fixed_indexes.hpp>
+#include <tl/parser_api.hpp>
+
+#include <sstream>
 
 namespace TransLucid
 {
@@ -42,6 +46,44 @@ ConsDefWS::operator()(Context& kappa, Context& delta)
 Tree::Expr
 ConsDefWS::group(const std::list<EquationDefinition>& defs)
 {
+  if (defs.size() != 1)
+  {
+    throw "too many definitions";
+  }
+
+  auto& cons = get<Parser::ConstructorDecl>(*defs.front().parsed());
+
+  Tree::TupleExpr::TuplePairs pairs
+  {
+    {Tree::DimensionExpr{DIM_TYPE}, cons.type},
+    {Tree::DimensionExpr{DIM_CONS}, cons.name}
+  };
+
+  for (size_t i = 0; i != cons.args.size(); ++i)
+  {
+    std::ostringstream argos;
+    argos << "arg" << i;
+    pairs.push_back(std::make_pair(
+      Tree::DimensionExpr(utf8_to_utf32(argos.str())),
+      Tree::IdentExpr(cons.args[i])
+    ));
+  }
+
+  Tree::ConditionalBestfitExpr cond;
+  cond.declarations.push_back(std::make_tuple
+  (
+    defs.front().start(),
+    cons.guard,
+    Tree::Expr(),
+    Tree::TupleExpr{pairs}
+  ));
+
+  Tree::Expr abstractions = cond;
+
+  for (auto iter = cons.args.rbegin(); iter != cons.args.rend(); ++iter)
+  {
+    abstractions = Tree::LambdaExpr(*iter, abstractions);
+  }
 }
 
 void
