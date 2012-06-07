@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/datadef.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/parser_api.hpp>
+#include <tl/system.hpp>
 
 #include <sstream>
 
@@ -59,6 +60,9 @@ ConsDefWS::group(const std::list<EquationDefinition>& defs)
     {Tree::DimensionExpr{DIM_CONS}, cons.name}
   };
 
+  std::map<u32string, dimension_index> rewrites;
+  std::vector<dimension_index> dims;
+
   for (size_t i = 0; i != cons.args.size(); ++i)
   {
     std::ostringstream argos;
@@ -67,23 +71,39 @@ ConsDefWS::group(const std::list<EquationDefinition>& defs)
       Tree::DimensionExpr(utf8_to_utf32(argos.str())),
       Tree::IdentExpr(cons.args[i])
     ));
+
+    auto dim = m_system.nextHiddenDim();
+
+    dims.push_back(dim);
+
+    rewrites.insert({cons.args[i], dim});
   }
+
+  Tree::Expr guard = fixupGuardArgs(cons.guard, rewrites);
 
   Tree::ConditionalBestfitExpr cond;
   cond.declarations.push_back(std::make_tuple
   (
     defs.front().start(),
-    cons.guard,
+    guard,
     Tree::Expr(),
     Tree::TupleExpr{pairs}
   ));
 
   Tree::Expr abstractions = cond;
 
-  for (auto iter = cons.args.rbegin(); iter != cons.args.rend(); ++iter)
+  auto dimIter = dims.rbegin();
+  for (auto argsIter = cons.args.rbegin();
+       argsIter != cons.args.rend();
+       ++argsIter, ++dimIter)
   {
-    abstractions = Tree::LambdaExpr(*iter, abstractions);
+    auto lambda = Tree::LambdaExpr(*argsIter, abstractions);
+    lambda.argDim = *dimIter;
+
+    abstractions = std::move(lambda);
   }
+
+  return abstractions;
 }
 
 void
@@ -101,6 +121,7 @@ ConsDefWS::del(uuid id, size_t time)
 bool 
 ConsDefWS::repl(uuid id, size_t time, Parser::Line line)
 {
+  return m_bestfit.repl(id, time, line);
 }
 
 }

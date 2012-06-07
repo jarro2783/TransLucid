@@ -22,6 +22,9 @@ along with TransLucid; see the file COPYING.  If not see
  * Data and constructor declarations.
  */
 
+#ifndef TL_DATADEF_HPP_INCLUDED
+#define TL_DATADEF_HPP_INCLUDED
+
 #include <tl/bestfit.hpp>
 
 namespace TransLucid
@@ -92,3 +95,5 @@ namespace TransLucid
     System& m_system;
   };
 }
+
+#endif
