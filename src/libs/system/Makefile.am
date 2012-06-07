@@ -1,4 +1,4 @@
-#   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+#   Copyright (C) 2009--2012 Jarryd Beck
 #
 #   This file is part of TransLucid.
 #
@@ -27,7 +27,7 @@ libtlsystem_la_LIBADD = -lgmpxx -lgmp -lltdl $(TL_LIBS) -lrt $(BOOST_LDFLAGS)
 
 libtlsystem_la_SOURCES = \
   ast.cpp bestfit.cpp builtin_types.cpp \
-  cache.cpp charset.cpp context.cpp \
+  cache.cpp charset.cpp context.cpp datadef.cpp \
   dimtranslator.cpp equation.cpp \
   eval_workshops.cpp free_variables.cpp function.cpp \
   hyperdatons/arrayhd.cpp hyperdatons/envhd.cpp hyperdatons/filehd.cpp \

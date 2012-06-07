@@ -134,6 +134,14 @@ namespace TransLucid
       Tree::Expr id;
     };
 
+    struct ConstructorDecl
+    {
+      u32string name;
+      std::vector<u32string> args;
+      Tree::Expr guard;
+      u32string type;
+    };
+
     struct ReplDecl;
 
     typedef Variant
@@ -152,6 +160,7 @@ namespace TransLucid
       OpDecl,
       HDDecl,
       DelDecl,
+      ConstructorDecl,
       recursive_wrapper<ReplDecl>
     > Line;
 

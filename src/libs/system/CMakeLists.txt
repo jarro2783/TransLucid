@@ -18,7 +18,7 @@ add_custom_target(generate_static_lexer DEPENDS
 
 set (SYSTEM_SOURCES
 ast.cpp bestfit.cpp builtin_types.cpp cache.cpp charset.cpp
-context.cpp dimtranslator.cpp 
+context.cpp datadef.cpp dimtranslator.cpp 
 equation.cpp
 eval_workshops.cpp free_variables.cpp
 function.cpp

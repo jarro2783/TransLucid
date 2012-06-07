@@ -338,6 +338,13 @@ namespace detail
 
     typedef Constant result_type;
 
+    template <typename T>
+    Constant
+    operator()(T&& t)
+    {
+      return Constant();
+    }
+
     Constant
     operator()(const Parser::HDDecl& hd)
     {
@@ -857,6 +864,15 @@ System::addConstructorInternal
   {
     return Types::Special::create(SP_ERROR);
   }
+
+  consIter = m_constructors.insert({name, std::make_shared<ConsDefWS>(*this)})
+    .first;
+
+  consIter->second->addEquation(u, std::forward<Input>(decl), m_time);
+
+  m_identifiers.insert({name, consIter->second});
+
+  return Types::UUID::create(u);
 }
 
 //adds eqn | [symbol : "s"] = value;;
@@ -927,6 +943,7 @@ System::init_equations()
   addDecl(*this, U"in", U"DECLID");
   addDecl(*this, U"out", U"DECLID");
   addDecl(*this, U"data", U"DECLID");
+  addDecl(*this, U"constructor", U"DECLID");
   addDecl(*this, U"fun", U"DECLID");
   addDecl(*this, U"op", U"DECLID");
   addDecl(*this, U"del", U"DECLID");
@@ -2331,6 +2348,8 @@ System::addConstructorRaw
   }
 
   u32string name = get<u32string>(iter->getValue());
+
+  return addConstructorInternal(name, input);
 }
 
 } //namespace TransLucid

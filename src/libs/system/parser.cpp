@@ -240,6 +240,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"hd", this, &Parser::parse_in_decl);
   add_decl_parser(m_top_decls, U"out", this, &Parser::parse_out_decl);
   add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
+  add_decl_parser(m_top_decls, U"constructor", this, &Parser::parse_cons_decl);
   add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
   add_decl_parser(m_top_decls, U"op", this, &Parser::parse_op_decl);
   add_decl_parser(m_top_decls, U"del", this, &Parser::parse_del_decl);
@@ -1277,6 +1278,48 @@ Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
   begin = current;
 
   result = data;
+
+  return true;
+}
+
+bool
+Parser::parse_cons_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != 
+    U"constructor")
+  {
+    return false;
+  }
+
+  auto current = begin;
+  ++current;
+
+  //the constructor name
+  expect_no_advance(current, end, "id", TOKEN_ID);
+
+  ConstructorDecl decl;
+  decl.name = get<u32string>(current->getValue());
+
+  //then a list of args
+  ++current;
+  while (*current == TOKEN_ID)
+  {
+    decl.args.push_back(get<u32string>(current->getValue()));
+    ++current;
+  }
+
+  //then an optional guard [...]
+  parse_tuple(current, end, decl.guard, SEPARATOR_COLON);
+
+  //then = data type name
+  expect(current, end, "=", TOKEN_EQUALS);
+
+  expect_no_advance(current, end, "id", TOKEN_ID);
+
+  decl.type = get<u32string>(current->getValue());
+
+  result = decl;
 
   return true;
 }
