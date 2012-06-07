@@ -21,13 +21,13 @@ includesdir = $(prefix)/include/tl
 
 includes_HEADERS = ast.hpp ast_fwd.hpp bestfit.hpp builtin_types.hpp \
   cache.hpp \
-  charset.hpp constws.hpp context.hpp \
+  charset.hpp constws.hpp context.hpp datadef.hpp \
   dimtranslator.hpp equation.hpp exception.hpp \
   eval_workshops.hpp fixed_indexes.hpp function_registry.hpp \
   gmpxx_fwd.hpp header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer_util.hpp library.hpp \
   line_tokenizer.hpp mpl.hpp \
-  object_registry.hpp output.hpp \
+  object_registry.hpp opdefs.hpp output.hpp \
   parser_api.hpp parser_defs.hpp parser_iterator.hpp \
   range.hpp registries.hpp rename.hpp semantic_transform.hpp \
   set_types.hpp system.hpp system_object.hpp system_util.hpp \
