@@ -112,7 +112,7 @@ namespace TransLucid
       const StreamPosIterator& end,
       Context& context,
       System::IdentifierLookup& idents,
-      bool interpret = false
+      bool interpret = true
     );
     
     class LexerIterator
@@ -125,7 +125,7 @@ namespace TransLucid
         const StreamPosIterator& end,
         Context& context,
         const System::IdentifierLookup& idents,
-        bool interpret = false
+        bool interpret = true
       )
       : m_stream(new std::list<Token>)
       , m_next(&begin), m_end(&end), m_context(&context), m_idents(idents)
