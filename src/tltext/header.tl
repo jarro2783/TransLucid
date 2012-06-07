@@ -2,7 +2,9 @@
 dim slot;;
 dim envvar;;
 
-data Infinite = infty | neginfty;;
+data Infinite;;
+constructor infty = Infinite;;
+constructor neginfty = Infinite;;
 
 var sperror = construct_special!"sperror";;
 var spaccess = construct_special!"spaccess";;
@@ -17,13 +19,25 @@ var sploop = construct_special!"sploop";;
 //fun bestselect__.a.b = spmultidef;;
 fun special_combine.a.b = a;;
 
-data Assoc = AssocNon | AssocLeft | AssocRight;;
-data HostDecl = HostDim intmp | HostType intmp | HostFunc intmp;;
-data OpType = OpPostfix ustring bool
-            | OpPrefix ustring bool
-            | OpInfix ustring bool Assoc intmp
-            ;;
-data Hyperdaton = HdIn ustring | HdOut ustring;;
+data Assoc;;
+constructor AssocNon = Assoc;;
+constructor AssocLeft = Assoc;;
+constructor AssocRight = Assoc;;
+
+data HostDecl;;
+constructor HostDim a [a : intmp] = HostDecl;;
+constructor HostType a [a : intmp] = HostDecl;;
+constructor HostFunc a [a : intmp] = HostDecl;;
+
+data OpType;;
+constructor OpPostfix a b [a : ustring, b : bool] = OpType;;
+constructor OpPrefix a b [a : ustring, b : bool] = OpType;;
+constructor OpInfix a b c d [a : ustring, b : bool, c : Assoc, d : intmp]
+  = OpType;;
+
+data Hyperdaton;;
+constructor HdIn a [a : ustring] = Hyperdaton;;
+constructor HdOut a [a : ustring] = Hyperdaton;;
 
 op + = OpInfix."plus".false.AssocLeft.100;;
 op - = OpInfix."minus".false.AssocLeft.100;;
