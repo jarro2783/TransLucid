@@ -685,7 +685,8 @@ VariableWS::group(const std::list<EquationDefinition>& lines)
   Tree::ConditionalBestfitExpr best;
   for (auto& l : lines)
   {
-    auto eqn = get<Parser::Equation>(l.parsed().get());
+    auto eqn = get<Parser::Variable>(l.parsed().get());
+    //auto eqn = get<Parser::Equation>(l.parsed().get());
 
     if (eqn == nullptr)
     {
@@ -695,10 +696,20 @@ VariableWS::group(const std::list<EquationDefinition>& lines)
     best.declarations.push_back(std::make_tuple
     (
       l.start(),
+      std::get<1>(eqn->eqn),
+      std::get<2>(eqn->eqn),
+      std::get<3>(eqn->eqn)
+    ));
+
+#if 0
+    best.declarations.push_back(std::make_tuple
+    (
+      l.start(),
       std::get<1>(*eqn),
       std::get<2>(*eqn),
       std::get<3>(*eqn)
     ));
+#endif
   }
 
   return best;
