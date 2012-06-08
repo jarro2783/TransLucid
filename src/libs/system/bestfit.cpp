@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/bestfit.hpp>
 #include <tl/eval_workshops.hpp>
+#include <tl/output.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/utility.hpp>
 #include <tl/workshop_builder.hpp>
@@ -77,6 +78,7 @@ BestfitGroup::parse(Context& k)
 
       if (!success)
       {
+        throw "parse error";
       }
       else
       {
@@ -165,9 +167,11 @@ BestfitGroup::operator()(Context& k)
     {
       compile(k);
     }
-    catch (...)
+    catch (const Parser::ParseError& e)
     {
-      //special parse error
+      std::cerr << "exception parsing: " << e.m_pos.file << ":" << e.m_pos.line 
+                << ":" << e.m_pos.character << ":" << e.what() << std::endl;
+      throw e;
     }
   }
 

@@ -286,6 +286,9 @@ RenameIdentifiers::renameFunction(const T& f)
   l.name = unique;
   l.rhs = apply_visitor(*this, f.rhs);
 
+  //copy the dim
+  l.argDim = f.argDim;
+
   //restore the shadowed name
   if (!shadowed.empty())
   {

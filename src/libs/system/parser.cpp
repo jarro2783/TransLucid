@@ -1319,7 +1319,11 @@ Parser::parse_cons_decl(LexerIterator& begin, const LexerIterator& end,
 
   decl.type = get<u32string>(current->getValue());
 
+  ++current;
+
   result = decl;
+
+  begin = current;
 
   return true;
 }

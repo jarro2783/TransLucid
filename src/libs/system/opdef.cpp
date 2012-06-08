@@ -67,6 +67,10 @@ OpDefWS::group(const std::list<EquationDefinition>& defs)
 
   Tree::ConditionalBestfitExpr best;
 
+  auto dim = m_system.nextHiddenDim();
+
+  std::map<u32string, dimension_index> rewrites{{U"op", dim}};
+
   for (auto eqn : defs)
   {
     auto decl = get<Parser::OpDecl>(&*eqn.parsed());
@@ -75,10 +79,6 @@ OpDefWS::group(const std::list<EquationDefinition>& defs)
     {
       throw "operator definition not an operator";
     }
-
-    auto dim = m_system.nextHiddenDim();
-
-    std::map<u32string, dimension_index> rewrites{{U"op", dim}};
 
     auto guard = Tree::TupleExpr({{Tree::IdentExpr(U"op"), decl->optext}});
     auto guardFixed = fixupGuardArgs(guard, rewrites);
@@ -95,7 +95,10 @@ OpDefWS::group(const std::list<EquationDefinition>& defs)
     );
   }
 
-  return Tree::LambdaExpr(U"op", best);
+  Tree::LambdaExpr fn(U"op", best);
+  fn.argDim = dim;
+
+  return fn;
 }
 
 }

@@ -47,6 +47,8 @@ FreeVariableReplacer::operator()(const Tree::LambdaExpr& e)
 
   expr.rhs = apply_visitor(*this, expr.rhs);
 
+  expr.argDim = e.argDim;
+
   m_bound.erase(e.name);
 
   return expr;

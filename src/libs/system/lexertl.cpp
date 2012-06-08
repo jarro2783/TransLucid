@@ -55,7 +55,10 @@ namespace
       U"del",
       U"repl",
       U"host",
-      U"hd"
+      U"hd",
+      U"constructor",
+      U"data",
+      U"dim"
     };
 
     return decls.find(name) != decls.end();
@@ -398,7 +401,7 @@ namespace
       std::u32string text = u32string(begin, end);
 
       //need OPTYPE @ [symbol <- u32string(first, last)]
-      WS* ws = idents.lookup(U"OPERATOR");
+      WS* ws = idents.lookup(U"operator");
 
       if (ws == nullptr)
       {
@@ -406,11 +409,13 @@ namespace
         return text;
       }
 
-      ContextPerturber p(context, 
-        {{DIM_SYMBOL, Types::String::create(text)}}
-      );
+      //ContextPerturber p(context, 
+      //  {{DIM_SYMBOL, Types::String::create(text)}}
+      //);
 
-      Constant v = (*ws)(context);
+      Constant opfn = (*ws)(context);
+
+      Constant v = applyFunction(context, opfn, Types::String::create(text));
 
       //the result should be a tuple, just ignore if not
       //a tuple

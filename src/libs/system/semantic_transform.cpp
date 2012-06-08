@@ -213,7 +213,7 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
 
   //1. generate a new dimension
   dimension_index argDim = expr.argDim == 0 ? 
-    m_system.nextHiddenDim() : argDim;
+    m_system.nextHiddenDim() : expr.argDim;
 
   m_lambdaScope.insert({e.name, argDim});
 
