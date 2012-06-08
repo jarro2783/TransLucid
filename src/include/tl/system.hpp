@@ -98,6 +98,8 @@ namespace TransLucid
       OperatorMap;
     typedef std::unordered_map<u32string, std::shared_ptr<ConsDefWS>> 
       ConstructorMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<Assignment>>
+      AssignmentMap;
 
     System(bool cached = false);
     ~System();
@@ -286,6 +288,13 @@ namespace TransLucid
     BaseFunctionType*
     lookupBaseFunction(const u32string& name);
 
+    OutputHD*
+    getOutputHD(const u32string& name)
+    {
+      auto iter = m_outputHDs.find(name);
+      return iter == m_outputHDs.end() ? nullptr : iter->second;
+    }
+
     private:
     //definitions of Equations
     typedef std::unordered_map<uuid, DefinitionMap::iterator> UUIDDefinition;
@@ -405,12 +414,12 @@ namespace TransLucid
     FunctionMap m_functions;
     std::shared_ptr<OpDefWS> m_operators;
     ConstructorMap m_constructors;
+    AssignmentMap m_assignments;
 
     //TODO deprecating
     DefinitionMap m_equations;
 
     UUIDDefinition m_equationUUIDs;
-    DefinitionMap m_assignments;
     UUIDDefinition m_assignmentUUIDs;
 
     //the variables that we want to cache

@@ -1047,17 +1047,6 @@ System::~System()
   //delete m_translator;
   delete m_parser;
 
-  //delete the equations
-  for (auto& v : m_assignments)
-  {
-    delete v.second;
-  }
-
-  for (auto& v : m_equations)
-  {
-    delete v.second;
-  }
-
   //clean up cache nodes
   for (auto& c : m_cachedVars)
   {
@@ -1068,6 +1057,11 @@ System::~System()
 void
 System::go()
 {
+  for (auto& assign : m_assignments)
+  {
+    assign.second->evaluate(*this, m_defaultk);
+  }
+
   #warning fix the go function
   #if 0
   for (const auto& ident : m_assignments)
@@ -1488,7 +1482,31 @@ System::addDeclInternal
 Constant
 System::addAssignment(const Parser::Equation& eqn)
 {
-  return addDeclInternal(eqn, m_assignments, m_assignmentUUIDs);
+  //return addDeclInternal(eqn, m_assignments, m_assignmentUUIDs);
+  uuid u = generate_uuid();
+
+  //find the assignment
+  auto assign = m_assignments.find(std::get<0>(eqn));
+
+  if (assign == m_assignments.end())
+  {
+    assign = m_assignments.insert(
+      {std::get<0>(eqn), std::make_shared<Assignment>()}
+    ).first;
+  }
+
+  //simplify, turn into workshops
+  Tree::Expr guard   = fixupTreeAndAdd(std::get<1>(eqn));
+  Tree::Expr boolean = fixupTreeAndAdd(std::get<2>(eqn));
+  Tree::Expr expr    = fixupTreeAndAdd(std::get<3>(eqn));
+
+  WorkshopBuilder compile(this);
+
+  auto guardws = std::shared_ptr<WS>(compile.build_workshops(guard));
+  auto booleanws = std::shared_ptr<WS>(compile.build_workshops(boolean));
+  auto exprws = std::shared_ptr<WS>(compile.build_workshops(expr));
+
+  assign->second->addDefinition(guardws, booleanws, exprws);
 }
 
 type_index
