@@ -1063,7 +1063,6 @@ System::go()
     assign.second->evaluate(*this, m_defaultk);
   }
 
-  #warning fix the go function
   #if 0
   for (const auto& ident : m_assignments)
   {
@@ -1100,6 +1099,7 @@ System::go()
       }
     }
   }
+  #endif
 
   //collect some garbage
   for (auto& cached : m_cachedVars)
@@ -1121,7 +1121,6 @@ System::go()
 
   ++m_time;
   setDefaultContext();
-  #endif
 }
 
 uuid
@@ -1508,6 +1507,8 @@ System::addAssignment(const Parser::Equation& eqn)
   auto exprws = std::shared_ptr<WS>(compile.build_workshops(expr));
 
   assign->second->addDefinition(guardws, booleanws, exprws);
+
+  return Types::UUID::create(u);
 }
 
 type_index
@@ -2304,7 +2305,7 @@ System::addFunDeclParsed
   Parser::FnDecl decl
 )
 {
-  addFunDeclInternal(decl.name, decl);
+  return addFunDeclInternal(decl.name, decl);
 }
 
 Constant

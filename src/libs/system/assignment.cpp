@@ -150,7 +150,7 @@ Assignment::evaluate
   for (auto& assign : m_definitions)
   {
     //const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
-    const auto& guard = std::get<1>(assign);
+    const auto& guard = std::get<0>(assign);
 
     if (guard)
     {
