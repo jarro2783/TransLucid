@@ -56,6 +56,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <signal.h>
 #include <unistd.h>
 
+#include <tl/assignment.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/cache.hpp>
 #include <tl/constws.hpp>
@@ -1491,7 +1492,7 @@ System::addAssignment(const Parser::Equation& eqn)
   if (assign == m_assignments.end())
   {
     assign = m_assignments.insert(
-      {std::get<0>(eqn), std::make_shared<Assignment>()}
+      {std::get<0>(eqn), std::make_shared<Assignment>(std::get<0>(eqn))}
     ).first;
   }
 

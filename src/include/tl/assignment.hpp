@@ -22,6 +22,9 @@ along with TransLucid; see the file COPYING.  If not see
  * Assignment declarations.
  */
 
+#ifndef TL_ASSIGNMENT_HPP_INCLUDED
+#define TL_ASSIGNMENT_HPP_INCLUDED
+
 #include <tl/workshop.hpp>
 
 #include <memory>
@@ -32,7 +35,9 @@ namespace TransLucid
   {
     public:
 
-    Assignment() = default;
+    Assignment(u32string name)
+    : m_name(name) 
+    {}
 
     void
     addDefinition
@@ -62,6 +67,9 @@ namespace TransLucid
     >
     Definition;
 
+    u32string m_name;
     std::vector<Definition> m_definitions;
   };
 }
+
+#endif

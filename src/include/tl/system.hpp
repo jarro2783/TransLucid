@@ -28,7 +28,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_set>
 #include <unordered_map>
 
-#include <tl/assignment.hpp>
 #include <tl/ast_fwd.hpp>
 #include <tl/datadef.hpp>
 #include <tl/dimtranslator.hpp>
@@ -68,6 +67,8 @@ namespace TransLucid
   class SemanticTransform;
 
   class BaseFunctionType;
+
+  class Assignment;
 
   struct GettextInit
   {

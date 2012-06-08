@@ -23,9 +23,106 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/assignment.hpp>
+#include <tl/fixed_indexes.hpp>
+#include <tl/system.hpp>
+#include <tl/types/tuple.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid
 {
+
+namespace {
+  //for every context in ctxts that is valid in k,
+  //output the result of computation compute to out
+  //at the moment we only know how to enumerate ranges, this could
+  //become richer as we work out the type system better
+  void
+  enumerateContextSet
+  (
+    const Tuple& ctxts, 
+    Context& k,
+    WS& compute,
+    OutputHD* out
+  )
+  {
+    Tuple variance = out->variance();
+
+    //all the ranges in order
+    std::vector<Range> limits;
+
+    //the current value of each range dimension
+    std::vector<std::pair<dimension_index, mpz_class>> current;
+
+    //the context to evaluate in
+    Context evalContext(k);
+
+    //determine which dimensions are ranges
+    for (const auto& v : ctxts)
+    {
+      if (v.second.index() == TYPE_INDEX_RANGE)
+      {
+        const Range& r = Types::Range::get(v.second);
+
+        if (r.lower() == nullptr || r.upper() == nullptr)
+        {
+          //std::cerr << "Error: infinite bounds in demand, dimension " <<
+          //  v.first << std::endl;
+          throw "Infinite bounds in demand";
+        }
+
+        limits.push_back(r);
+        current.push_back(std::make_pair(v.first, *r.lower()));
+      }
+      else
+      {
+        //if not a range then store it permanantly
+        evalContext.perturb(v.first, v.second);
+      }
+    }
+
+    //by doing it this way, even if there is no range, we still evaluate
+    //everything once
+    while (true)
+    {
+      ContextPerturber p(evalContext);
+      for (const auto& v : current)
+      {
+        p.perturb(v.first, Types::Intmp::create(v.second));
+      }
+
+      //is the demand valid for the hyperdaton, and is the demand valid for
+      //the current context
+      if (tupleApplicable(variance, evalContext) && k <= evalContext)
+      {
+        out->put(evalContext, compute(evalContext));
+      }
+      
+      //then we increment the counters at the end
+      auto limitIter = limits.begin();
+      auto currentIter = current.begin();
+      while (currentIter != current.end())
+      {
+        ++currentIter->second;
+        if (!limitIter->within(currentIter->second))
+        {
+          currentIter->second = *limitIter->lower();
+          ++currentIter;
+          ++limitIter;
+        }
+        else
+        {
+          break;
+        }
+      }
+      
+      if (currentIter == current.end())
+      {
+        break;
+      }
+    }
+  }
+
+}
 
 void
 Assignment::evaluate
@@ -34,6 +131,39 @@ Assignment::evaluate
   Context& k
 )
 {
+  auto hd = s.getOutputHD(m_name);
+
+  if (hd == nullptr)
+  {
+    //std::cerr << "warning: output hyperdaton \"" << ident.first
+    //  << "\" doesn't exist" << std::endl;
+    return;
+  }
+
+  Context theContext = k;
+
+  //theContext.perturb(DIM_TIME, Types::Intmp::create(m_time));
+
+  //this needs to be way better
+  //for a start: only look at demands for the current time
+  //auto equations = ident.second->equations();
+  for (auto& assign : m_definitions)
+  {
+    //const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
+    const auto& guard = std::get<1>(assign);
+
+    if (guard)
+    {
+      auto ctxts = (*guard)(theContext);
+
+      if (ctxts.index() == TYPE_INDEX_TUPLE)
+      {
+        //the demand could have ranges, so we need to enumerate them
+        enumerateContextSet(Types::Tuple::get(ctxts), theContext, 
+          *std::get<2>(assign), hd);
+      }
+    }
+  }
 }
 
 }
