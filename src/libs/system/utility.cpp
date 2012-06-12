@@ -29,7 +29,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 
 #include <tl/equation.hpp>
-#include <tl/remove_cbn.hpp>
+#include <tl/function_transform.hpp>
 #include <tl/rename.hpp>
 #include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
