@@ -225,18 +225,12 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   m_scope.push_back(argDim);
   m_scopeNames.push_back(e.name);
 
-  //add our free variables to the scope
-  for (const auto& free : e.free)
-  {
-    m_scope.push_back(free.second);
-  }
-
   //4. visit the child
   expr.rhs = apply_visitor(*this, expr.rhs);
 
   //5. restore the scope
   //m_scope.pop_back();
-  m_scope.resize(m_scope.size() - e.free.size() - 1);
+  m_scope.resize(m_scope.size() - 1);
   m_lambdaScope.erase(e.name);
 
   return expr;

@@ -896,8 +896,6 @@ LambdaAbstractionWS::operator()(Context& k)
       m_name,
       m_argDim,
       std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
-      std::vector<std::pair<u32string, dimension_index>>
-        (m_free.begin(), m_free.end()),
       m_rhs,
       k
     );
@@ -929,8 +927,6 @@ LambdaAbstractionWS::operator()(Context& kappa, Context& delta)
       m_name,
       m_argDim,
       std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
-      std::vector<std::pair<u32string, dimension_index>>
-        (m_free.begin(), m_free.end()),
       m_rhs,
       kappa,
       delta

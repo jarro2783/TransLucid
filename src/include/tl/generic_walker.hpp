@@ -137,7 +137,6 @@ namespace TransLucid
 
       le.argDim = e.argDim;
       le.scope = e.scope;
-      le.free = e.free;
 
       return le;
     }
@@ -152,7 +151,6 @@ namespace TransLucid
 
       phi.argDim = e.argDim;
       phi.scope = e.scope;
-      phi.free = e.free;
 
       return phi;
     }

@@ -33,7 +33,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/dimtranslator.hpp>
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
-#include <tl/free_variables.hpp>
 #include <tl/function.hpp>
 #include <tl/hyperdaton.hpp>
 #include <tl/opdef.hpp>
@@ -436,28 +435,6 @@ namespace TransLucid
     std::unordered_map<u32string, Tuple> m_outputHDDecls;
     std::unordered_map<u32string, Tuple> m_inputHDDecls;
 
-    typedef
-      std::tuple
-      <
-        ConditionalBestfitWS*, 
-        std::map<u32string, u32string>,
-        std::map<u32string, dimension_index>,
-        std::vector<Parser::FnDecl>,
-        WS*,
-        FreeVariableHelper
-      >
-    FnInfo;
-
-    //functions
-    //map from names to a tuple of
-    //(bestfitter, renamed arguments, args -> dim, definitions,
-    // top abstraction workshop, free var replacer)
-    std::unordered_map
-    <
-      u32string, 
-      FnInfo
-    > m_fndecls;
-
     //---- the sets of all the uuids of objects ----
 
     //the uuids of the dimensions
@@ -497,15 +474,6 @@ namespace TransLucid
     static GettextInit m_gettext;
 
     friend class detail::InputHDWS;
-
-    Tree::Expr
-    funWSTree
-    (
-      FnInfo& info, 
-      const Parser::FnDecl& decl,
-      const Tree::Expr& expr, 
-      WS* abstraction
-    );
 
     template <typename Input>
     Constant

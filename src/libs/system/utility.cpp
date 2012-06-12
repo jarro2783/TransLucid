@@ -704,14 +704,12 @@ fixupTree(System& s, const Tree::Expr& e)
   TreeRewriter rewriter;
   RenameIdentifiers renamer(s);
   RemoveCBN cbn;
-  FreeVariableReplacer free(s);
   SemanticTransform transform(s);
 
   Tree::Expr e1 = rewriter.rewrite(e);
   Tree::Expr e2 = renamer.rename(e1);
   Tree::Expr e3 = cbn.remove(e2);
-  Tree::Expr e4 = free.replaceFree(e3);
-  Tree::Expr e5 = transform.transform(e4);
+  Tree::Expr e4 = transform.transform(e3);
 
   const auto& scope = transform.getAllScopeArgs();
   const auto& odo = transform.getAllScopeOdometer();
@@ -721,7 +719,7 @@ fixupTree(System& s, const Tree::Expr& e)
 
   return 
   {
-    e5, 
+    e4, 
     {
       transform.newVars(),
       transform.getLin(),

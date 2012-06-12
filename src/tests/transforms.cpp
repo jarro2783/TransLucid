@@ -22,7 +22,6 @@ along with TransLucid; see the file COPYING.  If not see
  * Transformation tests.
  */
 
-#include <tl/free_variables.hpp>
 #include <tl/output.hpp>
 #include <tl/system.hpp>
 #include <tl/tree_printer.hpp>
@@ -50,67 +49,4 @@ parseExpression(TL::System& s, const TL::u32string& input)
   REQUIRE(s.parseExpression(posbegin, posend, result));
 
   return result;
-}
-
-void
-testFreeVars
-(
-  const TL::u32string& input,
-  std::set<TL::u32string> expected
-)
-{
-  TL::System s;
-
-  TL::Tree::Expr e1 = parseExpression(s, input);
-
-  TL::FreeVariableReplacer free(s);
-
-  TL::Tree::Expr e2 = free.replaceFree(e1);
-
-  const TL::Tree::LambdaExpr& lambda = TL::get<TL::Tree::LambdaExpr>(e2);
-
-  const auto& replaced = lambda.free;
-  auto current = replaced.begin();
-
-  auto expect = expected.begin();
-  while (expect != expected.end())
-  {
-    REQUIRE(current != replaced.end());
-    CHECK(current->first == *expect);
-    ++expect;
-    ++current;
-  }
-
-  REQUIRE(current == replaced.end());
-
-  auto fixed = TL::fixupTree(s, e1);
-  std::cerr << TL::Printer::print_expr_tree(fixed.first) << std::endl;
-}
-
-TEST_CASE ( "factorial", "free variables in factorial function" )
-{
-  testFreeVars
-  (
-    UR"(
-    \n -> f where
-      dim d <- n;;
-      var f [d : 0] = 1;;
-      var f [d : pos] = times.(#!d).(prev.d f);;
-    end;;
-    )",
-    {
-      U"pos", U"prev", U"times"
-    }
-  );
-
-  testFreeVars
-  (
-    UR"raw(\c ->
-  plus.(plus.(plus.(print_typename.c)."\"").(escape_string.(print.c)))."\""
-    )raw",
-    {
-      U"escape_string", U"plus", U"print_typename", U"print"
-    }
-  );
-
 }

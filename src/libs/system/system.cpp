@@ -83,7 +83,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/utility.hpp>
 
 #include "tl/gettext_internal.h"
-#include "tl/free_variables.hpp"
 
 namespace TransLucid
 {
@@ -1795,125 +1794,6 @@ findRenamedParams(const Tree::Expr& original, const Tree::Expr& renamed,
     }
   }
 
-}
-
-
-Tree::Expr
-System::funWSTree
-(
-  FnInfo& info, 
-  const Parser::FnDecl& decl,
-  const Tree::Expr& expr, 
-  WS* abstraction
-)
-{
-  //rename everything first
-  //then replace the free variables
-  //then turn into a wstree without renaming
-  //and add all the extra variables that resulted
-
-  //std::cerr << "to rename:" << std::endl;
-  //for (const auto& v : std::get<1>(info))
-  //{
-  //  std::cerr << v.first << " to " << v.second << std::endl;
-  //}
-
-  auto& renameRules = std::get<1>(info);
-
-  TreeRewriter rewriter;
-  RenameIdentifiers rename(*this, std::get<1>(info));
-  FreeVariableHelper& free = std::get<5>(info);
-
-  //bind the renamed arguments
-  std::cerr << "bound:" << std::endl;
-  for (auto arg : decl.args)
-  {
-    std::cerr << renameRules.find(arg.second)->second << std::endl;
-    free.addBound(renameRules.find(arg.second)->second);
-  }
-
-  Tree::Expr rewritten = rewriter.rewrite(expr);
-
-  Tree::Expr renamed = rename.rename(rewritten);
-
-  Tree::Expr freeReplaced = free.replaceFree(renamed);
-  //Tree::Expr freeReplaced = renamed;
-
-  std::cerr << "renamed expr:" << std::endl;
-  std::cerr << Printer::print_expr_tree(freeReplaced) << std::endl;
-
-  #if 0
-  TreeToWSTree tows(this);
-
-  Tree::Expr wstree = tows.toWSTreeNoRename(renamed);
-
-  addExtraVariables(tows);
-  #endif
-
-  SemanticTransform transform(*this);
-  Tree::Expr wstree = transform.transform(freeReplaced);
-
-  addTransformedEquations(transform.newVars());
-
-  addDefaultDimensions(transform);
-
-  //the abstraction is either LambdaAbstractionWS or NamedAbstractionWS
-  WS* nextws = nullptr;
-  Workshops::NamedAbstractionWS* cbn = 
-    dynamic_cast<Workshops::NamedAbstractionWS*>(abstraction);
-
-  if (cbn != nullptr)
-  {
-    cbn->addFreeVariables(free.getReplaced());
-    nextws = cbn->rhs();
-  }
-  else
-  {
-    Workshops::LambdaAbstractionWS* cbv = 
-      dynamic_cast<Workshops::LambdaAbstractionWS*>(abstraction);
-
-    cbv->addFreeVariables(free.getReplaced());
-    nextws = cbv->rhs();
-  }
-
-  std::vector<dimension_index> scope;
-
-  for (const auto& v : free.getReplaced())
-  {
-    scope.push_back(v.second);
-  }
-
-  //then add the scope to all the children
-  while (true)
-  {
-    Workshops::LambdaAbstractionWS* cbv = 
-      dynamic_cast<Workshops::LambdaAbstractionWS*>(nextws);
-    Workshops::NamedAbstractionWS* cbn = 
-      dynamic_cast<Workshops::NamedAbstractionWS*>(nextws);
-
-    if (cbv)
-    {
-      cbv->addScope(scope);
-      nextws = cbv->rhs();
-    }
-    else if (cbn)
-    {
-      cbn->addScope(scope);
-      nextws = cbn->rhs();
-    }
-    else
-    {
-      break;
-    }
-  }
-
-  std::cerr << "free vars:" << std::endl;
-  for (auto v : free.getReplaced())
-  {
-    std::cerr << v.first << " : " << v.second << std::endl;
-  }
-
-  return wstree;
 }
 
 Constant

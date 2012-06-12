@@ -549,14 +549,12 @@ namespace TransLucid
         const u32string& name, 
         dimension_index dim, 
         const std::vector<dimension_index> scope,
-        const std::vector<std::pair<u32string, dimension_index>>& free,
         WS* rhs
       )
       : m_system(system)
       , m_name(name)
       , m_argDim(dim)
       , m_scope(scope.begin(), scope.end())
-      , m_free(free.begin(), free.end())
       , m_rhs(rhs)
       {
       }
@@ -593,16 +591,6 @@ namespace TransLucid
 
       template <typename T>
       void
-      addFreeVariables
-      (
-        const T& free
-      )
-      {
-        m_free.insert(free.begin(), free.end());
-      }
-
-      template <typename T>
-      void
       addScope(const T& scope)
       {
         m_scope.insert(scope.begin(), scope.end());
@@ -613,7 +601,6 @@ namespace TransLucid
       u32string m_name;
       dimension_index m_argDim;
       std::set<dimension_index> m_scope;
-      std::map<u32string, dimension_index> m_free;
       WS* m_rhs;
     };
 

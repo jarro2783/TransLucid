@@ -253,7 +253,6 @@ WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
     e.name,
     e.argDim,
     e.scope,
-    e.free,
     rhs
   );
 }

@@ -280,21 +280,15 @@ namespace TransLucid
       const u32string& name, 
       dimension_index argDim, 
       const std::vector<dimension_index>& scope,
-      const std::vector<std::pair<u32string, dimension_index>>& free,
       WS* expr,
       Context& k
     )
     : m_system(system), m_name(name), m_dim(argDim),
-      m_free(free), m_expr(expr)
+      m_expr(expr)
     {
       for (auto d : scope)
       {
         m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
-      }
-
-      if (!free.empty())
-      {
-        m_freeContext = k;
       }
     }
 
@@ -324,8 +318,6 @@ namespace TransLucid
     u32string m_name;
     dimension_index m_dim;
     std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
-    std::vector<std::pair<u32string, dimension_index>> m_free;
-    Tuple m_freeContext;
     WS* m_expr;
   };
 
@@ -396,7 +388,6 @@ namespace TransLucid
     const u32string& name, 
     dimension_index argDim, 
     const std::vector<dimension_index>& scope,
-    const std::vector<std::pair<u32string, dimension_index>>& free,
     WS* expr,
     Context& kappa
   );
@@ -411,7 +402,6 @@ namespace TransLucid
     const u32string& name, 
     dimension_index argDim, 
     const std::vector<dimension_index>& scope,
-    const std::vector<std::pair<u32string, dimension_index>>& free,
     WS* expr,
     Context& kappa,
     Context& delta
