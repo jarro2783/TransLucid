@@ -31,9 +31,10 @@ namespace TransLucid
     IntensionType
     (
       WS* ws, 
-      const std::vector<std::pair<dimension_index, Constant>>& scope
+      const std::vector<std::pair<dimension_index, Constant>>& scope,
+      Context& k
     )
-    : m_ws(ws)
+    : m_ws(ws), m_k(k)
     {
     }
 
@@ -45,6 +46,13 @@ namespace TransLucid
     Constant
     operator()(Context& k) const
     {
+      // k \dagger k_a \dagger (k <| {\rho, m_scope})
+      //
+      // which is implemented by
+      //
+      // k_a \dagger (k_a - k) \dagger (k <| {\rho, m_scope})
+
+      #warning implement me
       ContextPerturber p(k, m_scope);
       return (*m_ws)(k);
     }
@@ -52,6 +60,7 @@ namespace TransLucid
     private:
     WS* m_ws;
     std::vector<std::pair<dimension_index, Constant>> m_scope;
+    Context m_k;
   };
 
   namespace Types
@@ -62,7 +71,8 @@ namespace TransLucid
       create
       (
         WS* ws, 
-        const std::vector<std::pair<dimension_index, Constant>>& scope
+        const std::vector<std::pair<dimension_index, Constant>>& scope,
+        Context& k
       );
 
       const IntensionType&

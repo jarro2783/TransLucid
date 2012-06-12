@@ -1445,13 +1445,14 @@ namespace TransLucid
       create
       (
         WS* ws, 
-        const std::vector<std::pair<dimension_index, Constant>>& scope
+        const std::vector<std::pair<dimension_index, Constant>>& scope,
+        Context& k
       )
       {
         ConstantPointerValue* p =
           new ConstantPointerValue(
             &workshop_type_functions,
-            new IntensionType(const_cast<WS*>(ws), scope));
+            new IntensionType(const_cast<WS*>(ws), scope, k));
 
         return Constant(p, TYPE_INDEX_WS);
       }

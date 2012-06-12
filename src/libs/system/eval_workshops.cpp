@@ -480,7 +480,7 @@ MakeIntenWS::operator()(Context& k)
   {
     scope.push_back({d, k.lookup(d)});
   }
-  return Types::Intension::create(m_rhs, scope);
+  return Types::Intension::create(m_rhs, scope, k);
 }
 
 Constant

@@ -26,6 +26,7 @@ includes_HEADERS = \
   charset.hpp constws.hpp context.hpp datadef.hpp \
   dimtranslator.hpp equation.hpp exception.hpp \
   eval_workshops.hpp fixed_indexes.hpp function_registry.hpp \
+	function_transform.hpp \
   gmpxx_fwd.hpp header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer_util.hpp library.hpp \
   line_tokenizer.hpp mpl.hpp \
