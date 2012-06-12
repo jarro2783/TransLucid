@@ -37,7 +37,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class RemoveCBN : public GenericTreeWalker<RemoveCBN>
+  class FunctionTransform : public GenericTreeWalker<FunctionTransform>
   {
     public:
     typedef Tree::Expr result_type;
@@ -45,7 +45,7 @@ namespace TransLucid
     using GenericTreeWalker::operator();
 
     Tree::Expr
-    remove(const Tree::Expr& e)
+    transform(const Tree::Expr& e)
     {
       return apply_visitor(*this, e);
     }
@@ -64,15 +64,34 @@ namespace TransLucid
     }
 
     Tree::Expr
+    operator()(const Tree::LambdaExpr& e)
+    {
+      Tree::LambdaExpr rewritten;
+
+      Tree::Expr rhs = Tree::MakeIntenExpr(e.rhs);
+
+      rewritten.rhs = apply_visitor(*this, rhs);
+      rewritten.argDim = e.argDim;
+      rewritten.name = e.name;
+
+      return rewritten;
+    }
+
+    Tree::Expr
     operator()(const Tree::PhiExpr& e)
     {
       m_cbnscope.insert(e.name);
 
-      Tree::Expr rhs = apply_visitor(*this, e.rhs);
+      Tree::LambdaExpr lambda = Tree::LambdaExpr(e.name, e.rhs);
+      lambda.argDim = e.argDim;;
+
+      Tree::Expr le = lambda;
+
+      Tree::Expr fun = apply_visitor(*this, le);
 
       m_cbnscope.erase(e.name);
 
-      return Tree::LambdaExpr(e.name, rhs);
+      return fun;
     }
 
     Tree::Expr

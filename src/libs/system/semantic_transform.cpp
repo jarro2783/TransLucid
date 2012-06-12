@@ -218,7 +218,6 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   m_lambdaScope.insert({e.name, argDim});
 
   //2. store our scope dimensions and ourself
-  expr.scope = m_scope;
   expr.argDim = argDim;
 
   //3. add ourselves to the scope

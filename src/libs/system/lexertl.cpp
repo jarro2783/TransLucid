@@ -1,5 +1,5 @@
 /* Lexer using lexertl.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 

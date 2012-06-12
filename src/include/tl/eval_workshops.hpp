@@ -548,13 +548,11 @@ namespace TransLucid
         System* system,
         const u32string& name, 
         dimension_index dim, 
-        const std::vector<dimension_index> scope,
         WS* rhs
       )
       : m_system(system)
       , m_name(name)
       , m_argDim(dim)
-      , m_scope(scope.begin(), scope.end())
       , m_rhs(rhs)
       {
       }
@@ -589,18 +587,10 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
-      template <typename T>
-      void
-      addScope(const T& scope)
-      {
-        m_scope.insert(scope.begin(), scope.end());
-      }
-
       private:
       System* m_system;
       u32string m_name;
       dimension_index m_argDim;
-      std::set<dimension_index> m_scope;
       WS* m_rhs;
     };
 

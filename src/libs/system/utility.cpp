@@ -703,12 +703,12 @@ fixupTree(System& s, const Tree::Expr& e)
 {
   TreeRewriter rewriter;
   RenameIdentifiers renamer(s);
-  RemoveCBN cbn;
+  FunctionTransform funs;
   SemanticTransform transform(s);
 
   Tree::Expr e1 = rewriter.rewrite(e);
   Tree::Expr e2 = renamer.rename(e1);
-  Tree::Expr e3 = cbn.remove(e2);
+  Tree::Expr e3 = funs.transform(e2);
   Tree::Expr e4 = transform.transform(e3);
 
   const auto& scope = transform.getAllScopeArgs();

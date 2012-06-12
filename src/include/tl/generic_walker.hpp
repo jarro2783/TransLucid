@@ -136,7 +136,6 @@ namespace TransLucid
       );
 
       le.argDim = e.argDim;
-      le.scope = e.scope;
 
       return le;
     }

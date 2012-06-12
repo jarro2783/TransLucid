@@ -23,11 +23,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_map>
 
 #include <tl/ast.hpp>
+#include <tl/generic_walker.hpp>
 #include <tl/system.hpp>
 
 namespace TransLucid
 {
-  class RenameIdentifiers
+  class RenameIdentifiers : public GenericTreeWalker<RenameIdentifiers>
   {
     public:
 
@@ -40,6 +41,8 @@ namespace TransLucid
 
     RenameIdentifiers(System& system);
     RenameIdentifiers(System& system, const RenameRules& startRules);
+
+    using GenericTreeWalker::operator();
 
     template <typename T>
     Tree::Expr 

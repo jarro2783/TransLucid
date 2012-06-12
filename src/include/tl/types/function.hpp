@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TYPES_FUNCTION_HPP_INCLUDED
 
 #include <tl/context.hpp>
+#include <tl/fixed_indexes.hpp>
 #include <tl/system.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types.hpp>
@@ -279,16 +280,18 @@ namespace TransLucid
       System* system,
       const u32string& name, 
       dimension_index argDim, 
-      const std::vector<dimension_index>& scope,
       WS* expr,
       Context& k
     )
-    : m_system(system), m_name(name), m_dim(argDim),
-      m_expr(expr)
+    : m_system(system), m_name(name), m_dim(argDim)
     {
-      for (auto d : scope)
+      //creating the function evaluates the expr and stores the result in
+      //m_inten
+      m_inten = (*expr)(k);
+
+      if (m_inten.index() != TYPE_INDEX_INTENSION)
       {
-        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
+        throw "function value not an intension";
       }
     }
 
@@ -307,7 +310,7 @@ namespace TransLucid
     size_t
     hash() const
     {
-      return reinterpret_cast<size_t>(m_expr);
+      return m_inten.hash();
     }
 
     bool
@@ -316,9 +319,8 @@ namespace TransLucid
     private:
     System* m_system;
     u32string m_name;
+    Constant m_inten;
     dimension_index m_dim;
-    std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
-    WS* m_expr;
   };
 
   class NameFunctionType
@@ -387,7 +389,6 @@ namespace TransLucid
     System *system,
     const u32string& name, 
     dimension_index argDim, 
-    const std::vector<dimension_index>& scope,
     WS* expr,
     Context& kappa
   );
@@ -401,7 +402,6 @@ namespace TransLucid
     System *system,
     const u32string& name, 
     dimension_index argDim, 
-    const std::vector<dimension_index>& scope,
     WS* expr,
     Context& kappa,
     Context& delta

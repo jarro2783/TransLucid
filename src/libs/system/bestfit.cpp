@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/bestfit.hpp>
 #include <tl/eval_workshops.hpp>
 #include <tl/output.hpp>
+#include <tl/tree_printer.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/utility.hpp>
 #include <tl/workshop_builder.hpp>
@@ -131,6 +132,9 @@ BestfitGroup::compileExpression(const Tree::Expr& expr)
 {
   //fixup the ast
   Tree::Expr fixed = m_system.fixupTreeAndAdd(expr);
+
+  std::cerr << "fixed up tree: " << Printer::print_expr_tree(fixed)
+    << std::endl;
 
   //compile the tree into a workshop
   WorkshopBuilder compile(&m_system);

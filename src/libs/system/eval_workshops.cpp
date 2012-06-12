@@ -474,13 +474,7 @@ BangOpWS::operator()(Context& k)
 Constant
 MakeIntenWS::operator()(Context& k)
 {
-  std::vector<std::pair<dimension_index, Constant>> scope;
-
-  for (auto d : m_scope)
-  {
-    scope.push_back({d, k.lookup(d)});
-  }
-  return Types::Intension::create(m_rhs, scope, k);
+  return Types::Intension::create(m_rhs, m_scope, k);
 }
 
 Constant
@@ -895,7 +889,6 @@ LambdaAbstractionWS::operator()(Context& k)
       m_system,
       m_name,
       m_argDim,
-      std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
       m_rhs,
       k
     );
@@ -926,7 +919,6 @@ LambdaAbstractionWS::operator()(Context& kappa, Context& delta)
       m_system,
       m_name,
       m_argDim,
-      std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
       m_rhs,
       kappa,
       delta

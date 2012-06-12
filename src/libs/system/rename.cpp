@@ -48,11 +48,13 @@ RenameIdentifiers::operator()(const Tree::IdentExpr& e)
 
   if (iter != m_rules.end())
   {
+    std::cerr << "renaming " << e.text << " to " << iter->second << std::endl;
     //record that we renamed something
     return Tree::IdentExpr(iter->second);
   }
   else
   {
+    std::cerr << "not renaming " << e.text << std::endl;
     return e;
   }
 }
@@ -112,7 +114,7 @@ RenameIdentifiers::operator()(const Tree::TupleExpr& e)
     ));
   }
 
-  return renamed;
+  return Tree::TupleExpr(renamed);
 }
 
 Tree::Expr
@@ -263,8 +265,8 @@ RenameIdentifiers::renameFunction(const T& f)
   //generate a new name
   u32string unique = generateUnique(U"uniquefn");
 
-  //std::cerr << "renaming function: " << f.name << " to " 
-  //          << unique << std::endl;
+  std::cerr << "renaming function: " << f.name << " to " 
+            << unique << std::endl;
 
   //if the name shadows an existing name then store it
   u32string shadowed;
@@ -278,7 +280,7 @@ RenameIdentifiers::renameFunction(const T& f)
   else
   {
     //there is no point storing the iterator, it might go away
-    m_rules.insert(std::make_pair(f.name, unique)).first;
+    m_rules.insert(std::make_pair(f.name, unique));
   }
 
   //rename

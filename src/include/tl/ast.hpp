@@ -644,7 +644,6 @@ namespace TransLucid
       Expr rhs; /**<The right-hand-side expression.*/
 
       dimension_index argDim;
-      std::vector<dimension_index> scope;
     };
 
     //TODO: fix TreeToWSTree when I implement this

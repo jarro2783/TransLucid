@@ -453,7 +453,7 @@ class TreePrinter
   print_fn_abstraction(const Fn& f, const u32string& symbol)
   {
     pp('(', Precedence::FN_ABSTRACTION);
-    m_os << symbol << f.name << " -> ";
+    m_os << symbol << f.argDim << " -> ";
     parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
     apply_visitor(*this, f.rhs);
     parenPop();

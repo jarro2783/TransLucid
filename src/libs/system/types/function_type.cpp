@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
+#include <tl/types/intension.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
@@ -111,13 +112,12 @@ createValueFunction
   System *system,
   const u32string& name, 
   dimension_index argDim, 
-  const std::vector<dimension_index>& scope,
   WS* expr,
   Context& kappa
 )
 {
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, scope, expr, kappa)
+    ValueFunctionType(system, name, argDim, expr, kappa)
   );
 }
 
@@ -130,14 +130,13 @@ createValueFunctionCached
   System *system,
   const u32string& name, 
   dimension_index argDim, 
-  const std::vector<dimension_index>& scope,
   WS* expr,
   Context& kappa,
   Context& delta
 )
 {
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, scope, expr, kappa)
+    ValueFunctionType(system, name, argDim, expr, kappa)
   );
 }
 
@@ -219,11 +218,10 @@ ValueFunctionType::apply(Context& k, const Constant& value) const
 {
   //set m_dim = value in the context and evaluate the expr
   ContextPerturber p(k, {{m_dim, value}});
-  p.perturb(m_scopeDims);
-  
-  auto r = (*m_expr)(k);
 
-  return r;
+  auto inten = get_constant_pointer<IntensionType>(m_inten);
+
+  return inten(k);
 }
 
 Constant
@@ -241,12 +239,8 @@ ValueFunctionType::apply
   pkappa.perturb({{m_dim, value}});
   pdelta.perturb({{m_dim, value}});
 
-  pkappa.perturb(m_scopeDims);
-  pdelta.perturb(m_scopeDims);
-
-  auto r = (*m_expr)(kappa, delta);
-
-  return r;
+  #warning implement cache
+  return Constant();
 }
 
 Constant
@@ -353,13 +347,13 @@ NameFunctionType::apply
 bool
 ValueFunctionType::less(const ValueFunctionType& rhs) const
 {
-  return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
+  //return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
 }
 
 bool
 NameFunctionType::less(const NameFunctionType& rhs) const
 {
-  return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
+  //return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
 }
 
 namespace Types
