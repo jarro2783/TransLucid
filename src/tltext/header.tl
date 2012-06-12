@@ -32,7 +32,7 @@ constructor HostFunc a [a : intmp] = HostDecl;;
 data OpType;;
 constructor OpPostfix a b [a : ustring, b : bool] = OpType;;
 constructor OpPrefix a b [a : ustring, b : bool] = OpType;;
-constructor OpInfix a b c d [a : ustring, b : bool, c : Assoc, d : intmp]
+constructor OpInfix a b c d //[a : ustring, b : bool, c : Assoc, d : intmp]
   = OpType;;
 
 data Hyperdaton;;

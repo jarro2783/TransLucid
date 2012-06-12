@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_TYPES_WORKSHOP_HPP_INCLUDED
 #define TL_TYPES_WORKSHOP_HPP_INCLUDED
 
+#include <tl/output.hpp>
 #include <tl/workshop.hpp>
 
 namespace TransLucid
@@ -34,7 +35,7 @@ namespace TransLucid
       const std::vector<dimension_index>& scope,
       Context& k
     )
-    : m_ws(ws), m_k(k.minimal_copy())
+    : m_ws(ws), m_scope(scope), m_k(k.minimal_copy())
     {
     }
 
@@ -55,14 +56,20 @@ namespace TransLucid
       #warning implement me
       //ContextPerturber p(k, m_scope);
       
+      std::cerr << "eval inten {" << std::endl;
       ContextPerturber p(m_k, k_a); 
 
       for (auto d : m_scope)
       {
+        std::cerr << "adding dim " << d << std::endl;
         p.perturb(d, m_k.lookup(d));
       }
 
-      return (*m_ws)(k_a);
+      auto result = (*m_ws)(m_k);
+
+      std::cerr << "}" << std::endl;
+
+      return result;
     }
 
     private:

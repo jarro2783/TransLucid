@@ -113,7 +113,11 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
         if (std::get<0>(*paramIter) != declIter->first)
         {
           //throw a parse error here
+          throw "inconsistent function definition";
         }
+
+        ++declIter;
+        ++paramIter;
       }
 
       auto guardFixed = fixupGuardArgs(fundecl->guard, rewrites);

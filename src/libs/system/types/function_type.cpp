@@ -219,9 +219,15 @@ ValueFunctionType::apply(Context& k, const Constant& value) const
   //set m_dim = value in the context and evaluate the expr
   ContextPerturber p(k, {{m_dim, value}});
 
+  std::cerr << "setting dim " << m_dim << std::endl;
+
   auto inten = get_constant_pointer<IntensionType>(m_inten);
 
-  return inten(k);
+  auto result = inten(k);
+
+  std::cerr << "unsetting dim " << m_dim << std::endl;
+
+  return result;
 }
 
 Constant

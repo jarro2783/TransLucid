@@ -83,7 +83,7 @@ addConstructor(System& s, const u32string& type, const u32string& basefn)
 void
 addTypeEquation(System& s, const u32string& type)
 {
-  s.addEquation(Parser::Equation{type, Tree::Expr(), Tree::Expr(),
+  s.addVariableDeclParsed(Parser::Equation{type, Tree::Expr(), Tree::Expr(),
     Tree::LiteralExpr(U"typetype", type)});
 }
 

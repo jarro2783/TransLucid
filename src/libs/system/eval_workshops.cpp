@@ -474,6 +474,8 @@ BangOpWS::operator()(Context& k)
 Constant
 MakeIntenWS::operator()(Context& k)
 {
+  std::cerr << "making intension with scope of size " << m_scope.size() 
+    << std::endl;
   return Types::Intension::create(m_rhs, m_scope, k);
 }
 

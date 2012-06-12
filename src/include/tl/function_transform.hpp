@@ -64,20 +64,6 @@ namespace TransLucid
     }
 
     Tree::Expr
-    operator()(const Tree::LambdaExpr& e)
-    {
-      Tree::LambdaExpr rewritten;
-
-      Tree::Expr rhs = Tree::MakeIntenExpr(e.rhs);
-
-      rewritten.rhs = apply_visitor(*this, rhs);
-      rewritten.argDim = e.argDim;
-      rewritten.name = e.name;
-
-      return rewritten;
-    }
-
-    Tree::Expr
     operator()(const Tree::PhiExpr& e)
     {
       m_cbnscope.insert(e.name);
