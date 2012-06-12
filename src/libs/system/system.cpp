@@ -1595,18 +1595,17 @@ System::setDefaultContext()
     m_defaultk.perturb(d, Types::Intmp::create(0));
   }
 
-  //set the function list dimensions to nil
-  for (auto d : m_fnLists)
+  //set the rho dimension to nil
+  auto nil = lookupIdentifiers().lookup(U"Nil");
+  
+  if (nil != nullptr)
   {
-    m_defaultk.perturb(d, Types::Tuple::create
-    (
-      tuple_t
-      {
-        {DIM_TYPE, Types::String::create(U"list")},
-        {DIM_CONS, Types::String::create(U"nil")}
-      }
-    )
-    );
+    auto nilvalue = (*nil)(m_defaultk);
+
+    if (nilvalue.index() == TYPE_INDEX_TUPLE)
+    {
+      m_defaultk.perturb(DIM_RHO, nilvalue);
+    }
   }
 
   for (const auto& v : m_envvars)

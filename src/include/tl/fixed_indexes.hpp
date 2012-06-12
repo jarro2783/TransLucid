@@ -90,15 +90,18 @@ namespace TransLucid
     //the constructor dim for data types
     DIM_CONS = -15,
 
+    //the rho dimension for the call stack
+    DIM_RHO = -16,
+
     //fix some defaults for arg0, arg1, arg2 and arg3 because they are commonly
     //used in code
-    DIM_ARG0 = -16,
-    DIM_ARG1 = -17,
-    DIM_ARG2 = -18,
-    DIM_ARG3 = -19,
+    DIM_ARG0 = -17,
+    DIM_ARG1 = -18,
+    DIM_ARG2 = -19,
+    DIM_ARG3 = -20,
 
     //the last one
-    DIM_INDEX_LAST = -20
+    DIM_INDEX_LAST = -21
   };
 
 } //namespace TransLucid

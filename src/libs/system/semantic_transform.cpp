@@ -90,6 +90,8 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   //rewrite E to
   //E @ [d_i <- E_i, Lin_i <- 0] @ [l <- #l + 1]
   //d_i is [which <- index_d, Lout_i <- #Lout_i]
+  //
+  //E @ [d_i <- (E_i @ [\rho <- tail.#!\rho])] @ [\rho <- Cons.l.#!\rho]
   Tree::TupleExpr::TuplePairs odometerDims;
 
   Tree::TupleExpr::TuplePairs outPairs;
@@ -126,40 +128,28 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     );
   }
 
-  //generate the E which sets L_in dimension to 0
-  for (auto dim : myLin)
-  {
-    odometerDims.push_back(
-      std::make_pair(Tree::DimensionExpr(dim), mpz_class(0)));
-  }
-
-  //increment our own dim
-  #if 0
-  Tree::Expr incOwnRaw = Tree::BinaryOpExpr
-    (
-      Tree::BinaryOperator(Tree::ASSOC_LEFT, U"plus", U"+", 0),
-      Tree::HashExpr(Tree::DimensionExpr(label), false),
-      mpz_class(1)
+  Tree::Expr pushRaw = 
+    Tree::LambdaAppExpr(
+      Tree::LambdaAppExpr(
+        Tree::IdentExpr(U"Cons"),
+        Tree::HashExpr(Tree::DimensionExpr(label))
+      ),
+      Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
     );
-  #endif
-  Tree::Expr incOwnRaw = Tree::BangAppExpr(
-    Tree::BaseAbstractionExpr(U"intmp_plus"),
-    {
-      Tree::HashExpr(Tree::DimensionExpr(label), false),
-      mpz_class(1)
-    }
-  );
 
   //need to do the whole tree fixup here
-  auto fixed = fixupTree(m_system, incOwnRaw);
-  Tree::Expr& incOwn = fixed.first;
+  auto fixed = fixupTree(m_system, pushRaw);
+  Tree::Expr& push = fixed.first;
   m_newVars.insert(m_newVars.end(), 
     fixed.second.equations.begin(), fixed.second.equations.end());
 
   w.e = Tree::AtExpr
     (
-      Tree::AtExpr(expr, Tree::TupleExpr(odometerDims)),
-      Tree::TupleExpr({{Tree::DimensionExpr(label), incOwn}})
+      Tree::AtExpr(expr, Tree::TupleExpr({{Tree::DimensionExpr(DIM_RHO), 
+        Tree::LambdaAppExpr(Tree::IdentExpr(U"tail"), 
+          Tree::HashExpr(Tree::DimensionExpr(DIM_RHO)))
+        }})),
+      Tree::TupleExpr({{Tree::DimensionExpr(label), push}})
     );
 
   //we return the rewritten E and add the variables to the list of variables
