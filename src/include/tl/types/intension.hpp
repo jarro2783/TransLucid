@@ -56,18 +56,25 @@ namespace TransLucid
       #warning implement me
       //ContextPerturber p(k, m_scope);
       
-      std::cerr << "eval inten {" << std::endl;
-      ContextPerturber p(m_k, k_a); 
+      //std::cerr << "eval inten {" << std::endl;
+
+      std::vector<std::pair<dimension_index, Constant>> saved;
+      saved.reserve(m_scope.size() + 1);
 
       for (auto d : m_scope)
       {
-        std::cerr << "adding dim " << d << std::endl;
-        p.perturb(d, m_k.lookup(d));
+        saved.push_back(std::make_pair(d, m_k.lookup(d)));
       }
+
+      saved.push_back(std::make_pair(DIM_RHO, m_k.lookup(DIM_RHO)));
+
+      ContextPerturber p(m_k, k_a); 
+
+      p.perturb(saved);
 
       auto result = (*m_ws)(m_k);
 
-      std::cerr << "}" << std::endl;
+      //std::cerr << "}" << std::endl;
 
       return result;
     }

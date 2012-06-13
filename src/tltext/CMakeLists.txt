@@ -36,8 +36,8 @@ add_definitions(${TLCFLAGS} -DTRANSLATE_DOMAIN=\"tltext\"
 
 add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})
 add_test(examples ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${EXAMPLESPATH})
-add_test(caching ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${CACHEPATH}
-  --cache)
+#add_test(caching ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${CACHEPATH}
+#  --cache)
 
 set(EXAMPLES_OUT examples.html)
 

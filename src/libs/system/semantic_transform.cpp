@@ -103,9 +103,9 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   }
 
   //generate a unique "which" for each dimension
+  int next = 0;
   for (const auto& v : e.dims)
   {
-    int next = m_system.nextHiddenDim();
     w.whichDims.push_back(next);
     odometerDims.push_back
     (
@@ -114,10 +114,13 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 
     //generate the dimExpr
     Tree::TupleExpr::TuplePairs dimTuple
-      {{Tree::DimensionExpr(U"which"), mpz_class(next)}}
-    ;
-
-    dimTuple.insert(dimTuple.end(), outPairs.begin(), outPairs.end());
+      {
+        {Tree::DimensionExpr(U"which"), mpz_class(next)},
+        {Tree::DimensionExpr(DIM_RHO), 
+          Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
+        }
+      }
+      ;
 
     //make a new var d = dimval
     m_newVars.push_back
@@ -126,6 +129,8 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
         Tree::TupleExpr(dimTuple)
       )
     );
+    
+    ++next;
   }
 
   Tree::Expr pushRaw = 

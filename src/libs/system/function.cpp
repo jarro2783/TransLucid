@@ -119,18 +119,18 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
         ++declIter;
         ++paramIter;
       }
-
-      auto guardFixed = fixupGuardArgs(fundecl->guard, rewrites);
-
-      //then create the conditional bestfit
-      cond.declarations.push_back(
-      std::make_tuple(
-        eqn.start(),
-        guardFixed,
-        fundecl->boolean,
-        fundecl->expr
-      ));
     }
+
+    auto guardFixed = fixupGuardArgs(fundecl->guard, rewrites);
+
+    //then create the conditional bestfit
+    cond.declarations.push_back(
+    std::make_tuple(
+      eqn.start(),
+      guardFixed,
+      fundecl->boolean,
+      fundecl->expr
+    ));
   }
 
   Tree::Expr abstractions = cond;

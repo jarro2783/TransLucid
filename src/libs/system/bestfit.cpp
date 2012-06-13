@@ -95,7 +95,7 @@ void
 BestfitGroup::compile(Context& k)
 {
   m_compiling = true;
-  std::cerr << "compiling " << m_name << std::endl;
+  //std::cerr << "compiling " << m_name << std::endl;
   parse(k);
 
   //add in the extra definitions for that which has changed
@@ -137,8 +137,8 @@ BestfitGroup::compileExpression(const Tree::Expr& expr)
   //fixup the ast
   Tree::Expr fixed = m_system.fixupTreeAndAdd(expr);
 
-  std::cerr << "fixed up tree: " << Printer::print_expr_tree(fixed)
-    << std::endl;
+  //std::cerr << "fixed up tree: " << Printer::print_expr_tree(fixed)
+  //  << std::endl;
 
   //compile the tree into a workshop
   WorkshopBuilder compile(&m_system);

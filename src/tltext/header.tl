@@ -333,10 +333,12 @@ fun canonical_print.c [c : range]   = print.c;;
 fun canonical_print.c [c : tuple]   = "[I don't know how to print a tuple]";;
 fun canonical_print.c               = print_typename.c + `"` + 
                                       escape_string.(print.c) + `"`;;
-//fun canonical_print.c = "cannot print this thing";;
 fun canonical_print.c [c : special] = print.c;;
 fun canonical_print.c [c : infty] = "infty";;
 fun canonical_print.c [c : neginfty] = "neginfty";;
+
+//I don't think that we want this definition
+//fun canonical_print.c = "cannot print this thing";;
 
 var RETURN = 0;;
 

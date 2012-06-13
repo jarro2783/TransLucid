@@ -204,7 +204,7 @@ template <typename... Delta>
 Constant
 IdentWS::evaluate(Context& kappa, Delta&&... delta)
 {
-  std::cerr << "evaluating variable: " << m_name << std::endl;
+  //std::cerr << "evaluating variable: " << m_name << std::endl;
   if (m_e == nullptr)
   {
     m_e = m_identifiers.lookup(m_name);
@@ -474,8 +474,8 @@ BangOpWS::operator()(Context& k)
 Constant
 MakeIntenWS::operator()(Context& k)
 {
-  std::cerr << "making intension with scope of size " << m_scope.size() 
-    << std::endl;
+  //std::cerr << "making intension with scope of size " << m_scope.size() 
+  //  << std::endl;
   return Types::Intension::create(m_rhs, m_scope, k);
 }
 
