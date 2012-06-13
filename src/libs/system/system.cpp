@@ -2076,21 +2076,11 @@ System::addTransformedEquations
   const std::vector<Parser::Equation>& newVars
 )
 {
-  WorkshopBuilder compile(this);
-
   //add all the new equations
   //std::cerr << "adding extra equations" << std::endl;
   for (const auto& e : newVars)
   {
-    //std::cerr << std::get<0>(e) << std::endl;
-    addDeclInternal(
-      std::get<0>(e),
-      GuardWS(compile.build_workshops(std::get<1>(e)),
-        compile.build_workshops(std::get<2>(e))),
-      compile.build_workshops(std::get<3>(e)),
-      m_equations,
-      m_equationUUIDs
-    );
+    addVariableDeclParsed(e);
   }
 }
 
