@@ -1920,13 +1920,29 @@ System::addHostFunction
 
   auto newname = os.str();
 
-  m_basefuns.insert(
-    std::make_pair(u32string(newname.begin(), newname.end()), theclone));
+  auto newname32 = u32string(newname.begin(), newname.end());
 
+  m_basefuns.insert(std::make_pair(newname32, theclone));
 
   //then add to m_identifiers
-  //name = BaseFunctionWS
+  //name = VariableWS
   //and add Tree::basefun(name_counter) to its definition
+  //
+  //for several additions of the base function through time we will have
+  //name = basefun(name_0)
+  //name = basefun(name_1)
+  //name = basefun(name_2)
+  //...
+
+  return addVariableDeclParsed(
+    Parser::Equation
+    (
+      name,
+      Tree::nil(),
+      Tree::nil(),
+      Tree::BaseAbstractionExpr(newname32)
+    )
+  );
 
   //std::unique_ptr<BangAbstractionWS> 
   //  op(new BangAbstractionWS(theclone.get()));
@@ -2099,14 +2115,14 @@ System::fixupTreeAndAdd(const Tree::Expr& e)
 BaseFunctionType*
 System::lookupBaseFunction(const u32string& name)
 {
-  auto iter = m_functionRegistry.find(name);
-  if (iter == m_functionRegistry.end())
+  auto iter = m_basefuns.find(name);
+  if (iter == m_basefuns.end())
   {
     return nullptr;
   }
   else
   {
-    return std::get<0>(iter->second);
+    return iter->second.get();
   }
 }
 
