@@ -201,6 +201,7 @@ namespace TransLucid
     : m_grouper(grouper)
     , m_system(system)
     , m_parsed(0)
+    , m_compiling(false)
     {
     }
 
@@ -270,6 +271,12 @@ namespace TransLucid
     Constant
     operator()(Context& kappa, Context& delta);
 
+    void
+    setName(const u32string& name)
+    {
+      m_name = name;
+    }
+
     private:
 
     void
@@ -338,6 +345,10 @@ namespace TransLucid
     std::vector<CompiledDefinition> m_evaluators;
 
     size_t m_parsed;
+
+    bool m_compiling;
+
+    u32string m_name;
   };
 
   /**

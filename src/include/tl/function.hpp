@@ -41,6 +41,7 @@ namespace TransLucid
     FunctionWS(const u32string& name, System& system)
     : m_name(name), m_system(system), m_bestfit(this, system)
     {
+      m_bestfit.setName(U"function: " + name);
     }
 
     Constant

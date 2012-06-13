@@ -57,6 +57,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unistd.h>
 
 #include <tl/assignment.hpp>
+#include <tl/basefun.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/cache.hpp>
 #include <tl/constws.hpp>
@@ -1895,20 +1896,51 @@ Constant
 System::addHostFunction
   (const u32string& name, BaseFunctionType* address, int arity)
 {
-  std::unique_ptr<BaseFunctionType> theclone(address->clone());
-  std::unique_ptr<BangAbstractionWS> 
-    op(new BangAbstractionWS(theclone.get()));
+  //m_baseCounter keeps the number of times this function has been
+  //defined, and m_basefuns is the actual definitions where the name has
+  //been appended with a version number
+  std::shared_ptr<BaseFunctionType> theclone(address->clone());
+
+  auto iter = m_baseCounter.find(name);
+
+  size_t count = 0;
+
+  if (iter == m_baseCounter.end())
+  {
+    m_baseCounter.insert(std::make_pair(name, 0));
+  }
+  else
+  {
+    count = iter->second;
+    ++iter->second;
+  }
+
+  std::ostringstream os;
+  os << name << "_" << count;
+
+  auto newname = os.str();
+
+  m_basefuns.insert(
+    std::make_pair(u32string(newname.begin(), newname.end()), theclone));
+
+
+  //then add to m_identifiers
+  //name = BaseFunctionWS
+  //and add Tree::basefun(name_counter) to its definition
+
+  //std::unique_ptr<BangAbstractionWS> 
+  //  op(new BangAbstractionWS(theclone.get()));
 
   //add equation fn.op_name = bang abstraction workshop with fn.fn
-  uuid u = addEquation(name, op.get());
-  Constant c = Types::UUID::create(u);
+  //uuid u = addEquation(name, op.get());
+  //Constant c = Types::UUID::create(u);
 
-  m_functionRegistry.insert({name, std::make_tuple(theclone.get(), u)});
+  //m_functionRegistry.insert({name, std::make_tuple(theclone.get(), u)});
 
-  op.release();
-  theclone.release();
+  //op.release();
+  //theclone.release();
 
-  return c;
+  //return c;
 }
 
 void

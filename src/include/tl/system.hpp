@@ -296,6 +296,13 @@ namespace TransLucid
     }
 
     private:
+
+    typedef std::unordered_map<u32string, size_t> BaseFunctionCounter;
+    typedef std::unordered_map<
+      u32string, 
+      std::shared_ptr<BaseFunctionType>
+    > BaseFunctionDefinitions;
+
     //definitions of Equations
     typedef std::unordered_map<uuid, DefinitionMap::iterator> UUIDDefinition;
 
@@ -415,6 +422,10 @@ namespace TransLucid
     std::shared_ptr<OpDefWS> m_operators;
     ConstructorMap m_constructors;
     AssignmentMap m_assignments;
+
+    //base functions
+    BaseFunctionCounter m_baseCounter;
+    BaseFunctionDefinitions m_basefuns;
 
     //TODO deprecating
     DefinitionMap m_equations;

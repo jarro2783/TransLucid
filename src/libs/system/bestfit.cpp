@@ -94,6 +94,8 @@ BestfitGroup::parse(Context& k)
 void
 BestfitGroup::compile(Context& k)
 {
+  m_compiling = true;
+  std::cerr << "compiling " << m_name << std::endl;
   parse(k);
 
   //add in the extra definitions for that which has changed
@@ -125,6 +127,8 @@ BestfitGroup::compile(Context& k)
       ++change;
     }
   }
+
+  m_compiling = false;
 }
 
 std::shared_ptr<WS>
@@ -165,7 +169,13 @@ BestfitGroup::compileInstant(int time)
 Constant
 BestfitGroup::operator()(Context& k)
 {
-  if (m_parsed != m_definitions.size())
+  if (m_compiling)
+  {
+    throw U"loop compiling BestfitGroup: " + m_name;
+  }
+
+  //if (m_parsed != m_definitions.size())
+  if (m_changes.size() > m_evaluators.size())
   {
     try
     {

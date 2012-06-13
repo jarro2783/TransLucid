@@ -100,6 +100,7 @@ VariableWS::VariableWS(const u32string& name, System& system)
   )
 #endif
 {
+  m_bestfit.setName(U"variable: " + m_name);
 }
 
 VariableWS::~VariableWS()

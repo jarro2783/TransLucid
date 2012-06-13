@@ -21,7 +21,7 @@ includesdir = $(prefix)/include/tl
 
 includes_HEADERS = \
   assignment.hpp ast.hpp ast_fwd.hpp \
-  bestfit.hpp builtin_types.hpp \
+  basefun.hpp bestfit.hpp builtin_types.hpp \
   cache.hpp \
   charset.hpp constws.hpp context.hpp datadef.hpp \
   dimtranslator.hpp equation.hpp exception.hpp \

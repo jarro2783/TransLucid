@@ -137,18 +137,23 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
       Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
     );
 
+  Tree::Expr popRaw =
+    Tree::LambdaAppExpr(
+      Tree::IdentExpr(U"tail"), 
+      Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
+    );
+
   //need to do the whole tree fixup here
-  auto fixed = fixupTree(m_system, pushRaw);
-  Tree::Expr& push = fixed.first;
-  m_newVars.insert(m_newVars.end(), 
-    fixed.second.equations.begin(), fixed.second.equations.end());
+  auto push = fullFixTree(pushRaw);
+  auto pop = fullFixTree(popRaw);
 
   w.e = Tree::AtExpr
     (
-      Tree::AtExpr(expr, Tree::TupleExpr({{Tree::DimensionExpr(DIM_RHO), 
-        Tree::LambdaAppExpr(Tree::IdentExpr(U"tail"), 
-          Tree::HashExpr(Tree::DimensionExpr(DIM_RHO)))
-        }})),
+      Tree::AtExpr(
+        expr, 
+        Tree::TupleExpr({
+          {Tree::DimensionExpr(DIM_RHO), pop}
+        })),
       Tree::TupleExpr({{Tree::DimensionExpr(label), push}})
     );
 
@@ -231,6 +236,17 @@ Tree::Expr
 SemanticTransform::operator()(const Tree::PhiExpr& e)
 {
   throw "error: SemanticTransform(PhiExpr) reached";
+}
+
+Tree::Expr
+SemanticTransform::fullFixTree(const Tree::Expr& expr)
+{
+  //need to do the whole tree fixup here
+  auto fixed = fixupTree(m_system, expr);
+  m_newVars.insert(m_newVars.end(), 
+    fixed.second.equations.begin(), fixed.second.equations.end());
+
+  return fixed.first;
 }
 
 }
