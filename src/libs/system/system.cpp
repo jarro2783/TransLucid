@@ -1058,6 +1058,7 @@ System::~System()
 void
 System::go()
 {
+  setDefaultContext();
   for (auto& assign : m_assignments)
   {
     assign.second->evaluate(*this, m_defaultk);
@@ -1185,21 +1186,12 @@ System::addDimension(const u32string& dimension)
 {
   //add equation DIM | [name : "dimension"] = true
   //add equation dimension = Tree::DimensionExpr(U"dimension")
-  Constant c = addEquation(Parser::Equation(
+  return addVariableDeclParsed(Parser::Equation(
     dimension,
     Tree::Expr(),
     Tree::Expr(), 
     Tree::DimensionExpr(dimension)
   ));
-
-  //add to the set of dimensions
-  if (c.index() != TYPE_INDEX_SPECIAL)
-  {
-    //TODO make the uuid type and then this is where we extract it
-    m_dimension_uuids.insert(Types::UUID::get(c));
-  }
-
-  return c;
 }
 
 Constant

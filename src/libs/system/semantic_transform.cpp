@@ -137,7 +137,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     Tree::LambdaAppExpr(
       Tree::LambdaAppExpr(
         Tree::IdentExpr(U"Cons"),
-        Tree::HashExpr(Tree::DimensionExpr(label))
+        Tree::DimensionExpr(label)
       ),
       Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
     );
@@ -159,7 +159,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
         Tree::TupleExpr({
           {Tree::DimensionExpr(DIM_RHO), pop}
         })),
-      Tree::TupleExpr({{Tree::DimensionExpr(label), push}})
+      Tree::TupleExpr({{Tree::DimensionExpr(DIM_RHO), push}})
     );
 
   //we return the rewritten E and add the variables to the list of variables
