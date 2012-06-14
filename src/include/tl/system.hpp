@@ -295,6 +295,12 @@ namespace TransLucid
       return iter == m_outputHDs.end() ? nullptr : iter->second;
     }
 
+    int
+    nextWhere()
+    {
+      return m_whereCounter++;
+    }
+
     private:
 
     typedef std::unordered_map<u32string, size_t> BaseFunctionCounter;
@@ -476,6 +482,7 @@ namespace TransLucid
     size_t m_uniqueVarIndex;
     size_t m_uniqueDimIndex;
     dimension_index m_hiddenDim;
+    int m_whereCounter;
 
     bool m_debug;
     bool m_verbose;
@@ -554,6 +561,13 @@ namespace TransLucid
     addVariableDeclParsed
     (
       Parser::Equation decl
+    );
+
+    Constant
+    addDimDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
     );
 
     Constant

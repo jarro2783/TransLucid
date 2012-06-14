@@ -1013,6 +1013,7 @@ System::System(bool cached)
 , m_uniqueVarIndex(0)
 , m_uniqueDimIndex(0)
 , m_hiddenDim(-1)
+, m_whereCounter(0)
 , m_debug(false)
 {
   //create the obj, const and fun ids
@@ -2143,6 +2144,10 @@ System::addDeclaration(const Parser::RawInput& input)
   {
     return addVariableDeclRaw(input, lexit);
   }
+  else if (token == U"dim")
+  {
+    return addDimDeclRaw(input, lexit);
+  }
   else if (token == U"fun")
   {
     return addFunDeclRaw(input, lexit);
@@ -2279,6 +2284,30 @@ System::addConstructorRaw
   u32string name = get<u32string>(iter->getValue());
 
   return addConstructorInternal(name, input);
+}
+
+Constant
+System::addDimDeclRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+   ++iter;
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string name = get<u32string>(iter->getValue());
+
+  return addVariableDeclParsed(Parser::Equation
+  (
+    name, 
+    Tree::Expr(), 
+    Tree::Expr(),
+    Tree::DimensionExpr(nextHiddenDim())
+  ));
 }
 
 } //namespace TransLucid

@@ -137,8 +137,8 @@ BestfitGroup::compileExpression(const Tree::Expr& expr)
   //fixup the ast
   Tree::Expr fixed = m_system.fixupTreeAndAdd(expr);
 
-  //std::cerr << "fixed up tree: " << Printer::print_expr_tree(fixed)
-  //  << std::endl;
+  //std::cerr << m_name << ": fixed up tree: " << Printer::print_expr_tree(fixed)
+  //  << ";;\n" << std::endl;
 
   //compile the tree into a workshop
   WorkshopBuilder compile(&m_system);

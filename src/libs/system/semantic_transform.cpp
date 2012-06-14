@@ -41,7 +41,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   std::vector<dimension_index> myLin;
   
   //generate new label
-  dimension_index label = m_system.nextHiddenDim();
+  dimension_index label = m_system.nextWhere();
   w.myDim = label;
 
   //store L_out
