@@ -36,6 +36,8 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   //all the names are already unique
   Tree::WhereExpr w = e;
 
+  w.vars.clear();
+
   std::vector<dimension_index> myLin;
   
   //generate new label
@@ -67,16 +69,21 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     Tree::Expr booleanExpr = apply_visitor(*this, std::get<2>(evar));;
     myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
-    m_newVars.push_back
-    (
-      Parser::Equation
+    auto newEqn = Parser::Equation
       (
         std::get<0>(evar),
         guardExpr,
         booleanExpr,
         varExpr
-      )
+      );
+
+    m_newVars.push_back
+    (
+      newEqn
     );
+
+    w.vars.push_back(newEqn);
+
     m_Lin.clear();
   }
 
