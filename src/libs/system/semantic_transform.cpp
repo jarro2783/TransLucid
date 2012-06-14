@@ -92,25 +92,22 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   //d_i is [which <- index_d, Lout_i <- #Lout_i]
   //
   //E @ [d_i <- (E_i @ [\rho <- tail.#!\rho])] @ [\rho <- Cons.l.#!\rho]
-  Tree::TupleExpr::TuplePairs odometerDims;
 
-  Tree::TupleExpr::TuplePairs outPairs;
-  //generate the Lout_i pairs
-  for (dimension_index d : m_Lout)
-  {
-    outPairs.push_back(std::make_pair(Tree::DimensionExpr(d),
-      Tree::HashExpr(Tree::DimensionExpr(d), false)));
-  }
+  Tree::Expr popRaw =
+    Tree::LambdaAppExpr(
+      Tree::IdentExpr(U"tail"), 
+      Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
+    );
+
+  auto pop = fullFixTree(popRaw);
+
+  Tree::TupleExpr dimInit;
 
   //generate a unique "which" for each dimension
   int next = 0;
   for (const auto& v : e.dims)
   {
     w.whichDims.push_back(next);
-    odometerDims.push_back
-    (
-      std::make_pair(Tree::IdentExpr(v.first), apply_visitor(*this, v.second))
-    );
 
     //generate the dimExpr
     Tree::TupleExpr::TuplePairs dimTuple
@@ -121,6 +118,22 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
         }
       }
       ;
+
+    if (get<Tree::nil>(&v.second) == nullptr)
+    {
+      dimInit.pairs.push_back(std::make_pair
+        (
+          Tree::IdentExpr(v.first),
+          Tree::AtExpr
+          (
+            apply_visitor(*this, v.second),
+            Tree::TupleExpr
+            ({
+              {Tree::DimensionExpr(DIM_RHO), pop}
+            })
+          )
+        ));
+    }
 
     //make a new var d = dimval
     m_newVars.push_back
@@ -142,23 +155,15 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
       Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
     );
 
-  Tree::Expr popRaw =
-    Tree::LambdaAppExpr(
-      Tree::IdentExpr(U"tail"), 
-      Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
-    );
-
   //need to do the whole tree fixup here
   auto push = fullFixTree(pushRaw);
-  auto pop = fullFixTree(popRaw);
 
   w.e = Tree::AtExpr
     (
       Tree::AtExpr(
         expr, 
-        Tree::TupleExpr({
-          {Tree::DimensionExpr(DIM_RHO), pop}
-        })),
+        dimInit
+      ),
       Tree::TupleExpr({{Tree::DimensionExpr(DIM_RHO), push}})
     );
 
