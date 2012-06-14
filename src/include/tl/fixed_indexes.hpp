@@ -51,7 +51,6 @@ namespace TransLucid
     TYPE_INDEX_VALUE_FUNCTION,
     TYPE_INDEX_NAME_FUNCTION,
     TYPE_INDEX_UUID,
-    TYPE_INDEX_WS, //this will go away and intension will be left
     TYPE_INDEX_INTENSION,
     TYPE_INDEX_INHD,
     TYPE_INDEX_IOHD,
