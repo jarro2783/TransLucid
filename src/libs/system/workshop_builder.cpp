@@ -245,7 +245,7 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 {
-  WS* rhs = apply_visitor(*this, e.rhs);
+  WS* rhs = operator()(e.inten);
 
   return new Workshops::LambdaAbstractionWS
   (

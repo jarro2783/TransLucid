@@ -206,7 +206,7 @@ SemanticTransform::operator()(const Tree::MakeIntenExpr& e)
 {
   Tree::MakeIntenExpr inten;
   inten.expr = apply_visitor(*this, e.expr);
-  inten.scope = m_scope;
+  inten.scope.insert(inten.scope.end(), m_scope.begin(), m_scope.end());
 
   return inten;
 }
@@ -244,7 +244,10 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   m_lambdaScope.erase(e.name);
 
   //wrap the child up in an intension
-  expr.rhs = Tree::MakeIntenExpr(child, m_scope);
+  //expr.rhs = Tree::MakeIntenExpr(child, m_scope);
+  expr.inten.expr = child;
+  expr.inten.scope.insert(expr.inten.scope.end(), m_scope.begin(), 
+    m_scope.end());
 
   return expr;
 }

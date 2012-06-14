@@ -643,6 +643,8 @@ namespace TransLucid
       u32string name; /**<The bound parameter.*/
       Expr rhs; /**<The right-hand-side expression.*/
 
+      MakeIntenExpr inten;
+
       dimension_index argDim;
     };
 
