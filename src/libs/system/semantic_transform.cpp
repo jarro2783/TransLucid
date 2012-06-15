@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/output.hpp>
 #include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
 #include <tl/utility.hpp>
@@ -206,6 +207,7 @@ SemanticTransform::operator()(const Tree::MakeIntenExpr& e)
 {
   Tree::MakeIntenExpr inten;
   inten.expr = apply_visitor(*this, e.expr);
+
   inten.scope.insert(inten.scope.end(), m_scope.begin(), m_scope.end());
 
   return inten;
@@ -239,12 +241,12 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   auto child = apply_visitor(*this, expr.rhs);
 
   //5. restore the scope
-  //m_scope.pop_back();
-  m_scope.resize(m_scope.size() - 1);
+  m_scope.pop_back();
+  //m_scope.resize(m_scope.size() - 1);
   m_lambdaScope.erase(e.name);
 
   //wrap the child up in an intension
-  //expr.rhs = Tree::MakeIntenExpr(child, m_scope);
+  expr.rhs = child;
   expr.inten.expr = child;
   expr.inten.scope.insert(expr.inten.scope.end(), m_scope.begin(), 
     m_scope.end());

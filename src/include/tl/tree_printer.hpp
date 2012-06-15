@@ -27,7 +27,7 @@ namespace TransLucid
 {
   namespace Printer
   {
-    std::string print_expr_tree(const Tree::Expr& expr);
+    std::string print_expr_tree(const Tree::Expr& expr, bool verbose = false);
 
     std::string
     printEquation(const Parser::Equation& e);

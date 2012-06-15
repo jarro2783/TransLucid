@@ -41,8 +41,16 @@ class TreePrinter
   //of course since this class is only used internally, you knew all that right
   std::string printTree(const Tree::Expr& e);
 
+  void
+  verbose()
+  {
+    m_verbose = true;
+  }
+
   private:
   std::ostringstream m_os;
+
+  bool m_verbose;
 
   enum class Subtree
   {
@@ -351,9 +359,26 @@ class TreePrinter
   }
 
   void
+  printIntenScope(const Tree::MakeIntenExpr& e)
+  {
+    m_os << " {";
+    for (auto d : e.scope)
+    {
+      m_os << d << ", ";
+    }
+    m_os << "}";
+  }
+
+  void
   operator()(const Tree::MakeIntenExpr& e)
   {
     m_os << u32string(U"↑");
+
+    if (m_verbose)
+    {
+      printIntenScope(e);
+    }
+
     apply_visitor(*this, e.expr);
   }
 
@@ -448,12 +473,31 @@ class TreePrinter
     pp(')', Precedence::FN_APP);
   }
 
+  void
+  printFnIntenScope(const Tree::PhiExpr& l)
+  {
+  }
+
+  void
+  printFnIntenScope(const Tree::LambdaExpr& l)
+  {
+    printIntenScope(l.inten);
+  }
+
   template <typename Fn>
   void
   print_fn_abstraction(const Fn& f, const u32string& symbol)
   {
     pp('(', Precedence::FN_ABSTRACTION);
-    m_os << symbol << f.argDim << " -> ";
+    m_os << symbol << f.argDim;
+
+    if (m_verbose)
+    {
+      printFnIntenScope(f);
+    }
+    
+    m_os << " -> ";
+
     parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
     apply_visitor(*this, f.rhs);
     parenPop();
@@ -556,9 +600,15 @@ class TreePrinter
   }
 };
 
-std::string print_expr_tree(const Tree::Expr& expr)
+std::string print_expr_tree(const Tree::Expr& expr, bool verbose)
 {
   TreePrinter print;
+
+  if (verbose)
+  {
+    print.verbose();
+  }
+
   return print.printTree(expr);
 }
 

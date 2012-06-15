@@ -28,8 +28,8 @@ along with TransLucid; see the file COPYING.  If not see
  * The output is a tree rewritten according to the transformation.
  */
 
-#ifndef TL_REMOVE_CBN_HPP_INCLUDED
-#define TL_REMOVE_CBN_HPP_INCLUDED
+#ifndef TL_FUNCTION_TRANSFORM_HPP_INCLUDED
+#define TL_FUNCTION_TRANSFORM_HPP_INCLUDED
 
 #include <tl/generic_walker.hpp>
 

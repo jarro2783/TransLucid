@@ -33,6 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/rename.hpp>
 #include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
+#include <tl/tree_printer.hpp>
 #include <tl/tree_rewriter.hpp>
 #include <tl/types.hpp>
 #include <tl/types/demand.hpp>
@@ -710,6 +711,9 @@ fixupTree(System& s, const Tree::Expr& e)
   Tree::Expr e2 = renamer.rename(e1);
   Tree::Expr e3 = funs.transform(e2);
   Tree::Expr e4 = transform.transform(e3);
+
+  //std::cerr << "after fixing up tree: " << Printer::print_expr_tree(e4, true)
+  //  << std::endl;
 
   const auto& scope = transform.getAllScopeArgs();
   const auto& odo = transform.getAllScopeOdometer();
