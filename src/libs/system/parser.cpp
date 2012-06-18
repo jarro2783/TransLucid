@@ -913,11 +913,11 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
 
   if (type == TOKEN_SLASH)
   {
-    result = Tree::LambdaExpr(std::move(name), std::move(rhs));
+    result = Tree::LambdaExpr(std::move(name), binds, std::move(rhs));
   }
   else if (type == TOKEN_DBLSLASH)
   {
-    result = Tree::PhiExpr(std::move(name), std::move(rhs));
+    result = Tree::PhiExpr(std::move(name), binds, std::move(rhs));
   }
   else
   {

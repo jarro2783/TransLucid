@@ -217,13 +217,16 @@ Constant
 ValueFunctionType::apply(Context& k, const Constant& value) const
 {
   //set m_dim = value in the context and evaluate the expr
-  ContextPerturber p(k, {{m_dim, value}});
+  Constant intenConstant;
+  {
+    ContextPerturber p(m_kappa, {{m_dim, value}});
 
-  //std::cerr << "setting dim " << m_dim << std::endl;
+    //std::cerr << "setting dim " << m_dim << std::endl;
 
-  auto intenConstant = (*m_expr)(m_kappa);
+    intenConstant = (*m_expr)(m_kappa);
+  }
 
-  if (intenConstant.index() != TYPE_INDEX_SPECIAL)
+  if (intenConstant.index() != TYPE_INDEX_INTENSION)
   {
     return Types::Special::create(SP_TYPEERROR);
   }

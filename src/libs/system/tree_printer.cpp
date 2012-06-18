@@ -374,6 +374,8 @@ class TreePrinter
   {
     m_os << u32string(U"↑");
 
+    print_binds(e.binds);
+
     if (m_verbose)
     {
       printIntenScope(e);
@@ -482,6 +484,25 @@ class TreePrinter
   printFnIntenScope(const Tree::LambdaExpr& l)
   {
     printIntenScope(l.inten);
+    print_binds(l.inten.binds);
+  }
+
+  template <typename Container>
+  void
+  print_binds(Container&& c)
+  {
+    if (c.size() != 0)
+    {
+      m_os << "{";
+
+      for (auto& b : c)
+      {
+        apply_visitor(*this, b);
+        m_os << ", ";
+      }
+
+      m_os << "}";
+    }
   }
 
   template <typename Fn>
@@ -489,12 +510,17 @@ class TreePrinter
   print_fn_abstraction(const Fn& f, const u32string& symbol)
   {
     pp('(', Precedence::FN_ABSTRACTION);
-    m_os << symbol << f.argDim;
+
+    m_os << symbol;
+
+    print_binds(f.binds);
 
     if (m_verbose)
     {
       printFnIntenScope(f);
     }
+
+    m_os << "(" << f.name << ", " << f.argDim << ")";
     
     m_os << " -> ";
 
@@ -584,7 +610,7 @@ class TreePrinter
   void
   operator()(const Tree::ConditionalBestfitExpr& c)
   {
-    m_os << "bestof";
+    m_os << "bestof ";
 
     for (auto& decl : c.declarations)
     {
