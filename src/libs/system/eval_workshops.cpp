@@ -1006,58 +1006,6 @@ LambdaApplicationWS::operator()(Context& kappa, Context& delta)
 }
 
 Constant
-NamedAbstractionWS::operator()(Context& k)
-{
-  return createNameFunction
-    (
-      m_system, 
-      m_name, 
-      m_argDim, 
-      m_odometerDim, 
-      std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
-      std::vector<std::pair<u32string, dimension_index>>
-        (m_free.begin(), m_free.end()), 
-      m_rhs, 
-      k
-    );
-
-  #if 0
-  return Types::NameFunction::create
-  (
-    NameFunctionType
-    (
-      m_system,
-      m_name,
-      m_argDim,
-      m_odometerDim,
-      m_scope,
-      m_free,
-      m_rhs, 
-      k
-    )
-  );
-  #endif
-}
-
-Constant
-NamedAbstractionWS::operator()(Context& kappa, Context& delta)
-{
-  return createNameFunctionCached
-    (
-      m_system, 
-      m_name, 
-      m_argDim, 
-      m_odometerDim, 
-      std::vector<dimension_index>(m_scope.begin(), m_scope.end()), 
-      std::vector<std::pair<u32string, dimension_index>>
-        (m_free.begin(), m_free.end()), 
-      m_rhs, 
-      kappa,
-      delta
-    );
-}
-
-Constant
 AtTupleWS::operator()(Context& k)
 {
   //evaluate the tuple into a vector of fixed size

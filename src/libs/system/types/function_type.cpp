@@ -81,31 +81,6 @@ bool function_less
 
 }
 
-NameFunctionType::NameFunctionType
-(
-  System* system,
-  const u32string& name, 
-  dimension_index argDim, 
-  dimension_index odometerDim, 
-  const std::vector<dimension_index>& scope,
-  const std::vector<std::pair<u32string, dimension_index>>& free,
-  WS* expr,
-  Context& k
-)
-: m_system(system), m_name(name), m_argDim(argDim), 
-  m_odometerDim(odometerDim), m_expr(expr), m_free(free)
-{
-  for (auto d : scope)
-  {
-    m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
-  }
-
-  if (!m_free.empty())
-  {
-    m_freeContext = k;
-  }
-}
-
 Constant
 createValueFunction
 (
@@ -137,79 +112,6 @@ createValueFunctionCached
 {
   return Types::ValueFunction::create(
     ValueFunctionType(system, name, argDim, expr, kappa)
-  );
-}
-
-Constant
-createNameFunction
-(
-  System *system,
-  const u32string& name, 
-  dimension_index argDim, 
-  dimension_index odometerDim,
-  const std::vector<dimension_index>& scope,
-  const std::vector<std::pair<u32string, dimension_index>>& free,
-  WS* expr,
-  Context& kappa
-)
-{
-  return Types::NameFunction::create(
-    NameFunctionType(system, name, argDim, odometerDim, 
-      scope, free, expr, kappa)
-  );
-}
-
-//check for scope dimensions
-//evaluate free variables, checking for demands
-//then create the actual function
-Constant
-createNameFunctionCached
-(
-  System *system,
-  const u32string& name, 
-  dimension_index argDim, 
-  dimension_index odometerDim,
-  const std::vector<dimension_index>& scope,
-  const std::vector<std::pair<u32string, dimension_index>>& free,
-  WS* expr,
-  Context& kappa,
-  Context& delta
-)
-{
-  std::vector<dimension_index> demands;
-  std::vector<std::pair<dimension_index, Constant>> freeValues;
-
-  System::IdentifierLookup idents = system->lookupIdentifiers();
-
-  //evaluate all of the free variables
-  for (const auto& v : free)
-  {
-    auto var = idents.lookup(v.first);
-    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-      : (*idents.lookup(v.first))(kappa, delta);
-
-    if (value.index() == TYPE_INDEX_DEMAND)
-    {
-      Types::Demand::append(value, demands);
-    }
-
-    freeValues.push_back(std::make_pair(
-      v.second, value
-    ));
-  }
-
-  return Types::NameFunction::create(
-    NameFunctionType
-    (
-      system,
-      name,
-      argDim,
-      odometerDim,
-      scope,
-      free,
-      expr,
-      kappa
-    )
   );
 }
 
@@ -261,118 +163,10 @@ ValueFunctionType::apply
   return Constant();
 }
 
-Constant
-NameFunctionType::apply
-(
-  Context& k, 
-  const Constant& c,
-  std::vector<dimension_index>& Lall
-) const
-{
-  //add to the list of our args
-  //pre: c is a workshop value
-
-  //add to the list of odometers
-  tuple_t odometer;
-  for (auto d : Lall)
-  {
-    odometer.insert(std::make_pair(d, k.lookup(d)));
-  }
-
-  //argdim = cons(c, #argdim)
-  Tuple argList = makeList(c, k.lookup(m_argDim));
-  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
-    k.lookup(m_odometerDim));
-
-  ContextPerturber p(k,
-  {
-    {m_argDim, Types::Tuple::create(argList)},
-    {m_odometerDim, Types::Tuple::create(odometerList)}
-  });
-
-  p.perturb(m_scopeDims);
-
-  return (*m_expr)(k);
-}
-
-Constant
-NameFunctionType::apply
-(
-  Context& kappa, 
-  Context& delta, 
-  const Constant& c,
-  std::vector<dimension_index>& Lall
-) const
-{
-  //add to the list of our args
-  //pre: c is a workshop value
-
-  //add to the list of odometers
-  //std::vector<dimension_index> demands;
-  tuple_t odometer;
-  for (auto d : Lall)
-  {
-    #if 0
-    if (!delta.has_entry(d))
-    {
-      demands.push_back(d);
-    }
-    #endif
-    odometer.insert(std::make_pair(d, kappa.lookup(d)));
-  }
-
-  //first lookup the dimensions that we need
-  //if (!delta.has_entry(m_argDim))
-  //{
-  //  demands.push_back(m_argDim);
-  //}
-
-  //if (!delta.has_entry(m_odometerDim))
-  //{
-  //  demands.push_back(m_odometerDim);
-  //}
-
-  #if 0
-  if (!demands.empty())
-  {
-    return Types::Demand::create(demands);
-  }
-  #endif
-
-  //argdim = cons(c, #argdim)
-  Tuple argList = makeList(c, kappa.lookup(m_argDim));
-  Tuple odometerList = makeList(Types::Tuple::create(Tuple(odometer)),
-    kappa.lookup(m_odometerDim));
-
-  ContextPerturber pkappa{kappa};
-  ContextPerturber pdelta{delta};
-
-  std::initializer_list<std::pair<dimension_index, Constant>>
-  toChange = {
-    {m_argDim, Types::Tuple::create(argList)},
-    {m_odometerDim, Types::Tuple::create(odometerList)}
-  };
-
-  pkappa.perturb(toChange);
-  pdelta.perturb(toChange);
-
-  pkappa.perturb(m_scopeDims);
-  pdelta.perturb(m_scopeDims);
-
-  return (*m_expr)(kappa, delta);
-}
-
 bool
 ValueFunctionType::less(const ValueFunctionType& rhs) const
 {
   //this needs to be implemented properly
-  return false;
-  //return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
-}
-
-bool
-NameFunctionType::less(const NameFunctionType& rhs) const
-{
   return false;
   //return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
 }
@@ -388,20 +182,6 @@ less(const Constant& lhs, const Constant& rhs)
 {
   const auto& flhs = get_constant_pointer<ValueFunctionType>(lhs);
   const auto& frhs = get_constant_pointer<ValueFunctionType>(rhs);
-
-  return flhs.less(frhs);
-}
-
-}
-
-namespace NameFunction
-{
-
-bool
-less(const Constant& lhs, const Constant& rhs)
-{
-  const auto& flhs = get_constant_pointer<NameFunctionType>(lhs);
-  const auto& frhs = get_constant_pointer<NameFunctionType>(rhs);
 
   return flhs.less(frhs);
 }
