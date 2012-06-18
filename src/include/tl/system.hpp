@@ -193,26 +193,12 @@ namespace TransLucid
       OutputHD* hd
     );
 
-    Constant
-    addInputHyperdaton
-    (
-      const u32string& name,
-      InputHD* hd
-    );
-
-    void
-    addOutputDeclaration
-    (
-      const u32string& name,
-      const Tree::Expr& guard
-    );
-
-    void
-    addInputDeclaration
-    (
-      const u32string& name,
-      const Tree::Expr& guard
-    );
+    //Constant
+    //addInputHyperdaton
+    //(
+    //  const u32string& name,
+    //  InputHD* hd
+    //);
 
     //parses an expression, returns a tree of the expression as parsed by
     //the current definitions of the system
@@ -333,10 +319,6 @@ namespace TransLucid
     void
     init_types();
 
-    //initialises the default equations
-    void
-    init_equations();
-
     void 
     init_dimensions(const std::initializer_list<u32string>& args);
 
@@ -347,15 +329,6 @@ namespace TransLucid
     // -- internal add functions --
 
     template <typename T>
-    Constant
-    addSymbolInfo
-    (
-      const u32string& eqn, 
-      const u32string& s, 
-      const T& value
-    );
-
-    template <typename T>
     Tuple
     addHDDecl
     (
@@ -363,18 +336,6 @@ namespace TransLucid
       const Tree::Expr& guard,
       T& decls
     );
-
-    Constant 
-    addOpType(const u32string& symbol, const u32string& type);
-
-    Constant
-    addATLSymbol(const u32string& symbol, const u32string& op);
-
-    Constant
-    addAssoc(const u32string& symbol, const u32string assoc);
-
-    Constant
-    addPrecedence(const u32string& symbol, const mpz_class& precedence);
 
     uuid
     addDeclInternal
@@ -397,16 +358,6 @@ namespace TransLucid
     Tree::Expr
     toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
       Renames&&... renames);
-
-    void
-    addDefaultDimensions
-    (
-      const std::vector<dimension_index>& zeros,
-      const std::vector<dimension_index>& nils
-    );
-
-    void
-    addDefaultDimensions(const SemanticTransform& t);
 
     bool m_cached;
     bool m_cacheEnabled;

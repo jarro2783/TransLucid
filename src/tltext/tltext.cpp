@@ -489,9 +489,12 @@ TLText::setup_clargs()
       ++i;
     }
 
-    m_system.addInputHyperdaton(U"CLARGS", m_argsHD);
+    //m_system.addInputHyperdaton(U"CLARGS", m_argsHD);
   }
+
+  //TODO work out input hyperdatons
   
+  #if 0
   m_system.addEquation(Parser::Equation
     {
       U"CLARGS",
@@ -500,14 +503,15 @@ TLText::setup_clargs()
       u32string()
     }
   );
+  #endif
 }
 
 void
 TLText::setup_envhd()
 {
-  m_envHD = new EnvHD(m_system, m_system);
+  //m_envHD = new EnvHD(m_system, m_system);
 
-  m_system.addInputHyperdaton(U"ENV", m_envHD);
+  //m_system.addInputHyperdaton(U"ENV", m_envHD);
 }
 
 
