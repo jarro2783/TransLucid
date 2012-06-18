@@ -214,15 +214,6 @@ namespace TransLucid
       const Tree::Expr& guard
     );
 
-    Constant
-    parseLine
-    (
-      Parser::StreamPosIterator& begin, 
-      const Parser::StreamPosIterator& end,
-      int verbose = 1, 
-      bool debug = false
-    );
-
     //parses an expression, returns a tree of the expression as parsed by
     //the current definitions of the system
     bool
