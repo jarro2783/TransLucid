@@ -1,5 +1,5 @@
 /* The parser.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -240,6 +240,7 @@ Parser::Parser(System& system)
   add_decl_parser(m_top_decls, U"hd", this, &Parser::parse_in_decl);
   add_decl_parser(m_top_decls, U"out", this, &Parser::parse_out_decl);
   add_decl_parser(m_top_decls, U"data", this, &Parser::parse_data_decl);
+  add_decl_parser(m_top_decls, U"constructor", this, &Parser::parse_cons_decl);
   add_decl_parser(m_top_decls, U"fun", this, &Parser::parse_fun_decl);
   add_decl_parser(m_top_decls, U"op", this, &Parser::parse_op_decl);
   add_decl_parser(m_top_decls, U"del", this, &Parser::parse_del_decl);
@@ -705,6 +706,36 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
     begin = current;
     return true;
   }
+  else if (*begin == TOKEN_UARROW)
+  {
+    auto current = begin;
+    ++current;
+
+    std::vector<Tree::Expr> binds;
+    parse_bound_dims(current, end, binds);
+
+    Tree::Expr rhs;
+    expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
+
+    result = Tree::MakeIntenExpr(rhs, binds);
+
+    begin = current;
+
+    return true;
+  }
+  else if (*begin == TOKEN_DARROW)
+  {
+    auto current = begin;
+
+    Tree::Expr rhs;
+    expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
+
+    result = Tree::EvalIntenExpr(rhs);
+
+    begin = current;
+
+    return true;
+  }
   else
   {
     return parse_postfix_expr(begin, end, result);
@@ -898,6 +929,9 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
 {
   LexerIterator current = begin;
 
+  std::vector<Tree::Expr> binds;
+  parse_bound_dims(current, end, binds);
+
   expect_no_advance(current, end, "identifier", TOKEN_ID);
   u32string name = get<u32string>(current->getValue());
   ++current;
@@ -909,11 +943,11 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
 
   if (type == TOKEN_SLASH)
   {
-    result = Tree::LambdaExpr(std::move(name), std::move(rhs));
+    result = Tree::LambdaExpr(std::move(name), binds, std::move(rhs));
   }
   else if (type == TOKEN_DBLSLASH)
   {
-    result = Tree::PhiExpr(std::move(name), std::move(rhs));
+    result = Tree::PhiExpr(std::move(name), binds, std::move(rhs));
   }
   else
   {
@@ -921,6 +955,51 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
   }
 
   //once it has all worked we can move along the iterator
+  begin = current;
+}
+
+bool
+Parser::parse_bound_dims(LexerIterator& begin, const LexerIterator& end,
+  std::vector<Tree::Expr>& result)
+{
+  if (*begin != TOKEN_LBRACE)
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+
+  ++current;
+
+  parse_expr_list(current, end, result);
+
+  expect(current, end, "}", TOKEN_RBRACE);
+
+  begin = current;
+
+  return true;
+}
+
+void
+Parser::parse_expr_list(LexerIterator& begin, const LexerIterator& end,
+  std::vector<Tree::Expr>& result)
+{
+  Tree::Expr expr;
+
+  auto current = begin;
+  
+  while (parse_expr(current, end, expr))
+  {
+    result.push_back(expr);
+
+    if (*current != TOKEN_COMMA)
+    {
+      break;
+    }
+
+    ++current;
+  }
+
   begin = current;
 }
 
@@ -1282,6 +1361,52 @@ Parser::parse_data_decl(LexerIterator& begin, const LexerIterator& end,
 }
 
 bool
+Parser::parse_cons_decl(LexerIterator& begin, const LexerIterator& end,
+  Line& result)
+{
+  if (*begin != TOKEN_DECLID || get<u32string>(begin->getValue()) != 
+    U"constructor")
+  {
+    return false;
+  }
+
+  auto current = begin;
+  ++current;
+
+  //the constructor name
+  expect_no_advance(current, end, "id", TOKEN_ID);
+
+  ConstructorDecl decl;
+  decl.name = get<u32string>(current->getValue());
+
+  //then a list of args
+  ++current;
+  while (*current == TOKEN_ID)
+  {
+    decl.args.push_back(get<u32string>(current->getValue()));
+    ++current;
+  }
+
+  //then an optional guard [...]
+  parse_tuple(current, end, decl.guard, SEPARATOR_COLON);
+
+  //then = data type name
+  expect(current, end, "=", TOKEN_EQUALS);
+
+  expect_no_advance(current, end, "id", TOKEN_ID);
+
+  decl.type = get<u32string>(current->getValue());
+
+  ++current;
+
+  result = decl;
+
+  begin = current;
+
+  return true;
+}
+
+bool
 Parser::parse_op_decl(LexerIterator& begin, const LexerIterator& end,
   Line& result)
 {
@@ -1293,11 +1418,14 @@ Parser::parse_op_decl(LexerIterator& begin, const LexerIterator& end,
   OpDecl decl;
 
   LexerIterator current = begin;
+  current.interpret(false);
   ++current;
 
   expect_no_advance(current, end, "operator", TOKEN_OPERATOR);
 
   decl.optext = get<u32string>(current->getValue());
+
+  current.interpret();
 
   ++current;
 
@@ -1500,7 +1628,7 @@ Parser::nextToken(LexerIterator& begin)
 void
 LexerIterator::readOne()
 {
-  Token t = nextToken(*m_next, *m_end, *m_context, m_idents);
+  Token t = nextToken(*m_next, *m_end, *m_context, m_idents, m_interpret);
 
   if (t != 0)
   {

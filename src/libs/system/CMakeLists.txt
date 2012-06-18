@@ -17,19 +17,21 @@ add_custom_target(generate_static_lexer DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp)
 
 set (SYSTEM_SOURCES
-ast.cpp bestfit.cpp builtin_types.cpp cache.cpp charset.cpp
-context.cpp dimtranslator.cpp 
+assignment.cpp ast.cpp bestfit.cpp builtin_types.cpp cache.cpp charset.cpp
+context.cpp datadef.cpp dimtranslator.cpp 
 equation.cpp
 eval_workshops.cpp
+function.cpp
 hyperdatons/arrayhd.cpp
 hyperdatons/envhd.cpp
 hyperdatons/filehd.cpp
 internal_strings.cpp lexertl.cpp lexer_util.cpp 
-library.cpp line_tokenizer.cpp parser.cpp
-range.cpp rename.cpp system.cpp system_util.cpp
-tree_printer.cpp
+library.cpp line_tokenizer.cpp opdef.cpp parser.cpp
+range.cpp rename.cpp semantic_transform.cpp 
+system.cpp system_util.cpp
+tree_printer.cpp tree_rewriter.cpp
 tree_to_wstree.cpp 
-types/function.cpp types/numbers.cpp types/union.cpp
+types/function_type.cpp types/numbers.cpp types/union.cpp
 types.cpp utility.cpp uuid.cpp
 workshop_builder.cpp
 )
@@ -60,7 +62,7 @@ if (BUILD_STATIC_SYSTEM)
   set_target_properties(tlsystem-static PROPERTIES PREFIX "lib")
 endif()
 
-target_link_libraries(tlsystem ltdl rt gmpxx ${ICU_LIBRARIES})
+target_link_libraries(tlsystem ltdl rt gmpxx ${ICU_LIBRARIES} -Wl,-O1)
 INSTALL(TARGETS tlsystem
    LIBRARY DESTINATION lib
 )

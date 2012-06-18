@@ -1,5 +1,5 @@
 /* The System.
-   Copyright (C) 2009-2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -29,14 +29,17 @@ along with TransLucid; see the file COPYING.  If not see
 #include <unordered_map>
 
 #include <tl/ast_fwd.hpp>
+#include <tl/datadef.hpp>
 #include <tl/dimtranslator.hpp>
 #include <tl/types.hpp>
 #include <tl/equation.hpp>
-//#include <tl/function_registry.hpp>
+#include <tl/function.hpp>
 #include <tl/hyperdaton.hpp>
+#include <tl/opdef.hpp>
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
+#include <tl/system_object.hpp>
 
 namespace TransLucid
 {
@@ -60,8 +63,11 @@ namespace TransLucid
 
   class Translator;
   class TreeToWSTree;
+  class SemanticTransform;
 
   class BaseFunctionType;
+
+  class Assignment;
 
   struct GettextInit
   {
@@ -81,6 +87,19 @@ namespace TransLucid
   class System : public TypeRegistry, public DimensionRegistry
   {
     public:
+    typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<WS>> IdentifierMap;
+    typedef std::unordered_map<uuid, std::shared_ptr<SystemObject>> ObjectMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<VariableWS>> 
+      VariableMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<FunctionWS>> 
+      FunctionMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<OpDefWS>> 
+      OperatorMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<ConsDefWS>> 
+      ConstructorMap;
+    typedef std::unordered_map<u32string, std::shared_ptr<Assignment>>
+      AssignmentMap;
 
     System(bool cached = false);
     ~System();
@@ -158,9 +177,6 @@ namespace TransLucid
     Constant
     addAssignment(const Parser::Equation& eqn);
 
-    Constant
-    addFunction(const Parser::FnDecl& fn);
-
     Constant 
     addDimension(const u32string& dimension);
 
@@ -222,6 +238,12 @@ namespace TransLucid
       Tree::Expr& expr);
 
     void
+    addTransformedEquations
+    (
+      const std::vector<Parser::Equation>& newVars
+    );
+
+    void
     loadLibrary(const u32string& s);
 
     void
@@ -260,9 +282,34 @@ namespace TransLucid
     bool
     cacheEnabled() const;
 
+    Tree::Expr
+    fixupTreeAndAdd(const Tree::Expr& e);
+
+    BaseFunctionType*
+    lookupBaseFunction(const u32string& name);
+
+    OutputHD*
+    getOutputHD(const u32string& name)
+    {
+      auto iter = m_outputHDs.find(name);
+      return iter == m_outputHDs.end() ? nullptr : iter->second;
+    }
+
+    int
+    nextWhere()
+    {
+      return m_whereCounter++;
+    }
+
     private:
+
+    typedef std::unordered_map<u32string, size_t> BaseFunctionCounter;
+    typedef std::unordered_map<
+      u32string, 
+      std::shared_ptr<BaseFunctionType>
+    > BaseFunctionDefinitions;
+
     //definitions of Equations
-    typedef std::unordered_map<u32string, VariableWS*> DefinitionMap;
     typedef std::unordered_map<uuid, DefinitionMap::iterator> UUIDDefinition;
 
     //output hyperdatons
@@ -360,19 +407,40 @@ namespace TransLucid
     toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
       Renames&&... renames);
 
+    void
+    addDefaultDimensions
+    (
+      const std::vector<dimension_index>& zeros,
+      const std::vector<dimension_index>& nils
+    );
+
+    void
+    addDefaultDimensions(const SemanticTransform& t);
+
     bool m_cached;
     bool m_cacheEnabled;
 
+    ObjectMap m_objects;
+    IdentifierMap m_identifiers;
+
+    VariableMap m_variables;
+    FunctionMap m_functions;
+    std::shared_ptr<OpDefWS> m_operators;
+    ConstructorMap m_constructors;
+    AssignmentMap m_assignments;
+
+    //base functions
+    BaseFunctionCounter m_baseCounter;
+    BaseFunctionDefinitions m_basefuns;
+
+    //TODO deprecating
     DefinitionMap m_equations;
+
     UUIDDefinition m_equationUUIDs;
-    DefinitionMap m_assignments;
     UUIDDefinition m_assignmentUUIDs;
 
     //the variables that we want to cache
     std::unordered_map<u32string, Workshops::CacheWS*> m_cachedVars;
-
-    //functions from fun decls
-    std::unordered_map<u32string, WS*> m_functions;
 
     //maps of string to hds and the hds uuids
     OutputHDMap m_outputHDs;
@@ -383,21 +451,6 @@ namespace TransLucid
     //input and output hd declarations, for now just have the valid range
     std::unordered_map<u32string, Tuple> m_outputHDDecls;
     std::unordered_map<u32string, Tuple> m_inputHDDecls;
-
-    //functions
-    //map from names to a tuple of
-    //(bestfitter, renamed arguments, args -> dim, definitions)
-    std::unordered_map
-    <
-      u32string, 
-      std::tuple
-      <
-        ConditionalBestfitWS*, 
-        std::map<u32string, u32string>,
-        std::map<u32string, dimension_index>,
-        std::vector<Parser::FnDecl>
-      >
-    > m_fndecls;
 
     //---- the sets of all the uuids of objects ----
 
@@ -429,6 +482,7 @@ namespace TransLucid
     size_t m_uniqueVarIndex;
     size_t m_uniqueDimIndex;
     dimension_index m_hiddenDim;
+    int m_whereCounter;
 
     bool m_debug;
     bool m_verbose;
@@ -439,7 +493,96 @@ namespace TransLucid
 
     friend class detail::InputHDWS;
 
+    template <typename Input>
+    Constant
+    addVariableDeclInternal
+    (
+      const u32string& name,
+      Input&& decl
+    );
+
+    template <typename Input>
+    Constant
+    addFunDeclInternal
+    (
+      const u32string& name,
+      Input&& decl
+    );
+
+    template <typename Input>
+    Constant
+    addOpDeclInternal
+    (
+      const u32string& name,
+      Input&& decl
+    );
+
+    template <typename Input>
+    Constant
+    addConstructorInternal
+    (
+      const u32string& name,
+      Input&& decl
+    );
+
     public:
+
+    Constant
+    addDeclaration(const Parser::RawInput& input);
+
+    Constant
+    addOpDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    addFunDeclParsed
+    (
+      Parser::FnDecl decl
+    );
+
+    Constant
+    addFunDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    addVariableDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    addVariableDeclParsed
+    (
+      Parser::Equation decl
+    );
+
+    Constant
+    addDimDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    addDataDeclRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    addConstructorRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
 
     size_t
     nextVarIndex()
@@ -463,7 +606,7 @@ namespace TransLucid
     {
       IdentifierLookup
       (
-        DefinitionMap& identifiers,
+        IdentifierMap& identifiers,
         decltype(m_cachedVars)& cached
       )
       : m_identifiers(&identifiers),
@@ -484,13 +627,13 @@ namespace TransLucid
       lookup(const u32string& name) const;
 
       private:
-      DefinitionMap* m_identifiers;
+      IdentifierMap* m_identifiers;
       decltype(m_cachedVars)* m_cached;
     };
 
     IdentifierLookup lookupIdentifiers()
     {
-      return IdentifierLookup(m_equations, m_cachedVars);
+      return IdentifierLookup(m_identifiers, m_cachedVars);
     }
 
     //template <size_t N>

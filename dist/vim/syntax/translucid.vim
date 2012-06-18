@@ -2,7 +2,7 @@
 sy case match
 
 " decl keywords
-sy keyword      tlDecl             var fun op assign hd dim data
+sy keyword      tlDecl             var fun op assign hd dim data constructor
 
 " if expressions
 sy keyword      tlConditional      if then else elsif fi

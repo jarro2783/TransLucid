@@ -83,6 +83,7 @@ namespace TransLucid
         m_rules.add(U"!", TOKEN_BANG);
         m_rules.add(U":", TOKEN_COLON);
         m_rules.add(U",", TOKEN_COMMA);
+        m_rules.add(U"↓", TOKEN_DARROW);
         m_rules.add(U"%%", TOKEN_DBLPERCENT);
         m_rules.add(U";;", TOKEN_DBLSEMI);
         m_rules.add(UR"(\\\\)", TOKEN_DBLSLASH);
@@ -99,6 +100,7 @@ namespace TransLucid
         m_rules.add(U"\\)", TOKEN_RPAREN);
         m_rules.add(U"\\]", TOKEN_RSQUARE);
         m_rules.add(UR"(\\)", TOKEN_SLASH);
+        m_rules.add(U"↑", TOKEN_UARROW);
 
         m_rules.add(U"{IDENT}", TOKEN_ID);
 

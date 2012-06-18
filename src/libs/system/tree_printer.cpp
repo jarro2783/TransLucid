@@ -1,5 +1,5 @@
 /* Tree printer.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -41,8 +41,16 @@ class TreePrinter
   //of course since this class is only used internally, you knew all that right
   std::string printTree(const Tree::Expr& e);
 
+  void
+  verbose()
+  {
+    m_verbose = true;
+  }
+
   private:
   std::ostringstream m_os;
+
+  bool m_verbose;
 
   enum class Subtree
   {
@@ -252,6 +260,12 @@ class TreePrinter
   }
 
   void
+  operator()(const Tree::BaseAbstractionExpr& b)
+  {
+    m_os << u32string(U"⊥") << b.name;
+  }
+
+  void
   operator()(const Tree::ParenExpr& p)
   {
     //pass on the paren info without modification
@@ -345,6 +359,32 @@ class TreePrinter
   }
 
   void
+  printIntenScope(const Tree::MakeIntenExpr& e)
+  {
+    m_os << " {";
+    for (auto d : e.scope)
+    {
+      m_os << d << ", ";
+    }
+    m_os << "}";
+  }
+
+  void
+  operator()(const Tree::MakeIntenExpr& e)
+  {
+    m_os << u32string(U"↑");
+
+    print_binds(e.binds);
+
+    if (m_verbose)
+    {
+      printIntenScope(e);
+    }
+
+    apply_visitor(*this, e.expr);
+  }
+
+  void
   operator()(const Tree::EvalIntenExpr& e)
   {
     m_os << u32string(U"↓");
@@ -392,7 +432,7 @@ class TreePrinter
   print_tuple_pair(const Pair& p)
   {
     apply_visitor(*this, p.first);
-    m_os << " : ";
+    m_os << " <- ";
     apply_visitor(*this, p.second);
   }
 
@@ -435,12 +475,55 @@ class TreePrinter
     pp(')', Precedence::FN_APP);
   }
 
+  void
+  printFnIntenScope(const Tree::PhiExpr& l)
+  {
+  }
+
+  void
+  printFnIntenScope(const Tree::LambdaExpr& l)
+  {
+    printIntenScope(l.inten);
+    print_binds(l.inten.binds);
+  }
+
+  template <typename Container>
+  void
+  print_binds(Container&& c)
+  {
+    if (c.size() != 0)
+    {
+      m_os << "{";
+
+      for (auto& b : c)
+      {
+        apply_visitor(*this, b);
+        m_os << ", ";
+      }
+
+      m_os << "}";
+    }
+  }
+
   template <typename Fn>
   void
   print_fn_abstraction(const Fn& f, const u32string& symbol)
   {
     pp('(', Precedence::FN_ABSTRACTION);
-    m_os << symbol << f.name << " -> ";
+
+    m_os << symbol;
+
+    print_binds(f.binds);
+
+    if (m_verbose)
+    {
+      printFnIntenScope(f);
+    }
+
+    m_os << "(" << f.name << ", " << f.argDim << ")";
+    
+    m_os << " -> ";
+
     parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
     apply_visitor(*this, f.rhs);
     parenPop();
@@ -523,11 +606,35 @@ class TreePrinter
 
     pp(')', Precedence::WHERE_CLAUSE);
   }
+
+  void
+  operator()(const Tree::ConditionalBestfitExpr& c)
+  {
+    m_os << "bestof ";
+
+    for (auto& decl : c.declarations)
+    {
+      apply_visitor(*this, std::get<1>(decl));
+      m_os << " | ";
+      apply_visitor(*this, std::get<2>(decl));
+      m_os << " = ";
+      apply_visitor(*this, std::get<3>(decl));
+      m_os << ";;";
+    }
+
+    m_os << "end";
+  }
 };
 
-std::string print_expr_tree(const Tree::Expr& expr)
+std::string print_expr_tree(const Tree::Expr& expr, bool verbose)
 {
   TreePrinter print;
+
+  if (verbose)
+  {
+    print.verbose();
+  }
+
   return print.printTree(expr);
 }
 

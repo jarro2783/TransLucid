@@ -111,7 +111,8 @@ namespace TransLucid
       StreamPosIterator& begin, 
       const StreamPosIterator& end,
       Context& context,
-      System::IdentifierLookup& idents
+      System::IdentifierLookup& idents,
+      bool interpret = true
     );
     
     class LexerIterator
@@ -123,10 +124,12 @@ namespace TransLucid
         StreamPosIterator& begin,
         const StreamPosIterator& end,
         Context& context,
-        const System::IdentifierLookup& idents
+        const System::IdentifierLookup& idents,
+        bool interpret = true
       )
       : m_stream(new std::list<Token>)
       , m_next(&begin), m_end(&end), m_context(&context), m_idents(idents)
+      , m_interpret(interpret)
       {
         //initialise position to the end, then try to read something
         m_pos = m_stream->end();
@@ -134,6 +137,12 @@ namespace TransLucid
       }
 
       LexerIterator(const LexerIterator& rhs) = default;
+
+      void
+      interpret(bool i = true)
+      {
+        m_interpret = i;
+      }
 
       LexerIterator&
       operator++()
@@ -220,6 +229,8 @@ namespace TransLucid
       System::IdentifierLookup m_idents;
 
       static Token m_endToken;
+
+      bool m_interpret;
     };
   }
 }

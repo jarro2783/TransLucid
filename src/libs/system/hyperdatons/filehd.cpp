@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
  * @file filehd.cpp
  * File hyperdaton implementation.
  */
-
+#if 0
 #include <fstream>
 #include <algorithm>
 
@@ -903,3 +903,4 @@ init_file_hds(System& s)
 }
 
 }
+#endif

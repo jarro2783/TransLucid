@@ -45,7 +45,7 @@ find_package(PkgConfig REQUIRED)
 
 set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
 
-set(TLCFLAGS -Wall -Wno-unused-local-typedefs -std=gnu++0x 
+set(TLCFLAGS -Wall -Wno-unused-local-typedefs -std=gnu++11 
   -DPACKAGE_VERSION=\"${VERSION}\"
   -DHAVE_CONFIG_H)
 
@@ -68,7 +68,7 @@ pkg_check_modules(ICU REQUIRED icu-uc)
 if (NOT ICU_FOUND)
   message(FATAL_ERROR "ICU not found")
 endif()
-set(TLLIBS -std=gnu++0x ${ICU_LLDFLAGS})
+set(TLLIBS -std=gnu++11 ${ICU_LDFLAGS})
 
 # do we build tlweb
 #option (ENABLE_TLWEB "Build the tlweb application" OFF)

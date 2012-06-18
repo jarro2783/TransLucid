@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TYPES_FUNCTION_HPP_INCLUDED
 
 #include <tl/context.hpp>
+#include <tl/fixed_indexes.hpp>
 #include <tl/system.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types.hpp>
@@ -67,6 +68,9 @@ namespace TransLucid
       return reinterpret_cast<size_t>(this);
     }
 
+    virtual size_t
+    arity() const = 0;
+
     private:
     virtual Constant
     applyFn(const Constant& c) const = 0;
@@ -99,6 +103,12 @@ namespace TransLucid
     }
 
     ~BaseFunctionAbstraction() throw() {}
+
+    size_t
+    arity() const
+    {
+      return 1;
+    }
 
     private:
     Constant
@@ -207,6 +217,12 @@ namespace TransLucid
       return new BuiltinBaseFunction(*this);
     }
 
+    size_t
+    arity() const
+    {
+      return NumArgs;
+    }
+
     #if 0
     template <typename E = typename std::enable_if<NumArgs == 1, void>::type>
     Constant
@@ -264,23 +280,12 @@ namespace TransLucid
       System* system,
       const u32string& name, 
       dimension_index argDim, 
-      const std::vector<dimension_index>& scope,
-      const std::vector<std::pair<u32string, dimension_index>>& free,
       WS* expr,
       Context& k
     )
-    : m_system(system), m_name(name), m_dim(argDim),
-      m_free(free), m_expr(expr)
+    : m_system(system), m_name(name), m_dim(argDim), m_expr(expr), 
+      m_kappa(k.minimal_copy())
     {
-      for (auto d : scope)
-      {
-        m_scopeDims.push_back(std::make_pair(d, k.lookup(d)));
-      }
-
-      if (!free.empty())
-      {
-        m_freeContext = k;
-      }
     }
 
     ValueFunctionType*
@@ -298,7 +303,7 @@ namespace TransLucid
     size_t
     hash() const
     {
-      return reinterpret_cast<size_t>(m_expr);
+      return std::hash<u32string>()(m_name);
     }
 
     bool
@@ -308,10 +313,8 @@ namespace TransLucid
     System* m_system;
     u32string m_name;
     dimension_index m_dim;
-    std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
-    std::vector<std::pair<u32string, dimension_index>> m_free;
-    Tuple m_freeContext;
     WS* m_expr;
+    mutable Context m_kappa;
   };
 
   class NameFunctionType
@@ -380,8 +383,6 @@ namespace TransLucid
     System *system,
     const u32string& name, 
     dimension_index argDim, 
-    const std::vector<dimension_index>& scope,
-    const std::vector<std::pair<u32string, dimension_index>>& free,
     WS* expr,
     Context& kappa
   );
@@ -395,8 +396,6 @@ namespace TransLucid
     System *system,
     const u32string& name, 
     dimension_index argDim, 
-    const std::vector<dimension_index>& scope,
-    const std::vector<std::pair<u32string, dimension_index>>& free,
     WS* expr,
     Context& kappa,
     Context& delta

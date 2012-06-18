@@ -1,5 +1,5 @@
 /* Utility functions.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -131,13 +131,13 @@ namespace TransLucid
   valueRefines(const Constant& a, const Constant& b);
 
   bool
-  booleanTrue(const GuardWS& g, Context& c);
+  booleanTrue(const EquationGuard& g, Context& c);
 
   //the cached boolean true
   bool
   booleanTrue
   (
-    const GuardWS& g, 
+    const EquationGuard& g, 
     Context& c, 
     Context& delta, 
     std::vector<dimension_index>& demands
@@ -206,6 +206,20 @@ namespace TransLucid
     const Constant& lhs, 
     const Constant& rhs
   );
+
+  struct ExtraTreeInformation
+  {
+    std::vector<Parser::Equation> equations;
+    std::vector<dimension_index> defaultZeros;
+    std::vector<dimension_index> defaultNils;
+  };
+
+  std::pair
+  <
+    Tree::Expr,
+    ExtraTreeInformation
+  >
+  fixupTree(System& s, const Tree::Expr& e);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

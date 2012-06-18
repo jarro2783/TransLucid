@@ -32,6 +32,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <fstream>
 #include <signal.h>
 
+#include <tl/output.hpp>
+
 #include "gettext.h"
 
 #define _(String) gettext (String)
@@ -293,6 +295,11 @@ int main(int argc, char *argv[])
   catch (const char* c)
   {
     std::cerr << "terminated with exception: " << c << std::endl;
+    return 1;
+  }
+  catch (const TransLucid::u32string& error)
+  {
+    std::cerr << "terminated with exception: " << error << std::endl;
     return 1;
   }
   catch (TransLucid::TLText::ReturnError& ret)

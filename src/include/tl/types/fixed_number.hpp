@@ -100,7 +100,7 @@ namespace TransLucid
   void
   addIntegerFunction(System& s, const u32string& name, const u32string& op)
   {
-    s.addFunction
+    s.addFunDeclParsed
     (
       Parser::FnDecl
       {
@@ -124,7 +124,7 @@ namespace TransLucid
   void
   addFloatFunction(System& s, const u32string& name, const u32string& op)
   {
-    s.addFunction
+    s.addFunDeclParsed
     (
       Parser::FnDecl
       {
@@ -189,14 +189,10 @@ namespace TransLucid
       F f
     )
     {
-      std::unique_ptr<BuiltinBaseFunction<N>> 
-        fn(new BuiltinBaseFunction<N>
-          (createFunction(f))
-      );
-      std::unique_ptr<BangAbstractionWS> ws(new BangAbstractionWS(fn.get()));
-      fn.release();
-      s.addEquation(name, ws.get());
-      ws.release();
+      //add host function
+      BuiltinBaseFunction<N> fun(createFunction(f));
+
+      s.addHostFunction(name, &fun, N);
     }
 
     Constant

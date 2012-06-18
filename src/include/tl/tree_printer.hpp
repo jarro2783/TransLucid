@@ -1,5 +1,5 @@
 /* Prints a Tree::Expr
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -27,7 +27,7 @@ namespace TransLucid
 {
   namespace Printer
   {
-    std::string print_expr_tree(const Tree::Expr& expr);
+    std::string print_expr_tree(const Tree::Expr& expr, bool verbose = false);
 
     std::string
     printEquation(const Parser::Equation& e);

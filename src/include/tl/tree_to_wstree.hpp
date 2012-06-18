@@ -53,6 +53,9 @@ namespace TransLucid
     toWSTree(const Tree::Expr& expr, 
       const RenameIdentifiers::RenameRules& initial);
 
+    Tree::Expr
+    toWSTreeNoRename(const Tree::Expr& expr);
+
     Tree::Expr operator()(const Tree::nil& n);
     Tree::Expr operator()(bool b);
     Tree::Expr operator()(Special s);

@@ -1,5 +1,5 @@
 /* Parser forward declarations.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -23,7 +23,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/ast.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/types.hpp>
-#include <tl/system.hpp>
 
 /**
  * @file parser_api.hpp
@@ -135,6 +134,14 @@ namespace TransLucid
       Tree::Expr id;
     };
 
+    struct ConstructorDecl
+    {
+      u32string name;
+      std::vector<u32string> args;
+      Tree::Expr guard;
+      u32string type;
+    };
+
     struct ReplDecl;
 
     typedef Variant
@@ -153,6 +160,7 @@ namespace TransLucid
       OpDecl,
       HDDecl,
       DelDecl,
+      ConstructorDecl,
       recursive_wrapper<ReplDecl>
     > Line;
 
@@ -172,6 +180,17 @@ namespace TransLucid
 
       U32Iterator begin;
       U32Iterator end;
+    };
+
+    struct RawInput
+    {
+      //where it came from
+      u32string source;
+      int line;
+      int character;
+
+      //the actual input
+      u32string text;
     };
      
     class ParseError : public std::exception

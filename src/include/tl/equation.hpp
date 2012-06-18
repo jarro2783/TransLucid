@@ -1,5 +1,5 @@
 /* Equations (ident = expr)
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -21,14 +21,21 @@ along with TransLucid; see the file COPYING.  If not see
 #define EQUATION_HPP_INCLUDED
 
 #include <tl/ast_fwd.hpp>
-#include <tl/exception.hpp>
 #include <tl/bestfit.hpp>
-#include <tl/workshop.hpp>
+#include <tl/exception.hpp>
+#include <tl/parser_api.hpp>
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
+#include <tl/workshop.hpp>
 
 #include <list>
 #include <memory>
+#include <unordered_map>
+
+/**
+ * @file equation.hpp
+ * Variables.
+ */
 
 namespace TransLucid
 {
@@ -105,6 +112,7 @@ namespace TransLucid
        ;
     }
 
+    #if 0
     /**
      * @brief Evaluate the guard.
      *
@@ -113,6 +121,7 @@ namespace TransLucid
     template <typename... Delta>
     std::pair<bool, Tuple>
     evaluate(Context& k, Delta&&... delta) const;
+    #endif
 
     /**
      * @brief Adds a system imposed dimension.
@@ -253,7 +262,7 @@ namespace TransLucid
     GuardWS m_validContext;
     std::shared_ptr<WS> m_h;
     uuid m_id;
-    Tree::Expr* m_ast;
+    //Tree::Expr* m_ast;
     int m_provenance;
     int m_endTime;
     int m_priority;
@@ -261,7 +270,7 @@ namespace TransLucid
 
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
-  class VariableWS : public WS
+  class VariableWS : public WS, public DefinitionGrouper
   {
     public:
     typedef std::map<uuid, EquationWS> UUIDEquationMap;
@@ -273,7 +282,7 @@ namespace TransLucid
     
     ~VariableWS();
 
-    virtual Constant
+    Constant
     operator()(Context& k);
 
     Constant
@@ -291,6 +300,12 @@ namespace TransLucid
     }
     #endif
 
+    void
+    addEquation(uuid id, Parser::RawInput input, int time);
+
+    void
+    addEquation(uuid id, Parser::Variable eqn, int time);
+
     uuid
     addEquation(EquationWS* e, size_t time);
 
@@ -304,10 +319,10 @@ namespace TransLucid
     );
 
     virtual bool 
-    delexpr(uuid id, size_t time);
+    del(uuid id, size_t time);
 
     virtual bool 
-    replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr);
+    repl(uuid id, size_t time, Parser::Line line);
 
     /**
      * The equations belonging directly to this variable. Returns the map of
@@ -319,9 +334,8 @@ namespace TransLucid
       return m_equations;
     }
 
-    protected:
-
-    VariableMap m_variables;
+    Tree::Expr
+    group(const std::list<EquationDefinition>& lines);
 
     private:
 
@@ -330,61 +344,18 @@ namespace TransLucid
 
     typedef std::map<int, ProvenanceList> PriorityList;
 
-    //maps uuid to variables so that we know which child owns the equation
-    //belonging to a uuid
-    typedef std::map<uuid, VariableWS*> UUIDVarMap;
-
     UUIDEquationMap m_equations;
 
     u32string m_name;
     System& m_system;
-    bool storeuuid;
+    //bool storeuuid;
 
-    BestFittable m_bestFit;
-    CompileBestFit *m_compileBestFit;
+    //BestFittable m_bestFit;
+    //CompileBestFit *m_compileBestFit;
 
     PriorityList m_priorityVars;
-  };
 
-  class ConditionalBestfitWS : public WS
-  {
-    public:
-    template <typename String, typename Enable = 
-      std::enable_if<std::is_same<String, u32string>::value>
-    >
-    ConditionalBestfitWS(String&& name, System& system)
-    {
-      m_var = new VariableWS(U"fun_" + name, system);
-    }
-
-    ConditionalBestfitWS(const ConditionalBestfitWS&) = delete;
-    ConditionalBestfitWS(ConditionalBestfitWS&) = delete;
-
-    ~ConditionalBestfitWS()
-    {
-      delete m_var;
-    }
-
-    Constant
-    operator()(Context& k);
-
-    Constant
-    operator()(Context& kappa, Context& delta);
-
-    uuid
-    addEquation
-    (
-      const u32string& name, 
-      GuardWS guard, 
-      WS* e, 
-      size_t time
-    )
-    {
-      return m_var->addEquation(name, guard, e, time);
-    }
-
-    private:
-    VariableWS *m_var;
+    BestfitGroup m_bestfit;
   };
 };
 

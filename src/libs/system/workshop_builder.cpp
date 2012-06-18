@@ -1,5 +1,5 @@
 /* Translates AST::Expr to hyperdatons.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -92,6 +92,12 @@ WorkshopBuilder::operator()(const Tree::HashSymbol& s)
   return new Workshops::HashSymbolWS();
 }
 
+WS* 
+WorkshopBuilder::operator()(const Tree::BaseAbstractionExpr& e)
+{
+  return new Workshops::BaseAbstractionWS(*m_system, e.name);
+}
+
 WS*
 WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 {
@@ -176,9 +182,28 @@ WorkshopBuilder::operator()(const Tree::IfExpr& e)
 }
 
 WS* 
+WorkshopBuilder::operator()(const Tree::MakeIntenExpr& e)
+{
+  std::vector<WS*> binds;
+
+  for (auto& b : e.binds)
+  {
+    binds.push_back(apply_visitor(*this, b));
+  }
+
+  WS* rhs = apply_visitor(*this, e.expr);
+  WS* result = new Workshops::MakeIntenWS(*m_system, rhs, binds, e.scope);
+
+  return result;
+}
+
+WS* 
 WorkshopBuilder::operator()(const Tree::EvalIntenExpr& e)
 {
-  return nullptr;
+  WS* rhs = apply_visitor(*this, e.expr);
+  WS* result = new Workshops::EvalIntenWS(rhs);
+
+  return result;
 }
 
 WS*
@@ -227,15 +252,13 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 {
-  WS* rhs = apply_visitor(*this, e.rhs);
+  WS* rhs = operator()(e.inten);
 
   return new Workshops::LambdaAbstractionWS
   (
     m_system,
     e.name,
     e.argDim,
-    e.scope,
-    e.free,
     rhs
   );
 }
@@ -243,6 +266,8 @@ WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::PhiExpr& e)
 {
+  throw "error: WorkshopBuilder(PhiExpr) reached";
+  #if 0
   WS* rhs = apply_visitor(*this, e.rhs);
 
   return new Workshops::NamedAbstractionWS
@@ -255,6 +280,7 @@ WorkshopBuilder::operator()(const Tree::PhiExpr& e)
     e.free,
     rhs
   );
+  #endif
 }
 
 WS* 
@@ -269,9 +295,7 @@ WorkshopBuilder::operator()(const Tree::LambdaAppExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::PhiAppExpr& e)
 {
-  WS* lhs = apply_visitor(*this, e.lhs);
-  WS* rhs = apply_visitor(*this, e.rhs);
-  return new Workshops::NameApplicationWS(lhs, rhs);
+  throw "WorkshopBuilder::operator()(PhiAppExpr)";
 }
 
 WS* 
@@ -281,6 +305,36 @@ WorkshopBuilder::operator()(const Tree::WhereExpr& e)
   //which means that we can simply translate the expression
 
   return apply_visitor(*this, e.e);
+}
+
+WS* 
+WorkshopBuilder::operator()(const Tree::ConditionalBestfitExpr& e)
+{
+  std::vector<CompiledEquationWS> compiled;
+  for (auto equation : e.declarations)
+  {
+    auto guard = apply_visitor(*this, std::get<1>(equation));
+    auto boolean = apply_visitor(*this, std::get<2>(equation));
+    auto expr = apply_visitor(*this, std::get<3>(equation));
+
+    compiled.push_back
+    (
+      CompiledEquationWS
+      (
+        EquationGuard
+        (
+          guard, boolean
+        ),
+        std::shared_ptr<WS>(expr),
+        std::get<0>(equation)
+      )
+    );
+  }
+
+  auto bestfit = std::unique_ptr<ConditionalBestfitWS>(
+    new ConditionalBestfitWS(compiled));
+
+  return bestfit.release();
 }
 
 } //namespace TransLucid
