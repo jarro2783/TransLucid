@@ -68,7 +68,13 @@ namespace TransLucid
     {
       m_cbnscope.insert(e.name);
 
-      Tree::LambdaExpr lambda = Tree::LambdaExpr(e.name, e.rhs);
+      std::vector<Tree::Expr> binds;
+      for (auto& b : e.binds)
+      {
+        binds.push_back(apply_visitor(*this, b));
+      }
+
+      Tree::LambdaExpr lambda = Tree::LambdaExpr(e.name, binds, e.rhs);
       lambda.argDim = e.argDim;;
 
       Tree::Expr le = lambda;

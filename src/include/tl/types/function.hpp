@@ -283,16 +283,9 @@ namespace TransLucid
       WS* expr,
       Context& k
     )
-    : m_system(system), m_name(name), m_dim(argDim)
+    : m_system(system), m_name(name), m_dim(argDim), m_expr(expr), 
+      m_kappa(k.minimal_copy())
     {
-      //creating the function evaluates the expr and stores the result in
-      //m_inten
-      m_inten = (*expr)(k);
-
-      if (m_inten.index() != TYPE_INDEX_INTENSION)
-      {
-        throw "function value not an intension";
-      }
     }
 
     ValueFunctionType*
@@ -310,7 +303,7 @@ namespace TransLucid
     size_t
     hash() const
     {
-      return m_inten.hash();
+      return std::hash<u32string>()(m_name);
     }
 
     bool
@@ -319,8 +312,9 @@ namespace TransLucid
     private:
     System* m_system;
     u32string m_name;
-    Constant m_inten;
     dimension_index m_dim;
+    WS* m_expr;
+    mutable Context m_kappa;
   };
 
   class NameFunctionType

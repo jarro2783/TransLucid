@@ -439,11 +439,17 @@ namespace TransLucid
       : expr(e)
       {}
 
-      MakeIntenExpr(Expr e, std::vector<dimension_index> scope)
-      : expr(e), scope(scope)
+      MakeIntenExpr
+      (
+        Expr e, 
+        std::vector<Expr> binds,
+        std::vector<dimension_index> scope
+      )
+      : expr(e), binds(binds), scope(scope)
       {}
 
       Expr expr;
+      std::vector<Expr> binds;
 
       std::vector<dimension_index> scope;
     };
@@ -640,12 +646,29 @@ namespace TransLucid
       {
       }
 
+      /**
+       * Construct a LambdaExpr.
+       * @param name The parameter to bind.
+       * @param bind The dimensions to bind.
+       * @param rhs The right-hand-side expression.
+       */
+      template <typename RExpr>
+      LambdaExpr
+      (
+        const u32string& name, 
+        std::vector<Expr> bind,
+        RExpr&& rhs
+      )
+      : name(name), binds(bind), rhs(std::forward<RExpr>(rhs)), argDim(0)
+      {
+      }
+
       u32string name; /**<The bound parameter.*/
+      std::vector<Expr> binds;
       Expr rhs; /**<The right-hand-side expression.*/
 
-      MakeIntenExpr inten;
-
       dimension_index argDim;
+      MakeIntenExpr inten;
     };
 
     //TODO: fix TreeToWSTree when I implement this
@@ -660,8 +683,13 @@ namespace TransLucid
       {
       }
 
+      PhiExpr(const u32string& name, std::vector<Expr> bind, const Expr& rhs)
+      : name(name), binds(bind), rhs(rhs), argDim(0)
+      {
+      }
+
       u32string name;
-      //std::vector<Expr> binds;
+      std::vector<Expr> binds;
       Expr rhs;
 
       dimension_index argDim;

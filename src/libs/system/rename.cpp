@@ -291,6 +291,12 @@ RenameIdentifiers::renameFunction(const T& f)
   //copy the dim
   l.argDim = f.argDim;
 
+  //rename in the bound dimensions
+  for (auto& b : f.binds)
+  {
+    l.binds.push_back(apply_visitor(*this, b));
+  }
+
   //restore the shadowed name
   if (!shadowed.empty())
   {

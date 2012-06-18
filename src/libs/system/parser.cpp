@@ -899,6 +899,9 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
 {
   LexerIterator current = begin;
 
+  std::vector<Tree::Expr> binds;
+  parse_bound_dims(current, end, binds);
+
   expect_no_advance(current, end, "identifier", TOKEN_ID);
   u32string name = get<u32string>(current->getValue());
   ++current;
@@ -922,6 +925,51 @@ Parser::parse_function(LexerIterator& begin, const LexerIterator& end,
   }
 
   //once it has all worked we can move along the iterator
+  begin = current;
+}
+
+bool
+Parser::parse_bound_dims(LexerIterator& begin, const LexerIterator& end,
+  std::vector<Tree::Expr>& result)
+{
+  if (*begin != TOKEN_LBRACE)
+  {
+    return false;
+  }
+
+  LexerIterator current = begin;
+
+  ++current;
+
+  parse_expr_list(current, end, result);
+
+  expect(current, end, "}", TOKEN_RBRACE);
+
+  begin = current;
+
+  return true;
+}
+
+void
+Parser::parse_expr_list(LexerIterator& begin, const LexerIterator& end,
+  std::vector<Tree::Expr>& result)
+{
+  Tree::Expr expr;
+
+  auto current = begin;
+  
+  while (parse_expr(current, end, expr))
+  {
+    result.push_back(expr);
+
+    if (*current != TOKEN_COMMA)
+    {
+      break;
+    }
+
+    ++current;
+  }
+
   begin = current;
 }
 

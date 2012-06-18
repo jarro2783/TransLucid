@@ -251,6 +251,14 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   expr.inten.scope.insert(expr.inten.scope.end(), m_scope.begin(), 
     m_scope.end());
 
+  //do the bound dimensions
+  for (auto& b : e.binds)
+  {
+    Tree::Expr transformed = apply_visitor(*this, b);
+    expr.binds.push_back(transformed);
+    expr.inten.binds.push_back(transformed);
+  }
+
   return expr;
 }
 

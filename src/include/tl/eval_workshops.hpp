@@ -211,10 +211,12 @@ namespace TransLucid
 
       MakeIntenWS
       (
+        System& system,
         WS* rhs,
+        std::vector<WS*> binds,
         const std::vector<dimension_index>& scope
       )
-      : m_rhs(rhs), m_scope(scope)
+      : m_system(system), m_rhs(rhs), m_binds(binds), m_scope(scope)
       {
       }
 
@@ -230,7 +232,9 @@ namespace TransLucid
       operator()(Context& kappa, Context& delta);
 
       private:
+      System& m_system;
       WS* m_rhs;
+      std::vector<WS*> m_binds;
       std::vector<dimension_index> m_scope;
     };
 

@@ -184,8 +184,15 @@ WorkshopBuilder::operator()(const Tree::IfExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::MakeIntenExpr& e)
 {
+  std::vector<WS*> binds;
+
+  for (auto& b : e.binds)
+  {
+    binds.push_back(apply_visitor(*this, b));
+  }
+
   WS* rhs = apply_visitor(*this, e.expr);
-  WS* result = new Workshops::MakeIntenWS(rhs, e.scope);
+  WS* result = new Workshops::MakeIntenWS(*m_system, rhs, binds, e.scope);
 
   return result;
 }

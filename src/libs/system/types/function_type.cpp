@@ -221,7 +221,14 @@ ValueFunctionType::apply(Context& k, const Constant& value) const
 
   //std::cerr << "setting dim " << m_dim << std::endl;
 
-  auto inten = get_constant_pointer<IntensionType>(m_inten);
+  auto intenConstant = (*m_expr)(m_kappa);
+
+  if (intenConstant.index() != TYPE_INDEX_SPECIAL)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+
+  auto inten = get_constant_pointer<IntensionType>(intenConstant);
 
   auto result = inten(k);
 

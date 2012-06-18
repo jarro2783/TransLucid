@@ -100,6 +100,14 @@ namespace TransLucid
         Tree::Expr& result,
         size_t type);
 
+      bool
+      parse_bound_dims(LexerIterator& begin, const LexerIterator& end,
+        std::vector<Tree::Expr>& result);
+
+      void
+      parse_expr_list(LexerIterator& begin, const LexerIterator& end,
+        std::vector<Tree::Expr>& result);
+
       bool 
       parse_tuple(LexerIterator& begin, const LexerIterator& end,
         Tree::Expr& result, TupleSeparator sep);

@@ -31,11 +31,17 @@ namespace TransLucid
     public:
     IntensionType
     (
+      System* system,
       WS* ws, 
+      const std::vector<Constant> binds,
       const std::vector<dimension_index>& scope,
       Context& k
     )
-    : m_ws(ws), m_scope(scope), m_k(k.minimal_copy())
+    : m_system(system)
+    , m_ws(ws)
+    , m_binds(binds)
+    , m_scope(scope)
+    , m_k(k.minimal_copy())
     {
     }
 
@@ -61,6 +67,12 @@ namespace TransLucid
       std::vector<std::pair<dimension_index, Constant>> saved;
       saved.reserve(m_scope.size() + 1);
 
+      for (auto b : m_binds)
+      {
+        auto dim = m_system->getDimensionIndex(b);
+        saved.push_back(std::make_pair(dim, m_k.lookup(dim)));
+      }
+
       for (auto d : m_scope)
       {
         saved.push_back(std::make_pair(d, m_k.lookup(d)));
@@ -80,7 +92,9 @@ namespace TransLucid
     }
 
     private:
+    System* m_system;
     WS* m_ws;
+    std::vector<Constant> m_binds;
     std::vector<dimension_index> m_scope;
     mutable Context m_k;
   };
@@ -92,7 +106,9 @@ namespace TransLucid
       Constant
       create
       (
+        System* system,
         WS* ws, 
+        std::vector<Constant> binds,
         const std::vector<dimension_index>& scope,
         Context& k
       );

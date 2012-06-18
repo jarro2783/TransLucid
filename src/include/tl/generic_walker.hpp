@@ -102,9 +102,17 @@ namespace TransLucid
     Tree::Expr
     operator()(const Tree::MakeIntenExpr& e)
     {
+      std::vector<Tree::Expr> binds;
+
+      for (auto& b : e.binds)
+      {
+        binds.push_back(apply_visitor(*reinterpret_cast<Derived*>(this), b));
+      }
+
       return Tree::MakeIntenExpr
       {
         apply_visitor(*reinterpret_cast<Derived*>(this), e.expr), 
+        binds,
         e.scope
       };
     }
@@ -129,9 +137,17 @@ namespace TransLucid
 
     Tree::Expr operator()(const Tree::LambdaExpr& e)
     {
+      std::vector<Tree::Expr> binds;
+
+      for (auto& b : e.binds)
+      {
+        binds.push_back(apply_visitor(*reinterpret_cast<Derived*>(this), b));
+      }
+
       Tree::LambdaExpr le
       (
         e.name,
+        binds,
         apply_visitor(*reinterpret_cast<Derived*>(this), e.rhs)
       );
 
@@ -142,9 +158,17 @@ namespace TransLucid
 
     Tree::Expr operator()(const Tree::PhiExpr& e)
     {
+      std::vector<Tree::Expr> binds;
+
+      for (auto& b : e.binds)
+      {
+        binds.push_back(apply_visitor(*reinterpret_cast<Derived*>(this), b));
+      }
+
       Tree::PhiExpr phi
       (
         e.name,
+        binds,
         apply_visitor(*reinterpret_cast<Derived*>(this), e.rhs)
       );
 

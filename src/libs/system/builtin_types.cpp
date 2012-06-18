@@ -1444,7 +1444,9 @@ namespace TransLucid
       Constant
       create
       (
+        System* system,
         WS* ws, 
+        std::vector<Constant> binds,
         const std::vector<dimension_index>& scope,
         Context& k
       )
@@ -1452,7 +1454,7 @@ namespace TransLucid
         ConstantPointerValue* p =
           new ConstantPointerValue(
             &workshop_type_functions,
-            new IntensionType(const_cast<WS*>(ws), scope, k));
+            new IntensionType(system, const_cast<WS*>(ws), binds, scope, k));
 
         return Constant(p, TYPE_INDEX_INTENSION);
       }
