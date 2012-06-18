@@ -59,10 +59,7 @@ namespace TransLucid
       //
       // k_a \dagger (k_a - m_k) \dagger (m_k <| {\rho, m_scope})
 
-      #warning implement me
-      //ContextPerturber p(k, m_scope);
-      
-      //std::cerr << "eval inten {" << std::endl;
+      //make this more efficient
 
       std::vector<std::pair<dimension_index, Constant>> saved;
       saved.reserve(m_scope.size() + 1);
@@ -85,8 +82,6 @@ namespace TransLucid
       p.perturb(saved);
 
       auto result = (*m_ws)(m_k);
-
-      //std::cerr << "}" << std::endl;
 
       return result;
     }

@@ -255,7 +255,9 @@ ValueFunctionType::apply
   pkappa.perturb({{m_dim, value}});
   pdelta.perturb({{m_dim, value}});
 
-  #warning implement cache
+  #ifdef CACHE_TODO
+  #warning implement cache here
+  #endif
   return Constant();
 }
 
@@ -363,12 +365,15 @@ NameFunctionType::apply
 bool
 ValueFunctionType::less(const ValueFunctionType& rhs) const
 {
+  //this needs to be implemented properly
+  return false;
   //return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
 }
 
 bool
 NameFunctionType::less(const NameFunctionType& rhs) const
 {
+  return false;
   //return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
 }
 

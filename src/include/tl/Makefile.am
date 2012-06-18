@@ -30,7 +30,7 @@ includes_HEADERS = \
   gmpxx_fwd.hpp header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer_util.hpp library.hpp \
   line_tokenizer.hpp mpl.hpp \
-  object_registry.hpp opdefs.hpp output.hpp \
+  object_registry.hpp opdef.hpp output.hpp \
   parser_api.hpp parser_defs.hpp parser_iterator.hpp \
   range.hpp registries.hpp rename.hpp semantic_transform.hpp \
   set_types.hpp system.hpp system_object.hpp system_util.hpp \

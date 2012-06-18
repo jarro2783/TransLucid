@@ -487,6 +487,11 @@ MakeIntenWS::operator()(Context& k)
 Constant
 MakeIntenWS::operator()(Context& kappa, Context& delta)
 {
+  #ifdef CACHE_TODO
+  #warning implement cache here
+  #endif
+
+  return Constant();
 }
 
 Constant
@@ -506,6 +511,10 @@ EvalIntenWS::operator()(Context& k)
 Constant
 EvalIntenWS::operator()(Context& kappa, Context& delta)
 {
+  #ifdef CACHE_TODO
+  #warning implement cache here
+  #endif
+  return Constant();
 }
 
 Constant

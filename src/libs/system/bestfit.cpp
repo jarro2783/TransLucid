@@ -196,6 +196,10 @@ BestfitGroup::operator()(Context& k)
 Constant
 BestfitGroup::operator()(Context& kappa, Context& delta)
 {
+  #ifdef CACHE_TODO
+  #warning implement cache here
+  #endif
+  return Constant();
 }
 
 Constant
