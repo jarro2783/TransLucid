@@ -439,6 +439,10 @@ namespace TransLucid
       : expr(e)
       {}
 
+      MakeIntenExpr(Expr e, std::vector<Expr> binds)
+      : expr(e), binds(binds)
+      {}
+
       MakeIntenExpr
       (
         Expr e, 

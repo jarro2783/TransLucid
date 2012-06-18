@@ -317,6 +317,7 @@ fun print_typename.c [c : basefun] = "basefun";;
 fun print_typename.c [c : lambda] = "lambda";;
 fun print_typename.c [c : phi] = "phi";;
 fun print_typename.c [c : floatmp] = "floatmp";;
+fun print_typename.c [c : intension] = "intension";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;

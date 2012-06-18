@@ -59,6 +59,12 @@ OpDefWS::addEquation(uuid id, Parser::RawInput input, int time)
   m_bestfit.addEquation(id, input, time);
 }
 
+void
+OpDefWS::addEquation(uuid id, Parser::Line input, int time)
+{
+  m_bestfit.addEquation(id, input, time);
+}
+
 Tree::Expr
 OpDefWS::group(const std::list<EquationDefinition>& defs)
 {

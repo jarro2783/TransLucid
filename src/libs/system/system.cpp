@@ -1006,7 +1006,8 @@ System::System(bool cached)
    {U"demand", TYPE_INDEX_DEMAND},
    {U"calc", TYPE_INDEX_CALC},
    {U"basefun", TYPE_INDEX_BASE_FUNCTION},
-   {U"union", TYPE_INDEX_UNION}
+   {U"union", TYPE_INDEX_UNION},
+   {U"intension", TYPE_INDEX_INTENSION}
   }
   )
 , m_time(0)
@@ -1210,7 +1211,21 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     typeName = U"OpPostfix";
   }
 
-  return addEquation(Parser::Equation(
+  return addOpDeclInternal(op.symbol, Parser::OpDecl{op.symbol,
+    Tree::LambdaAppExpr
+    (
+      Tree::LambdaAppExpr
+      (
+        Tree::IdentExpr(typeName),
+        op.op
+      ),
+      op.call_by_name
+    )
+  });
+
+  #if 0
+
+  return addVariableDeclParsed(Parser::Equation(
     U"OPERATOR",
     Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
     Tree::Expr(),
@@ -1223,6 +1238,8 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     }
     )
   ));
+  #endif
+
   #if 0
   u32string typeName;
 
@@ -1281,8 +1298,27 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
     break;
   }
 
-  return addEquation(Parser::Equation(
-    U"OPERATOR",
+  return addOpDeclInternal(op.symbol, Parser::OpDecl{op.symbol,
+    Tree::LambdaAppExpr
+    (
+      Tree::LambdaAppExpr
+      (
+        Tree::LambdaAppExpr
+        (
+          Tree::LambdaAppExpr
+          (
+            Tree::IdentExpr(U"OpInfix"),
+            op.op
+          ),
+          op.cbn
+        ),
+        Tree::IdentExpr(assocType)
+      ),
+      op.precedence
+    )
+  });
+
+#if 0
     Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
     Tree::Expr(),
     Tree::TupleExpr(
@@ -1302,6 +1338,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
     }
     )
   ));
+#endif
 
   #if 0
   u32string assocName;

@@ -1708,6 +1708,7 @@ init_builtin_types(System& s)
   type_names.push_back(U"lambda");
   type_names.push_back(U"phi");
   type_names.push_back(U"uuid");
+  type_names.push_back(U"intension");
     
   //add all of the literals (LITERAL ... =)
   add_builtin_literals(s, type_names);
@@ -1717,7 +1718,7 @@ init_builtin_types(System& s)
 
   to_print_types.push_back(U"error");
 
-  add_builtin_printers(s, to_print_types);
+  //add_builtin_printers(s, to_print_types);
 
   add_base_functions(s);
 

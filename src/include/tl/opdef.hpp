@@ -46,6 +46,9 @@ namespace TransLucid
     operator()(Context& kappa, Context& delta);
 
     void
+    addEquation(uuid id, Parser::Line input, int time);
+
+    void
     addEquation(uuid id, Parser::RawInput input, int time);
 
     bool 

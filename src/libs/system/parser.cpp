@@ -706,6 +706,36 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
     begin = current;
     return true;
   }
+  else if (*begin == TOKEN_UARROW)
+  {
+    auto current = begin;
+    ++current;
+
+    std::vector<Tree::Expr> binds;
+    parse_bound_dims(current, end, binds);
+
+    Tree::Expr rhs;
+    expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
+
+    result = Tree::MakeIntenExpr(rhs, binds);
+
+    begin = current;
+
+    return true;
+  }
+  else if (*begin == TOKEN_DARROW)
+  {
+    auto current = begin;
+
+    Tree::Expr rhs;
+    expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
+
+    result = Tree::EvalIntenExpr(rhs);
+
+    begin = current;
+
+    return true;
+  }
   else
   {
     return parse_postfix_expr(begin, end, result);
