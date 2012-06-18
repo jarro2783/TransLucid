@@ -1,5 +1,5 @@
 /* Translates AST::Expr to workshops.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -57,9 +57,11 @@ namespace TransLucid
     WS* operator()(const Tree::ParenExpr& e);
     WS* operator()(const Tree::UnaryOpExpr& e);
     WS* operator()(const Tree::BinaryOpExpr& e);
+    WS* operator()(const Tree::MakeIntenExpr& e);
     WS* operator()(const Tree::EvalIntenExpr& e);
     WS* operator()(const Tree::IfExpr& e);
     WS* operator()(const Tree::HashExpr& e);
+    WS* operator()(const Tree::BaseAbstractionExpr& e);
     WS* operator()(const Tree::TupleExpr& e);
     WS* operator()(const Tree::AtExpr& e);
     WS* operator()(const Tree::LambdaExpr& e);
@@ -68,6 +70,7 @@ namespace TransLucid
     WS* operator()(const Tree::LambdaAppExpr& e);
     WS* operator()(const Tree::PhiAppExpr& e);
     WS* operator()(const Tree::WhereExpr& e);
+    WS* operator()(const Tree::ConditionalBestfitExpr& e);
 
     private:
     //the system to compile with

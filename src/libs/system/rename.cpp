@@ -48,11 +48,13 @@ RenameIdentifiers::operator()(const Tree::IdentExpr& e)
 
   if (iter != m_rules.end())
   {
+    //std::cerr << "renaming " << e.text << " to " << iter->second << std::endl;
     //record that we renamed something
     return Tree::IdentExpr(iter->second);
   }
   else
   {
+    //std::cerr << "not renaming " << e.text << std::endl;
     return e;
   }
 }
@@ -112,7 +114,7 @@ RenameIdentifiers::operator()(const Tree::TupleExpr& e)
     ));
   }
 
-  return renamed;
+  return Tree::TupleExpr(renamed);
 }
 
 Tree::Expr
@@ -278,13 +280,22 @@ RenameIdentifiers::renameFunction(const T& f)
   else
   {
     //there is no point storing the iterator, it might go away
-    m_rules.insert(std::make_pair(f.name, unique)).first;
+    m_rules.insert(std::make_pair(f.name, unique));
   }
 
   //rename
   T l(f);
   l.name = unique;
   l.rhs = apply_visitor(*this, f.rhs);
+
+  //copy the dim
+  l.argDim = f.argDim;
+
+  //rename in the bound dimensions
+  for (auto& b : f.binds)
+  {
+    l.binds.push_back(apply_visitor(*this, b));
+  }
 
   //restore the shadowed name
   if (!shadowed.empty())

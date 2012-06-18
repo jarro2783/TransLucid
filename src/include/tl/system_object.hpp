@@ -1,5 +1,5 @@
-/* Workshop type, stores a pointer to workshop in a Constant.
-   Copyright (C) 2011 Jarryd Beck.
+/* System objects.
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -17,51 +17,28 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TL_TYPES_WORKSHOP_HPP_INCLUDED
-#define TL_TYPES_WORKSHOP_HPP_INCLUDED
+/**
+ * @file system_object.hpp
+ * Abstract base class for objects that can exist in the system.
+ */
 
-#include <tl/workshop.hpp>
+#ifndef TL_SYSTEM_OBJECT_HPP_INCLUDED
+#define TL_SYSTEM_OBJECT_HPP_INCLUDED
+
+#include <tl/parser_api.hpp>
 
 namespace TransLucid
 {
-
-  class WorkshopType
+  class SystemObject
   {
     public:
-    WorkshopType(WS* ws)
-    : m_ws(ws)
-    {
-    }
 
-    WS* ws() const
-    {
-      return m_ws;
-    }
+    virtual bool
+    del(uuid id, int time) = 0;
 
-    private:
-    WS* m_ws;
+    virtual bool
+    repl(uuid id, int time, const Parser::Line& line) = 0;
   };
-
-  namespace Types
-  {
-    namespace Workshop
-    {
-      Constant
-      create(const WS* ws);
-
-      const WorkshopType&
-      get(const Constant& c);
-
-      bool 
-      equality(const Constant& lhs, const Constant& rhs);
-
-      size_t
-      hash(const Constant& c);
-
-      bool
-      less(const Constant& lhs, const Constant& rhs);
-    }
-  }
 }
 
 #endif

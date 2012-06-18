@@ -1,5 +1,5 @@
 /* The context.
-   Copyright (C) 2009-2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009-2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -93,7 +93,34 @@ namespace TransLucid
         m_context.at(makeIndex(i)).size() != 0;
     }
 
+    Context
+    minimal_copy() const
+    {
+      Context k;
+      k.m_min = m_min;
+      k.m_max = m_max;
+      k.m_context.resize(m_context.size());
+
+      auto siter = m_context.begin();
+      auto diter = k.m_context.begin();
+
+      while (siter != m_context.end())
+      {
+        if (!siter->empty())
+        {
+          diter->push(siter->top());
+        }
+
+        ++siter;
+        ++diter;
+      }
+
+      return k;
+    }
+
     private:
+
+    friend class ContextPerturber;
 
     dimension_index
     makeIndex(dimension_index i) const
@@ -193,6 +220,25 @@ namespace TransLucid
     ~ContextPerturber()
     {
       m_k.restore(m_dims);
+    }
+
+    void
+    perturb(const Context& k_p)
+    {
+      //perturb m_k by everything in k_p
+      auto d = k_p.m_min + 1;
+      auto iter = k_p.m_context.begin();
+
+      while (iter != k_p.m_context.end())
+      {
+        if (!iter->empty())
+        {
+          perturb(d, iter->top());
+        }
+
+        ++iter;
+        ++d;
+      }
     }
 
     private:

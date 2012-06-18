@@ -1,5 +1,5 @@
 /* The parser.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -100,6 +100,14 @@ namespace TransLucid
         Tree::Expr& result,
         size_t type);
 
+      bool
+      parse_bound_dims(LexerIterator& begin, const LexerIterator& end,
+        std::vector<Tree::Expr>& result);
+
+      void
+      parse_expr_list(LexerIterator& begin, const LexerIterator& end,
+        std::vector<Tree::Expr>& result);
+
       bool 
       parse_tuple(LexerIterator& begin, const LexerIterator& end,
         Tree::Expr& result, TupleSeparator sep);
@@ -156,6 +164,10 @@ namespace TransLucid
 
       bool
       parse_data_decl(LexerIterator& begin, const LexerIterator& end,
+        Line& result);
+
+      bool
+      parse_cons_decl(LexerIterator& begin, const LexerIterator& end,
         Line& result);
 
       bool

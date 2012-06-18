@@ -11,8 +11,7 @@ namespace TransLucid
 
   enum Special
   {
-    SP_ERROR, /**<Error value. Should never have this value, having a special
-    of this value means an error occured somewhere.*/
+    SP_ERROR, /**<Generic error value. */
     SP_ACCESS, /**<Access error. Something requested could not be accessed.*/
     SP_TYPEERROR,
     SP_DIMENSION,

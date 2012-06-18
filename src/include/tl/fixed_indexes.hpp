@@ -1,6 +1,6 @@
 /* Predefined type and dimension indexes which must exist
    for the system to work.
-   Copyright (C) 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -45,21 +45,21 @@ namespace TransLucid
     TYPE_INDEX_DIMENSION,
     TYPE_INDEX_TUPLE,
     TYPE_INDEX_TYPE,
-    TYPE_INDEX_RANGE,
+    TYPE_INDEX_RANGE, //10
     TYPE_INDEX_UNION,
-    TYPE_INDEX_BASE_FUNCTION,  //10
+    TYPE_INDEX_BASE_FUNCTION,
     TYPE_INDEX_VALUE_FUNCTION,
     TYPE_INDEX_NAME_FUNCTION,
     TYPE_INDEX_UUID,
-    TYPE_INDEX_WS,
+    TYPE_INDEX_INTENSION,
     TYPE_INDEX_INHD,
     TYPE_INDEX_IOHD,
     TYPE_INDEX_OUTHD,
-    TYPE_INDEX_CALC,
+    TYPE_INDEX_CALC, //20
     TYPE_INDEX_DEMAND,
 
     //the last one
-    TYPE_INDEX_LAST //20
+    TYPE_INDEX_LAST
   };
 
   //if you change something here, make sure to update the names in
@@ -89,15 +89,18 @@ namespace TransLucid
     //the constructor dim for data types
     DIM_CONS = -15,
 
+    //the rho dimension for the call stack
+    DIM_RHO = -16,
+
     //fix some defaults for arg0, arg1, arg2 and arg3 because they are commonly
     //used in code
-    DIM_ARG0 = -16,
-    DIM_ARG1 = -17,
-    DIM_ARG2 = -18,
-    DIM_ARG3 = -19,
+    DIM_ARG0 = -17,
+    DIM_ARG1 = -18,
+    DIM_ARG2 = -19,
+    DIM_ARG3 = -20,
 
     //the last one
-    DIM_INDEX_LAST = -20
+    DIM_INDEX_LAST = -21
   };
 
 } //namespace TransLucid

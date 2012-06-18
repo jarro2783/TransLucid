@@ -1,5 +1,5 @@
 /* Abstract syntax tree.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -198,9 +198,9 @@ namespace TransLucid
     };
 
     /**
-     * Nothing. An nothing node in the AST, it is an error to have a node
-     * of this type, but necessary for functioning of the parser.
-     */
+     * Nothing. A nothing node in the AST, this will occur whenever there
+     * is no tree for a particular entity.
+     */ 
     struct nil
     {
     };
@@ -280,34 +280,27 @@ namespace TransLucid
       u32string text; /**< The name of the identifier.*/
     };
 
+    struct BaseAbstractionExpr
+    {
+      BaseAbstractionExpr() = default;
+
+      BaseAbstractionExpr(const u32string& name)
+      : name(name)
+      {}
+
+      u32string name;
+    };
+
     struct HashSymbol
     {
     };
 
-    class ParenExpr;
-    class UnaryOpExpr;
-    class BinaryOpExpr;
-    class HashExpr;
-    class TupleExpr;
-    class IfExpr;
-    class AtExpr;
-    class LambdaExpr;
-    class PhiExpr;
-    class BangAppExpr;
-    class LambdaAppExpr;
-    class PhiAppExpr;
-    class WhereExpr;
-
-    // Not defined in ast.hpp
-    class OpExpr;
-    class RangeExpr;
-
     //defined in ast_fwd.hpp
-    #if 0
     /**
      * Abstract syntax tree node. A single expression node in the 
      * abstract syntax tree which is created by the parser.
      */
+    #if 0
     typedef Variant
     <
       nil,
@@ -320,6 +313,7 @@ namespace TransLucid
       DimensionExpr,
       IdentExpr,
       HashSymbol,
+      BaseAbstraction,
       recursive_wrapper<ParenExpr>,
       recursive_wrapper<UnaryOpExpr>,
       recursive_wrapper<BinaryOpExpr>,
@@ -347,7 +341,7 @@ namespace TransLucid
        * Construct a parenthesised expression.
        * @param e The inside expression.
        */
-      ParenExpr(const Expr& e)
+      explicit ParenExpr(const Expr& e)
       : e(e)
       {
       }
@@ -441,7 +435,25 @@ namespace TransLucid
     {
       MakeIntenExpr() = default;
 
+      MakeIntenExpr(Expr e)
+      : expr(e)
+      {}
+
+      MakeIntenExpr(Expr e, std::vector<Expr> binds)
+      : expr(e), binds(binds)
+      {}
+
+      MakeIntenExpr
+      (
+        Expr e, 
+        std::vector<Expr> binds,
+        std::vector<dimension_index> scope
+      )
+      : expr(e), binds(binds), scope(scope)
+      {}
+
       Expr expr;
+      std::vector<Expr> binds;
 
       std::vector<dimension_index> scope;
     };
@@ -449,6 +461,11 @@ namespace TransLucid
     struct EvalIntenExpr
     {
       EvalIntenExpr() = default;
+
+      EvalIntenExpr(const Tree::Expr& rhs)
+      : expr(rhs)
+      {
+      }
 
       Expr expr;
     };
@@ -524,7 +541,7 @@ namespace TransLucid
        * Construct a hash expression.
        * @param e The sub expression.
        */
-      HashExpr(const Expr& e, bool cached = true)
+      explicit HashExpr(const Expr& e, bool cached = true)
       : e(e), cached(cached)
       {}
 
@@ -614,7 +631,9 @@ namespace TransLucid
      */
     struct LambdaExpr
     {
-      LambdaExpr() = default;
+      LambdaExpr() 
+      : argDim(0)
+      {}
 
       /**
        * Construct a LambdaExpr.
@@ -627,40 +646,58 @@ namespace TransLucid
         const u32string& name, 
         RExpr&& rhs
       )
-      : name(name), rhs(std::forward<RExpr>(rhs))
+      : name(name), rhs(std::forward<RExpr>(rhs)), argDim(0)
+      {
+      }
+
+      /**
+       * Construct a LambdaExpr.
+       * @param name The parameter to bind.
+       * @param bind The dimensions to bind.
+       * @param rhs The right-hand-side expression.
+       */
+      template <typename RExpr>
+      LambdaExpr
+      (
+        const u32string& name, 
+        std::vector<Expr> bind,
+        RExpr&& rhs
+      )
+      : name(name), binds(bind), rhs(std::forward<RExpr>(rhs)), argDim(0)
       {
       }
 
       u32string name; /**<The bound parameter.*/
+      std::vector<Expr> binds;
       Expr rhs; /**<The right-hand-side expression.*/
 
       dimension_index argDim;
-      std::vector<dimension_index> scope;
-
-      //the free variables to evaluate
-      std::vector<std::pair<u32string, dimension_index>> free;
+      MakeIntenExpr inten;
     };
 
     //TODO: fix TreeToWSTree when I implement this
     struct PhiExpr
     {
-      PhiExpr() = default;
+      PhiExpr()
+      : argDim(0)
+      {}
 
       PhiExpr(const u32string& name, const Expr& rhs)
-      : name(name), rhs(rhs)
+      : name(name), rhs(rhs), argDim(0)
+      {
+      }
+
+      PhiExpr(const u32string& name, std::vector<Expr> bind, const Expr& rhs)
+      : name(name), binds(bind), rhs(rhs), argDim(0)
       {
       }
 
       u32string name;
-      //std::vector<Expr> binds;
+      std::vector<Expr> binds;
       Expr rhs;
 
       dimension_index argDim;
-      dimension_index odometerDim;
       std::vector<dimension_index> scope;
-
-      //the free variables to evaluate
-      std::vector<std::pair<u32string, dimension_index>> free;
     };
 
     /**
@@ -738,6 +775,14 @@ namespace TransLucid
       std::vector<size_t> whichDims;
     };
 
+    struct ConditionalBestfitExpr
+    {
+      //provenance [...] | boolean = expr
+      typedef std::tuple<int, Expr, Expr, Expr> Declaration;
+
+      std::vector<Declaration> declarations;
+    };
+
     /**
      * Creates a binary operation from the op and the left and right hand
      * sides. Inserts one into the tree of the other depending on the
@@ -782,6 +827,7 @@ namespace TransLucid
     PRINT_NODE(LambdaAppExpr)
     PRINT_NODE(PhiAppExpr)
     PRINT_NODE(WhereExpr)
+    PRINT_NODE(ConditionalBestfitExpr)
     #endif
   }
 

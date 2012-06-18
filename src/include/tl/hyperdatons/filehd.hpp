@@ -1,5 +1,5 @@
 /* File hyperdatons.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011,2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -83,6 +83,7 @@ namespace TransLucid
   };
   #endif
 
+  #if 0
   class FileArrayInFn : public BaseFunctionType
   {
     public:
@@ -194,4 +195,5 @@ namespace TransLucid
     u32string m_file;
     System& m_system;
   };
+  #endif
 }

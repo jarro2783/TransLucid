@@ -1,5 +1,5 @@
 /* Workshops generated from AST::Expr.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef SET_EVALUATOR_HPP_INCLUDED
-#define SET_EVALUATOR_HPP_INCLUDED
+#ifndef TL_EVAL_WORKSHOP_HPP_INCLUDED
+#define TL_EVAL_WORKSHOP_HPP_INCLUDED
 
 /**
  * @file compiled_functors.hpp
@@ -33,6 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/workshop.hpp>
 
 #include <list>
+#include <set>
 
 //Some of these functors are constructed with the system, some are not.
 //The ones that are make a demand of the system.
@@ -42,7 +43,7 @@ along with TransLucid; see the file COPYING.  If not see
 //On the other hand, IdentWS is used whenever an arbitrary identifier is 
 //referred to.
 //For an identifier x:
-//IdentWS makes the demand system([id : "x"]) & k
+//IdentWS gets x from the system and evaluates it in the current context
 
 namespace TransLucid
 {
@@ -204,6 +205,63 @@ namespace TransLucid
     {
     };
 
+    class MakeIntenWS : public WS
+    {
+      public:
+
+      MakeIntenWS
+      (
+        System& system,
+        WS* rhs,
+        std::vector<WS*> binds,
+        const std::vector<dimension_index>& scope
+      )
+      : m_system(system), m_rhs(rhs), m_binds(binds), m_scope(scope)
+      {
+      }
+
+      ~MakeIntenWS()
+      {
+        delete m_rhs;
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+      System& m_system;
+      WS* m_rhs;
+      std::vector<WS*> m_binds;
+      std::vector<dimension_index> m_scope;
+    };
+
+    class EvalIntenWS : public WS
+    {
+      public:
+
+      EvalIntenWS(WS* rhs)
+      : m_rhs(rhs)
+      {
+      }
+
+      ~EvalIntenWS()
+      {
+        delete m_rhs;
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+      WS* m_rhs;
+    };
+
     /**
      * An if expression workshop.
      */
@@ -283,12 +341,32 @@ namespace TransLucid
       operator()(Context& k);
 
       Constant
-      operator()(Context& k, Context& kappa);
+      operator()(Context& kappa, Context& delta);
 
       private:
       System& m_system;
       WS* m_e;
       bool m_cached;
+    };
+
+    class BaseAbstractionWS : public WS
+    {
+      public:
+      BaseAbstractionWS(System& s, const u32string& name)
+      : m_system(s), m_name(name), m_function(nullptr)
+      {
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+      System& m_system;
+      u32string m_name;
+      BaseFunctionType* m_function;
     };
 
     /**
@@ -402,6 +480,7 @@ namespace TransLucid
       WS* e1;
     };
 
+#if 0
     /**
      * A base function abstraction workshop.
      * Creates a base function abstraction.
@@ -451,6 +530,7 @@ namespace TransLucid
       std::vector<dimension_index> m_scope;
       WS* m_rhs;
     };
+#endif
 
     /**
      * A call-by-value abstraction workshop.
@@ -472,15 +552,11 @@ namespace TransLucid
         System* system,
         const u32string& name, 
         dimension_index dim, 
-        const std::vector<dimension_index> scope,
-        const std::vector<std::pair<u32string, dimension_index>>& free,
         WS* rhs
       )
       : m_system(system)
       , m_name(name)
       , m_argDim(dim)
-      , m_scope(scope)
-      , m_free(free)
       , m_rhs(rhs)
       {
       }
@@ -515,21 +591,10 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
-      void
-      addFreeVariables
-      (
-        std::vector<std::pair<u32string, dimension_index>> free
-      )
-      {
-        m_free.insert(m_free.end(), free.begin(), free.end());
-      }
-
       private:
       System* m_system;
       u32string m_name;
       dimension_index m_argDim;
-      std::vector<dimension_index> m_scope;
-      std::vector<std::pair<u32string, dimension_index>> m_free;
       WS* m_rhs;
     };
 
@@ -605,8 +670,8 @@ namespace TransLucid
       , m_name(name)
       , m_argDim(argDim)
       , m_odometerDim(odometerDim)
-      , m_scope(scope)
-      , m_free(free)
+      , m_scope(scope.begin(), scope.end())
+      , m_free(free.begin(), free.end())
       , m_rhs(rhs)
       {
       }
@@ -640,13 +705,21 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      template <typename T>
       void
       addFreeVariables
       (
-        std::vector<std::pair<u32string, dimension_index>> free
+        const T& free
       )
       {
-        m_free.insert(m_free.end(), free.begin(), free.end());
+        m_free.insert(free.begin(), free.end());
+      }
+
+      template <typename T>
+      void
+      addScope(const T& scope)
+      {
+        m_scope.insert(scope.begin(), scope.end());
       }
 
       private:
@@ -654,52 +727,9 @@ namespace TransLucid
       u32string m_name;
       dimension_index m_argDim;
       dimension_index m_odometerDim;
-      std::vector<dimension_index> m_scope;
-      std::vector<std::pair<u32string, dimension_index>> m_free;
+      std::set<dimension_index> m_scope;
+      std::map<u32string, dimension_index> m_free;
       WS* m_rhs;
-    };
-
-    /**
-     * The call-by-name application workshop. Evaluates a call by name
-     * function application.
-     */
-    class NameApplicationWS : public WS
-    {
-      public:
-      /**
-       * Constructs a call by name application workshop.
-       * @param lhs The lhs argument.
-       * @param rhs The rhs argument.
-       */
-      NameApplicationWS(WS* lhs, WS* rhs)
-      : m_lhs(lhs)
-      , m_rhs(rhs)
-      {
-      }
-
-      ~NameApplicationWS()
-      {
-        delete m_lhs;
-        delete m_rhs;
-      }
-
-      /**
-       * Evaluates a call by name application. If the lhs evaluates to a call
-       * by name abstraction, it evaluates the abstraction passing the rhs as
-       * an intension.
-       * @param k The current context.
-       */
-      Constant
-      operator()(Context& k);
-
-      Constant
-      operator()(Context& kappa, Context& delta);
-
-      private:
-      WS* m_lhs;
-      WS* m_rhs;
-
-      std::vector<dimension_index> m_Lall;
     };
 
     /**
@@ -745,4 +775,4 @@ namespace TransLucid
   }
 }
 
-#endif // SET_EVALUATOR_HPP_INCLUDED
+#endif // TL_EVAL_WORKSHOP_HPP_INCLUDED

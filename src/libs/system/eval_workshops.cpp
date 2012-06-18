@@ -1,5 +1,5 @@
 /* Workshops generated from AST::Expr.
-   Copyright (C) 2009--2012 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -36,7 +36,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/function.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
-#include <tl/types/workshop.hpp>
+#include <tl/types/intension.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
@@ -204,6 +204,7 @@ template <typename... Delta>
 Constant
 IdentWS::evaluate(Context& kappa, Delta&&... delta)
 {
+  //std::cerr << "evaluating variable: " << m_name << std::endl;
   if (m_e == nullptr)
   {
     m_e = m_identifiers.lookup(m_name);
@@ -468,6 +469,43 @@ BangOpWS::operator()(Context& k)
   {
     return Types::Special::create(SP_UNDEF);
   }
+}
+
+Constant
+MakeIntenWS::operator()(Context& k)
+{
+  std::vector<Constant> binds;
+
+  for (auto& b : m_binds)
+  {
+    binds.push_back((*b)(k));
+  }
+
+  return Types::Intension::create(&m_system, m_rhs, binds, m_scope, k);
+}
+
+Constant
+MakeIntenWS::operator()(Context& kappa, Context& delta)
+{
+}
+
+Constant
+EvalIntenWS::operator()(Context& k)
+{
+  Constant rhs = (*m_rhs)(k);
+
+  if (rhs.index() != TYPE_INDEX_INTENSION)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+
+  const IntensionType& inten = Types::Intension::get(rhs);
+  return inten(k);
+}
+
+Constant
+EvalIntenWS::operator()(Context& kappa, Context& delta)
+{
 }
 
 Constant
@@ -829,17 +867,25 @@ AtWS::operator()(Context& kappa, Context& delta)
 Constant
 BaseAbstractionWS::operator()(Context& k)
 {
-  return Types::BaseFunction::create
-  (
-    BaseFunctionAbstraction
-    (
-      //m_name, 
-      m_argDim, 
-      m_scope,
-      m_rhs, 
-      k
-    )
-  );
+  if (m_function == nullptr)
+  {
+    m_function = m_system.lookupBaseFunction(m_name);
+  }
+
+  if (m_function == nullptr)
+  {
+    return Types::Special::create(SP_CONST);
+  }
+  else
+  {
+    return Types::BaseFunction::create(*m_function);
+  }
+}
+
+Constant
+BaseAbstractionWS::operator()(Context& kappa, Context& delta)
+{
+  return operator()(kappa);
 }
 
 Constant
@@ -850,8 +896,6 @@ LambdaAbstractionWS::operator()(Context& k)
       m_system,
       m_name,
       m_argDim,
-      m_scope,
-      m_free,
       m_rhs,
       k
     );
@@ -882,8 +926,6 @@ LambdaAbstractionWS::operator()(Context& kappa, Context& delta)
       m_system,
       m_name,
       m_argDim,
-      m_scope,
-      m_free,
       m_rhs,
       kappa,
       delta
@@ -963,8 +1005,9 @@ NamedAbstractionWS::operator()(Context& k)
       m_name, 
       m_argDim, 
       m_odometerDim, 
-      m_scope, 
-      m_free, 
+      std::vector<dimension_index>(m_scope.begin(), m_scope.end()),
+      std::vector<std::pair<u32string, dimension_index>>
+        (m_free.begin(), m_free.end()), 
       m_rhs, 
       k
     );
@@ -996,51 +1039,13 @@ NamedAbstractionWS::operator()(Context& kappa, Context& delta)
       m_name, 
       m_argDim, 
       m_odometerDim, 
-      m_scope, 
-      m_free, 
+      std::vector<dimension_index>(m_scope.begin(), m_scope.end()), 
+      std::vector<std::pair<u32string, dimension_index>>
+        (m_free.begin(), m_free.end()), 
       m_rhs, 
       kappa,
       delta
     );
-}
-
-Constant
-NameApplicationWS::operator()(Context& k)
-{
-  Constant lhs = (*m_lhs)(k);
-
-  if (lhs.index() != TYPE_INDEX_NAME_FUNCTION)
-  {
-    return Types::Special::create(SP_TYPEERROR);
-  }
-
-  //named application passes a pointer to the intension
-  Constant rhs = Types::Workshop::create(m_rhs);
-  const NameFunctionType& f = Types::NameFunction::get(lhs);
-
-  return f.apply(k, rhs, m_Lall);
-}
-
-Constant
-NameApplicationWS::operator()(Context& kappa, Context& delta)
-{
-  Constant lhs = (*m_lhs)(kappa, delta);
-
-  if (lhs.index() == TYPE_INDEX_DEMAND)
-  {
-    return lhs;
-  }
-
-  if (lhs.index() != TYPE_INDEX_NAME_FUNCTION)
-  {
-    return Types::Special::create(SP_TYPEERROR);
-  }
-
-  //named application passes a pointer to the intension
-  Constant rhs = Types::Workshop::create(m_rhs);
-  const NameFunctionType& f = Types::NameFunction::get(lhs);
-
-  return f.apply(kappa, delta, rhs, m_Lall);
 }
 
 Constant

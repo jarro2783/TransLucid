@@ -1,4 +1,4 @@
-#   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+#   Copyright (C) 2009--2012 Jarryd Beck
 #
 #   This file is part of TransLucid.
 #
@@ -29,20 +29,24 @@ libtlsystem_la_LIBADD = \
   -lgmpxx -lgmp \
   -lltdl $(TL_LIBS) -lrt $(BOOST_LDFLAGS)
 
-libtlsystem_la_SOURCES = ast.cpp bestfit.cpp builtin_types.cpp \
-  cache.cpp charset.cpp context.cpp \
+libtlsystem_la_SOURCES = \
+  assignment.cpp ast.cpp bestfit.cpp builtin_types.cpp \
+  cache.cpp charset.cpp context.cpp datadef.cpp \
   dimtranslator.cpp equation.cpp \
-  eval_workshops.cpp \
+  eval_workshops.cpp free_variables.cpp function.cpp \
   hyperdatons/arrayhd.cpp hyperdatons/envhd.cpp hyperdatons/filehd.cpp \
   internal_strings.cpp lexertl.cpp lexer_util.cpp library.cpp \
-  line_tokenizer.cpp parser.cpp range.cpp rename.cpp \
-  system.cpp system_util.cpp tree_printer.cpp tree_to_wstree.cpp \
-  types/function.cpp types/numbers.cpp types/union.cpp \
+  line_tokenizer.cpp opdef.cpp parser.cpp range.cpp rename.cpp \
+	semantic_transform.cpp \
+  system.cpp system_util.cpp tree_printer.cpp tree_rewriter.cpp \
+  tree_to_wstree.cpp \
+  types/function_type.cpp types/numbers.cpp types/union.cpp \
   types.cpp utility.cpp uuid.cpp workshop_builder.cpp
 
-libtlsystem_la_CPPFLAGS = -I$(top_srcdir)/src/include \
--DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) \
--DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"$(localedir)\"
+libtlsystem_la_CPPFLAGS = \
+  -I$(top_srcdir)/src/include \
+  -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) \
+  -DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"$(localedir)\"
 
 systemdatadir = $(pkgdatadir)
 dist_systemdata_DATA = system_header.tl

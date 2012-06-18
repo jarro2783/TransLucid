@@ -1,5 +1,5 @@
 /* Utility functions.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -28,9 +28,13 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iostream>
 
-#include <tl/utility.hpp>
 #include <tl/equation.hpp>
+#include <tl/function_transform.hpp>
+#include <tl/rename.hpp>
+#include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
+#include <tl/tree_printer.hpp>
+#include <tl/tree_rewriter.hpp>
 #include <tl/types.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
@@ -40,6 +44,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
 #include <tl/types/union.hpp>
+#include <tl/utility.hpp>
 
 #ifdef ICONV_CONVERT
 #include <iconv.h>
@@ -379,7 +384,7 @@ tupleRefines(const Tuple& a, const Tuple& b, bool canequal)
 }
 
 bool
-booleanTrue(const GuardWS& g, Context& k)
+booleanTrue(const EquationGuard& g, Context& k)
 {
   WS* b = g.boolean();
 
@@ -400,7 +405,7 @@ booleanTrue(const GuardWS& g, Context& k)
 bool
 booleanTrue
 (
-  const GuardWS& g, 
+  const EquationGuard& g, 
   Context& kappa, 
   Context& delta, 
   std::vector<dimension_index>& demands
@@ -566,7 +571,7 @@ u32_to_ascii(const u32string& s)
 Constant
 lookup_context(System& system, const Constant& v, const Context& k)
 {
-  size_t index;
+  dimension_index index;
   if (v.index() == TYPE_INDEX_DIMENSION)
   {
     index = get_constant<dimension_index>(v);
@@ -688,6 +693,43 @@ applyFunction
   {
     return Types::Special::create(SP_TYPEERROR);
   }
+}
+
+std::pair
+<
+  Tree::Expr,
+  ExtraTreeInformation
+>
+fixupTree(System& s, const Tree::Expr& e)
+{
+  TreeRewriter rewriter;
+  RenameIdentifiers renamer(s);
+  FunctionTransform funs;
+  SemanticTransform transform(s);
+
+  Tree::Expr e1 = rewriter.rewrite(e);
+  Tree::Expr e2 = renamer.rename(e1);
+  Tree::Expr e3 = funs.transform(e2);
+  Tree::Expr e4 = transform.transform(e3);
+
+  //std::cerr << "after fixing up tree: " << Printer::print_expr_tree(e4, true)
+  //  << std::endl;
+
+  const auto& scope = transform.getAllScopeArgs();
+  const auto& odo = transform.getAllScopeOdometer();
+
+  std::vector<dimension_index> nils(scope.begin(), scope.end());
+  nils.insert(nils.end(), odo.begin(), odo.end());
+
+  return 
+  {
+    e4, 
+    {
+      transform.newVars(),
+      transform.getLin(),
+      nils
+    }
+  };
 }
 
 }

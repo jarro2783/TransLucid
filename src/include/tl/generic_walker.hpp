@@ -1,5 +1,5 @@
 /* Tree walk when not much changes.
-   Copyright (C) 2011 Jarryd Beck
+   Copyright (C) 2011, 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -16,6 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
+
+#ifndef TL_GENERIC_WALKER_HPP_INCLUDED
+#define TL_GENERIC_WALKER_HPP_INCLUDED
 
 #include <tl/ast.hpp>
 
@@ -74,6 +77,12 @@ namespace TransLucid
         apply_visitor(*reinterpret_cast<Derived*>(this), e.e));
     }
 
+    Tree::Expr
+    operator()(const Tree::BaseAbstractionExpr& e)
+    {
+      return e;
+    }
+
     Tree::Expr operator()(const Tree::TupleExpr& e)
     {
       std::vector<std::pair<Tree::Expr, Tree::Expr>> visited;
@@ -88,6 +97,24 @@ namespace TransLucid
       }
 
       return Tree::TupleExpr{visited};
+    }
+
+    Tree::Expr
+    operator()(const Tree::MakeIntenExpr& e)
+    {
+      std::vector<Tree::Expr> binds;
+
+      for (auto& b : e.binds)
+      {
+        binds.push_back(apply_visitor(*reinterpret_cast<Derived*>(this), b));
+      }
+
+      return Tree::MakeIntenExpr
+      {
+        apply_visitor(*reinterpret_cast<Derived*>(this), e.expr), 
+        binds,
+        e.scope
+      };
     }
 
     Tree::Expr
@@ -108,9 +135,48 @@ namespace TransLucid
       );
     }
 
-    Tree::Expr operator()(const Tree::LambdaExpr& e);
+    Tree::Expr operator()(const Tree::LambdaExpr& e)
+    {
+      std::vector<Tree::Expr> binds;
 
-    Tree::Expr operator()(const Tree::PhiExpr& e);
+      for (auto& b : e.binds)
+      {
+        binds.push_back(apply_visitor(*reinterpret_cast<Derived*>(this), b));
+      }
+
+      Tree::LambdaExpr le
+      (
+        e.name,
+        binds,
+        apply_visitor(*reinterpret_cast<Derived*>(this), e.rhs)
+      );
+
+      le.argDim = e.argDim;
+
+      return le;
+    }
+
+    Tree::Expr operator()(const Tree::PhiExpr& e)
+    {
+      std::vector<Tree::Expr> binds;
+
+      for (auto& b : e.binds)
+      {
+        binds.push_back(apply_visitor(*reinterpret_cast<Derived*>(this), b));
+      }
+
+      Tree::PhiExpr phi
+      (
+        e.name,
+        binds,
+        apply_visitor(*reinterpret_cast<Derived*>(this), e.rhs)
+      );
+
+      phi.argDim = e.argDim;
+      phi.scope = e.scope;
+
+      return phi;
+    }
 
     Tree::Expr operator()(const Tree::BangAppExpr& e)
     {
@@ -147,7 +213,54 @@ namespace TransLucid
       );
     }
 
-    Tree::Expr operator()(const Tree::WhereExpr& e);
+    Tree::Expr operator()(const Tree::WhereExpr& e)
+    {
+      Tree::WhereExpr where;
+
+      where.e = e.e;
+
+      //do the dims
+      for (const auto& dim : e.dims)
+      {
+        where.dims.push_back(std::make_pair(dim.first,
+          apply_visitor(*reinterpret_cast<Derived*>(this), dim.second)));
+      }
+
+      //do the vars
+      for (const auto& var : e.vars)
+      {
+        where.vars.push_back(std::make_tuple(
+          std::get<0>(var),
+          apply_visitor(*reinterpret_cast<Derived*>(this), std::get<1>(var)),
+          apply_visitor(*reinterpret_cast<Derived*>(this), std::get<2>(var)),
+          apply_visitor(*reinterpret_cast<Derived*>(this), std::get<3>(var))
+        ));
+      }
+
+      return where;
+    }
+
+    Tree::Expr
+    operator()(const Tree::ConditionalBestfitExpr& e)
+    {
+      Tree::ConditionalBestfitExpr cond;
+
+      for (auto eqn : e.declarations)
+      {
+        cond.declarations.push_back
+        (
+          std::make_tuple
+          (
+            std::get<0>(eqn),
+            apply_visitor(*reinterpret_cast<Derived*>(this), std::get<1>(eqn)),
+            apply_visitor(*reinterpret_cast<Derived*>(this), std::get<2>(eqn)),
+            apply_visitor(*reinterpret_cast<Derived*>(this), std::get<3>(eqn))
+          )
+        );
+      }
+
+      return cond;
+    }
 
     std::vector<std::pair<Tree::Expr, Tree::Expr>>
     visit_list
@@ -172,3 +285,5 @@ namespace TransLucid
 
   };
 }
+
+#endif

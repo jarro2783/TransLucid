@@ -56,15 +56,20 @@ along with TransLucid; see the file COPYING.  If not see
 #include <signal.h>
 #include <unistd.h>
 
+#include <tl/assignment.hpp>
+#include <tl/basefun.hpp>
 #include <tl/builtin_types.hpp>
 #include <tl/cache.hpp>
 #include <tl/constws.hpp>
 #include <tl/context.hpp>
 #include <tl/eval_workshops.hpp>
 #include <tl/function_registry.hpp>
+#include <tl/opdef.hpp>
 #include <tl/output.hpp>
 #include <tl/parser.hpp>
 #include <tl/parser_iterator.hpp>
+#include <tl/semantic_transform.hpp>
+#include <tl/tree_rewriter.hpp>
 #include <tl/tree_to_wstree.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/demand.hpp>
@@ -73,7 +78,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/uuid.hpp>
-#include <tl/types/workshop.hpp>
+#include <tl/types/intension.hpp>
 #include <tl/workshop_builder.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
@@ -110,13 +115,11 @@ namespace
   Constant
   compile_and_evaluate(const Tree::Expr& expr, System& system)
   {
-    TreeToWSTree tows(&system);
-
-    Tree::Expr wsTree = tows.toWSTree(expr);
+    Tree::Expr transformed = system.fixupTreeAndAdd(expr);
 
     WorkshopBuilder compiler(&system);
 
-    std::auto_ptr<WS> ws(compiler.build_workshops(wsTree));
+    std::auto_ptr<WS> ws(compiler.build_workshops(transformed));
 
     return (*ws)(system.getDefaultContext());
   }
@@ -211,164 +214,6 @@ namespace
     }
   }
 
-  class ArgsWorkshop : public WS
-  {
-    public:
-    ArgsWorkshop()
-    {
-    }
-
-    Constant
-    operator()(Context& kappa, Context& delta)
-    {
-      //make sure the necessary dimensions are there
-      //I should write this in TL
-      //
-      //args = eval_workshop.(#!#!psi) 
-      //         @ #!#!pi @ [#!psi <- tail.#!#!psi, #!pi <- #!#!pi]
-
-      //we need to check if DIM_PSI and DIM_PI exist
-      //then look them up and check that their dims exist
-      //then we can call the normal operator()
-      
-      std::vector<dimension_index> needs;
-
-      //these two will always be set because of how args works
-      #if 0
-      if (!delta.has_entry(DIM_PSI))
-      {
-        needs.push_back(DIM_PSI);
-      }
-
-      if (!delta.has_entry(DIM_PI))
-      {
-        needs.push_back(DIM_PI);
-      }
-
-      if (needs.size() > 0)
-      {
-        return Types::Demand::create(needs);
-      }
-      #endif
-
-      //then we have the dimensions that we need
-      Constant hashPsi = delta.lookup(DIM_PSI);
-
-      if (hashPsi.index() != TYPE_INDEX_DIMENSION)
-      {
-        throw "list dimension not a dimension";
-      }
-      
-      auto d1 = get_constant<dimension_index>(hashPsi);
-      if (!delta.has_entry(d1))
-      {
-        needs.push_back(d1);
-      }
-
-      Constant hashPi = delta.lookup(DIM_PI);
-
-      if (hashPi.index() != TYPE_INDEX_DIMENSION)
-      {
-        throw "list dimension not a dimension";
-      }
-
-      #if 0
-      auto d2 = get_constant<dimension_index>(hashPi);
-      if (!delta.has_entry(d2))
-      {
-        needs.push_back(d2);
-      }
-      #endif
-
-      if (needs.size() > 0)
-      {
-        return Types::Demand::create(needs);
-      }
-
-      return evaluate(kappa, delta);
-    }
-
-    Constant
-    operator()(Context& k)
-    {
-      return evaluate(k);
-    }
-
-    //when this is called, delta will be setup correctly if it is the cached
-    //version, if not it just won't exist
-    //in which case it is always safe to read from the kappa
-    //then pass on kappa and delta if it exists as appropriate
-    template <typename... Delta>
-    Constant
-    evaluate(Context& kappa, Delta&&... delta)
-    {
-      //this should always work, but it's a bit hacky
-
-      //head of ##\psi
-      Constant hashPsi = kappa.lookup(DIM_PSI);
-
-      if (hashPsi.index() != TYPE_INDEX_DIMENSION)
-      {
-        throw "list dimension not a dimension";
-      }
-
-      Constant hashHashPsi = 
-        kappa.lookup(get_constant<dimension_index>(hashPsi));
-
-      if (hashHashPsi.index() != TYPE_INDEX_TUPLE)
-      {
-        throw "list expected, type not a tuple";
-      }
-
-      Constant hashPi = kappa.lookup(DIM_PI);
-
-      if (hashPi.index() != TYPE_INDEX_DIMENSION)
-      {
-        throw "list dimension not a dimension";
-      }
-
-      Constant hashHashPi = 
-        kappa.lookup(get_constant<dimension_index>(hashPi));
-
-      if (hashHashPi.index() != TYPE_INDEX_TUPLE)
-      {
-        throw "list expected, type not a tuple";
-      }
-
-      //hashHashPsi will be a list of workshop objects
-
-      //expr is a workshop object
-      Constant expr = listHead(hashHashPsi);
-
-      try
-      {
-
-        ContextPerturber p(kappa,
-          {
-            {get_constant<dimension_index>(hashPsi), listTail(hashHashPsi)},
-            {get_constant<dimension_index>(hashPi), listTail(hashHashPi)}
-          }
-        );
-
-        p.perturb(Types::Tuple::get(listHead(hashHashPi)));
-
-        WS* w = Types::Workshop::get(expr).ws();
-
-        return (*w)(kappa, delta...);
-      
-      }
-      catch (...)
-      {
-        std::cerr << "caught exception in args lookup" << std::endl
-        << "#pi = " << get_constant<dimension_index>(hashPi) << std::endl
-        << "#psi = " << get_constant<dimension_index>(hashPsi) << std::endl;
-
-        throw;
-      }
-
-    }
-  };
-
   class MakeErrorWS : public WS
   {
     public:
@@ -384,6 +229,39 @@ namespace
       return Constant();
     }
   };
+
+  template <typename Iterator>
+  class GenericObject : public SystemObject
+  {
+    public:
+
+    bool
+    del(uuid id, int time)
+    {
+      return m_object->del(id, time);
+    }
+
+    bool
+    repl(uuid id, int time, const Parser::Line& line)
+    {
+      return m_object->repl(id, time, line);
+    }
+
+    private:
+    Iterator m_object;
+
+    public:
+    GenericObject(decltype(m_object) object)
+    : m_object(object)
+    {}
+  };
+
+  template <typename Object>
+  std::shared_ptr<GenericObject<Object>>
+  make_generic_object(Object&& o)
+  {
+    return std::make_shared<GenericObject<Object>>(std::forward<Object>(o));
+  }
 }
 
 GettextInit System::m_gettext;
@@ -460,6 +338,13 @@ namespace detail
     }
 
     typedef Constant result_type;
+
+    template <typename T>
+    Constant
+    operator()(T&& t)
+    {
+      return Constant();
+    }
 
     Constant
     operator()(const Parser::HDDecl& hd)
@@ -858,13 +743,137 @@ namespace detail
     Constant
     operator()(const Parser::FnDecl& fn)
     {
-      return m_system.addFunction(fn);
+      return Constant();
     }
 
     private:
     System& m_system;
     int m_verbose;
   };
+}
+
+//private template  functions go at the top, but after the local
+//definitions
+
+template <typename Input>
+Constant
+System::addVariableDeclInternal
+(
+  const u32string& name,
+  Input&& decl
+)
+{
+  uuid u = generate_uuid();
+
+  auto equationIter = m_variables.find(name);
+
+  std::shared_ptr<VariableWS> var;
+  if (equationIter == m_variables.end())
+  {
+    var = std::make_shared<VariableWS>(name, *this);
+    auto variter = m_variables.insert({name, var});
+
+    //create a new VariableObject to manage the uuid
+    m_objects.insert({u, make_generic_object(variter.first->second)});
+  }
+  else
+  {
+    var = equationIter->second;
+  }
+  var->addEquation(u, std::forward<Input>(decl), m_time);
+
+  m_identifiers.insert({name, var});
+
+  return Types::UUID::create(u);
+}
+
+template <typename Input>
+Constant
+System::addFunDeclInternal
+(
+  const u32string& name,
+  Input&& decl
+)
+{
+  uuid u = generate_uuid();
+
+  auto funIter = m_functions.find(name);
+
+  std::shared_ptr<FunctionWS> fun;
+  if (funIter == m_functions.end())
+  {
+    fun = std::make_shared<FunctionWS>(name, *this);
+    auto funAddIter = m_functions.insert({name, fun});
+
+    m_objects.insert({u, make_generic_object(funAddIter.first->second)});
+  }
+  else
+  {
+    fun = funIter->second;
+  }
+
+  fun->addEquation(u, decl, m_time);
+
+  m_identifiers.insert({name, fun});
+
+  return Types::UUID::create(u);
+}
+
+template <typename Input>
+Constant
+System::addOpDeclInternal
+(
+  const u32string& name,
+  Input&& decl
+)
+{
+  uuid u = generate_uuid();
+
+  auto opident = m_identifiers.find(U"operator");
+
+  if (opident == m_identifiers.end())
+  {
+    m_operators = std::make_shared<OpDefWS>(*this);
+    m_identifiers.insert({U"operator", m_operators});
+  }
+
+  m_operators->addEquation(u, decl, m_time);
+
+  m_objects.insert(
+  {
+    u, 
+    make_generic_object(m_operators)
+  });
+
+  return Types::UUID::create(u);
+}
+
+template <typename Input>
+Constant
+System::addConstructorInternal
+(
+  const u32string& name,
+  Input&& decl
+)
+{
+  uuid u = generate_uuid();
+
+  //this name cannot already exist
+  auto consIter = m_constructors.find(name);
+
+  if (consIter != m_constructors.end())
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  consIter = m_constructors.insert({name, std::make_shared<ConsDefWS>(*this)})
+    .first;
+
+  consIter->second->addEquation(u, std::forward<Input>(decl), m_time);
+
+  m_identifiers.insert({name, consIter->second});
+
+  return Types::UUID::create(u);
 }
 
 //adds eqn | [symbol : "s"] = value;;
@@ -883,52 +892,6 @@ System::addSymbolInfo
     Tree::Expr(),
     value
   ));
-}
-
-
-template <typename T>
-WS*
-System::buildConstantWS(size_t index)
-{
-  WS* h = new T(this);
-
-  #if 0
-  tuple_t guard =
-  {
-    {
-      DIM_TYPE,
-      Constant(String(T::name), TYPE_INDEX_USTRING)
-    }
-  };
-  #endif
-
-  //sets the following
-
-  //CONST | [type : ustring<name>]
-  //addEquation(U"CONST", GuardWS(Tuple(guard)), h);
-
-  addEquation(Parser::Equation
-    (
-      U"LITERAL", 
-      Tree::TupleExpr(Tree::TupleExpr::TuplePairs{{U"DIM_TYPE", T::name}}), 
-      Tree::Expr(),
-      h
-    )
-  );
-
-  #if 0
-  //TYPE_INDEX | [type : ustring<name>] = index;;
-  addEquation
-  (
-    U"TYPE_INDEX", 
-    GuardWS(Tuple(guard)), 
-    new Hyperdatons::IntmpConstWS(index)
-  );
-  #endif
-
-  //TODO: sort out the default literals
-
-  return h;
 }
 
 template <typename... Args>
@@ -980,12 +943,8 @@ System::init_equations()
   addDecl(*this, U"assign", U"DECLID");
   addDecl(*this, U"in", U"DECLID");
   addDecl(*this, U"out", U"DECLID");
-  addDecl(*this, U"infixl", U"DECLID");
-  addDecl(*this, U"infixr", U"DECLID");
-  addDecl(*this, U"infixn", U"DECLID");
-  addDecl(*this, U"prefix", U"DECLID");
-  addDecl(*this, U"postfix", U"DECLID");
   addDecl(*this, U"data", U"DECLID");
+  addDecl(*this, U"constructor", U"DECLID");
   addDecl(*this, U"fun", U"DECLID");
   addDecl(*this, U"op", U"DECLID");
   addDecl(*this, U"del", U"DECLID");
@@ -1010,8 +969,6 @@ System::init_equations()
     Tree::LambdaExpr(U"x")
   ));
   #endif
-
-  addEquation(U"args", GuardWS(), new ArgsWorkshop);
 
   addEquation(U"make_error", GuardWS(), new MakeErrorWS);
 }
@@ -1049,13 +1006,15 @@ System::System(bool cached)
    {U"demand", TYPE_INDEX_DEMAND},
    {U"calc", TYPE_INDEX_CALC},
    {U"basefun", TYPE_INDEX_BASE_FUNCTION},
-   {U"union", TYPE_INDEX_UNION}
+   {U"union", TYPE_INDEX_UNION},
+   {U"intension", TYPE_INDEX_INTENSION}
   }
   )
 , m_time(0)
 , m_uniqueVarIndex(0)
 , m_uniqueDimIndex(0)
 , m_hiddenDim(-1)
+, m_whereCounter(0)
 , m_debug(false)
 {
   //create the obj, const and fun ids
@@ -1091,17 +1050,6 @@ System::~System()
   //delete m_translator;
   delete m_parser;
 
-  //delete the equations
-  for (auto& v : m_assignments)
-  {
-    delete v.second;
-  }
-
-  for (auto& v : m_equations)
-  {
-    delete v.second;
-  }
-
   //clean up cache nodes
   for (auto& c : m_cachedVars)
   {
@@ -1112,6 +1060,13 @@ System::~System()
 void
 System::go()
 {
+  setDefaultContext();
+  for (auto& assign : m_assignments)
+  {
+    assign.second->evaluate(*this, m_defaultk);
+  }
+
+  #if 0
   for (const auto& ident : m_assignments)
   {
     auto hd = m_outputHDs.find(ident.first);
@@ -1147,6 +1102,7 @@ System::go()
       }
     }
   }
+  #endif
 
   //collect some garbage
   for (auto& cached : m_cachedVars)
@@ -1232,21 +1188,12 @@ System::addDimension(const u32string& dimension)
 {
   //add equation DIM | [name : "dimension"] = true
   //add equation dimension = Tree::DimensionExpr(U"dimension")
-  Constant c = addEquation(Parser::Equation(
+  return addVariableDeclParsed(Parser::Equation(
     dimension,
     Tree::Expr(),
     Tree::Expr(), 
     Tree::DimensionExpr(dimension)
   ));
-
-  //add to the set of dimensions
-  if (c.index() != TYPE_INDEX_SPECIAL)
-  {
-    //TODO make the uuid type and then this is where we extract it
-    m_dimension_uuids.insert(Types::UUID::get(c));
-  }
-
-  return c;
 }
 
 Constant
@@ -1264,7 +1211,21 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     typeName = U"OpPostfix";
   }
 
-  return addEquation(Parser::Equation(
+  return addOpDeclInternal(op.symbol, Parser::OpDecl{op.symbol,
+    Tree::LambdaAppExpr
+    (
+      Tree::LambdaAppExpr
+      (
+        Tree::IdentExpr(typeName),
+        op.op
+      ),
+      op.call_by_name
+    )
+  });
+
+  #if 0
+
+  return addVariableDeclParsed(Parser::Equation(
     U"OPERATOR",
     Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
     Tree::Expr(),
@@ -1277,6 +1238,8 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     }
     )
   ));
+  #endif
+
   #if 0
   u32string typeName;
 
@@ -1335,8 +1298,27 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
     break;
   }
 
-  return addEquation(Parser::Equation(
-    U"OPERATOR",
+  return addOpDeclInternal(op.symbol, Parser::OpDecl{op.symbol,
+    Tree::LambdaAppExpr
+    (
+      Tree::LambdaAppExpr
+      (
+        Tree::LambdaAppExpr
+        (
+          Tree::LambdaAppExpr
+          (
+            Tree::IdentExpr(U"OpInfix"),
+            op.op
+          ),
+          op.cbn
+        ),
+        Tree::IdentExpr(assocType)
+      ),
+      op.precedence
+    )
+  });
+
+#if 0
     Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
     Tree::Expr(),
     Tree::TupleExpr(
@@ -1356,6 +1338,7 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
     }
     )
   ));
+#endif
 
   #if 0
   u32string assocName;
@@ -1468,13 +1451,19 @@ System::addDeclInternal
   UUIDDefinition& uuids
 )
 {
-  TreeToWSTree tows(this);
+  //TreeToWSTree tows(this);
 
   //simplify, turn into workshops
-  Tree::Expr guard   = toWSTreePlusExtras(std::get<1>(eqn), tows);
-  Tree::Expr boolean = toWSTreePlusExtras(std::get<2>(eqn), tows);
-  Tree::Expr expr    = toWSTreePlusExtras(std::get<3>(eqn), tows);
+  //Tree::Expr guard   = toWSTreePlusExtras(std::get<1>(eqn), tows);
+  //Tree::Expr boolean = toWSTreePlusExtras(std::get<2>(eqn), tows);
+  //Tree::Expr expr    = toWSTreePlusExtras(std::get<3>(eqn), tows);
 
+  //simplify, turn into workshops
+  Tree::Expr guard   = fixupTreeAndAdd(std::get<1>(eqn));
+  Tree::Expr boolean = fixupTreeAndAdd(std::get<2>(eqn));
+  Tree::Expr expr    = fixupTreeAndAdd(std::get<3>(eqn));
+
+  #if 0
   if (m_debug)
   {
     //print everything
@@ -1489,6 +1478,7 @@ System::addDeclInternal
       std::cout << Printer::printEquation(e) << std::endl;
     }
   }
+  #endif
 
   WorkshopBuilder compile(this);
 
@@ -1502,6 +1492,7 @@ System::addDeclInternal
   );
 
   //add all the new equations
+  #if 0
   for (const auto& e : tows.newVars())
   {
     addDeclInternal(
@@ -1513,6 +1504,7 @@ System::addDeclInternal
       uuids
     );
   }
+  #endif
 
   return Types::UUID::create(u);
 }
@@ -1520,7 +1512,33 @@ System::addDeclInternal
 Constant
 System::addAssignment(const Parser::Equation& eqn)
 {
-  return addDeclInternal(eqn, m_assignments, m_assignmentUUIDs);
+  //return addDeclInternal(eqn, m_assignments, m_assignmentUUIDs);
+  uuid u = generate_uuid();
+
+  //find the assignment
+  auto assign = m_assignments.find(std::get<0>(eqn));
+
+  if (assign == m_assignments.end())
+  {
+    assign = m_assignments.insert(
+      {std::get<0>(eqn), std::make_shared<Assignment>(std::get<0>(eqn))}
+    ).first;
+  }
+
+  //simplify, turn into workshops
+  Tree::Expr guard   = fixupTreeAndAdd(std::get<1>(eqn));
+  Tree::Expr boolean = fixupTreeAndAdd(std::get<2>(eqn));
+  Tree::Expr expr    = fixupTreeAndAdd(std::get<3>(eqn));
+
+  WorkshopBuilder compile(this);
+
+  auto guardws = std::shared_ptr<WS>(compile.build_workshops(guard));
+  auto booleanws = std::shared_ptr<WS>(compile.build_workshops(boolean));
+  auto exprws = std::shared_ptr<WS>(compile.build_workshops(expr));
+
+  assign->second->addDefinition(guardws, booleanws, exprws);
+
+  return Types::UUID::create(u);
 }
 
 type_index
@@ -1608,18 +1626,17 @@ System::setDefaultContext()
     m_defaultk.perturb(d, Types::Intmp::create(0));
   }
 
-  //set the function list dimensions to nil
-  for (auto d : m_fnLists)
+  //set the rho dimension to nil
+  auto nil = lookupIdentifiers().lookup(U"Nil");
+  
+  if (nil != nullptr)
   {
-    m_defaultk.perturb(d, Types::Tuple::create
-    (
-      tuple_t
-      {
-        {DIM_TYPE, Types::String::create(U"list")},
-        {DIM_CONS, Types::String::create(U"nil")}
-      }
-    )
-    );
+    auto nilvalue = (*nil)(m_defaultk);
+
+    if (nilvalue.index() == TYPE_INDEX_TUPLE)
+    {
+      m_defaultk.perturb(DIM_RHO, nilvalue);
+    }
   }
 
   for (const auto& v : m_envvars)
@@ -1720,6 +1737,35 @@ System::addInputHyperdaton
   }
 }
 
+void
+System::addDefaultDimensions(const SemanticTransform& t)
+{
+  //The L_in dims are set to 0 in the default context
+  m_Lin.insert(m_Lin.end(), t.getLin().begin(), t.getLin().end());
+
+  //function lists must have a nil element set
+  m_fnLists.insert(m_fnLists.end(), 
+    t.getAllScopeArgs().begin(), t.getAllScopeArgs().end());
+
+  m_fnLists.insert(m_fnLists.end(), 
+    t.getAllScopeOdometer().begin(), t.getAllScopeOdometer().end());
+}
+
+void
+System::addDefaultDimensions  
+(                             
+  const std::vector<dimension_index>& zeros,
+  const std::vector<dimension_index>& nils
+)                             
+{                             
+  //The L_in dims are set to 0 in the default context
+  m_Lin.insert(m_Lin.end(), zeros.begin(), zeros.end());
+                              
+  //function lists must have a nil element set
+  m_fnLists.insert(m_fnLists.end(), nils.begin(), nils.end());                  
+}
+
+#if 0
 template <typename... Renames>
 Tree::Expr
 System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows, 
@@ -1727,17 +1773,11 @@ System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
 {
   Tree::Expr wstree = tows.toWSTree(e, renames...);
 
-  //The L_in dims are set to 0 in the default context
-  m_Lin.insert(m_Lin.end(), tows.getLin().begin(), tows.getLin().end());
-
-  m_fnLists.insert(m_fnLists.end(), 
-    tows.getAllScopeArgs().begin(), tows.getAllScopeArgs().end());
-
-  m_fnLists.insert(m_fnLists.end(), 
-    tows.getAllScopeOdometer().begin(), tows.getAllScopeOdometer().end());
+  addExtraVariables(tows);
 
   return wstree;
 }
+#endif
 
 //the two trees must be identical abstractions except for parameter names
 //makes a rename map from the difference
@@ -1784,233 +1824,6 @@ findRenamedParams(const Tree::Expr& original, const Tree::Expr& renamed,
     }
   }
 
-}
-
-Tree::Expr
-fixupGuardArgs(const Tree::Expr& guard,
-  const std::map<u32string, dimension_index>& rewrites
-)
-{
-  //first check if it is nil
-  const Tree::nil* n = get<Tree::nil>(&guard);
-  if (n != nullptr)
-  {
-    return guard;
-  }
-
-  //the guard must be a tuple
-  const Tree::TupleExpr& tuple = get<Tree::TupleExpr>(guard);
-
-  decltype(tuple.pairs) rewritten;
-
-  for (auto& p : tuple.pairs)
-  {
-    const Tree::IdentExpr* id = get<Tree::IdentExpr>(&p.first);
-    if (id != nullptr)
-    {
-      auto iter = rewrites.find(id->text);
-      if (iter != rewrites.end())
-      {
-        rewritten.push_back(std::make_pair(
-          Tree::DimensionExpr(iter->second), p.second));
-      }
-      else
-      {
-        rewritten.push_back((p));
-      }
-    }
-    else
-    {
-      rewritten.push_back((p));
-    }
-  }
-
-  return Tree::TupleExpr{rewritten};
-}
-
-Constant
-System::addFunction(const Parser::FnDecl& fn)
-{
-  //first try to find the function
-  auto iter = m_fndecls.find(fn.name);
-
-  ConditionalBestfitWS* fnws = nullptr;
-  TreeToWSTree tows(this);
-  WorkshopBuilder compile(this);
-
-  if (iter == m_fndecls.end())
-  {
-    if (fn.args.size() == 0)
-    {
-      //error
-      return Types::Special::create(SP_CONST);
-    }
-    //add a new one
-    fnws = new ConditionalBestfitWS(fn.name, *this);
-
-    //create a new equation for this thing
-    //build up the parameters and end with fnws
-
-    Tree::Expr abstractions;
-    for (auto iter = fn.args.rbegin(); iter != fn.args.rend(); ++iter)
-    {
-      if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
-      {
-        abstractions = Tree::LambdaExpr(iter->second, std::move(abstractions));
-      }
-      else
-      {
-        abstractions = Tree::PhiExpr(iter->second, std::move(abstractions));
-      }
-    }
-
-    //need to save the renamed variables here somehow
-    Tree::Expr absexpr = toWSTreePlusExtras(abstractions, tows);
-
-    RenameIdentifiers::RenameRules renames; 
-    std::map<u32string, dimension_index> renamed_dims;
-
-    findRenamedParams(abstractions, absexpr, renames, renamed_dims);
-
-    iter = m_fndecls.insert(
-      std::make_pair(fn.name, 
-        std::make_tuple(
-          fnws, 
-          renames,
-          renamed_dims,
-          std::vector<Parser::FnDecl>()
-        )
-      )
-    ).first;
-
-    WS* absws = compile.build_workshops(absexpr);
-
-    //go through the workshops and stick fnws at the end
-    WS* current = absws;
-    
-    //there can't possibly be zero arguments here so this is safe
-    auto iterAhead = fn.args.begin();
-    auto iter = fn.args.begin();
-    ++iterAhead;
-
-    while (true)
-    {
-      if (iterAhead == fn.args.end())
-      {
-        //we're on the last one
-        if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
-        {
-          dynamic_cast<Workshops::LambdaAbstractionWS*>
-            (current)->set_rhs(fnws);
-        }
-        else
-        {
-          dynamic_cast<Workshops::NamedAbstractionWS*>
-            (current)->set_rhs(fnws);
-        }
-        break;
-      }
-      else
-      {
-        if (iter->first == Parser::FnDecl::ArgType::CALL_BY_VALUE)
-        {
-          current = dynamic_cast<Workshops::LambdaAbstractionWS*>
-            (current)->rhs();
-        }
-        else
-        {
-          current = dynamic_cast<Workshops::NamedAbstractionWS*>
-            (current)->rhs();
-        }
-      }
-
-      ++iter;
-      ++iterAhead;
-    }
-
-    addEquation(fn.name, absws);
-    m_functions.insert({{fn.name, absws}});
-
-    //std::cerr << "adding function abstraction:" << std::endl;
-    //std::cerr << Printer::print_expr_tree(absexpr) << std::endl;
-  }
-  else
-  {
-    if (fn.args.size() != 0 && fn.args !=
-      std::get<3>(iter->second).front().args)
-    {
-      //error
-      return Types::Special::create(SP_CONST);
-    }
-    //either it has no args or its args match, so we can continue
-    //get the existing one
-    fnws = std::get<0>(iter->second);
-  }
-
-  //if we get here then we have a valid function, and a valid pointer
-  //to a ConditionalBestfitWS, so add it to the system
-
-  //compile the expression
-  //TODO I can probably remove this duplication
-  //I need to rename in these two first somehow
-  const auto& toRename = std::get<1>(iter->second);
-
-  //std::cerr << "Renaming in function body:" << std::endl;
-  //for (auto& p : toRename)
-  //{
-  //  std::cerr << p.first << " -> " << p.second << std::endl;
-  //}
-
-  Tree::Expr guardFixed = fixupGuardArgs(fn.guard, std::get<2>(iter->second));
-  Tree::Expr guard = toWSTreePlusExtras(guardFixed, tows, toRename);
-  Tree::Expr boolean = toWSTreePlusExtras(fn.boolean, tows, toRename);
-  Tree::Expr expr = toWSTreePlusExtras(fn.expr, tows, toRename);
-
-  //std::cerr << "adding function definition:" << std::endl;
-  //std::cerr << Printer::print_expr_tree(guard) 
-  //          << " -> " 
-  //          << Printer::print_expr_tree(expr)
-  //          << std::endl;
-
-  WS* gws = compile.build_workshops(guard);
-  WS* bws = compile.build_workshops(boolean);
-  WS* ews = compile.build_workshops(expr);
-
-  //add the definition to the end of the vector of functions
-  std::get<3>(iter->second).push_back(fn);
-
-  //add it as an equation to the conditional
-  //std::cerr << "adding function equation to " << fn.name << std::endl;
-  //std::cerr << "guard is " << gws << std::endl;
-  uuid u = fnws->addEquation(fn.name, GuardWS(gws, bws), ews, m_time);
-
-  bool cachethis = true;
-  if (cacheExclude.find(fn.name) != cacheExclude.end())
-  {
-    cachethis = false;
-  }
-
-  //add all the new equations
-  //more duplication
-  for (const auto& e : tows.newVars())
-  {
-    addDeclInternal(
-      std::get<0>(e),
-      GuardWS(compile.build_workshops(std::get<1>(e)),
-        compile.build_workshops(std::get<2>(e))),
-      compile.build_workshops(std::get<3>(e)),
-      m_equations,
-      m_equationUUIDs
-    );
-
-    //cache this thing
-    if (m_cached && cachethis)
-    {
-      cacheVar(std::get<0>(e));
-    }
-  }
-
-  return Types::UUID::create(u);
 }
 
 Constant
@@ -2067,8 +1880,11 @@ System::addEnvVars()
     std::string var = *envvar;
     size_t equals = var.find('=');
 
+    //std::cerr << "variable: " << var << std::endl;
+    //std::cerr << "equals is at " << equals << std::endl;
     std::string varname = var.substr(0, equals);
     std::string varvalue = var.substr(equals + 1, std::string::npos);
+    //std::cerr << "read in: " << varname << ", " << varvalue << std::endl;
 
     u32string u32name(varname.begin(), varname.end());
 
@@ -2110,20 +1926,67 @@ Constant
 System::addHostFunction
   (const u32string& name, BaseFunctionType* address, int arity)
 {
-  std::unique_ptr<BaseFunctionType> theclone(address->clone());
-  std::unique_ptr<BangAbstractionWS> 
-    op(new BangAbstractionWS(theclone.get()));
+  //m_baseCounter keeps the number of times this function has been
+  //defined, and m_basefuns is the actual definitions where the name has
+  //been appended with a version number
+  std::shared_ptr<BaseFunctionType> theclone(address->clone());
+
+  auto iter = m_baseCounter.find(name);
+
+  size_t count = 0;
+
+  if (iter == m_baseCounter.end())
+  {
+    m_baseCounter.insert(std::make_pair(name, 0));
+  }
+  else
+  {
+    count = iter->second;
+    ++iter->second;
+  }
+
+  std::ostringstream os;
+  os << name << "_" << count;
+
+  auto newname = os.str();
+
+  auto newname32 = u32string(newname.begin(), newname.end());
+
+  m_basefuns.insert(std::make_pair(newname32, theclone));
+
+  //then add to m_identifiers
+  //name = VariableWS
+  //and add Tree::basefun(name_counter) to its definition
+  //
+  //for several additions of the base function through time we will have
+  //name = basefun(name_0)
+  //name = basefun(name_1)
+  //name = basefun(name_2)
+  //...
+
+  return addVariableDeclParsed(
+    Parser::Equation
+    (
+      name,
+      Tree::nil(),
+      Tree::nil(),
+      Tree::BaseAbstractionExpr(newname32)
+    )
+  );
+
+  //std::unique_ptr<BangAbstractionWS> 
+  //  op(new BangAbstractionWS(theclone.get()));
 
   //add equation fn.op_name = bang abstraction workshop with fn.fn
-  uuid u = addEquation(name, op.get());
-  Constant c = Types::UUID::create(u);
+  //uuid u = addEquation(name, op.get());
+  //Constant c = Types::UUID::create(u);
 
-  m_functionRegistry.insert({name, std::make_tuple(theclone.get(), u)});
+  //m_functionRegistry.insert({name, std::make_tuple(theclone.get(), u)});
 
-  op.release();
-  theclone.release();
+  //op.release();
+  //theclone.release();
 
-  return c;
+  //return c;
 }
 
 void
@@ -2143,7 +2006,8 @@ System::deleteEntity(const uuid& u)
     return false;
   }
 
-  return iter->second->second->delexpr(u, m_time);
+  return false;
+  //return iter->second->second->delexpr(u, m_time);
 }
 
 u32string
@@ -2218,7 +2082,7 @@ System::IdentifierLookup::lookup(const u32string& name) const
   auto r = m_identifiers->find(name);
   if (r != m_identifiers->end())
   {
-    return r->second;
+    return r->second.get();
   }
   else
   {
@@ -2242,6 +2106,245 @@ bool
 System::cacheEnabled() const
 {
   return m_cacheEnabled;
+}
+
+void
+System::addTransformedEquations
+(
+  const std::vector<Parser::Equation>& newVars
+)
+{
+  //add all the new equations
+  //std::cerr << "adding extra equations" << std::endl;
+  for (const auto& e : newVars)
+  {
+    addVariableDeclParsed(e);
+  }
+}
+
+Tree::Expr
+System::fixupTreeAndAdd(const Tree::Expr& e)
+{
+  auto result = fixupTree(*this, e);
+  addTransformedEquations(result.second.equations);
+  addDefaultDimensions(result.second.defaultZeros, result.second.defaultNils);
+
+  return result.first;
+}
+
+BaseFunctionType*
+System::lookupBaseFunction(const u32string& name)
+{
+  auto iter = m_basefuns.find(name);
+  if (iter == m_basefuns.end())
+  {
+    return nullptr;
+  }
+  else
+  {
+    return iter->second.get();
+  }
+}
+
+Constant
+System::addDeclaration(const Parser::RawInput& input)
+{
+  //create a U32Iterator for the input
+  Parser::U32Iterator inputBegin(
+    Parser::makeUTF32Iterator(input.text.begin())
+  );
+  Parser::U32Iterator inputEnd(
+    Parser::makeUTF32Iterator(input.text.end())
+  );
+
+  //create a stream pos iterator for the U32Iterator
+  Parser::StreamPosIterator posbegin(inputBegin, input.source,
+    input.line, input.character);
+  Parser::StreamPosIterator posend(inputEnd);
+
+  //create a lexer iterator
+  Parser::LexerIterator lexit(posbegin, posend, m_defaultk, 
+    lookupIdentifiers());
+  Parser::LexerIterator lexend = lexit.makeEnd();
+
+  //get the first token
+  auto start = *lexit;
+
+  if (start.getType() != Parser::TOKEN_DECLID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+  
+  u32string token = get<u32string>(start.getValue());
+
+  if (token == U"var")
+  {
+    return addVariableDeclRaw(input, lexit);
+  }
+  else if (token == U"dim")
+  {
+    return addDimDeclRaw(input, lexit);
+  }
+  else if (token == U"fun")
+  {
+    return addFunDeclRaw(input, lexit);
+  }
+  else if (token == U"op")
+  {
+    return addOpDeclRaw(input, lexit);
+  }
+  else if (token == U"data")
+  {
+    return addDataDeclRaw(input, lexit);
+  }
+  else if (token == U"constructor")
+  {
+    return addConstructorRaw(input, lexit);
+  }
+
+  return Constant();
+}
+
+Constant
+System::addVariableDeclRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  ++iter;
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string name = get<u32string>(iter->getValue());
+
+  return addVariableDeclInternal(name, input);
+}
+
+Constant
+System::addVariableDeclParsed
+(
+  Parser::Equation decl
+)
+{
+  return addVariableDeclInternal(std::get<0>(decl), Parser::Variable(decl));
+}
+
+Constant
+System::addFunDeclRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  ++iter;
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string name = get<u32string>(iter->getValue());
+
+  return addFunDeclInternal(name, input);
+}
+
+Constant
+System::addFunDeclParsed
+(
+  Parser::FnDecl decl
+)
+{
+  return addFunDeclInternal(decl.name, decl);
+}
+
+Constant
+System::addOpDeclRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  iter.interpret(false);
+  ++iter;
+
+  if (iter->getType() != Parser::TOKEN_OPERATOR)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string text = get<u32string>(iter->getValue());
+
+  return addOpDeclInternal(text, input);
+}
+
+Constant
+System::addDataDeclRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  ++iter;
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string name = get<u32string>(iter->getValue());
+
+  return addVariableDeclParsed(Parser::Equation
+  (
+    name,
+    Tree::Expr(),
+    Tree::Expr(),
+    Tree::TupleExpr(Tree::TupleExpr::TuplePairs({
+      {Tree::DimensionExpr{DIM_TYPE}, name}
+    }))
+  ));
+}
+
+Constant
+System::addConstructorRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  ++iter;
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string name = get<u32string>(iter->getValue());
+
+  return addConstructorInternal(name, input);
+}
+
+Constant
+System::addDimDeclRaw
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+   ++iter;
+  if (iter->getType() != Parser::TOKEN_ID)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  u32string name = get<u32string>(iter->getValue());
+
+  return addVariableDeclParsed(Parser::Equation
+  (
+    name, 
+    Tree::Expr(), 
+    Tree::Expr(),
+    Tree::DimensionExpr(nextHiddenDim())
+  ));
 }
 
 } //namespace TransLucid

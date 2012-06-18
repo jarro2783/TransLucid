@@ -2,27 +2,42 @@
 dim slot;;
 dim envvar;;
 
-data Infinite = infty | neginfty;;
+data Infinite;;
+constructor infty = Infinite;;
+constructor neginfty = Infinite;;
 
-var sperror = special"sperror";;
-var spaccess = special"spaccess";;
-var sptypeerror = special"sptypeerror";;
-var spdim = special"spdim";;
-var sparith = special"sparith";;
-var spundef = special"spundef";;
-var spconst = special"spconst";;
-var spmultidef = special"spmultidef";;
-var sploop = special"sploop";;
+var sperror = construct_special!"sperror";;
+var spaccess = construct_special!"spaccess";;
+var sptypeerror = construct_special!"sptypeerror";;
+var spdim = construct_special!"spdim";;
+var sparith = construct_special!"sparith";;
+var spundef = construct_special!"spundef";;
+var spconst = construct_special!"spconst";;
+var spmultidef = construct_special!"spmultidef";;
+var sploop = construct_special!"sploop";;
 
-fun bestselect__.a.b = spmultidef;;
+//fun bestselect__.a.b = spmultidef;;
+fun special_combine.a.b = a;;
 
-data Assoc = AssocNon | AssocLeft | AssocRight;;
-data HostDecl = HostDim intmp | HostType intmp | HostFunc intmp;;
-data OpType = OpPostfix ustring bool
-            | OpPrefix ustring bool
-            | OpInfix ustring bool Assoc intmp
-            ;;
-data Hyperdaton = HdIn ustring | HdOut ustring;;
+data Assoc;;
+constructor AssocNon = Assoc;;
+constructor AssocLeft = Assoc;;
+constructor AssocRight = Assoc;;
+
+data HostDecl;;
+constructor HostDim a [a : intmp] = HostDecl;;
+constructor HostType a [a : intmp] = HostDecl;;
+constructor HostFunc a [a : intmp] = HostDecl;;
+
+data OpType;;
+constructor OpPostfix a b [a : ustring, b : bool] = OpType;;
+constructor OpPrefix a b [a : ustring, b : bool] = OpType;;
+constructor OpInfix a b c d //[a : ustring, b : bool, c : Assoc, d : intmp]
+  = OpType;;
+
+data Hyperdaton;;
+constructor HdIn a [a : ustring] = Hyperdaton;;
+constructor HdOut a [a : ustring] = Hyperdaton;;
 
 op + = OpInfix."plus".false.AssocLeft.100;;
 op - = OpInfix."minus".false.AssocLeft.100;;
@@ -233,7 +248,8 @@ fun union_construct.a.b = make_union!(a,b);;
 //convert to a from b
 fun convert.a.b [a : floatmp, b : intmp] = floatmp_convert_intmp!b;;
 
-var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
+//var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
+fun fby.d X Y = if #!d <= 0 then X else prev.d Y fi;;
 var index = \d -> #!d + 1;;
 var prev = \d -> \\X -> X @ [d <- #!d - 1];;
 var next = \d -> \\X -> X @ [d <- #!d + 1];;
@@ -301,6 +317,7 @@ fun print_typename.c [c : basefun] = "basefun";;
 fun print_typename.c [c : lambda] = "lambda";;
 fun print_typename.c [c : phi] = "phi";;
 fun print_typename.c [c : floatmp] = "floatmp";;
+fun print_typename.c [c : intension] = "intension";;
 
 fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
 fun construct_literal.t.v [t : "special"] = construct_special!v;;
@@ -317,10 +334,12 @@ fun canonical_print.c [c : range]   = print.c;;
 fun canonical_print.c [c : tuple]   = "[I don't know how to print a tuple]";;
 fun canonical_print.c               = print_typename.c + `"` + 
                                       escape_string.(print.c) + `"`;;
-//fun canonical_print.c = "cannot print this thing";;
 fun canonical_print.c [c : special] = print.c;;
 fun canonical_print.c [c : infty] = "infty";;
 fun canonical_print.c [c : neginfty] = "neginfty";;
+
+//I don't think that we want this definition
+//fun canonical_print.c = "cannot print this thing";;
 
 var RETURN = 0;;
 
@@ -399,7 +418,9 @@ end ;;
 // Define lists and functions over lists.
 
 // The List data type and the Cons and Nil constructors.
-data List a = Cons a (List a) | Nil ;;
+data List;;
+constructor Cons a b [b : List] = List;;
+constructor Nil = List;;
 
 // Two infix operators defined over lists.
 op :: = OpInfix."cons_list".false.AssocRight.(~10) ;;

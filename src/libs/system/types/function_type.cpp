@@ -20,9 +20,12 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/types/demand.hpp>
 #include <tl/types/function.hpp>
+#include <tl/types/intension.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
+
+#include <tl/output.hpp>
 
 namespace TransLucid
 {
@@ -76,74 +79,6 @@ bool function_less
   return false;
 }
 
-void
-evaluateFree
-(
-  System* system,
-  ContextPerturber& p,
-  const std::vector<std::pair<u32string, dimension_index>>& free,
-  Context& k
-)
-{
-  std::vector<std::pair<dimension_index, Constant>> freeValues;
-
-  System::IdentifierLookup idents = system->lookupIdentifiers();
-
-  //evaluate all of the free variables
-  for (const auto& v : free)
-  {
-    auto var = idents.lookup(v.first);
-    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-      : (*idents.lookup(v.first))(k);
-
-    freeValues.push_back(std::make_pair(
-      v.second, value
-    ));
-  }
-
-  p.perturb(freeValues);
-}
-
-void
-evaluateFreeCached
-(
-  System* system,
-  ContextPerturber& pkappa,
-  ContextPerturber& pdelta,
-  const std::vector<std::pair<u32string, dimension_index>>& free,
-  Context& kappa,
-  Context& delta,
-  std::vector<dimension_index>& demands
-)
-{
-  std::vector<std::pair<dimension_index, Constant>> freeValues;
-
-  System::IdentifierLookup idents = system->lookupIdentifiers();
-
-  //evaluate all of the free variables
-  for (const auto& v : free)
-  {
-    auto var = idents.lookup(v.first);
-    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-      : (*idents.lookup(v.first))(kappa, delta);
-
-    if (value.index() == TYPE_INDEX_DEMAND)
-    {
-      Types::Demand::append(value, demands);
-    }
-
-    freeValues.push_back(std::make_pair(
-      v.second, value
-    ));
-  }
-
-  if (demands.size() == 0)
-  {
-    pkappa.perturb(freeValues);
-    pdelta.perturb(freeValues);
-  }
-}
-
 }
 
 NameFunctionType::NameFunctionType
@@ -177,32 +112,12 @@ createValueFunction
   System *system,
   const u32string& name, 
   dimension_index argDim, 
-  const std::vector<dimension_index>& scope,
-  const std::vector<std::pair<u32string, dimension_index>>& free,
   WS* expr,
   Context& kappa
 )
 {
-  #if 0
-  std::vector<std::pair<dimension_index, Constant>> freeValues;
-
-  System::IdentifierLookup idents = system->lookupIdentifiers();
-
-  //evaluate all of the free variables
-  for (const auto& v : free)
-  {
-    auto var = idents.lookup(v.first);
-    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-      : (*idents.lookup(v.first))(kappa);
-
-    freeValues.push_back(std::make_pair(
-      v.second, value
-    ));
-  }
-  #endif
-
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, scope, free, expr, kappa)
+    ValueFunctionType(system, name, argDim, expr, kappa)
   );
 }
 
@@ -215,46 +130,13 @@ createValueFunctionCached
   System *system,
   const u32string& name, 
   dimension_index argDim, 
-  const std::vector<dimension_index>& scope,
-  const std::vector<std::pair<u32string, dimension_index>>& free,
   WS* expr,
   Context& kappa,
   Context& delta
 )
 {
-  #if 0
-  std::vector<dimension_index> demands;
-  std::vector<std::pair<dimension_index, Constant>> freeValues;
-
-  System::IdentifierLookup idents = system->lookupIdentifiers();
-
-  //evaluate all of the free variables
-  for (const auto& v : free)
-  {
-    auto var = idents.lookup(v.first);
-    Constant value = var == nullptr ? Types::Special::create(SP_UNDEF)
-      : (*idents.lookup(v.first))(kappa, delta);
-
-    if (value.index() == TYPE_INDEX_DEMAND)
-    {
-      Types::Demand::append(value, demands);
-    }
-    else
-    {
-      freeValues.push_back(std::make_pair(
-        v.second, value
-      ));
-    }
-  }
-
-  if (demands.size() > 0)
-  {
-    return Types::Demand::create(demands);
-  }
-  #endif
-
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, scope, free, expr, kappa)
+    ValueFunctionType(system, name, argDim, expr, kappa)
   );
 }
 
@@ -335,15 +217,27 @@ Constant
 ValueFunctionType::apply(Context& k, const Constant& value) const
 {
   //set m_dim = value in the context and evaluate the expr
-  ContextPerturber p(k, {{m_dim, value}});
-  p.perturb(m_scopeDims);
-  
-  Context freeContext{m_freeContext};
-  evaluateFree(m_system, p, m_free, freeContext);
-  
-  auto r = (*m_expr)(k);
+  Constant intenConstant;
+  {
+    ContextPerturber p(m_kappa, {{m_dim, value}});
 
-  return r;
+    //std::cerr << "setting dim " << m_dim << std::endl;
+
+    intenConstant = (*m_expr)(m_kappa);
+  }
+
+  if (intenConstant.index() != TYPE_INDEX_INTENSION)
+  {
+    return Types::Special::create(SP_TYPEERROR);
+  }
+
+  auto inten = get_constant_pointer<IntensionType>(intenConstant);
+
+  auto result = inten(k);
+
+  //std::cerr << "unsetting dim " << m_dim << std::endl;
+
+  return result;
 }
 
 Constant
@@ -358,18 +252,11 @@ ValueFunctionType::apply
   ContextPerturber pkappa{kappa};
   ContextPerturber pdelta{delta};
 
-  std::vector<dimension_index> demands;
-  evaluateFreeCached(m_system, pkappa, pdelta, m_free, kappa, delta, demands);
-
   pkappa.perturb({{m_dim, value}});
   pdelta.perturb({{m_dim, value}});
 
-  pkappa.perturb(m_scopeDims);
-  pdelta.perturb(m_scopeDims);
-
-  auto r = (*m_expr)(kappa, delta);
-
-  return r;
+  #warning implement cache
+  return Constant();
 }
 
 Constant
@@ -402,9 +289,6 @@ NameFunctionType::apply
   });
 
   p.perturb(m_scopeDims);
-
-  Context freeContext{m_freeContext};
-  evaluateFree(m_system, p, m_free, freeContext);
 
   return (*m_expr)(k);
 }
@@ -461,14 +345,6 @@ NameFunctionType::apply
   ContextPerturber pkappa{kappa};
   ContextPerturber pdelta{delta};
 
-  std::vector<dimension_index> demands;
-  evaluateFreeCached(m_system, pkappa, pdelta, m_free, kappa, delta, demands);
-
-  if (demands.size() > 0)
-  {
-    return Types::Demand::create(demands);
-  }
-
   std::initializer_list<std::pair<dimension_index, Constant>>
   toChange = {
     {m_argDim, Types::Tuple::create(argList)},
@@ -487,13 +363,13 @@ NameFunctionType::apply
 bool
 ValueFunctionType::less(const ValueFunctionType& rhs) const
 {
-  return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
+  //return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
 }
 
 bool
 NameFunctionType::less(const NameFunctionType& rhs) const
 {
-  return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
+  //return function_less(m_expr, rhs.m_expr, m_scopeDims, rhs.m_scopeDims);
 }
 
 namespace Types

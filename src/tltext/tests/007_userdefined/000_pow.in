@@ -1,13 +1,13 @@
 op ** = OpInfix."exponent".false.AssocRight.400;;
-op ^ = OpInfix."exponent".false.AssocRight.400;;
+op ^  = OpInfix."exponent".false.AssocRight.400;;
+
+fun exponent.a.b [a : intmp, b : intmp] = pow.b.a;;
 
 fun pow.n = g
 where
   dim d <- n;;
-  var g = fby.d (\s -> 1) (\s -> s * g.s);;
+  var g = fby.d (\s -> 1) (\ {d} s -> s * g.s);;
 end;;
-
-fun exponent.a.b [a : intmp, b : intmp] = pow.b.a;;
 
 %%
 2 ^ 0;;

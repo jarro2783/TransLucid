@@ -49,7 +49,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/type.hpp>
 #include <tl/types/union.hpp>
 #include <tl/types/uuid.hpp>
-#include <tl/types/workshop.hpp>
+#include <tl/types/intension.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
@@ -475,10 +475,10 @@ namespace TransLucid
 
     TypeFunctions workshop_type_functions =
       {
-        &Types::Workshop::equality,
-        &Types::Workshop::hash,
-        &delete_ptr<WorkshopType>,
-        &Types::Workshop::less
+        &Types::Intension::equality,
+        &Types::Intension::hash,
+        &delete_ptr<IntensionType>,
+        &Types::Intension::less
       };
 
     TypeFunctions demand_type_functions =
@@ -1439,23 +1439,30 @@ namespace TransLucid
       }
     }
 
-    namespace Workshop
+    namespace Intension
     {
       Constant
-      create(const WS* ws)
+      create
+      (
+        System* system,
+        WS* ws, 
+        std::vector<Constant> binds,
+        const std::vector<dimension_index>& scope,
+        Context& k
+      )
       {
         ConstantPointerValue* p =
           new ConstantPointerValue(
             &workshop_type_functions,
-            new WorkshopType(const_cast<WS*>(ws)));
+            new IntensionType(system, const_cast<WS*>(ws), binds, scope, k));
 
-        return Constant(p, TYPE_INDEX_WS);
+        return Constant(p, TYPE_INDEX_INTENSION);
       }
 
-      const WorkshopType&
+      const IntensionType&
       get(const Constant& w)
       {
-        return get_constant_pointer<WorkshopType>(w);
+        return get_constant_pointer<IntensionType>(w);
       }
 
       size_t
@@ -1561,7 +1568,7 @@ BaseFunctionAbstraction::applyFn(const Constant& c) const
 void
 add_file_io(System& s)
 {
-  init_file_hds(s);
+  //init_file_hds(s);
 }
 
 void
@@ -1571,7 +1578,9 @@ add_one_base_function(System& s, const u32string& name, BaseFunctionType* fn)
     op(new BangAbstractionWS(fn->clone()));
 
   //add equation fn.op_name = bang abstraction workshop with fn.fn
-  s.addEquation(name, op.get());
+  //s.addEquation(name, op.get());
+
+  s.addHostFunction(name, fn, fn->arity());
 
   op.release();
 }
@@ -1699,6 +1708,7 @@ init_builtin_types(System& s)
   type_names.push_back(U"lambda");
   type_names.push_back(U"phi");
   type_names.push_back(U"uuid");
+  type_names.push_back(U"intension");
     
   //add all of the literals (LITERAL ... =)
   add_builtin_literals(s, type_names);
@@ -1708,7 +1718,7 @@ init_builtin_types(System& s)
 
   to_print_types.push_back(U"error");
 
-  add_builtin_printers(s, to_print_types);
+  //add_builtin_printers(s, to_print_types);
 
   add_base_functions(s);
 

@@ -1,5 +1,5 @@
 /* Abstract syntax tree.
-   Copyright (C) 2009, 2010, 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -47,8 +47,10 @@ namespace TransLucid
     class ParenExpr;
     class UnaryOpExpr;
     class BinaryOpExpr;
+    class MakeIntenExpr;
     class EvalIntenExpr;
     class HashExpr;
+    class BaseAbstractionExpr;
     class TupleExpr;
     class IfExpr;
     class AtExpr;
@@ -58,6 +60,7 @@ namespace TransLucid
     class LambdaAppExpr;
     class PhiAppExpr;
     class WhereExpr;
+    class ConditionalBestfitExpr;
 
    /**
      * Abstract syntax tree node. A single expression node in the 
@@ -75,9 +78,11 @@ namespace TransLucid
       DimensionExpr,
       IdentExpr,
       HashSymbol,
+      BaseAbstractionExpr,
       recursive_wrapper<ParenExpr>,
       recursive_wrapper<UnaryOpExpr>,
       recursive_wrapper<BinaryOpExpr>,
+      recursive_wrapper<MakeIntenExpr>,
       recursive_wrapper<EvalIntenExpr>,
       recursive_wrapper<IfExpr>,
       recursive_wrapper<HashExpr>,
@@ -88,7 +93,8 @@ namespace TransLucid
       recursive_wrapper<BangAppExpr>,
       recursive_wrapper<LambdaAppExpr>,
       recursive_wrapper<PhiAppExpr>,
-      recursive_wrapper<WhereExpr>
+      recursive_wrapper<WhereExpr>,
+      recursive_wrapper<ConditionalBestfitExpr>
     > Expr;
 
     class BinaryOperator;

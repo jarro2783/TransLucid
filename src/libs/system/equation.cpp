@@ -1,5 +1,5 @@
 /* Equations (ident = expr)
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -35,11 +35,17 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <vector>
 
+#define XSTRING(x) STRING(x)
+#define STRING(x) #x
+
 namespace TransLucid
 {
 
 namespace
 {
+  //just to instantiate something for now
+  bool bool_guard_hack = false;
+
   //-1 represents no end time
   constexpr int END_TIME_INFINITE = -1;
 
@@ -82,7 +88,7 @@ EquationWS::~EquationWS()
 }
 
 VariableWS::VariableWS(const u32string& name, System& system)
-: m_name(name), m_system(system)
+: m_name(name), m_system(system), m_bestfit(this, system)
 #if 0
  ,m_compileBestFit
   (
@@ -94,6 +100,7 @@ VariableWS::VariableWS(const u32string& name, System& system)
   )
 #endif
 {
+  m_bestfit.setName(U"variable: " + m_name);
 }
 
 VariableWS::~VariableWS()
@@ -268,106 +275,6 @@ GuardWS::operator=(const GuardWS& rhs)
   return *this;
 }
 
-template <typename... Delta>
-std::pair<bool, Tuple>
-GuardWS::evaluate(Context& k, Delta&&... delta) const
-{
-  if (!m_compiled)
-  {
-    compile();
-  }
-
-  bool nonspecial = true;
-  m_demands.clear();
-  tuple_t t = m_dimConstConst;
-
-  if (m_guard)
-  {
-    //start with the const dimensions and evaluate the non-const ones
-
-    //evaluate the ones left
-    for (const auto& constNon : m_dimConstNon)
-    {
-      Constant ord = constNon.second->operator()(k, delta...);
-
-      if (ord.index() == TYPE_INDEX_DEMAND)
-      {
-        const auto& dims = Types::Demand::get(ord).dims();
-        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
-      }
-      else
-      {
-        t.insert(std::make_pair(constNon.first, ord));
-      }
-    }
-
-    for (const auto& nonConst : m_dimNonConst)
-    {
-      Constant dim = nonConst.first->operator()(k, delta...);
-
-      if (dim.index() == TYPE_INDEX_DEMAND)
-      {
-        const auto& dims = Types::Demand::get(dim).dims();
-        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
-      }
-      else if (dim.index() == TYPE_INDEX_SPECIAL)
-      {
-        nonspecial = false;
-      }
-      else
-      {
-        dimension_index index =
-          dim.index() == TYPE_INDEX_DIMENSION 
-          ? get_constant<dimension_index>(dim)
-          : m_system->getDimensionIndex(dim);
-
-        t.insert(std::make_pair(index, nonConst.second));
-      }
-    }
-
-    for (const auto& nonNon : m_dimNonNon)
-    {
-      Constant dim = nonNon.first->operator()(k, delta...);
-      Constant ord = nonNon.second->operator()(k, delta...);
-
-      if (dim.index() == TYPE_INDEX_SPECIAL)
-      {
-        nonspecial = false;
-      }
-
-      bool isdemand = false;
-
-      if (ord.index() == TYPE_INDEX_DEMAND)
-      {
-        const auto& dims = Types::Demand::get(ord).dims();
-        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
-        isdemand = true;
-      }
-
-      if (dim.index() == TYPE_INDEX_DEMAND)
-      {
-        const auto& dims = Types::Demand::get(dim).dims();
-        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
-        isdemand = true;
-      }
-
-      if (!isdemand)
-      {
-        dimension_index index =
-          dim.index() == TYPE_INDEX_DIMENSION 
-          ? get_constant<dimension_index>(dim)
-          : m_system->getDimensionIndex(dim);
-
-        t.insert(std::make_pair(index, ord));
-      }
-    }
-  }
-
-  //the tuple doesn't matter here if nonspecial is false, the false
-  //says ignore the result
-  return std::make_pair(nonspecial, Tuple(t));
-}
-
 GuardWS makeGuardWithTime(const mpz_class& start)
 {
   GuardWS g;
@@ -376,6 +283,26 @@ GuardWS makeGuardWithTime(const mpz_class& start)
   return g;
 }
 
+Constant
+VariableWS::operator()(Context& k)
+{
+  //sort out an undefined reference for now
+  if (bool_guard_hack)
+  {
+    //GuardWS g;
+    //g.evaluate(k);
+  }
+
+  return m_bestfit(k);
+}
+
+Constant
+VariableWS::operator()(Context& kappa, Context& delta)
+{
+  return m_bestfit(kappa, delta);
+}
+
+#if 0
 //how to bestfit with a cache
 //  until we find a priority that has valid equations and there are no demands
 //  for dimensions, do:
@@ -684,6 +611,7 @@ VariableWS::bestfit(const applicable_list& applicable, Context& k,
     return Types::Special::create(SP_MULTIDEF);
   }
 }
+#endif
 
 uuid
 VariableWS::addEquation(EquationWS* e, size_t time)
@@ -724,32 +652,68 @@ VariableWS::addEquation
   //return m_equations.insert(std::make_pair(eq.id(), eq)).first->first;
 }
 
-bool
-VariableWS::delexpr(uuid id, size_t time)
+void
+VariableWS::addEquation(uuid id, Parser::Variable eqn, int time)
 {
-  UUIDEquationMap::iterator iter = m_equations.find(id);
+  m_bestfit.addEquation(id, eqn, time);
+}
 
-  if (iter != m_equations.end())
-  {
-    iter->second.del(time);
-  }
-  return true;
+void
+VariableWS::addEquation(uuid id, Parser::RawInput input, int time)
+{
+  m_bestfit.addEquation(id, input, time);
 }
 
 bool
-VariableWS::replexpr(uuid id, size_t time, const GuardWS& guard, WS* expr)
+VariableWS::del(uuid id, size_t time)
 {
-  UUIDEquationMap::iterator iter = m_equations.find(id);
+  return m_bestfit.del(id, time);
+}
 
-  if (iter != m_equations.end())
+bool
+VariableWS::repl(uuid id, size_t time, Parser::Line line)
+{
+  return m_bestfit.repl(id, time, line);
+}
+
+Tree::Expr
+VariableWS::group(const std::list<EquationDefinition>& lines)
+{
+  //all the definitions in lines are guaranteed to have a parsed
+  //definition
+
+  //create a conditional best fitter of all these equations
+  Tree::ConditionalBestfitExpr best;
+  for (auto& l : lines)
   {
-    //not sure how to do this yet, but how about we turn off that warning
-    return true;
+    auto eqn = get<Parser::Variable>(l.parsed().get());
+    //auto eqn = get<Parser::Equation>(l.parsed().get());
+
+    if (eqn == nullptr)
+    {
+      throw "internal compiler error: " __FILE__ ":" XSTRING(__LINE__);
+    }
+
+    best.declarations.push_back(std::make_tuple
+    (
+      l.start(),
+      std::get<1>(eqn->eqn),
+      std::get<2>(eqn->eqn),
+      std::get<3>(eqn->eqn)
+    ));
+
+#if 0
+    best.declarations.push_back(std::make_tuple
+    (
+      l.start(),
+      std::get<1>(*eqn),
+      std::get<2>(*eqn),
+      std::get<3>(*eqn)
+    ));
+#endif
   }
-  else
-  {
-    return false;
-  }
+
+  return best;
 }
 
 void
@@ -758,16 +722,8 @@ EquationWS::del(size_t time)
   m_endTime = time;
 }
 
-Constant
-ConditionalBestfitWS::operator()(Context& k)
-{
-  return (*m_var)(k);
-}
-
-Constant
-ConditionalBestfitWS::operator()(Context& k, Context& delta)
-{
-  return (*m_var)(k, delta);
-}
+//template
+//std::pair<bool, Tuple>
+//GuardWS::evaluate(Context& k) const;
 
 }
