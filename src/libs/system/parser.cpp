@@ -726,6 +726,7 @@ Parser::parse_prefix_expr(LexerIterator& begin, const LexerIterator& end,
   else if (*begin == TOKEN_DARROW)
   {
     auto current = begin;
+    ++current;
 
     Tree::Expr rhs;
     expect(current, end, rhs, "expression", &Parser::parse_prefix_expr);
