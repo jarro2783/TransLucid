@@ -426,14 +426,6 @@ namespace TransLucid
         &Types::ValueFunction::less
       };
 
-    TypeFunctions name_function_type_functions =
-      {
-        &Types::NameFunction::equality,
-        &Types::NameFunction::hash,
-        &delete_ptr<NameFunctionType>,
-        &Types::NameFunction::less
-      };
-
     TypeFunctions range_type_functions =
       {
         &Types::Range::equality,
@@ -837,16 +829,6 @@ namespace TransLucid
     };
 
     template <>
-    struct clone<NameFunctionType>
-    {
-      NameFunctionType*
-      operator()(const NameFunctionType& n)
-      {
-        return n.clone();
-      }
-    };
-
-    template <>
     struct clone<ValueFunctionType>
     {
       ValueFunctionType*
@@ -1033,34 +1015,6 @@ namespace TransLucid
       get(const Constant& c)
       {
         return get_constant_pointer<ValueFunctionType>(c);
-      }
-
-      size_t
-      hash(const Constant& c)
-      {
-        return get(c).hash();
-      }
-
-      bool
-      equality(const Constant& lhs, const Constant& rhs)
-      {
-        return lhs.data.ptr->data == rhs.data.ptr->data;
-      }
-    }
-
-    namespace NameFunction
-    {
-      Constant
-      create(const NameFunctionType& f)
-      {
-        return make_constant_pointer
-          (f, &name_function_type_functions, TYPE_INDEX_NAME_FUNCTION);
-      }
-
-      const NameFunctionType&
-      get(const Constant& c)
-      {
-        return get_constant_pointer<NameFunctionType>(c);
       }
 
       size_t

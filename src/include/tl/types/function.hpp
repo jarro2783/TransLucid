@@ -317,66 +317,6 @@ namespace TransLucid
     mutable Context m_kappa;
   };
 
-  class NameFunctionType
-  {
-    public:
-    NameFunctionType
-    (
-      System* system,
-      const u32string& name, 
-      dimension_index argDim, 
-      dimension_index odometerDim, 
-      const std::vector<dimension_index>& scope,
-      const std::vector<std::pair<u32string, dimension_index>>& free,
-      WS* expr,
-      Context& k
-    );
-
-    Constant
-    apply
-    (
-      Context& k, 
-      const Constant& c, 
-      std::vector<dimension_index>& Lall
-    ) const;
-
-    Constant
-    apply
-    (
-      Context& kappa, 
-      Context& delta,
-      const Constant& c, 
-      std::vector<dimension_index>& Lall
-    ) const;
-
-    NameFunctionType*
-    clone() const
-    {
-      return new NameFunctionType(*this);
-    }
-
-    size_t
-    hash() const
-    {
-      return reinterpret_cast<size_t>(m_expr);
-    }
-
-    bool
-    less(const NameFunctionType& rhs) const;
-
-    private:
-    System* m_system;
-    u32string m_name;
-    dimension_index m_argDim;
-    dimension_index m_odometerDim;
-    WS* m_expr;
-
-    std::vector<std::pair<dimension_index, Constant>> m_scopeDims;
-    std::vector<std::pair<u32string, dimension_index>> m_free;
-
-    Tuple m_freeContext;
-  };
-
   Constant
   createValueFunction
   (
@@ -396,36 +336,6 @@ namespace TransLucid
     System *system,
     const u32string& name, 
     dimension_index argDim, 
-    WS* expr,
-    Context& kappa,
-    Context& delta
-  );
-
-  Constant
-  createNameFunction
-  (
-    System *system,
-    const u32string& name, 
-    dimension_index argDim, 
-    dimension_index odometerDim,
-    const std::vector<dimension_index>& scope,
-    const std::vector<std::pair<u32string, dimension_index>>& free,
-    WS* expr,
-    Context& kappa
-  );
-
-  //check for scope dimensions
-  //evaluate free variables, checking for demands
-  //then create the actual function
-  Constant
-  createNameFunctionCached
-  (
-    System *system,
-    const u32string& name, 
-    dimension_index argDim, 
-    dimension_index odometerDim,
-    const std::vector<dimension_index>& scope,
-    const std::vector<std::pair<u32string, dimension_index>>& free,
     WS* expr,
     Context& kappa,
     Context& delta
@@ -454,24 +364,6 @@ namespace TransLucid
       create(const ValueFunctionType& f);
 
       const ValueFunctionType&
-      get(const Constant& c);
-
-      bool
-      equality(const Constant& lhs, const Constant& rhs);
-
-      size_t
-      hash(const Constant& c);
-
-      bool
-      less(const Constant& lhs, const Constant& rhs);
-    }
-
-    namespace NameFunction
-    {
-      Constant
-      create(const NameFunctionType& f);
-
-      const NameFunctionType&
       get(const Constant& c);
 
       bool

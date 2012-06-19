@@ -267,20 +267,6 @@ WS*
 WorkshopBuilder::operator()(const Tree::PhiExpr& e)
 {
   throw "error: WorkshopBuilder(PhiExpr) reached";
-  #if 0
-  WS* rhs = apply_visitor(*this, e.rhs);
-
-  return new Workshops::NamedAbstractionWS
-  (
-    m_system,
-    e.name,
-    e.argDim,
-    e.odometerDim,
-    e.scope,
-    e.free,
-    rhs
-  );
-  #endif
 }
 
 WS* 

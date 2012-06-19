@@ -326,430 +326,6 @@ namespace detail
     System& m_system;
     InputHD* m_hd;
   };
-
-  class LineAdder
-  {
-    public:
-
-    LineAdder(System& s, int verbose)
-    : m_system(s)
-    , m_verbose(verbose)
-    {
-    }
-
-    typedef Constant result_type;
-
-    template <typename T>
-    Constant
-    operator()(T&& t)
-    {
-      return Constant();
-    }
-
-    Constant
-    operator()(const Parser::HDDecl& hd)
-    {
-      //TODO understand hyperdatons
-      return Types::Special::create(SP_CONST);
-    }
-
-    Constant
-    operator()(const Tree::BinaryOperator& binop)
-    {
-      return m_system.addBinaryOperator(binop);
-    }
-
-    Constant
-    operator()(const Tree::UnaryOperator& unop)
-    {
-      return m_system.addUnaryOperator(unop);
-    }
-
-    Constant
-    operator()(const Parser::Variable& var)
-    {
-      if (m_verbose > 1)
-      {
-        std::cout << Printer::printEquation(var.eqn) << std::endl;
-      }
-      return m_system.addEquation(var.eqn);
-    }
-
-    Constant
-    operator()(const Parser::Assignment& assign)
-    {
-      if (m_verbose > 1)
-      {
-        std::cout << Printer::printEquation(assign.eqn) << std::endl;
-      }
-      return m_system.addAssignment(assign.eqn);
-    }
-
-    #if 0
-    Constant
-    operator()(const std::pair<Parser::Equation, Parser::DeclType>& eqn)
-    {
-      if (m_verbose)
-      {
-        std::cout << Parser::printEquation(eqn.first) << std::endl;
-      }
-      if (eqn.second == Parser::DECL_DEF)
-      {
-        return m_system.addEquation(eqn.first);
-      }
-      else
-      {
-        return m_system.addAssignment(eqn.first);
-      }
-    }
-    #endif
-
-    Constant
-    operator()(const Parser::DimensionDecl& dim)
-    {
-      return m_system.addDimension(dim.dim);
-    }
-
-    Constant
-    operator()(const Parser::LibraryDecl& lib)
-    {
-      //what should this return
-      m_system.loadLibrary(lib.lib);
-      return Constant();
-    }
-
-    Constant
-    operator()(const Parser::OutputDecl& out)
-    {
-      //output hd declaration
-      Constant hd = compile_and_evaluate(std::get<3>(out.eqn), m_system);
-
-      if (hd.index() != TYPE_INDEX_OUTHD)
-      {
-        return Types::Special::create(SP_CONST);
-      }
-
-      Constant uuid = m_system.addOutputHyperdaton
-      (
-        std::get<0>(out.eqn),
-        dynamic_cast<OutputHD*>(Types::Hyperdatons::get(hd))
-      );
-
-      hd.data.ptr->release();
-
-      if (get<Tree::nil>(&std::get<1>(out.eqn)) == nullptr)
-      {
-        m_system.addOutputDeclaration(
-          std::get<0>(out.eqn), std::get<1>(out.eqn));
-      }
-
-      return uuid;
-
-    }
-
-    Constant
-    operator()(const Parser::InputDecl& in)
-    {
-      //input hd declaration
-      Constant hd = compile_and_evaluate(std::get<3>(in.eqn), m_system);
-
-      if (hd.index() != TYPE_INDEX_INHD)
-      {
-        return Types::Special::create(SP_CONST);
-      }
-
-      Constant uuid = m_system.addInputHyperdaton
-      (
-        std::get<0>(in.eqn),
-        dynamic_cast<InputHD*>(Types::Hyperdatons::get(hd))
-      );
-
-      hd.data.ptr->release();
-
-      if (get<Tree::nil>(&std::get<1>(in.eqn)) == nullptr)
-      {
-        m_system.addInputDeclaration(std::get<0>(in.eqn), std::get<1>(in.eqn));
-      }
-
-      return uuid;
-    }
-
-    Constant
-    operator()(const Parser::ReplDecl& repl)
-    {
-      //TODO implement repl
-      return Constant();
-    }
-
-    Constant
-    operator()(const Parser::HostDecl& host)
-    {
-      Constant decl = compile_and_evaluate(host.expr, m_system);
-
-      if (decl.index() != TYPE_INDEX_TUPLE)
-      {
-        return Types::Special::create(SP_CONST);
-      }
-
-      const Tuple& t = get_constant_pointer<Tuple>(decl);
-
-      auto consiter = t.find(DIM_CONS);
-      if (consiter == t.end())
-      {
-        return Types::Special::create(SP_CONST);
-      }
-
-      const Constant& cons = consiter->second;
-      if (cons.index() != TYPE_INDEX_USTRING)
-      {
-        return Types::Special::create(SP_CONST);
-      }
-
-      const u32string& consname = get_constant_pointer<u32string>(cons);
-
-      if (consname == U"HostDim" || consname == U"HostType")
-      {
-        //get the number out of the tuple
-        auto arg0iter = t.find(DIM_ARG0);
-        if (arg0iter == t.end())
-        {
-          return Types::Special::create(SP_CONST);
-        }
-
-        const Constant& index = arg0iter->second;
-        if (index.index() != TYPE_INDEX_INTMP)
-        {
-          return Types::Special::create(SP_CONST);
-        }
-
-        const mpz_class& zindex = get_constant_pointer<mpz_class>(index);
-
-        if (consname == U"HostDim")
-        {
-          dimension_index dimindex = zindex.get_si();
-
-          return m_system.addHostDimension(host.identifier, dimindex);
-        }
-        else
-        {
-          //HostType
-          type_index tindex = zindex.get_ui();
-          (void)tindex;
-          m_system.addHostTypeIndex(tindex, host.identifier);
-          return Types::Special::create(SP_CONST);
-        }
-      }
-      else if (consname == U"HostFunc")
-      {
-        //get arg0 and arg1
-
-        auto arg0iter = t.find(DIM_ARG0);
-        auto arg1iter = t.find(DIM_ARG1);
-
-        if (arg0iter == t.end() || arg1iter == t.end())
-        {
-          return Types::Special::create(SP_CONST);
-        }
-
-        //arg0 is an address
-        const Constant& caddress = arg0iter->second;
-
-        //arg1 is the arity
-        const Constant& carity = arg1iter->second;
-
-        if (caddress.index() != TYPE_INDEX_INTMP || 
-            carity.index() != TYPE_INDEX_INTMP)
-        {
-          return Types::Special::create(SP_CONST);
-        }
-
-        const mpz_class& zaddress = get_constant_pointer<mpz_class>(caddress);
-        const mpz_class& zarity = get_constant_pointer<mpz_class>(carity);
-
-        if (!zaddress.fits_ulong_p() || zarity < 1)
-        {
-          return Types::Special::create(SP_CONST);
-        }
-
-        long laddress = zaddress.get_ui();
-
-        BaseFunctionType* paddress = 
-          reinterpret_cast<BaseFunctionType*>(laddress);
-
-        m_system.addHostFunction(host.identifier, paddress, zarity.get_ui());
-
-        return Types::Special::create(SP_CONST);
-      }
-      else
-      {
-        return Types::Special::create(SP_CONST);
-      }
-    }
-
-    Constant
-    operator()(const Parser::DataType& data)
-    {
-      //for each constructor in data.constructors
-      //constructor.name = \v_i (constructors.size() args) -> 
-      //  [type <- "data.name", cons <- "constructor.name", argi <- v_i]
-
-      for (const auto& cons : data.constructors)
-      {
-      
-        Tree::TupleExpr::TuplePairs pairs
-          {
-            {Tree::DimensionExpr{DIM_TYPE}, data.name},
-            {Tree::DimensionExpr{DIM_CONS}, cons.name}
-          }
-        ;
-
-        std::vector<u32string> parameters;
-        for (size_t i = 0; i != cons.args.size(); ++i)
-        {
-          std::ostringstream argos;
-          std::ostringstream paramos;
-          argos << "arg" << i;
-          paramos << "param" << i;
-          pairs.push_back(std::make_pair(
-            Tree::DimensionExpr(utf8_to_utf32(argos.str())),
-            Tree::IdentExpr(utf8_to_utf32(paramos.str()))
-          ));
-
-          parameters.push_back(utf8_to_utf32(paramos.str()));
-        }
-
-        Tree::Expr lastfn = Tree::TupleExpr{pairs};
-
-        for (auto riter = parameters.rbegin(); riter != parameters.rend();
-          ++riter)
-        {
-          lastfn = Tree::LambdaExpr(*riter, std::move(lastfn));
-        }
-
-        m_system.addEquation
-        (
-          Parser::Equation
-          (
-            cons.name,
-            Tree::nil(),
-            Tree::nil(),
-            lastfn
-          )
-        );
-      }
-
-      return Constant();
-    }
-
-    Constant
-    operator()(const Parser::DelDecl& decl)
-    {
-      Constant id = compile_and_evaluate(decl.id, m_system);
-
-      if (id.index() != TYPE_INDEX_UUID)
-      {
-        return Types::Special::create(SP_TYPEERROR);
-      }
-
-      const uuid& u = Types::UUID::get(id);
-
-      return Types::Boolean::create(m_system.deleteEntity(u));
-    }
-
-    Constant
-    operator()(const Parser::OpDecl& op)
-    {
-      //add OPERATOR [symbol : "op.optext"] = op.expr;;
-      m_system.addEquation(Parser::Equation
-        (
-          U"OPERATOR",
-          Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.optext}}),
-          Tree::Expr(),
-          op.expr
-        )
-      );
-
-      #if 0
-      Constant decl = compile_and_evaluate(op.expr, m_system);
-
-      if (decl.index() != TYPE_INDEX_TUPLE)
-      {
-        return Types::Special::create(SP_CONST);
-      }
-
-      const Tuple& t = get_constant_pointer<Tuple>(decl);
-
-      auto consiter = t.find(DIM_CONS);
-      if (consiter == t.end())
-      {
-        return Types::Special::create(SP_CONST);
-      }
-
-      const Constant& cons = consiter->second;
-      if (cons.index() != TYPE_INDEX_USTRING)
-      {
-        return Types::Special::create(SP_CONST);
-      }
-
-      const u32string& consname = get_constant_pointer<u32string>(cons);
-
-      if (consname == U"OpPostfix" || consname == U"OpPrefix")
-      {
-        //need arg0 and arg1
-        auto arg0iter = t.find(DIM_ARG0);
-        auto arg1iter = t.find(DIM_ARG1);
-
-        if (arg0iter == t.end() || arg1iter == t.end())
-        {
-          return Types::Special::create(SP_CONST);
-        }
-
-        const Constant& ctranslateTo = arg0iter->second;
-        const Constant& ccbn = arg1iter->second;
-
-        if (ctranslateTo.index() != TYPE_INDEX_USTRING)
-        {
-          return Types::Special::create(SP_CONST);
-        }
-
-        if (ccbn.index() != TYPE_INDEX_BOOL)
-        {
-          return Types::Special::create(SP_CONST);
-        }
-
-        const u32string& stranslateTo = 
-          get_constant_pointer<u32string>(ctranslateTo);
-        bool bcbn = get_constant<bool>(ccbn);
-
-        Tree::UnaryType optype;
-        if (consname == U"OpPrefix")
-        {
-          optype = Tree::UNARY_PREFIX;
-        }
-        else
-        {
-          optype = Tree::UNARY_POSTFIX;
-        }
-
-        Tree::UnaryOperator unop(op.optext, stranslateTo, optype);
-        unop.call_by_name = bcbn;
-      }
-
-      #endif
-
-      return Types::Special::create(SP_CONST);
-    }
-
-    Constant
-    operator()(const Parser::FnDecl& fn)
-    {
-      return Constant();
-    }
-
-    private:
-    System& m_system;
-    int m_verbose;
-  };
 }
 
 //private template  functions go at the top, but after the local
@@ -876,42 +452,12 @@ System::addConstructorInternal
   return Types::UUID::create(u);
 }
 
-//adds eqn | [symbol : "s"] = value;;
-template <typename T>
-Constant
-System::addSymbolInfo
-(
-  const u32string& eqn, 
-  const u32string& s, 
-  const T& value
-)
-{
-  return addEquation(Parser::Equation(
-    eqn,
-    Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), s}}),
-    Tree::Expr(),
-    value
-  ));
-}
-
 template <typename... Args>
 void 
 addEqn(System& s, Args... args)
 {
   s.addEquation(Parser::Equation(
     args...
-  ));
-}
-
-template <typename Arg>
-void
-addInitEqn(System& s, const u32string& name, Arg&& e)
-{
-  s.addEquation(Parser::Equation(
-    name,
-    Tree::Expr(),
-    Tree::Expr(),
-    std::forward<Arg>(e)
   ));
 }
 
@@ -925,52 +471,6 @@ addDecl(System& s, const u32string& name, const u32string& value)
     Tree::Expr(),
     value
     ));
-}
-
-void
-System::init_equations()
-{
-  //types of identifiers
-  addInitEqn(*this,
-    U"ID_TYPE",
-    u32string(U"ID")
-  );
-
-  //var, dim, assign, in, out
-  addDecl(*this, U"var", U"DECLID");
-  addDecl(*this, U"host", U"DECLID");
-  addDecl(*this, U"dim", U"DECLID");
-  addDecl(*this, U"assign", U"DECLID");
-  addDecl(*this, U"in", U"DECLID");
-  addDecl(*this, U"out", U"DECLID");
-  addDecl(*this, U"data", U"DECLID");
-  addDecl(*this, U"constructor", U"DECLID");
-  addDecl(*this, U"fun", U"DECLID");
-  addDecl(*this, U"op", U"DECLID");
-  addDecl(*this, U"del", U"DECLID");
-  addDecl(*this, U"repl", U"DECLID");
-
-  //add PRINT="this type has no printer"
-  addInitEqn(*this,
-    U"PRINT",
-    u32string(U"This type has no printer!")
-  );
-
-  //args = case hd(##\psi) of E @ [#\pi <- tl(##\pi), #\psi <- tl(##\psi)]
-  //  @ hd(##\pi)
-
-  //add a function eval_workshop
-  #if 0
-  addEquation(Parser::Equation
-  (
-    U"eval_workshop",
-    Tree::Expr(),
-    Tree::Expr(),
-    Tree::LambdaExpr(U"x")
-  ));
-  #endif
-
-  addEquation(U"make_error", GuardWS(), new MakeErrorWS);
 }
 
 void 
@@ -1040,8 +540,6 @@ System::System(bool cached)
     }
   );
 
-  init_equations();
-
   init_builtin_types(*this);
 }
 
@@ -1065,44 +563,6 @@ System::go()
   {
     assign.second->evaluate(*this, m_defaultk);
   }
-
-  #if 0
-  for (const auto& ident : m_assignments)
-  {
-    auto hd = m_outputHDs.find(ident.first);
-
-    if (hd == m_outputHDs.end())
-    {
-      std::cerr << "warning: output hyperdaton \"" << ident.first
-        << "\" doesn't exist" << std::endl;
-      continue;
-    }
-
-    Context theContext = m_defaultk;
-
-    //theContext.perturb(DIM_TIME, Types::Intmp::create(m_time));
-
-    //this needs to be way better
-    //for a start: only look at demands for the current time
-    auto equations = ident.second->equations();
-    for (auto& assign : equations)
-    {
-      //const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
-      const GuardWS& guard = assign.second.validContext();
-
-      auto ctxts = guard.evaluate(theContext);
-
-      //ContextPerturber p(theContext, constraint);
-
-      if (ctxts.first)
-      {
-        //the demand could have ranges, so we need to enumerate them
-        enumerateContextSet(ctxts.second, theContext, 
-          assign.second, hd->second);
-      }
-    }
-  }
-  #endif
 
   //collect some garbage
   for (auto& cached : m_cachedVars)
@@ -1139,45 +599,6 @@ System::loadLibrary(const u32string& s)
 }
 
 Constant
-System::parseLine
-(
-  Parser::StreamPosIterator& begin, 
-  const Parser::StreamPosIterator& end,
-  int verbose,
-  bool debug
-)
-{
-  //TODO this is a hack, implement debug and verbose properly
-  //some sort of output object might be good too
-  m_debug = debug;
-
-  Parser::Line line;
-
-  Parser::LexerIterator lexit(begin, end, m_defaultk, lookupIdentifiers());
-  Parser::LexerIterator lexend = lexit.makeEnd();
-  bool success = m_parser->parse_decl(lexit, lexend, line);
-
-  if (success)
-  {
-    detail::LineAdder adder(*this, verbose);
-    Constant c = apply_visitor(adder, line);
-
-    //this is the best way that we know for now, fix up the default context for
-    //the L_in dims that were added
-    setDefaultContext();
-
-    return c;
-  }
-  else
-  {
-    //TODO fix this
-    std::cerr << "not a line" << std::endl;
-  }
-
-  return Types::Special::create(SP_CONST); 
-}
-
-Constant
 System::addEquation(const Parser::Equation& eqn)
 {
   return addDeclInternal(eqn, m_equations, m_equationUUIDs);
@@ -1201,7 +622,6 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
 {
   u32string typeName;
 
-  Constant a = addATLSymbol(op.symbol, op.op);
   if (op.type == Tree::UNARY_PREFIX)
   {
     typeName = U"OpPrefix";
@@ -1223,55 +643,6 @@ System::addUnaryOperator(const Tree::UnaryOperator& op)
     )
   });
 
-  #if 0
-
-  return addVariableDeclParsed(Parser::Equation(
-    U"OPERATOR",
-    Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
-    Tree::Expr(),
-    Tree::TupleExpr(
-    {
-      {Tree::DimensionExpr(DIM_TYPE), u32string(U"OpType")},
-      {Tree::DimensionExpr(DIM_CONS), u32string(typeName)},
-      {Tree::DimensionExpr(DIM_ARG0), op.op},
-      {Tree::DimensionExpr(DIM_ARG1), op.call_by_name},
-    }
-    )
-  ));
-  #endif
-
-  #if 0
-  u32string typeName;
-
-  Constant a = addATLSymbol(op.symbol, op.op);
-  if (op.type == Tree::UNARY_PREFIX)
-  {
-    typeName = U"PREFIX";
-  }
-  else
-  {
-    typeName = U"POSTFIX";
-  }
-
-  Constant t = addOpType(op.symbol, typeName);
-
-  if (hasSpecial({a, t}))
-  {
-    return Types::Special::create(SP_CONST);
-  }
-
-  uuid u = generate_uuid();
-
-  m_unop_uuids.insert(std::make_pair(u,
-    UnaryUUIDs
-    (
-      Types::UUID::get(a),
-      Types::UUID::get(t)
-    )
-  ));
-
-  return Types::UUID::create(u);
-  #endif
 }
 
 Constant
@@ -1317,101 +688,6 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
       op.precedence
     )
   });
-
-#if 0
-    Tree::TupleExpr({{Tree::DimensionExpr(DIM_SYMBOL), op.symbol}}),
-    Tree::Expr(),
-    Tree::TupleExpr(
-    {
-      {Tree::DimensionExpr(DIM_TYPE), u32string(U"OpType")},
-      {Tree::DimensionExpr(DIM_CONS), u32string(U"OpInfix")},
-      {Tree::DimensionExpr(DIM_ARG0), op.op},
-      {Tree::DimensionExpr(DIM_ARG1), op.cbn},
-      {Tree::DimensionExpr(DIM_ARG2), 
-        Tree::TupleExpr(
-        {
-          {Tree::DimensionExpr(DIM_TYPE), u32string(U"Assoc")},
-          {Tree::DimensionExpr(DIM_CONS), assocType}
-        })
-      },
-      {Tree::DimensionExpr(DIM_ARG3), op.precedence}
-    }
-    )
-  ));
-#endif
-
-  #if 0
-  u32string assocName;
-
-  switch(op.assoc)
-  {
-    case Tree::ASSOC_LEFT:
-    assocName = U"LEFT";
-    break;
-
-    case Tree::ASSOC_RIGHT:
-    assocName = U"RIGHT";
-    break;
-
-    case Tree::ASSOC_NON:
-    assocName = U"NON";
-    break;
-    
-    default:
-    //if this exception is raised then we added different associativity
-    //operators but forgot to take care of them here
-    throw __FILE__ ":" STRING_(__LINE__) ": oops";
-    break;
-  }
-
-  Constant t = addOpType(op.symbol, U"BINARY");
-  Constant s = addATLSymbol(op.symbol, op.op);
-  Constant a = addAssoc(op.symbol, assocName);
-  Constant p = addPrecedence(op.symbol, op.precedence);
-
-  if (hasSpecial({t, s, a, p}))
-  {
-    return Types::Special::create(SP_CONST);
-  }
-
-  uuid u = generate_uuid();
-
-  m_binop_uuids.insert(std::make_pair(u, 
-    BinaryUUIDs
-    (
-      Types::UUID::get(t),
-      Types::UUID::get(s),
-      Types::UUID::get(a),
-      Types::UUID::get(p)
-    )
-  ));
-
-  return Types::UUID::create(u);
-  #endif
-}
-
-Constant 
-System::addOpType(const u32string& symbol, const u32string& type)
-{
-  return addSymbolInfo(U"OPTYPE", symbol, type);
-}
-
-Constant
-System::addATLSymbol(const u32string& symbol, const u32string& op)
-{
-  return addSymbolInfo(U"ATL_SYMBOL", symbol, op);
-}
-
-Constant
-System::addAssoc(const u32string& symbol, const u32string assoc)
-{
-  return addSymbolInfo(U"ASSOC", symbol, assoc);
-}
-
-Constant
-System::addPrecedence(const u32string& symbol, const mpz_class& precedence)
-{
-  return addSymbolInfo(U"PREC", symbol, precedence);
 }
 
 uuid
@@ -1620,12 +896,6 @@ System::setDefaultContext()
       }
   ));
 
-  //set the L_in dimensions to zero
-  for (auto d : m_Lin)
-  {
-    m_defaultk.perturb(d, Types::Intmp::create(0));
-  }
-
   //set the rho dimension to nil
   auto nil = lookupIdentifiers().lookup(U"Nil");
   
@@ -1645,66 +915,7 @@ System::setDefaultContext()
   }
 }
 
-template <typename T>
-Tuple
-System::addHDDecl
-(
-  const u32string& name,
-  const Tree::Expr& guard,
-  T& decls
-)
-{
-  //compile and evaluate guard
-  Constant c = compile_and_evaluate(guard, *this);
-  
-  //add as new constraint to output HD
-  if (c.index() == TYPE_INDEX_TUPLE)
-  {
-    auto iter = decls.find(name);
-
-    if (iter != decls.end())
-    {
-      const Tuple& t = Types::Tuple::get(c);
-      //only update if the tuple is more specific than or the same as the
-      //existing one
-      if (t == iter->second || tupleRefines(t, iter->second))
-      {
-        iter->second = t;
-        return t;
-      }
-    }
-  }
-  return Tuple();
-}
-
-void
-System::addOutputDeclaration
-(
-  const u32string& name,
-  const Tree::Expr& guard
-)
-{
-  Tuple t = addHDDecl(name, guard, m_outputHDDecls);
-
-  //inform the hd of the same thing
-  auto iter = m_outputHDs.find(name);
-
-  if (iter != m_outputHDs.end())
-  {
-    iter->second->addAssignment(t);
-  }
-}
-
-void
-System::addInputDeclaration
-(
-  const u32string& name,
-  const Tree::Expr& guard
-)
-{
-  addHDDecl(name, guard, m_inputHDDecls);
-}
-
+#if 0
 Constant
 System::addInputHyperdaton
 (
@@ -1736,95 +947,7 @@ System::addInputHyperdaton
     return Types::Special::create(SP_MULTIDEF); 
   }
 }
-
-void
-System::addDefaultDimensions(const SemanticTransform& t)
-{
-  //The L_in dims are set to 0 in the default context
-  m_Lin.insert(m_Lin.end(), t.getLin().begin(), t.getLin().end());
-
-  //function lists must have a nil element set
-  m_fnLists.insert(m_fnLists.end(), 
-    t.getAllScopeArgs().begin(), t.getAllScopeArgs().end());
-
-  m_fnLists.insert(m_fnLists.end(), 
-    t.getAllScopeOdometer().begin(), t.getAllScopeOdometer().end());
-}
-
-void
-System::addDefaultDimensions  
-(                             
-  const std::vector<dimension_index>& zeros,
-  const std::vector<dimension_index>& nils
-)                             
-{                             
-  //The L_in dims are set to 0 in the default context
-  m_Lin.insert(m_Lin.end(), zeros.begin(), zeros.end());
-                              
-  //function lists must have a nil element set
-  m_fnLists.insert(m_fnLists.end(), nils.begin(), nils.end());                  
-}
-
-#if 0
-template <typename... Renames>
-Tree::Expr
-System::toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows, 
-  Renames&&... renames)
-{
-  Tree::Expr wstree = tows.toWSTree(e, renames...);
-
-  addExtraVariables(tows);
-
-  return wstree;
-}
 #endif
-
-//the two trees must be identical abstractions except for parameter names
-//makes a rename map from the difference
-//rename_dims is a map from the lhs name to the rhs dimension
-void
-findRenamedParams(const Tree::Expr& original, const Tree::Expr& renamed,
-  RenameIdentifiers::RenameRules& renames,
-  std::map<u32string, dimension_index>& rename_dims
-)
-{
-  const Tree::Expr* lhsexpr = &original;
-  const Tree::Expr* rhsexpr = &renamed;
-
-  bool done = false;
-  while (!done)
-  {
-    const Tree::LambdaExpr* lhslambda = get<Tree::LambdaExpr>(lhsexpr);
-
-    if (lhslambda != nullptr)
-    {
-      const Tree::LambdaExpr& rhslambda = get<Tree::LambdaExpr>(*rhsexpr);
-      renames.insert(std::make_pair(lhslambda->name, rhslambda.name));
-      rename_dims.insert(std::make_pair(lhslambda->name, rhslambda.argDim));
-
-      lhsexpr = &lhslambda->rhs;
-      rhsexpr = &rhslambda.rhs;
-    }
-    else
-    {
-      const Tree::PhiExpr* lhsphi = get<Tree::PhiExpr>(lhsexpr);
-      if (lhsphi != nullptr)
-      {
-        const Tree::PhiExpr& rhsphi = get<Tree::PhiExpr>(*rhsexpr);
-        renames.insert(std::make_pair(lhsphi->name, rhsphi.name));
-        rename_dims.insert(std::make_pair(lhsphi->name, rhsphi.argDim));
-        
-        lhsexpr = &lhsphi->rhs;
-        rhsexpr = &rhsphi.rhs;
-      }
-      else
-      {
-        done = true;
-      }
-    }
-  }
-
-}
 
 Constant
 System::evalExpr(const Tree::Expr& e)
@@ -1908,7 +1031,7 @@ System::addHostDimension(const u32string& name, dimension_index index)
 {
   if (m_dimTranslator.assignIndex(name, index))
   {
-    return addEquation(Parser::Equation
+    return addVariableDeclParsed(Parser::Equation
       (
         name,
         Tree::Expr(),
@@ -2127,7 +1250,6 @@ System::fixupTreeAndAdd(const Tree::Expr& e)
 {
   auto result = fixupTree(*this, e);
   addTransformedEquations(result.second.equations);
-  addDefaultDimensions(result.second.defaultZeros, result.second.defaultNils);
 
   return result.first;
 }
