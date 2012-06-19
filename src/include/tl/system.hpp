@@ -155,6 +155,7 @@ namespace TransLucid
     }
 
     //string input?
+    #if 0
     uuid
     addEquation(const u32string& name, const GuardWS& guard, WS* e);
 
@@ -163,6 +164,7 @@ namespace TransLucid
     {
       return addEquation(name, GuardWS(), e);
     }
+    #endif
 
     Constant
     addHostDimension(const u32string& name, dimension_index index);
@@ -225,9 +227,6 @@ namespace TransLucid
 
     void
     go();
-
-    Constant
-    evalExpr(const Tree::Expr& e);
 
     void
     addEnvVars();
@@ -335,20 +334,6 @@ namespace TransLucid
       const u32string& name,
       const Tree::Expr& guard,
       T& decls
-    );
-
-    uuid
-    addDeclInternal
-    (
-      const u32string& name, 
-      const GuardWS& guard, WS* e,
-      DefinitionMap& declarations,
-      UUIDDefinition& uuids
-    );
-
-    Constant
-    addDeclInternal(const Parser::Equation& eqn, DefinitionMap& declarations,
-      UUIDDefinition& uuids
     );
 
     void
