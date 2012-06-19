@@ -41,7 +41,7 @@ namespace TransLucid
     , m_ws(ws)
     , m_binds(binds)
     , m_scope(scope)
-    , m_k(k.minimal_copy())
+    , m_k(k)
     {
     }
 
@@ -95,7 +95,7 @@ namespace TransLucid
     WS* m_ws;
     std::vector<Constant> m_binds;
     std::vector<dimension_index> m_scope;
-    mutable Context m_k;
+    MinimalContext m_k;
   };
 
   namespace Types
