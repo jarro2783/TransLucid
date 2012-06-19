@@ -1,9 +1,23 @@
-#if __GNUC__ < REQUIRED_MAJOR
-  #error
-#endif
+#ifdef __GNUC__
 
-#if __GNUC_MINOR__ < REQUIRED_MINOR
-  #error
+  #ifdef __clang__
+
+    #if !__has_feature(cxx_constexpr)
+      #error C++11 mode required
+    #endif
+
+  #else
+
+    #if __GNUC__ < REQUIRED_MAJOR
+      #error
+    #endif
+
+    #if __GNUC_MINOR__ < REQUIRED_MINOR
+      #error
+    #endif
+
+  #endif
+
 #endif
 
 int main()

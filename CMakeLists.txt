@@ -32,8 +32,10 @@ execute_process(COMMAND
   ${CMAKE_SOURCE_DIR}/checks/generate_gcc_min_version_check
   OUTPUT_FILE ${CMAKE_BINARY_DIR}/version.cpp)
 
-try_compile(GCC_IS_CORRECT_VERSION ${CMAKE_BINARY_DIR} 
-  ${CMAKE_BINARY_DIR}/version.cpp)
+try_compile(GCC_IS_CORRECT_VERSION ${CMAKE_BINARY_DIR}
+  ${CMAKE_BINARY_DIR}/version.cpp
+  COMPILE_DEFINITIONS "-std=gnu++11"
+)
 
 if (NOT GCC_IS_CORRECT_VERSION)
    message(FATAL_ERROR "g++ version 4.7.0 or greater is required")
