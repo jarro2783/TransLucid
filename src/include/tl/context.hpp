@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_CONTEXT_HPP_INCLUDED
 #define TL_CONTEXT_HPP_INCLUDED
 
+#include <tl/types/special.hpp>
 #include <tl/types.hpp>
 
 #include <algorithm>
@@ -138,6 +139,24 @@ namespace TransLucid
       );
     }
 
+    dimension_index
+    max() const
+    {
+      return m_max;
+    }
+
+    dimension_index
+    min() const
+    {
+      return m_min;
+    }
+
+    const std::set<dimension_index>&
+    setDims() const
+    {
+      return m_setDims;
+    }
+
     private:
 
     friend class ContextPerturber;
@@ -159,6 +178,62 @@ namespace TransLucid
 
     ContextType m_context;
 
+    std::set<dimension_index> m_setDims;
+  };
+
+  class MinimalContext
+  {
+    public:
+
+    MinimalContext
+    (
+      const Context& k
+    )
+    : m_all(Types::Special::create(SP_DIMENSION))
+    , m_min(k.min())
+    , m_max(k.max())
+    , m_context(k.max() - k.min() - 1)
+    , m_setDims(k.setDims())
+    {
+      size_t i = 0;
+      dimension_index d = m_min + 1;
+      
+      while (d != m_max)
+      {
+        m_context[i] = k.lookup(d);
+        ++i;
+        ++d;
+      }
+    }
+
+    const Constant&
+    lookup(dimension_index dim) const
+    {
+      if (dim <= m_min || dim >= m_max)
+      {
+        return m_all;
+      }
+
+      return m_context[dim - m_min - 1];
+    }
+
+    //computes this - rhs and puts the result in out
+    template <typename OutputIterator>
+    void
+    difference(const Context& rhs, OutputIterator&& out) const
+    {
+      std::set_difference(
+        m_setDims.begin(), m_setDims.end(),
+        rhs.setDims().begin(), rhs.setDims().end(),
+        std::forward<OutputIterator>(out)
+      );
+    }
+
+    private:
+    Constant m_all;
+    dimension_index m_min;
+    dimension_index m_max;
+    std::vector<Constant> m_context;
     std::set<dimension_index> m_setDims;
   };
 
