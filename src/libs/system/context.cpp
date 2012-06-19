@@ -125,6 +125,8 @@ Context::perturb(dimension_index d, const Constant& c)
   }
 
   m_context[makeIndex(d)].push(c);
+
+  m_setDims.insert(d);
 }
 
 void

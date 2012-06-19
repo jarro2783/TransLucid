@@ -60,28 +60,32 @@ namespace TransLucid
       // k_a \dagger (k_a - m_k) \dagger (m_k <| {\rho, m_scope})
 
       //make this more efficient
+      std::vector<dimension_index> difference;
 
-      std::vector<std::pair<dimension_index, Constant>> saved;
-      saved.reserve(m_scope.size() + 1);
+      m_k.difference(k_a, std::back_inserter(difference));
 
-      for (auto b : m_binds)
+      ContextPerturber p(k_a); 
+
+      for (auto d : difference)
       {
-        auto dim = m_system->getDimensionIndex(b);
-        saved.push_back(std::make_pair(dim, m_k.lookup(dim)));
+        p.perturb(d, m_k.lookup(d));
       }
 
       for (auto d : m_scope)
       {
-        saved.push_back(std::make_pair(d, m_k.lookup(d)));
+        //saved.push_back(std::make_pair(d, m_k.lookup(d)));
+        p.perturb(d, m_k.lookup(d));
       }
 
-      saved.push_back(std::make_pair(DIM_RHO, m_k.lookup(DIM_RHO)));
+      p.perturb(DIM_RHO, m_k.lookup(DIM_RHO));
 
-      ContextPerturber p(m_k, k_a); 
+      for (auto b : m_binds)
+      {
+        auto dim = m_system->getDimensionIndex(b);
+        p.perturb(dim, m_k.lookup(dim));
+      }
 
-      p.perturb(saved);
-
-      auto result = (*m_ws)(m_k);
+      auto result = (*m_ws)(k_a);
 
       return result;
     }
