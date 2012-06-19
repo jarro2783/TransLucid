@@ -250,7 +250,6 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   expr.inten.expr = child;
   expr.inten.scope.insert(expr.inten.scope.end(), m_scope.begin(), 
     m_scope.end());
-  expr.inten.scope.push_back(argDim);
 
   //do the bound dimensions
   for (auto& b : e.binds)
