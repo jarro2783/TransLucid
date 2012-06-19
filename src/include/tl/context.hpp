@@ -27,8 +27,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 
+#include <algorithm>
 #include <deque>
 #include <initializer_list>
+#include <set>
 #include <stack>
 #include <vector>
 
@@ -74,7 +76,13 @@ namespace TransLucid
     {
       for (const auto& v : list)
       {
-        m_context[makeIndex(v)].pop();
+        size_t index = makeIndex(v);
+        m_context[index].pop();
+
+        if (m_context[index].size() == 0)
+        {
+          m_setDims.erase(v);
+        }
       }
     }
 
@@ -118,6 +126,18 @@ namespace TransLucid
       return k;
     }
 
+    //computes this - rhs and puts the result in out
+    template <typename OutputIterator>
+    void
+    difference(const Context& rhs, OutputIterator&& out) const
+    {
+      std::set_difference(
+        m_setDims.begin(), m_setDims.end(),
+        rhs.m_setDims.begin(), rhs.m_setDims.end(),
+        std::forward<OutputIterator>(out)
+      );
+    }
+
     private:
 
     friend class ContextPerturber;
@@ -138,6 +158,8 @@ namespace TransLucid
     Constant m_all;
 
     ContextType m_context;
+
+    std::set<dimension_index> m_setDims;
   };
 
   class ContextPerturber

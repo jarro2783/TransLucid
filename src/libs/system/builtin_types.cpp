@@ -1587,47 +1587,11 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
   };
 
   add_one_base_function(s, U"construct_typetype", &construct_typetype);
-
-  s.addEquation(Parser::Equation(
-    U"TYPENAME",
-    Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), 
-      Tree::IdentExpr(U"error")}}),
-    Tree::Expr(),
-    u32string(U"error"))
-  );
 }
 
 void
 add_builtin_printers(System& s, const std::vector<u32string>& to_print_types)
 {
-  //add all the printers for each type
-  //PRINT | [arg0 : t] = "print_t"!(#arg0)
-
-  for (auto t : to_print_types)
-  {
-    s.addEquation(Parser::Equation(
-      PRINT_IDENT,
-      Tree::TupleExpr({{Tree::DimensionExpr(U"arg0"), Tree::IdentExpr(t)}}),
-      Tree::Expr(),
-      Tree::BangAppExpr(Tree::IdentExpr(U"print_" + t),
-          Tree::HashExpr(Tree::DimensionExpr(U"arg0"))
-      )
-    ));
-  }
-
-  //string returns itself
-  //PRINT | [arg0 : ustring] = #arg0;;
-  s.addEquation(Parser::Equation
-  (
-    PRINT_IDENT,
-    Tree::TupleExpr(
-    {{
-      Tree::DimensionExpr(u32string(U"arg0")),
-      Tree::IdentExpr(u32string(U"ustring"))
-    }}),
-    Tree::Expr(),
-    Tree::HashExpr(Tree::DimensionExpr(u32string(U"arg0")))
-  ));
 }
 
 void

@@ -17,33 +17,6 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-//--------- Header Equations -------------
-//For dimensions:
-//DIM | [name : "dimension"] = true;;
-//
-//For operations:
-//OPTYPE | [symbol : "s"] = "{PREFIX, POSTFIX, BINARY}";;
-//ATL_SYMBOL | [symbol : "s"] = "fnname";;
-//
-//For binary:
-//ASSOC | [symbol : "s"] = "{LEFT, RIGHT, NON}";;
-//PREC  | [symbol : "s"] = N;;
-
-//---- Adding Equations / Assignments ----
-//As these are both almost identical, but are stored in a different variable,
-//the code for adding these has been written only once.
-//There are two types of functions:
-//add*(Parser::Equation) and
-//add*(name, guard, varws)
-//The common code has been put in:
-//addDeclInternal
-//with both overloads. The former translates the trees and then simply calls
-//the latter. They both take a reference to the data structure to store these
-//in.
-//The specific functions addEquation and addAssignment are both wrappers for
-//the appropriate addDeclInternal, they pass m_equations and m_assignments
-//respectively.
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -98,121 +71,6 @@ namespace
     //U"wvr",
     //U"fby"
   };
-
-  bool
-  hasSpecial(const std::initializer_list<Constant>& c)
-  {
-    for(auto v : c)
-    {
-      if (v.index() == TYPE_INDEX_SPECIAL)
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  Constant
-  compile_and_evaluate(const Tree::Expr& expr, System& system)
-  {
-    Tree::Expr transformed = system.fixupTreeAndAdd(expr);
-
-    WorkshopBuilder compiler(&system);
-
-    std::auto_ptr<WS> ws(compiler.build_workshops(transformed));
-
-    return (*ws)(system.getDefaultContext());
-  }
-
-  //for every context in ctxts that is valid in k,
-  //output the result of computation compute to out
-  //at the moment we only know how to enumerate ranges, this could
-  //become richer as we work out the type system better
-  void
-  enumerateContextSet
-  (
-    const Tuple& ctxts, 
-    Context& k,
-    WS& compute,
-    OutputHD* out
-  )
-  {
-    Tuple variance = out->variance();
-
-    //all the ranges in order
-    std::vector<Range> limits;
-
-    //the current value of each range dimension
-    std::vector<std::pair<dimension_index, mpz_class>> current;
-
-    //the context to evaluate in
-    Context evalContext(k);
-
-    //determine which dimensions are ranges
-    for (const auto& v : ctxts)
-    {
-      if (v.second.index() == TYPE_INDEX_RANGE)
-      {
-        const Range& r = Types::Range::get(v.second);
-
-        if (r.lower() == nullptr || r.upper() == nullptr)
-        {
-          std::cerr << "Error: infinite bounds in demand, dimension " <<
-            v.first << std::endl;
-          throw "Infinite bounds in demand";
-        }
-
-        limits.push_back(r);
-        current.push_back(std::make_pair(v.first, *r.lower()));
-      }
-      else
-      {
-        //if not a range then store it permanantly
-        evalContext.perturb(v.first, v.second);
-      }
-    }
-
-    //by doing it this way, even if there is no range, we still evaluate
-    //everything once
-    while (true)
-    {
-      ContextPerturber p(evalContext);
-      for (const auto& v : current)
-      {
-        p.perturb(v.first, Types::Intmp::create(v.second));
-      }
-
-      //is the demand valid for the hyperdaton, and is the demand valid for
-      //the current context
-      if (tupleApplicable(variance, evalContext) && k <= evalContext)
-      {
-        out->put(evalContext, compute(evalContext));
-      }
-      
-      //then we increment the counters at the end
-      auto limitIter = limits.begin();
-      auto currentIter = current.begin();
-      while (currentIter != current.end())
-      {
-        ++currentIter->second;
-        if (!limitIter->within(currentIter->second))
-        {
-          currentIter->second = *limitIter->lower();
-          ++currentIter;
-          ++limitIter;
-        }
-        else
-        {
-          break;
-        }
-      }
-      
-      if (currentIter == current.end())
-      {
-        break;
-      }
-    }
-  }
 
   class MakeErrorWS : public WS
   {
@@ -452,27 +310,6 @@ System::addConstructorInternal
   return Types::UUID::create(u);
 }
 
-template <typename... Args>
-void 
-addEqn(System& s, Args... args)
-{
-  s.addEquation(Parser::Equation(
-    args...
-  ));
-}
-
-void
-addDecl(System& s, const u32string& name, const u32string& value)
-{
-  s.addEquation(Parser::Equation(
-    U"ID_TYPE",
-    Tree::TupleExpr(
-        {{Tree::DimensionExpr(DIM_ARG0), name}}),
-    Tree::Expr(),
-    value
-    ));
-}
-
 void 
 System::init_dimensions(const std::initializer_list<u32string>& args)
 {
@@ -586,24 +423,6 @@ System::go()
   setDefaultContext();
 }
 
-uuid
-System::addEquation(const u32string& name, const GuardWS& guard, WS* e)
-{
-  return addDeclInternal(name, guard, e, m_equations, m_equationUUIDs);
-}
-
-void
-System::loadLibrary(const u32string& s)
-{
-  //m_translator->loadLibrary(s);
-}
-
-Constant
-System::addEquation(const Parser::Equation& eqn)
-{
-  return addDeclInternal(eqn, m_equations, m_equationUUIDs);
-}
-
 Constant 
 System::addDimension(const u32string& dimension)
 {
@@ -690,105 +509,9 @@ System::addBinaryOperator(const Tree::BinaryOperator& op)
   });
 }
 
-uuid
-System::addDeclInternal
-(
-  const u32string& name, 
-  const GuardWS& guard, WS* e,
-  DefinitionMap& declarations,
-  UUIDDefinition& uuids
-)
-{
-  auto i = declarations.find(name);
-  VariableWS* var = nullptr;
-
-  if (i == declarations.end())
-  {
-    var = new VariableWS(name, *this);
-    i = declarations.insert(std::make_pair(name, var)).first;
-  }
-  else
-  {
-    var = i->second;
-  }
-
-  uuid u = var->addEquation(name, guard, e, m_time);
-
-  uuids.insert(std::make_pair(u, i));
-
-  return u;
-}
-
-Constant
-System::addDeclInternal
-(
-  const Parser::Equation& eqn, 
-  DefinitionMap& declarations,
-  UUIDDefinition& uuids
-)
-{
-  //TreeToWSTree tows(this);
-
-  //simplify, turn into workshops
-  //Tree::Expr guard   = toWSTreePlusExtras(std::get<1>(eqn), tows);
-  //Tree::Expr boolean = toWSTreePlusExtras(std::get<2>(eqn), tows);
-  //Tree::Expr expr    = toWSTreePlusExtras(std::get<3>(eqn), tows);
-
-  //simplify, turn into workshops
-  Tree::Expr guard   = fixupTreeAndAdd(std::get<1>(eqn));
-  Tree::Expr boolean = fixupTreeAndAdd(std::get<2>(eqn));
-  Tree::Expr expr    = fixupTreeAndAdd(std::get<3>(eqn));
-
-  #if 0
-  if (m_debug)
-  {
-    //print everything
-    std::cout << "The rewritten expr" << std::endl; 
-    std::cout << 
-      Printer::printEquation
-      (std::make_tuple(std::get<0>(eqn), guard, boolean, expr)) 
-      << std::endl;
-
-    for (const auto& e : tows.newVars())
-    {
-      std::cout << Printer::printEquation(e) << std::endl;
-    }
-  }
-  #endif
-
-  WorkshopBuilder compile(this);
-
-  uuid u = addDeclInternal(
-    std::get<0>(eqn),
-    GuardWS(compile.build_workshops(guard),
-      compile.build_workshops(boolean)),
-    compile.build_workshops(expr),
-    declarations,
-    uuids
-  );
-
-  //add all the new equations
-  #if 0
-  for (const auto& e : tows.newVars())
-  {
-    addDeclInternal(
-      std::get<0>(e),
-      GuardWS(compile.build_workshops(std::get<1>(e)),
-        compile.build_workshops(std::get<2>(e))),
-      compile.build_workshops(std::get<3>(e)),
-      declarations,
-      uuids
-    );
-  }
-  #endif
-
-  return Types::UUID::create(u);
-}
-
 Constant
 System::addAssignment(const Parser::Equation& eqn)
 {
-  //return addDeclInternal(eqn, m_assignments, m_assignmentUUIDs);
   uuid u = generate_uuid();
 
   //find the assignment
@@ -948,12 +671,6 @@ System::addInputHyperdaton
   }
 }
 #endif
-
-Constant
-System::evalExpr(const Tree::Expr& e)
-{
-  return compile_and_evaluate(e, *this);
-}
 
 u32string
 System::printDimension(dimension_index dim) const

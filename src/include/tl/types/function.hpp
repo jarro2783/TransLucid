@@ -283,9 +283,9 @@ namespace TransLucid
       WS* expr,
       Context& k
     )
-    : m_system(system), m_name(name), m_dim(argDim), m_expr(expr), 
-      m_kappa(k.minimal_copy())
+    : m_system(system), m_name(name), m_dim(argDim)
     {
+      m_inten = (*expr)(k);
     }
 
     ValueFunctionType*
@@ -313,8 +313,7 @@ namespace TransLucid
     System* m_system;
     u32string m_name;
     dimension_index m_dim;
-    WS* m_expr;
-    mutable Context m_kappa;
+    Constant m_inten;
   };
 
   Constant

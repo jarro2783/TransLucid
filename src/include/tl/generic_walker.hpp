@@ -217,7 +217,7 @@ namespace TransLucid
     {
       Tree::WhereExpr where;
 
-      where.e = e.e;
+      where.e = apply_visitor(*reinterpret_cast<Derived*>(this), e.e);
 
       //do the dims
       for (const auto& dim : e.dims)
