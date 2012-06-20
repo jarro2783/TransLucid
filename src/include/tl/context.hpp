@@ -78,11 +78,16 @@ namespace TransLucid
       for (const auto& v : list)
       {
         size_t index = makeIndex(v);
-        m_context[index].pop();
+        m_context[index].second.pop();
 
-        if (m_context[index].size() == 0)
+        if (m_context[index].second.size() == 0)
         {
           m_setDims.erase(v);
+          m_context[index].first = m_all;
+        }
+        else
+        {
+          m_context[index].first = m_context[index].second.top();
         }
       }
     }
@@ -99,44 +104,7 @@ namespace TransLucid
       return 
         i > m_min && 
         i < m_max && 
-        m_context.at(makeIndex(i)).size() != 0;
-    }
-
-    Context
-    minimal_copy() const
-    {
-      Context k;
-      k.m_min = m_min;
-      k.m_max = m_max;
-      k.m_context.resize(m_context.size());
-
-      auto siter = m_context.begin();
-      auto diter = k.m_context.begin();
-
-      while (siter != m_context.end())
-      {
-        if (!siter->empty())
-        {
-          diter->push(siter->top());
-        }
-
-        ++siter;
-        ++diter;
-      }
-
-      return k;
-    }
-
-    //computes this - rhs and puts the result in out
-    template <typename OutputIterator>
-    void
-    difference(const Context& rhs, OutputIterator&& out) const
-    {
-      std::set_difference(
-        m_setDims.begin(), m_setDims.end(),
-        rhs.m_setDims.begin(), rhs.m_setDims.end(),
-        std::forward<OutputIterator>(out)
-      );
+        m_context.at(makeIndex(i)).second.size() != 0;
     }
 
     dimension_index
@@ -167,7 +135,7 @@ namespace TransLucid
       return i - m_min - 1;
     }
 
-    typedef std::deque<std::stack<Constant>> ContextType;
+    typedef std::deque<std::pair<Constant, std::stack<Constant>>> ContextType;
 
     //one before the smallest
     dimension_index m_min;
@@ -272,9 +240,9 @@ namespace TransLucid
 
       while (iter != k_p.m_context.end())
       {
-        if (!iter->empty())
+        if (!iter->second.empty())
         {
-          perturb(d, iter->top());
+          perturb(d, iter->second.top());
         }
 
         ++iter;
