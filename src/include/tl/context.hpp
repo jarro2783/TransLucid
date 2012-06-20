@@ -181,62 +181,6 @@ namespace TransLucid
     std::set<dimension_index> m_setDims;
   };
 
-  class MinimalContext
-  {
-    public:
-
-    MinimalContext
-    (
-      const Context& k
-    )
-    : m_all(Types::Special::create(SP_DIMENSION))
-    , m_min(k.min())
-    , m_max(k.max())
-    , m_context(k.max() - k.min() - 1)
-    , m_setDims(k.setDims())
-    {
-      size_t i = 0;
-      dimension_index d = m_min + 1;
-      
-      while (d != m_max)
-      {
-        m_context[i] = k.lookup(d);
-        ++i;
-        ++d;
-      }
-    }
-
-    const Constant&
-    lookup(dimension_index dim) const
-    {
-      if (dim <= m_min || dim >= m_max)
-      {
-        return m_all;
-      }
-
-      return m_context[dim - m_min - 1];
-    }
-
-    //computes this - rhs and puts the result in out
-    template <typename OutputIterator>
-    void
-    difference(const Context& rhs, OutputIterator&& out) const
-    {
-      std::set_difference(
-        m_setDims.begin(), m_setDims.end(),
-        rhs.setDims().begin(), rhs.setDims().end(),
-        std::forward<OutputIterator>(out)
-      );
-    }
-
-    private:
-    Constant m_all;
-    dimension_index m_min;
-    dimension_index m_max;
-    std::vector<Constant> m_context;
-    std::set<dimension_index> m_setDims;
-  };
-
   class ContextPerturber
   {
     public:
@@ -342,6 +286,103 @@ namespace TransLucid
     Context& m_k;
     std::vector<dimension_index> m_dims;
   };
+
+  class MinimalContext
+  {
+    private:
+
+    struct Comparator
+    {
+      bool
+      operator()
+      (
+        dimension_index dim, 
+        const std::pair<dimension_index, Constant>& p
+      )
+      const
+      {
+        return dim < p.first;
+      }
+
+      bool
+      operator()
+      (
+        const std::pair<dimension_index, Constant>& p,
+        dimension_index dim
+      )
+      const
+      {
+        return p.first < dim;
+      }
+    };
+
+    public:
+
+    MinimalContext
+    (
+      const Context& k
+    )
+    : m_all(Types::Special::create(SP_DIMENSION))
+    {
+      m_context.reserve(k.setDims().size());
+
+      for (auto d : k.setDims())
+      {
+        m_context.push_back(std::make_pair(d, k.lookup(d)));
+      }
+    }
+
+    const Constant&
+    lookup(dimension_index dim) const
+    {
+      //binary search the context vector
+
+      auto iter = std::lower_bound(m_context.begin(), m_context.end(), dim,
+        Comparator()
+      );
+
+      if (iter != m_context.end() && iter->first == dim)
+      {
+        return iter->second;
+      }
+      else
+      {
+        return m_all;
+      }
+    }
+
+    #if 0
+    //computes this - rhs and puts the result in out
+    template <typename OutputIterator>
+    void
+    difference(const Context& rhs, OutputIterator&& out) const
+    {
+      std::set_difference(
+        m_setDims.begin(), m_setDims.end(),
+        rhs.setDims().begin(), rhs.setDims().end(),
+        std::forward<OutputIterator>(out)
+      );
+    }
+    #endif
+
+    //perturbs with p the things in this not in k
+    void
+    perturbDifference(ContextPerturber& p, Context& k) const
+    {
+      for (auto& pair : m_context)
+      {
+        if (!k.has_entry(pair.first))
+        {
+          p.perturb(pair.first, pair.second);
+        }
+      }
+    }
+
+    private:
+    Constant m_all;
+    std::vector<std::pair<dimension_index, Constant>> m_context;
+  };
+
 }
 
 #endif

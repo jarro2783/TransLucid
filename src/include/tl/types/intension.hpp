@@ -60,16 +60,9 @@ namespace TransLucid
       // k_a \dagger (k_a - m_k) \dagger (m_k <| {\rho, m_scope})
 
       //make this more efficient
-      std::vector<dimension_index> difference;
-
-      m_k.difference(k_a, std::back_inserter(difference));
-
       ContextPerturber p(k_a); 
 
-      for (auto d : difference)
-      {
-        p.perturb(d, m_k.lookup(d));
-      }
+      m_k.perturbDifference(p, k_a);
 
       for (auto d : m_scope)
       {
