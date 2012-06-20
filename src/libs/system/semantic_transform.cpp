@@ -42,33 +42,19 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   std::vector<dimension_index> myLin;
   
   //generate new label
-  dimension_index label = m_system.nextWhere();
-  w.myDim = label;
+  mpz_class label = m_system.nextWhere();
+  w.myLabel = label;
 
-  //store L_out
-  //visit children variables
-  m_Lout.push_back(label);
-
-  //L_in is all of the inner where clauses 
-  //apply_visitor(*this, e.e);
-
-  m_Lin.clear();
   for (const auto& evar : e.vars)
   {
     //expr
-    m_Lin.clear();
     Tree::Expr varExpr = apply_visitor(*this, std::get<3>(evar));
-    myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
     //guard
-    m_Lin.clear();
     Tree::Expr guardExpr = apply_visitor(*this, std::get<1>(evar));
-    myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
     //boolean
-    m_Lin.clear();
     Tree::Expr booleanExpr = apply_visitor(*this, std::get<2>(evar));;
-    myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
 
     auto newEqn = Parser::Equation
       (
@@ -84,16 +70,10 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     );
 
     w.vars.push_back(newEqn);
-
-    m_Lin.clear();
   }
 
   //visit child E
   Tree::Expr expr = apply_visitor(*this, e.e);
-  myLin.insert(myLin.end(), m_Lin.begin(), m_Lin.end());
-
-  //we have now fully computed the where clause's L_in
-  w.Lin = myLin;
 
   //rewrite E to
   //E @ [d_i <- E_i, Lin_i <- 0] @ [l <- #l + 1]
@@ -158,7 +138,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     Tree::LambdaAppExpr(
       Tree::LambdaAppExpr(
         Tree::IdentExpr(U"Cons"),
-        Tree::DimensionExpr(label)
+        label
       ),
       Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
     );
@@ -177,13 +157,6 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 
   //we return the rewritten E and add the variables to the list of variables
   //to add to the system
-
-  //also add ourselves to the L_in to return
-  myLin.push_back(label);
-  m_Lin = std::move(myLin);
-
-  //restore L_out
-  m_Lout.pop_back();
 
   return w;
 }

@@ -42,6 +42,17 @@ B @ [a <- 1, b <- 1, c <- 0] ;;
 B @ [a <- 1, b <- 1, c <- 1] ;;
 
 $$%%
+
+mm;;
+default₂;;
+rotate;;
+tournamentOp₁;;
+tournamentOp₁.a.5.plus A @ [b <- 3];;
+default₂.a.0.(m-1).b.0.(p-1).0 A @ [a <- 0, b <- 0] ;;
+default₂.a.0.(m-1).b.0.(p-1).0 A @ [a <- 0, b <- 0] ;;
+default₂.a.0.(p-1).b.0.(n-1).0 B @ [a <- 0, b <- 0, c <- 0] ;;
+
+$$%%
 C @ [a <- 0, b <- 0] ;;
 C @ [a <- 0, b <- 1] ;;
 C @ [a <- 1, b <- 0] ;;

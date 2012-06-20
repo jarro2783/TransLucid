@@ -63,7 +63,15 @@ Context::restore(const Tuple& t)
   {
     auto index = makeIndex(v.first);
     m_context[index].second.pop();
-    m_context[index].first = m_context[index].second.top();
+
+    if (!m_context[index].second.empty())
+    {
+      m_context[index].first = m_context[index].second.top();
+    }
+    else
+    {
+      m_context[index].first = m_all;
+    }
   }
 }
 

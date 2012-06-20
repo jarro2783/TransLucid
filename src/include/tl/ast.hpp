@@ -769,9 +769,7 @@ namespace TransLucid
         std::tuple<u32string, Expr, Expr, Expr>
       > vars;
 
-      dimension_index myDim;
-      std::vector<dimension_index> Lin;
-      std::vector<dimension_index> Lout;
+      mpz_class myLabel;
       std::vector<size_t> whichDims;
     };
 

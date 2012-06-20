@@ -34,7 +34,7 @@ where
   dim dʹ <- 0 ;;
   var Xʹ = default₁.d.0.n.infty X ;;
   var Y  = fby.t (fby.dʹ Xʹ infty)
-           (merge.dʹ (firstOfPair.d Y) (secondOfPair.d Y)) ;;
+           (merge.dʹ (LofPair.d Y) (RofPair.d Y)) ;;
 end ;;
 
 dim a ;;
