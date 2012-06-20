@@ -1528,15 +1528,7 @@ add_file_io(System& s)
 void
 add_one_base_function(System& s, const u32string& name, BaseFunctionType* fn)
 {
-  std::unique_ptr<BangAbstractionWS> 
-    op(new BangAbstractionWS(fn->clone()));
-
-  //add equation fn.op_name = bang abstraction workshop with fn.fn
-  //s.addEquation(name, op.get());
-
   s.addHostFunction(name, fn, fn->arity());
-
-  op.release();
 }
 
 inline
