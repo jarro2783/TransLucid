@@ -34,7 +34,9 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
     Parser::FnDecl
     {
       U"print",
-      {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
+      //I think clang is broken, this should work without the next line
+      std::vector<std::pair<Parser::FnDecl::ArgType, u32string>>
+        {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
       //gcc 4.7.0 appears to be broken
       //Tree::TupleExpr({{Tree::IdentExpr(U"c"), Tree::IdentExpr(type)}}),
       Tree::TupleExpr(Tree::TupleExpr::TuplePairs
@@ -49,6 +51,8 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
     Parser::FnDecl
     {
       U"print_typename",
+      //I think clang is broken, this should work without the next line
+      std::vector<std::pair<Parser::FnDecl::ArgType, u32string>>
       {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
       //same here
       //Tree::TupleExpr({{Tree::IdentExpr(U"c"), Tree::IdentExpr(type)}}),
@@ -69,6 +73,8 @@ addConstructor(System& s, const u32string& type, const u32string& basefn)
     Parser::FnDecl
     {
       U"construct_literal",
+      //I think clang is broken, this should work without the next line
+      std::vector<std::pair<Parser::FnDecl::ArgType, u32string>>
       {
         {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"t"},
         {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"v"}

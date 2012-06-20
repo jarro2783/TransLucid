@@ -105,6 +105,8 @@ namespace TransLucid
       Parser::FnDecl
       {
         U"fint" + op,
+        //I think clang is broken, this should work without the next line
+        std::vector<std::pair<Parser::FnDecl::ArgType, u32string>>
         {
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"is_signed"}
@@ -129,6 +131,8 @@ namespace TransLucid
       Parser::FnDecl
       {
         U"float" + op,
+        //I think clang is broken, this should work without the next line
+        std::vector<std::pair<Parser::FnDecl::ArgType, u32string>>
         {
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
         },

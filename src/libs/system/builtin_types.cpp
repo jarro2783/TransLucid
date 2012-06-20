@@ -415,7 +415,7 @@ namespace TransLucid
         &Types::BaseFunction::equality,
         &Types::BaseFunction::hash,
         &delete_ptr<BaseFunctionType>,
-        //&less_false
+        &less_false
       };
 
     TypeFunctions value_function_type_functions =

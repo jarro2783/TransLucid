@@ -149,27 +149,27 @@ namespace TransLucid
       typedef typename std::function<Constant(Args...)> type;
     };
 
-    template <size_t N, size_t... Args>
+    template <int N, int... Args>
     struct n_args_caller : public n_args_caller<N-1, N, Args...>
     {
     };
 
-    template <size_t... Args>
-    struct n_args_caller<-1, Args...>
+    template <int... Args>
+    struct n_args_caller<0, Args...>
     {
       template <typename F>
       Constant 
       operator()(F f, const std::vector<Constant>& args)
       {
-        return f(args.at(Args)...);
+        return f(args.at(Args-1)...);
       }
     };
 
-    template <size_t N, typename F>
+    template <int N, typename F>
     Constant 
     call_n_args(F f, const std::vector<Constant>& args)
     {
-      return n_args_caller<N-1>()(f, args);
+      return n_args_caller<N>()(f, args);
     }
 
     template <size_t N>
@@ -381,7 +381,7 @@ namespace TransLucid
   class BangAbstractionWS : public WS
   {
     public:
-    constexpr BangAbstractionWS(BaseFunctionType* fn)
+    BangAbstractionWS(BaseFunctionType* fn)
     : m_fn(fn)
     {
     }
