@@ -1401,14 +1401,16 @@ namespace TransLucid
         System* system,
         WS* ws, 
         std::vector<Constant> binds,
-        const std::vector<dimension_index>& scope,
+        std::vector<dimension_index> scope,
         Context& k
       )
       {
         ConstantPointerValue* p =
           new ConstantPointerValue(
             &workshop_type_functions,
-            new IntensionType(system, const_cast<WS*>(ws), binds, scope, k));
+            new IntensionType(system, const_cast<WS*>(ws), 
+              std::move(binds), 
+              std::move(scope), k));
 
         return Constant(p, TYPE_INDEX_INTENSION);
       }

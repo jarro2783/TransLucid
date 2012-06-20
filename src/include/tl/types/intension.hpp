@@ -33,14 +33,14 @@ namespace TransLucid
     (
       System* system,
       WS* ws, 
-      const std::vector<Constant> binds,
-      const std::vector<dimension_index>& scope,
+      std::vector<Constant> binds,
+      std::vector<dimension_index> scope,
       Context& k
     )
     : m_system(system)
     , m_ws(ws)
-    , m_binds(binds)
-    , m_scope(scope)
+    , m_binds(std::move(binds))
+    , m_scope(std::move(scope))
     , m_k(k)
     {
     }
@@ -101,7 +101,7 @@ namespace TransLucid
         System* system,
         WS* ws, 
         std::vector<Constant> binds,
-        const std::vector<dimension_index>& scope,
+        std::vector<dimension_index> scope,
         Context& k
       );
 
