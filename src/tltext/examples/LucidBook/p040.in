@@ -1,0 +1,46 @@
+// Page 040 from Lucid, the Dataflow Programming Language.
+// Compute the n-th prime, using functions.
+
+// primeno(100)
+// where
+//   primeno(I) = if I eq 1
+//                then 2
+//                else nextprime(primeno(I - 1)) fi;
+//   nextprime(Q) = if isprime(Q + 1)
+//                  then Q + 1
+//                  else nextprime(Q + 1) fi;
+//   isprime(P ) = nodivsgt(2)
+//   where
+//     nodivsgt(k) = k * k > P or P mod k ne 0 and nodivsgt(k + 1) ;
+//   end;
+// end
+
+// Define the functions.
+
+// n-th prime number, starting from 0.
+fun primeno.n =
+  if n == 0 then 2 else nextprime.(primeno.(n - 1)) fi;;
+
+// Next prime greater than p.
+fun nextprime.p =
+  if isprime.(p + 1) then p + 1 else nextprime.(p + 1) fi;;
+
+// True if n is prime.
+fun isprime.n = nodivsgt.2.n ;;
+
+// True if there are no divisors of n greater than k.
+fun nodivsgt.k.n =
+  ((k * k) > n) || ((n % k) != 0) && (nodivsgt.(k + 1).n) ;;
+
+// Test the functions.
+
+%%
+primeno.0 ;;
+primeno.1 ;;
+primeno.2 ;;
+primeno.3 ;;
+primeno.4 ;;
+primeno.5 ;;
+primeno.6 ;;
+$$%%
+primeno.100 ;;

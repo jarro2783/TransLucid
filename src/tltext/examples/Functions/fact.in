@@ -1,0 +1,40 @@
+// Factorial function, calculated using tournament computation.
+// The variable f varies with respect to dimensions t and d,
+// effectively creating a computation tree.  For example,
+// to compute the factorial of 3, the variable f becomes
+//    d
+//  t 1 1 2 3 1 1 ...
+//    1 6 1 1 1 1 ...
+//    6 1 1 1 1 1 ...
+// and the answer is 6, picked up when t=2 and d=0.
+//
+// Similarly, for the factorial of 6, f becomes
+//      d
+//  t   1   1   2   3   4   5   6   1   1 ...
+//      1   6  20   6   1   1   1   1   1 ...
+//      6 120   1   1   1   1   1   1   1 ...
+//    720   1   1   1   1   1   1   1   1 ...
+// and the answer is 720, picked up when t=3 and d=0.
+//
+// When t = 0, the value of f is a d-stream such that f is
+// the current d-index if it is between 1 to n, and 1 otherwise.
+// When t > 0, the value of f is a d-stream such that f is
+// the product of pairs from the (t-1) d-stream.
+
+fun fact.n = f
+where
+  dim d <- 0 ;;
+  var f = tournamentOp₁.d.n.times (default₁.d.1.n.1 (#!d)) ;;
+end ;;
+
+// We test the factorial function on inputs 0 through 8.
+%%
+fact.0 ;;
+fact.1 ;;
+fact.2 ;;
+fact.3 ;;
+fact.4 ;;
+fact.5 ;;
+fact.6 ;;
+fact.7 ;;
+fact.8 ;;

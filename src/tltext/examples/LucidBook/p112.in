@@ -1,0 +1,58 @@
+// Page 112 from Lucid, the Dataflow Programming Language.
+// Program which approximates the base-ten logarithm
+// of a float x such that 1 < x < 10.
+
+// midlog asa abs(mid - X) < 0.0001
+// where
+//   X is current X;
+//   low = 1 fby if X < mid then low else mid fi;
+//   hi = 10 fby if X < mid then mid else hi fi;
+//   mid = a asa err < 0.0001
+//   where
+//     S is current low * hi ;
+//     a = S/2 fby (a + S/a)/2;
+//     err = abs(S - a * a);
+//   end;
+//   lowlog = 0 fby if X < mid then lowlog else midlog fi;
+//   hilog = 1 fby if X < mid then midlog else hilog fi;
+//   midlog = (lowlog + hilog)/2;
+// end
+
+// Name the float constants being used below.
+
+var float₀ = floatmp"0.0" ;;
+var float₁ = floatmp"1.0" ;;
+var float₂ = floatmp"2.0" ;;
+var float₁₀ = floatmp"10.0" ;;
+var precision = floatmp"0.5" ;;
+
+// Define the functions.
+
+// Aproximation of square root of x.
+fun ourmid.x = asa.d a (err < precision) 
+where
+  dim d <- 0 ;;
+  var a = fby.d (x / float₂) ((a + x / a) / float₂) ;;
+  var err = abs.(x - a * a) ;;
+end ;;
+
+// Aproximation of base-ten logarithm of x.
+fun ourlog.x = asa.d midlog (abs.(mid - x) < precision) 
+where
+  dim d <- 0 ;;
+  var low = fby.d float₁ (if x < mid then low else mid fi) ;;
+  var hi = fby.d float₁₀ (if x < mid then mid else hi fi) ;;
+  var mid = ourmid.(low * hi) ;;
+  var lowlog = fby.d float₀ (if x < mid then lowlog else midlog fi) ;;
+  var hilog = fby.d float₁ (if x < mid then midlog else hilog fi) ;;
+  var midlog = (lowlog + hilog) / float₂ ;;
+end ;;
+
+// Test the functions.
+
+%%
+
+ourmid.floatmp"0.50" ;;
+ourmid.floatmp"0.75" ;;
+$$%%
+ourlog.floatmp"8.0" ;;

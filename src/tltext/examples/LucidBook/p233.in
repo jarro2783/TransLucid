@@ -1,0 +1,36 @@
+// Page 233 from Lucid, the Dataflow Programming Language.
+// Lambda Lucid example, stream of power functions.
+
+// outputs the stream 1, 9, 125, ... (= 1¹, 3², 5³, ...)
+// pow(odd)
+// where
+//   pow = \x : x fby \x : x * pow (x);
+//   odd = 1 fby odd + 2;
+// end
+// 
+// // outputs 1, 27, 625, ... (= 1² , 3³ , 5⁴ ,...) 
+// (next pow) (odd)
+// where
+//   pow = \x : x fby \x : x * pow(x);
+//   odd = 1 fby odd + 2;
+// end
+
+// Define the d-streams.
+
+dim d ;;
+var odd = fby.d 1 (odd + 2) ;;
+var pow = fby.d (\x -> x) (\ {d} x -> x * pow.x) ;;
+
+// Test the d-streams.
+
+%%
+pow.odd @ [d <- 0] ;;
+pow.odd @ [d <- 1] ;;
+pow.odd @ [d <- 2] ;;
+pow.odd @ [d <- 3] ;;
+
+$$%%
+(next.d pow).odd @ [d <- 0] ;;
+(next.d pow).odd @ [d <- 1] ;;
+(next.d pow).odd @ [d <- 2] ;;
+(next.d pow).odd @ [d <- 3] ;;

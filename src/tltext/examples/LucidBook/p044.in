@@ -1,0 +1,91 @@
+// Page 044 from Lucid, the Dataflow Programming Language.
+// Permutations of a list.
+
+// perms([a b c d])
+// where
+//   perms(L) = if L eq []
+//              then [[]]
+//              else allinserts(hd(L), perms(tl(L)))
+//              fi;
+//   allinserts(x, J) = if J eq []
+//                      then []
+//                      else inserts(x, hd(J)) <> allinserts(x, tl(J))
+//                      fi;
+//   inserts(x, M) = if M eq []
+//                   then [%[% x %]%]
+//                   else (X :: M) :: h(hd(M), inserts(x, tl(M)))
+//                     where
+//                       h(m, K) = if K eq []
+//                                 then []
+//                                 else (m :: hd(K)) :: h(m, tl(K))
+//                                 fi;
+//                     end
+//                   fi;
+// end
+
+
+// Define the functions for permutations.
+// We write llist for a list of lists.
+
+// The llist of all permutations of list l.
+fun perms.l =
+  if isNil.l then Cons.Nil.Nil
+  else allInserts.(head.l).(perms.(tail.l)) fi ;;
+
+// The llist created by inserting x into every one of the lists
+// in the existing permutations in llist L.
+fun allInserts.x.L =
+  if isNil.L then Nil
+  else inserts.x.(head.L) <> allInserts.x.(tail.L) fi ;; 
+
+// The llist created by placing x in all possible slots in list l.
+fun inserts.x.l =
+  if isNil.l then ((x :: Nil) :: Nil)
+  else (x :: l) :: addNewHead.(head.l).(inserts.x.(tail.l)) fi ;;
+
+// The llist created by adding x to the head of all lists in llist L.
+fun addNewHead.x.L = 
+  if isNil.L then Nil
+  else (x :: head.L) :: (addNewHead.x.(tail.L)) fi ;;
+
+
+// Test functions on various inputs.
+
+%%
+head.((1::Nil) <> (2::Nil)) ;;         // Should be 1
+head.(tail.((1::Nil) <> (2::Nil))) ;;  // Should be 2
+head.((1::Nil) <> Nil) ;;              // Should be 1
+head.(Nil <> (2::Nil)) ;;              // Should be 2
+isNil.(Nil) ;;                         // Should be true
+isNil.(1::Nil) ;;                      // Should be false
+isList.(Nil) ;;                        // Should be true
+isList.(1::Nil) ;;                     // Should be true
+length.(Nil) ;;                        // Should be 0
+length.(1::Nil) ;;                     // Should be 1
+length.(1::2::Nil) ;;                  // Should be 2
+$$%%
+perms.Nil ;;
+$$%%
+perms.(1::Nil) ;;
+$$%%
+perms.(1::2::Nil) ;;
+$$%%
+perms.(1::2::3::Nil) ;;
+$$%%
+perms.(1::2::3::4::Nil) ;;
+$$%%
+length.(head.(perms.(1::Nil))) ;;
+$$%%
+length.(head.(perms.(1::2::Nil))) ;;
+$$%%
+length.(head.(perms.(1::2::3::Nil))) ;;
+$$%%
+length.(head.(perms.(1::2::3::4::Nil))) ;;
+$$%%
+length.(perms.(1::Nil)) ;;
+$$%%
+length.(perms.(1::2::Nil)) ;;
+$$%%
+length.(perms.(1::2::3::Nil)) ;;
+$$%%
+length.(perms.(1::2::3::4::Nil)) ;;
