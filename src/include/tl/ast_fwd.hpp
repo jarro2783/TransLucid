@@ -39,28 +39,28 @@ namespace TransLucid
 
   namespace Tree
   {
-    class nil;
-    class LiteralExpr;
-    class DimensionExpr;
-    class IdentExpr;
-    class HashSymbol;
-    class ParenExpr;
-    class UnaryOpExpr;
-    class BinaryOpExpr;
-    class MakeIntenExpr;
-    class EvalIntenExpr;
-    class HashExpr;
-    class BaseAbstractionExpr;
-    class TupleExpr;
-    class IfExpr;
-    class AtExpr;
-    class LambdaExpr;
-    class PhiExpr;
-    class BangAppExpr;
-    class LambdaAppExpr;
-    class PhiAppExpr;
-    class WhereExpr;
-    class ConditionalBestfitExpr;
+    struct nil;
+    struct LiteralExpr;
+    struct DimensionExpr;
+    struct IdentExpr;
+    struct HashSymbol;
+    struct ParenExpr;
+    struct UnaryOpExpr;
+    struct BinaryOpExpr;
+    struct MakeIntenExpr;
+    struct EvalIntenExpr;
+    struct HashExpr;
+    struct BaseAbstractionExpr;
+    struct TupleExpr;
+    struct IfExpr;
+    struct AtExpr;
+    struct LambdaExpr;
+    struct PhiExpr;
+    struct BangAppExpr;
+    struct LambdaAppExpr;
+    struct PhiAppExpr;
+    struct WhereExpr;
+    struct ConditionalBestfitExpr;
 
    /**
      * Abstract syntax tree node. A single expression node in the 
@@ -97,8 +97,8 @@ namespace TransLucid
       recursive_wrapper<ConditionalBestfitExpr>
     > Expr;
 
-    class BinaryOperator;
-    class UnaryOperator;
+    struct BinaryOperator;
+    struct UnaryOperator;
   }
 
   namespace Parser

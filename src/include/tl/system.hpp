@@ -52,7 +52,7 @@ namespace TransLucid
   namespace Parser
   {
     class Parser;
-    class FnDecl;
+    struct FnDecl;
 
     class LexerIterator;
   }

@@ -26,6 +26,8 @@ set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 include(GettextTranslate)
 
+include(CheckCXXCompilerFlag)
+
 enable_testing()
 
 execute_process(COMMAND
@@ -47,7 +49,12 @@ find_package(PkgConfig REQUIRED)
 
 set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
 
-set(TLCFLAGS -Wall -Wno-unused-local-typedefs -std=gnu++11 
+CHECK_CXX_COMPILER_FLAG(-Wno-unused-local-typedefs HAS_NO_UNUSED_LOCAL)
+if (HAS_NO_UNUSED_LOCAL)
+  set(W_NO_UNUSED_LOCAL -Wno-unused-local-typedefs)
+endif()
+
+set(TLCFLAGS -Wall ${W_NO_UNUSED_LOCAL} -std=gnu++11 
   -DPACKAGE_VERSION=\"${VERSION}\"
   -DHAVE_CONFIG_H)
 
