@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 
   init_gettext();
 
-  //setSignals();
+  setSignals();
 
   //void (*foo)() = nullptr;
   //(*foo)();
