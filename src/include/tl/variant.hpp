@@ -567,7 +567,7 @@ namespace TransLucid
   typename Visitor::result_type
   apply_visitor(Visitor& visitor, Visitable& visitable, Args&&... args)
   {
-    return visitable.apply_visitor<false_>
+    return visitable.template apply_visitor<false_>
       (visitor, std::forward<Args>(args)...);
   }
 
@@ -575,7 +575,7 @@ namespace TransLucid
   typename Visitor::result_type
   apply_visitor(const Visitor& visitor, Visitable& visitable, Args&&... args)
   {
-    return visitable.apply_visitor<false_>
+    return visitable.template apply_visitor<false_>
       (visitor, std::forward<Args>(args)...);
   }
 

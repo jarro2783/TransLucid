@@ -415,7 +415,7 @@ namespace TransLucid
         &Types::BaseFunction::equality,
         &Types::BaseFunction::hash,
         &delete_ptr<BaseFunctionType>,
-        //&less_false
+        &less_false
       };
 
     TypeFunctions value_function_type_functions =
@@ -1401,14 +1401,16 @@ namespace TransLucid
         System* system,
         WS* ws, 
         std::vector<Constant> binds,
-        const std::vector<dimension_index>& scope,
+        std::vector<dimension_index> scope,
         Context& k
       )
       {
         ConstantPointerValue* p =
           new ConstantPointerValue(
             &workshop_type_functions,
-            new IntensionType(system, const_cast<WS*>(ws), binds, scope, k));
+            new IntensionType(system, const_cast<WS*>(ws), 
+              std::move(binds), 
+              std::move(scope), k));
 
         return Constant(p, TYPE_INDEX_INTENSION);
       }
@@ -1528,15 +1530,7 @@ add_file_io(System& s)
 void
 add_one_base_function(System& s, const u32string& name, BaseFunctionType* fn)
 {
-  std::unique_ptr<BangAbstractionWS> 
-    op(new BangAbstractionWS(fn->clone()));
-
-  //add equation fn.op_name = bang abstraction workshop with fn.fn
-  //s.addEquation(name, op.get());
-
   s.addHostFunction(name, fn, fn->arity());
-
-  op.release();
 }
 
 inline

@@ -33,14 +33,14 @@ namespace TransLucid
     (
       System* system,
       WS* ws, 
-      const std::vector<Constant> binds,
-      const std::vector<dimension_index>& scope,
+      std::vector<Constant> binds,
+      std::vector<dimension_index> scope,
       Context& k
     )
     : m_system(system)
     , m_ws(ws)
-    , m_binds(binds)
-    , m_scope(scope)
+    , m_binds(std::move(binds))
+    , m_scope(std::move(scope))
     , m_k(k)
     {
     }
@@ -60,16 +60,9 @@ namespace TransLucid
       // k_a \dagger (k_a - m_k) \dagger (m_k <| {\rho, m_scope})
 
       //make this more efficient
-      std::vector<dimension_index> difference;
-
-      m_k.difference(k_a, std::back_inserter(difference));
-
       ContextPerturber p(k_a); 
 
-      for (auto d : difference)
-      {
-        p.perturb(d, m_k.lookup(d));
-      }
+      m_k.perturbDifference(p, k_a);
 
       for (auto d : m_scope)
       {
@@ -108,7 +101,7 @@ namespace TransLucid
         System* system,
         WS* ws, 
         std::vector<Constant> binds,
-        const std::vector<dimension_index>& scope,
+        std::vector<dimension_index> scope,
         Context& k
       );
 

@@ -33,6 +33,8 @@ namespace TransLucid
 namespace
 {
 
+//work out function comparison
+#if 0
 bool function_less
 (
   WS* lexpr,
@@ -78,6 +80,7 @@ bool function_less
   //if we got here then they are equal
   return false;
 }
+#endif
 
 }
 

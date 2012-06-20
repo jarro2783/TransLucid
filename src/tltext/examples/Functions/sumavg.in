@@ -1,0 +1,24 @@
+// The sumavg function returns a tuple containing
+// both the running sum and the mean of an input
+// stream X varying in dimension d.  It is inspired
+// by the simultaneous definitions available in
+// Indexical Lucid, and presented in the book
+// Multidimensional Programming, by Aschroft, Faustini,
+// Jagannathan and Wadge, p.9.
+
+
+dim sum ;;
+dim avg ;;
+fun sumavg.d X = [sum <- S, avg <- S/(#!d + 1)]
+where
+  var S = fby.d X (next.d X + S) ;;
+end ;;
+
+dim a ;;
+var A = #!a ;;
+var B = sumavg.a A ;;
+
+%%
+
+(B @ [a <- 10])!sum ;;
+(B @ [a <- 10])!avg ;;

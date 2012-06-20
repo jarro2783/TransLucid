@@ -95,6 +95,7 @@ namespace std
   template <>
   struct hash<TransLucid::uuid>
   {
+    public:
     size_t operator()(const TransLucid::uuid& u) const;
   };
 }

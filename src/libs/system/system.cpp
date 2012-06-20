@@ -36,7 +36,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/constws.hpp>
 #include <tl/context.hpp>
 #include <tl/eval_workshops.hpp>
-#include <tl/function_registry.hpp>
 #include <tl/opdef.hpp>
 #include <tl/output.hpp>
 #include <tl/parser.hpp>

@@ -1,0 +1,22 @@
+// The Hamming function produces a stream containing all of the natural
+// numbers of the form 2^i3^j5^k.  The solution goes back to Gilles Kahn.
+// A stream is primed with 1, followed by the 3-way merge of multiplying
+// the stream by 2, 3 and 5.
+
+fun hamming.d = f
+where
+ var f = fby.d 1 (merge.d (hamming.d * 2)
+                          (merge.d (hamming.d * 3) (hamming.d * 5))) ;;
+end ;;
+
+dim a ;;
+var ham = hamming.a ;;
+
+%%
+
+ham @ [a <- 0] ;;
+ham @ [a <- 1] ;;
+ham @ [a <- 2] ;;
+ham @ [a <- 3] ;;
+ham @ [a <- 4] ;;
+ham @ [a <- 5] ;;

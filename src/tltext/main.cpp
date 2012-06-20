@@ -63,7 +63,7 @@ std::unique_ptr<std::ofstream> openOutput(const std::string& output)
   return os;
 }
 
-void* altstack;
+std::unique_ptr<char[]> altstack;
 
 void
 handleSignals(int signal)
@@ -85,11 +85,11 @@ setSignals()
   //overflow the stack trying to handle the stack overflow
 
   //ask for 512kB
-  altstack = malloc(512*1024);
+  altstack.reset(new char[512*1024]);
 
   stack_t ss;
 
-  ss.ss_sp = altstack;
+  ss.ss_sp = altstack.get();
   ss.ss_size = 512*1024;
   ss.ss_flags = 0;
 
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 
   init_gettext();
 
-  //setSignals();
+  setSignals();
 
   //void (*foo)() = nullptr;
   //(*foo)();

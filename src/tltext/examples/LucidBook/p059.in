@@ -1,0 +1,60 @@
+// Page 059 from Lucid, the Dataflow Programming Language.
+// Create a stream of the primes.
+
+// P
+// where
+//   nats = 1 :: bump(nats)
+//   where
+//     bump(X) = hd (X) + 1 :: bump(tl(X));
+//   end;
+//   P = 2 :: primesin tl (tl (nats))
+//   where
+//     primesin(L) = if isprime hd (L)
+//                   then hd (L) :: primesin tl (L)
+//                   else primesin tl (L) fi;
+//     isprime(n) = nodivsin(P )
+//     where
+//       nodivsin(Q) = (q * q > n) or (n mod q ne 0) and nodivsin(tl (Q))
+//       where
+//         q = hd (Q);
+//       end;
+//     end;
+//   end;
+// end
+
+// Define the streams.
+
+// d is the dimension of variance of our streams
+dim d ;;
+
+// N is the d-stream of natural numbers starting from 3.
+var N = #!d + 3;;
+
+// P is the d-stream of prime numbers.
+var P = fby.d 2 (primesin N) ;;
+
+// Define the functions.
+
+// Filter out the non-primes in d-stream Q.
+fun primesin Q = wvr.d Q (isprime.Q) ;;
+
+// True if n is prime.
+fun isprime.n = nodivsin.n P ;;
+
+// True if n has no divisors in d-stream Q.
+fun nodivsin.n Q = 
+  ((q * q) > n) || ((n % q) != 0) && (nodivsin.n (next.d Q))
+where
+  var q = first.d Q ;;
+end ;;
+
+// Test the d-stream P.
+
+%%
+P @ [d <- 0] ;;
+P @ [d <- 1] ;;
+P @ [d <- 2] ;;
+P @ [d <- 3] ;;
+P @ [d <- 4] ;;
+P @ [d <- 5] ;;
+P @ [d <- 6] ;;

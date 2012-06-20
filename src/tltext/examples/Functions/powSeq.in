@@ -1,0 +1,94 @@
+// Power sequences created through successive additions.
+// This program is presented in detail in the book
+// Multidimensional Programming, by Aschroft, Faustini,
+// Jagannathan and Wadge, pp.11-16.
+
+// The variable f varies in dimensions d and dʹ.
+// When dʹ=0, the value is always 1.
+// When dʹ=1, the d-stream always gives the current d-index.
+// When dʹ>1, the d-stream is the previous d-stream,
+// with every N-th element removed, where N is the dʹ-index.
+//
+// Examples are:
+// 0: 1   1   1   1   1   1   1   1   1 ...
+//
+// 1: 1   1   1   1   1   1   1   1   1 ...
+//    1   2   3   4   5   6   7   8   9 ...
+//
+// 2: 1   1   1   1   1   1   1   1   1 ...
+//    1   2   3   4   5   6   7   8   9 ...
+//    1   3   5   7   9  ...                Drop every 2nd
+//    1   4   9  16  25  ...
+//
+// 3: 1   1   1   1   1   1   1   1   1 ...
+//    1   2   3   4   5   6   7   8   9 ...
+//    1   2   4   5   7   8  10  11  13 ... Drop every 3rd
+//    1   3   7  12  19  27  37  48  61 ...
+//    1   7  19  37  61 ...                 Drop every 2nd
+//    1   8  27  64 125 ...
+//
+// 4: 1   1   1   1   1   1   1   1   1 ...
+//    1   2   3   4   5   6   7   8   9 ...
+//    1   2   3   5   6   7   9  10  11 ... Drop every 4th
+//    1   3   6  11  17  24  33  43  54 ...
+//    1   3  11  17  33  43  67  81 113 ... Drop every 3rd
+//    1   4  15  32  65 108 175 256 369 ...
+//    1  15  65 175 369 ...                 Drop every 2nd
+//    1  16  81 256 625 ...
+
+fun drop.d.n X = wvr.d X wanted
+where
+  var wanted = (index.d) % n != 0 ;;
+end ;;
+
+fun powSeq.d.n = f
+where
+  dim dʹ <- n ;;
+  var N = fby.dʹ (n + 1) (N - 1) ;;
+  var f = fby.dʹ 1 (runningOp.d.plus (drop.d.N f)) ;;
+end ;;
+
+// Define the sequences of 0-th, 1-th, 2-nd, 3-rd and 4-th powers.
+dim a ;;
+var A₀ = powSeq.a.0 ;;
+var A₁ = powSeq.a.1 ;;
+var A₂ = powSeq.a.2 ;;
+var A₃ = powSeq.a.3 ;;
+var A₄ = powSeq.a.4 ;;
+
+// Test the sequences.
+
+%%
+
+A₀ @ [a <- 0] ;;
+A₀ @ [a <- 1] ;;
+A₀ @ [a <- 2] ;;
+A₀ @ [a <- 3] ;;
+
+$$ %%
+
+A₁ @ [a <- 0] ;;
+A₁ @ [a <- 1] ;;
+A₁ @ [a <- 2] ;;
+A₁ @ [a <- 3] ;;
+
+$$ %%
+
+A₂ @ [a <- 0] ;;
+A₂ @ [a <- 1] ;;
+A₂ @ [a <- 2] ;;
+A₂ @ [a <- 3] ;;
+
+$$ %%
+
+A₃ @ [a <- 0] ;;
+A₃ @ [a <- 1] ;;
+A₃ @ [a <- 2] ;;
+A₃ @ [a <- 3] ;;
+
+$$ %%
+
+A₄ @ [a <- 0] ;;
+A₄ @ [a <- 1] ;;
+A₄ @ [a <- 2] ;;
+A₄ @ [a <- 3] ;;

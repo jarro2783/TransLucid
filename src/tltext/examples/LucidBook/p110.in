@@ -1,0 +1,48 @@
+// Page 110 from Lucid, the Dataflow Programming Language.
+// Power program.
+
+// p asa i eq N
+// where
+//   N is current n;
+//   X is current x;
+//   i = 0 fby i + 1;
+//   p = 1 fby X * p;
+// end
+
+// Define the function.
+
+// n-th power of x.
+fun pow.x.n = asa.d p (#!d == n)
+where
+  dim d <- 0 ;;
+  var p = fby.d 1 (x * p) ;;
+end ;;
+
+// Test the functions
+
+%%
+pow.1.0 ;;
+pow.1.1 ;;
+pow.1.2 ;;
+pow.1.3 ;;
+$$%%
+pow.2.0 ;;
+pow.2.1 ;;
+pow.2.2 ;;
+pow.2.3 ;;
+$$%%
+pow.3.0 ;;
+pow.3.1 ;;
+pow.3.2 ;;
+pow.3.3 ;;
+$$%%
+pow.4.0 ;;
+pow.4.1 ;;
+pow.4.2 ;;
+pow.4.3 ;;
+$$%%
+pow.5.0 ;;
+pow.5.1 ;;
+pow.5.2 ;;
+pow.5.3 ;;
+

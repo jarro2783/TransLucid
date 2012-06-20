@@ -1,0 +1,95 @@
+// Merge sort.  This program uses three dimensions.
+// In direction d, elements 0 through n of X count.
+// Variable Xʹ is X followed by ∞ in the d direction.
+// When t=0, Y is Xʹ followed by ∞ in the dʹ direction.
+// When t>0, Y is the pairwise merge of Y from t-1.
+// When t=ilog.n, then we transform Y's dʹ-variance into d-variance.
+
+// Example: Here is variable Y for the input X = 0 3 2 7 ...
+//
+// t=0:
+//        ∞   ∞   ∞   ∞   ∞
+//   dʹ  0   3   2   7  ∞
+//       d
+//
+// t=1:
+//         ∞   ∞   ∞
+//        3   7   ∞
+//   dʹ  0   2   ∞
+//       d
+//
+// t=2:
+//           ∞   ∞
+//          7   ∞
+//         3   ∞
+//        2   ∞
+//   dʹ  0   ∞
+//       d
+//
+// The final result is then 0 2 3 7 ...
+
+fun sort.d.n X = rotate.dʹ.d (first.d Y)
+where
+  dim t  <- ilog.n ;;
+  dim dʹ <- 0 ;;
+  var Xʹ = default₁.d.0.n.infty X ;;
+  var Y  = fby.t (fby.dʹ Xʹ infty)
+           (merge.dʹ (LofPair.d Y) (RofPair.d Y)) ;;
+end ;;
+
+dim a ;;
+var A = #!a * 3 ;;
+var B = #!a * 5 ;;
+var Aʹ = default₁.a.0.2.infty A ;;
+var Bʹ = default₁.a.0.2.infty B ;;
+var C = merge.a Aʹ Bʹ ;;
+var D = if #!a % 2 == 0 then #!a else 2 * #!a + 1 fi ;;
+var E = sort.a.3 D ;;
+
+%%
+
+Aʹ @ [a <- 0] ;;
+Aʹ @ [a <- 1] ;;
+Aʹ @ [a <- 2] ;;
+Aʹ @ [a <- 3] ;;
+Aʹ @ [a <- 4] ;;
+Aʹ @ [a <- 5] ;;
+Aʹ @ [a <- 6] ;;
+Aʹ @ [a <- 7] ;;
+
+$$%%
+
+Bʹ @ [a <- 0] ;;
+Bʹ @ [a <- 1] ;;
+Bʹ @ [a <- 2] ;;
+Bʹ @ [a <- 3] ;;
+Bʹ @ [a <- 4] ;;
+Bʹ @ [a <- 5] ;;
+Bʹ @ [a <- 6] ;;
+Bʹ @ [a <- 7] ;;
+
+$$%%
+
+C @ [a <- 0] ;;
+C @ [a <- 1] ;;
+C @ [a <- 2] ;;
+C @ [a <- 3] ;;
+C @ [a <- 4] ;;
+C @ [a <- 5] ;;
+C @ [a <- 6] ;;
+C @ [a <- 7] ;;
+
+$$%%
+
+D @ [a <- 0] ;;
+D @ [a <- 1] ;;
+D @ [a <- 2] ;;
+D @ [a <- 3] ;;
+
+$$%%
+
+E @ [a <- 0] ;;
+E @ [a <- 1] ;;
+E @ [a <- 2] ;;
+E @ [a <- 3] ;;
+E @ [a <- 4] ;;

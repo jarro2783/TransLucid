@@ -1,0 +1,34 @@
+// Page 123 from Lucid, the Dataflow Programming Language.
+// Stream of Hamming numbers.
+
+// h
+// where
+//   h = 1 fby merge(merge(2 * h, 3 * h), 5 * h);
+//   merge(x, y) = if xx <= yy then xx else yy fi
+//   where
+//     xx = x upon xx <= yy;
+//     yy = y upon yy <= xx;
+//   end
+// end
+
+// Define the d-stream h.
+
+dim d ;;
+var h = fby.d 1 (merge.d (merge.d (2 * h) (3 * h)) (5 * h)) ;;
+
+// Test the d-stream h.
+
+%%
+h @ [d <- 0] ;;
+$$%%
+h @ [d <- 1] ;;
+$$%%
+h @ [d <- 2] ;;
+$$%%
+h @ [d <- 3] ;;
+$$%%
+h @ [d <- 4] ;;
+$$%%
+h @ [d <- 5] ;;
+$$%%
+h @ [d <- 6] ;;

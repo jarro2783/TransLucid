@@ -481,7 +481,8 @@ MakeIntenWS::operator()(Context& k)
     binds.push_back((*b)(k));
   }
 
-  return Types::Intension::create(&m_system, m_rhs, binds, m_scope, k);
+  return Types::Intension::create(&m_system, m_rhs, std::move(binds), 
+    m_scope, k);
 }
 
 Constant

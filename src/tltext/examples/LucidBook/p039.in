@@ -1,0 +1,57 @@
+// Page 039 from Lucid, the Dataflow Programming Language.
+// Fast power function, distinguishing between even and odd powers.
+
+// pow(B, E)
+// where
+//   evenpow(x, n) = pow(x * x, n/2);
+//   oddpow(x, m) = x * evenpow(x, m - 1);
+//   pow(x, n) = if n eq 0 then 1
+//               elseif odd(n) then oddpow(x, n)
+//               else evenpow(x, n)
+//               fi;
+// end
+
+// Define the functions.
+
+// True if n is odd.
+fun odd.n       = n % 2 == 1 ;;
+
+// n-th power of x, n even.
+fun evenpow.x.n = pow.(x * x).(n / 2) ;;
+
+// n-th power of x, n odd.
+fun oddpow.x.n  = x * evenpow.x.(n - 1) ;;
+
+// n-th power of x.
+fun pow.x.n     = if n == 0 then 1
+                  elsif odd.n then oddpow.x.n
+                  else evenpow.x.n
+                  fi ;;
+
+// Test the functions.
+
+%%
+pow.1.0 ;;
+pow.2.0 ;;
+pow.3.0 ;;
+pow.4.0 ;;
+pow.1.1 ;;
+pow.2.1 ;;
+pow.3.1 ;;
+pow.4.1 ;;
+pow.1.2 ;;
+pow.2.2 ;;
+pow.3.2 ;;
+pow.4.2 ;;
+pow.1.3 ;;
+pow.2.3 ;;
+pow.3.3 ;;
+pow.4.3 ;;
+pow.1.10 ;;
+pow.2.10 ;;
+pow.3.10 ;;
+pow.4.10 ;;
+pow.1.25 ;;
+pow.2.25 ;;
+pow.3.25 ;;
+pow.4.25 ;;

@@ -1,0 +1,57 @@
+// Page 128 from Lucid, the Dataflow Programming Language.
+// Prime numbers, by taking complement of composite numbers.
+
+// This program is not correct, the previous version worked better.
+// prime
+// where
+//   prime = complement(composite);
+//   composite = pm(2 fby next prime)
+//   where
+//     pm(x) = (2 * first x) fby merge(i * first x, pm(next x))
+//     where
+//       i = 3 fby i + 1;
+//     end;
+//     n = 2 fby n + 1;
+//   end;
+//   complement(x) = i whenever i ne X
+//   where
+//     X = x upon i eq X;
+//     i = 2 fby i + 1;
+//   end;
+//   merge(x, y) = if xx <= yy then xx else yy fi
+//   where
+//     xx = x upon xx <= yy;
+//     yy = y upon yy <= xx ;
+//   end;
+// end
+ 
+// Define the d-streams.
+
+dim d ;;
+var prime = complement composite ;;
+var composite = pm (fby.d 2 (next.d prime)) ;;
+
+// Define the functions.
+
+// d-stream of naturals not in d-stream X.
+fun complement X = wvr.d I₂ (I₂ != Xʹ) 
+where
+  var Xʹ = upon.d X (I₂ == Xʹ) ;;
+  var I₂ = #!d + 2 ;;
+end ;;
+
+// d-stream of multiples of elements of d-stream X.
+fun pm X =
+    fby.d (2 * X) (merge.d (I₃ * first.d X) (pm (next.d X)))
+where
+  var I₃ = #!d + 3 ;;
+end ;;
+
+// Test the functions.
+
+%%
+prime @ [d <- 0] ;;
+prime @ [d <- 1] ;;
+prime @ [d <- 2] ;;
+prime @ [d <- 3] ;;
+prime @ [d <- 4] ;;

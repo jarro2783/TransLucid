@@ -1,0 +1,64 @@
+// Page 111 from Lucid, the Dataflow Programming Language.
+// Power program using repeated squaring.
+
+// prod(if odd(k) then p else 1 fi) asa k eq 0
+// where
+//   N is current n;
+//   X is current x;
+//   p = X fby p * p;
+//   k = N fby k div 2;
+//   prod(c) = y
+//   where
+//     y = 1 fby y * c;
+//   end;
+//   odd(i) = i mod 2 eq 1;
+// end
+
+// Define the functions.
+
+// Running product of d-stream X.
+fun prod.d X = Y 
+where
+  var Y = fby.d 1 (Y * X) ;;
+end ;;
+
+// True if n is odd.
+fun odd.n = n % 2 == 1 ;;
+
+// n-th power of x.
+fun pow.x.n =
+    asa.d (prod.d (if odd.K then P else 1 fi)) (K == 0) 
+where
+  dim d <- 0 ;;
+  var P = fby.d x (P * P) ;;
+  var K = fby.d n (K / 2) ;;
+end ;;
+
+%%
+pow.1.0 ;;
+pow.1.1 ;;
+pow.1.2 ;;
+pow.1.3 ;;
+$$%%
+pow.2.0 ;;
+pow.2.1 ;;
+pow.2.2 ;;
+pow.2.3 ;;
+$$%%
+pow.3.0 ;;
+pow.3.1 ;;
+pow.3.2 ;;
+pow.3.3 ;;
+$$%%
+pow.4.0 ;;
+pow.4.1 ;;
+pow.4.2 ;;
+pow.4.3 ;;
+$$%%
+pow.5.0 ;;
+pow.5.1 ;;
+pow.5.2 ;;
+pow.5.3 ;;
+
+
+

@@ -56,36 +56,22 @@ Context::Context(const Tuple& k)
   }
 }
 
-const Constant&
-Context::lookup(dimension_index dim) const
-{
-  if (dim <= m_min || dim >= m_max)
-  {
-    return m_all;
-  }
-  else
-  {
-    const auto& s = m_context[makeIndex(dim)];
-
-    if (s.empty())
-    {
-      return m_all;
-    }
-    else
-    {
-      return s.top();
-    }
-  }
-
-  return m_all;
-}
-
 void
 Context::restore(const Tuple& t)
 {
   for (const auto& v : t)
   {
-    m_context[makeIndex(v.first)].pop();
+    auto index = makeIndex(v.first);
+    m_context[index].second.pop();
+
+    if (!m_context[index].second.empty())
+    {
+      m_context[index].first = m_context[index].second.top();
+    }
+    else
+    {
+      m_context[index].first = m_all;
+    }
   }
 }
 
@@ -114,17 +100,21 @@ Context::perturb(dimension_index d, const Constant& c)
   if (d >= m_max)
   {
     std::fill_n(std::back_inserter(m_context), d - m_max + 1,
-      std::stack<Constant>());
+      std::make_pair(Types::Special::create(SP_DIMENSION), 
+        std::stack<Constant>()));
     m_max = d + 1;
   }
   else if (d <= m_min)
   {
     std::fill_n(std::front_inserter(m_context), m_min - d + 1,
-      std::stack<Constant>());
+      std::make_pair(Types::Special::create(SP_DIMENSION), 
+        std::stack<Constant>()));
     m_min = d - 1;
   }
 
-  m_context[makeIndex(d)].push(c);
+  auto index = makeIndex(d);
+  m_context[index].second.push(c);
+  m_context[index].first = c;
 
   m_setDims.insert(d);
 }
@@ -144,9 +134,9 @@ Context::operator Tuple() const
   for (dimension_index d = m_min + 1; d != m_max; ++d)
   {
     const auto& s = m_context[makeIndex(d)];
-    if (!s.empty())
+    if (!s.second.empty())
     {
-      t.insert(std::make_pair(d, s.top()));
+      t.insert(std::make_pair(d, s.second.top()));
     }
   }
 
@@ -166,7 +156,7 @@ Context::operator<=(const Context& rhs) const
   {
     while(current != rhs.m_min + 1)
     {
-      if (!m_context[index].empty())
+      if (!m_context[index].second.empty())
       {
         return false;
       }
@@ -184,12 +174,12 @@ Context::operator<=(const Context& rhs) const
   {
     const auto& ls = m_context[index];
     const auto& rs = rhs.m_context[rhsIndex];
-    if (!ls.empty())
+    if (!ls.second.empty())
     {
-      if (!rs.empty())
+      if (!rs.second.empty())
       {
-        const Constant& lc = ls.top();
-        const Constant& rc = rs.top();
+        const Constant& lc = ls.second.top();
+        const Constant& rc = rs.second.top();
 
         if (lc != rc)
         {
@@ -212,7 +202,7 @@ Context::operator<=(const Context& rhs) const
   {
     while (current < m_max)
     {
-      if (!m_context[index].empty())
+      if (!m_context[index].second.empty())
       {
         return false;
       }
