@@ -100,13 +100,15 @@ Context::perturb(dimension_index d, const Constant& c)
   if (d >= m_max)
   {
     std::fill_n(std::back_inserter(m_context), d - m_max + 1,
-      std::pair<Constant, std::stack<Constant>>());
+      std::make_pair(Types::Special::create(SP_DIMENSION), 
+        std::stack<Constant>()));
     m_max = d + 1;
   }
   else if (d <= m_min)
   {
     std::fill_n(std::front_inserter(m_context), m_min - d + 1,
-      std::pair<Constant, std::stack<Constant>>());
+      std::make_pair(Types::Special::create(SP_DIMENSION), 
+        std::stack<Constant>()));
     m_min = d - 1;
   }
 
