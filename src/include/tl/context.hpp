@@ -69,7 +69,19 @@ namespace TransLucid
      * @return The ordinate of that dimension.
      */
     const Constant&
-    lookup(dimension_index dim) const;
+    lookup(dimension_index dim) const
+    {
+      if (dim <= m_min || dim >= m_max)
+      {
+        return m_all;
+      }
+      else
+      {
+        const auto& s = m_context[makeIndex(dim)];
+
+        return s.first;
+      }
+    }
 
     template <typename List>
     void

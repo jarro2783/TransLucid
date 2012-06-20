@@ -56,21 +56,6 @@ Context::Context(const Tuple& k)
   }
 }
 
-const Constant&
-Context::lookup(dimension_index dim) const
-{
-  if (dim <= m_min || dim >= m_max)
-  {
-    return m_all;
-  }
-  else
-  {
-    const auto& s = m_context[makeIndex(dim)];
-
-    return s.first;
-  }
-}
-
 void
 Context::restore(const Tuple& t)
 {
