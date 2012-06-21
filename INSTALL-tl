@@ -11,10 +11,9 @@ assume that the version numbers referred to in the instructions
 below are the ones we are using.
 
 - GCC 4.7.0 or higher, we are using 4.7.0.
-- ICU 4.6 or higher, we are using 4_8_1.
-- MPI 1.0.x or higher, we are using 1.5.4.
-- BOOST 1_46_0 or higher, we are using 1_48_0.
-- TransLucid, latest version.
+- ICU 4.6 or higher, we are using 49_1.
+- BOOST 1_46_0 or higher, we are using 1_49_0.
+- TransLucid, latest version, currently 0.2.0.
 
 ===================================================================
 
@@ -25,7 +24,7 @@ prerequisites, then you will not need to build everything.
 
 - Set PATH and LD_LIBRARY_PATH variables.
 - Ensure GCC is installed.
-- Ensure ICU and MPI are installed.
+- Ensure ICU is installed.
 - Ensure BOOST is installed.
 - Download TransLucid.
 - Install TransLucid.
@@ -67,77 +66,43 @@ Specifically, in the instructions below:
 
 -------------------------------------------------------------------
 
-ICU
+TransLucid from Tarball
 
-TransLucid requires BOOST to be compiled with ICU, which is a
-collection of libraries providing Unicode and Globalization
-support for software applications.  ICU can be downloaded from
-
-    http://site.icu-project.org/download
-
-as a distribution tarball ($DOWNLOADS/icu4c-4_8_1-src.tgz).
-For detailed installation instructions, read the INSTALL file
-in the root directory of the source.  Here is a short version
-of the instructions:
+TransLucid's source code is hosted on sourceforge.net and released as
+a tarball. The latest release is version 0.2.0.
+To get the source, type:
 
     cd $SRC
-    tar xzf $DOWNLOADS/icu4c-4_8_1-src.tgz
-    cd icu/source
-    ./configure --prefix="$PREFIX" --enable-static
+    wget \
+http://sourceforge.net/projects/translucid/files/TransLucid/0.2.0/tl-0.2.0.tar.bz2/download \
+    -O tl-0.2.0.tar.bz2
+
+or direct your browser to the above URL. This downloads the 
+distribution tarball as tl-0.2.0.tar.bz2. To untar it, type:
+
+    tar -xf tl-0.2.0.tar.bz2
+
+This creates a new directory, tl-0.2.0, and unpacks the
+source there.  (Note that if you already downloaded TransLucid
+from sourceforge yourself, you would know this first step, as
+you did it already!)
+
+To build TransLucid:
+
+    cd $SRC
+    cd tl-0.2.0
+    ./configure --prefix="$PREFIX" --disable-static
     make
-    make install 
+    make install
+
+The --disable-static flag will make TransLucid compile faster.
+
+Possibly, you will need to set the PKG_CONFIG_PATH variable to find
+the icu-uc package.
 
 -------------------------------------------------------------------
 
-MPI
-
-TransLucid requires BOOST to be compiled with MPI, which is a
-collection of Standard MPI (Message Passing Interface) runtime
-programs.  BOOST needs the MPI header files to compile correctly.
-MPI can be downloaded from
-
-    http://www.open-mpi.org/software/ompi/v1.5/
-
-as a distribution tarball (downloads/openmpi-1.5.4.tar.bz2).
-For detailed installation instructions, read the INSTALL file
-in the root directory of the source.  Here is a short version
-of the instructions:
-
-    cd $SRC
-    tar xjf $DOWNLOADS/openmpi-1.5.4.tar.bz2
-    cd openmpi-1.5.4
-    ./configure --prefix="$PREFIX"
-    make
-    make install 
-
--------------------------------------------------------------------
-
-BOOST
-
-BOOST provides free peer-reviewed portable C++ source libraries
-and the emphasis is on creating libraries that work well with the
-C++ Standard Library.  It can be downloaded from
-
-    http://www.boost.org/
-
-as a distribution tarball ($DOWNLOADS/boost_1_48_0.tar.bz2).
-Detailed installation instructions can be found at
-
-    http://www.boost.org/doc/libs/1_48_0/more/getting_started/index.html
-
-The BOOST distribution must be informed that you wish the MPI code
-to be compiled in.  Here is the complete instruction sequence:
-
-    cd $SRC
-    tar xjf $DOWNLOADS/boost_1_48_0.tar.bz2 
-    cd boost_1_48_0
-    echo "using mpi ;" >> tools/build/v2/user-config.jam
-    ./bootstrap.sh --with-icu="$PREFIX" --prefix="$PREFIX"
-    ./bjam install
-
--------------------------------------------------------------------
-
-TransLucid
+TransLucid from Git
 
 TransLucid's source code is hosted on sourceforge.net in a git repository.
 To get the source:
@@ -155,17 +120,14 @@ you did it already!)
 To build TransLucid:
 
     cd $SRC
-    export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:"
     cd translucid-git
     ./bootstrap.sh
-    ./configure --prefix="$PREFIX" \
-                --with-boost="$PREFIX" \
-                --disable-static
+    ./configure --prefix="$PREFIX" --disable-static
     make
     make install
 
-The PKG_CONFIG_PATH line allows the configure script
-to find the icu-uc package.
-As for the --disable-static flag,
-it will make TransLucid compile faster.
+The --disable-static flag will make TransLucid compile faster.
+
+Possibly, you will need to set the PKG_CONFIG_PATH variable to find
+the icu-uc package.
 
