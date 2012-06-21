@@ -216,6 +216,7 @@ namespace TransLucid
       m_definitions.push_back(EquationDefinition{id, time, -1});
       m_definitions.back().setRaw(input);
       change(time);
+      addUUID(id);
     }
 
     void
@@ -278,6 +279,16 @@ namespace TransLucid
     }
 
     private:
+
+    void
+    addUUID(const uuid& id)
+    {
+      m_uuids.insert(
+      {
+        id, 
+        {m_definitions.size() - 1}
+      });
+    }
 
     void
     parse(Context& k);
