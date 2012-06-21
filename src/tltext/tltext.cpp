@@ -468,37 +468,8 @@ TLText::processExpressions
 void
 TLText::setup_clargs()
 {
-  if (m_clargs.size() != 0)
-  {
-    std::vector<size_t> bounds{m_clargs.size()};
-    std::vector<Constant> dims
-    {
-      Types::Dimension::create(m_system.getDimensionIndex(U"arg0"))
-    };
-
-    m_argsHD = new ArrayNHD<u32string, 1>
-    (
-      bounds,
-      dims,
-      m_system,
-      Types::String::create,
-      Types::String::get
-    );
-
-    int i = 0;
-    for (auto v : m_clargs)
-    {
-      (*m_argsHD)[i] = u32string(v.begin(), v.end());
-      ++i;
-    }
-
-    //m_system.addInputHyperdaton(U"CLARGS", m_argsHD);
-  }
-
-  //TODO work out input hyperdatons
   
-  #if 0
-  m_system.addEquation(Parser::Equation
+  m_system.addVariableDeclParsed(Parser::Equation
     {
       U"CLARGS",
       Tree::Expr(),
@@ -506,7 +477,25 @@ TLText::setup_clargs()
       u32string()
     }
   );
-  #endif
+
+  if (m_clargs.size() != 0)
+  {
+    int i = 0;
+    for (auto v : m_clargs)
+    {
+      m_system.addVariableDeclParsed(Parser::Equation
+        {
+          U"CLARGS",
+          Tree::TupleExpr(Tree::TupleExpr::TuplePairs
+          {
+            {Tree::DimensionExpr(U"arg0"), mpz_class(i)}
+          }),
+          Tree::Expr(),
+          utf8_to_utf32(v)
+        });
+      ++i;
+    }
+  }
 }
 
 void
