@@ -99,6 +99,12 @@ namespace
     }
 
     bool
+    repl(uuid id, int time, const Parser::RawInput& line)
+    {
+      return m_object->repl(id, time, line);
+    }
+
+    bool
     repl(uuid id, int time, const Parser::Line& line)
     {
       return m_object->repl(id, time, line);
@@ -852,9 +858,9 @@ System::deleteEntity(const uuid& u)
 u32string
 System::printConstant(const Constant& c)
 {
-  auto iter = m_equations.find(U"canonical_print");
+  auto iter = m_identifiers.find(U"canonical_print");
 
-  if (iter == m_equations.end())
+  if (iter == m_identifiers.end())
   {
     return utf8_to_utf32(_("no print function defined"));
   }
@@ -1039,6 +1045,14 @@ System::addDeclaration(const Parser::RawInput& input)
   {
     return addConstructorRaw(input, lexit);
   }
+  else if (token == U"del")
+  {
+    return delDecl(input, lexit);
+  }
+  else if (token == U"repl")
+  {
+    return replDecl(input, lexit);
+  }
 
   return Constant();
 }
@@ -1183,6 +1197,88 @@ System::addDimDeclRaw
     Tree::Expr(),
     Tree::DimensionExpr(nextHiddenDim())
   ));
+}
+
+Constant
+System::delDecl
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  ++iter;
+
+  if (iter->getType() != Parser::TOKEN_CONSTANT)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  auto value = get<std::pair<u32string, u32string>>(iter->getValue());
+
+  if (value.first != U"uuid")
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  uuid id;
+  try
+  {
+    id = parse_uuid(value.second);
+  }
+  catch (InvalidUUID&)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  auto object = m_objects.find(id);
+
+  if (object == m_objects.end())
+  {
+    return Types::Special::create(SP_UNDEF);
+  }
+
+  return Types::Boolean::create(object->second->del(id, m_time));
+}
+
+Constant
+System::replDecl
+(
+  const Parser::RawInput& input, 
+  Parser::LexerIterator& iter
+)
+{
+  ++iter;
+
+  if (iter->getType() != Parser::TOKEN_CONSTANT)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  auto value = get<std::pair<u32string, u32string>>(iter->getValue());
+
+  if (value.first != U"uuid")
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  uuid id;
+  try
+  {
+    id = parse_uuid(value.second);
+  }
+  catch (InvalidUUID&)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  auto object = m_objects.find(id);
+
+  if (object == m_objects.end())
+  {
+    return Types::Special::create(SP_UNDEF);
+  }
+
+  return Types::Boolean::create(object->second->repl(id, m_time, input));
 }
 
 } //namespace TransLucid

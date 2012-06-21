@@ -1478,11 +1478,15 @@ Parser::parse_repl_decl(LexerIterator& begin, const LexerIterator& end,
 
   ReplDecl repl;
 
-  expect(current, end, repl.id, "constant", &Parser::parse_constant);
+  expect_no_advance(current, end, "constant", TOKEN_CONSTANT);
+  repl.id = get<std::pair<u32string, u32string>>(current->getValue());
+  ++current;
+  //expect(current, end, repl.id, "constant", &Parser::parse_constant);
 
   expect(current, end, repl.repl, "line", &Parser::parse_line);
 
   begin = current;
+  result = repl;
 
   return true;
 }

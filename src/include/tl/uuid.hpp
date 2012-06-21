@@ -70,6 +70,13 @@ namespace TransLucid
     return seed;
   }
 
+  struct InvalidUUID
+  {
+  };
+
+  uuid
+  parse_uuid(const u32string& text);
+
   uuid
   generate_uuid();
 

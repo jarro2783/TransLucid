@@ -65,6 +65,12 @@ namespace TransLucid
     bool 
     repl(uuid id, size_t time, Parser::Line line);
 
+    bool 
+    repl(uuid id, size_t time, Parser::RawInput line)
+    {
+      return m_bestfit.repl(id, time, line);
+    }
+
     Tree::Expr
     group(const std::list<EquationDefinition>& defs);
 

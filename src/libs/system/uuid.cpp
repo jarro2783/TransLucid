@@ -30,6 +30,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  
   namespace
   {
     class RandomIterator
@@ -137,53 +138,6 @@ namespace TransLucid
       full_bits_generator generator;
     };
 
-    struct InvalidUUID
-    {
-    };
-
-    uuid
-    parse_uuid(const u32string& text)
-    {
-      if (text.length() != 32)
-      {
-        throw InvalidUUID();
-      }
-
-      uuid u;
-      uuid::iterator data = u.begin();
-      int which = 0;
-      for (auto c : text)
-      {
-        int value;
-        if (c >= '0' && c <= '9')
-        {
-          value = c - '0';
-        }
-        else if (c >= 'A' && c <= 'F')
-        {
-          value = c - 'A' + 10;
-        }
-        else
-        {
-          throw InvalidUUID();
-        }
-
-        if (which == 0)
-        {
-          *data = value << 4;    
-          which = 1;
-        }
-        else
-        {
-          *data = *data | value;
-          ++data;
-          which = 0;
-        }
-      }
-
-      return u;
-    }
-
     void
     append_char(int value, u32string& result)
     {
@@ -198,6 +152,49 @@ namespace TransLucid
     }
 
     uuid_random_generator<std::mt19937> uuid_generator;
+  }
+
+  uuid
+  parse_uuid(const u32string& text)
+  {
+    if (text.length() != 32)
+    {
+      throw InvalidUUID();
+    }
+
+    uuid u;
+    uuid::iterator data = u.begin();
+    int which = 0;
+    for (auto c : text)
+    {
+      int value;
+      if (c >= '0' && c <= '9')
+      {
+        value = c - '0';
+      }
+      else if (c >= 'A' && c <= 'F')
+      {
+        value = c - 'A' + 10;
+      }
+      else
+      {
+        throw InvalidUUID();
+      }
+
+      if (which == 0)
+      {
+        *data = value << 4;    
+        which = 1;
+      }
+      else
+      {
+        *data = *data | value;
+        ++data;
+        which = 0;
+      }
+    }
+
+    return u;
   }
 
   uuid

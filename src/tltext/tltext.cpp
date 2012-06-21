@@ -178,6 +178,9 @@ TLText::run()
 
   m_uuids = uuids;
 
+  //make instant 0 happen
+  m_system.go();
+
   *m_error << m_initialOut << std::endl;
   *m_is >> std::noskipws;
 

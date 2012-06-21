@@ -324,6 +324,12 @@ namespace TransLucid
     virtual bool 
     repl(uuid id, size_t time, Parser::Line line);
 
+    virtual bool 
+    repl(uuid id, size_t time, Parser::RawInput line)
+    {
+      return m_bestfit.repl(id, time, line);
+    }
+
     /**
      * The equations belonging directly to this variable. Returns the map of
      * UUIDs to equations for the current variable.

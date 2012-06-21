@@ -40,6 +40,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
 #include <tl/system_object.hpp>
+#include <tl/trie.hpp>
 
 namespace TransLucid
 {
@@ -506,6 +507,20 @@ namespace TransLucid
 
     Constant
     addConstructorRaw
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    delDecl
+    (
+      const Parser::RawInput& input, 
+      Parser::LexerIterator& iter
+    );
+
+    Constant
+    replDecl
     (
       const Parser::RawInput& input, 
       Parser::LexerIterator& iter
