@@ -83,7 +83,18 @@ BestfitGroup::parse(Context& k)
       }
       else
       {
-        definition.setParsed(result);
+        //if this is a repl declaration then we just want the actual
+        //declaration
+        auto repl = get<Parser::ReplDecl>(&result);
+
+        if (repl != nullptr)
+        {
+          definition.setParsed(repl->repl);
+        }
+        else
+        {
+          definition.setParsed(result);
+        }
       }
     }
 

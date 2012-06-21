@@ -38,6 +38,9 @@ namespace TransLucid
 
     virtual bool
     repl(uuid id, int time, const Parser::Line& line) = 0;
+
+    virtual bool
+    repl(uuid id, int time, const Parser::RawInput& line) = 0;
   };
 }
 

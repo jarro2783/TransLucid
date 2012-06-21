@@ -99,6 +99,12 @@ namespace
     }
 
     bool
+    repl(uuid id, int time, const Parser::RawInput& line)
+    {
+      return m_object->repl(id, time, line);
+    }
+
+    bool
     repl(uuid id, int time, const Parser::Line& line)
     {
       return m_object->repl(id, time, line);
@@ -1241,6 +1247,38 @@ System::replDecl
   Parser::LexerIterator& iter
 )
 {
+  ++iter;
+
+  if (iter->getType() != Parser::TOKEN_CONSTANT)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  auto value = get<std::pair<u32string, u32string>>(iter->getValue());
+
+  if (value.first != U"uuid")
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  uuid id;
+  try
+  {
+    id = parse_uuid(value.second);
+  }
+  catch (InvalidUUID&)
+  {
+    return Types::Special::create(SP_ERROR);
+  }
+
+  auto object = m_objects.find(id);
+
+  if (object == m_objects.end())
+  {
+    return Types::Special::create(SP_UNDEF);
+  }
+
+  return Types::Boolean::create(object->second->repl(id, m_time, input));
 }
 
 } //namespace TransLucid

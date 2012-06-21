@@ -411,7 +411,7 @@ namespace TransLucid
     <
       typename T, 
       typename Dummy = 
-       typename std::enable_if
+        typename std::enable_if
         <
           !std::is_same
           <

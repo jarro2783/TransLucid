@@ -47,7 +47,19 @@ namespace TransLucid
     {
       Declaration() = default;
 
-      template <typename Eqn>
+      template <
+        typename Eqn, 
+        typename Dummy = 
+          typename std::enable_if
+          <
+            std::is_same
+            <
+              Equation,
+              typename std::remove_reference<Eqn>::type
+            >::value,
+            Eqn
+          >::type
+      >
       Declaration(Eqn&& e)
       : eqn(std::forward<Eqn>(e))
       {}
@@ -167,7 +179,7 @@ namespace TransLucid
     struct ReplDecl
     {
       //replace this...
-      Tree::Expr id;
+      std::pair<u32string, u32string> id;
       //with this
       Line repl;
     };

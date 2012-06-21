@@ -230,6 +230,7 @@ namespace TransLucid
       m_definitions.push_back(EquationDefinition{id, time, -1});
       m_definitions.back().setParsed(definition);
       change(time);
+      addUUID(id);
     }
 
     bool
@@ -260,7 +261,37 @@ namespace TransLucid
     }
 
     bool
-    repl(uuid id, size_t time, Parser::Line line)
+    repl(uuid id, int time, Parser::RawInput line)
+    {
+      //end this thing at time-1 and set the new definition from
+      //now to infinity (-1)
+      //we can't replace if something has already been deleted
+      auto iter = m_uuids.find(id);
+
+      if (iter == m_uuids.end())
+      {
+        return false;
+      }
+
+      auto last = iter->second.back();
+
+      if (m_definitions[last].end() != -1)
+      {
+        return false;
+      }
+
+      m_definitions[last].setEnd(time);
+
+      m_definitions.push_back(EquationDefinition{id, time, -1});
+      m_definitions.back().setRaw(line);
+
+      change(time);
+
+      return true;
+    }
+
+    bool
+    repl(uuid id, int time, Parser::Line line)
     {
       //TODO implement me
       return false;
