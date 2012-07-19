@@ -225,6 +225,8 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
     m_scope.end());
 
   //do the bound dimensions
+  expr.inten.binds.clear();
+  expr.binds.clear();
   for (auto& b : e.binds)
   {
     Tree::Expr transformed = apply_visitor(*this, b);

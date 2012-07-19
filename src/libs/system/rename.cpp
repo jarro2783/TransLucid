@@ -292,6 +292,7 @@ RenameIdentifiers::renameFunction(const T& f)
   l.argDim = f.argDim;
 
   //rename in the bound dimensions
+  l.binds.clear();
   for (auto& b : f.binds)
   {
     l.binds.push_back(apply_visitor(*this, b));
