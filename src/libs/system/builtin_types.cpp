@@ -517,6 +517,7 @@ namespace TransLucid
       {U"spaccess", SP_ACCESS},
       {U"sptypeerror", SP_TYPEERROR},
       {U"sparith", SP_ARITH},
+      {U"spdim", SP_DIMENSION},
       {U"spundef", SP_UNDEF},
       {U"spconst", SP_CONST},
       {U"spmultidef", SP_MULTIDEF},
