@@ -475,6 +475,18 @@ class TreePrinter
     pp(')', Precedence::FN_APP);
   }
 
+  void
+  printFnIntenScope(const Tree::PhiExpr& l)
+  {
+  }
+
+  void
+  printFnIntenScope(const Tree::LambdaExpr& l)
+  {
+    printIntenScope(l.inten);
+    print_binds(l.inten.binds);
+  }
+
   template <typename Container>
   void
   print_binds(Container&& c)
@@ -502,6 +514,11 @@ class TreePrinter
     m_os << symbol;
 
     print_binds(f.binds);
+
+    if (m_verbose)
+    {
+      printFnIntenScope(f);
+    }
 
     m_os << "(" << f.name << ", " << f.argDim << ")";
     

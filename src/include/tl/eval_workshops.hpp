@@ -552,14 +552,12 @@ namespace TransLucid
         System* system,
         const u32string& name, 
         dimension_index dim, 
-        WS* rhs,
-        std::vector<WS*> binds
+        WS* rhs
       )
       : m_system(system)
       , m_name(name)
       , m_argDim(dim)
       , m_rhs(rhs)
-      , m_binds(binds)
       {
       }
 
@@ -598,7 +596,6 @@ namespace TransLucid
       u32string m_name;
       dimension_index m_argDim;
       WS* m_rhs;
-      std::vector<WS*> m_binds;
     };
 
     /*

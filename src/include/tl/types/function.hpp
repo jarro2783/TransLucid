@@ -1,5 +1,5 @@
 /* The function types.
-   Copyright (C) 2011,2012 Jarryd Beck
+   Copyright (C) 2011 Jarryd Beck and John Plaice
 
 This file is part of TransLucid.
 
@@ -281,18 +281,11 @@ namespace TransLucid
       const u32string& name, 
       dimension_index argDim, 
       WS* expr,
-      const std::vector<WS*>& binds,
       Context& k
     )
-    : m_system(system), m_name(name), m_dim(argDim), m_expr(expr)
+    : m_system(system), m_name(name), m_dim(argDim)
     {
-      for (auto ws : binds)
-      {
-        auto c = (*ws)(k);
-        auto d = system->getDimensionIndex(c); 
-
-        m_binds.push_back(std::make_pair(d, k.lookup(d)));
-      }
+      m_inten = (*expr)(k);
     }
 
     ValueFunctionType*
@@ -320,8 +313,7 @@ namespace TransLucid
     System* m_system;
     u32string m_name;
     dimension_index m_dim;
-    WS* m_expr;
-    std::vector<std::pair<dimension_index, Constant>> m_binds;
+    Constant m_inten;
   };
 
   Constant
@@ -331,7 +323,6 @@ namespace TransLucid
     const u32string& name, 
     dimension_index argDim, 
     WS* expr,
-    const std::vector<WS*>& binds,
     Context& kappa
   );
 

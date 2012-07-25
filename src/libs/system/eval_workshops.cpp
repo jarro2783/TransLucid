@@ -907,7 +907,6 @@ LambdaAbstractionWS::operator()(Context& k)
       m_name,
       m_argDim,
       m_rhs,
-      m_binds,
       k
     );
 

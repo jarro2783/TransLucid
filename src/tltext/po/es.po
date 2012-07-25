@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-07-19 13:00+1000\n"
+"POT-Creation-Date: 2012-05-24 17:30+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Spanish <translucid@cse.unsw.edu.au>\n"
@@ -17,80 +17,80 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:252
+#: src/tltext/tltext.cpp:249
 msgid "// instant %1% beginning"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which demand we are printing
-#: src/tltext/tltext.cpp:259
+#: src/tltext/tltext.cpp:256
 msgid "// demand %1%"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:277
+#: src/tltext/tltext.cpp:274
 msgid "// instant %1% end"
 msgstr ""
 
-#: src/tltext/main.cpp:74
+#: src/tltext/main.cpp:72
 msgid "TLtext has encountered a segfault, goodbye..."
 msgstr ""
 
 #. TRANSLATORS: the options description name in the help message
-#: src/tltext/main.cpp:145
+#: src/tltext/main.cpp:143
 msgid "tltext options"
 msgstr ""
 
 #. TRANSLATORS: the help message for --args
-#: src/tltext/main.cpp:150
+#: src/tltext/main.cpp:148
 msgid "arguments to pass to TransLucid in the CLARGS variable"
 msgstr ""
 
 #. TRANSLATORS: the help message for --cache
-#: src/tltext/main.cpp:152
+#: src/tltext/main.cpp:150
 msgid "use cache"
 msgstr ""
 
 #. TRANSLATORS: the help message for --debug
-#: src/tltext/main.cpp:154
+#: src/tltext/main.cpp:152
 msgid "debug mode"
 msgstr ""
 
 #. TRANSLATORS: the help message for --help
-#: src/tltext/main.cpp:156
+#: src/tltext/main.cpp:154
 msgid "show this message"
 msgstr ""
 
 #. TRANSLATORS: the help message for --no-builtin-header
-#: src/tltext/main.cpp:158
+#: src/tltext/main.cpp:156
 msgid "don't use the standard header"
 msgstr ""
 
 #. TRANSLATORS: the help message for --header
-#: src/tltext/main.cpp:160
+#: src/tltext/main.cpp:158
 msgid "load another header"
 msgstr ""
 
 #. TRANSLATORS: the help message for --input
-#: src/tltext/main.cpp:162
+#: src/tltext/main.cpp:160
 msgid "input file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --output
-#: src/tltext/main.cpp:164
+#: src/tltext/main.cpp:162
 msgid "output file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --uuid
-#: src/tltext/main.cpp:166
+#: src/tltext/main.cpp:164
 msgid "print uuids"
 msgstr ""
 
 #. TRANSLATORS: the help message for --verbose
-#: src/tltext/main.cpp:168
+#: src/tltext/main.cpp:166
 msgid "level of verbosity"
 msgstr ""
 
 #. TRANSLATORS: the help message for --version
-#: src/tltext/main.cpp:170
+#: src/tltext/main.cpp:168
 msgid "show version"
 msgstr ""

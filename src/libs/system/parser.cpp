@@ -88,8 +88,6 @@ token_name(int token)
     /* TRANSLATORS: token */
     _("`,'"),
     /* TRANSLATORS: token */
-    _("`<-'"),
-    /* TRANSLATORS: token */
     _("`\%\%'"),
     /* TRANSLATORS: token */
     _("`;;'"),
