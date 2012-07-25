@@ -33,8 +33,8 @@ namespace TransLucid
     (
       System* system,
       WS* ws, 
-      std::vector<Constant> binds,
-      std::vector<dimension_index> scope,
+      const std::vector<Constant>& binds,
+      const std::vector<dimension_index>& scope,
       Context& k
     )
     : m_system(system)
@@ -43,6 +43,16 @@ namespace TransLucid
     , m_scope(std::move(scope))
     , m_k(k)
     {
+      for (auto c : binds)
+      {
+        auto d = m_system->getDimensionIndex(c);
+        m_bound.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      for (auto d : scope)
+      {
+        m_bound.push_back(std::make_pair(d, k.lookup(d)));
+      }
     }
 
     WS* ws() const
@@ -58,6 +68,10 @@ namespace TransLucid
       // which is implemented by
       //
       // k_a \dagger (k_a - m_k) \dagger (m_k <| {\rho, m_scope})
+
+      // new semantics
+      // k_a \dagger (k <| {m_binds, m_scope, \rho})
+      // so only the dimensions requested from kappa will be saved
 
       //make this more efficient
       ContextPerturber p(k_a); 
@@ -88,6 +102,7 @@ namespace TransLucid
     WS* m_ws;
     std::vector<Constant> m_binds;
     std::vector<dimension_index> m_scope;
+    std::vector<std::pair<dimension_index, Constant>> m_bound;
     MinimalContext m_k;
   };
 
