@@ -42,7 +42,8 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   std::vector<dimension_index> myLin;
   
   //generate new label
-  mpz_class label = m_system.nextWhere();
+  mpz_class label = w.myLabel != 0 ? w.myLabel : m_system.nextWhere();
+
   w.myLabel = label;
 
   for (const auto& evar : e.vars)
