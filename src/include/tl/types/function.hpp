@@ -282,6 +282,7 @@ namespace TransLucid
       dimension_index argDim, 
       WS* expr,
       const std::vector<WS*>& binds,
+      const std::vector<dimension_index>& scope,
       Context& k
     )
     : m_system(system), m_name(name), m_dim(argDim), m_expr(expr)
@@ -293,6 +294,14 @@ namespace TransLucid
 
         m_binds.push_back(std::make_pair(d, k.lookup(d)));
       }
+
+      for (auto d : scope)
+      {
+        m_binds.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      //hold on to rho
+      m_binds.push_back(std::make_pair(DIM_RHO, k.lookup(DIM_RHO)));
     }
 
     ValueFunctionType*
@@ -332,6 +341,7 @@ namespace TransLucid
     dimension_index argDim, 
     WS* expr,
     const std::vector<WS*>& binds,
+    const std::vector<dimension_index>& scope,
     Context& kappa
   );
 

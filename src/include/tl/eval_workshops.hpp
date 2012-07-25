@@ -553,13 +553,15 @@ namespace TransLucid
         const u32string& name, 
         dimension_index dim, 
         WS* rhs,
-        std::vector<WS*> binds
+        const std::vector<WS*>& binds,
+        const std::vector<dimension_index>& scope
       )
       : m_system(system)
       , m_name(name)
       , m_argDim(dim)
       , m_rhs(rhs)
       , m_binds(binds)
+      , m_scope(scope)
       {
       }
 
@@ -599,6 +601,7 @@ namespace TransLucid
       dimension_index m_argDim;
       WS* m_rhs;
       std::vector<WS*> m_binds;
+      std::vector<dimension_index> m_scope;
     };
 
     /*
