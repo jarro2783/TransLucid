@@ -672,7 +672,6 @@ namespace TransLucid
       Expr rhs; /**<The right-hand-side expression.*/
 
       dimension_index argDim;
-      MakeIntenExpr inten;
     };
 
     //TODO: fix TreeToWSTree when I implement this

@@ -219,20 +219,13 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   //m_scope.resize(m_scope.size() - 1);
   m_lambdaScope.erase(e.name);
 
-  //wrap the child up in an intension
   expr.rhs = child;
-  expr.inten.expr = child;
-  expr.inten.scope.insert(expr.inten.scope.end(), m_scope.begin(), 
-    m_scope.end());
 
-  //do the bound dimensions
-  expr.inten.binds.clear();
   expr.binds.clear();
   for (auto& b : e.binds)
   {
     Tree::Expr transformed = apply_visitor(*this, b);
     expr.binds.push_back(transformed);
-    expr.inten.binds.push_back(transformed);
   }
 
   return expr;

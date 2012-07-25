@@ -36,7 +36,7 @@ namespace TransLucid
 {
 
 WorkshopBuilder::WorkshopBuilder(System* system)
-: m_system(system), m_infn(false)
+: m_system(system)
 {
 }
 
@@ -252,14 +252,22 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
 {
-  WS* rhs = operator()(e.inten);
+  WS* rhs = apply_visitor(*this, e.rhs);
+
+  std::vector<WS*> binds;
+
+  for (auto& b : e.binds)
+  {
+    binds.push_back(apply_visitor(*this, b));
+  }
 
   return new Workshops::LambdaAbstractionWS
   (
     m_system,
     e.name,
     e.argDim,
-    rhs
+    rhs,
+    binds
   );
 }
 

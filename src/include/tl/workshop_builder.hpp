@@ -84,8 +84,6 @@ namespace TransLucid
 
     //the where L_{out}s
     std::vector<dimension_index> m_whereOut;
-
-    bool m_infn;
   };
 
 } //namespace TransLucid
