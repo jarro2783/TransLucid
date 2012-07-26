@@ -41,7 +41,6 @@ namespace TransLucid
     , m_ws(ws)
     , m_binds(std::move(binds))
     , m_scope(std::move(scope))
-    , m_k(k)
     {
       for (auto c : binds)
       {
@@ -53,6 +52,8 @@ namespace TransLucid
       {
         m_bound.push_back(std::make_pair(d, k.lookup(d)));
       }
+
+      m_bound.push_back(std::make_pair(DIM_RHO, k.lookup(DIM_RHO)));
     }
 
     WS* ws() const
@@ -63,34 +64,13 @@ namespace TransLucid
     Constant
     operator()(Context& k_a) const
     {
-      // m_k \dagger k_a \dagger (m_k <| {\rho, m_scope})
-      //
-      // which is implemented by
-      //
-      // k_a \dagger (k_a - m_k) \dagger (m_k <| {\rho, m_scope})
-
       // new semantics
       // k_a \dagger (k <| {m_binds, m_scope, \rho})
       // so only the dimensions requested from kappa will be saved
 
-      //make this more efficient
       ContextPerturber p(k_a); 
 
-      m_k.perturbDifference(p, k_a);
-
-      for (auto d : m_scope)
-      {
-        //saved.push_back(std::make_pair(d, m_k.lookup(d)));
-        p.perturb(d, m_k.lookup(d));
-      }
-
-      p.perturb(DIM_RHO, m_k.lookup(DIM_RHO));
-
-      for (auto b : m_binds)
-      {
-        auto dim = m_system->getDimensionIndex(b);
-        p.perturb(dim, m_k.lookup(dim));
-      }
+      p.perturb(m_bound);
 
       auto result = (*m_ws)(k_a);
 
@@ -103,7 +83,6 @@ namespace TransLucid
     std::vector<Constant> m_binds;
     std::vector<dimension_index> m_scope;
     std::vector<std::pair<dimension_index, Constant>> m_bound;
-    MinimalContext m_k;
   };
 
   namespace Types
