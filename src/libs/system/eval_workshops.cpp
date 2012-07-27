@@ -1009,6 +1009,33 @@ LambdaApplicationWS::operator()(Context& kappa, Context& delta)
 }
 
 Constant
+WhereWS::operator()(Context& k)
+{
+  //get a new CHI dimension for each dim
+  //evaluate each initialiser
+  //perturb theta_j with the initiliaser
+  //evaluate E_0
+
+  std::vector<std::pair<dimension_index, Constant>> change;
+
+  for (auto v : m_dims)
+  {
+    //the CHI dimension
+
+    //the initialiser
+    if (v.second != nullptr)
+    {
+    }
+  }
+}
+
+Constant
+WhereWS::operator()(Context& kappa, Context& delta)
+{
+  return Constant();
+}
+
+Constant
 AtTupleWS::operator()(Context& k)
 {
   //evaluate the tuple into a vector of fixed size

@@ -647,6 +647,28 @@ namespace TransLucid
       WS* m_rhs;
     };
 
+    class WhereWS : public WS
+    {
+      public:
+      WhereWS
+      (
+        std::vector<std::pair<dimension_index, WS*>> dims
+      )
+      : m_dims(dims)
+      {
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+
+      std::vector<std::pair<dimension_index, WS*>> m_dims;
+    };
+
     /**
      * Evaluates an at expression when the rhs is a tuple expression. This
      * allows us to make an optimisation by not building tuples all the time.

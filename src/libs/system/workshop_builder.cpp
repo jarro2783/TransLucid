@@ -296,8 +296,12 @@ WorkshopBuilder::operator()(const Tree::PhiAppExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::WhereExpr& e)
 {
-  //the where expression must already be annotated and transformed
-  //which means that we can simply translate the expression
+  std::vector<std::pair<dimension_index, WS*>> dims;
+
+  for (auto v : e.dims)
+  {
+    
+  }
 
   return apply_visitor(*this, e.e);
 }

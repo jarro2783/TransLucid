@@ -73,31 +73,12 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     w.vars.push_back(newEqn);
   }
 
-  //visit child E
-  Tree::Expr expr = apply_visitor(*this, e.e);
-
-  //rewrite E to
-  //E @ [d_i <- E_i, Lin_i <- 0] @ [l <- #l + 1]
-  //d_i is [which <- index_d, Lout_i <- #Lout_i]
-  //
-  //E @ [d_i <- (E_i @ [\rho <- tail.#!\rho])] @ [\rho <- Cons.l.#!\rho]
-
-  Tree::Expr popRaw =
-    Tree::LambdaAppExpr(
-      Tree::IdentExpr(U"tail"), 
-      Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
-    );
-
-  auto pop = fullFixTree(popRaw);
-
   Tree::TupleExpr dimInit;
 
   //generate a unique "which" for each dimension
   int next = 0;
   for (const auto& v : e.dims)
   {
-    w.whichDims.push_back(next);
-
     //generate the dimExpr
     Tree::TupleExpr::TuplePairs dimTuple
       {
@@ -108,53 +89,25 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
       }
       ;
 
-    if (get<Tree::nil>(&v.second) == nullptr)
-    {
-      dimInit.pairs.push_back(std::make_pair
-        (
-          Tree::IdentExpr(v.first),
-          Tree::AtExpr
-          (
-            apply_visitor(*this, v.second),
-            Tree::TupleExpr
-            ({
-              {Tree::DimensionExpr(DIM_RHO), pop}
-            })
-          )
-        ));
-    }
+    auto theta = m_system.nextHiddenDim();
 
-    //make a new var d = dimval
-    m_newVars.push_back
-    (
-      Parser::Equation(v.first, Tree::Expr(), Tree::Expr(), 
-        Tree::TupleExpr(dimTuple)
-      )
-    );
-    
+    w.dimAllocation.push_back(theta);
+
+    m_lambdaScope.insert(std::make_pair(v.first, theta)); 
+
     ++next;
   }
 
-  Tree::Expr pushRaw = 
-    Tree::LambdaAppExpr(
-      Tree::LambdaAppExpr(
-        Tree::IdentExpr(U"Cons"),
-        label
-      ),
-      Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
-    );
+  //visit child E
+  Tree::Expr expr = apply_visitor(*this, e.e);
 
-  //need to do the whole tree fixup here
-  auto push = fullFixTree(pushRaw);
+  //restore the scope
+  for (auto v : e.dims)
+  {
+    m_lambdaScope.erase(v.first);
+  }
 
-  w.e = Tree::AtExpr
-    (
-      Tree::AtExpr(
-        expr, 
-        dimInit
-      ),
-      Tree::TupleExpr({{Tree::DimensionExpr(DIM_RHO), push}})
-    );
+  w.e = expr;
 
   //we return the rewritten E and add the variables to the list of variables
   //to add to the system

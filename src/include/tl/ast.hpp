@@ -770,7 +770,7 @@ namespace TransLucid
       > vars;
 
       mpz_class myLabel;
-      std::vector<size_t> whichDims;
+      std::vector<dimension_index> dimAllocation;
     };
 
     struct ConditionalBestfitExpr
