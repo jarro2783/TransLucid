@@ -366,21 +366,26 @@ BangOpWS::operator()(Context& k)
 {
   //lookup function in the system and call it
 
-  //evaluate name expr
+  //evaluate fn expr
+  RhoManager rho(k);
   Constant name = (*m_name)(k);
 
   if (name.index() == TYPE_INDEX_BASE_FUNCTION)
   {
     bool isSpecial = false;
     std::vector<Constant> args;
+    int index = 1;
     for (auto ws : m_args)
     {
+      rho.changeTop(index);
       args.push_back((*ws)(k));
 
       if (args.back().index() == TYPE_INDEX_SPECIAL)
       {
         isSpecial = true;
       }
+
+      ++index;
     }
 
     if (isSpecial)
@@ -476,9 +481,13 @@ MakeIntenWS::operator()(Context& k)
 {
   std::vector<Constant> binds;
 
+  int index = 1;
+  RhoManager rho(k);
   for (auto& b : m_binds)
   {
+    rho.changeTop(index);
     binds.push_back((*b)(k));
+    ++index;
   }
 
   return Types::Intension::create(&m_system, m_rhs, std::move(binds), 
@@ -498,6 +507,7 @@ MakeIntenWS::operator()(Context& kappa, Context& delta)
 Constant
 EvalIntenWS::operator()(Context& k)
 {
+  RhoManager rho(k);
   Constant rhs = (*m_rhs)(k);
 
   if (rhs.index() != TYPE_INDEX_INTENSION)
@@ -505,6 +515,7 @@ EvalIntenWS::operator()(Context& k)
     return Types::Special::create(SP_TYPEERROR);
   }
 
+  rho.changeTop(1);
   const IntensionType& inten = Types::Intension::get(rhs);
   return inten(k);
 }
@@ -521,6 +532,7 @@ EvalIntenWS::operator()(Context& kappa, Context& delta)
 Constant
 IfWS::operator()(Context& k)
 {
+  RhoManager rho(k);
   Constant condv = (*m_condition)(k);
 
   if (condv.index() == TYPE_INDEX_SPECIAL)
@@ -533,14 +545,17 @@ IfWS::operator()(Context& k)
 
     if (b)
     {
+      rho.changeTop(1);
       return (*m_then)(k);
       //result = makeValue(e->then->visit(this, d));
     }
     else
     {
+      uint8_t rhoIndex = 2;
       //run the elsifs and else
       for (const auto& p : m_elsifs_2)
       {
+        rho.changeTop(rhoIndex);
         Constant cond = p.first->operator()(k);
 
         type_index index = cond.index();
@@ -554,6 +569,7 @@ IfWS::operator()(Context& k)
           bool bcond = get_constant<bool>(cond);
           if (bcond)
           {
+            rho.changeTop(rhoIndex + 1);
             return p.second->operator()(k);
           }
         }
@@ -561,8 +577,11 @@ IfWS::operator()(Context& k)
         {
           return Types::Special::create(SP_TYPEERROR);
         }
+
+        rhoIndex += 2;
       }
 
+      rho.changeTop(rhoIndex);
       return (*m_else)(k);
     }
   }
