@@ -392,10 +392,10 @@ namespace TransLucid
   class RhoManager
   {
     public:
-    RhoManager(Context& k)
+    RhoManager(Context& k, uint8_t start = 0)
     : m_kappa(k)
     {
-      m_kappa.pushRho(0);
+      m_kappa.pushRho(start);
     }
 
     ~RhoManager()

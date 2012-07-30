@@ -287,12 +287,17 @@ namespace TransLucid
     )
     : m_system(system), m_name(name), m_dim(argDim), m_expr(expr)
     {
+      RhoManager rho(k);
+      uint8_t index = 1;
       for (auto ws : binds)
       {
+        rho.changeTop(index);
         auto c = (*ws)(k);
         auto d = system->getDimensionIndex(c); 
 
         m_binds.push_back(std::make_pair(d, k.lookup(d)));
+
+        ++index;
       }
 
       for (auto d : scope)

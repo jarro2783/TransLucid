@@ -746,11 +746,15 @@ UCharConstWS::operator()(Context& kappa, Context& delta)
 Constant
 TupleWS::operator()(Context& k)
 {
+  uint8_t index = 0;
+  RhoManager rho(k);
   tuple_t kp;
   for(auto& pair : m_elements)
   {
+    rho.changeTop(index * 2);
     //const Pair& p = v.first.value<Pair>();
     Constant left = (*pair.first)(k);
+    rho.changeTop(index * 2 + 1);
     Constant right = (*pair.second)(k);
     
     if (left.index() == TYPE_INDEX_SPECIAL)
@@ -769,6 +773,8 @@ TupleWS::operator()(Context& k)
     {
       kp[m_system.getDimensionIndex(left)] = right;
     }
+
+    ++index;
   }
   return Types::Tuple::create(Tuple(kp));
 }
@@ -838,6 +844,7 @@ Constant
 AtWS::operator()(Context& k)
 {
   //tuple_t kNew = k.tuple();
+  RhoManager rho(k, 1);
   Constant val1 = (*e1)(k);
   if (val1.index() != TYPE_INDEX_TUPLE)
   {
@@ -856,6 +863,7 @@ AtWS::operator()(Context& k)
     }
 
     ContextPerturber p(k, t);
+    rho.changeTop(2);
     return (*e2)(k);
   }
 }
@@ -985,6 +993,8 @@ LambdaApplicationWS::operator()(Context& k)
   //evaluate the lhs, evaluate the rhs
   //and pass the value to the function to evaluate
 
+  RhoManager rho(k);
+  rho.changeTop(1);
   Constant lhs = (*m_lhs)(k);
   //first make sure that it is a function
   if (lhs.index() != TYPE_INDEX_VALUE_FUNCTION)
@@ -992,9 +1002,11 @@ LambdaApplicationWS::operator()(Context& k)
     return Types::Special::create(SP_TYPEERROR);
   }
 
+  rho.changeTop(2);
   Constant rhs = (*m_rhs)(k);
   const ValueFunctionType& f = Types::ValueFunction::get(lhs);
 
+  rho.changeTop(3);
   return f.apply(k, rhs);
 }
 
@@ -1061,6 +1073,9 @@ AtTupleWS::operator()(Context& k)
   //do some magic to initialise the vector with iterators that do the
   //evaluation all at once so that we only need one allocation
 
+  RhoManager rho(k);
+  int index = 1;
+
   bool access = false;
 
   const Constant& dimTime = k.lookup(DIM_TIME);
@@ -1070,7 +1085,9 @@ AtTupleWS::operator()(Context& k)
 
   for (const auto& entry : m_tuple)
   {
+    rho.changeTop(index*2);
     Constant lhs = (*entry.first)(k);
+    rho.changeTop(index*2 + 1);
     Constant rhs = (*entry.second)(k);
 
     if (lhs.index() == TYPE_INDEX_SPECIAL)
@@ -1100,6 +1117,8 @@ AtTupleWS::operator()(Context& k)
           std::make_pair(this->m_system.getDimensionIndex(lhs), rhs));
       }
     }
+
+    ++index;
   }
   
   if (specials.size() > 0)
@@ -1114,6 +1133,7 @@ AtTupleWS::operator()(Context& k)
   else
   {
     ContextPerturber p(k, tuple);
+    rho.changeTop(1);
     return (*m_e2)(k);
   }
 }
