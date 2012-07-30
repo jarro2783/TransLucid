@@ -203,7 +203,7 @@ macro(GettextTranslate)
   #  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   #)
 
-  add_dependencies(update-po ${MAKEVAR_DOMAIN}.pot-update)
+  #add_dependencies(update-po ${MAKEVAR_DOMAIN}.pot-update)
 
   file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/LINGUAS LINGUAS 
       REGEX "^[^#].*")
