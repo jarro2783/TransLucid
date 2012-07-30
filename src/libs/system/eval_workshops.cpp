@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <gmpxx.h>
 
 #include <tl/builtin_types.hpp>
+#include <tl/chi.hpp>
 #include <tl/context.hpp>
 #include <tl/constws.hpp>
 #include <tl/eval_workshops.hpp>
@@ -1047,17 +1048,30 @@ WhereWS::operator()(Context& k)
   //perturb theta_j with the initiliaser
   //evaluate E_0
 
+  RhoManager rho(k);
+
   std::vector<std::pair<dimension_index, Constant>> change;
 
+  int index = 1;
   for (auto v : m_dims)
   {
     //the CHI dimension
+    ChiDim chi(index, 
+      std::vector<uint8_t>(k.getRho().begin(), k.getRho().end()));
+    dimension_index d = m_system.getChiDim(chi);
 
     //the initialiser
     if (v.second != nullptr)
     {
+      rho.changeTop(index);
+      change.push_back(std::make_pair(d, (*v.second)(k)));
+      change.push_back(std::make_pair(v.first, Types::Dimension::create(d)));
     }
+    ++index;
   }
+
+  rho.changeTop(0);
+  return (*m_expr)(k);
 }
 
 Constant

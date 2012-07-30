@@ -25,10 +25,8 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef SYSTEM_HPP_INCLUDED
 #define SYSTEM_HPP_INCLUDED
 
-#include <unordered_set>
-#include <unordered_map>
-
 #include <tl/ast_fwd.hpp>
+#include <tl/chi.hpp>
 #include <tl/datadef.hpp>
 #include <tl/dimtranslator.hpp>
 #include <tl/types.hpp>
@@ -41,6 +39,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/registries.hpp>
 #include <tl/system_object.hpp>
 #include <tl/trie.hpp>
+
+#include <unordered_set>
+#include <unordered_map>
 
 namespace TransLucid
 {
@@ -133,6 +134,12 @@ namespace TransLucid
     {
       return m_dimTranslator.unique();
       //return m_hiddenDim--;
+    }
+
+    dimension_index
+    getChiDim(const ChiDim& dim)
+    {
+      return m_chiMap.lookup(dim);
     }
 
     /**
@@ -416,6 +423,8 @@ namespace TransLucid
     bool m_verbose;
 
     Parser::Parser* m_parser;
+
+    ChiMap m_chiMap;
 
     static GettextInit m_gettext;
 

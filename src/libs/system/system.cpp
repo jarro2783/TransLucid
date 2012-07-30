@@ -358,6 +358,7 @@ System::System(bool cached)
 , m_hiddenDim(-1)
 , m_whereCounter(0)
 , m_debug(false)
+, m_chiMap(*this)
 {
   //create the obj, const and fun ids
 

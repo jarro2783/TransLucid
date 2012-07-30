@@ -296,14 +296,17 @@ WorkshopBuilder::operator()(const Tree::PhiAppExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::WhereExpr& e)
 {
-  std::vector<std::pair<dimension_index, WS*>> dims;
+  std::vector<std::pair<int, WS*>> dims;
 
+  int which = 1;
   for (auto v : e.dims)
   {
-    
+    dims.push_back(std::make_pair(which, apply_visitor(*this, v.second)));
   }
 
-  return apply_visitor(*this, e.e);
+  auto expr = apply_visitor(*this, e.e);
+
+  return new Workshops::WhereWS(expr, dims, *m_system);
 }
 
 WS* 
