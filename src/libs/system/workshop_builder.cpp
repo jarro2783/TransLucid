@@ -298,10 +298,11 @@ WorkshopBuilder::operator()(const Tree::WhereExpr& e)
 {
   std::vector<std::pair<int, WS*>> dims;
 
-  int which = 1;
+  auto alloc = e.dimAllocation.begin();
   for (auto v : e.dims)
   {
-    dims.push_back(std::make_pair(which, apply_visitor(*this, v.second)));
+    dims.push_back(std::make_pair(*alloc, apply_visitor(*this, v.second)));
+    ++alloc;
   }
 
   auto expr = apply_visitor(*this, e.e);

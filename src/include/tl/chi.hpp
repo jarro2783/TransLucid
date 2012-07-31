@@ -30,6 +30,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <cstdint>
 #include <cstring>
 #include <functional>
+#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -68,7 +69,24 @@ namespace TransLucid
 
     int m_which;
     std::vector<uint8_t> m_stack;
+
+    friend
+    std::ostream&
+    operator<<(std::ostream& os, const ChiDim& chi);
   };
+
+  inline
+  std::ostream&
+  operator<<(std::ostream& os, const ChiDim& chi)
+  {
+    os << chi.m_which << ", ";
+    for (auto v : chi.m_stack)
+    {
+      os << static_cast<int>(v) << ":";
+    }
+
+    return os;
+  }
 }
 
 namespace std

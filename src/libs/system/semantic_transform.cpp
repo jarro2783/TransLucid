@@ -46,6 +46,31 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 
   w.myLabel = label;
 
+  //do the dimensions
+  int next = 0;
+  for (const auto& v : e.dims)
+  {
+    //generate the dimExpr
+    Tree::TupleExpr::TuplePairs dimTuple
+      {
+        {Tree::DimensionExpr(U"which"), mpz_class(next)},
+        {Tree::DimensionExpr(DIM_RHO), 
+          Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
+        }
+      }
+      ;
+
+    auto theta = m_system.nextHiddenDim();
+
+    w.dimAllocation.push_back(theta);
+
+    m_lambdaScope.insert(std::make_pair(v.first, theta)); 
+
+    ++next;
+  }
+
+
+  //do the variables
   for (const auto& evar : e.vars)
   {
     //expr
@@ -72,32 +97,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 
     w.vars.push_back(newEqn);
   }
-
-  Tree::TupleExpr dimInit;
-
-  //generate a unique "which" for each dimension
-  int next = 0;
-  for (const auto& v : e.dims)
-  {
-    //generate the dimExpr
-    Tree::TupleExpr::TuplePairs dimTuple
-      {
-        {Tree::DimensionExpr(U"which"), mpz_class(next)},
-        {Tree::DimensionExpr(DIM_RHO), 
-          Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
-        }
-      }
-      ;
-
-    auto theta = m_system.nextHiddenDim();
-
-    w.dimAllocation.push_back(theta);
-
-    m_lambdaScope.insert(std::make_pair(v.first, theta)); 
-
-    ++next;
-  }
-
+  
   //visit child E
   Tree::Expr expr = apply_visitor(*this, e.e);
 
