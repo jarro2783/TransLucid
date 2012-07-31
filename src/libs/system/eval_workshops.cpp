@@ -1060,7 +1060,7 @@ WhereWS::operator()(Context& k)
       std::vector<uint8_t>(k.getRho().begin(), k.getRho().end()));
     dimension_index d = m_system.getChiDim(chi);
 
-    std::cout << "chi dimension: " << chi << " has index " << d << std::endl;
+    //std::cerr << "chi dimension: " << chi << " has index " << d << std::endl;
 
     //the initialiser
     if (v.second != nullptr)
@@ -1068,17 +1068,17 @@ WhereWS::operator()(Context& k)
       rho.changeTop(index);
       change.push_back(std::make_pair(d, (*v.second)(k)));
 
-      std::cerr << "setting dimension " << d << std::endl;
+      //std::cerr << "setting dimension " << d << std::endl;
     }
 
     //which dim are we actually using
-    std::cerr << "setting: [" << v.first << " <- " << d << "]" << std::endl;
+    //std::cerr << "setting: [" << v.first << " <- " << d << "]" << std::endl;
     change.push_back(std::make_pair(v.first, Types::Dimension::create(d)));
     ++index;
   }
 
   rho.changeTop(0);
-  ContextPerturber(k, change);
+  ContextPerturber p(k, change);
   return (*m_expr)(k);
 }
 

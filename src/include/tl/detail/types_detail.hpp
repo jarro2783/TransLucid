@@ -107,8 +107,8 @@ namespace TransLucid
       void
       operator()(Constant& c, int32_t v)
       {
-        c.data.ui32 = v;
-        c.data.field = TYPE_FIELD_UI32;
+        c.data.si32 = v;
+        c.data.field = TYPE_FIELD_SI32;
       }
     };
 

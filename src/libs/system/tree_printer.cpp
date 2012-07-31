@@ -582,7 +582,14 @@ class TreePrinter
     for (const auto& v : w.vars)
     {
       std::string var = Printer::printEquation(v);
-      m_os << var << ";;" << std::endl;
+      m_os << "var " << var << ";;" << std::endl;
+    }
+
+    for (const auto& v : w.dims)
+    {
+      m_os << "dim " << v.first << " <- ";
+      apply_visitor(*this, v.second);
+      m_os << ";;" << std::endl;
     }
 
     m_os << "end" << std::endl;

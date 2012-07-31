@@ -35,9 +35,7 @@ Tree::Expr
 SemanticTransform::operator()(const Tree::WhereExpr& e)
 {
   //all the names are already unique
-  Tree::WhereExpr w = e;
-
-  w.vars.clear();
+  Tree::WhereExpr w;
 
   std::vector<dimension_index> myLin;
   
@@ -50,23 +48,28 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   int next = 0;
   for (const auto& v : e.dims)
   {
-    //generate the dimExpr
-    Tree::TupleExpr::TuplePairs dimTuple
-      {
-        {Tree::DimensionExpr(U"which"), mpz_class(next)},
-        {Tree::DimensionExpr(DIM_RHO), 
-          Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
-        }
-      }
-      ;
-
+    //get a new dimension for this dimension identifier
     auto theta = m_system.nextHiddenDim();
 
+    //transform the initialiser
+    w.dims.push_back(std::make_pair(v.first, apply_visitor(*this, v.second)));
+    //save the new dimension
     w.dimAllocation.push_back(theta);
 
-    m_lambdaScope.insert(std::make_pair(v.first, theta)); 
-
     ++next;
+  }
+
+  auto alloc = w.dimAllocation.begin();
+  for (const auto& v : e.dims)
+  {
+    //rename identifiers in scope
+    //after visiting all the dimension initialisation expressions
+    m_lambdaScope.insert(std::make_pair(v.first, *alloc)); 
+
+    //put the dim in scope too
+    m_scope.push_back(*alloc);
+
+    ++alloc;
   }
 
 
@@ -106,6 +109,8 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   {
     m_lambdaScope.erase(v.first);
   }
+
+  m_scope.resize(m_scope.size() - e.dims.size());
 
   w.e = expr;
 
