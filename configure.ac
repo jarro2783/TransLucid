@@ -31,10 +31,6 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 # Checks for programs.
 AC_PROG_CXX
-
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
-
 AC_LANG([C++])
 
 GCC_MIN_VERSION=`cat $srcdir/checks/gcc_min_version`
@@ -48,6 +44,9 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([$GCC_CHECK_TEXT])],
   [AC_MSG_RESULT([yes])],
   [AC_MSG_ERROR([gcc version $GCC_MIN_VERSION or greater is required])]
 )
+
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
 
 # Do we build tlweb
 AC_ARG_ENABLE([tlweb],
