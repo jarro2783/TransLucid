@@ -668,6 +668,7 @@ namespace TransLucid
       }
 
       u32string name; /**<The bound parameter.*/
+      std::vector<dimension_index> scope;
       std::vector<Expr> binds;
       Expr rhs; /**<The right-hand-side expression.*/
 
@@ -769,7 +770,7 @@ namespace TransLucid
       > vars;
 
       mpz_class myLabel;
-      std::vector<size_t> whichDims;
+      std::vector<dimension_index> dimAllocation;
     };
 
     struct ConditionalBestfitExpr

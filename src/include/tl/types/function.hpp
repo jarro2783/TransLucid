@@ -282,17 +282,34 @@ namespace TransLucid
       dimension_index argDim, 
       WS* expr,
       const std::vector<WS*>& binds,
+      const std::vector<dimension_index>& scope,
       Context& k
     )
     : m_system(system), m_name(name), m_dim(argDim), m_expr(expr)
     {
+      RhoManager rho(k);
+      uint8_t index = 1;
       for (auto ws : binds)
       {
+        rho.changeTop(index);
         auto c = (*ws)(k);
         auto d = system->getDimensionIndex(c); 
 
         m_binds.push_back(std::make_pair(d, k.lookup(d)));
+
+        ++index;
       }
+
+      //std::cerr << "binding in function:" << std::endl;
+      for (auto d : scope)
+      {
+        //std::cerr << d << " ";
+        m_binds.push_back(std::make_pair(d, k.lookup(d)));
+      }
+      //std::cerr << std::endl;
+
+      //hold on to rho
+      m_binds.push_back(std::make_pair(DIM_RHO, k.lookup(DIM_RHO)));
     }
 
     ValueFunctionType*
@@ -332,6 +349,7 @@ namespace TransLucid
     dimension_index argDim, 
     WS* expr,
     const std::vector<WS*>& binds,
+    const std::vector<dimension_index>& scope,
     Context& kappa
   );
 

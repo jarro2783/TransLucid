@@ -35,9 +35,7 @@ Tree::Expr
 SemanticTransform::operator()(const Tree::WhereExpr& e)
 {
   //all the names are already unique
-  Tree::WhereExpr w = e;
-
-  w.vars.clear();
+  Tree::WhereExpr w;
 
   std::vector<dimension_index> myLin;
   
@@ -46,6 +44,36 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 
   w.myLabel = label;
 
+  //do the dimensions
+  int next = 0;
+  for (const auto& v : e.dims)
+  {
+    //get a new dimension for this dimension identifier
+    auto theta = m_system.nextHiddenDim();
+
+    //transform the initialiser
+    w.dims.push_back(std::make_pair(v.first, apply_visitor(*this, v.second)));
+    //save the new dimension
+    w.dimAllocation.push_back(theta);
+
+    ++next;
+  }
+
+  auto alloc = w.dimAllocation.begin();
+  for (const auto& v : e.dims)
+  {
+    //rename identifiers in scope
+    //after visiting all the dimension initialisation expressions
+    m_lambdaScope.insert(std::make_pair(v.first, *alloc)); 
+
+    //put the dim in scope too
+    m_scope.push_back(*alloc);
+
+    ++alloc;
+  }
+
+
+  //do the variables
   for (const auto& evar : e.vars)
   {
     //expr
@@ -72,89 +100,19 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 
     w.vars.push_back(newEqn);
   }
-
+  
   //visit child E
   Tree::Expr expr = apply_visitor(*this, e.e);
 
-  //rewrite E to
-  //E @ [d_i <- E_i, Lin_i <- 0] @ [l <- #l + 1]
-  //d_i is [which <- index_d, Lout_i <- #Lout_i]
-  //
-  //E @ [d_i <- (E_i @ [\rho <- tail.#!\rho])] @ [\rho <- Cons.l.#!\rho]
-
-  Tree::Expr popRaw =
-    Tree::LambdaAppExpr(
-      Tree::IdentExpr(U"tail"), 
-      Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
-    );
-
-  auto pop = fullFixTree(popRaw);
-
-  Tree::TupleExpr dimInit;
-
-  //generate a unique "which" for each dimension
-  int next = 0;
-  for (const auto& v : e.dims)
+  //restore the scope
+  for (auto v : e.dims)
   {
-    w.whichDims.push_back(next);
-
-    //generate the dimExpr
-    Tree::TupleExpr::TuplePairs dimTuple
-      {
-        {Tree::DimensionExpr(U"which"), mpz_class(next)},
-        {Tree::DimensionExpr(DIM_RHO), 
-          Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
-        }
-      }
-      ;
-
-    if (get<Tree::nil>(&v.second) == nullptr)
-    {
-      dimInit.pairs.push_back(std::make_pair
-        (
-          Tree::IdentExpr(v.first),
-          Tree::AtExpr
-          (
-            apply_visitor(*this, v.second),
-            Tree::TupleExpr
-            ({
-              {Tree::DimensionExpr(DIM_RHO), pop}
-            })
-          )
-        ));
-    }
-
-    //make a new var d = dimval
-    m_newVars.push_back
-    (
-      Parser::Equation(v.first, Tree::Expr(), Tree::Expr(), 
-        Tree::TupleExpr(dimTuple)
-      )
-    );
-    
-    ++next;
+    m_lambdaScope.erase(v.first);
   }
 
-  Tree::Expr pushRaw = 
-    Tree::LambdaAppExpr(
-      Tree::LambdaAppExpr(
-        Tree::IdentExpr(U"Cons"),
-        label
-      ),
-      Tree::HashExpr(Tree::DimensionExpr(DIM_RHO))
-    );
+  m_scope.resize(m_scope.size() - e.dims.size());
 
-  //need to do the whole tree fixup here
-  auto push = fullFixTree(pushRaw);
-
-  w.e = Tree::AtExpr
-    (
-      Tree::AtExpr(
-        expr, 
-        dimInit
-      ),
-      Tree::TupleExpr({{Tree::DimensionExpr(DIM_RHO), push}})
-    );
+  w.e = expr;
 
   //we return the rewritten E and add the variables to the list of variables
   //to add to the system
@@ -227,6 +185,9 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
     Tree::Expr transformed = apply_visitor(*this, b);
     expr.binds.push_back(transformed);
   }
+
+  expr.scope = e.scope;
+  expr.scope.insert(expr.scope.end(), m_scope.begin(), m_scope.end());
 
   return expr;
 }

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <algorithm>
 #include <sstream>
 #include <stack>
 
@@ -499,9 +500,13 @@ class TreePrinter
   {
     pp('(', Precedence::FN_ABSTRACTION);
 
-    m_os << symbol;
+    m_os << symbol << " ";
 
     print_binds(f.binds);
+    m_os << "{";
+    std::copy(f.scope.begin(), f.scope.end(), 
+      std::ostream_iterator<typename decltype(f.scope)::value_type>(m_os));
+    m_os << "}";
 
     m_os << "(" << f.name << ", " << f.argDim << ")";
     
@@ -582,7 +587,14 @@ class TreePrinter
     for (const auto& v : w.vars)
     {
       std::string var = Printer::printEquation(v);
-      m_os << var << ";;" << std::endl;
+      m_os << "var " << var << ";;" << std::endl;
+    }
+
+    for (const auto& v : w.dims)
+    {
+      m_os << "dim " << v.first << " <- ";
+      apply_visitor(*this, v.second);
+      m_os << ";;" << std::endl;
     }
 
     m_os << "end" << std::endl;

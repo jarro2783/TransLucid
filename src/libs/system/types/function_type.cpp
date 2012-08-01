@@ -92,11 +92,12 @@ createValueFunction
   dimension_index argDim, 
   WS* expr,
   const std::vector<WS*>& binds,
+  const std::vector<dimension_index>& scope,
   Context& kappa
 )
 {
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, expr, binds, kappa)
+    ValueFunctionType(system, name, argDim, expr, binds, scope, kappa)
   );
 }
 

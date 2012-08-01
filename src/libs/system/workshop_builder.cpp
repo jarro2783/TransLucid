@@ -267,7 +267,8 @@ WorkshopBuilder::operator()(const Tree::LambdaExpr& e)
     e.name,
     e.argDim,
     rhs,
-    binds
+    binds,
+    e.scope
   );
 }
 
@@ -295,10 +296,18 @@ WorkshopBuilder::operator()(const Tree::PhiAppExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::WhereExpr& e)
 {
-  //the where expression must already be annotated and transformed
-  //which means that we can simply translate the expression
+  std::vector<std::pair<int, WS*>> dims;
 
-  return apply_visitor(*this, e.e);
+  auto alloc = e.dimAllocation.begin();
+  for (auto v : e.dims)
+  {
+    dims.push_back(std::make_pair(*alloc, apply_visitor(*this, v.second)));
+    ++alloc;
+  }
+
+  auto expr = apply_visitor(*this, e.e);
+
+  return new Workshops::WhereWS(expr, dims, *m_system);
 }
 
 WS* 

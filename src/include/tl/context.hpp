@@ -137,6 +137,30 @@ namespace TransLucid
       return m_setDims;
     }
 
+    void
+    pushRho(uint8_t index)
+    {
+      m_rho.push_front(index);
+    }
+
+    void 
+    popRho()
+    {
+      m_rho.pop_back();
+    }
+
+    uint8_t&
+    topRho()
+    {
+      return m_rho.back();
+    }
+
+    const std::deque<uint8_t>&
+    getRho()
+    {
+      return m_rho;
+    }
+
     private:
 
     friend class ContextPerturber;
@@ -159,6 +183,8 @@ namespace TransLucid
     ContextType m_context;
 
     std::set<dimension_index> m_setDims;
+
+    std::deque<uint8_t> m_rho;
   };
 
   class ContextPerturber
@@ -361,6 +387,30 @@ namespace TransLucid
     private:
     Constant m_all;
     std::vector<std::pair<dimension_index, Constant>> m_context;
+  };
+
+  class RhoManager
+  {
+    public:
+    RhoManager(Context& k, uint8_t start = 0)
+    : m_kappa(k)
+    {
+      m_kappa.pushRho(start);
+    }
+
+    ~RhoManager()
+    {
+      m_kappa.popRho();
+    }
+
+    void
+    changeTop(int index)
+    {
+      m_kappa.topRho() = index;
+    }
+
+    private:
+    Context& m_kappa;
   };
 
 }

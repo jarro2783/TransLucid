@@ -31,7 +31,7 @@ libtlsystem_la_LIBADD = \
 
 libtlsystem_la_SOURCES = \
   assignment.cpp ast.cpp bestfit.cpp builtin_types.cpp \
-  cache.cpp charset.cpp context.cpp datadef.cpp \
+  cache.cpp charset.cpp chi.cpp context.cpp datadef.cpp \
   dimtranslator.cpp equation.cpp \
   eval_workshops.cpp function.cpp \
   hyperdatons/arrayhd.cpp hyperdatons/envhd.cpp hyperdatons/filehd.cpp \
