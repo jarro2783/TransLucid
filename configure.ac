@@ -37,12 +37,13 @@ GCC_MIN_VERSION=`cat $srcdir/checks/gcc_min_version`
 GCC_CHECK_TEXT=`$srcdir/checks/generate_gcc_min_version_check`
 
 # check for the correct version of gcc
-AC_MSG_CHECKING([for gcc >= $GCC_MIN_VERSION])
+AC_MSG_CHECKING([for an appropriate compiler])
 #GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
 CXXFLAGS="-std=gnu++11"
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([$GCC_CHECK_TEXT])], 
   [AC_MSG_RESULT([yes])],
-  [AC_MSG_ERROR([gcc version $GCC_MIN_VERSION or greater is required])]
+  [AC_MSG_ERROR([no suitable compiler found, see config.log for more
+  information])]
 )
 
 AC_LIBTOOL_DLOPEN
@@ -116,10 +117,20 @@ AC_SUBST([ICU_LIBS])
 
 TL_CHECK_ICU
 
+OLD_CPPFLAGS=${CPPFLAGS}
+CPPFLAGS="-Werror -Wno-unused-local-typedefs ${CPPFLAGS}"
+
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM()],
+  UNUSED_TYPEDEF_FLAG="-Wno-unused-local-typedefs",
+)
+
+CPPFLAGS=${OLD_CPPFLAGS}
+
 TL_LDFLAGS="-std=gnu++11"
 TL_LIBS="${ICU_LIBS}"
 TL_CFLAGS="-std=gnu++11 -fno-strict-aliasing ${ICU_CFLAGS} \
-  -Wno-unused-local-typedefs"
+  ${UNUSED_TYPEDEF_FLAG}"
 
 AC_SUBST(TL_LDFLAGS)
 AC_SUBST(TL_LIBS)

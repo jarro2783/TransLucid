@@ -3,7 +3,59 @@
   #ifdef __clang__
 
     #if !__has_feature(cxx_constexpr)
-      #error C++11 mode required
+      #error Clang doesn't support constexpr
+    #endif
+
+    #if !__has_feature(cxx_decltype)
+      #error Clang doesn't support decltype
+    #endif
+
+    #if !__has_feature(cxx_deleted_functions)
+      #error Clang doesn't support deleted functions
+    #endif
+
+    #if !__has_feature(cxx_generalized_initializers)
+      #error Clang doesn't support generalized initializers
+    #endif
+
+    #if !__has_feature(cxx_lambdas)
+      #error Clang doesn't support lambdas
+    #endif
+
+    #if !__has_feature(cxx_nullptr)
+      #error Clang doesn't support nullptr
+    #endif
+
+    #if !__has_feature(cxx_range_for)
+      #error Clang doesn't support range based for loops
+    #endif
+
+    #if !__has_feature(cxx_raw_string_literals)
+      #error Clang doesn't support raw string literals
+    #endif
+
+    #if !__has_feature(cxx_rvalue_references)
+      #error Clang doesn't support rvalue references
+    #endif
+
+    #if !__has_feature(cxx_auto_type)
+      #error Clang doesn't support auto as a type
+    #endif
+
+    #if !__has_feature(cxx_trailing_return)
+      #error Clang doesn't support trailing return types
+    #endif
+
+    #if !__has_feature(cxx_unicode_literals)
+      #error Clang doesn't support unicode literals
+    #endif
+
+    #if !__has_feature(cxx_variadic_templates)
+      #error Clang doesn't support variadic templates
+    #endif
+
+    #if !__has_feature(cxx_user_literals)
+      #error Clang doesn't support user-defined literals
     #endif
 
   #else
