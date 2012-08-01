@@ -91,11 +91,12 @@ createValueFunction
   const u32string& name, 
   dimension_index argDim, 
   WS* expr,
+  const std::vector<WS*>& binds,
   Context& kappa
 )
 {
   return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, expr, kappa)
+    ValueFunctionType(system, name, argDim, expr, binds, kappa)
   );
 }
 
@@ -113,27 +114,25 @@ createValueFunctionCached
   Context& delta
 )
 {
-  return Types::ValueFunction::create(
-    ValueFunctionType(system, name, argDim, expr, kappa)
-  );
+  //return Types::ValueFunction::create(
+  //  ValueFunctionType(system, name, argDim, expr, kappa)
+  //);
+  #ifdef CACHE_TODO
+  #warning implement cache here
+  #endif
+  return Constant();
 }
 
 Constant
 ValueFunctionType::apply(Context& k, const Constant& value) const
 {
   //set m_dim = value in the context and evaluate the expr
-  if (m_inten.index() != TYPE_INDEX_INTENSION)
-  {
-    return Types::Special::create(SP_TYPEERROR);
-  }
-
-  auto inten = get_constant_pointer<IntensionType>(m_inten);
-
   ContextPerturber p{k, {{m_dim, value}}};
 
-  auto result = inten(k);
+  //set the bound dimensions
+  p.perturb(m_binds);
 
-  return result;
+  return (*m_expr)(k);
 }
 
 Constant
