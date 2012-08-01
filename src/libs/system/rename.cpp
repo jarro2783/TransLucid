@@ -298,6 +298,8 @@ RenameIdentifiers::renameFunction(const T& f)
     l.binds.push_back(apply_visitor(*this, b));
   }
 
+  l.scope = f.scope;
+
   //restore the shadowed name
   if (!shadowed.empty())
   {

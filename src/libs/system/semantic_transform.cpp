@@ -186,7 +186,8 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
     expr.binds.push_back(transformed);
   }
 
-  expr.scope = m_scope;
+  expr.scope = e.scope;
+  expr.scope.insert(expr.scope.end(), m_scope.begin(), m_scope.end());
 
   return expr;
 }

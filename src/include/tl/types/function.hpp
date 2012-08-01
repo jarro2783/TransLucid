@@ -300,10 +300,13 @@ namespace TransLucid
         ++index;
       }
 
+      //std::cerr << "binding in function:" << std::endl;
       for (auto d : scope)
       {
+        //std::cerr << d << " ";
         m_binds.push_back(std::make_pair(d, k.lookup(d)));
       }
+      //std::cerr << std::endl;
 
       //hold on to rho
       m_binds.push_back(std::make_pair(DIM_RHO, k.lookup(DIM_RHO)));

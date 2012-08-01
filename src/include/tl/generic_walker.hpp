@@ -151,6 +151,8 @@ namespace TransLucid
         apply_visitor(*reinterpret_cast<Derived*>(this), e.rhs)
       );
 
+      le.scope = e.scope;
+
       le.argDim = e.argDim;
 
       return le;
