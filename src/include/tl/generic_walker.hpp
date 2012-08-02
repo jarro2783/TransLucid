@@ -239,6 +239,22 @@ namespace TransLucid
         ));
       }
 
+      //do the funs
+      for (const auto& fun : e.funs)
+      {
+        where.funs.push_back
+        (
+          Parser::FnDecl
+          {
+            fun.name,
+            fun.args,
+            apply_visitor(*reinterpret_cast<Derived*>(this), fun.guard),
+            apply_visitor(*reinterpret_cast<Derived*>(this), fun.boolean),
+            apply_visitor(*reinterpret_cast<Derived*>(this), fun.expr)
+          }
+        );
+      }
+
       return where;
     }
 
