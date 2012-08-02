@@ -94,6 +94,7 @@ namespace TransLucid
     std::vector<dimension_index> m_Lin;
 
     std::vector<Parser::Equation> m_newVars;
+    //std::vector<Parser::Equation> m_newFuns;
 
     //the scope of dimensions to save
     std::vector<dimension_index> m_scope;

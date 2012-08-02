@@ -28,6 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iostream>
 
+#include <tl/collapse.hpp>
 #include <tl/equation.hpp>
 #include <tl/function_transform.hpp>
 #include <tl/rename.hpp>

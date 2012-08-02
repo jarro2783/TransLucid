@@ -100,6 +100,11 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 
     w.vars.push_back(newEqn);
   }
+
+  //do the functions
+  for (const auto& efun : e.funs)
+  {
+  }
   
   //visit child E
   Tree::Expr expr = apply_visitor(*this, e.e);
