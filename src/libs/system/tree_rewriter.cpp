@@ -120,33 +120,4 @@ TreeRewriter::operator()(const Tree::BangAppExpr& e)
   }
 }
 
-Tree::Expr 
-TreeRewriter::operator()(const Tree::WhereExpr& e)
-{
-  Tree::WhereExpr where;
-
-  where.e = apply_visitor(*this, e.e);
-
-  //replace everything in the dimension expressions
-  for (const auto& dim : e.dims)
-  {
-    where.dims.push_back(std::make_pair(dim.first,
-      apply_visitor(*this, dim.second)));
-  }
-
-  //replace everything in the var expressions
-  for (const auto& var : e.vars)
-  {
-    where.vars.push_back(std::make_tuple(
-      std::get<0>(var),
-      apply_visitor(*this, std::get<1>(var)),
-      apply_visitor(*this, std::get<2>(var)),
-      apply_visitor(*this, std::get<3>(var))
-    ));
-  }
-
-  return where;
-}
-
-
 }
