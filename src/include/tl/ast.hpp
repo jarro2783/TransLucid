@@ -40,6 +40,11 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  namespace Parser
+  {
+    struct FnDecl;
+  }
+
   /** 
    * Abstract syntax tree. Contains all of the classes, types and functions
    * related to the abstract syntax tree.
@@ -769,6 +774,8 @@ namespace TransLucid
         std::tuple<u32string, Expr, Expr, Expr>
       > vars;
 
+      std::vector<Parser::FnDecl> funs;
+
       mpz_class myLabel;
       std::vector<dimension_index> dimAllocation;
     };
@@ -838,6 +845,9 @@ namespace TransLucid
     typedef std::tuple<u32string, Tree::Expr, Tree::Expr, Tree::Expr>
     Equation;
   }
+
 }
+
+#include <tl/parser_api.hpp>
 
 #endif // AST_NEW_HPP_INCLUDED

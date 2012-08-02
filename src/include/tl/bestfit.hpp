@@ -184,6 +184,7 @@ namespace TransLucid
     {
       return m_parsed;
     }
+
   };
 
   class DefinitionGrouper
