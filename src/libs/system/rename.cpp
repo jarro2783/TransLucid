@@ -248,6 +248,22 @@ RenameIdentifiers::operator()(const Tree::WhereExpr& e)
     );
   }
 
+  //rename the funs
+  for (const auto& fun : e.funs)
+  {
+    w.funs.push_back
+    (
+      Parser::FnDecl
+      {
+        renameString(fun.name),
+        fun.args,
+        apply_visitor(*this, fun.guard),
+        apply_visitor(*this, fun.boolean),
+        apply_visitor(*this, fun.expr)
+      }
+    );
+  }
+
   //delete the dim names and var names, then reinsert the shadowed
   for (const auto& v : newNames)
   {
