@@ -715,19 +715,11 @@ fixupTree(System& s, const Tree::Expr& e)
   //std::cerr << "after fixing up tree: " << Printer::print_expr_tree(e4, true)
   //  << std::endl;
 
-  const auto& scope = transform.getAllScopeArgs();
-  const auto& odo = transform.getAllScopeOdometer();
-
-  std::vector<dimension_index> nils(scope.begin(), scope.end());
-  nils.insert(nils.end(), odo.begin(), odo.end());
-
   return 
   {
     e4, 
     {
-      transform.newVars(),
-      transform.getLin(),
-      nils
+      transform.newVars()
     }
   };
 }

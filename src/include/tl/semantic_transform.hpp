@@ -82,16 +82,6 @@ namespace TransLucid
       return m_Lin;
     }
 
-    const std::vector<dimension_index>& getAllScopeArgs() const
-    {
-      return m_namedAllScopeArgs;
-    }
-
-    const std::vector<dimension_index>& getAllScopeOdometer() const
-    {
-      return m_namedAllScopeOdometers;
-    }
-
     private:
     typedef std::map<u32string, dimension_index> LambdaReplaced;
 
@@ -105,13 +95,11 @@ namespace TransLucid
 
     std::vector<Parser::Equation> m_newVars;
 
-    //we actually only need one scope stack
+    //the scope of dimensions to save
     std::vector<dimension_index> m_scope;
 
+    //the names of what is in scope
     std::vector<u32string> m_scopeNames;
-
-    std::vector<dimension_index> m_namedAllScopeArgs;
-    std::vector<dimension_index> m_namedAllScopeOdometers;
 
     LambdaReplaced m_lambdaScope;
   };

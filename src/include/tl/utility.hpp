@@ -210,8 +210,6 @@ namespace TransLucid
   struct ExtraTreeInformation
   {
     std::vector<Parser::Equation> equations;
-    std::vector<dimension_index> defaultZeros;
-    std::vector<dimension_index> defaultNils;
   };
 
   std::pair
