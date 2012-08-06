@@ -64,7 +64,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   {
     //rename identifiers in scope
     //after visiting all the dimension initialisation expressions
-    m_lambdaScope.insert(std::make_pair(v.first, *alloc)); 
+    m_fnScope.insert(std::make_pair(v.first, *alloc)); 
 
     //put the dim in scope too
     m_scope.push_back(*alloc);
@@ -112,7 +112,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   //restore the scope
   for (auto v : e.dims)
   {
-    m_lambdaScope.erase(v.first);
+    m_fnScope.erase(v.first);
   }
 
   m_scope.resize(m_scope.size() - e.dims.size());
@@ -128,9 +128,18 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 Tree::Expr
 SemanticTransform::operator()(const Tree::IdentExpr& e)
 {
-  auto iter = m_lambdaScope.find(e.text);
-  if (iter != m_lambdaScope.end())
+  //does this need to be replaced for a function parameter or dim
+  auto iter = m_fnScope.find(e.text);
+  if (iter != m_fnScope.end())
   {
+    //is it a call by name?
+    auto cbniter = m_cbnscope.find(e.text);
+    if (cbniter != m_cbnscope.end())
+    {
+      return Tree::EvalIntenExpr(
+        Tree::HashExpr(Tree::DimensionExpr(iter->second)));
+    }
+
     return Tree::HashExpr(Tree::DimensionExpr(iter->second));
   }
   else
@@ -165,7 +174,7 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   dimension_index argDim = expr.argDim == 0 ? 
     m_system.nextHiddenDim() : expr.argDim;
 
-  m_lambdaScope.insert({e.name, argDim});
+  m_fnScope.insert({e.name, argDim});
 
   //2. store our scope dimensions and ourself
   expr.argDim = argDim;
@@ -180,7 +189,7 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   //5. restore the scope
   m_scope.pop_back();
   //m_scope.resize(m_scope.size() - 1);
-  m_lambdaScope.erase(e.name);
+  m_fnScope.erase(e.name);
 
   expr.rhs = child;
 
@@ -200,7 +209,30 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
 Tree::Expr
 SemanticTransform::operator()(const Tree::PhiExpr& e)
 {
-  throw "error: SemanticTransform(PhiExpr) reached";
+  auto dim = m_system.nextHiddenDim();
+
+  //if this shadows
+
+  m_fnScope.insert(std::make_pair(e.name, dim));
+  m_cbnscope.insert(e.name);
+
+  std::vector<Tree::Expr> binds;
+  for (auto& b : e.binds)
+  {
+    binds.push_back(apply_visitor(*this, b));
+  }
+
+  Tree::LambdaExpr lambda = Tree::LambdaExpr(e.name, binds, e.rhs);
+  lambda.argDim = e.argDim;;
+
+  Tree::Expr le = lambda;
+
+  Tree::Expr fun = apply_visitor(*this, le);
+
+  m_fnScope.erase(e.name);
+  m_cbnscope.erase(e.name);
+
+  return fun;
 }
 
 ScopePtr

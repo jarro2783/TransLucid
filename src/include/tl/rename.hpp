@@ -32,7 +32,7 @@ namespace TransLucid
   {
     public:
 
-    //for boost::apply_visitor
+    //for the visitor interface
     typedef Tree::Expr result_type;
 
     //a hashmap would be better, but we need to hold on to iterators

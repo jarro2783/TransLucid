@@ -99,9 +99,9 @@ namespace TransLucid
     std::vector<u32string> m_scopeNames;
 
     //function parameters to replace
-    ParameterReplaced m_lambdaScope;
+    ParameterReplaced m_fnScope;
 
-    //call by name scope names
+    //which ones are call by name
     std::set<u32string> m_cbnscope;
 
     //the renames

@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/types.hpp>
 
+#include <set>
 #include <unordered_map>
 
 namespace TransLucid
@@ -45,7 +46,8 @@ namespace TransLucid
    */
   struct Scope
   {
-    std::vector<dimension_index> dims; 
+    std::set<u32string> cbnParams;
+    std::vector<dimension_index> scopeDims; 
     std::unordered_map<u32string, dimension_index> lookups;
     std::unordered_map<u32string, u32string> renames;
   };
