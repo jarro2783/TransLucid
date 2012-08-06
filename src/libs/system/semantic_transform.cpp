@@ -22,6 +22,19 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <tl/utility.hpp>
 
+// There are several problems in writing this transformation:
+//   1. The evaluator needs to be lazy.
+//   2. Everything needs to be renamed.
+//   3. The scope at each where clause needs to be known to enable laziness.
+//   4. There are several different ways to rewrite an identifier depending
+//       on what it was.
+//
+// The solution is therefore this: Rename everything on the fly, and use the
+// unique names for determining what to rewrite expressions to. Then, hold
+// on to the scope for each where clause.
+// The scope is stored as a shared pointer to a scope object, because every
+// entity declared inside a where clause will have the same scope.
+
 namespace TransLucid
 {
 

@@ -37,6 +37,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/semantics.hpp>
 
 #include <set>
+#include <stack>
 #include <unordered_map>
 
 namespace TransLucid
@@ -103,6 +104,9 @@ namespace TransLucid
 
     //which ones are call by name
     std::set<u32string> m_cbnscope;
+
+    //the currently shadowed names and their renamed name
+    std::stack<std::pair<u32string, u32string>> m_shadowed;
 
     //the renames
     //a hashmap would be better, but we need to hold on to iterators
