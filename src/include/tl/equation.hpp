@@ -41,282 +41,30 @@ namespace TransLucid
 {
   class System;
 
-  class InvalidGuard : public Exception
-  {
-  };
-
-  /**
-   * @brief Represents the guard of an equation.
-   *
-   * The guard is the bit between the @ and the = in
-   * eqn @ [dim : E, ...] = expr.
-   * The system can impose elements of the guard, it is an error for
-   * the user to specify those ones too.
-   **/
-  class GuardWS
-  {
-    public:
-
-    /**
-     * @brief Constructs a guard from an AST.
-     *
-     * Specifies the AST to use for the guard.
-     **/
-    GuardWS(WS* g, WS* b);
-
-    /**
-     * @brief Creates a guard with no AST.
-     *
-     * There are no user dimensions in the guard. System imposed
-     * dimensions can still be added.
-     **/
-    GuardWS()
-    : m_guard(nullptr), m_boolean(nullptr), m_compiled(true), 
-      m_system(nullptr)
-    , m_priority(0)
-    {
-    }
-
-    GuardWS(const Tuple& t)
-    : m_compiled(true), m_system(nullptr), m_priority(0)
-    {
-       for (Tuple::const_iterator iter = t.begin();
-          iter != t.end();
-          ++iter)
-       {
-          addDimension(iter->first, iter->second);
-       }
-    }
-
-    GuardWS(const GuardWS&);
-
-    ~GuardWS() = default;
-
-    GuardWS& operator=(const GuardWS&);
-
-    /**
-     * @brief Determines if there are any dimensions in the guard.
-     *
-     * @return false if there are no user or system imposed dimensions,
-     * true otherwise.
-     **/
-    operator bool() const
-    {
-       return 
-          m_guard != nullptr
-       || m_boolean != nullptr
-       || m_dimConstConst.size() != 0
-       || m_dimConstNon.size() != 0
-       || m_dimNonConst.size() != 0
-       || m_dimNonNon.size() != 0
-       ;
-    }
-
-    #if 0
-    /**
-     * @brief Evaluate the guard.
-     *
-     * Returns a tuple of the dimensions and the evaluated AST.
-     **/
-    template <typename... Delta>
-    std::pair<bool, Tuple>
-    evaluate(Context& k, Delta&&... delta) const;
-    #endif
-
-    /**
-     * @brief Adds a system imposed dimension.
-     *
-     * The system can add dimensions to the guard which the user can't
-     * change.
-     **/
-    void
-    addDimension(size_t dim, const Constant& v)
-    {
-       m_dimConstConst[dim] = v;
-    }
-
-    WS*
-    boolean() const
-    {
-       return m_boolean.get();
-    }
-
-    int
-    priority() const
-    {
-      return m_priority;
-    }
-
-    //after a call to evaluate, these are reset to whatever demands evaluate
-    //produced
-    const std::vector<dimension_index>&
-    demands() const
-    {
-      return m_demands;
-    }
-
-    private:
-
-    void
-    compile() const;
-
-    std::shared_ptr<WS> m_guard;
-    std::shared_ptr<WS> m_boolean;
-
-    mutable std::map<dimension_index, Constant> m_dimConstConst;
-    mutable std::map<dimension_index, WS*> m_dimConstNon;
-
-    mutable std::map<WS*, Constant> m_dimNonConst;
-    mutable std::map<WS*, WS*> m_dimNonNon;
-
-    //have we compiled the guard?
-    mutable bool m_compiled;
-
-    mutable bool m_onlyConst;
-
-    mutable System* m_system;
-
-    mutable int m_priority;
-
-    mutable std::vector<dimension_index> m_demands;
-  };
-
-  class VariableWS;
-
-  typedef std::map<u32string, VariableWS*> VariableMap;
-
-  class EquationWS : public WS
-  {
-    public:
-    EquationWS(const u32string& name, const GuardWS& valid, WS* h,
-      int provenance);
-
-    EquationWS();
-
-    ~EquationWS();
-
-    const u32string&
-    name() const
-    {
-       return m_name;
-    }
-
-    const GuardWS&
-    validContext() const
-    {
-       return m_validContext;
-    }
-
-    operator bool() const
-    {
-       return m_h != 0;
-    }
-
-    WS*
-    equation() const
-    {
-       return m_h.get();
-    }
-
-    const uuid&
-    id() const
-    {
-      return m_id;
-    }
-
-    void
-    del(size_t time);
-
-    Constant
-    operator()(Context& k)
-    {
-      return (*m_h)(k);
-    }
-
-    Constant
-    operator()(Context& kappa, Context& delta)
-    {
-      return (*m_h)(kappa, delta);
-    }
-
-    int
-    provenance() const
-    {
-      return m_provenance;
-    }
-
-    int
-    priority() const
-    {
-      return m_priority;
-    }
-
-    int
-    endTime() const
-    {
-      return m_endTime;
-    }
-
-    private:
-    u32string m_name;
-    GuardWS m_validContext;
-    std::shared_ptr<WS> m_h;
-    uuid m_id;
-    //Tree::Expr* m_ast;
-    int m_provenance;
-    int m_endTime;
-    int m_priority;
-  };
-
   //represents all definitions of a variable, is responsible for
   //JIT and best fitting
   class VariableWS : public WS, public DefinitionGrouper
   {
     public:
-    typedef std::map<uuid, EquationWS> UUIDEquationMap;
-    typedef std::tuple<Tuple, VariableWS::UUIDEquationMap::const_iterator> 
-      ApplicableTuple;
-    typedef std::vector<ApplicableTuple> applicable_list;
-
     VariableWS(const u32string& name, System& system);
     
-    ~VariableWS();
-
     Constant
-    operator()(Context& k);
-
-    Constant
-    operator()(Context& kappa, Context& delta);
-
-    template <typename... Delta>
-    Constant
-    bestfit(const applicable_list& applicable, Context& k, Delta&&... delta);
-
-    #if 0
-    virtual uuid
-    addExpr(const Tuple& k, WS* h)
+    operator()(Context& k)
     {
-      return addExprInternal(k, h).first;
+      return m_bestfit(k);
     }
-    #endif
+
+    Constant
+    operator()(Context& kappa, Context& delta)
+    {
+      return m_bestfit(kappa, delta);
+    }
 
     void
     addEquation(uuid id, Parser::RawInput input, int time);
 
     void
     addEquation(uuid id, Parser::Variable eqn, int time);
-
-    uuid
-    addEquation(EquationWS* e, size_t time);
-
-    uuid
-    addEquation
-    (
-      const u32string& name, 
-      GuardWS guard, 
-      WS* e, 
-      size_t time
-    );
 
     virtual bool 
     del(uuid id, size_t time);
@@ -330,36 +78,11 @@ namespace TransLucid
       return m_bestfit.repl(id, time, line);
     }
 
-    /**
-     * The equations belonging directly to this variable. Returns the map of
-     * UUIDs to equations for the current variable.
-     * @return A map of UUID to the current variable's equations.
-     */
-    const UUIDEquationMap& equations() const
-    {
-      return m_equations;
-    }
-
     Tree::Expr
     group(const std::list<EquationDefinition>& lines);
 
     private:
-
-    typedef std::list<std::pair<int, UUIDEquationMap::iterator>> 
-      ProvenanceList;
-
-    typedef std::map<int, ProvenanceList> PriorityList;
-
-    UUIDEquationMap m_equations;
-
     u32string m_name;
-    System& m_system;
-    //bool storeuuid;
-
-    //BestFittable m_bestFit;
-    //CompileBestFit *m_compileBestFit;
-
-    PriorityList m_priorityVars;
 
     BestfitGroup m_bestfit;
   };
