@@ -85,9 +85,6 @@ namespace TransLucid
     private:
     typedef std::map<u32string, dimension_index> LambdaReplaced;
 
-    Tree::Expr
-    fullFixTree(const Tree::Expr& expr);
-
     System& m_system;
 
     std::vector<dimension_index> m_Lout;

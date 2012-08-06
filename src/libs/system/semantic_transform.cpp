@@ -203,15 +203,4 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
   throw "error: SemanticTransform(PhiExpr) reached";
 }
 
-Tree::Expr
-SemanticTransform::fullFixTree(const Tree::Expr& expr)
-{
-  //need to do the whole tree fixup here
-  auto fixed = fixupTree(m_system, expr);
-  m_newVars.insert(m_newVars.end(), 
-    fixed.second.equations.begin(), fixed.second.equations.end());
-
-  return fixed.first;
-}
-
 }
