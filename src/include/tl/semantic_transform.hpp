@@ -34,8 +34,10 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/generic_walker.hpp>
+#include <tl/semantics.hpp>
 
-#include <map>
+#include <set>
+#include <unordered_map>
 
 namespace TransLucid
 {
@@ -52,6 +54,9 @@ namespace TransLucid
     : m_system(system)
     {
     }
+
+    void
+    restoreScope(const ScopePtr& scope);
 
     Tree::Expr
     transform(const Tree::Expr& e);
@@ -77,21 +82,15 @@ namespace TransLucid
       return m_newVars;
     }
 
-    const std::vector<dimension_index>& getLin() const
-    {
-      return m_Lin;
-    }
-
     private:
-    typedef std::map<u32string, dimension_index> LambdaReplaced;
+    typedef std::unordered_map<u32string, dimension_index> ParameterReplaced;
+
+    ScopePtr
+    makeScope() const;
 
     System& m_system;
 
-    std::vector<dimension_index> m_Lout;
-    std::vector<dimension_index> m_Lin;
-
     std::vector<Parser::Equation> m_newVars;
-    //std::vector<Parser::Equation> m_newFuns;
 
     //the scope of dimensions to save
     std::vector<dimension_index> m_scope;
@@ -99,7 +98,18 @@ namespace TransLucid
     //the names of what is in scope
     std::vector<u32string> m_scopeNames;
 
-    LambdaReplaced m_lambdaScope;
+    //function parameters to replace
+    ParameterReplaced m_lambdaScope;
+
+    //call by name scope names
+    std::set<u32string> m_cbnscope;
+
+    //the renames
+    //a hashmap would be better, but we need to hold on to iterators
+    //while we're changing it and they can't be invalidated
+    typedef std::map<u32string, u32string> RenameRules;
+
+    RenameRules m_rename;
   };
 }
 

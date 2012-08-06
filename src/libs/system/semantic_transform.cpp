@@ -203,4 +203,9 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
   throw "error: SemanticTransform(PhiExpr) reached";
 }
 
+ScopePtr
+SemanticTransform::makeScope() const
+{
+}
+
 }

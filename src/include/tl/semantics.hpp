@@ -39,10 +39,9 @@ namespace TransLucid
    * already inside another scope.
    *
    * An expression has the following scope:
-   * @list
-   * @li Dimensions to hold
-   * @li Identifiers to rename
-   * @li identifiers to convert to #!d
+   * - Dimensions to hold
+   * - Identifiers to rename
+   * - identifiers to convert to #!d
    */
   struct Scope
   {
@@ -50,6 +49,8 @@ namespace TransLucid
     std::unordered_map<u32string, dimension_index> lookups;
     std::unordered_map<u32string, u32string> renames;
   };
+
+  typedef std::shared_ptr<Scope> ScopePtr;
 }
 
 #endif
