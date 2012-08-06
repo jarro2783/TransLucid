@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/context.hpp>
 #include <tl/parser_api.hpp>
+#include <tl/semantics.hpp>
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
 #include <tl/workshop.hpp>
@@ -170,6 +171,7 @@ namespace TransLucid
     int m_end;
     std::shared_ptr<Parser::RawInput> m_raw;
     std::shared_ptr<Parser::Line> m_parsed;
+    Scope m_scope;
 
     public:
 

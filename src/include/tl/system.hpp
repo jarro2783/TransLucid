@@ -37,6 +37,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/registries.hpp>
+#include <tl/semantics.hpp>
 #include <tl/system_object.hpp>
 #include <tl/trie.hpp>
 
