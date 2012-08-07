@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/system.hpp>
 #include <tl/utility.hpp>
 
+#include <sstream>
+
 // There are several problems in writing this transformation:
 //   1. The evaluator needs to be lazy.
 //   2. Everything needs to be renamed.
@@ -222,9 +224,8 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
 Tree::Expr
 SemanticTransform::operator()(const Tree::PhiExpr& e)
 {
+  auto name = openScope(e.name);
   auto dim = m_system.nextHiddenDim();
-
-  //if this shadows
 
   m_fnScope.insert(std::make_pair(e.name, dim));
   m_cbnscope.insert(e.name);
@@ -251,6 +252,24 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
 ScopePtr
 SemanticTransform::makeScope() const
 {
+}
+
+//open a new scope, possibly shadowing another
+u32string
+SemanticTransform::openScope(const u32string& id)
+{
+  //TODO the rename stack should be a map of stacks
+  auto index = m_system.nextVarIndex();
+
+  std::ostringstream os;
+  os << index << "_uniqueid";
+  
+  auto iter = m_rename.find(id);
+
+  if (iter != m_rename.end())
+  {
+    m_shadowed.push(std::make_pair(id, iter->second));
+  }
 }
 
 }

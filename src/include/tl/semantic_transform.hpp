@@ -89,6 +89,14 @@ namespace TransLucid
     ScopePtr
     makeScope() const;
 
+    //open a new scope, possibly shadowing another
+    u32string
+    openScope(const u32string& id);
+
+    //get the current rename for this identifier
+    const u32string& 
+    rename(const u32string& name);
+
     System& m_system;
 
     std::vector<Parser::Equation> m_newVars;
