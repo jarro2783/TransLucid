@@ -703,26 +703,26 @@ std::pair
 >
 fixupTree(System& s, const Tree::Expr& e)
 {
-  TreeRewriter rewriter;
-  RenameIdentifiers renamer(s);
-  FunctionTransform funs;
+  //TreeRewriter rewriter;
+  //RenameIdentifiers renamer(s);
+  //FunctionTransform funs;
   SemanticTransform transform(s);
 
-  Tree::Expr e1 = rewriter.rewrite(e);
-  Tree::Expr e2 = renamer.rename(e1);
-  Tree::Expr e3 = funs.transform(e2);
-  Tree::Expr e4 = transform.transform(e3);
+  //Tree::Expr e1 = rewriter.rewrite(e);
+  //Tree::Expr e2 = renamer.rename(e1);
+  //Tree::Expr e3 = funs.transform(e2);
+  Tree::Expr e4 = transform.transform(e);
 
   //std::cerr << "after fixing up tree: " << Printer::print_expr_tree(e4, true)
   //  << std::endl;
 
-  return 
-  {
-    e4, 
-    {
-      transform.newVars()
-    }
-  };
+  //return 
+  //{
+  //  e4, 
+  //  {
+  //    transform.newVars()
+  //  }
+  //};
 }
 
 }

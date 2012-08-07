@@ -77,12 +77,6 @@ namespace TransLucid
     Tree::Expr
     operator()(const Tree::PhiExpr& e);
 
-    const std::vector<Parser::Equation>& 
-    newVars() const
-    {
-      return m_newVars;
-    }
-
     private:
     typedef std::unordered_map<u32string, dimension_index> ParameterReplaced;
 
@@ -102,8 +96,6 @@ namespace TransLucid
 
     System& m_system;
 
-    std::vector<Parser::Equation> m_newVars;
-
     //the scope of dimensions to save
     std::vector<dimension_index> m_scope;
 
@@ -122,6 +114,15 @@ namespace TransLucid
     typedef std::map<u32string, std::stack<u32string>> RenameRules;
 
     RenameRules m_rename;
+
+    std::vector<std::pair<ScopePtr, Parser::Line>> m_newVars;
+
+    public:
+    const decltype(m_newVars)&
+    newVars() const
+    {
+      return m_newVars;
+    }
   };
 }
 

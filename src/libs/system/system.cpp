@@ -972,7 +972,7 @@ Tree::Expr
 System::fixupTreeAndAdd(const Tree::Expr& e)
 {
   auto result = fixupTree(*this, e);
-  addTransformedEquations(result.second.equations);
+  //addTransformedEquations(result.second.equations);
 
   return result.first;
 }

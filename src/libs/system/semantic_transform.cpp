@@ -114,6 +114,28 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 
   //create the declarations with scope to add later
   auto currentScope = makeScope();
+
+  //add the variables
+  for (const auto& evar : e.vars)
+  {
+    m_newVars.push_back(std::make_pair(currentScope, 
+      Parser::Variable
+      {
+        Parser::Equation
+        {
+          std::get<0>(evar),
+          std::get<1>(evar),
+          std::get<2>(evar),
+          std::get<3>(evar)
+        }
+      }));
+  }
+
+  //add the functions
+  for (const auto& efun : e.funs)
+  {
+    m_newVars.push_back(std::make_pair(currentScope, efun));
+  }
   
   //visit child E
   Tree::Expr expr = apply_visitor(*this, e.e);
