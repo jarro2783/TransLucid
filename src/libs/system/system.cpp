@@ -199,7 +199,8 @@ Constant
 System::addVariableDeclInternal
 (
   const u32string& name,
-  Input&& decl
+  Input&& decl,
+  ScopePtr scope
 )
 {
   uuid u = generate_uuid();
@@ -969,9 +970,9 @@ System::addTransformedEquations
 }
 
 Tree::Expr
-System::fixupTreeAndAdd(const Tree::Expr& e)
+System::fixupTreeAndAdd(const Tree::Expr& e, ScopePtr scope)
 {
-  auto result = fixupTree(*this, e);
+  auto result = fixupTree(*this, e, scope);
   //addTransformedEquations(result.second.equations);
 
   return result.first;

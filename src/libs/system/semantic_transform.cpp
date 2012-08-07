@@ -355,4 +355,21 @@ SemanticTransform::getRenamed(const u32string& name)
   return name;
 }
 
+void
+SemanticTransform::restoreScope(const ScopePtr& scope)
+{
+  m_cbnscope = scope->cbnParams;
+  m_scope = scope->scopeDims;
+  m_fnScope = scope->lookups;
+
+  //initialise the stack of names
+  for (const auto& r : scope->renames)
+  {
+    auto result = 
+      m_rename.insert(std::make_pair(r.first, RenameRules::mapped_type()));
+
+    result.first->second.push(r.second);
+  }
+}
+
 }

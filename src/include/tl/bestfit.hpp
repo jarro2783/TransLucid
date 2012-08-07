@@ -165,13 +165,26 @@ namespace TransLucid
       m_parsed = std::make_shared<Parser::Line>(parsed);
     }
 
+    void
+    setScope(ScopePtr scope)
+    {
+      m_scope = scope;
+    }
+
+    ScopePtr
+    getScope() const
+    {
+      return m_scope;
+    }
+    
+
     private:
     uuid m_uuid;
     int m_start;
     int m_end;
     std::shared_ptr<Parser::RawInput> m_raw;
     std::shared_ptr<Parser::Line> m_parsed;
-    Scope m_scope;
+    ScopePtr m_scope;
 
     public:
 
@@ -213,11 +226,13 @@ namespace TransLucid
     (
       uuid id,
       Parser::RawInput input,
-      int time
+      int time,
+      ScopePtr scope = ScopePtr()
     )
     {
       m_definitions.push_back(EquationDefinition{id, time, -1});
       m_definitions.back().setRaw(input);
+      m_definitions.back().setScope(scope);
       change(time);
       addUUID(id);
     }
@@ -227,11 +242,13 @@ namespace TransLucid
     (
       uuid id,
       Parser::Line definition,
-      int time
+      int time,
+      ScopePtr scope = ScopePtr()
     )
     {
       m_definitions.push_back(EquationDefinition{id, time, -1});
       m_definitions.back().setParsed(definition);
+      m_definitions.back().setScope(scope);
       change(time);
       addUUID(id);
     }
@@ -363,7 +380,7 @@ namespace TransLucid
     compileInstant(int time);
 
     std::shared_ptr<WS>
-    compileExpression(const Tree::Expr& expr);
+    compileExpression(const Tree::Expr& expr, ScopePtr scope);
 
     Constant
     evaluate(Context& k);

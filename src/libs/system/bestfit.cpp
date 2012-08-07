@@ -131,7 +131,8 @@ BestfitGroup::compile(Context& k)
       Tree::Expr expression = compileInstant(m_changes[change]);
 
       //make this into a workshop
-      std::shared_ptr<WS> evaluator = compileExpression(expression);
+      std::shared_ptr<WS> evaluator = compileExpression(expression, 
+        m_definitions.front().getScope());
 
       m_evaluators.push_back(CompiledDefinition{start, end, evaluator});
 
@@ -143,10 +144,10 @@ BestfitGroup::compile(Context& k)
 }
 
 std::shared_ptr<WS>
-BestfitGroup::compileExpression(const Tree::Expr& expr)
+BestfitGroup::compileExpression(const Tree::Expr& expr, ScopePtr scope)
 {
   //fixup the ast
-  Tree::Expr fixed = m_system.fixupTreeAndAdd(expr);
+  Tree::Expr fixed = m_system.fixupTreeAndAdd(expr, scope);
 
   std::cerr << m_name << ": fixed up tree: " 
     << Printer::print_expr_tree(fixed, true)

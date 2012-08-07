@@ -701,12 +701,17 @@ std::pair
   Tree::Expr,
   ExtraTreeInformation
 >
-fixupTree(System& s, const Tree::Expr& e)
+fixupTree(System& s, const Tree::Expr& e, ScopePtr scope)
 {
   //TreeRewriter rewriter;
   //RenameIdentifiers renamer(s);
   //FunctionTransform funs;
   SemanticTransform transform(s);
+
+  if (scope.get())
+  {
+    transform.restoreScope(scope);
+  }
 
   //Tree::Expr e1 = rewriter.rewrite(e);
   //Tree::Expr e2 = renamer.rename(e1);

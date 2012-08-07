@@ -61,10 +61,12 @@ namespace TransLucid
     }
 
     void
-    addEquation(uuid id, Parser::RawInput input, int time);
+    addEquation(uuid id, Parser::RawInput input, int time, 
+      ScopePtr = ScopePtr());
 
     void
-    addEquation(uuid id, Parser::Variable eqn, int time);
+    addEquation(uuid id, Parser::Variable eqn, int time, 
+      ScopePtr = ScopePtr());
 
     virtual bool 
     del(uuid id, size_t time);

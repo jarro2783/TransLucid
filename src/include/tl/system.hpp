@@ -268,7 +268,7 @@ namespace TransLucid
     cacheEnabled() const;
 
     Tree::Expr
-    fixupTreeAndAdd(const Tree::Expr& e);
+    fixupTreeAndAdd(const Tree::Expr& e, ScopePtr scope = ScopePtr());
 
     BaseFunctionType*
     lookupBaseFunction(const u32string& name);
@@ -436,7 +436,8 @@ namespace TransLucid
     addVariableDeclInternal
     (
       const u32string& name,
-      Input&& decl
+      Input&& decl,
+      ScopePtr = ScopePtr()
     );
 
     template <typename Input>

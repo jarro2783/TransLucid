@@ -217,7 +217,7 @@ namespace TransLucid
     Tree::Expr,
     ExtraTreeInformation
   >
-  fixupTree(System& s, const Tree::Expr& e);
+  fixupTree(System& s, const Tree::Expr& e, ScopePtr scope = ScopePtr());
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

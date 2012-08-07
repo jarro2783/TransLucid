@@ -70,15 +70,17 @@ VariableWS::VariableWS(const u32string& name, System& system)
 }
 
 void
-VariableWS::addEquation(uuid id, Parser::Variable eqn, int time)
+VariableWS::addEquation(uuid id, Parser::Variable eqn, int time, 
+  ScopePtr scope)
 {
-  m_bestfit.addEquation(id, eqn, time);
+  m_bestfit.addEquation(id, eqn, time, scope);
 }
 
 void
-VariableWS::addEquation(uuid id, Parser::RawInput input, int time)
+VariableWS::addEquation(uuid id, Parser::RawInput input, int time,
+  ScopePtr scope)
 {
-  m_bestfit.addEquation(id, input, time);
+  m_bestfit.addEquation(id, input, time, scope);
 }
 
 bool
