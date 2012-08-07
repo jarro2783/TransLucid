@@ -49,7 +49,10 @@ SemanticTransform::transform(const Tree::Expr& e)
 Tree::Expr
 SemanticTransform::operator()(const Tree::WhereExpr& e)
 {
-  //all the names are already unique
+  //this is done lazily, so we don't actually visit the variables.
+  //we need to visit the dimension initialisers and the expression
+  //the dimension initialisers are done in the starting scope, and the 
+  //expression is done with the variables and dimensions in scope
   Tree::WhereExpr w;
 
   std::vector<dimension_index> myLin;
