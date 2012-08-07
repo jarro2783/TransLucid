@@ -189,6 +189,45 @@ namespace detail
     System& m_system;
     InputHD* m_hd;
   };
+
+  class LineAdder
+  {
+    public:
+
+    typedef void result_type;
+
+    LineAdder(System& system)
+    : m_system(system)
+    {
+    }
+
+    void
+    add(const Parser::Line& line, ScopePtr scope)
+    {
+      apply_visitor(*this, line, scope);
+    }
+
+    template <typename T>
+    void
+    operator()(const T&, ScopePtr scope)
+    {
+    }
+
+    void
+    operator()(const Parser::FnDecl& fun, ScopePtr scope)
+    {
+      m_system.addFunDeclInternal(fun.name, fun, scope);
+    }
+
+    void
+    operator()(const Parser::Variable& var, ScopePtr scope)
+    {
+      m_system.addVariableDeclInternal(std::get<0>(var.eqn), var, scope);
+    }
+
+    private:
+    System& m_system;
+  };
 }
 
 //private template  functions go at the top, but after the local
@@ -429,6 +468,13 @@ System::go()
 
   ++m_time;
   setDefaultContext();
+}
+
+void
+System::addParsedDecl(const Parser::Line& decl, ScopePtr scope)
+{
+  detail::LineAdder adder(*this);
+  adder.add(decl, scope);
 }
 
 Constant 
@@ -966,7 +1012,7 @@ System::addTransformedEquations
   //std::cerr << "adding extra equations" << std::endl;
   for (const auto& e : newVars.equations)
   {
-    //addVariableDeclParsed(e);
+    addParsedDecl(e.second, e.first);
   }
 }
 

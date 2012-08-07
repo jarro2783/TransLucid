@@ -50,6 +50,7 @@ namespace TransLucid
   namespace detail
   {
     class InputHDWS;
+    class LineAdder;
   }
 
   namespace Parser
@@ -232,6 +233,9 @@ namespace TransLucid
     (
       const ExtraTreeInformation& newVars
     );
+
+    void
+    addParsedDecl(const Parser::Line& decl, ScopePtr scope);
 
     void
     loadLibrary(const u32string& s);
@@ -432,6 +436,7 @@ namespace TransLucid
     static GettextInit m_gettext;
 
     friend class detail::InputHDWS;
+    friend class detail::LineAdder;
 
     template <typename Input>
     Constant

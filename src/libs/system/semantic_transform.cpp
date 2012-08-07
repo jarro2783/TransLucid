@@ -339,6 +339,11 @@ SemanticTransform::popScope(const u32string& id)
   if (iter != m_rename.end())
   {
     iter->second.pop();
+
+    if (iter->second.empty())
+    {
+      m_rename.erase(iter);
+    }
   }
 }
 
@@ -349,6 +354,11 @@ SemanticTransform::getRenamed(const u32string& name)
 
   if (iter != m_rename.end())
   {
+    if (iter->second.empty())
+    {
+      std::cerr << "top of stack is empty" << std::endl;
+    }
+
     return iter->second.top();
   }
 
