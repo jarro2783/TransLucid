@@ -232,7 +232,8 @@ Constant
 System::addFunDeclInternal
 (
   const u32string& name,
-  Input&& decl
+  Input&& decl,
+  ScopePtr scope
 )
 {
   uuid u = generate_uuid();
@@ -958,14 +959,14 @@ System::cacheEnabled() const
 void
 System::addTransformedEquations
 (
-  const std::vector<Parser::Equation>& newVars
+  const ExtraTreeInformation& newVars
 )
 {
   //add all the new equations
   //std::cerr << "adding extra equations" << std::endl;
-  for (const auto& e : newVars)
+  for (const auto& e : newVars.equations)
   {
-    addVariableDeclParsed(e);
+    //addVariableDeclParsed(e);
   }
 }
 
@@ -973,7 +974,7 @@ Tree::Expr
 System::fixupTreeAndAdd(const Tree::Expr& e, ScopePtr scope)
 {
   auto result = fixupTree(*this, e, scope);
-  //addTransformedEquations(result.second.equations);
+  addTransformedEquations(result.second);
 
   return result.first;
 }

@@ -44,9 +44,10 @@ FunctionWS::operator()(Context& kappa, Context& delta)
 }
 
 void
-FunctionWS::addEquation(uuid id, Parser::RawInput input, int time)
+FunctionWS::addEquation(uuid id, Parser::RawInput input, int time,
+  ScopePtr scope)
 {
-  m_bestfit.addEquation(id, input, time);
+  m_bestfit.addEquation(id, input, time, scope);
 }
 
 bool 

@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/bestfit.hpp>
 #include <tl/parser_api.hpp>
+#include <tl/semantics.hpp>
 #include <tl/uuid.hpp>
 #include <tl/workshop.hpp>
 
@@ -51,12 +52,14 @@ namespace TransLucid
     operator()(Context& kappa, Context& delta);
 
     void
-    addEquation(uuid id, Parser::RawInput input, int time);
+    addEquation(uuid id, Parser::RawInput input, int time, 
+      ScopePtr = ScopePtr());
 
     void
-    addEquation(uuid id, Parser::Line input, int time)
+    addEquation(uuid id, Parser::Line input, int time,
+      ScopePtr scope = ScopePtr())
     {
-      m_bestfit.addEquation(id, input, time);
+      m_bestfit.addEquation(id, input, time, scope);
     }
 
     bool 

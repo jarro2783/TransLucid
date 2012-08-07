@@ -209,7 +209,7 @@ namespace TransLucid
 
   struct ExtraTreeInformation
   {
-    std::vector<std::pair<ScopePtr, Parser::Equation>> equations;
+    std::vector<std::pair<ScopePtr, Parser::Line>> equations;
   };
 
   std::pair

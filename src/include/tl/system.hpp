@@ -72,6 +72,8 @@ namespace TransLucid
 
   class Assignment;
 
+  struct ExtraTreeInformation;
+
   struct GettextInit
   {
     GettextInit();
@@ -228,7 +230,7 @@ namespace TransLucid
     void
     addTransformedEquations
     (
-      const std::vector<Parser::Equation>& newVars
+      const ExtraTreeInformation& newVars
     );
 
     void
@@ -445,7 +447,8 @@ namespace TransLucid
     addFunDeclInternal
     (
       const u32string& name,
-      Input&& decl
+      Input&& decl,
+      ScopePtr scope = ScopePtr()
     );
 
     template <typename Input>

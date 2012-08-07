@@ -721,13 +721,13 @@ fixupTree(System& s, const Tree::Expr& e, ScopePtr scope)
   //std::cerr << "after fixing up tree: " << Printer::print_expr_tree(e4, true)
   //  << std::endl;
 
-  //return 
-  //{
-  //  e4, 
-  //  {
-  //    transform.newVars()
-  //  }
-  //};
+  return 
+  {
+    e4, 
+    {
+      transform.newVars()
+    }
+  };
 }
 
 }
