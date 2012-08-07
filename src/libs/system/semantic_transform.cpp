@@ -70,19 +70,20 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     ++next;
   }
 
+  //put the dimensions in scope
   auto alloc = w.dimAllocation.begin();
   for (const auto& v : e.dims)
   {
+    auto renamed = pushScope(v.first);
     //rename identifiers in scope
     //after visiting all the dimension initialisation expressions
-    m_fnScope.insert(std::make_pair(v.first, *alloc)); 
+    m_fnScope.insert(std::make_pair(renamed, *alloc)); 
 
     //put the dim in scope too
     m_scope.push_back(*alloc);
 
     ++alloc;
   }
-
 
   //do the variables
   for (const auto& evar : e.vars)
