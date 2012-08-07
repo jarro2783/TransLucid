@@ -91,11 +91,14 @@ namespace TransLucid
 
     //open a new scope, possibly shadowing another
     u32string
-    openScope(const u32string& id);
+    pushScope(const u32string& id);
+
+    void
+    popScope(const u32string& id);
 
     //get the current rename for this identifier
     const u32string& 
-    rename(const u32string& name);
+    getRenamed(const u32string& name);
 
     System& m_system;
 
@@ -113,13 +116,10 @@ namespace TransLucid
     //which ones are call by name
     std::set<u32string> m_cbnscope;
 
-    //the currently shadowed names and their renamed name
-    std::stack<std::pair<u32string, u32string>> m_shadowed;
-
     //the renames
     //a hashmap would be better, but we need to hold on to iterators
     //while we're changing it and they can't be invalidated
-    typedef std::map<u32string, u32string> RenameRules;
+    typedef std::map<u32string, std::stack<u32string>> RenameRules;
 
     RenameRules m_rename;
   };

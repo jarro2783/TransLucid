@@ -143,8 +143,11 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
 Tree::Expr
 SemanticTransform::operator()(const Tree::IdentExpr& e)
 {
+  //first get the renamed name
+  auto unique = getRenamed(e.text);
+
   //does this need to be replaced for a function parameter or dim
-  auto iter = m_fnScope.find(e.text);
+  auto iter = m_fnScope.find(unique);
   if (iter != m_fnScope.end())
   {
     //is it a call by name?
@@ -183,20 +186,22 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   //4. visit the child
   //5. restore the scope
 
+  auto unique = pushScope(e.name);
+
   Tree::LambdaExpr expr = e;
 
   //1. generate a new dimension
   dimension_index argDim = expr.argDim == 0 ? 
     m_system.nextHiddenDim() : expr.argDim;
 
-  m_fnScope.insert({e.name, argDim});
+  m_fnScope.insert({unique, argDim});
 
   //2. store our scope dimensions and ourself
   expr.argDim = argDim;
 
   //3. add ourselves to the scope
   m_scope.push_back(argDim);
-  m_scopeNames.push_back(e.name);
+  //m_scopeNames.push_back(unique);
 
   //4. visit the child
   auto child = apply_visitor(*this, expr.rhs);
@@ -204,8 +209,9 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   //5. restore the scope
   m_scope.pop_back();
   //m_scope.resize(m_scope.size() - 1);
-  m_fnScope.erase(e.name);
+  m_fnScope.erase(unique);
 
+  expr.name = unique;
   expr.rhs = child;
 
   expr.binds.clear();
@@ -224,11 +230,11 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
 Tree::Expr
 SemanticTransform::operator()(const Tree::PhiExpr& e)
 {
-  auto name = openScope(e.name);
+  auto unique = pushScope(e.name);
   auto dim = m_system.nextHiddenDim();
 
-  m_fnScope.insert(std::make_pair(e.name, dim));
-  m_cbnscope.insert(e.name);
+  m_fnScope.insert(std::make_pair(unique, dim));
+  m_cbnscope.insert(unique);
 
   std::vector<Tree::Expr> binds;
   for (auto& b : e.binds)
@@ -236,7 +242,9 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
     binds.push_back(apply_visitor(*this, b));
   }
 
-  Tree::LambdaExpr lambda = Tree::LambdaExpr(e.name, binds, e.rhs);
+  auto rhs = apply_visitor(*this, e.rhs);
+
+  Tree::LambdaExpr lambda = Tree::LambdaExpr(unique, binds, rhs);
   lambda.argDim = e.argDim;;
 
   Tree::Expr le = lambda;
@@ -245,6 +253,8 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
 
   m_fnScope.erase(e.name);
   m_cbnscope.erase(e.name);
+
+  popScope(e.name);
 
   return fun;
 }
@@ -256,20 +266,50 @@ SemanticTransform::makeScope() const
 
 //open a new scope, possibly shadowing another
 u32string
-SemanticTransform::openScope(const u32string& id)
+SemanticTransform::pushScope(const u32string& id)
 {
   //TODO the rename stack should be a map of stacks
   auto index = m_system.nextVarIndex();
 
   std::ostringstream os;
   os << index << "_uniqueid";
-  
+
+  auto unique = os.str();
+
+  auto iter = m_rename.find(id);
+
+  if (iter == m_rename.end())
+  {
+    m_rename.insert(std::make_pair(id, decltype(m_rename)::mapped_type()));
+  }
+
+  iter->second.push(u32string(unique.begin(), unique.end()));
+
+  return iter->second.top();
+}
+
+void
+SemanticTransform::popScope(const u32string& id)
+{
   auto iter = m_rename.find(id);
 
   if (iter != m_rename.end())
   {
-    m_shadowed.push(std::make_pair(id, iter->second));
+    iter->second.pop();
   }
+}
+
+const u32string& 
+SemanticTransform::getRenamed(const u32string& name)
+{
+  auto iter = m_rename.find(name);
+
+  if (iter != m_rename.end())
+  {
+    return iter->second.top();
+  }
+
+  return name;
 }
 
 }
