@@ -60,12 +60,12 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   for (const auto& v : e.dims)
   {
     //get a new dimension for this dimension identifier
-    auto theta = m_system.nextHiddenDim();
+    auto phi_x = m_system.nextHiddenDim();
 
     //transform the initialiser
     w.dims.push_back(std::make_pair(v.first, apply_visitor(*this, v.second)));
     //save the new dimension
-    w.dimAllocation.push_back(theta);
+    w.dimAllocation.push_back(phi_x);
 
     ++next;
   }
@@ -85,48 +85,54 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     ++alloc;
   }
 
-  //do the variables
+  //stops us renaming more than once for multiply declared variables
+  std::set<u32string> seenVars;
+
+  //put the renamed variables in the scope
   for (const auto& evar : e.vars)
   {
-    //expr
-    Tree::Expr varExpr = apply_visitor(*this, std::get<3>(evar));
+    const auto& name = std::get<0>(evar);
 
-    //guard
-    Tree::Expr guardExpr = apply_visitor(*this, std::get<1>(evar));
-
-    //boolean
-    Tree::Expr booleanExpr = apply_visitor(*this, std::get<2>(evar));;
-
-    auto newEqn = Parser::Equation
-      (
-        std::get<0>(evar),
-        guardExpr,
-        booleanExpr,
-        varExpr
-      );
-
-    m_newVars.push_back
-    (
-      newEqn
-    );
-
-    w.vars.push_back(newEqn);
+    if (seenVars.find(name) != seenVars.end())
+    {
+      seenVars.insert(name);
+      pushScope(name);
+    }
   }
 
   //do the functions
   for (const auto& efun : e.funs)
   {
+    const auto& name = efun.name;
+
+    if (seenVars.find(name) != seenVars.end())
+    {
+      seenVars.insert(name);
+      pushScope(name);
+    }
   }
+
+  //create the declarations with scope to add later
+  auto currentScope = makeScope();
   
   //visit child E
   Tree::Expr expr = apply_visitor(*this, e.e);
 
   //restore the scope
+
+  //restore the variables in scope
+  for (const auto& name : seenVars)
+  {
+    popScope(name);
+  }
+
+  //remove the dims from rewriting
   for (auto v : e.dims)
   {
     m_fnScope.erase(v.first);
   }
 
+  //drop the dims to hold on to
   m_scope.resize(m_scope.size() - e.dims.size());
 
   w.e = expr;
@@ -134,6 +140,9 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   //we return the rewritten E and add the variables to the list of variables
   //to add to the system
 
+  //this where clause is now effectively a wheredim clause, it will have no
+  //variable identifiers because they have all been renamed and added to the
+  //set of new things
   return w;
 }
 
@@ -281,7 +290,6 @@ SemanticTransform::makeScope() const
 u32string
 SemanticTransform::pushScope(const u32string& id)
 {
-  //TODO the rename stack should be a map of stacks
   auto index = m_system.nextVarIndex();
 
   std::ostringstream os;
