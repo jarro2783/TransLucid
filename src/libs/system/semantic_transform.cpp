@@ -55,13 +55,6 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   //expression is done with the variables and dimensions in scope
   Tree::WhereExpr w;
 
-  std::vector<dimension_index> myLin;
-  
-  //generate new label
-  mpz_class label = w.myLabel != 0 ? w.myLabel : m_system.nextWhere();
-
-  w.myLabel = label;
-
   //do the dimensions
   int next = 0;
   for (const auto& v : e.dims)

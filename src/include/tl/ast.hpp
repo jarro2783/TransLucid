@@ -776,7 +776,6 @@ namespace TransLucid
 
       std::vector<Parser::FnDecl> funs;
 
-      mpz_class myLabel;
       std::vector<dimension_index> dimAllocation;
     };
 
