@@ -262,6 +262,22 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
 ScopePtr
 SemanticTransform::makeScope() const
 {
+  decltype(Scope::renames) renames;
+
+  for (const auto& r : m_rename)
+  {
+    renames.insert(std::make_pair(r.first, r.second.top()));
+  }
+
+  return std::make_shared<Scope>
+  (
+    Scope{
+      m_cbnscope, 
+      m_scope,
+      m_fnScope,
+      renames
+    }
+  );
 }
 
 //open a new scope, possibly shadowing another
