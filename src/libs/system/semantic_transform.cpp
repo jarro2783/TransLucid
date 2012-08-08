@@ -323,7 +323,8 @@ SemanticTransform::pushScope(const u32string& id)
 
   if (iter == m_rename.end())
   {
-    m_rename.insert(std::make_pair(id, decltype(m_rename)::mapped_type()));
+    iter = m_rename
+      .insert(std::make_pair(id, decltype(m_rename)::mapped_type())).first;
   }
 
   iter->second.push(u32string(unique.begin(), unique.end()));
