@@ -64,6 +64,7 @@ namespace TransLucid
       TOKEN_RPAREN,
       TOKEN_RSQUARE,
       TOKEN_SLASH,
+      TOKEN_SLASH_UNDERSCORE,
       TOKEN_THEN,
       TOKEN_TRUE,
       TOKEN_UARROW,

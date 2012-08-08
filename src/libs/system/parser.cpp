@@ -144,6 +144,8 @@ token_name(int token)
     /* TRANSLATORS: token */
     _("`\\'"),
     /* TRANSLATORS: token */
+    _("`\\_'"),
+    /* TRANSLATORS: token */
     _("`then'"),
     /* TRANSLATORS: token */
     _("`true'"),
@@ -916,6 +918,15 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
     }
     break;
 
+    case TOKEN_SLASH_UNDERSCORE:
+    {
+      LexerIterator current = begin;
+      ++current;
+      parse_base_function(current, end, result);
+      begin = current;
+    }
+    break;
+
     case TOKEN_HASH:
     result = Tree::HashSymbol();
     ++begin;
@@ -929,6 +940,26 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
   }
 
   return success;
+}
+
+void
+Parser::parse_base_function(LexerIterator& begin, const LexerIterator& end,
+  Tree::Expr& result)
+{
+  //bound dims, (params), -> E
+  LexerIterator current = begin;
+
+  std::vector<Tree::Expr> bound;
+  std::vector<u32string> params;
+
+  parse_bound_dims(current, end, bound);
+
+  if (*current == TOKEN_LPAREN)
+  {
+    //parse_
+  }
+
+  begin = current;
 }
 
 void
@@ -989,6 +1020,10 @@ Parser::parse_bound_dims(LexerIterator& begin, const LexerIterator& end,
   return true;
 }
 
+/*
+ * Parses a list of expressions.
+ * Parses expr (, expr)*
+ */
 void
 Parser::parse_expr_list(LexerIterator& begin, const LexerIterator& end,
   std::vector<Tree::Expr>& result)

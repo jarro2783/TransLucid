@@ -100,6 +100,7 @@ namespace TransLucid
         m_rules.add(U"\\)", TOKEN_RPAREN);
         m_rules.add(U"\\]", TOKEN_RSQUARE);
         m_rules.add(UR"(\\)", TOKEN_SLASH);
+        m_rules.add(UR"(\\_)", TOKEN_SLASH_UNDERSCORE);
         m_rules.add(U"↑", TOKEN_UARROW);
 
         m_rules.add(U"{IDENT}", TOKEN_ID);
