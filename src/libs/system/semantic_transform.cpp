@@ -274,7 +274,7 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
   if (iter != m_fnScope.end())
   {
     //is it a call by name?
-    auto cbniter = m_cbnscope.find(e.text);
+    auto cbniter = m_cbnscope.find(unique);
     if (cbniter != m_cbnscope.end())
     {
       return Tree::EvalIntenExpr(
@@ -309,9 +309,17 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   //4. visit the child
   //5. restore the scope
 
-  auto unique = pushScope(e.name);
-
   Tree::LambdaExpr expr = e;
+
+  //do the binds before changing the scope
+  expr.binds.clear();
+  for (auto& b : e.binds)
+  {
+    Tree::Expr transformed = apply_visitor(*this, b);
+    expr.binds.push_back(transformed);
+  }
+
+  auto unique = pushScope(e.name);
 
   //1. generate a new dimension
   dimension_index argDim = expr.argDim == 0 ? 
@@ -337,13 +345,6 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   expr.name = unique;
   expr.rhs = child;
 
-  expr.binds.clear();
-  for (auto& b : e.binds)
-  {
-    Tree::Expr transformed = apply_visitor(*this, b);
-    expr.binds.push_back(transformed);
-  }
-
   expr.scope = e.scope;
   expr.scope.insert(expr.scope.end(), m_scope.begin(), m_scope.end());
 
@@ -353,33 +354,32 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
 Tree::Expr
 SemanticTransform::operator()(const Tree::PhiExpr& e)
 {
-  auto unique = pushScope(e.name);
-  auto dim = m_system.nextHiddenDim();
-
-  m_fnScope.insert(std::make_pair(unique, dim));
-  m_cbnscope.insert(unique);
-
   std::vector<Tree::Expr> binds;
   for (auto& b : e.binds)
   {
     binds.push_back(apply_visitor(*this, b));
   }
 
+  auto unique = pushScope(e.name);
+  auto dim = m_system.nextHiddenDim();
+
+  m_fnScope.insert(std::make_pair(unique, dim));
+  m_cbnscope.insert(unique);
+  m_scope.push_back(dim);
+
   auto rhs = apply_visitor(*this, e.rhs);
 
-  Tree::LambdaExpr lambda = Tree::LambdaExpr(unique, binds, rhs);
-  lambda.argDim = e.argDim;;
-
-  Tree::Expr le = lambda;
-
-  Tree::Expr fun = apply_visitor(*this, le);
-
-  m_fnScope.erase(e.name);
-  m_cbnscope.erase(e.name);
+  m_scope.pop_back();
+  m_fnScope.erase(unique);
+  m_cbnscope.erase(unique);
 
   popScope(e.name);
 
-  return fun;
+  Tree::LambdaExpr lambda = Tree::LambdaExpr(unique, binds, rhs);
+  lambda.argDim = dim;;
+  lambda.scope = m_scope;
+
+  return lambda;
 }
 
 Tree::Expr
