@@ -46,6 +46,91 @@ SemanticTransform::transform(const Tree::Expr& e)
   return apply_visitor(*this, e);
 }
 
+Tree::Expr 
+SemanticTransform::operator()(const Tree::ParenExpr& e)
+{
+  //we can drop the parens now
+  return apply_visitor(*this, e.e);
+}
+
+Tree::Expr 
+SemanticTransform::operator()(const Tree::LiteralExpr& e)
+{
+  Tree::Expr rewritten =
+    Tree::LambdaAppExpr( 
+      Tree::LambdaAppExpr(Tree::IdentExpr(U"construct_literal"), e.type),
+      e.text);
+
+  return apply_visitor(*this, rewritten);
+}
+
+Tree::Expr 
+SemanticTransform::operator()(const Tree::UnaryOpExpr& e)
+{
+  //(FN1 ! (#arg0)) @ [fnname <- e.op.op, arg0 <- T(e.e)]
+
+  Tree::Expr result = Tree::LambdaAppExpr
+  (
+    Tree::IdentExpr(e.op.op),
+    e.e
+  );
+
+  return apply_visitor(*this, result);
+}
+
+Tree::Expr 
+SemanticTransform::operator()(const Tree::BinaryOpExpr& e)
+{
+  //(e.op.op) . (e.lhs) . (e.rhs)
+  //(FN2 ! (#arg0, #arg1))
+  //  @ [fnname <- e.op.op, arg0 <- T(e.lhs), arg1 <- T(e.rhs)]
+
+  Tree::Expr result;
+    
+  if (e.op.cbn)
+  {
+    result = Tree::PhiAppExpr
+    (
+      Tree::PhiAppExpr(Tree::IdentExpr(e.op.op), e.lhs),
+      e.rhs
+    );
+  }
+  else
+  {
+    result = Tree::LambdaAppExpr
+    (
+      Tree::LambdaAppExpr(Tree::IdentExpr(e.op.op), e.lhs),
+      e.rhs
+    );
+  }
+
+  return apply_visitor(*this, result);
+}
+
+Tree::Expr 
+SemanticTransform::operator()(const Tree::BangAppExpr& e)
+{
+  //first check if it is #!E
+  if (get<Tree::HashSymbol>(&e.name) != nullptr)
+  {
+    Tree::Expr rhs = apply_visitor(*this, e.args.at(0));
+    return Tree::HashExpr(rhs);
+  }
+  else
+  {
+    Tree::Expr name = apply_visitor(*this, e.name);
+    std::vector<Tree::Expr> args;
+
+    for (auto expr : e.args)
+    {
+      args.push_back(apply_visitor(*this, expr));
+    }
+
+    return Tree::BangAppExpr(name, args);
+  }
+}
+
+
 Tree::Expr
 SemanticTransform::operator()(const Tree::WhereExpr& e)
 {
@@ -93,7 +178,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   {
     const auto& name = std::get<0>(evar);
 
-    if (seenVars.find(name) != seenVars.end())
+    if (seenVars.find(name) == seenVars.end())
     {
       seenVars.insert(name);
       pushScope(name);
@@ -105,7 +190,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   {
     const auto& name = efun.name;
 
-    if (seenVars.find(name) != seenVars.end())
+    if (seenVars.find(name) == seenVars.end())
     {
       seenVars.insert(name);
       pushScope(name);
@@ -123,7 +208,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
       {
         Parser::Equation
         {
-          std::get<0>(evar),
+          getRenamed(std::get<0>(evar)),
           std::get<1>(evar),
           std::get<2>(evar),
           std::get<3>(evar)
@@ -134,7 +219,15 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   //add the functions
   for (const auto& efun : e.funs)
   {
-    m_newVars.push_back(std::make_pair(currentScope, efun));
+    m_newVars.push_back(std::make_pair(currentScope, 
+      Parser::FnDecl
+      {
+        getRenamed(efun.name),
+        efun.args,
+        efun.guard,
+        efun.boolean,
+        efun.expr
+      }));
   }
   
   //visit child E
@@ -173,6 +266,8 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
 {
   //first get the renamed name
   auto unique = getRenamed(e.text);
+  //std::cerr << "replacing '" << e.text << "' with '" << unique 
+  //  << "'" << std::endl;
 
   //does this need to be replaced for a function parameter or dim
   auto iter = m_fnScope.find(unique);
@@ -190,7 +285,7 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
   }
   else
   {
-    return e;
+    return Tree::IdentExpr(unique);
   }
 }
 
@@ -285,6 +380,17 @@ SemanticTransform::operator()(const Tree::PhiExpr& e)
   popScope(e.name);
 
   return fun;
+}
+
+Tree::Expr
+SemanticTransform::operator()(const Tree::PhiAppExpr& e)
+{
+  Tree::Expr result = Tree::LambdaAppExpr
+  (
+    e.lhs, Tree::MakeIntenExpr(e.rhs)
+  );
+
+  return apply_visitor(*this, result);
 }
 
 ScopePtr

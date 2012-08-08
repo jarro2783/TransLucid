@@ -259,7 +259,7 @@ System::addVariableDeclInternal
   {
     var = equationIter->second;
   }
-  var->addEquation(u, std::forward<Input>(decl), m_time);
+  var->addEquation(u, std::forward<Input>(decl), m_time, scope);
 
   m_identifiers.insert({name, var});
 
@@ -292,7 +292,7 @@ System::addFunDeclInternal
     fun = funIter->second;
   }
 
-  fun->addEquation(u, decl, m_time);
+  fun->addEquation(u, decl, m_time, scope);
 
   m_identifiers.insert({name, fun});
 

@@ -65,6 +65,21 @@ namespace TransLucid
     Tree::Expr 
     operator()(const Tree::IdentExpr& e);
 
+    Tree::Expr 
+    operator()(const Tree::ParenExpr& e);
+
+    Tree::Expr 
+    operator()(const Tree::LiteralExpr& e);
+
+    Tree::Expr 
+    operator()(const Tree::UnaryOpExpr& e);
+
+    Tree::Expr 
+    operator()(const Tree::BinaryOpExpr& e);
+
+    Tree::Expr 
+    operator()(const Tree::BangAppExpr& e);
+
     Tree::Expr
     operator()(const Tree::WhereExpr& where);
 
@@ -76,6 +91,9 @@ namespace TransLucid
 
     Tree::Expr
     operator()(const Tree::PhiExpr& e);
+
+    Tree::Expr
+    operator()(const Tree::PhiAppExpr& e);
 
     private:
     typedef std::unordered_map<u32string, dimension_index> ParameterReplaced;

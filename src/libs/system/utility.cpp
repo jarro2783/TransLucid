@@ -710,7 +710,12 @@ fixupTree(System& s, const Tree::Expr& e, ScopePtr scope)
 
   if (scope.get())
   {
+    //std::cerr << "restoring some scope" << std::endl;
     transform.restoreScope(scope);
+  }
+  else
+  {
+    //std::cerr << "no scope to restore" << std::endl;
   }
 
   //Tree::Expr e1 = rewriter.rewrite(e);
