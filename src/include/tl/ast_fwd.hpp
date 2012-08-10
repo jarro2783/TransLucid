@@ -50,12 +50,13 @@ namespace TransLucid
     struct MakeIntenExpr;
     struct EvalIntenExpr;
     struct HashExpr;
-    struct BaseAbstractionExpr;
+    struct HostOpExpr;
     struct TupleExpr;
     struct IfExpr;
     struct AtExpr;
     struct LambdaExpr;
     struct PhiExpr;
+    struct BaseAbstractionExpr;
     struct BangAppExpr;
     struct LambdaAppExpr;
     struct PhiAppExpr;
@@ -78,7 +79,7 @@ namespace TransLucid
       DimensionExpr,
       IdentExpr,
       HashSymbol,
-      BaseAbstractionExpr,
+      HostOpExpr,
       recursive_wrapper<ParenExpr>,
       recursive_wrapper<UnaryOpExpr>,
       recursive_wrapper<BinaryOpExpr>,
@@ -90,6 +91,7 @@ namespace TransLucid
       recursive_wrapper<AtExpr>,
       recursive_wrapper<LambdaExpr>,
       recursive_wrapper<PhiExpr>,
+      recursive_wrapper<BaseAbstractionExpr>,
       recursive_wrapper<BangAppExpr>,
       recursive_wrapper<LambdaAppExpr>,
       recursive_wrapper<PhiAppExpr>,

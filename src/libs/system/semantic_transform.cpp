@@ -301,6 +301,73 @@ SemanticTransform::operator()(const Tree::MakeIntenExpr& e)
 }
 
 Tree::Expr
+SemanticTransform::operator()(const Tree::BaseAbstractionExpr& e)
+{
+
+  struct PairCreator
+  {
+    template <typename A, typename B>
+    auto
+    operator()(A&& a, B&& b) const
+    -> decltype(std::make_pair(std::forward<A>(a), std::forward<B>(b)))
+    {
+      return std::make_pair(std::forward<A>(a), std::forward<B>(b));
+    }
+  };
+
+  struct Eraser
+  {
+    template <typename C, typename Value>
+    void
+    operator()(C&& c, Value&& v)
+    {
+      c.erase(v);
+    }
+  };
+
+  using std::placeholders::_1;
+  using std::placeholders::_2;
+  //make new names, generate dimensions and put things in scope
+  std::vector<dimension_index> dims;
+
+  std::vector<u32string> renamed;
+
+  //visit the bound dimension expressions
+  std::vector<Tree::Expr> binds;
+  std::transform(e.binds.begin(), e.binds.end(), std::back_inserter(binds),
+    std::bind(visitor_applier(), std::ref(*this), _1)
+  );
+
+  //rename the parameters
+  std::transform(e.params.begin(), e.params.end(), std::back_inserter(renamed),
+    std::bind(std::mem_fn(&SemanticTransform::pushScope), this, _1));
+
+  //generate hidden dimensions
+  std::generate_n(std::back_inserter(dims), e.params.size(), 
+    std::bind(std::mem_fn(&System::nextHiddenDim), std::ref(m_system)));
+
+  //put the hidden dimensions in scope
+  std::copy(dims.begin(), dims.end(), std::back_inserter(m_scope));
+
+  //put the hidden dimension in fnscope
+  std::transform(renamed.begin(), renamed.end(), dims.begin(),
+    std::inserter(m_fnScope, m_fnScope.begin()),
+    std::bind(PairCreator(), _1, _2)
+  );
+
+  //visit the body
+  auto body = apply_visitor(*this, e.body);
+
+  //restore the scope
+  m_scope.resize(m_scope.size() - dims.size());
+
+  std::for_each(renamed.begin(), renamed.end(), 
+    std::bind(Eraser(), m_fnScope, _1));
+
+  return Tree::BaseAbstractionExpr(binds, renamed, body);
+}
+
+Tree::Expr
 SemanticTransform::operator()(const Tree::LambdaExpr& e)
 {
   //1. generate a new dimension

@@ -87,6 +87,9 @@ namespace TransLucid
     operator()(const Tree::MakeIntenExpr& e);
 
     Tree::Expr
+    operator()(const Tree::BaseAbstractionExpr& e);
+
+    Tree::Expr
     operator()(const Tree::LambdaExpr& e);
 
     Tree::Expr

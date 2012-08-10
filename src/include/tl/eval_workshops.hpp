@@ -349,10 +349,10 @@ namespace TransLucid
       bool m_cached;
     };
 
-    class BaseAbstractionWS : public WS
+    class HostOpWS : public WS
     {
       public:
-      BaseAbstractionWS(System& s, const u32string& name)
+      HostOpWS(System& s, const u32string& name)
       : m_system(s), m_name(name), m_function(nullptr)
       {
       }

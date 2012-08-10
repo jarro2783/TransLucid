@@ -903,7 +903,7 @@ AtWS::operator()(Context& kappa, Context& delta)
 }
 
 Constant
-BaseAbstractionWS::operator()(Context& k)
+HostOpWS::operator()(Context& k)
 {
   if (m_function == nullptr)
   {
@@ -921,7 +921,7 @@ BaseAbstractionWS::operator()(Context& k)
 }
 
 Constant
-BaseAbstractionWS::operator()(Context& kappa, Context& delta)
+HostOpWS::operator()(Context& kappa, Context& delta)
 {
   return operator()(kappa);
 }

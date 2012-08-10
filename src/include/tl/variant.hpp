@@ -613,6 +613,30 @@ namespace TransLucid
     return *t;
   }
 
+  struct visitor_applier
+  {
+    template <typename Visitor, typename Visitable, typename... Args>
+    auto
+    operator()(Visitor&& visitor, Visitable&& visitable, Args&&... args)
+    -> decltype
+      (
+        apply_visitor
+        (
+          std::forward<Visitor>(visitor),
+          std::forward<Visitable>(visitable),
+          std::forward<Args>(args)...
+        )
+      )
+    {
+      return apply_visitor
+      (
+        std::forward<Visitor>(visitor),
+        std::forward<Visitable>(visitable),
+        std::forward<Args>(args)...
+      );
+    }
+  };
+
 }
 
 #endif

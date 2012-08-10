@@ -956,8 +956,36 @@ Parser::parse_base_function(LexerIterator& begin, const LexerIterator& end,
 
   if (*current == TOKEN_LPAREN)
   {
-    //parse_
+    ++current;
+
+    //identifier list
+    while (*current == TOKEN_ID)
+    {
+      ++current;
+
+      params.push_back(get<u32string>(current->getValue()));
+
+      if (*current != TOKEN_COMMA)
+      {
+        break;
+      }
+      ++current;
+    }
+
+    expect(current, end, ")", TOKEN_RPAREN);
   }
+  else
+  {
+    expect_no_advance(current, end, "id", TOKEN_ID);
+    params.push_back(get<u32string>(current->getValue()));
+    ++current;
+  }
+
+  expect(current, end, "->", TOKEN_RARROW);
+
+  Tree::Expr body;
+
+  expect(current, end, body, "expr", &Parser::parse_expr);
 
   begin = current;
 }

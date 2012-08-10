@@ -285,11 +285,11 @@ namespace TransLucid
       u32string text; /**< The name of the identifier.*/
     };
 
-    struct BaseAbstractionExpr
+    struct HostOpExpr
     {
-      BaseAbstractionExpr() = default;
+      HostOpExpr() = default;
 
-      BaseAbstractionExpr(const u32string& name)
+      HostOpExpr(const u32string& name)
       : name(name)
       {}
 
@@ -300,40 +300,7 @@ namespace TransLucid
     {
     };
 
-    //defined in ast_fwd.hpp
-    /**
-     * Abstract syntax tree node. A single expression node in the 
-     * abstract syntax tree which is created by the parser.
-     */
-    #if 0
-    typedef Variant
-    <
-      nil,
-      bool,
-      Special,     //replaces SpecialExpr
-      mpz_class,          //replaces IntegerExpr
-      char32_t,           //replaces UcharExpr
-      u32string,          //replaces StringExpr
-      LiteralExpr,
-      DimensionExpr,
-      IdentExpr,
-      HashSymbol,
-      BaseAbstraction,
-      recursive_wrapper<ParenExpr>,
-      recursive_wrapper<UnaryOpExpr>,
-      recursive_wrapper<BinaryOpExpr>,
-      recursive_wrapper<IfExpr>,
-      recursive_wrapper<HashExpr>,
-      recursive_wrapper<TupleExpr>,
-      recursive_wrapper<AtExpr>,
-      recursive_wrapper<LambdaExpr>,
-      recursive_wrapper<PhiExpr>,
-      recursive_wrapper<BangAppExpr>,
-      recursive_wrapper<LambdaAppExpr>,
-      recursive_wrapper<PhiAppExpr>,
-      recursive_wrapper<WhereExpr>
-    > Expr;
-    #endif
+    //the actualy Expr is defined in ast_fwd.hpp
 
     /**
      * A parenthesised expression.
@@ -502,6 +469,26 @@ namespace TransLucid
 
       Expr name; /**< The operation name. */
       std::vector<Expr> args; /**< The arguments. */
+    };
+    
+    struct BaseAbstractionExpr
+    {
+      BaseAbstractionExpr() = default;
+
+      BaseAbstractionExpr
+      (
+        const std::vector<Expr>& binds,
+        const std::vector<u32string>& params,
+        const Expr& body
+      )
+      : binds(binds),
+        params(params),
+        body(body)
+      {}
+
+      std::vector<Expr> binds;
+      std::vector<u32string> params;
+      Expr body;
     };
 
     /**

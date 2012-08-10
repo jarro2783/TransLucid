@@ -261,7 +261,7 @@ class TreePrinter
   }
 
   void
-  operator()(const Tree::BaseAbstractionExpr& b)
+  operator()(const Tree::HostOpExpr& b)
   {
     m_os << u32string(U"⊥") << b.name;
   }
@@ -561,6 +561,39 @@ class TreePrinter
       apply_visitor(*this, *iter);
     }
     m_os << ")";
+  }
+
+  void
+  operator()(const Tree::BaseAbstractionExpr& f)
+  {
+    m_os << "\\_";
+    print_binds(f.binds);
+
+    if (f.params.size() > 1)
+    {
+      m_os << "(";
+
+      size_t i = 0;
+      while (i != f.params.size())
+      {
+        m_os << f.params.at(i);
+
+        if (i + 1 != f.params.size())
+        {
+          m_os << ", ";
+        }
+        ++i;
+      }
+
+      m_os << ")";
+    }
+    else
+    {
+      m_os << f.params.at(0);
+    }
+
+    m_os << " -> ";
+    apply_visitor(*this, f.body);
   }
 
   void

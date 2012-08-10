@@ -864,7 +864,7 @@ System::addHostFunction
       name,
       Tree::nil(),
       Tree::nil(),
-      Tree::BaseAbstractionExpr(newname32)
+      Tree::HostOpExpr(newname32)
     )
   );
 
