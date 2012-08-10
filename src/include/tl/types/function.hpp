@@ -87,19 +87,14 @@ namespace TransLucid
     public:
     BaseFunctionAbstraction
     (
-      dimension_index argDim,
-      const std::vector<dimension_index>& scope,
+      const std::vector<dimension_index>& dims,
+      const std::vector<WS*>& binds,
       WS* expr,
       const Context& k
     )
-    : m_dim(argDim)
+    : m_dims(dims)
     , m_expr(expr)
-    , m_k(k)
     {
-      for (auto d : scope)
-      {
-        m_scope.push_back(std::make_pair(d, k.lookup(d)));
-      }
     }
 
     ~BaseFunctionAbstraction() throw() {}
@@ -127,8 +122,8 @@ namespace TransLucid
       return new BaseFunctionAbstraction(*this);
     }
 
-    dimension_index m_dim;
-    std::vector<std::pair<dimension_index, Constant>> m_scope;
+    std::vector<dimension_index> m_dims;
+    std::vector<std::pair<dimension_index, Constant>> m_binds;
     WS* m_expr;
     Tuple m_k;
   };

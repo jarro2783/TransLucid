@@ -1513,12 +1513,12 @@ namespace TransLucid
 Constant
 BaseFunctionAbstraction::applyFn(const Constant& c) const
 {
-  Context newk;
-  ContextPerturber p(newk, m_k);
-  p.perturb(m_scope);
-  p.perturb({{m_dim, c}});
+  //Context newk;
+  //ContextPerturber p(newk, m_k);
+  //p.perturb(m_scope);
+  //p.perturb({{m_dim, c}});
 
-  return (*m_expr)(newk);
+  //return (*m_expr)(newk);
 }
 
 //everything that creates hyperdatons

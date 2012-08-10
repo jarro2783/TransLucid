@@ -480,7 +480,6 @@ namespace TransLucid
       WS* e1;
     };
 
-#if 0
     /**
      * A base function abstraction workshop.
      * Creates a base function abstraction.
@@ -497,14 +496,12 @@ namespace TransLucid
        */
       BaseAbstractionWS
       (
-        const u32string& name,
-        dimension_index dim,
-        std::vector<dimension_index> scope,
+        const std::vector<dimension_index>& dims,
+        const std::vector<WS*>& binds,
         WS* rhs
       )
-      : m_name(name)
-      , m_argDim(dim)
-      , m_scope(scope)
+      : m_dims(dims)
+      , m_binds(binds)
       , m_rhs(rhs)
       {
       }
@@ -524,13 +521,14 @@ namespace TransLucid
       Constant
       operator()(Context& k);
 
+      Constant
+      operator()(Context& kappa, Context& delta);
+
       private:
-      u32string m_name;
-      dimension_index m_argDim;
-      std::vector<dimension_index> m_scope;
+      std::vector<dimension_index> m_dims;
+      std::vector<WS*> m_binds;
       WS* m_rhs;
     };
-#endif
 
     /**
      * A call-by-value abstraction workshop.

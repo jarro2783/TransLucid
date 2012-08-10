@@ -364,7 +364,10 @@ SemanticTransform::operator()(const Tree::BaseAbstractionExpr& e)
   std::for_each(renamed.begin(), renamed.end(), 
     std::bind(Eraser(), m_fnScope, _1));
 
-  return Tree::BaseAbstractionExpr(binds, renamed, body);
+  Tree::BaseAbstractionExpr rewritten(binds, renamed, body);
+  rewritten.dims = dims;
+
+  return rewritten;
 }
 
 Tree::Expr

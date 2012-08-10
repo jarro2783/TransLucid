@@ -926,6 +926,17 @@ HostOpWS::operator()(Context& kappa, Context& delta)
   return operator()(kappa);
 }
 
+
+Constant
+BaseAbstractionWS::operator()(Context& k)
+{
+}
+
+Constant
+BaseAbstractionWS::operator()(Context& kappa, Context& delta)
+{
+}
+
 Constant
 LambdaAbstractionWS::operator()(Context& k)
 {

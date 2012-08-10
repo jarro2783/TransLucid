@@ -488,6 +488,7 @@ namespace TransLucid
 
       std::vector<Expr> binds;
       std::vector<u32string> params;
+      std::vector<dimension_index> dims;
       Expr body;
     };
 

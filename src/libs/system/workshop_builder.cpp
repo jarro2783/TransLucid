@@ -252,6 +252,16 @@ WorkshopBuilder::operator()(const Tree::AtExpr& e)
 WS* 
 WorkshopBuilder::operator()(const Tree::BaseAbstractionExpr& e)
 {
+  std::vector<WS*> binds;
+
+  for (auto& b : e.binds)
+  {
+    binds.push_back(apply_visitor(*this, b));
+  }
+
+  WS* body = apply_visitor(*this, e.body);
+
+  return new Workshops::BaseAbstractionWS(e.dims, binds, body);
 }
 
 WS*
