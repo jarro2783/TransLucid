@@ -300,10 +300,10 @@ SemanticTransform::operator()(const Tree::MakeIntenExpr& e)
   return inten;
 }
 
-Tree::Expr
-SemanticTransform::operator()(const Tree::BaseAbstractionExpr& e)
+//these could be local to the one function that uses them, but at the moment,
+//GCC doesn't like it
+namespace
 {
-
   struct PairCreator
   {
     template <typename A, typename B>
@@ -324,7 +324,11 @@ SemanticTransform::operator()(const Tree::BaseAbstractionExpr& e)
       c.erase(v);
     }
   };
+}
 
+Tree::Expr
+SemanticTransform::operator()(const Tree::BaseAbstractionExpr& e)
+{
   using std::placeholders::_1;
   using std::placeholders::_2;
   //make new names, generate dimensions and put things in scope
