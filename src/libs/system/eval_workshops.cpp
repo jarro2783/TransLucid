@@ -936,6 +936,7 @@ BaseAbstractionWS::operator()(Context& k)
     (
       m_system,
       m_dims,
+      m_scope,
       m_binds,
       m_rhs,
       k

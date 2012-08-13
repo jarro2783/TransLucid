@@ -261,7 +261,8 @@ WorkshopBuilder::operator()(const Tree::BaseAbstractionExpr& e)
 
   WS* body = apply_visitor(*this, e.body);
 
-  return new Workshops::BaseAbstractionWS(m_system, e.dims, binds, body);
+  return new Workshops::BaseAbstractionWS(m_system, e.dims, 
+    e.scope, binds, body);
 }
 
 WS*

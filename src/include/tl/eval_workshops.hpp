@@ -498,11 +498,13 @@ namespace TransLucid
       (
         System* system,
         const std::vector<dimension_index>& dims,
+        const std::vector<dimension_index>& scope,
         const std::vector<WS*>& binds,
         WS* rhs
       )
       : m_system(system)
       , m_dims(dims)
+      , m_scope(scope)
       , m_binds(binds)
       , m_rhs(rhs)
       {
@@ -529,6 +531,7 @@ namespace TransLucid
       private:
       System* m_system;
       std::vector<dimension_index> m_dims;
+      std::vector<dimension_index> m_scope;
       std::vector<WS*> m_binds;
       WS* m_rhs;
     };

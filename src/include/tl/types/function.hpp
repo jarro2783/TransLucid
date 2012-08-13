@@ -89,11 +89,13 @@ namespace TransLucid
     (
       System* system,
       const std::vector<dimension_index>& dims,
+      const std::vector<dimension_index>& scope,
       const std::vector<WS*>& binds,
       WS* expr,
       Context& k
     )
-    : m_expr(expr)
+    : m_dims(dims)
+    , m_expr(expr)
     {
       RhoManager rho(k);
       uint8_t index = 1;
@@ -109,7 +111,7 @@ namespace TransLucid
       }
 
       //std::cerr << "binding in function:" << std::endl;
-      for (auto d : dims)
+      for (auto d : scope)
       {
         //std::cerr << d << " ";
         m_binds.push_back(std::make_pair(d, k.lookup(d)));
@@ -135,8 +137,26 @@ namespace TransLucid
     Constant
     applyFn(const std::vector<Constant>& args) const
     {
-      //TODO fix this
-      return Constant();
+      if (m_dims.size() != args.size())
+      {
+        return Types::Special::create(SP_TYPEERROR);
+      }
+
+      Context newk;
+      ContextPerturber p(newk, m_binds);
+
+      //these ranges are the same length because we just checked it
+      auto dimIter = m_dims.begin();
+      auto argIter = args.begin();
+
+      while (dimIter != m_dims.end())
+      {
+        p.perturb(*dimIter, *argIter);
+        ++dimIter;
+        ++argIter;
+      }
+
+      return (*m_expr)(newk);
     }
 
     BaseFunctionAbstraction*
@@ -145,6 +165,7 @@ namespace TransLucid
       return new BaseFunctionAbstraction(*this);
     }
 
+    std::vector<dimension_index> m_dims;
     std::vector<std::pair<dimension_index, Constant>> m_binds;
     WS* m_expr;
     Tuple m_k;

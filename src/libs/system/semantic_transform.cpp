@@ -370,6 +370,7 @@ SemanticTransform::operator()(const Tree::BaseAbstractionExpr& e)
 
   Tree::BaseAbstractionExpr rewritten(binds, renamed, body);
   rewritten.dims = dims;
+  rewritten.scope = m_scope;
 
   return rewritten;
 }

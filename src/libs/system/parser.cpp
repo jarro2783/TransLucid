@@ -961,9 +961,9 @@ Parser::parse_base_function(LexerIterator& begin, const LexerIterator& end,
     //identifier list
     while (*current == TOKEN_ID)
     {
-      ++current;
-
       params.push_back(get<u32string>(current->getValue()));
+
+      ++current;
 
       if (*current != TOKEN_COMMA)
       {
@@ -986,6 +986,8 @@ Parser::parse_base_function(LexerIterator& begin, const LexerIterator& end,
   Tree::Expr body;
 
   expect(current, end, body, "expr", &Parser::parse_expr);
+
+  result = Tree::BaseAbstractionExpr(bound, params, body);
 
   begin = current;
 }
