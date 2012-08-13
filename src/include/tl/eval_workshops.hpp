@@ -496,11 +496,13 @@ namespace TransLucid
        */
       BaseAbstractionWS
       (
+        System* system,
         const std::vector<dimension_index>& dims,
         const std::vector<WS*>& binds,
         WS* rhs
       )
-      : m_dims(dims)
+      : m_system(system)
+      , m_dims(dims)
       , m_binds(binds)
       , m_rhs(rhs)
       {
@@ -525,6 +527,7 @@ namespace TransLucid
       operator()(Context& kappa, Context& delta);
 
       private:
+      System* m_system;
       std::vector<dimension_index> m_dims;
       std::vector<WS*> m_binds;
       WS* m_rhs;

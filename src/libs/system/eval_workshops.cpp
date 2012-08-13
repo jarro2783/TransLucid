@@ -930,11 +930,23 @@ HostOpWS::operator()(Context& kappa, Context& delta)
 Constant
 BaseAbstractionWS::operator()(Context& k)
 {
+  return Types::BaseFunction::create
+  (
+    BaseFunctionAbstraction
+    (
+      m_system,
+      m_dims,
+      m_binds,
+      m_rhs,
+      k
+    )
+  );
 }
 
 Constant
 BaseAbstractionWS::operator()(Context& kappa, Context& delta)
 {
+  return Constant();
 }
 
 Constant
