@@ -77,6 +77,7 @@ namespace TransLucid
     {
       enum class ArgType
       {
+        CALL_BY_BASE,
         CALL_BY_VALUE,
         CALL_BY_NAME
       };

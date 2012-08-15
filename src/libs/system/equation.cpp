@@ -54,7 +54,7 @@ namespace
 
     while (iter != results.end())
     {
-      Constant fn2 = applyFunction(k, fn, currentVal);
+      Constant fn2 = applyFunction<FUN_VALUE>(k, fn, currentVal);
       currentVal = applyFunction(k, fn2, *iter);
       ++iter;
     }

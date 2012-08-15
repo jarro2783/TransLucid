@@ -475,6 +475,16 @@ namespace TransLucid
     {
       BaseAbstractionExpr() = default;
 
+      //single parameter no binds
+      BaseAbstractionExpr
+      (
+        const u32string& param,
+        const Expr& body
+      )
+      {
+      }
+
+      //multiple parameters with binds
       BaseAbstractionExpr
       (
         const std::vector<Expr>& binds,

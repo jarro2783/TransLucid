@@ -634,7 +634,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
     }
     break;
 
-    case TOKEN_DOT:
+    case SYMBOL_VALUE_APP:
     {
       Tree::Expr rhs;
       ++current;
@@ -644,7 +644,7 @@ Parser::parse_token_app(LexerIterator& begin, const LexerIterator& end,
     }
     break;
 
-    case TOKEN_BANG:
+    case SYMBOL_BASE_APP:
     {
       Tree::Expr rhs;
       ++current;
@@ -1663,13 +1663,22 @@ Parser::parse_fun_decl(LexerIterator& begin, const LexerIterator& end,
         get<u32string>(current->getValue())));
       ++current;
     }
-    else if (*current == TOKEN_DOT)
+    else if (*current == SYMBOL_VALUE_APP)
     {
       ++current;
       expect_no_advance(current, end, "id", TOKEN_ID);
       decl.args.push_back(std::make_pair(FnDecl::ArgType::CALL_BY_VALUE,
         get<u32string>(current->getValue())));
       ++current;
+    }
+    else if (*current == SYMBOL_BASE_APP)
+    {
+      ++current;
+      expect_no_advance(current, end, "id", TOKEN_ID);
+      decl.args.push_back(std::make_pair(FnDecl::ArgType::CALL_BY_BASE,
+        get<u32string>(current->getValue())));
+      ++current;
+
     }
     else
     {

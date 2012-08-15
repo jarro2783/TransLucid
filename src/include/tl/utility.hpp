@@ -195,18 +195,6 @@ namespace TransLucid
   std::string
   read_file(std::istream& is);
 
-  Constant
-  applyFunction(Context& k, const Constant& lhs, const Constant& rhs);
-
-  Constant
-  applyFunction
-  (
-    Context& kappa, 
-    Context& delta, 
-    const Constant& lhs, 
-    const Constant& rhs
-  );
-
   struct ExtraTreeInformation
   {
     std::vector<std::pair<ScopePtr, Parser::Line>> equations;

@@ -916,7 +916,7 @@ System::printConstant(const Constant& c)
 
   Constant func = (*iter->second)(m_defaultk);
 
-  Constant result = applyFunction(m_defaultk, func, c); 
+  Constant result = applyFunction<FUN_VALUE>(m_defaultk, func, c); 
 
   if (result.index() != TYPE_INDEX_USTRING)
   {

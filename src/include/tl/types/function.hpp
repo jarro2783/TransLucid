@@ -471,6 +471,101 @@ namespace TransLucid
     private:
     BaseFunctionType* m_fn;
   };
+  
+  enum FnType
+  {
+    FUN_BASE,
+    FUN_VALUE,
+    FUN_NAME
+  };
+
+  namespace detail
+  {
+    namespace apply_fun
+    {
+      template <FnType Type>
+      struct FunIndex;
+
+      template <>
+      struct FunIndex<FUN_BASE>
+      {
+        static constexpr auto value = TYPE_INDEX_BASE_FUNCTION;
+      };
+
+      template <>
+      struct FunIndex<FUN_VALUE>
+      {
+        static constexpr auto value = TYPE_INDEX_VALUE_FUNCTION;
+      };
+
+      template <FnType Type>
+      struct GetValue;
+
+      template <>
+      struct GetValue<FUN_BASE>
+      {
+        static
+        auto
+        get(const Constant& fun)
+          -> decltype(Types::BaseFunction::get(fun))
+        {
+          return Types::BaseFunction::get(fun);
+        }
+
+      };
+
+      template <>
+      struct GetValue<FUN_VALUE>
+      {
+        static
+        auto
+        get(const Constant& fun)
+          -> decltype(Types::ValueFunction::get(fun))
+        {
+          return Types::ValueFunction::get(fun);
+        }
+      };
+    }
+  }
+
+  template <FnType Type>
+  Constant
+  applyFunction(Context& k, const Constant& lhs, const Constant& rhs)
+  {
+    if (lhs.index() == detail::apply_fun::FunIndex<Type>::value)
+    {
+      const auto& fnval = detail::apply_fun::GetValue<Type>::get(lhs);
+
+      return fnval.apply(k, rhs);
+    }
+    else
+    {
+      return Types::Special::create(SP_TYPEERROR);
+    }
+  }
+
+  template <FnType Type>
+  Constant
+  applyFunction
+  (
+    Context& kappa, 
+    Context& delta, 
+    const Constant& lhs, 
+    const Constant& rhs
+  )
+  {
+    if (lhs.index() == detail::apply_fun::FunIndex<Type>::value)
+    {
+      const auto& fnval = detail::apply_fun::GetValue<Type>::get(lhs);
+
+      return fnval.apply(kappa, delta, rhs);
+    }
+    else
+    {
+      return Types::Special::create(SP_TYPEERROR);
+    }
+  }
+
 }
 
 #endif

@@ -294,8 +294,10 @@ BangOpWS::operator()(Context& kappa, Context& delta)
       {
         if (iter->index() == TYPE_INDEX_SPECIAL)
         {
-          Constant fn2 = applyFunction(kappa, delta, fn, currentValue);
-          currentValue = applyFunction(kappa, delta, fn2, *iter);
+          Constant fn2 = applyFunction<FUN_VALUE>
+            (kappa, delta, fn, currentValue);
+          currentValue = applyFunction<FUN_VALUE>
+            (kappa, delta, fn2, *iter);
         }
         ++iter;
       }
@@ -351,8 +353,8 @@ BangOpWS::operator()(Context& kappa, Context& delta)
 
     Constant theFun = (*constant_bang)(kappa, delta);
 
-    return applyFunction(kappa, delta,
-      applyFunction(kappa, delta, theFun, fn),
+    return applyFunction<FUN_VALUE>(kappa, delta,
+      applyFunction<FUN_VALUE>(kappa, delta, theFun, fn),
       rhs
     );
   }
@@ -415,8 +417,8 @@ BangOpWS::operator()(Context& k)
       {
         if (iter->index() == TYPE_INDEX_SPECIAL)
         {
-          Constant fn2 = applyFunction(k, fn, currentValue);
-          currentValue = applyFunction(k, fn2, *iter);
+          Constant fn2 = applyFunction<FUN_VALUE>(k, fn, currentValue);
+          currentValue = applyFunction<FUN_VALUE>(k, fn2, *iter);
         }
         ++iter;
       }
@@ -466,8 +468,8 @@ BangOpWS::operator()(Context& k)
 
     Constant theFun = (*constant_bang)(k);
 
-    return applyFunction(k,
-      applyFunction(k, theFun, name),
+    return applyFunction<FUN_VALUE>(k,
+      applyFunction<FUN_VALUE>(k, theFun, name),
       rhs
     );
   }

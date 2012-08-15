@@ -97,10 +97,10 @@ ConsDefWS::group(const std::list<EquationDefinition>& defs)
        argsIter != cons.args.rend();
        ++argsIter, ++dimIter)
   {
-    auto lambda = Tree::LambdaExpr(*argsIter, abstractions);
-    lambda.argDim = *dimIter;
+    auto base = Tree::BaseAbstractionExpr(*argsIter, abstractions);
+    base.dims.push_back(*dimIter);
 
-    abstractions = std::move(lambda);
+    abstractions = std::move(base);
   }
 
   return abstractions;

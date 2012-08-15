@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/lexer_util.hpp>
 #include <tl/output.hpp>
 #include <tl/system.hpp>
+#include <tl/types/function.hpp>
 #include <tl/types_util.hpp>
 #include <tl/utility.hpp>
 
@@ -415,7 +416,8 @@ namespace
 
       Constant opfn = (*ws)(context);
 
-      Constant v = applyFunction(context, opfn, Types::String::create(text));
+      Constant v = applyFunction<FUN_BASE>
+        (context, opfn, Types::String::create(text));
 
       //the result should be a tuple, just ignore if not
       //a tuple

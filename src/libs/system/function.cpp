@@ -146,6 +146,12 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
       phi.argDim = std::get<2>(*iter);
       abstractions = std::move(phi);
     }
+    else if (std::get<0>(*iter) == Parser::FnDecl::ArgType::CALL_BY_BASE)
+    {
+      auto base = Tree::BaseAbstractionExpr(std::get<1>(*iter), abstractions);
+      base.dims.push_back(std::get<2>(*iter));
+      abstractions = std::move(base);
+    }
     else
     {
       auto lambda = Tree::LambdaExpr(std::get<1>(*iter), abstractions);
