@@ -814,6 +814,7 @@ namespace TransLucid
     PRINT_NODE(HashExpr)
     PRINT_NODE(TupleExpr)
     PRINT_NODE(AtExpr)
+    PRINT_NODE(BaseAbstractionExpr)
     PRINT_NODE(LambdaExpr)
     PRINT_NODE(PhiExpr)
     PRINT_NODE(BangAppExpr)
