@@ -525,6 +525,33 @@ namespace TransLucid
           return Types::ValueFunction::get(fun);
         }
       };
+
+      template <FnType Type>
+      struct ApplyFunction;
+
+      template <>
+      struct ApplyFunction<FUN_BASE>
+      {
+        template <typename Fun>
+        static
+        Constant
+        apply(Fun&& fun, Context& k, const Constant& rhs)
+        {
+          return fun.apply(rhs);
+        }
+      };
+
+      template <>
+      struct ApplyFunction<FUN_VALUE>
+      {
+        template <typename Fun>
+        static
+        Constant
+        apply(Fun&& fun, Context& k, const Constant& rhs)
+        {
+          return fun.apply(k, rhs);
+        }
+      };
     }
   }
 
@@ -536,7 +563,7 @@ namespace TransLucid
     {
       const auto& fnval = detail::apply_fun::GetValue<Type>::get(lhs);
 
-      return fnval.apply(k, rhs);
+      return detail::apply_fun::ApplyFunction<Type>::apply(fnval, k, rhs);
     }
     else
     {

@@ -101,8 +101,8 @@ OpDefWS::group(const std::list<EquationDefinition>& defs)
     );
   }
 
-  Tree::LambdaExpr fn(U"op", best);
-  fn.argDim = dim;
+  Tree::BaseAbstractionExpr fn(U"op", best);
+  fn.dims.push_back(dim);
 
   return fn;
 }

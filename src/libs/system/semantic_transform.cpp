@@ -347,8 +347,16 @@ SemanticTransform::operator()(const Tree::BaseAbstractionExpr& e)
     std::bind(std::mem_fn(&SemanticTransform::pushScope), this, _1));
 
   //generate hidden dimensions
-  std::generate_n(std::back_inserter(dims), e.params.size(), 
-    std::bind(std::mem_fn(&System::nextHiddenDim), std::ref(m_system)));
+  //but only if someone hasn't already given them to us
+  if (e.dims.size() == 0)
+  {
+    std::generate_n(std::back_inserter(dims), e.params.size(), 
+      std::bind(std::mem_fn(&System::nextHiddenDim), std::ref(m_system)));
+  }
+  else
+  {
+    dims = e.dims;
+  }
 
   //put the hidden dimensions in scope
   std::copy(dims.begin(), dims.end(), std::back_inserter(m_scope));
