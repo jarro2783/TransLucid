@@ -45,5 +45,5 @@ uint16"0" != uint16"1";;
 uint16"1" != uint16"1";;
 uint16"2" != uint16"1";;
 
-uint16"5"!prec;;
-uint16"5"!is_signed;;
+uint16"5".prec;;
+uint16"5".is_signed;;

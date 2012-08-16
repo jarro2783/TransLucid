@@ -52,5 +52,5 @@ sint16"0" != sint16"1";;
 sint16"1" != sint16"1";;
 sint16"2" != sint16"1";;
 
-sint16"5"!prec;;
-sint16"5"!is_signed;;
+sint16"5".prec;;
+sint16"5".is_signed;;

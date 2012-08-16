@@ -119,16 +119,16 @@ fun divide!a!b [a : float, b : float] | a.prec == b.prec
 fun uminus!a [a : floatmp] = floatmp_uminus.a;;
 fun uminus!a [a : intmp] = intmp_uminus.a;;
 
-fun constant_bang.a.b [a : sint8] = sint8_bang.b;;
-fun constant_bang.a.b [a : uint8] = uint8_bang.b;;
-fun constant_bang.a.b [a : sint16] = sint16_bang.b;;
-fun constant_bang.a.b [a : uint16] = uint16_bang.b;;
-fun constant_bang.a.b [a : sint32] = sint32_bang.b;;
-fun constant_bang.a.b [a : uint32] = uint32_bang.b;;
-fun constant_bang.a.b [a : sint64] = sint64_bang.b;;
-fun constant_bang.a.b [a : uint64] = uint64_bang.b;;
-fun constant_bang.a.b [a : float32] = float32_bang.b;;
-fun constant_bang.a.b [a : float64] = float64_bang.b;;
+fun constant_bang!a!b [a : sint8] = sint8_bang.b;;
+fun constant_bang!a!b [a : uint8] = uint8_bang.b;;
+fun constant_bang!a!b [a : sint16] = sint16_bang.b;;
+fun constant_bang!a!b [a : uint16] = uint16_bang.b;;
+fun constant_bang!a!b [a : sint32] = sint32_bang.b;;
+fun constant_bang!a!b [a : uint32] = uint32_bang.b;;
+fun constant_bang!a!b [a : sint64] = sint64_bang.b;;
+fun constant_bang!a!b [a : uint64] = uint64_bang.b;;
+fun constant_bang!a!b [a : float32] = float32_bang.b;;
+fun constant_bang!a!b [a : float64] = float64_bang.b;;
 
 fun float32_bang.a [a : prec] = 32;;
 fun float64_bang.a [a : prec] = 64;;

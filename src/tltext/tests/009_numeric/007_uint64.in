@@ -45,5 +45,5 @@ uint64"0" != uint64"1";;
 uint64"1" != uint64"1";;
 uint64"2" != uint64"1";;
 
-uint64"5"!prec;;
-uint64"5"!is_signed;;
+uint64"5".prec;;
+uint64"5".is_signed;;

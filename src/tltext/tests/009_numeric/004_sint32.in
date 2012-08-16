@@ -52,5 +52,5 @@ sint32"0" != sint32"1";;
 sint32"1" != sint32"1";;
 sint32"2" != sint32"1";;
 
-sint32"5"!prec;;
-sint32"5"!is_signed;;
+sint32"5".prec;;
+sint32"5".is_signed;;

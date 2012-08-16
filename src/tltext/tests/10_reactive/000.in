@@ -1,11 +1,11 @@
 var f = 42;;
 %%
 f;;
-#!time;;
+#.time;;
 $$
 %%
-#!time;;
+#.time;;
 $$
 %%
-#!time;;
+#.time;;
 f;;

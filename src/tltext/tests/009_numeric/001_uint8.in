@@ -45,5 +45,5 @@ uint8"0" != uint8"1";;
 uint8"1" != uint8"1";;
 uint8"2" != uint8"1";;
 
-uint8"5"!prec;;
-uint8"5"!is_signed;;
+uint8"5".prec;;
+uint8"5".is_signed;;

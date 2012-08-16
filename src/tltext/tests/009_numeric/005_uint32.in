@@ -45,5 +45,5 @@ uint32"0" != uint32"1";;
 uint32"1" != uint32"1";;
 uint32"2" != uint32"1";;
 
-uint32"5"!prec;;
-uint32"5"!is_signed;;
+uint32"5".prec;;
+uint32"5".is_signed;;
