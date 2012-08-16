@@ -24,7 +24,7 @@
 fun fact.n = f
 where
   dim d <- 0 ;;
-  var f = tournamentOp₁.d.n.times (default₁.d.1.n.1 (#!d)) ;;
+  var f = tournamentOp₁.d.n.times (default₁.d.1.n.1 (#.d)) ;;
 end ;;
 
 // We test the factorial function on inputs 0 through 8.
