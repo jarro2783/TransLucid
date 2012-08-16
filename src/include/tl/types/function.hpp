@@ -97,6 +97,11 @@ namespace TransLucid
     : m_dims(dims)
     , m_expr(expr)
     {
+      if (m_expr == nullptr)
+      {
+        std::cerr << "base function built with nullptr body" << std::endl;
+      }
+
       RhoManager rho(k);
       uint8_t index = 1;
       for (auto ws : binds)

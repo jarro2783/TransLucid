@@ -6,15 +6,15 @@ data Infinite;;
 constructor infty = Infinite;;
 constructor neginfty = Infinite;;
 
-var sperror = construct_special!"sperror";;
-var spaccess = construct_special!"spaccess";;
-var sptypeerror = construct_special!"sptypeerror";;
-var spdim = construct_special!"spdim";;
-var sparith = construct_special!"sparith";;
-var spundef = construct_special!"spundef";;
-var spconst = construct_special!"spconst";;
-var spmultidef = construct_special!"spmultidef";;
-var sploop = construct_special!"sploop";;
+var sperror = construct_special."sperror";;
+var spaccess = construct_special."spaccess";;
+var sptypeerror = construct_special."sptypeerror";;
+var spdim = construct_special."spdim";;
+var sparith = construct_special."sparith";;
+var spundef = construct_special."spundef";;
+var spconst = construct_special."spconst";;
+var spmultidef = construct_special."spmultidef";;
+var sploop = construct_special."sploop";;
 
 //fun bestselect__.a.b = spmultidef;;
 fun special_combine.a.b = a;;
@@ -73,51 +73,51 @@ var nonpos = neginfty..0;;
 //var int = neginfty..infty;;
 
 //fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
-fun plus.a.b [a : intmp, b : intmp] = intmp_plus!(a,b);;
-fun plus.a.b [a : floatmp, b : floatmp] = floatmp_plus!(a,b);;
-fun plus.a.b [a : fint, b : fint] 
-  | a!prec == b!prec && a!is_signed == b!is_signed
-  = (fint_plus.(a!prec).(a!is_signed))!(a,b);;
+fun plus!a!b [a : intmp, b : intmp] = intmp_plus.(a,b);;
+fun plus!a!b [a : floatmp, b : floatmp] = floatmp_plus.(a,b);;
+fun plus!a!b [a : fint, b : fint] 
+  | a.prec == b.prec && a.is_signed == b.is_signed
+  = (fint_plus!(a.prec)!(a.is_signed)).(a,b);;
 
-fun minus.a.b [a : intmp, b : intmp] = intmp_minus!(a,b);;
-fun minus.a.b [a : floatmp, b : floatmp] = floatmp_minus!(a,b);;
-fun minus.a.b [a : fint, b : fint] 
-  | a!prec == b!prec && a!is_signed == b!is_signed
-  = (fint_minus.(a!prec).(a!is_signed))!(a,b);;
+fun minus!a!b [a : intmp, b : intmp] = intmp_minus.(a,b);;
+fun minus!a!b [a : floatmp, b : floatmp] = floatmp_minus.(a,b);;
+fun minus!a!b [a : fint, b : fint] 
+  | a.prec == b.prec && a.is_signed == b.is_signed
+  = (fint_minus!(a.prec)!(a.is_signed)).(a,b);;
 
-fun times.a.b [a : intmp, b : intmp] = intmp_times!(a,b);;
-fun times.a.b [a : floatmp, b : floatmp] = floatmp_times!(a,b);;
-fun times.a.b [a : fint, b : fint] 
-  | a!prec == b!prec && a!is_signed == b!is_signed
-  = (fint_times.(a!prec).(a!is_signed))!(a,b);;
+fun times!a!b [a : intmp, b : intmp] = intmp_times.(a,b);;
+fun times!a!b [a : floatmp, b : floatmp] = floatmp_times.(a,b);;
+fun times!a!b [a : fint, b : fint] 
+  | a.prec == b.prec && a.is_signed == b.is_signed
+  = (fint_times!(a.prec)!(a.is_signed)).(a,b);;
 
-fun divide.a.b [a : intmp, b : intmp] = intmp_divide!(a,b);;
-fun divide.a.b [a : floatmp, b : floatmp] = floatmp_divide!(a,b);;
-fun divide.a.b [a : fint, b : fint] 
-  | a!prec == b!prec && a!is_signed == b!is_signed
-  = (fint_divide.(a!prec).(a!is_signed))!(a,b);;
+fun divide!a!b [a : intmp, b : intmp] = intmp_divide.(a,b);;
+fun divide!a!b [a : floatmp, b : floatmp] = floatmp_divide.(a,b);;
+fun divide!a!b [a : fint, b : fint] 
+  | a.prec == b.prec && a.is_signed == b.is_signed
+  = (fint_divide!(a.prec)!(a.is_signed)).(a,b);;
 
-fun modulus.a.b [a : intmp, b : intmp] = intmp_modulus!(a,b);;
-fun modulus.a.b [a : fint, b : fint] 
-  | a!prec == b!prec && a!is_signed == b!is_signed
-  = (fint_modulus.(a!prec).(a!is_signed))!(a,b);;
+fun modulus!a!b [a : intmp, b : intmp] = intmp_modulus.(a,b);;
+fun modulus!a!b [a : fint, b : fint] 
+  | a.prec == b.prec && a.is_signed == b.is_signed
+  = (fint_modulus!(a.prec)!(a.is_signed)).(a,b);;
 
-fun sqrt.a [a : floatmp] = floatmp_sqrt!a;;
+fun sqrt!a [a : floatmp] = floatmp_sqrt.a;;
 
-fun plus.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_plus.(a!prec))!(a,b);;
+fun plus!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_plus!(a.prec)).(a,b);;
 
-fun minus.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_minus.(a!prec))!(a,b);;
+fun minus!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_minus!(a.prec)).(a,b);;
 
-fun times.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_times.(a!prec))!(a,b);;
+fun times!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_times!(a.prec)).(a,b);;
 
-fun divide.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_divide.(a!prec))!(a,b);;
+fun divide!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_divide!(a.prec)).(a,b);;
 
-fun uminus.a [a : floatmp] = floatmp_uminus!a;;
-fun uminus.a [a : intmp] = intmp_uminus!a;;
+fun uminus!a [a : floatmp] = floatmp_uminus.a;;
+fun uminus!a [a : intmp] = intmp_uminus.a;;
 
 fun constant_bang.a.b [a : sint8] = sint8_bang.b;;
 fun constant_bang.a.b [a : uint8] = uint8_bang.b;;
@@ -163,183 +163,183 @@ fun uint64_bang.a [a : is_signed] = false;;
 //fun sint8_bang.a.b [a : prec] = sint8_precision!b;;
 //fun sint8_bang.a.b [a : signed] = true;;
 
-fun lte.a.b [a : intmp, b : intmp] = intmp_lte!(a,b);;
-fun lte.a.b [a : intmp, b : infty] = true;;
-fun lte.a.b [a : infty, b : intmp] = false;;
-fun lte.a.b [a : infty, b : infty] = true;;
-fun lte.a.b [a : neginfty, b : neginfty] = true;;
-fun lte.a.b [a : neginfty, b : intmp] = true;;
-fun lte.a.b [a : intmp, b : neginfty] = false;;
-fun lte.a.b [a : floatmp, b : floatmp] = floatmp_lte!(a,b);;
-fun lte.a.b [a : fint, b : fint] 
-  | a!prec == b!prec && a!is_signed == b!is_signed 
-  = fint_lte.(a!prec).(a!is_signed)!(a,b);;
+fun lte!a!b [a : intmp, b : intmp] = intmp_lte.(a,b);;
+fun lte!a!b [a : intmp, b : infty] = true;;
+fun lte!a!b [a : infty, b : intmp] = false;;
+fun lte!a!b [a : infty, b : infty] = true;;
+fun lte!a!b [a : neginfty, b : neginfty] = true;;
+fun lte!a!b [a : neginfty, b : intmp] = true;;
+fun lte!a!b [a : intmp, b : neginfty] = false;;
+fun lte!a!b [a : floatmp, b : floatmp] = floatmp_lte.(a,b);;
+fun lte!a!b [a : fint, b : fint] 
+  | a.prec == b.prec && a.is_signed == b.is_signed 
+  = fint_lte!(a.prec)!(a.is_signed).(a,b);;
 
-fun lt.a.b [a : intmp, b : intmp] = intmp_lt!(a,b);;
-fun lt.a.b [a : intmp, b : infty] = true;;
-fun lt.a.b [a : infty, b : intmp] = false;;
-fun lt.a.b [a : infty, b : infty] = false;;
-fun lt.a.b [a : neginfty, b : neginfty] = false;;
-fun lt.a.b [a : neginfty, b : intmp] = true;;
-fun lt.a.b [a : intmp, b : neginfty] = false;;
-fun lt.a.b [a : floatmp, b : floatmp] = floatmp_lt!(a,b);;
-fun lt.a.b [a : fint, b : fint]
-  | a!prec == b!prec && a!is_signed == b!is_signed 
-  = fint_lt.(a!prec).(a!is_signed)!(a,b);;
+fun lt!a!b [a : intmp, b : intmp] = intmp_lt.(a,b);;
+fun lt!a!b [a : intmp, b : infty] = true;;
+fun lt!a!b [a : infty, b : intmp] = false;;
+fun lt!a!b [a : infty, b : infty] = false;;
+fun lt!a!b [a : neginfty, b : neginfty] = false;;
+fun lt!a!b [a : neginfty, b : intmp] = true;;
+fun lt!a!b [a : intmp, b : neginfty] = false;;
+fun lt!a!b [a : floatmp, b : floatmp] = floatmp_lt.(a,b);;
+fun lt!a!b [a : fint, b : fint]
+  | a.prec == b.prec && a.is_signed == b.is_signed 
+  = fint_lt!(a.prec)!(a.is_signed).(a,b);;
 
-fun gte.a.b [a : intmp, b : intmp] = intmp_gte!(a,b);;
-fun gte.a.b [a : floatmp, b : floatmp] = floatmp_gte!(a,b);;
-fun gte.a.b [a : fint, b : fint]
-  | a!prec == b!prec && a!is_signed == b!is_signed 
-  = fint_gte.(a!prec).(a!is_signed)!(a,b);;
+fun gte!a!b [a : intmp, b : intmp] = intmp_gte.(a,b);;
+fun gte!a!b [a : floatmp, b : floatmp] = floatmp_gte.(a,b);;
+fun gte!a!b [a : fint, b : fint]
+  | a.prec == b.prec && a.is_signed == b.is_signed 
+  = fint_gte!(a.prec)!(a.is_signed).(a,b);;
 
-fun gt.a.b [a : intmp, b : intmp] = intmp_gt!(a,b);;
-fun gt.a.b [a : floatmp, b : floatmp] = floatmp_gt!(a,b);;
-fun gt.a.b [a : fint, b : fint]
-  | a!prec == b!prec && a!is_signed == b!is_signed 
-  = fint_gt.(a!prec).(a!is_signed)!(a,b);;
+fun gt!a!b [a : intmp, b : intmp] = intmp_gt.(a,b);;
+fun gt!a!b [a : floatmp, b : floatmp] = floatmp_gt.(a,b);;
+fun gt!a!b [a : fint, b : fint]
+  | a.prec == b.prec && a.is_signed == b.is_signed 
+  = fint_gt!(a.prec)!(a.is_signed).(a,b);;
 
-fun eq.a.b [a : intmp, b : intmp] = intmp_eq!(a,b);;
-fun eq.a.b [a : floatmp, b : floatmp] = floatmp_eq!(a,b);;
-fun eq.a.b [a : fint, b : fint] 
-  | intmp_eq!(a!prec, b!prec) && bool_eq!(a!is_signed, b!is_signed)
-  = (fint_eq.(a!prec).(a!is_signed))!(a,b);;
+fun eq!a!b [a : intmp, b : intmp] = intmp_eq.(a,b);;
+fun eq!a!b [a : floatmp, b : floatmp] = floatmp_eq.(a,b);;
+fun eq!a!b [a : fint, b : fint] 
+  | intmp_eq.(a.prec, b.prec) && bool_eq.(a.is_signed, b.is_signed)
+  = (fint_eq!(a.prec)!(a.is_signed)).(a,b);;
 
-fun ne.a.b [a : intmp, b : intmp] = intmp_ne!(a,b);;
-fun ne.a.b [a : floatmp, b : floatmp] = floatmp_ne!(a,b);;
-fun ne.a.b [a : fint, b : fint]
-  | a!prec == b!prec && a!is_signed == b!is_signed 
-  = fint_ne.(a!prec).(a!is_signed)!(a,b);;
+fun ne!a!b [a : intmp, b : intmp] = intmp_ne.(a,b);;
+fun ne!a!b [a : floatmp, b : floatmp] = floatmp_ne.(a,b);;
+fun ne!a!b [a : fint, b : fint]
+  | a.prec == b.prec && a.is_signed == b.is_signed 
+  = fint_ne!(a.prec)!(a.is_signed).(a,b);;
 
-fun eq.a.b [a : bool, b : bool] = bool_eq!(a,b);;
+fun eq!a!b [a : bool, b : bool] = bool_eq.(a,b);;
 
-fun lt.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_lt.(a!prec))!(a,b);;
+fun lt!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_lt!(a.prec)).(a,b);;
 
-fun lte.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_lte.(a!prec))!(a,b);;
+fun lte!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_lte!(a.prec)).(a,b);;
 
-fun gt.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_gt.(a!prec))!(a,b);;
+fun gt!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_gt!(a.prec)).(a,b);;
 
-fun gte.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_gte.(a!prec))!(a,b);;
+fun gte!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_gte!(a.prec)).(a,b);;
 
-fun eq.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_eq.(a!prec))!(a,b);;
+fun eq!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_eq!(a.prec)).(a,b);;
 
-fun ne.a.b [a : float, b : float] | a!prec == b!prec 
-  = (float_ne.(a!prec))!(a,b);;
+fun ne!a!b [a : float, b : float] | a.prec == b.prec 
+  = (float_ne!(a.prec)).(a,b);;
 
 fun bool_and a b = if a then b else false fi;;
 fun bool_or a b = if a then true else b fi;;
 
-fun plus.a.b [a : ustring, b : ustring] = ustring_plus!(a,b);;
+fun plus!a!b [a : ustring, b : ustring] = ustring_plus.(a,b);;
 
-fun abs.a [a : floatmp] = floatmp_abs!a;;
+fun abs!a [a : floatmp] = floatmp_abs.a;;
 
-fun range_construct.a.b [a : intmp, b : intmp] = make_range!(a,b);;
-fun range_construct.a.b [a : intmp, b : infty] = make_range_infty!a;;
-fun range_construct.a.b [a : neginfty, b : intmp] = make_range_neginfty!b;;
-fun range_construct.a.b [a : neginfty, b : infty] = make_range_infinite;;
+fun range_construct!a!b [a : intmp, b : intmp] = make_range.(a,b);;
+fun range_construct!a!b [a : intmp, b : infty] = make_range_infty.a;;
+fun range_construct!a!b [a : neginfty, b : intmp] = make_range_neginfty.b;;
+fun range_construct!a!b [a : neginfty, b : infty] = make_range_infinite;;
 
-fun union_construct.a.b = make_union!(a,b);;
+fun union_construct!a!b = make_union.(a,b);;
 
 //convert to a from b
-fun convert.a.b [a : floatmp, b : intmp] = floatmp_convert_intmp!b;;
+fun convert!a!b [a : floatmp, b : intmp] = floatmp_convert_intmp.b;;
 
 //var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
-fun fby.d X Y = if #!d <= 0 then X else prev.d Y fi;;
-var index = \d -> #!d + 1;;
-var prev = \d -> \\X -> X @ [d <- #!d - 1];;
-var next = \d -> \\X -> X @ [d <- #!d + 1];;
+fun fby.d X Y = if #.d <= 0 then X else prev.d Y fi;;
+fun index.d = #.d + 1;;
+fun prev.d X = X @ [d <- #.d - 1];;
+fun next.d X = X @ [d <- #.d + 1];;
 
-fun escape_character.c | is_printable!c = print.c;;
-fun escape_character.c | is_printable!c == false && code_point!c <= 0GFFFF 
-  = `\u` + code_point_4!c;;
-fun escape_character.c | is_printable!c == false && code_point!c > 0GFFFF 
-  = `\U` + code_point_8!c;;
-fun escape_character.c [c : '\n'] = `\n`;;
-fun escape_character.c [c : '\t'] = `\t`;;
-fun escape_character.c [c : '\r'] = `\r`;;
-fun escape_character.c [c : '\\'] = `\\`;;
-fun escape_character.c [c : '\"'] = `\"`;;
-fun escape_character.c [c : '\''] = `\'`;;
+fun escape_character!c | is_printable.c = print!c;;
+fun escape_character!c | is_printable.c == false && code_point.c <= 0GFFFF 
+  = `\u` + code_point_4.c;;
+fun escape_character!c | is_printable.c == false && code_point.c > 0GFFFF 
+  = `\U` + code_point_8.c;;
+fun escape_character!c [c : '\n'] = `\n`;;
+fun escape_character!c [c : '\t'] = `\t`;;
+fun escape_character!c [c : '\r'] = `\r`;;
+fun escape_character!c [c : '\\'] = `\\`;;
+fun escape_character!c [c : '\"'] = `\"`;;
+fun escape_character!c [c : '\''] = `\'`;;
 
-fun string_at.s.pos [s : ustring, pos : intmp] = string_at_base!(s,pos);;
-fun substring.s.start.length [s : ustring, start : intmp, length : intmp]
-  = substring_base!(s, start, length);;
-fun substring.s.start.length [s : ustring, start : intmp, length : infty]
-  = substring_toend_base!(s, start);;
+fun string_at!s!pos [s : ustring, pos : intmp] = string_at_base.(s,pos);;
+fun substring!s!start!length [s : ustring, start : intmp, length : intmp]
+  = substring_base.(s, start, length);;
+fun substring!s!start!length [s : ustring, start : intmp, length : infty]
+  = substring_toend_base.(s, start);;
 
-fun escape_string.s = escape_character.(string_at.s.0)
-  + escape_string.(substring.s.1.infty)
+fun escape_string!s = escape_character!(string_at!s!0)
+  + escape_string!(substring!s!1!infty)
 ;;
-fun escape_string.s [s : ""] = "";;
+fun escape_string!s [s : ""] = "";;
 
-fun print_special.c [c : sperror] = "sperror";;
-fun print_special.c [c : spaccess] = "spaccess";;
-fun print_special.c [c : sptypeerror] = "typeerror";;
-fun print_special.c [c : spdim] = "spdim";;
-fun print_special.c [c : sparith] = "sparith";;
-fun print_special.c [c : spundef] = "spundef";;
-fun print_special.c [c : spconst] = "spconst";;
-fun print_special.c [c : spmultidef] = "spmultidef";;
-fun print_special.c [c : sploop] = "sploop";;
+fun print_special!c [c : sperror] = "sperror";;
+fun print_special!c [c : spaccess] = "spaccess";;
+fun print_special!c [c : sptypeerror] = "typeerror";;
+fun print_special!c [c : spdim] = "spdim";;
+fun print_special!c [c : sparith] = "sparith";;
+fun print_special!c [c : spundef] = "spundef";;
+fun print_special!c [c : spconst] = "spconst";;
+fun print_special!c [c : spmultidef] = "spmultidef";;
+fun print_special!c [c : sploop] = "sploop";;
 
-fun print.c = "I don't know how to print this type";;
-fun print.c [c : ustring] = c;;
-fun print.c [c : intmp] = print_intmp!c;;
-fun print.c [c : floatmp] = print_floatmp!c;;
-fun print.c [c : bool] = print_bool!c;;
-fun print.c [c : special] = print_special.c;;
-fun print.c [c : typetype] = print_typetype!c;;
-fun print.c [c : uchar] = print_uchar!c;;
-fun print.c [c : range] = print_range!c;;
-fun print.c [c : tuple] = print_tuple!c;;
-fun print.c [c : uuid] = print_uuid!c;;
-fun print.c [c : demand] = "Cannot print demands";;
-fun print.c [c : calc] = "Cannot print calc";;
+fun print!c = "I don't know how to print this type";;
+fun print!c [c : ustring] = c;;
+fun print!c [c : intmp] = print_intmp.c;;
+fun print!c [c : floatmp] = print_floatmp.c;;
+fun print!c [c : bool] = print_bool.c;;
+fun print!c [c : special] = print_special!c;;
+fun print!c [c : typetype] = print_typetype.c;;
+fun print!c [c : uchar] = print_uchar.c;;
+fun print!c [c : range] = print_range.c;;
+fun print!c [c : tuple] = print_tuple.c;;
+fun print!c [c : uuid] = print_uuid.c;;
+fun print!c [c : demand] = "Cannot print demands";;
+fun print!c [c : calc] = "Cannot print calc";;
 
-fun print_typename.c = "unknown typename";;
-fun print_typename.c [c : intmp] = "intmp";;
-fun print_typename.c [c : ustring] = "ustring";;
-fun print_typename.c [c : uchar] = "uchar";;
-fun print_typename.c [c : bool] = "bool";;
-fun print_typename.c [c : range] = "range";;
-fun print_typename.c [c : tuple] = "tuple";;
-fun print_typename.c [c : special] = "special";;
-fun print_typename.c [c : typetype] = "typetype";;
-fun print_typename.c [c : uuid] = "uuid";;
-fun print_typename.c [c : demand] = "demand";;
-fun print_typename.c [c : calc] = "calc";;
-fun print_typename.c [c : basefun] = "basefun";;
-fun print_typename.c [c : lambda] = "lambda";;
-fun print_typename.c [c : phi] = "phi";;
-fun print_typename.c [c : floatmp] = "floatmp";;
-fun print_typename.c [c : intension] = "intension";;
+fun print_typename!c = "unknown typename";;
+fun print_typename!c [c : intmp] = "intmp";;
+fun print_typename!c [c : ustring] = "ustring";;
+fun print_typename!c [c : uchar] = "uchar";;
+fun print_typename!c [c : bool] = "bool";;
+fun print_typename!c [c : range] = "range";;
+fun print_typename!c [c : tuple] = "tuple";;
+fun print_typename!c [c : special] = "special";;
+fun print_typename!c [c : typetype] = "typetype";;
+fun print_typename!c [c : uuid] = "uuid";;
+fun print_typename!c [c : demand] = "demand";;
+fun print_typename!c [c : calc] = "calc";;
+fun print_typename!c [c : basefun] = "basefun";;
+fun print_typename!c [c : lambda] = "lambda";;
+fun print_typename!c [c : phi] = "phi";;
+fun print_typename!c [c : floatmp] = "floatmp";;
+fun print_typename!c [c : intension] = "intension";;
 
-fun construct_literal.t.v [t : "intmp"] = construct_intmp!v;;
-fun construct_literal.t.v [t : "special"] = construct_special!v;;
-fun construct_literal.t.v [t : "typetype"] = construct_typetype!v;;
-fun construct_literal.t.v [t : "uuid"] = construct_uuid!v;;
-fun construct_literal.t.v [t : "floatmp"] = construct_floatmp!v;;
+fun construct_literal!t!v [t : "intmp"] = construct_intmp.v;;
+fun construct_literal!t!v [t : "special"] = construct_special.v;;
+fun construct_literal!t!v [t : "typetype"] = construct_typetype.v;;
+fun construct_literal!t!v [t : "uuid"] = construct_uuid.v;;
+fun construct_literal!t!v [t : "floatmp"] = construct_floatmp.v;;
 
 //the print equations
-fun canonical_print.c [c : intmp]   = print.c;;
-fun canonical_print.c [c : ustring] = `"` + escape_string.(print.c) + `"`;;
-fun canonical_print.c [c : uchar]   = "'" + escape_string.(print.c) + "'";;
-fun canonical_print.c [c : bool]    = print.c;;
-fun canonical_print.c [c : range]   = print.c;;
-fun canonical_print.c [c : tuple]   = "[I don't know how to print a tuple]";;
-fun canonical_print.c               = print_typename.c + `"` + 
-                                      escape_string.(print.c) + `"`;;
-fun canonical_print.c [c : special] = print.c;;
-fun canonical_print.c [c : infty] = "infty";;
-fun canonical_print.c [c : neginfty] = "neginfty";;
+fun canonical_print!c [c : intmp]   = print!c;;
+fun canonical_print!c [c : ustring] = `"` + escape_string!(print!c) + `"`;;
+fun canonical_print!c [c : uchar]   = "'" + escape_string!(print!c) + "'";;
+fun canonical_print!c [c : bool]    = print!c;;
+fun canonical_print!c [c : range]   = print!c;;
+fun canonical_print!c [c : tuple]   = "[I don't know how to print a tuple]";;
+fun canonical_print!c               = print_typename!c + `"` + 
+                                      escape_string!(print!c) + `"`;;
+fun canonical_print!c [c : special] = print!c;;
+fun canonical_print!c [c : infty] = "infty";;
+fun canonical_print!c [c : neginfty] = "neginfty";;
 
 //I don't think that we want this definition
-//fun canonical_print.c = "cannot print this thing";;
+//fun canonical_print!c = "cannot print this thing";;
 
 var RETURN = 0;;
 

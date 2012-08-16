@@ -1041,14 +1041,14 @@ TEST_CASE( "expr parser", "basic expression parser tests" )
   CHECK(TL::get<mpz_class>(result) == 42);
 
   //function application
-  std::string input2("f.d A B");
+  std::string input2("f!d A B");
 
   TL::Parser::StreamPosIterator rawbegin2
   (
     TL::Parser::U32Iterator(
       TL::Parser::makeUTF8Iterator(input2.begin())
     ),
-    U"f.d A B"
+    U"f!d A B"
   );
 
   TL::Parser::StreamPosIterator rawend2(
@@ -1065,7 +1065,7 @@ TEST_CASE( "expr parser", "basic expression parser tests" )
   TL::Parser::LexerIterator end2 = begin2.makeEnd();
 
   CHECK(p.parse_expr(begin2, end2, result));
-  CHECK(TL::Printer::print_expr_tree(result) == "f.d A B");
+  CHECK(TL::Printer::print_expr_tree(result) == "f!d A B");
 
   TL::Tree::PhiAppExpr* appB = TL::get<TL::Tree::PhiAppExpr>(&result);
   REQUIRE(appB != 0);

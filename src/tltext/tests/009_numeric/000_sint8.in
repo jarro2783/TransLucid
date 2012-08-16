@@ -52,5 +52,5 @@ sint8"0" != sint8"1";;
 sint8"1" != sint8"1";;
 sint8"2" != sint8"1";;
 
-sint8"5"!prec;;
-sint8"5"!is_signed;;
+sint8"5".prec;;
+sint8"5".is_signed;;

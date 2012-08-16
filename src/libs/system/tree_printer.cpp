@@ -553,7 +553,7 @@ class TreePrinter
   operator()(const Tree::BangAppExpr& b)
   {
     apply_visitor(*this, b.name);
-    m_os << "!(";
+    m_os << ".(";
     apply_visitor(*this, b.args.front());
     for (auto iter = ++b.args.begin(); iter != b.args.end(); ++iter)
     {
@@ -599,7 +599,7 @@ class TreePrinter
   void
   operator()(const Tree::LambdaAppExpr& l)
   {
-    print_fn_application(l, '.');
+    print_fn_application(l, '!');
   }
 
   void

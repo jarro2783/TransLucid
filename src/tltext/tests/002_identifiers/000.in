@@ -1,5 +1,5 @@
 //tests that the dimension "id" doesn't conflict when it's a prefix of a
 //longer identifier
-var identity = #!1;;
+var identity = #.1;;
 %%
 identity @ [1 <- 1];;

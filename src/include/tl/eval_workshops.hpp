@@ -508,6 +508,11 @@ namespace TransLucid
       , m_binds(binds)
       , m_rhs(rhs)
       {
+        if (rhs == nullptr)
+        {
+          std::cerr << "base abstraction workshop with nullptr body" 
+            << std::endl;
+        }
       }
 
       ~BaseAbstractionWS()

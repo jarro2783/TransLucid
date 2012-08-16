@@ -481,6 +481,8 @@ namespace TransLucid
         const u32string& param,
         const Expr& body
       )
+      : params{param}
+      , body(body)
       {
       }
 
