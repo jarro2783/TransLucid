@@ -350,7 +350,7 @@ fun first.d X = X @ [d <- 0] ;;
 fun wvr.d X B = X @ [d <- T]
 where
   var T = fby.d U (U @ [d <- T + 1]) ;;
-  var U = if B then #!d else next.d U fi ;;
+  var U = if B then #.d else next.d U fi ;;
 end ;;
 
 // The upon function, B is assumed to be Boolean.
@@ -370,15 +370,15 @@ end ;;
 fun asa.d X B = first.d (wvr.d X B) ;;
 
 // Rotating and transposing.
-fun rotate.d.dʹ X = X @ [d <- #!dʹ] ;;
-fun transpose.d.dʹ X = X @ [d <- #!dʹ, dʹ <- #!d] ;;
+fun rotate.d.dʹ X = X @ [d <- #.dʹ] ;;
+fun transpose.d.dʹ X = X @ [d <- #.dʹ, dʹ <- #.d] ;;
 
 // For divide-and-conquer computations.
-fun LofPair.d X = X @ [d <- #!d * 2] ;;
-fun RofPair.d X = X @ [d <- #!d * 2 + 1] ;;
+fun LofPair.d X = X @ [d <- #.d * 2] ;;
+fun RofPair.d X = X @ [d <- #.d * 2 + 1] ;;
 
 // The integer log function, for depth of divide-and-conquer.
-fun ilog.n = asa.d (#!d) (double > n)
+fun ilog.n = asa.d (#.d) (double > n)
 where
   dim d <- 0 ;;
   var double = fby.d 1 (double * 2) ;;
@@ -404,14 +404,14 @@ end ;;
 fun tournamentOp₁.d.n.g X = Y @ [d <- 0]
 where
   dim t <- ilog.n ;;
-  var Y = fby.t X (g.(LofPair.d Y).(RofPair.d Y)) ;;
+  var Y = fby.t X (g!(LofPair.d Y)!(RofPair.d Y)) ;;
 end ;;
 
 fun tournamentOp₂.d₁.d₂.n.g X = Y @ [d <- 0]
 where
   dim t <- ilog.n ;;
-  var Y = fby.t X (g.(NWofQuad.d₁.d₂ Y).(NEofQuad.d₁.d₂ Y).
-                     (SWofQuad.d₁.d₂ Y).(SEofQuad.d₁.d₂ Y)) ;;
+  var Y = fby.t X (g!(NWofQuad.d₁.d₂ Y)!(NEofQuad.d₁.d₂ Y)!
+                     (SWofQuad.d₁.d₂ Y)!(SEofQuad.d₁.d₂ Y)) ;;
 end ;;
 
 

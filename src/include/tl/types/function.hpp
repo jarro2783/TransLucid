@@ -125,6 +125,7 @@ namespace TransLucid
 
       //hold on to rho
       m_binds.push_back(std::make_pair(DIM_RHO, k.lookup(DIM_RHO)));
+      m_binds.push_back(std::make_pair(DIM_TIME, k.lookup(DIM_TIME)));
     }
 
     ~BaseFunctionAbstraction() throw() {}
