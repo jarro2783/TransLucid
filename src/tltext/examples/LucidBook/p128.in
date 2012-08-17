@@ -37,14 +37,14 @@ var composite = pm (fby.d 2 (next.d prime)) ;;
 fun complement X = wvr.d I₂ (I₂ != Xʹ) 
 where
   var Xʹ = upon.d X (I₂ == Xʹ) ;;
-  var I₂ = #!d + 2 ;;
+  var I₂ = #.d + 2 ;;
 end ;;
 
 // d-stream of multiples of elements of d-stream X.
 fun pm X =
     fby.d (2 * X) (merge.d (I₃ * first.d X) (pm (next.d X)))
 where
-  var I₃ = #!d + 3 ;;
+  var I₃ = #.d + 3 ;;
 end ;;
 
 // Test the functions.

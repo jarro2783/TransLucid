@@ -20,7 +20,7 @@ end ;;
 dim a ;;
 dim b ;;
 dim c ;;
-var A = 2*#!a + 3*#!b + 1;;
+var A = 2*#.a + 3*#.b + 1;;
 var B = (rotate.b.c A) * (rotate.a.c A) ;;
 var C = mm.a.b.2.2.2 A A ;;
 

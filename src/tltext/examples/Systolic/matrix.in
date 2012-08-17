@@ -2,17 +2,17 @@ dim x ;;
 dim y ;;
 dim t ;;
 
-var A = 2*#!x + 3*#!y + 1;;
-var B = 3*#!x + 5*#!y + 1;;
+var A = 2*#.x + 3*#.y + 1;;
+var B = 3*#.x + 5*#.y + 1;;
 
 var C [t : 0 ] = 0 ;;
 var C = prev.t C + prev.t (prev.x left) * prev.t (prev.y top) ;;
 
-var left [ t : 0 , x : ~3-#!y .. ~1-#!y ] = A @ [ x <- 0 - ( #!x + #!y +1) ] ;;
+var left [ t : 0 , x : ~3-#.y .. ~1-#.y ] = A @ [ x <- 0 - ( #.x + #.y +1) ] ;;
 var left [ t : 0 ] = 0 ;;
 var left [ t : pos ] = prev.t (prev.x left) ;;
 
-var top  [ t : 0 , y : ~3-#!x .. ~1-#!x ] = B @ [ y <- 0 - ( #!y + #!x +1) ] ;;
+var top  [ t : 0 , y : ~3-#.x .. ~1-#.x ] = B @ [ y <- 0 - ( #.y + #.x +1) ] ;;
 var top  [ t : 0 ] = 0 ;;
 var top  [ t : pos ] = prev.t (prev.y top) ;;
 

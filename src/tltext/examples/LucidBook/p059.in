@@ -28,7 +28,7 @@
 dim d ;;
 
 // N is the d-stream of natural numbers starting from 3.
-var N = #!d + 3;;
+var N = #.d + 3;;
 
 // P is the d-stream of prime numbers.
 var P = fby.d 2 (primesin N) ;;

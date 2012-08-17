@@ -33,7 +33,7 @@ fun square.x = x * x ;;
 fun avg.d X = mean
 where 
   var mean = fby.d X (mean + diff) ;;
-  var diff = (next.d X - mean) / convert.floatmp.(index.d + 1) ;;
+  var diff = (next.d X - mean) / (convert!floatmp!(index!d + 1)) ;;
 end ;;
 
 // Square root of x, using Newton-Raphson.
@@ -41,7 +41,7 @@ fun sqroot.x = asa.d approx (err < precision)
 where
   dim d <- 0 ;;
   var approx = fby.d (x / float₂) ((approx + x / approx) / float₂) ;;
-  var err = abs.(square.approx - x) ;;
+  var err = abs!(square.approx - x) ;;
 end ;;
 
 // Running standard deviation, in direction d, of stream X.

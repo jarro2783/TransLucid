@@ -33,11 +33,11 @@ fun ourmid.x = asa.d a (err < precision)
 where
   dim d <- 0 ;;
   var a = fby.d (x / float₂) ((a + x / a) / float₂) ;;
-  var err = abs.(x - a * a) ;;
+  var err = abs!(x - a * a) ;;
 end ;;
 
 // Aproximation of base-ten logarithm of x.
-fun ourlog.x = asa.d midlog (abs.(mid - x) < precision) 
+fun ourlog.x = asa.d midlog (abs!(mid - x) < precision) 
 where
   dim d <- 0 ;;
   var low = fby.d float₁ (if x < mid then low else mid fi) ;;

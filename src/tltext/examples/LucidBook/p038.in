@@ -19,8 +19,8 @@ var float₈ = floatmp"8.0" ;;
 // Product of the roots of a quadratic equation.
 fun rootprod.a.b.c = r₁ * r₂
 where
-  var r₁ = uminus.b + sqrt.d / (float₂ * a) ;;
-  var r₂ = uminus.b - sqrt.d / (float₂ * a) ;;
+  var r₁ = uminus!b + sqrt!d / (float₂ * a) ;;
+  var r₂ = uminus!b - sqrt!d / (float₂ * a) ;;
   var d = b * b - float₄ * a * c ;;
 end ;;
 

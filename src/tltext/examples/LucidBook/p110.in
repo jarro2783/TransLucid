@@ -12,7 +12,7 @@
 // Define the function.
 
 // n-th power of x.
-fun pow.x.n = asa.d p (#!d == n)
+fun pow.x.n = asa.d p (#.d == n)
 where
   dim d <- 0 ;;
   var p = fby.d 1 (x * p) ;;

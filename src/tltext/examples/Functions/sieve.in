@@ -13,7 +13,7 @@ fun sieve.n = f
 where
   dim d  <- n ;;
   dim dʹ <- 0 ;;
-  var f = fby.d (#!dʹ + 2)
+  var f = fby.d (#.dʹ + 2)
                 (wvr.dʹ f ((f % (first.dʹ f)) != 0)) ;;
 end ;;
 

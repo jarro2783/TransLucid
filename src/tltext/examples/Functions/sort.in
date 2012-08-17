@@ -38,12 +38,12 @@ where
 end ;;
 
 dim a ;;
-var A = #!a * 3 ;;
-var B = #!a * 5 ;;
+var A = #.a * 3 ;;
+var B = #.a * 5 ;;
 var Aʹ = default₁.a.0.2.infty A ;;
 var Bʹ = default₁.a.0.2.infty B ;;
 var C = merge.a Aʹ Bʹ ;;
-var D = if #!a % 2 == 0 then #!a else 2 * #!a + 1 fi ;;
+var D = if #.a % 2 == 0 then #.a else 2 * #.a + 1 fi ;;
 var E = sort.a.3 D ;;
 
 %%

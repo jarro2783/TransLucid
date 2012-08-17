@@ -3,14 +3,14 @@
 // A stream is primed with 1, followed by the 3-way merge of multiplying
 // the stream by 2, 3 and 5.
 
-fun hamming.d = f
+fun hamming!d = f
 where
- var f = fby.d 1 (merge.d (hamming.d * 2)
-                          (merge.d (hamming.d * 3) (hamming.d * 5))) ;;
+ var f = fby.d 1 (merge.d (hamming!d * 2)
+                          (merge.d (hamming!d * 3) (hamming!d * 5))) ;;
 end ;;
 
 dim a ;;
-var ham = hamming.a ;;
+var ham = hamming!a ;;
 
 %%
 

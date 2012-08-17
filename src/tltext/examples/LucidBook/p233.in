@@ -19,7 +19,7 @@
 
 dim d ;;
 var odd = fby.d 1 (odd + 2) ;;
-var pow = fby.d (\x -> x) (\ {d} x -> x * pow.x) ;;
+var pow = fby.d (\_x -> x) (\_ {d} x -> x * pow.x) ;;
 
 // Test the d-streams.
 

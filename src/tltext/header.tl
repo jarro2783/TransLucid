@@ -250,7 +250,7 @@ fun convert!a!b [a : floatmp, b : intmp] = floatmp_convert_intmp.b;;
 
 //var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 fun fby.d X Y = if #.d <= 0 then X else prev.d Y fi;;
-fun index.d = #.d + 1;;
+fun index!d = #.d + 1;;
 fun prev.d X = X @ [d <- #.d - 1];;
 fun next.d X = X @ [d <- #.d + 1];;
 
@@ -386,7 +386,7 @@ end ;;
 
 fun runningOp.d.g X = S
 where
-  var S = fby.d X (g.(next.d X).S) ;;
+  var S = fby.d X (g!(next.d X)!S) ;;
 end ;;
 
 fun default₁.d.m.n.val X = Y
@@ -427,14 +427,14 @@ op :: = OpInfix."cons_list".false.AssocRight.(~10) ;;
 op <> = OpInfix."append_list".false.AssocRight.(~10) ;;
 
 // The cons_list function corresponding to operator "::".
-fun cons_list.a.b [b : [type <- "List"]] = Cons.a.b ;;
+fun cons_list!a!b [b : [type <- "List"]] = Cons.a.b ;;
 
 // The append_list function corresponding to operator "<>".
-fun append_list.l₁.l₂
+fun append_list!l₁!l₂
   [l₁ : Nil, l₂ : [type <- "List"]] = l₂ ;;
-fun append_list.l₁.l₂
+fun append_list!l₁!l₂
   [l₁ : [type <- "List"], l₂ : [type <- "List"]]
-  = head.l₁ :: append_list.(tail.l₁).l₂ ;;
+  = head.l₁ :: append_list!(tail.l₁)!l₂ ;;
 
 // True if l is a List.
 fun isList.l [l : [type <- "List"]] = true ;;
@@ -445,10 +445,10 @@ fun isNil.l [l : Nil] = true ;;
 fun isNil.l = false ;;
 
 // The head of non-empty list l.
-fun head.l [l : [type <- "List", cons <- "Cons"]] = l!arg0;;
+fun head.l [l : [type <- "List", cons <- "Cons"]] = l.arg0;;
 
 // The tail of non-empty list l.
-fun tail.l [l : [type <- "List", cons <- "Cons"]] = l!arg1;;
+fun tail.l [l : [type <- "List", cons <- "Cons"]] = l.arg1;;
 
 // The length of a list.
 fun length.l [l : Nil] = 0 ;;

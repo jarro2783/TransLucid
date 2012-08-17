@@ -9,16 +9,16 @@
 
 dim sum ;;
 dim avg ;;
-fun sumavg.d X = [sum <- S, avg <- S/(#!d + 1)]
+fun sumavg.d X = [sum <- S, avg <- S/(#.d + 1)]
 where
   var S = fby.d X (next.d X + S) ;;
 end ;;
 
 dim a ;;
-var A = #!a ;;
+var A = #.a ;;
 var B = sumavg.a A ;;
 
 %%
 
-(B @ [a <- 10])!sum ;;
-(B @ [a <- 10])!avg ;;
+(B @ [a <- 10]).sum ;;
+(B @ [a <- 10]).avg ;;

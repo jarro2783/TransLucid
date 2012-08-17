@@ -5,7 +5,7 @@
 dim a ;;
 dim b ;;
 
-var A = 2*#!a + 3*#!b ;;
+var A = 2*#.a + 3*#.b ;;
 var B = transpose.a.b A ;;
 
 %%

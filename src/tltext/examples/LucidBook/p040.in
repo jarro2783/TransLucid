@@ -42,5 +42,6 @@ primeno.3 ;;
 primeno.4 ;;
 primeno.5 ;;
 primeno.6 ;;
-$$%%
-primeno.100 ;;
+//$$ %%
+//this takes ages right now
+//primeno.100 ;;
