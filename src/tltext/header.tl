@@ -52,6 +52,7 @@ op == = OpInfix."eq".false.AssocNon.25;;
 op != = OpInfix."ne".false.AssocNon.25;;
 op && = OpInfix."bool_and".true.AssocLeft.20;;
 op || = OpInfix."bool_or".true.AssocLeft.15;;
+op ¬ = OpPrefix."negate".false ;;
 
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
@@ -71,6 +72,8 @@ var nat = 0..infty;;
 var neg = neginfty .. ~1;;
 var nonpos = neginfty..0;;
 //var int = neginfty..infty;;
+
+fun negate!a = if a then false else true fi;;
 
 //fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
 fun plus!a!b [a : intmp, b : intmp] = intmp_plus.(a,b);;
