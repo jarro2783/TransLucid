@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export PAGE_FILE="lucid_examples.html"
+export LINK_TEXT="Examples from the book <em>Lucid, the Dataflow Language</em>"
+export PAGE_TITLE="Lucid code examples"
+export PAGE_TOP="<h1>Lucid code examples</h1>\n\
+<p>These examples all come from <em>Lucid, the Dataflow Language</em>.</p>"
+
+export INPUT_FILES="LucidBook/p001.in=ISWIM example:LucidBook/p038.in=Another
+ISWIM example:LucidBook/p039.in=Fast power:LucidBook/p040.in=Primes:LucidBook/p044.in=List permutations:LucidBook/p059.in=Stream of primes:LucidBook/p110.in=Powers:LucidBook/p111.in=Repeated squaring powers:LucidBook/p112.in=Logarithm:LucidBook/p123.in=Hamming numbers:LucidBook/p128.in=Prime numbers by complement of composites:LucidBook/p233.in=Stream of power functions"
