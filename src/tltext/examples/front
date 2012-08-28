@@ -1,6 +1,13 @@
 #!/bin/bash
 
-export FRONT_INPUT="FrontPage/factarray.in=Factorial as an infinite array <em>fact</em> indexed by dimension <em>d</em>:FrontPage/factfun.in=Factorial as a function <em>fact</em> reaching into an infinite array <em>f</em>:FrontPage/fold.in=Running application over <em>d</em> of function <em>fn</em> to array <em>X</em>:FrontPage/funarray.in=<h2>Array of functions</h2><h3>Higher-order function <em>pow</em> returns the <em>n</em>-th&ndash;power 
+export FRONT_INPUT="FrontPage/factarray.in=<h1>Factorial as an infinite 
+array <em>fact</em> indexed by dimension <em>d</em></h1>
+:FrontPage/factfun.in=<h1>Factorial as a function <em>fact</em> 
+reaching into an infinite array <em>f</em></h1>
+:FrontPage/fold.in=<h2>Running application over <em>d</em> of 
+function <em>fn</em> to array <em>X</em></h2>
+:FrontPage/funarray.in=<h2>Array of functions</h2><h3>Higher-order 
+function <em>pow</em> returns the <em>n</em>-th&ndash;power 
 function,<br>
 i.e., the <em>n</em>-th element of the 
   array <em>g</em> of power functions</h3>"

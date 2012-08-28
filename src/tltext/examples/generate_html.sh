@@ -98,3 +98,12 @@ declarations</a></li>
 echo "<h1>TLWeb Examples</h1>" >> $EXAMPLES
 
 source $SRC_ROOT/front
+
+IFS=":"
+for front in $FRONT_INPUT; do
+  echo ${front%=*}
+  echo ${front#*=} >> $EXAMPLES
+  echo "<form action=\"tlweb\" method=\"post\">
+  <p>" >> $EXAMPLES
+
+done
