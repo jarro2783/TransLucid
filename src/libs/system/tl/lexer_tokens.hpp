@@ -24,6 +24,7 @@ namespace TransLucid
 {
   namespace Parser
   {
+    //if this is modified, then modify token_name in libs/system/parser.cpp
     enum TokenType
     {
       TOKEN_EOF = 0, //end of file is 0 according to lexertl
@@ -56,8 +57,8 @@ namespace TransLucid
       TOKEN_LBRACE,
       TOKEN_LPAREN,
       TOKEN_LSQUARE,
+      TOKEN_NOW,          //30
       TOKEN_OPERATOR, //don't match this, it's converted to the right op
-                          //30
       TOKEN_PIPE,
       TOKEN_RARROW,
       TOKEN_RBRACE,
@@ -67,8 +68,8 @@ namespace TransLucid
       TOKEN_SLASH_UNDERSCORE,
       TOKEN_THEN,
       TOKEN_TRUE,
-      TOKEN_UARROW,
-      TOKEN_UCHAR,        //40
+      TOKEN_UARROW,       //40
+      TOKEN_UCHAR,
       TOKEN_UNARY,
       TOKEN_WHERE,
 

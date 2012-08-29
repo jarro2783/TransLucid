@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export PAGE_FILE="other_examples.html"
+export LINK_TEXT="Programming methodology experiments"
+export PAGE_TITLE="Translucid examples"
+export PAGE_TOP="<h1>Translucid code examples</h1>\n\
+<p>These are all examples of TransLucid programs.</p>"
+
+export INPUT_FILES="Functions/fact.in=Factorial tournament style:Functions/hamming.in=Hamming numbers:Functions/matrix.in=Matrix multiplication:Functions/powSeq.in=Sequence of powers by addition:Functions/sieve.in=Sieve of Eratosthenes:Functions/sort.in=Merge sort:Functions/sumavg.in=Sum and average:Functions/transpose.in=Transpose a variable"
+

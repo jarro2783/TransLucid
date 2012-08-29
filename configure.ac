@@ -17,7 +17,7 @@ dnl   along with TransLucid; see the file COPYING.  If not see
 dnl   <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.61])
-AC_INIT([tl], [0.3.0], [jarrydb@cse.unsw.edu.au])
+AC_INIT([tl], [0.4.0], [jarrydb@cse.unsw.edu.au])
 AC_CONFIG_SRCDIR([src/libs/system/system.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -25,7 +25,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_GNU_GETTEXT_VERSION([0.18.1])
 AM_GNU_GETTEXT([external])
 
-AM_INIT_AUTOMAKE([dist-bzip2 -Wno-portability])
+AM_INIT_AUTOMAKE([dist-bzip2 dist-xz -Wno-portability])
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 

@@ -129,6 +129,8 @@ token_name(int token)
     _("`('"),
     /* TRANSLATORS: token */
     _("`['"),
+    /* TRANSLATORS: token */
+    _("`now'"),
     /* TRANSLATORS: token description */
     _("operator symbol"),
     /* TRANSLATORS: token */
@@ -929,6 +931,12 @@ Parser::parse_primary_expr(LexerIterator& begin, const LexerIterator& end,
 
     case TOKEN_HASH:
     result = Tree::HashSymbol();
+    ++begin;
+    break;
+
+    case TOKEN_NOW:
+    //get the current time out of the context
+    result = Types::Intmp::get(m_context.lookup(DIM_TIME));
     ++begin;
     break;
 
