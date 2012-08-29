@@ -1,0 +1,14 @@
+fun fold.d.fn X = f where 
+  var f [d : 0] = X;;
+  var f [d : pos] = fn!X!(prev.d f);;
+end;;
+
+var M = #.0;;
+var N = fby.0 1 (index!0);;
+
+%%
+
+fold.0.plus M @ [0 &lt;- 2];;
+fold.0.plus M @ [0 &lt;- 10];;
+fold.0.plus (2*M + 1) @ [0 &lt;- 3];;
+fold.0.times N @ [0 &lt;- 500];;

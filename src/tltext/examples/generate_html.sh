@@ -99,11 +99,20 @@ echo "<h1>TLWeb Examples</h1>" >> $EXAMPLES
 
 source $SRC_ROOT/front
 
-IFS=":"
+IFS="%"
 for front in $FRONT_INPUT; do
-  echo ${front%=*}
-  echo ${front#*=} >> $EXAMPLES
-  echo "<form action=\"tlweb\" method=\"post\">
-  <p>" >> $EXAMPLES
+  INPUT_NAME=${front%%:*}
+  TAIL=${front#*:}
+  DESCRIPTION=${TAIL%:*}
+  HEIGHT=${TAIL#*:}
+  echo $DESCRIPTION >> $EXAMPLES
+  echo "<form action=\"http://translucid.web.cse.unsw.edu.au/tlweb\" 
+    method=\"post\">
+  <p><textarea cols=\"80\" rows=\"$HEIGHT\" name=\"program\">" >> $EXAMPLES
+  cat $SRC_ROOT/$INPUT_NAME >> $EXAMPLES
+  echo "</textarea><br><input type=\"submit\" value=\"Run\">
+    </p></form>" >> $EXAMPLES
 
 done
+
+echo "</body></html>" >> $EXAMPLES
