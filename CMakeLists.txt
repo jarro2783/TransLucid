@@ -19,7 +19,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(tl)
 
-set(VERSION "0.3.0")
+set(VERSION "0.4.0")
 set(builddir ${CMAKE_BINARY_DIR}/doc)
 set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 

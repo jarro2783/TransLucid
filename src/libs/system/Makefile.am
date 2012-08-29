@@ -23,7 +23,7 @@ EXTRA_DIST = CMakeLists.txt po/CMakeLists.txt
 lib_LTLIBRARIES = libtlsystem.la
 
 libtlsystem_la_LDFLAGS = \
-  -version-info 3:0:0 \
+  -version-info 4:0:0 \
   $(TL_LDFLAGS)
 libtlsystem_la_LIBADD = \
   -lgmpxx -lgmp \
