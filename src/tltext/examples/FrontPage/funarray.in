@@ -1,6 +1,6 @@
 fun pow.n = g where
-  dim d &lt;- n;;
-  var g = fby.d (\_ s -&gt; 1) (\_ {d} s -&gt; s * g.s);;
+  dim d <- n;;
+  var g = fby.d (\_ s -> 1) (\_ {d} s -> s * g.s);;
 end;;
       
 %%

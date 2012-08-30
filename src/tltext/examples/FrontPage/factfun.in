@@ -1,6 +1,6 @@
 fun fact.n = f
 where
-  dim d &lt;- n;;
+  dim d <- n;;
   var f [d : 0] = 1;;
   var f [d : pos] = #.d * (prev.d f);;
 end;;

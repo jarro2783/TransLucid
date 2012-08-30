@@ -8,7 +8,7 @@ var N = fby.0 1 (index!0);;
 
 %%
 
-fold.0.plus M @ [0 &lt;- 2];;
-fold.0.plus M @ [0 &lt;- 10];;
-fold.0.plus (2*M + 1) @ [0 &lt;- 3];;
-fold.0.times N @ [0 &lt;- 500];;
+fold.0.plus M @ [0 <- 2];;
+fold.0.plus M @ [0 <- 10];;
+fold.0.plus (2*M + 1) @ [0 <- 3];;
+fold.0.times N @ [0 <- 500];;
