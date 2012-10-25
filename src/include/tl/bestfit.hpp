@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/context.hpp>
 #include <tl/parser_api.hpp>
+#include <tl/region.hpp>
 #include <tl/semantics.hpp>
 #include <tl/types.hpp>
 #include <tl/uuid.hpp>
