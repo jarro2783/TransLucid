@@ -26,5 +26,13 @@ namespace TransLucid
 {
   class Region
   {
+    public:
+
+    enum class Containment
+    {
+      IS,
+      SUBSET,
+      IMP
+    };
   };
 }
