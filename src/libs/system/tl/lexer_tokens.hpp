@@ -80,8 +80,10 @@ namespace TransLucid
       TOKEN_LAST //nothing, one past the last
     };
 
-    static const auto SYMBOL_BASE_APP = TOKEN_DOT;
-    static const auto SYMBOL_VALUE_APP = TOKEN_BANG;
+    enum {
+      SYMBOL_BASE_APP = TOKEN_DOT,
+      SYMBOL_VALUE_APP = TOKEN_BANG
+    };
   }
 }
 
