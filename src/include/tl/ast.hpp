@@ -35,6 +35,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <gmpxx.h>
 
 #include <tl/ast_fwd.hpp>
+#include <tl/region.hpp>
 #include <tl/types_basic.hpp>
 #include <tl/variant.hpp>
 
@@ -590,6 +591,21 @@ namespace TransLucid
       TupleExpr(const TuplePairs& p)
       : pairs(p)
       {}
+    };
+
+    struct RegionExpr
+    {
+      typedef std::tuple<Expr, Region::Containment, Expr> Entry;
+      typedef std::vector<Entry> Entries;
+
+      RegionExpr() = default;
+
+      RegionExpr(Entries e)
+      : entries(std::move(e))
+      {
+      }
+
+      Entries entries;
     };
 
     struct BestofExpr

@@ -51,6 +51,7 @@ namespace TransLucid
     struct EvalIntenExpr;
     struct HashExpr;
     struct HostOpExpr;
+    struct RegionExpr;
     struct TupleExpr;
     struct IfExpr;
     struct AtExpr;
@@ -87,6 +88,7 @@ namespace TransLucid
       recursive_wrapper<EvalIntenExpr>,
       recursive_wrapper<IfExpr>,
       recursive_wrapper<HashExpr>,
+      recursive_wrapper<RegionExpr>,
       recursive_wrapper<TupleExpr>,
       recursive_wrapper<AtExpr>,
       recursive_wrapper<LambdaExpr>,

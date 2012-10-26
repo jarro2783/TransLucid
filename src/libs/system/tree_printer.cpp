@@ -428,6 +428,51 @@ class TreePrinter
     parenPop();
   }
 
+  void
+  print_region_entry(const Tree::RegionExpr::Entry& entry)
+  {
+    apply_visitor(*this, std::get<0>(entry));
+
+    switch (std::get<1>(entry))
+    {
+      case Region::Containment::IS:
+      m_os << " is ";
+      break;
+      case Region::Containment::IMP:
+      m_os << " imp ";
+      break;
+      case Region::Containment::IN:
+      m_os << " : ";
+      break;
+    }
+
+    apply_visitor(*this, std::get<2>(entry));
+  }
+
+  void
+  operator()(const Tree::RegionExpr& r)
+  {
+    parenPush(Precedence::MINUS_INF, Assoc::NON, Subtree::NONE);
+    m_os << "[";
+
+    auto iter = r.entries.begin();
+    if (iter != r.entries.end())
+    {
+      print_region_entry(*iter);
+      ++iter;
+    }
+
+    while (iter != r.entries.end())
+    {
+      m_os << ", ";
+      print_region_entry(*iter);
+      ++iter;
+    }
+    m_os << "]";
+    parenPop();
+
+  }
+
   template <typename Pair>
   void
   print_tuple_pair(const Pair& p)

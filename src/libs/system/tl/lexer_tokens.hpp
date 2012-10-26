@@ -52,12 +52,14 @@ namespace TransLucid
       TOKEN_HASH,
       TOKEN_IF,
       TOKEN_ID,
+      TOKEN_IMP,
       TOKEN_INTEGER,
+      TOKEN_IS,
       TOKEN_LARROW,
       TOKEN_LBRACE,
-      TOKEN_LPAREN,
+      TOKEN_LPAREN,       //30
       TOKEN_LSQUARE,
-      TOKEN_NOW,          //30
+      TOKEN_NOW,
       TOKEN_OPERATOR, //don't match this, it's converted to the right op
       TOKEN_PIPE,
       TOKEN_RARROW,
@@ -66,9 +68,9 @@ namespace TransLucid
       TOKEN_RSQUARE,
       TOKEN_SLASH,
       TOKEN_SLASH_UNDERSCORE,
-      TOKEN_THEN,
+      TOKEN_THEN,         //40
       TOKEN_TRUE,
-      TOKEN_UARROW,       //40
+      TOKEN_UARROW,
       TOKEN_UCHAR,
       TOKEN_UNARY,
       TOKEN_WHERE,

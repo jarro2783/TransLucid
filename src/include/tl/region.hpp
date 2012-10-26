@@ -22,6 +22,9 @@ along with TransLucid; see the file COPYING.  If not see
  * The region object.
  */
 
+#ifndef TL_REGION_HPP_INCLUDED
+#define TL_REGION_HPP_INCLUDED
+
 namespace TransLucid
 {
   class Region
@@ -31,8 +34,10 @@ namespace TransLucid
     enum class Containment
     {
       IS,
-      SUBSET,
+      IN,
       IMP
     };
   };
 }
+
+#endif

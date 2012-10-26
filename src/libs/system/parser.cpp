@@ -120,7 +120,11 @@ token_name(int token)
     /* TRANSLATORS: token description */
     _("identifier"),
     /* TRANSLATORS: token description */
+    _("imp"),
+    /* TRANSLATORS: token description */
     _("integer literal"),
+    /* TRANSLATORS: token description */
+    _("is"),
     /* TRANSLATORS: token */
     _("`<-'"),
     /* TRANSLATORS: token */
@@ -1089,24 +1093,77 @@ bool
 Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
   Tree::Expr& result, TupleSeparator sep)
 {
+  enum TupleType
+  {
+    PARSING_UNKNOWN,
+    PARSING_REGION,
+    PARSING_TUPLE
+  };
+
   if (*begin != TOKEN_LSQUARE) { return false; }
 
   LexerIterator current = begin;
   ++current;
 
+  TupleType what = PARSING_UNKNOWN;
+
   size_t tok = sep == SEPARATOR_COLON ? TOKEN_COLON : TOKEN_LARROW;
 
-  Tree::TupleExpr::TuplePairs pairs;
+  Tree::TupleExpr::TuplePairs tuple;
+  Tree::RegionExpr::Entries region;
+  Region::Containment lastContainment;
   bool parsingTuple = true;
   while (parsingTuple)
   {
     Tree::Expr lhs;
     Tree::Expr rhs;
     expect(current, end, lhs, "expr", &Parser::parse_expr);
-    expect(current, end, "<-", tok);
-    expect(current, end, rhs, "expr", &Parser::parse_expr);
 
-    pairs.push_back(std::make_pair(lhs, rhs));
+    switch (current->getType())
+    {
+      case TOKEN_LARROW:
+      if (what == PARSING_UNKNOWN)
+      {
+        what = PARSING_TUPLE;
+      }
+      else if (what == PARSING_REGION)
+      {
+        //error
+      }
+      expect(current, end, rhs, "expr", &Parser::parse_expr);
+      tuple.push_back(std::make_pair(lhs, rhs));
+      break;
+
+      case TOKEN_IS:
+      case TOKEN_IMP:
+      case TOKEN_COLON:
+
+      if (what == PARSING_UNKNOWN)
+      {
+        what = PARSING_REGION;
+      }
+      else if (what == PARSING_TUPLE)
+      {
+        //error
+      }
+
+      switch (current->getType())
+      {
+        case TOKEN_IS:
+        lastContainment = Region::Containment::IS;
+        break;
+
+        case TOKEN_IMP:
+        lastContainment = Region::Containment::IMP;
+        break;
+
+        default:
+        lastContainment = Region::Containment::IN;
+      }
+      expect(current, end, rhs, "expr", &Parser::parse_expr);
+      region.push_back(std::make_tuple(lhs, lastContainment, rhs));
+      break;
+    }
 
     if (*current != TOKEN_COMMA) { parsingTuple = false; }
     else { ++current; }
@@ -1114,7 +1171,14 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
 
   expect(current, end, "]", TOKEN_RSQUARE);
 
-  result = Tree::TupleExpr(pairs);
+  if (what == PARSING_REGION)
+  {
+    result = Tree::RegionExpr(region);
+  }
+  else
+  {
+    result = Tree::TupleExpr(tuple);
+  }
   begin = current;
   return true;
 }
