@@ -1107,8 +1107,6 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
 
   TupleType what = PARSING_UNKNOWN;
 
-  size_t tok = sep == SEPARATOR_COLON ? TOKEN_COLON : TOKEN_LARROW;
-
   Tree::TupleExpr::TuplePairs tuple;
   Tree::RegionExpr::Entries region;
   Region::Containment lastContainment;
@@ -1160,6 +1158,9 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
         default:
         lastContainment = Region::Containment::IN;
       }
+
+      ++current;
+
       expect(current, end, rhs, "expr", &Parser::parse_expr);
       region.push_back(std::make_tuple(lhs, lastContainment, rhs));
       break;

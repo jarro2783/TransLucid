@@ -1,5 +1,5 @@
 /* Built-in types.
-   Copyright (C) 2009--2012 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -44,6 +44,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/intmp.hpp>
 #include <tl/types/numbers.hpp>
 #include <tl/types/range.hpp>
+#include <tl/types/region.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/type.hpp>
@@ -432,6 +433,14 @@ namespace TransLucid
         &Types::Range::hash,
         &delete_ptr<Range>,
         &Types::Range::less
+      };
+
+    TypeFunctions region_type_functions =
+      {
+        &Types::Region::equality,
+        &Types::Region::hash,
+        &delete_ptr<Region>,
+        &Types::Region::less
       };
 
     TypeFunctions tuple_type_functions =
@@ -870,6 +879,16 @@ namespace TransLucid
     };
 
     template <>
+    struct clone<Region>
+    {
+      Region*
+      operator()(const Region& r)
+      {
+        return new Region(r);
+      }
+    };
+
+    template <>
     struct clone<Tuple>
     {
       Tuple*
@@ -1110,6 +1129,38 @@ namespace TransLucid
       less(const Constant& lhs, const Constant& rhs)
       {
         return get(lhs) < get(rhs);
+      }
+    }
+
+    namespace Region
+    {
+      Constant
+      create(const TransLucid::Region& r)
+      {
+        return make_constant_pointer
+          (r, &region_type_functions, TYPE_INDEX_REGION);
+      }
+
+      const TransLucid::Region&
+      get(const Constant& r)
+      {
+        return get_constant_pointer<TransLucid::Region>(r);
+      }
+
+      bool 
+      equality(const Constant& lhs, const Constant& rhs)
+      {
+        return get(lhs) == get(rhs);
+      }
+
+      size_t
+      hash(const Constant& c)
+      {
+      }
+
+      bool
+      less(const Constant& lhs, const Constant& rhs)
+      {
       }
     }
 

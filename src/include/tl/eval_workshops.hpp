@@ -379,7 +379,19 @@ namespace TransLucid
       typedef std::vector<std::tuple<WS*, Region::Containment, WS*>>
         EntryWorkshops;
 
-      RegionWS(const EntryWorkshops& entries);
+      RegionWS(const EntryWorkshops& entries)
+      : m_entries(entries)
+      {
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+      EntryWorkshops m_entries;
     };
 
     /**

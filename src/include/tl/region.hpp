@@ -25,6 +25,11 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_REGION_HPP_INCLUDED
 #define TL_REGION_HPP_INCLUDED
 
+#include <utility>
+#include <vector>
+
+#include <tl/types.hpp>
+
 namespace TransLucid
 {
   class Region
@@ -37,6 +42,60 @@ namespace TransLucid
       IN,
       IMP
     };
+
+    typedef std::tuple<Constant, Containment, Constant> Entry;
+    typedef std::vector<Entry> Entries;
+
+    Region(Entries entries)
+    : m_entries(entries)
+    {
+    }
+
+    bool
+    operator==(const Region& rhs) const
+    {
+      if (m_entries.size() != rhs.m_entries.size())
+      {
+        return false;
+      }
+
+      auto liter = m_entries.begin();
+      auto riter = rhs.m_entries.begin();
+
+      while (liter != m_entries.end())
+      {
+        const auto& lval = *liter;
+        const auto& rval = *riter;
+
+        if (std::get<0>(lval) != std::get<0>(rval))
+        {
+          return false;
+        }
+
+        if (std::get<1>(lval) != std::get<1>(rval))
+        {
+          return false;
+        }
+
+        if (std::get<2>(lval) != std::get<2>(rval))
+        {
+          return false;
+        }
+
+        ++liter;
+        ++riter;
+      }
+
+      return true;
+    }
+
+    bool
+    operator<(const Region& rhs) const
+    {
+    }
+
+    private:
+    Entries m_entries;
   };
 }
 

@@ -223,6 +223,8 @@ WorkshopBuilder::operator()(const Tree::RegionExpr& e)
     WS* rhs = apply_visitor(*this, std::get<2>(v));
     entries.push_back(std::make_tuple(lhs, std::get<1>(v), rhs));
   }
+
+  return new Workshops::RegionWS(entries);
 }
 
 WS*
