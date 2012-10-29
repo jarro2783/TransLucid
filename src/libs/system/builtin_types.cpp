@@ -1156,11 +1156,13 @@ namespace TransLucid
       size_t
       hash(const Constant& c)
       {
+        return get(c).hash();
       }
 
       bool
       less(const Constant& lhs, const Constant& rhs)
       {
+        return get(lhs) < get(rhs);
       }
     }
 

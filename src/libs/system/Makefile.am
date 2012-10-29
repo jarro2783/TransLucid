@@ -36,7 +36,7 @@ libtlsystem_la_SOURCES = \
   eval_workshops.cpp function.cpp \
   hyperdatons/arrayhd.cpp hyperdatons/envhd.cpp hyperdatons/filehd.cpp \
   internal_strings.cpp lexertl.cpp lexer_util.cpp library.cpp \
-  line_tokenizer.cpp opdef.cpp parser.cpp range.cpp rename.cpp \
+  line_tokenizer.cpp opdef.cpp parser.cpp range.cpp region.cpp rename.cpp \
 	semantic_transform.cpp \
   system.cpp system_util.cpp tree_printer.cpp tree_rewriter.cpp \
   tree_to_wstree.cpp \

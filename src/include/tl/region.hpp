@@ -1,5 +1,5 @@
 /* A region.
-   Copyright (C) 2009-2012 Jarryd Beck
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -52,47 +52,13 @@ namespace TransLucid
     }
 
     bool
-    operator==(const Region& rhs) const
-    {
-      if (m_entries.size() != rhs.m_entries.size())
-      {
-        return false;
-      }
-
-      auto liter = m_entries.begin();
-      auto riter = rhs.m_entries.begin();
-
-      while (liter != m_entries.end())
-      {
-        const auto& lval = *liter;
-        const auto& rval = *riter;
-
-        if (std::get<0>(lval) != std::get<0>(rval))
-        {
-          return false;
-        }
-
-        if (std::get<1>(lval) != std::get<1>(rval))
-        {
-          return false;
-        }
-
-        if (std::get<2>(lval) != std::get<2>(rval))
-        {
-          return false;
-        }
-
-        ++liter;
-        ++riter;
-      }
-
-      return true;
-    }
+    operator==(const Region& rhs) const;
 
     bool
-    operator<(const Region& rhs) const
-    {
-    }
+    operator<(const Region& rhs) const;
+
+    size_t
+    hash() const;
 
     private:
     Entries m_entries;
