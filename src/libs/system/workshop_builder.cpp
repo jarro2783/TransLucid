@@ -224,7 +224,7 @@ WorkshopBuilder::operator()(const Tree::RegionExpr& e)
     entries.push_back(std::make_tuple(lhs, std::get<1>(v), rhs));
   }
 
-  return new Workshops::RegionWS(entries);
+  return new Workshops::RegionWS(*m_system, entries);
 }
 
 WS*

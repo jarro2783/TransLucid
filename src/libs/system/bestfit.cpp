@@ -708,20 +708,20 @@ EquationGuard::compile() const
   k.perturb(DIM_TIME, Types::Intmp::create(0));
 
   //some trickery to evaluate guards at compile time
-  Workshops::TupleWS* t = dynamic_cast<Workshops::TupleWS*>(m_guard.get());
+  Workshops::RegionWS* t = dynamic_cast<Workshops::RegionWS*>(m_guard.get());
 
   //For now guards must be a literal tuple
   if (t != nullptr)
   {
-    const auto& pairs = t->getElements();
+    const auto& entries = t->getEntries();
     System& s = t->getSystem();
     m_system = &s;
 
-    for (const auto& val : pairs)
+    for (const auto& val : entries)
     {
       bool lhsConst = true;
       bool rhsConst = true;
-      Constant lhs = val.first->operator()(k);
+      Constant lhs = std::get<0>(val)->operator()(k);
 
       if (lhs.index() == TYPE_INDEX_SPECIAL)
       {
@@ -733,7 +733,7 @@ EquationGuard::compile() const
         ? get_constant<dimension_index>(lhs)
         : s.getDimensionIndex(lhs);
 
-      Constant rhs = val.second->operator()(k);
+      Constant rhs = std::get<2>(val)->operator()(k);
 
       if (rhs.index() == TYPE_INDEX_SPECIAL)
       {
@@ -751,18 +751,19 @@ EquationGuard::compile() const
         }
         else
         {
-          m_dimConstNon.insert(std::make_pair(dimIndex, val.second));
+          m_dimConstNon.insert(std::make_pair(dimIndex, std::get<2>(val)));
         }
       }
       else
       {
         if (rhsConst)
         {
-          m_dimNonConst.insert(std::make_pair(val.first, rhs));
+          m_dimNonConst.insert(std::make_pair(std::get<0>(val), rhs));
         }
         else
         {
-          m_dimNonNon.insert(std::make_pair(val.first, val.second));
+          m_dimNonNon.insert(std::make_pair(std::get<0>(val), 
+            std::get<2>(val)));
         }
       }
       #if 0
@@ -791,8 +792,8 @@ EquationGuard::compile() const
   }
   else
   {
-    std::cerr << "guard is not a tuple" << std::endl;
-    throw "guard is not a tuple";
+    std::cerr << "guard is not a region" << std::endl;
+    throw "guard is not a region";
   }
 }
 

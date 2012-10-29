@@ -86,7 +86,14 @@ OpDefWS::group(const std::list<EquationDefinition>& defs)
       throw "operator definition not an operator";
     }
 
-    auto guard = Tree::TupleExpr({{Tree::IdentExpr(U"op"), decl->optext}});
+    auto guard = Tree::RegionExpr(Tree::RegionExpr::Entries
+      {
+        Tree::RegionExpr::Entry{
+          Tree::IdentExpr(U"op"), 
+          Region::Containment::IS, 
+          decl->optext
+        }
+      });
     auto guardFixed = fixupGuardArgs(guard, rewrites);
 
     best.declarations.push_back

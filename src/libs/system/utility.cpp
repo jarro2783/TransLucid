@@ -118,6 +118,12 @@ namespace
   }
 
   IsSubsetFn 
+  subset_of_region(const Constant& c)
+  {
+    return &issubset_false;
+  }
+
+  IsSubsetFn 
   subset_of_tuple(const Constant& c)
   {
     if (c.index() != TYPE_INDEX_TUPLE)
@@ -217,6 +223,7 @@ namespace
           &isSubsetAtomic<TYPE_INDEX_USTRING>,
           &isSubsetAtomic<TYPE_INDEX_FLOATMP>,
           &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
+          &subset_of_region,
           &subset_of_tuple,
           &subset_of_type,
           &subset_of_range,
