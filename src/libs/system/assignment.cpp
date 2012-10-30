@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/assignment.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/system.hpp>
+#include <tl/types/region.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/utility.hpp>
 
@@ -39,7 +40,7 @@ namespace {
   void
   enumerateContextSet
   (
-    const Tuple& ctxts, 
+    const Region& ctxts, 
     Context& k,
     WS& compute,
     OutputHD* out
@@ -59,9 +60,10 @@ namespace {
     //determine which dimensions are ranges
     for (const auto& v : ctxts)
     {
-      if (v.second.index() == TYPE_INDEX_RANGE)
+      if (std::get<2>(v).index() == TYPE_INDEX_RANGE && 
+          std::get<1>(v) == Region::Containment::IN)
       {
-        const Range& r = Types::Range::get(v.second);
+        const Range& r = Types::Range::get(std::get<2>(v));
 
         if (r.lower() == nullptr || r.upper() == nullptr)
         {
@@ -71,12 +73,12 @@ namespace {
         }
 
         limits.push_back(r);
-        current.push_back(std::make_pair(v.first, *r.lower()));
+        current.push_back(std::make_pair(std::get<0>(v), *r.lower()));
       }
       else
       {
         //if not a range then store it permanantly
-        evalContext.perturb(v.first, v.second);
+        evalContext.perturb(std::get<0>(v), std::get<2>(v));
       }
     }
 
@@ -156,10 +158,10 @@ Assignment::evaluate
     {
       auto ctxts = (*guard)(theContext);
 
-      if (ctxts.index() == TYPE_INDEX_TUPLE)
+      if (ctxts.index() == TYPE_INDEX_REGION)
       {
         //the demand could have ranges, so we need to enumerate them
-        enumerateContextSet(Types::Tuple::get(ctxts), theContext, 
+        enumerateContextSet(Types::Region::get(ctxts), theContext, 
           *std::get<2>(assign), hd);
       }
     }

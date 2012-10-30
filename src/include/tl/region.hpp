@@ -43,7 +43,7 @@ namespace TransLucid
       IMP
     };
 
-    typedef std::tuple<Constant, Containment, Constant> Entry;
+    typedef std::tuple<dimension_index, Containment, Constant> Entry;
     typedef std::vector<Entry> Entries;
 
     Region(Entries entries)
@@ -62,6 +62,33 @@ namespace TransLucid
 
     private:
     Entries m_entries;
+
+    public:
+
+    Entries::const_iterator
+    begin() const
+    {
+      return m_entries.begin();
+    }
+
+    Entries::const_iterator
+    end() const
+    {
+      return m_entries.end();
+    }
+
+    Entries::iterator
+    begin()
+    {
+      return m_entries.begin();
+    }
+
+    Entries::iterator
+    end()
+    {
+      return m_entries.end();
+    }
+
   };
 }
 
