@@ -443,6 +443,7 @@ namespace TransLucid
     {
     }
 
+    /*
     EquationGuard(const Tuple& t)
     : m_compiled(true), m_system(nullptr), m_priority(0)
     {
@@ -453,6 +454,7 @@ namespace TransLucid
           addDimension(iter->first, iter->second);
        }
     }
+    */
 
     EquationGuard(const EquationGuard&);
 
@@ -484,7 +486,7 @@ namespace TransLucid
      * Returns a tuple of the dimensions and the evaluated AST.
      **/
     template <typename... Delta>
-    std::pair<bool, Tuple>
+    std::pair<bool, Region>
     evaluate(Context& k, Delta&&... delta) const;
 
     /**
@@ -493,11 +495,11 @@ namespace TransLucid
      * The system can add dimensions to the guard which the user can't
      * change.
      **/
-    void
-    addDimension(size_t dim, const Constant& v)
-    {
-       m_dimConstConst[dim] = v;
-    }
+    //void
+    //addDimension(size_t dim, const Constant& v)
+    //{
+    //   m_dimConstConst[dim] = v;
+    //}
 
     WS*
     boolean() const
@@ -527,11 +529,21 @@ namespace TransLucid
     std::shared_ptr<WS> m_guard;
     std::shared_ptr<WS> m_boolean;
 
-    mutable std::map<dimension_index, Constant> m_dimConstConst;
-    mutable std::map<dimension_index, WS*> m_dimConstNon;
+    mutable std::map<
+      dimension_index, std::pair<Region::Containment, Constant>
+    > m_dimConstConst;
 
-    mutable std::map<WS*, Constant> m_dimNonConst;
-    mutable std::map<WS*, WS*> m_dimNonNon;
+    mutable std::map<
+      dimension_index, std::pair<Region::Containment, WS*>
+    > m_dimConstNon;
+
+    mutable std::map<
+      WS*, std::pair<Region::Containment, Constant>
+    > m_dimNonConst;
+
+    mutable std::map<
+      WS*, std::pair<Region::Containment, WS*>
+    > m_dimNonNon;
 
     //have we compiled the guard?
     mutable bool m_compiled;

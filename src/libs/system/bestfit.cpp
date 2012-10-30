@@ -279,7 +279,7 @@ BestfitGroup::evaluate(Context& k)
 }
 
 template <typename... Delta>
-std::pair<bool, Tuple>
+std::pair<bool, Region>
 EquationGuard::evaluate(Context& k, Delta&&... delta) const
 {
   if (!m_compiled)
@@ -289,7 +289,7 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
 
   bool nonspecial = true;
   m_demands.clear();
-  tuple_t t = m_dimConstConst;
+  Region::Entries t = m_dimConstConst;
 
   if (m_guard)
   {
@@ -298,7 +298,7 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
     //evaluate the ones left
     for (const auto& constNon : m_dimConstNon)
     {
-      Constant ord = constNon.second->operator()(k, delta...);
+      Constant ord = constNon.second.second->operator()(k, delta...);
 
       if (ord.index() == TYPE_INDEX_DEMAND)
       {
@@ -307,7 +307,8 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
       }
       else
       {
-        t.insert(std::make_pair(constNon.first, ord));
+        t.insert(std::make_pair(constNon.first,
+          std::make_pair(constNon.second.first, ord)));
       }
     }
 
@@ -331,14 +332,15 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
           ? get_constant<dimension_index>(dim)
           : m_system->getDimensionIndex(dim);
 
-        t.insert(std::make_pair(index, nonConst.second));
+        t.insert(std::make_pair(index, 
+          std::make_pair(nonConst.second.first, nonConst.second.second)));
       }
     }
 
     for (const auto& nonNon : m_dimNonNon)
     {
       Constant dim = nonNon.first->operator()(k, delta...);
-      Constant ord = nonNon.second->operator()(k, delta...);
+      Constant ord = nonNon.second.second->operator()(k, delta...);
 
       if (dim.index() == TYPE_INDEX_SPECIAL)
       {
@@ -368,14 +370,15 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
           ? get_constant<dimension_index>(dim)
           : m_system->getDimensionIndex(dim);
 
-        t.insert(std::make_pair(index, ord));
+        t.insert(std::make_pair(index, 
+          std::make_pair(nonNon.second.first, ord)));
       }
     }
   }
 
   //the tuple doesn't matter here if nonspecial is false, the false
   //says ignore the result
-  return std::make_pair(nonspecial, Tuple(t));
+  return std::make_pair(nonspecial, Region(t));
 }
 
 //how to bestfit with a cache
@@ -747,23 +750,26 @@ EquationGuard::compile() const
       {
         if (rhsConst)
         {
-          m_dimConstConst.insert(std::make_pair(dimIndex, rhs));
+          m_dimConstConst.insert(std::make_pair(dimIndex, 
+            std::make_pair(std::get<1>(val), rhs)));
         }
         else
         {
-          m_dimConstNon.insert(std::make_pair(dimIndex, std::get<2>(val)));
+          m_dimConstNon.insert(std::make_pair(dimIndex, 
+            std::make_pair(std::get<1>(val), std::get<2>(val))));
         }
       }
       else
       {
         if (rhsConst)
         {
-          m_dimNonConst.insert(std::make_pair(std::get<0>(val), rhs));
+          m_dimNonConst.insert(std::make_pair(std::get<0>(val), 
+            std::make_pair(std::get<1>(val), rhs)));
         }
         else
         {
           m_dimNonNon.insert(std::make_pair(std::get<0>(val), 
-            std::get<2>(val)));
+            std::make_pair(std::get<1>(val), std::get<2>(val))));
         }
       }
       #if 0
@@ -781,9 +787,9 @@ EquationGuard::compile() const
     auto priorityIter = m_dimConstConst.find(DIM_PRIORITY);
     if (priorityIter != m_dimConstConst.end())
     {
-      if (priorityIter->second.index() == TYPE_INDEX_INTMP)
+      if (priorityIter->second.second.index() == TYPE_INDEX_INTMP)
       {
-        m_priority = Types::Intmp::get(priorityIter->second).get_si();
+        m_priority = Types::Intmp::get(priorityIter->second.second).get_si();
         m_dimConstConst.erase(priorityIter);
       }
     }

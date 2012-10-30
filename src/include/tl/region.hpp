@@ -43,8 +43,8 @@ namespace TransLucid
       IMP
     };
 
-    typedef std::tuple<dimension_index, Containment, Constant> Entry;
-    typedef std::vector<Entry> Entries;
+    typedef std::map<dimension_index, std::pair<Containment, Constant>> 
+      Entries;
 
     Region(Entries entries)
     : m_entries(entries)

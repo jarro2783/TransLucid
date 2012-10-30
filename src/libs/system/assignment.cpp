@@ -60,10 +60,10 @@ namespace {
     //determine which dimensions are ranges
     for (const auto& v : ctxts)
     {
-      if (std::get<2>(v).index() == TYPE_INDEX_RANGE && 
-          std::get<1>(v) == Region::Containment::IN)
+      if (v.second.second.index() == TYPE_INDEX_RANGE && 
+          v.second.first == Region::Containment::IN)
       {
-        const Range& r = Types::Range::get(std::get<2>(v));
+        const Range& r = Types::Range::get(v.second.second);
 
         if (r.lower() == nullptr || r.upper() == nullptr)
         {
@@ -73,12 +73,12 @@ namespace {
         }
 
         limits.push_back(r);
-        current.push_back(std::make_pair(std::get<0>(v), *r.lower()));
+        current.push_back(std::make_pair(v.first, *r.lower()));
       }
       else
       {
         //if not a range then store it permanantly
-        evalContext.perturb(std::get<0>(v), std::get<2>(v));
+        evalContext.perturb(v.first, v.second.second);
       }
     }
 
