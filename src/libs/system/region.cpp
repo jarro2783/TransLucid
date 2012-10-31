@@ -43,17 +43,17 @@ Region::operator==(const Region& rhs) const
     const auto& lval = *liter;
     const auto& rval = *riter;
 
-    if (std::get<0>(lval) != std::get<0>(rval))
+    if (lval.first != rval.first)
     {
       return false;
     }
 
-    if (std::get<1>(lval) != std::get<1>(rval))
+    if (lval.second.first != rval.second.first)
     {
       return false;
     }
 
-    if (std::get<2>(lval) != std::get<2>(rval))
+    if (lval.second.second != rval.second.second)
     {
       return false;
     }
@@ -73,27 +73,27 @@ Region::operator<(const Region& rhs) const
 
   while (iterl != m_entries.end() && iterr != rhs.m_entries.end())
   {
-    if (std::get<0>(*iterl) < std::get<0>(*iterr))
+    if (iterl->first < iterr->first)
     {
       return true;
     }
-    else if (std::get<0>(*iterr) < std::get<0>(*iterl))
+    else if (iterr->first < iterl->first)
     {
       return false;
     }
-    else if (std::get<1>(*iterl) < std::get<1>(*iterr))
+    else if (iterl->second.first < iterr->second.first)
     {
       return true;
     }
-    else if (std::get<1>(*iterr) < std::get<1>(*iterl))
+    else if (iterr->second.first < iterl->second.first)
     {
       return false;
     }
-    else if (std::get<2>(*iterl) < std::get<2>(*iterr))
+    else if (iterl->second.second < iterr->second.second)
     {
       return true;
     }
-    else if (std::get<2>(*iterr) < std::get<2>(*iterl))
+    else if (iterr->second.second < iterl->second.second)
     {
       return false;
     }
@@ -124,9 +124,9 @@ Region::hash() const
 
   for (const auto& entry : m_entries)
   {
-    std::_Hash_impl::__hash_combine(std::get<0>(entry), value);
-    std::_Hash_impl::__hash_combine(std::get<1>(entry), value);
-    std::_Hash_impl::__hash_combine(std::get<2>(entry), value);
+    std::_Hash_impl::__hash_combine(entry.first, value);
+    std::_Hash_impl::__hash_combine(entry.second.first, value);
+    std::_Hash_impl::__hash_combine(entry.second.second, value);
   }
 
   return value;

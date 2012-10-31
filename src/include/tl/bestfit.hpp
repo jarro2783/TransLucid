@@ -486,7 +486,7 @@ namespace TransLucid
      * Returns a tuple of the dimensions and the evaluated AST.
      **/
     template <typename... Delta>
-    std::pair<bool, Region>
+    std::pair<bool, std::shared_ptr<Region>>
     evaluate(Context& k, Delta&&... delta) const;
 
     /**
@@ -630,7 +630,7 @@ namespace TransLucid
     operator()(Context& kappa, Context& delta);
 
     private:
-    typedef std::tuple<Tuple, Equations::iterator> 
+    typedef std::tuple<std::shared_ptr<Region>, Equations::iterator> 
       ApplicableTuple;
     typedef std::vector<ApplicableTuple> applicable_list;
 
@@ -647,6 +647,30 @@ namespace TransLucid
     Equations m_equations;
     PriorityList m_priorityVars;
   };
+
+  bool
+  regionApplicable(const Region& r, const Context& k);
+
+  //is region a a subset of region b? this is under the assumption that
+  //some context is inside both, so dimensions in common where one is an "is"
+  //and the other is a ":" must have the "is" inside the region, so that is
+  //not checked
+  //
+  //for each dimension we check the specifier with the order 
+  //  s  <= s 
+  //  is <= :
+  //and then if they are the same specifier, we check subset on the ordinate
+  bool
+  regionSubset(const Region& a, const Region& b, bool canequal = false);
+
+  //is the smaller value inside the bigger value according to the specifier
+  bool
+  valueInside
+  (
+    const Constant& smaller, 
+    Region::Containment specifier, 
+    const Constant& bigger
+  );
 }
 
 #endif // BESTFIT_HPP_INCLUDED

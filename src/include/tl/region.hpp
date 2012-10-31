@@ -46,6 +46,8 @@ namespace TransLucid
     typedef std::map<dimension_index, std::pair<Containment, Constant>> 
       Entries;
 
+    Region() = default;
+
     Region(Entries entries)
     : m_entries(entries)
     {

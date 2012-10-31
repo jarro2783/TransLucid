@@ -279,7 +279,7 @@ BestfitGroup::evaluate(Context& k)
 }
 
 template <typename... Delta>
-std::pair<bool, Region>
+std::pair<bool, std::shared_ptr<Region>>
 EquationGuard::evaluate(Context& k, Delta&&... delta) const
 {
   if (!m_compiled)
@@ -378,7 +378,7 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
 
   //the tuple doesn't matter here if nonspecial is false, the false
   //says ignore the result
-  return std::make_pair(nonspecial, Region(t));
+  return std::make_pair(nonspecial, std::make_shared<Region>(t));
 }
 
 //how to bestfit with a cache
@@ -422,7 +422,7 @@ ConditionalBestfitWS::bestfit(const applicable_list& applicable, Context& k,
     for (applicable_list::const_iterator j = applicable.begin();
          j != applicable.end(); ++j)
     {
-      if (i != j && !tupleRefines(std::get<0>(*i), std::get<0>(*j), true))
+      if (i != j && !regionSubset(*std::get<0>(*i), *std::get<0>(*j), true))
       {
         best = false;
       }
@@ -557,7 +557,7 @@ ConditionalBestfitWS::operator()(Context& k)
         const EquationGuard& guard = eqn_i->validContext();
         auto result = guard.evaluate(k);
 
-        if (result.first && tupleApplicable(result.second, k)
+        if (result.first && regionApplicable(*result.second, k)
           && booleanTrue(guard, k)
         )
         {
@@ -568,7 +568,7 @@ ConditionalBestfitWS::operator()(Context& k)
       else
       {
         applicable.push_back
-          (ApplicableTuple(Tuple(), eqn_i));
+          (ApplicableTuple(std::make_shared<Region>(), eqn_i));
       }
     }
   }
@@ -613,16 +613,15 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
 
         if (result.first)
         {
-          Tuple evalContext = result.second;
           std::copy(guard.demands().begin(), guard.demands().end(),
             std::back_inserter(demands));
 
-          potential.push_back(ApplicableTuple(evalContext, eqn_i));
+          potential.push_back(ApplicableTuple(result.second, eqn_i));
         }
       }
       else
       {
-        potential.push_back(ApplicableTuple(Tuple(), eqn_i));
+        potential.push_back(ApplicableTuple(std::make_shared<Region>(), eqn_i));
       }
     }
 
@@ -635,7 +634,7 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
     for (const auto& p : potential)
     {
       const auto& context = std::get<0>(p);
-      if (context.begin() == context.end())
+      if (context->begin() == context->end())
       {
         applicable.push_back(p);
       }
@@ -643,7 +642,7 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
       {
         //check that all the dimensions in context are in delta
         bool hasdemands = false;
-        for (const auto& index : context)
+        for (const auto& index : *context)
         {
           if (!delta.has_entry(index.first))
           {
@@ -654,7 +653,7 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
 
         //don't bother doing this if there are dimensions not available
         //booleanTrue returns false if there are demands
-        if (!hasdemands && tupleApplicable(context, kappa)
+        if (!hasdemands && regionApplicable(*context, kappa)
           && booleanTrue(std::get<1>(p)->validContext(), kappa, delta,
                demands)
         )
@@ -844,6 +843,150 @@ CompiledEquationWS::CompiledEquationWS
 , m_provenance(provenance)
 , m_priority(0)
 {
+}
+
+bool
+regionApplicable(const Region& r, const Context& k)
+{
+  for (const auto& set : r) 
+  //(Tuple::const_iterator iter = def.begin(); iter != def.end(); ++iter)
+  {
+    const Constant& val = k.lookup(set.first);
+    if (!valueInside(val, set.second.first, set.second.second))
+    {
+      return false;
+    }
+  }
+
+  //if def has nothing it is applicable
+  return true;
+}
+
+//is region a a subset of region b?
+bool
+regionSubset(const Region& a, const Region& b, bool canequal)
+{
+  #if 0
+  std::cerr << "== tuple refines ==" << std::endl;
+  a.print(std::cerr);
+  std::cerr << std::endl;
+  b.print(std::cerr);
+  std::cerr << std::endl;
+  #endif
+  //for a to refine b, everything in b must be in a, and for the values that 
+  //are, they have to be either equal, or their ranges must be more specific
+  //but a cannot equal b
+  bool equal = true;
+  auto it1 = a.begin();
+  auto it2 = b.begin();
+  while (it1 != a.end() && it2 != b.end())
+  {
+    type_index d1 = it1->first;
+    type_index d2 = it2->first;
+
+    //std::cerr << "tuples have dimensions: " << d1 << " and " << d2 << 
+    //  std::endl;
+
+    //extra dimension in b
+    if (d2 < d1)
+    {
+      //std::cerr << "no by extra dimension" << std::endl;
+      return false;
+    }
+
+    //extra dimension in a
+    if (d2 > d1)
+    {
+      ++it1;
+      //a is more specific if the rest passes
+      equal = false;
+      //std::cerr << "not equal by dimension" << std::endl;
+      continue;
+    }
+
+    auto spec1 = it1->second.first;
+    auto spec2 = it2->second.first;
+
+    //first check if the specifiers are the same
+    if (spec1 != spec2)
+    {
+      //if they are different and they aren't "is" and ":", then we don't have
+      //a subset relationship
+      if (!(spec1 == Region::Containment::IS && 
+            spec2 == Region::Containment::IN))
+      {
+        return false;
+      }
+      //otherwise a is an "is" and b is a ":", so continue
+    }
+    else
+    {
+      //if they are the same, then it depends on the exact values
+      if (!valueInside(it1->second.second, it1->second.first, 
+          it2->second.second))
+      {
+        //std::cerr << "no by not refines" << std::endl;
+        //std::cerr << it1->first << ", " << it2->first << std::endl;
+        //std::cerr << it1->second.index() << ", " << it2->second.index() 
+        //  << std::endl;
+        return false;
+      }
+      //if they both refine each other they are equal
+      else if (!valueInside(it2->second.second, it1->second.first,
+               it1->second.second))
+      {
+        //the a value is contained in the b value, so a is more
+        //specific as long as the rest passes
+        equal = false;
+        //std::cerr << "not equal by value" << std::endl;
+      }
+    }
+
+    ++it1;
+    ++it2;
+  }
+
+  if (it2 != b.end())
+  {
+    //b has stuff left, can't refine
+    //std::cerr << "no by b iter not at end" << std::endl;
+    return false;
+  }
+
+  if (it1 != a.end())
+  {
+    //there is stuff left in a that was never checked
+    //therefore it refines
+    //std::cerr << "refines" << std::endl;
+    return true;
+  }
+
+  //if we get here then a is either equal to b or refines it
+  //if not equal then the variable equal would have been changed somewhere
+  //std::cerr << (!equal ? "yes" : "no") << std::endl;
+  return !equal || canequal;
+}
+
+bool
+valueInside
+(
+  const Constant& smaller, 
+  Region::Containment specifier, 
+  const Constant& bigger
+)
+{
+  switch (specifier)
+  {
+    case Region::Containment::IN:
+    break;
+
+    case Region::Containment::IS:
+    break;
+
+    case Region::Containment::IMP:
+    return smaller == bigger;
+    break;
+  }
 }
 
 } //namespace TransLucid

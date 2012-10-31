@@ -757,11 +757,15 @@ RegionWS::operator()(Context& k)
   {
     Constant lhs = (*std::get<0>(entry))(k);
     Constant rhs = (*std::get<2>(entry))(k);
-    entries.push_back(
-      std::make_tuple(
+    entries.insert(
+      std::make_pair(
         m_system.getDimensionIndex(lhs), 
-        std::get<1>(entry), 
-        rhs));
+        std::make_pair(
+          std::get<1>(entry), 
+          rhs
+        )
+      )
+    );
   }
 
   return Types::Region::create(Region(entries));
