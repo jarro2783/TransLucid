@@ -981,6 +981,7 @@ valueInside
     break;
 
     case Region::Containment::IS:
+    return smaller == bigger;
     break;
 
     case Region::Containment::IMP:
