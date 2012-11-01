@@ -1116,7 +1116,10 @@ regionSubset(const Region& a, const Region& b, bool canequal)
       //if they are different and they aren't "is" and ":", then we don't have
       //a subset relationship
       if (!(spec1 == Region::Containment::IS && 
-            spec2 == Region::Containment::IN))
+              (spec2 == Region::Containment::IN || 
+               spec2 == Region::Containment::IMP
+              )
+          ))
       {
         return false;
       }

@@ -338,8 +338,8 @@ fun canonical_print!c [c imp tuple]   = "[I don't know how to print a tuple]";;
 fun canonical_print!c               = print_typename!c + `"` + 
                                       escape_string!(print!c) + `"`;;
 fun canonical_print!c [c imp special] = print!c;;
-fun canonical_print!c [c imp infty] = "infty";;
-fun canonical_print!c [c imp neginfty] = "neginfty";;
+fun canonical_print!c [c is infty] = "infty";;
+fun canonical_print!c [c is neginfty] = "neginfty";;
 
 //I don't think that we want this definition
 //fun canonical_print!c = "cannot print this thing";;
