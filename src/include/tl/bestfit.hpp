@@ -648,9 +648,6 @@ namespace TransLucid
     PriorityList m_priorityVars;
   };
 
-  bool
-  regionApplicable(const Region& r, const Context& k);
-
   //is region a a subset of region b? this is under the assumption that
   //some context is inside both, so dimensions in common where one is an "is"
   //and the other is a ":" must have the "is" inside the region, so that is

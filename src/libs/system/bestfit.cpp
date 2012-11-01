@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/demand.hpp>
+#include <tl/types/region.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/union.hpp>
 #include <tl/utility.hpp>
@@ -59,6 +60,55 @@ namespace
   constants_equal(const Constant& a, const Constant& b)
   {
     return a == b;
+  }
+
+  template <typename T>
+  struct TupleLookup;
+
+  template <>
+  struct TupleLookup<Tuple>
+  {
+    Constant
+    operator()(const Tuple& t, dimension_index dim)
+    {
+      auto iter = t.find(dim);
+
+      if (iter == t.end())
+      {
+        return Types::Special::create(SP_DIMENSION);
+      }
+      else
+      {
+        return iter->second;
+      }
+    }
+  };
+
+  template <>
+  struct TupleLookup<Context>
+  {
+    Constant
+    operator()(const Context& k, dimension_index dim)
+    {
+      return k.lookup(dim);
+    }
+  };
+
+  template <typename T>
+  bool
+  regionApplicable(const Region& r, const T& t)
+  {
+    for (const auto& set : r) 
+    {
+      Constant val = TupleLookup<T>()(t, set.first);
+      if (!valueInside(val, set.second.first, set.second.second))
+      {
+        return false;
+      }
+    }
+
+    //if def has nothing it is applicable
+    return true;
   }
 
   //there are several types that can only be compared with something
@@ -103,6 +153,23 @@ namespace
   IsSubsetFn 
   subset_of_region(const Constant& c)
   {
+    if (c.index() == TYPE_INDEX_TUPLE)
+    {
+      return [] (const Constant& a, const Constant& b) -> bool
+      {
+        //b is the region, a is a tuple
+        return regionApplicable(Types::Region::get(b), Types::Tuple::get(a));
+      };
+    }
+    else if (c.index() == TYPE_INDEX_REGION)
+    {
+      return [] (const Constant& a, const Constant& b) -> bool
+      {
+        return regionSubset(Types::Region::get(a), Types::Region::get(b), 
+          true);
+      };
+    }
+
     return &issubset_false;
   }
 
@@ -1046,23 +1113,6 @@ CompiledEquationWS::CompiledEquationWS
 , m_provenance(provenance)
 , m_priority(0)
 {
-}
-
-bool
-regionApplicable(const Region& r, const Context& k)
-{
-  for (const auto& set : r) 
-  //(Tuple::const_iterator iter = def.begin(); iter != def.end(); ++iter)
-  {
-    const Constant& val = k.lookup(set.first);
-    if (!valueInside(val, set.second.first, set.second.second))
-    {
-      return false;
-    }
-  }
-
-  //if def has nothing it is applicable
-  return true;
 }
 
 //is region a a subset of region b?
