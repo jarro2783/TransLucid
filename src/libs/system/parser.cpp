@@ -1123,6 +1123,7 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
       if (what == PARSING_UNKNOWN)
       {
         what = PARSING_TUPLE;
+        ++current;
       }
       else if (what == PARSING_REGION)
       {

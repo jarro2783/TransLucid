@@ -22,6 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/demand.hpp>
+#include <tl/types/tuple.hpp>
+#include <tl/types/union.hpp>
 #include <tl/utility.hpp>
 #include <tl/workshop_builder.hpp>
 
@@ -36,6 +38,207 @@ static constexpr size_t LINEAR_SEARCH_MAX_SIZE = 7;
 
 namespace TransLucid
 {
+
+namespace
+{
+  //is a a subset of b
+  typedef bool (*IsSubsetFn)(const Constant& a, const Constant& b);  
+
+  //returns a function that determines if the parameter is a subset of
+  //the particular type that it handles
+  typedef IsSubsetFn (*IsSubsetOf)(const Constant&);
+
+  //several things are immediately false
+  bool
+  issubset_false(const Constant&, const Constant&)
+  {
+    return false;
+  }
+
+  bool
+  constants_equal(const Constant& a, const Constant& b)
+  {
+    return a == b;
+  }
+
+  //there are several types that can only be compared with something
+  //of the same type, instead of writing the code several times for
+  //each, we will use templates.
+  //In that case, constant equality works fine.
+  template <type_index T>
+  IsSubsetFn
+  isSubsetAtomic(const Constant& c)
+  {
+    if (c.index() != T)
+    {
+      return &issubset_false;
+    }
+    else
+    {
+      return &constants_equal;
+    }
+  }
+
+  //TODO: work out tuples and tuple sets
+  //this currently returns false if the two are equal
+  //we probably want it to be true, but in some cases we want it to
+  //be false, so we have to work out what it all means
+  bool
+  tuple_subset_tuple(const Constant& sub, const Constant& super)
+  {
+    //std::cerr << "tuple subset in bestfit :)" << std::endl;
+    //bool r = 
+    return 
+    tupleRefines
+    (
+      Types::Tuple::get(sub),
+      Types::Tuple::get(super),
+      true
+    );
+
+    //std::cerr << "refines = " << r << std::endl;
+    //return r;
+  }
+
+  IsSubsetFn 
+  subset_of_region(const Constant& c)
+  {
+    return &issubset_false;
+  }
+
+  IsSubsetFn 
+  subset_of_tuple(const Constant& c)
+  {
+    if (c.index() != TYPE_INDEX_TUPLE)
+    {
+      return &issubset_false;
+    }
+    else
+    {
+      return &tuple_subset_tuple;
+    }
+  }
+
+  IsSubsetFn
+  subset_of_range(const Constant& c)
+  {
+    //at the moment we can only do ranges of integers
+    
+    if (c.index() == TYPE_INDEX_INTMP)
+    {
+      //lambda functions to the rescue
+      return [] (const Constant& a, const Constant& b)
+        {
+          //a is an int, b is a range
+          return Types::Range::get(b).within(Types::Intmp::get(a));
+        }
+      ;
+    }
+    else if (c.index() == TYPE_INDEX_RANGE)
+    {
+      return [] (const Constant& a, const Constant& b)
+        {
+          //a is a range, b is a range
+          return Types::Range::get(b).within(Types::Range::get(a));
+        }
+      ;
+    }
+    else
+    {
+      return &issubset_false;
+    }
+  }
+
+  IsSubsetFn
+  subset_of_type(const Constant& c)
+  {
+    return [] (const Constant& a, const Constant& b)
+      {
+        if (a.index() == TYPE_INDEX_TYPE)
+        {
+          return a == b;
+        }
+        //b is a type, a is anything
+        return (a.index() == get_constant<type_index>(b));
+      }
+    ;
+  }
+
+  bool subset_union_constant(const Constant& a, const Constant& b)
+  {
+    //a is a union
+    const UnionType& u = Types::Union::get(b);
+
+    return u.contains(a);
+  }
+
+  bool subset_union_union(const Constant& a, const Constant& b)
+  {
+    return false;
+  }
+
+  IsSubsetFn
+  subset_of_union(const Constant& c)
+  {
+    if (c.index() == TYPE_INDEX_UNION)
+    {
+      return &subset_union_union;
+    }
+    else
+    {
+      return &subset_union_constant;
+    }
+  }
+
+  class TypeComparators
+  {
+    public:
+
+    TypeComparators()
+    {
+      m_funs = new IsSubsetOf[NUM_FUNS]
+        {
+          &isSubsetAtomic<TYPE_INDEX_ERROR>,
+          &isSubsetAtomic<TYPE_INDEX_BOOL>,
+          &isSubsetAtomic<TYPE_INDEX_SPECIAL>,
+          &isSubsetAtomic<TYPE_INDEX_INTMP>,
+          &isSubsetAtomic<TYPE_INDEX_UCHAR>,
+          &isSubsetAtomic<TYPE_INDEX_USTRING>,
+          &isSubsetAtomic<TYPE_INDEX_FLOATMP>,
+          &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
+          &subset_of_region,
+          &subset_of_tuple,
+          &subset_of_type,
+          &subset_of_range,
+          &subset_of_union
+        };
+    }
+
+    ~TypeComparators()
+    {
+      delete [] m_funs;
+    }
+
+    IsSubsetOf
+    getComparator(type_index t)
+    {
+      if (t < NUM_FUNS)
+      {
+        return m_funs[t];
+      }
+      else
+      {
+        return nullptr;
+      }
+    }
+
+    private:
+    static const int NUM_FUNS = TYPE_INDEX_UNION + 1;
+    IsSubsetOf* m_funs;
+  };
+
+  static TypeComparators typeCompare;
+}
 
 //TODO finish this
 //the choice of how to best fit will very much depend on properties of the
@@ -922,7 +1125,7 @@ regionSubset(const Region& a, const Region& b, bool canequal)
     else
     {
       //if they are the same, then it depends on the exact values
-      if (!valueInside(it1->second.second, it1->second.first, 
+      if (!valueSmaller(it1->second.second, it1->second.first, 
           it2->second.second))
       {
         //std::cerr << "no by not refines" << std::endl;
@@ -932,7 +1135,7 @@ regionSubset(const Region& a, const Region& b, bool canequal)
         return false;
       }
       //if they both refine each other they are equal
-      else if (!valueInside(it2->second.second, it1->second.first,
+      else if (!valueSmaller(it2->second.second, it1->second.first,
                it1->second.second))
       {
         //the a value is contained in the b value, so a is more
@@ -967,6 +1170,31 @@ regionSubset(const Region& a, const Region& b, bool canequal)
   return !equal || canequal;
 }
 
+//does value a refine value b
+bool
+valueRefines(const Constant& a, const Constant& b)
+{
+  //this is implemented by creating a matrix of function pointers
+  //which is as big as the largest type index that we need to consider
+
+  //std::cerr << "== value refines ==" << std::endl;
+  //std::cerr << a << " r " << b << std::endl;
+  //if b is a range, a has to be a range and within or equal,
+  //or an int and inside, otherwise they have to be equal
+
+  IsSubsetOf f = typeCompare.getComparator(b.index());
+  if (f != 0)
+  {
+    IsSubsetFn sub = f(a);
+    return sub(a, b);
+  }
+  else
+  {
+    //there is no comparator, just check if they are equal
+    return a == b;
+  }
+}
+
 bool
 valueInside
 (
@@ -978,6 +1206,40 @@ valueInside
   switch (specifier)
   {
     case Region::Containment::IN:
+    //here we check if smaller is a subset of bigger
+    return valueRefines(smaller, bigger);
+    break;
+
+    case Region::Containment::IS:
+    return smaller == bigger;
+    break;
+
+    case Region::Containment::IMP:
+    if (bigger.index() == TYPE_INDEX_TYPE)
+    {
+      return smaller.index() == get_constant<type_index>(bigger);
+    }
+    return false;
+    break;
+  }
+
+  //this is to satisfy the compiler that we have a return value
+  return false;
+}
+
+bool
+valueSmaller
+(
+  const Constant& smaller, 
+  Region::Containment specifier, 
+  const Constant& bigger
+)
+{
+  switch (specifier)
+  {
+    case Region::Containment::IN:
+    //here we check if smaller is a subset of bigger
+    return valueRefines(smaller, bigger);
     break;
 
     case Region::Containment::IS:
@@ -988,6 +1250,9 @@ valueInside
     return smaller == bigger;
     break;
   }
+
+  //this is to satisfy the compiler that we have a return value
+  return false;
 }
 
 } //namespace TransLucid

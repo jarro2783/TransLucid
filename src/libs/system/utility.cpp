@@ -281,7 +281,7 @@ tupleApplicable(const Tuple& def, const Context& k)
   return true;
 }
 
-
+#if 0
 //does value a refine value b
 bool
 valueRefines(const Constant& a, const Constant& b)
@@ -307,6 +307,7 @@ valueRefines(const Constant& a, const Constant& b)
     return a == b;
   }
 }
+#endif
 
 //does a refine b
 bool

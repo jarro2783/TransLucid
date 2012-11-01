@@ -671,6 +671,14 @@ namespace TransLucid
     Region::Containment specifier, 
     const Constant& bigger
   );
+  
+  bool
+  valueSmaller
+  (
+    const Constant& smaller, 
+    Region::Containment specifier, 
+    const Constant& bigger
+  );
 }
 
 #endif // BESTFIT_HPP_INCLUDED
