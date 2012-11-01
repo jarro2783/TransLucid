@@ -190,31 +190,31 @@ fun lt!a!b [a : fint, b : fint]
   | a.prec == b.prec && a.is_signed == b.is_signed 
   = fint_lt!(a.prec)!(a.is_signed).(a,b);;
 
-fun gte!a!b [a : intmp, b : intmp] = intmp_gte.(a,b);;
-fun gte!a!b [a : floatmp, b : floatmp] = floatmp_gte.(a,b);;
+fun gte!a!b [a imp intmp, b imp intmp] = intmp_gte.(a,b);;
+fun gte!a!b [a imp floatmp, b imp floatmp] = floatmp_gte.(a,b);;
 fun gte!a!b [a : fint, b : fint]
   | a.prec == b.prec && a.is_signed == b.is_signed 
   = fint_gte!(a.prec)!(a.is_signed).(a,b);;
 
-fun gt!a!b [a : intmp, b : intmp] = intmp_gt.(a,b);;
-fun gt!a!b [a : floatmp, b : floatmp] = floatmp_gt.(a,b);;
+fun gt!a!b [a imp intmp, b imp intmp] = intmp_gt.(a,b);;
+fun gt!a!b [a imp floatmp, b imp floatmp] = floatmp_gt.(a,b);;
 fun gt!a!b [a : fint, b : fint]
   | a.prec == b.prec && a.is_signed == b.is_signed 
   = fint_gt!(a.prec)!(a.is_signed).(a,b);;
 
-fun eq!a!b [a : intmp, b : intmp] = intmp_eq.(a,b);;
-fun eq!a!b [a : floatmp, b : floatmp] = floatmp_eq.(a,b);;
+fun eq!a!b [a imp intmp, b imp intmp] = intmp_eq.(a,b);;
+fun eq!a!b [a imp floatmp, b imp floatmp] = floatmp_eq.(a,b);;
 fun eq!a!b [a : fint, b : fint] 
   | intmp_eq.(a.prec, b.prec) && bool_eq.(a.is_signed, b.is_signed)
   = (fint_eq!(a.prec)!(a.is_signed)).(a,b);;
 
-fun ne!a!b [a : intmp, b : intmp] = intmp_ne.(a,b);;
-fun ne!a!b [a : floatmp, b : floatmp] = floatmp_ne.(a,b);;
+fun ne!a!b [a imp intmp, b imp intmp] = intmp_ne.(a,b);;
+fun ne!a!b [a imp floatmp, b imp floatmp] = floatmp_ne.(a,b);;
 fun ne!a!b [a : fint, b : fint]
   | a.prec == b.prec && a.is_signed == b.is_signed 
   = fint_ne!(a.prec)!(a.is_signed).(a,b);;
 
-fun eq!a!b [a : bool, b : bool] = bool_eq.(a,b);;
+fun eq!a!b [a imp bool, b imp bool] = bool_eq.(a,b);;
 
 fun lt!a!b [a : float, b : float] | a.prec == b.prec 
   = (float_lt!(a.prec)).(a,b);;
@@ -237,7 +237,7 @@ fun ne!a!b [a : float, b : float] | a.prec == b.prec
 fun bool_and a b = if a then b else false fi;;
 fun bool_or a b = if a then true else b fi;;
 
-fun plus!a!b [a : ustring, b : ustring] = ustring_plus.(a,b);;
+fun plus!a!b [a imp ustring, b imp ustring] = ustring_plus.(a,b);;
 
 fun abs!a [a : floatmp] = floatmp_abs.a;;
 
