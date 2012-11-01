@@ -25,19 +25,19 @@ constructor AssocLeft = Assoc;;
 constructor AssocRight = Assoc;;
 
 data HostDecl;;
-constructor HostDim a [a : intmp] = HostDecl;;
-constructor HostType a [a : intmp] = HostDecl;;
-constructor HostFunc a [a : intmp] = HostDecl;;
+constructor HostDim a [a imp intmp] = HostDecl;;
+constructor HostType a [a imp intmp] = HostDecl;;
+constructor HostFunc a [a imp intmp] = HostDecl;;
 
 data OpType;;
-constructor OpPostfix a b [a : ustring, b : bool] = OpType;;
-constructor OpPrefix a b [a : ustring, b : bool] = OpType;;
+constructor OpPostfix a b [a imp ustring, b imp bool] = OpType;;
+constructor OpPrefix a b [a imp ustring, b imp bool] = OpType;;
 constructor OpInfix a b c d //[a : ustring, b : bool, c : Assoc, d : intmp]
   = OpType;;
 
 data Hyperdaton;;
-constructor HdIn a [a : ustring] = Hyperdaton;;
-constructor HdOut a [a : ustring] = Hyperdaton;;
+constructor HdIn a [a imp ustring] = Hyperdaton;;
+constructor HdOut a [a imp ustring] = Hyperdaton;;
 
 op + = OpInfix."plus".false.AssocLeft.100;;
 op - = OpInfix."minus".false.AssocLeft.100;;
@@ -76,36 +76,36 @@ var nonpos = neginfty..0;;
 fun negate!a = if a then false else true fi;;
 
 //fun plus.a.b [a : intmp, b : intmp] = int_plus!(a,b);;
-fun plus!a!b [a : intmp, b : intmp] = intmp_plus.(a,b);;
-fun plus!a!b [a : floatmp, b : floatmp] = floatmp_plus.(a,b);;
+fun plus!a!b [a imp intmp, b imp intmp] = intmp_plus.(a,b);;
+fun plus!a!b [a imp floatmp, b imp floatmp] = floatmp_plus.(a,b);;
 fun plus!a!b [a : fint, b : fint] 
   | a.prec == b.prec && a.is_signed == b.is_signed
   = (fint_plus!(a.prec)!(a.is_signed)).(a,b);;
 
-fun minus!a!b [a : intmp, b : intmp] = intmp_minus.(a,b);;
-fun minus!a!b [a : floatmp, b : floatmp] = floatmp_minus.(a,b);;
+fun minus!a!b [a imp intmp, b imp intmp] = intmp_minus.(a,b);;
+fun minus!a!b [a imp floatmp, b imp floatmp] = floatmp_minus.(a,b);;
 fun minus!a!b [a : fint, b : fint] 
   | a.prec == b.prec && a.is_signed == b.is_signed
   = (fint_minus!(a.prec)!(a.is_signed)).(a,b);;
 
-fun times!a!b [a : intmp, b : intmp] = intmp_times.(a,b);;
-fun times!a!b [a : floatmp, b : floatmp] = floatmp_times.(a,b);;
+fun times!a!b [a imp intmp, b imp intmp] = intmp_times.(a,b);;
+fun times!a!b [a imp floatmp, b imp floatmp] = floatmp_times.(a,b);;
 fun times!a!b [a : fint, b : fint] 
   | a.prec == b.prec && a.is_signed == b.is_signed
   = (fint_times!(a.prec)!(a.is_signed)).(a,b);;
 
-fun divide!a!b [a : intmp, b : intmp] = intmp_divide.(a,b);;
-fun divide!a!b [a : floatmp, b : floatmp] = floatmp_divide.(a,b);;
+fun divide!a!b [a imp intmp, b imp intmp] = intmp_divide.(a,b);;
+fun divide!a!b [a imp floatmp, b imp floatmp] = floatmp_divide.(a,b);;
 fun divide!a!b [a : fint, b : fint] 
   | a.prec == b.prec && a.is_signed == b.is_signed
   = (fint_divide!(a.prec)!(a.is_signed)).(a,b);;
 
-fun modulus!a!b [a : intmp, b : intmp] = intmp_modulus.(a,b);;
+fun modulus!a!b [a imp intmp, b imp intmp] = intmp_modulus.(a,b);;
 fun modulus!a!b [a : fint, b : fint] 
   | a.prec == b.prec && a.is_signed == b.is_signed
   = (fint_modulus!(a.prec)!(a.is_signed)).(a,b);;
 
-fun sqrt!a [a : floatmp] = floatmp_sqrt.a;;
+fun sqrt!a [a imp floatmp] = floatmp_sqrt.a;;
 
 fun plus!a!b [a : float, b : float] | a.prec == b.prec 
   = (float_plus!(a.prec)).(a,b);;
@@ -119,46 +119,46 @@ fun times!a!b [a : float, b : float] | a.prec == b.prec
 fun divide!a!b [a : float, b : float] | a.prec == b.prec 
   = (float_divide!(a.prec)).(a,b);;
 
-fun uminus!a [a : floatmp] = floatmp_uminus.a;;
-fun uminus!a [a : intmp] = intmp_uminus.a;;
+fun uminus!a [a imp floatmp] = floatmp_uminus.a;;
+fun uminus!a [a imp intmp] = intmp_uminus.a;;
 
-fun constant_bang!a!b [a : sint8] = sint8_bang.b;;
-fun constant_bang!a!b [a : uint8] = uint8_bang.b;;
-fun constant_bang!a!b [a : sint16] = sint16_bang.b;;
-fun constant_bang!a!b [a : uint16] = uint16_bang.b;;
-fun constant_bang!a!b [a : sint32] = sint32_bang.b;;
-fun constant_bang!a!b [a : uint32] = uint32_bang.b;;
-fun constant_bang!a!b [a : sint64] = sint64_bang.b;;
-fun constant_bang!a!b [a : uint64] = uint64_bang.b;;
-fun constant_bang!a!b [a : float32] = float32_bang.b;;
-fun constant_bang!a!b [a : float64] = float64_bang.b;;
+fun constant_bang!a!b [a imp sint8] = sint8_bang.b;;
+fun constant_bang!a!b [a imp uint8] = uint8_bang.b;;
+fun constant_bang!a!b [a imp sint16] = sint16_bang.b;;
+fun constant_bang!a!b [a imp uint16] = uint16_bang.b;;
+fun constant_bang!a!b [a imp sint32] = sint32_bang.b;;
+fun constant_bang!a!b [a imp uint32] = uint32_bang.b;;
+fun constant_bang!a!b [a imp sint64] = sint64_bang.b;;
+fun constant_bang!a!b [a imp uint64] = uint64_bang.b;;
+fun constant_bang!a!b [a imp float32] = float32_bang.b;;
+fun constant_bang!a!b [a imp float64] = float64_bang.b;;
 
-fun float32_bang.a [a : prec] = 32;;
-fun float64_bang.a [a : prec] = 64;;
+fun float32_bang.a [a is prec] = 32;;
+fun float64_bang.a [a is prec] = 64;;
 
-fun sint8_bang.a [a : prec] = 8;;
-fun sint8_bang.a [a : is_signed] = true;;
+fun sint8_bang.a [a is prec] = 8;;
+fun sint8_bang.a [a is is_signed] = true;;
 
-fun uint8_bang.a [a : prec] = 8;;
-fun uint8_bang.a [a : is_signed] = false;;
+fun uint8_bang.a [a is prec] = 8;;
+fun uint8_bang.a [a is is_signed] = false;;
 
-fun sint16_bang.a [a : prec] = 16;;
-fun sint16_bang.a [a : is_signed] = true;;
+fun sint16_bang.a [a is prec] = 16;;
+fun sint16_bang.a [a is is_signed] = true;;
 
-fun uint16_bang.a [a : prec] = 16;;
-fun uint16_bang.a [a : is_signed] = false;;
+fun uint16_bang.a [a is prec] = 16;;
+fun uint16_bang.a [a is is_signed] = false;;
 
-fun sint32_bang.a [a : prec] = 32;;
-fun sint32_bang.a [a : is_signed] = true;;
+fun sint32_bang.a [a is prec] = 32;;
+fun sint32_bang.a [a is is_signed] = true;;
 
-fun uint32_bang.a [a : prec] = 32;;
-fun uint32_bang.a [a : is_signed] = false;;
+fun uint32_bang.a [a is prec] = 32;;
+fun uint32_bang.a [a is is_signed] = false;;
 
-fun sint64_bang.a [a : prec] = 64;;
-fun sint64_bang.a [a : is_signed] = true;;
+fun sint64_bang.a [a is prec] = 64;;
+fun sint64_bang.a [a is is_signed] = true;;
 
-fun uint64_bang.a [a : prec] = 64;;
-fun uint64_bang.a [a : is_signed] = false;;
+fun uint64_bang.a [a is prec] = 64;;
+fun uint64_bang.a [a is is_signed] = false;;
 
 //fun uint8_bang.a.b [a : prec] = uint8_precision!b;;
 //fun uint8_bang.a.b [a : signed] = false;;
