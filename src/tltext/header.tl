@@ -239,17 +239,17 @@ fun bool_or a b = if a then true else b fi;;
 
 fun plus!a!b [a imp ustring, b imp ustring] = ustring_plus.(a,b);;
 
-fun abs!a [a : floatmp] = floatmp_abs.a;;
+fun abs!a [a imp floatmp] = floatmp_abs.a;;
 
-fun range_construct!a!b [a : intmp, b : intmp] = make_range.(a,b);;
-fun range_construct!a!b [a : intmp, b : infty] = make_range_infty.a;;
-fun range_construct!a!b [a : neginfty, b : intmp] = make_range_neginfty.b;;
-fun range_construct!a!b [a : neginfty, b : infty] = make_range_infinite;;
+fun range_construct!a!b [a imp intmp, b imp intmp] = make_range.(a,b);;
+fun range_construct!a!b [a imp intmp, b is infty] = make_range_infty.a;;
+fun range_construct!a!b [a is neginfty, b imp intmp] = make_range_neginfty.b;;
+fun range_construct!a!b [a is neginfty, b is infty] = make_range_infinite;;
 
 fun union_construct!a!b = make_union.(a,b);;
 
 //convert to a from b
-fun convert!a!b [a : floatmp, b : intmp] = floatmp_convert_intmp.b;;
+fun convert!a!b [a is floatmp, b imp intmp] = floatmp_convert_intmp.b;;
 
 //var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 fun fby.d X Y = if #.d <= 0 then X else prev.d Y fi;;
