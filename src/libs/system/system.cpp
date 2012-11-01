@@ -1200,8 +1200,12 @@ System::addDataDeclRaw
     name,
     Tree::Expr(),
     Tree::Expr(),
-    Tree::TupleExpr(Tree::TupleExpr::TuplePairs({
-      {Tree::DimensionExpr{DIM_TYPE}, name}
+    Tree::RegionExpr(Tree::RegionExpr::Entries({
+      std::make_tuple(
+        Tree::DimensionExpr{DIM_TYPE}, 
+        Region::Containment::IS, 
+        name
+      )
     }))
   ));
 }
