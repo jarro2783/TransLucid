@@ -71,7 +71,8 @@ namespace TransLucid
       );
     }
 
-    Tree::Expr operator()(const Tree::HashExpr& e)
+    Tree::Expr 
+    operator()(const Tree::HashExpr& e)
     {
       return Tree::HashExpr(
         apply_visitor(*reinterpret_cast<Derived*>(this), e.e));
@@ -83,7 +84,26 @@ namespace TransLucid
       return e;
     }
 
-    Tree::Expr operator()(const Tree::TupleExpr& e)
+    Tree::Expr
+    operator()(const Tree::RegionExpr& e)
+    {
+      Tree::RegionExpr::Entries entries;
+
+      for (const auto& entry : e.entries)
+      {
+        entries.push_back(std::make_tuple
+        (
+          apply_visitor(*reinterpret_cast<Derived*>(this), std::get<0>(entry)),
+          std::get<1>(entry),
+          apply_visitor(*reinterpret_cast<Derived*>(this), std::get<2>(entry))
+        ));
+      }
+
+      return Tree::RegionExpr{entries};
+    }
+
+    Tree::Expr 
+    operator()(const Tree::TupleExpr& e)
     {
       std::vector<std::pair<Tree::Expr, Tree::Expr>> visited;
 

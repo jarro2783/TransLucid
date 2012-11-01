@@ -1123,12 +1123,14 @@ Parser::parse_tuple(LexerIterator& begin, const LexerIterator& end,
       if (what == PARSING_UNKNOWN)
       {
         what = PARSING_TUPLE;
-        ++current;
       }
       else if (what == PARSING_REGION)
       {
         throw "found `<-' parsing region";
       }
+
+      ++current;
+
       expect(current, end, rhs, "expr", &Parser::parse_expr);
       tuple.push_back(std::make_pair(lhs, rhs));
       break;
