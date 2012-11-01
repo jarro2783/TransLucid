@@ -166,26 +166,26 @@ fun uint64_bang.a [a is is_signed] = false;;
 //fun sint8_bang.a.b [a : prec] = sint8_precision!b;;
 //fun sint8_bang.a.b [a : signed] = true;;
 
-fun lte!a!b [a : intmp, b : intmp] = intmp_lte.(a,b);;
-fun lte!a!b [a : intmp, b : infty] = true;;
-fun lte!a!b [a : infty, b : intmp] = false;;
-fun lte!a!b [a : infty, b : infty] = true;;
-fun lte!a!b [a : neginfty, b : neginfty] = true;;
-fun lte!a!b [a : neginfty, b : intmp] = true;;
-fun lte!a!b [a : intmp, b : neginfty] = false;;
-fun lte!a!b [a : floatmp, b : floatmp] = floatmp_lte.(a,b);;
+fun lte!a!b [a imp intmp, b imp intmp] = intmp_lte.(a,b);;
+fun lte!a!b [a imp intmp, b is infty] = true;;
+fun lte!a!b [a is infty, b imp intmp] = false;;
+fun lte!a!b [a is infty, b is infty] = true;;
+fun lte!a!b [a is neginfty, b is neginfty] = true;;
+fun lte!a!b [a is neginfty, b imp intmp] = true;;
+fun lte!a!b [a imp intmp, b is neginfty] = false;;
+fun lte!a!b [a imp floatmp, b imp floatmp] = floatmp_lte.(a,b);;
 fun lte!a!b [a : fint, b : fint] 
   | a.prec == b.prec && a.is_signed == b.is_signed 
   = fint_lte!(a.prec)!(a.is_signed).(a,b);;
 
-fun lt!a!b [a : intmp, b : intmp] = intmp_lt.(a,b);;
-fun lt!a!b [a : intmp, b : infty] = true;;
-fun lt!a!b [a : infty, b : intmp] = false;;
-fun lt!a!b [a : infty, b : infty] = false;;
-fun lt!a!b [a : neginfty, b : neginfty] = false;;
-fun lt!a!b [a : neginfty, b : intmp] = true;;
-fun lt!a!b [a : intmp, b : neginfty] = false;;
-fun lt!a!b [a : floatmp, b : floatmp] = floatmp_lt.(a,b);;
+fun lt!a!b [a imp intmp, b imp intmp] = intmp_lt.(a,b);;
+fun lt!a!b [a imp intmp, b is infty] = true;;
+fun lt!a!b [a is infty, b imp intmp] = false;;
+fun lt!a!b [a is infty, b is infty] = false;;
+fun lt!a!b [a is neginfty, b is neginfty] = false;;
+fun lt!a!b [a is neginfty, b imp intmp] = true;;
+fun lt!a!b [a imp intmp, b is neginfty] = false;;
+fun lt!a!b [a imp floatmp, b imp floatmp] = floatmp_lt.(a,b);;
 fun lt!a!b [a : fint, b : fint]
   | a.prec == b.prec && a.is_signed == b.is_signed 
   = fint_lt!(a.prec)!(a.is_signed).(a,b);;
