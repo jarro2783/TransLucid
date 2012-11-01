@@ -262,84 +262,84 @@ fun escape_character!c | is_printable.c == false && code_point.c <= 0GFFFF
   = `\u` + code_point_4.c;;
 fun escape_character!c | is_printable.c == false && code_point.c > 0GFFFF 
   = `\U` + code_point_8.c;;
-fun escape_character!c [c : '\n'] = `\n`;;
-fun escape_character!c [c : '\t'] = `\t`;;
-fun escape_character!c [c : '\r'] = `\r`;;
-fun escape_character!c [c : '\\'] = `\\`;;
-fun escape_character!c [c : '\"'] = `\"`;;
-fun escape_character!c [c : '\''] = `\'`;;
+fun escape_character!c [c is '\n'] = `\n`;;
+fun escape_character!c [c is '\t'] = `\t`;;
+fun escape_character!c [c is '\r'] = `\r`;;
+fun escape_character!c [c is '\\'] = `\\`;;
+fun escape_character!c [c is '\"'] = `\"`;;
+fun escape_character!c [c is '\''] = `\'`;;
 
-fun string_at!s!pos [s : ustring, pos : intmp] = string_at_base.(s,pos);;
-fun substring!s!start!length [s : ustring, start : intmp, length : intmp]
+fun string_at!s!pos [s imp ustring, pos imp intmp] = string_at_base.(s,pos);;
+fun substring!s!start!length [s imp ustring, start imp intmp, length imp intmp]
   = substring_base.(s, start, length);;
-fun substring!s!start!length [s : ustring, start : intmp, length : infty]
+fun substring!s!start!length [s imp ustring, start imp intmp, length is infty]
   = substring_toend_base.(s, start);;
 
 fun escape_string!s = escape_character!(string_at!s!0)
   + escape_string!(substring!s!1!infty)
 ;;
-fun escape_string!s [s : ""] = "";;
+fun escape_string!s [s is ""] = "";;
 
-fun print_special!c [c : sperror] = "sperror";;
-fun print_special!c [c : spaccess] = "spaccess";;
-fun print_special!c [c : sptypeerror] = "typeerror";;
-fun print_special!c [c : spdim] = "spdim";;
-fun print_special!c [c : sparith] = "sparith";;
-fun print_special!c [c : spundef] = "spundef";;
-fun print_special!c [c : spconst] = "spconst";;
-fun print_special!c [c : spmultidef] = "spmultidef";;
-fun print_special!c [c : sploop] = "sploop";;
+fun print_special!c [c is sperror] = "sperror";;
+fun print_special!c [c is spaccess] = "spaccess";;
+fun print_special!c [c is sptypeerror] = "typeerror";;
+fun print_special!c [c is spdim] = "spdim";;
+fun print_special!c [c is sparith] = "sparith";;
+fun print_special!c [c is spundef] = "spundef";;
+fun print_special!c [c is spconst] = "spconst";;
+fun print_special!c [c is spmultidef] = "spmultidef";;
+fun print_special!c [c is sploop] = "sploop";;
 
 fun print!c = "I don't know how to print this type";;
-fun print!c [c : ustring] = c;;
-fun print!c [c : intmp] = print_intmp.c;;
-fun print!c [c : floatmp] = print_floatmp.c;;
-fun print!c [c : bool] = print_bool.c;;
-fun print!c [c : special] = print_special!c;;
-fun print!c [c : typetype] = print_typetype.c;;
-fun print!c [c : uchar] = print_uchar.c;;
-fun print!c [c : range] = print_range.c;;
-fun print!c [c : tuple] = print_tuple.c;;
-fun print!c [c : uuid] = print_uuid.c;;
-fun print!c [c : demand] = "Cannot print demands";;
-fun print!c [c : calc] = "Cannot print calc";;
+fun print!c [c imp ustring] = c;;
+fun print!c [c imp intmp] = print_intmp.c;;
+fun print!c [c imp floatmp] = print_floatmp.c;;
+fun print!c [c imp bool] = print_bool.c;;
+fun print!c [c imp special] = print_special!c;;
+fun print!c [c imp typetype] = print_typetype.c;;
+fun print!c [c imp uchar] = print_uchar.c;;
+fun print!c [c imp range] = print_range.c;;
+fun print!c [c imp tuple] = print_tuple.c;;
+fun print!c [c imp uuid] = print_uuid.c;;
+fun print!c [c imp demand] = "Cannot print demands";;
+fun print!c [c imp calc] = "Cannot print calc";;
 
 fun print_typename!c = "unknown typename";;
-fun print_typename!c [c : intmp] = "intmp";;
-fun print_typename!c [c : ustring] = "ustring";;
-fun print_typename!c [c : uchar] = "uchar";;
-fun print_typename!c [c : bool] = "bool";;
-fun print_typename!c [c : range] = "range";;
-fun print_typename!c [c : tuple] = "tuple";;
-fun print_typename!c [c : special] = "special";;
-fun print_typename!c [c : typetype] = "typetype";;
-fun print_typename!c [c : uuid] = "uuid";;
-fun print_typename!c [c : demand] = "demand";;
-fun print_typename!c [c : calc] = "calc";;
-fun print_typename!c [c : basefun] = "basefun";;
-fun print_typename!c [c : lambda] = "lambda";;
-fun print_typename!c [c : phi] = "phi";;
-fun print_typename!c [c : floatmp] = "floatmp";;
-fun print_typename!c [c : intension] = "intension";;
+fun print_typename!c [c imp intmp] = "intmp";;
+fun print_typename!c [c imp ustring] = "ustring";;
+fun print_typename!c [c imp uchar] = "uchar";;
+fun print_typename!c [c imp bool] = "bool";;
+fun print_typename!c [c imp range] = "range";;
+fun print_typename!c [c imp tuple] = "tuple";;
+fun print_typename!c [c imp special] = "special";;
+fun print_typename!c [c imp typetype] = "typetype";;
+fun print_typename!c [c imp uuid] = "uuid";;
+fun print_typename!c [c imp demand] = "demand";;
+fun print_typename!c [c imp calc] = "calc";;
+fun print_typename!c [c imp basefun] = "basefun";;
+fun print_typename!c [c imp lambda] = "lambda";;
+fun print_typename!c [c imp phi] = "phi";;
+fun print_typename!c [c imp floatmp] = "floatmp";;
+fun print_typename!c [c imp intension] = "intension";;
 
-fun construct_literal!t!v [t : "intmp"] = construct_intmp.v;;
-fun construct_literal!t!v [t : "special"] = construct_special.v;;
-fun construct_literal!t!v [t : "typetype"] = construct_typetype.v;;
-fun construct_literal!t!v [t : "uuid"] = construct_uuid.v;;
-fun construct_literal!t!v [t : "floatmp"] = construct_floatmp.v;;
+fun construct_literal!t!v [t is "intmp"] = construct_intmp.v;;
+fun construct_literal!t!v [t is "special"] = construct_special.v;;
+fun construct_literal!t!v [t is "typetype"] = construct_typetype.v;;
+fun construct_literal!t!v [t is "uuid"] = construct_uuid.v;;
+fun construct_literal!t!v [t is "floatmp"] = construct_floatmp.v;;
 
 //the print equations
-fun canonical_print!c [c : intmp]   = print!c;;
-fun canonical_print!c [c : ustring] = `"` + escape_string!(print!c) + `"`;;
-fun canonical_print!c [c : uchar]   = "'" + escape_string!(print!c) + "'";;
-fun canonical_print!c [c : bool]    = print!c;;
-fun canonical_print!c [c : range]   = print!c;;
-fun canonical_print!c [c : tuple]   = "[I don't know how to print a tuple]";;
+fun canonical_print!c [c imp intmp]   = print!c;;
+fun canonical_print!c [c imp ustring] = `"` + escape_string!(print!c) + `"`;;
+fun canonical_print!c [c imp uchar]   = "'" + escape_string!(print!c) + "'";;
+fun canonical_print!c [c imp bool]    = print!c;;
+fun canonical_print!c [c imp range]   = print!c;;
+fun canonical_print!c [c imp tuple]   = "[I don't know how to print a tuple]";;
 fun canonical_print!c               = print_typename!c + `"` + 
                                       escape_string!(print!c) + `"`;;
-fun canonical_print!c [c : special] = print!c;;
-fun canonical_print!c [c : infty] = "infty";;
-fun canonical_print!c [c : neginfty] = "neginfty";;
+fun canonical_print!c [c imp special] = print!c;;
+fun canonical_print!c [c imp infty] = "infty";;
+fun canonical_print!c [c imp neginfty] = "neginfty";;
 
 //I don't think that we want this definition
 //fun canonical_print!c = "cannot print this thing";;
