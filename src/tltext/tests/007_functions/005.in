@@ -1,5 +1,5 @@
 fun foo.a | true = 42;;
-fun foo.a [a : 5] = 5;;
+fun foo.a [a is 5] = 5;;
 %%
 foo.4;;
 foo.5;;

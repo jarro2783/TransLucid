@@ -1,7 +1,7 @@
 %%
 RETURN ;;
 $$
-var RETURN [time:2] = 1000 ;;
+var RETURN [time is 2] = 1000 ;;
 %%
 RETURN ;;
 $$

@@ -2,6 +2,8 @@ data BinaryTree ;;
 constructor BinNode a b c [b : BinaryTree, c: BinaryTree] = BinaryTree ;;
 constructor BinLeaf a = BinaryTree ;;
 
+//var BinaryTree = [type is "BinaryTree"] ;;
+
 //fun BinNode.a.b.c =
 //[type <- "BinaryTree", cons <- "BinNode",
 //arg0 <- a, arg1 <- b, arg2 <- c] ;;

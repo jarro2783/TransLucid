@@ -1,5 +1,5 @@
-fun foo.a.b [a : intmp, b : intmp] = if a > b then a else b fi;;
-fun foo.a.b [a : ustring, b : ustring] = "strings";;
+fun foo.a.b [a imp intmp, b imp intmp] = if a > b then a else b fi;;
+fun foo.a.b [a imp ustring, b imp ustring] = "strings";;
 %%
 foo.1.2;;
 foo.2.1;;

@@ -1,7 +1,7 @@
 op ** = OpInfix."exponent".false.AssocRight.400;;
 op ^  = OpInfix."exponent".false.AssocRight.400;;
 
-fun exponent!a!b [a : intmp, b : intmp] = pow!b!a;;
+fun exponent!a!b [a imp intmp, b imp intmp] = pow!b!a;;
 
 fun pow!n = g
 where
