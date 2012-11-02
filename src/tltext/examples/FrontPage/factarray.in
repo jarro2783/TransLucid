@@ -1,5 +1,5 @@
 dim d;;
-var fact [d : 0] = 1;;
+var fact [d is 0] = 1;;
 var fact [d : pos] = #.d * (fact @ [d <- #.d - 1]);;
 %%
 fact @ [d <- 500];;

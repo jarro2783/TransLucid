@@ -1,5 +1,5 @@
 fun fold.d.fn X = f where 
-  var f [d : 0] = X;;
+  var f [d is 0] = X;;
   var f [d : pos] = fn!X!(prev.d f);;
 end;;
 

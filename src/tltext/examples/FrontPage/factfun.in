@@ -1,7 +1,7 @@
 fun fact.n = f
 where
   dim d <- n;;
-  var f [d : 0] = 1;;
+  var f [d is 0] = 1;;
   var f [d : pos] = #.d * (prev.d f);;
 end;;
 %%
