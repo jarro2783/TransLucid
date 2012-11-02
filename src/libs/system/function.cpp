@@ -177,21 +177,21 @@ fixupGuardArgs(const Tree::Expr& guard,
     return guard;
   }
 
-  //the guard must be a tuple
-  const Tree::TupleExpr& tuple = get<Tree::TupleExpr>(guard);
+  //the guard must be a region
+  const Tree::RegionExpr& region = get<Tree::RegionExpr>(guard);
 
-  decltype(tuple.pairs) rewritten;
+  decltype(region.entries) rewritten;
 
-  for (auto& p : tuple.pairs)
+  for (auto& p : region.entries)
   {
-    const Tree::IdentExpr* id = get<Tree::IdentExpr>(&p.first);
+    const Tree::IdentExpr* id = get<Tree::IdentExpr>(&std::get<0>(p));
     if (id != nullptr)
     {
       auto iter = rewrites.find(id->text);
       if (iter != rewrites.end())
       {
-        rewritten.push_back(std::make_pair(
-          Tree::DimensionExpr(iter->second), p.second));
+        rewritten.push_back(std::make_tuple(
+          Tree::DimensionExpr(iter->second), std::get<1>(p), std::get<2>(p)));
       }
       else
       {
@@ -204,7 +204,7 @@ fixupGuardArgs(const Tree::Expr& guard,
     }
   }
 
-  return Tree::TupleExpr{rewritten};
+  return Tree::RegionExpr{rewritten};
 }
 
 }

@@ -111,10 +111,12 @@ namespace TransLucid
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"is_signed"}
         },
-        Tree::TupleExpr(
+        Tree::RegionExpr(
         {
-          {Tree::IdentExpr(U"prec"), mpz_class(size)},
-          {Tree::IdentExpr(U"is_signed"), is_signed},
+          std::make_tuple
+          (Tree::IdentExpr(U"prec"), Region::Containment::IS, mpz_class(size)),
+          std::make_tuple
+          (Tree::IdentExpr(U"is_signed"), Region::Containment::IS,  is_signed),
         }),
         Tree::Expr(),
         Tree::IdentExpr(name + op)
@@ -136,9 +138,10 @@ namespace TransLucid
         {
           {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"prec"},
         },
-        Tree::TupleExpr(
+        Tree::RegionExpr(
         {
-          {Tree::IdentExpr(U"prec"), mpz_class(size)},
+          std::make_tuple(
+          Tree::IdentExpr(U"prec"), Region::Containment::IS, mpz_class(size)),
         }),
         Tree::Expr(),
         Tree::IdentExpr(name + op)

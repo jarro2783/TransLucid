@@ -94,12 +94,16 @@ TLText::TLText
     Parser::Equation
     (
       U"returnval", 
-      Tree::TupleExpr
-      (
+      Tree::RegionExpr(
+      {
+        Tree::RegionExpr::Entry
         {
-          {Tree::DimensionExpr(U"slot"), mpz_class(0)}
+          Tree::DimensionExpr(U"slot"), 
+          Region::Containment::IS,
+          mpz_class(0)
         }
-      ),
+      })
+      ,
       Tree::Expr(), 
       Tree::IdentExpr(U"RETURN")
     )
@@ -225,11 +229,21 @@ TLText::run()
         m_system.addAssignment(Parser::Equation
         (
           U"demand",
-          Tree::TupleExpr
+          Tree::RegionExpr
           (
             {
-              {Tree::DimensionExpr(U"time"), mpz_class(time)},
-              {Tree::DimensionExpr(U"slot"), mpz_class(slot)}
+              Tree::RegionExpr::Entry
+              {
+                Tree::DimensionExpr(U"time"), 
+                Region::Containment::IS,
+                mpz_class(time)
+              },
+              Tree::RegionExpr::Entry
+              {
+                Tree::DimensionExpr(U"slot"), 
+                Region::Containment::IS,
+                mpz_class(slot)
+              }
             }
           ),
           Tree::Expr(),

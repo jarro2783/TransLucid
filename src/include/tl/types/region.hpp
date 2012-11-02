@@ -1,5 +1,5 @@
 /* The tuple type.
-   Copyright (C) 2011, 2012 Jarryd Beck
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -17,22 +17,23 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TYPES_TUPLE_HPP_INCLUDED
-#define TYPES_TUPLE_HPP_INCLUDED
+#ifndef TL_TYPES_REGION_HPP_INCLUDED
+#define TL_TYPES_REGION_HPP_INCLUDED
 
+#include <tl/region.hpp>
 #include <tl/types.hpp>
 
 namespace TransLucid
 {
   namespace Types
   {
-    namespace Tuple
+    namespace Region
     {
       Constant
-      create(const TransLucid::Tuple& t);
+      create(const TransLucid::Region& r);
 
-      const TransLucid::Tuple&
-      get(const Constant& c);
+      const TransLucid::Region&
+      get(const Constant& r);
 
       bool 
       equality(const Constant& lhs, const Constant& rhs);
@@ -42,9 +43,9 @@ namespace TransLucid
 
       bool
       less(const Constant& lhs, const Constant& rhs);
+
     }
   }
 }
 
 #endif
-

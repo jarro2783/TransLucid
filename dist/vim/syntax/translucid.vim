@@ -8,11 +8,13 @@ sy keyword      tlDecl             var fun op assign hd dim data constructor
 sy keyword      tlConditional      if then else elsif fi
 sy keyword      tlWhere            where end
 sy keyword      tlBool             true false
+sy keyword      tlBestfit          imp is
 
 hi def link     tlDecl             Type
 hi def link     tlConditional      Conditional
 hi def link     tlWhere            Conditional
 hi def link     tlBool             Constant
+hi def link     tlBestfit          Type
 
 sy match        Error              "\<0[1-9a-zA-Z]\>"
 sy match        tlDecimalNumber    "\~\?\<[1-9][0-9]*\>"

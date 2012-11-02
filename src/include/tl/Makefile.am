@@ -32,7 +32,8 @@ includes_HEADERS = \
   line_tokenizer.hpp mpl.hpp \
   object_registry.hpp opdef.hpp output.hpp \
   parser_api.hpp parser_defs.hpp parser_iterator.hpp \
-  range.hpp registries.hpp rename.hpp semantic_transform.hpp semantics.hpp \
+  range.hpp region.hpp registries.hpp rename.hpp semantic_transform.hpp \
+  semantics.hpp \
   set_types.hpp system.hpp system_object.hpp system_util.hpp \
   tree_printer.hpp tree_rewriter.hpp tree_to_wstree.hpp trie.hpp \
   types.hpp types_basic.hpp types_fwd.hpp types_util.hpp utility.hpp \

@@ -35,6 +35,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/demand.hpp>
 #include <tl/types/dimension.hpp>
 #include <tl/types/function.hpp>
+#include <tl/types/region.hpp>
 #include <tl/types/special.hpp>
 #include <tl/types/tuple.hpp>
 #include <tl/types/intension.hpp>
@@ -744,6 +745,36 @@ Constant
 UCharConstWS::operator()(Context& kappa, Context& delta)
 {
   return operator()(kappa);
+}
+
+
+Constant
+RegionWS::operator()(Context& k)
+{
+  Region::Entries entries;
+
+  for (const auto& entry : m_entries)
+  {
+    Constant lhs = (*std::get<0>(entry))(k);
+    Constant rhs = (*std::get<2>(entry))(k);
+    entries.insert(
+      std::make_pair(
+        m_system.getDimensionIndex(lhs), 
+        std::make_pair(
+          std::get<1>(entry), 
+          rhs
+        )
+      )
+    );
+  }
+
+  return Types::Region::create(Region(entries));
+}
+
+Constant
+RegionWS::operator()(Context& kappa, Context& delta)
+{
+  return Constant();
 }
 
 Constant

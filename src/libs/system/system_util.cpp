@@ -39,8 +39,15 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
         {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
       //gcc 4.7.0 appears to be broken
       //Tree::TupleExpr({{Tree::IdentExpr(U"c"), Tree::IdentExpr(type)}}),
-      Tree::TupleExpr(Tree::TupleExpr::TuplePairs
-        {{Tree::IdentExpr(U"c"), Tree::IdentExpr(type)}}),
+      Tree::RegionExpr(Tree::RegionExpr::Entries
+      {
+        Tree::RegionExpr::Entry
+        {
+          Tree::IdentExpr(U"c"), 
+          Region::Containment::IN,
+          Tree::IdentExpr(type)
+        }
+      }),
       Tree::Expr(),
       Tree::BangAppExpr(Tree::IdentExpr(basefn), Tree::IdentExpr(U"c"))
     }
@@ -56,8 +63,15 @@ addPrinter(System& s, const u32string& type, const u32string& basefn)
       {{Parser::FnDecl::ArgType::CALL_BY_VALUE, U"c"}},
       //same here
       //Tree::TupleExpr({{Tree::IdentExpr(U"c"), Tree::IdentExpr(type)}}),
-      Tree::TupleExpr(Tree::TupleExpr::TuplePairs
-        {{Tree::IdentExpr(U"c"), Tree::IdentExpr(type)}}),
+      Tree::RegionExpr(Tree::RegionExpr::Entries
+      {
+        Tree::RegionExpr::Entry
+        {
+          Tree::IdentExpr(U"c"), 
+          Region::Containment::IN,
+          Tree::IdentExpr(type)
+        }
+      }),
       Tree::Expr(),
       type
     }
@@ -79,7 +93,12 @@ addConstructor(System& s, const u32string& type, const u32string& basefn)
         {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"t"},
         {Parser::FnDecl::ArgType::CALL_BY_VALUE, U"v"}
       },
-      Tree::TupleExpr({{Tree::IdentExpr(U"t"), type}}),
+      Tree::RegionExpr({
+        Tree::RegionExpr::Entry{
+          Tree::IdentExpr(U"t"), 
+          Region::Containment::IN,
+          type
+        }}),
       Tree::Expr(),
       Tree::BangAppExpr(Tree::IdentExpr(basefn), Tree::IdentExpr(U"v"))
     }

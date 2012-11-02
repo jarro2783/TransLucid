@@ -214,6 +214,20 @@ WorkshopBuilder::operator()(const Tree::HashExpr& e)
 }
 
 WS*
+WorkshopBuilder::operator()(const Tree::RegionExpr& e)
+{
+  Workshops::RegionWS::EntryWorkshops entries;
+  for (auto& v : e.entries)
+  {
+    WS* lhs = apply_visitor(*this, std::get<0>(v));
+    WS* rhs = apply_visitor(*this, std::get<2>(v));
+    entries.push_back(std::make_tuple(lhs, std::get<1>(v), rhs));
+  }
+
+  return new Workshops::RegionWS(*m_system, entries);
+}
+
+WS*
 WorkshopBuilder::operator()(const Tree::TupleExpr& e)
 {
   std::list<std::pair<WS*, WS*>> elements;

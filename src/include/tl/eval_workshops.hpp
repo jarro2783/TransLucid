@@ -370,6 +370,46 @@ namespace TransLucid
     };
 
     /**
+     * A region creation workshop.
+     */
+    class RegionWS : public WS
+    {
+      public:
+
+      typedef std::vector<std::tuple<WS*, Region::Containment, WS*>>
+        EntryWorkshops;
+
+      RegionWS(System& system, const EntryWorkshops& entries)
+      : m_system(system), m_entries(entries)
+      {
+      }
+
+      Constant
+      operator()(Context& k);
+
+      Constant
+      operator()(Context& kappa, Context& delta);
+
+      private:
+      System& m_system;
+      EntryWorkshops m_entries;
+
+      public:
+
+      const decltype(m_entries)&
+      getEntries() const
+      {
+        return m_entries;
+      }
+
+      System&
+      getSystem() const
+      {
+        return m_system;
+      }
+    };
+
+    /**
      * A tuple creation workshop.
      */
     class TupleWS : public WS

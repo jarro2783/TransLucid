@@ -22,6 +22,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 #include <tl/tree_printer.hpp>
 #include <tl/types/demand.hpp>
+#include <tl/types/region.hpp>
+#include <tl/types/tuple.hpp>
+#include <tl/types/union.hpp>
 #include <tl/utility.hpp>
 #include <tl/workshop_builder.hpp>
 
@@ -36,6 +39,273 @@ static constexpr size_t LINEAR_SEARCH_MAX_SIZE = 7;
 
 namespace TransLucid
 {
+
+namespace
+{
+  //is a a subset of b
+  typedef bool (*IsSubsetFn)(const Constant& a, const Constant& b);  
+
+  //returns a function that determines if the parameter is a subset of
+  //the particular type that it handles
+  typedef IsSubsetFn (*IsSubsetOf)(const Constant&);
+
+  //several things are immediately false
+  bool
+  issubset_false(const Constant&, const Constant&)
+  {
+    return false;
+  }
+
+  bool
+  constants_equal(const Constant& a, const Constant& b)
+  {
+    return a == b;
+  }
+
+  template <typename T>
+  struct TupleLookup;
+
+  template <>
+  struct TupleLookup<Tuple>
+  {
+    Constant
+    operator()(const Tuple& t, dimension_index dim)
+    {
+      auto iter = t.find(dim);
+
+      if (iter == t.end())
+      {
+        return Types::Special::create(SP_DIMENSION);
+      }
+      else
+      {
+        return iter->second;
+      }
+    }
+  };
+
+  template <>
+  struct TupleLookup<Context>
+  {
+    Constant
+    operator()(const Context& k, dimension_index dim)
+    {
+      return k.lookup(dim);
+    }
+  };
+
+  template <typename T>
+  bool
+  regionApplicable(const Region& r, const T& t)
+  {
+    for (const auto& set : r) 
+    {
+      Constant val = TupleLookup<T>()(t, set.first);
+      if (!valueInside(val, set.second.first, set.second.second))
+      {
+        return false;
+      }
+    }
+
+    //if def has nothing it is applicable
+    return true;
+  }
+
+  //there are several types that can only be compared with something
+  //of the same type, instead of writing the code several times for
+  //each, we will use templates.
+  //In that case, constant equality works fine.
+  template <type_index T>
+  IsSubsetFn
+  isSubsetAtomic(const Constant& c)
+  {
+    if (c.index() != T)
+    {
+      return &issubset_false;
+    }
+    else
+    {
+      return &constants_equal;
+    }
+  }
+
+  //TODO: work out tuples and tuple sets
+  //this currently returns false if the two are equal
+  //we probably want it to be true, but in some cases we want it to
+  //be false, so we have to work out what it all means
+  bool
+  tuple_subset_tuple(const Constant& sub, const Constant& super)
+  {
+    //std::cerr << "tuple subset in bestfit :)" << std::endl;
+    //bool r = 
+    return 
+    tupleRefines
+    (
+      Types::Tuple::get(sub),
+      Types::Tuple::get(super),
+      true
+    );
+
+    //std::cerr << "refines = " << r << std::endl;
+    //return r;
+  }
+
+  IsSubsetFn 
+  subset_of_region(const Constant& c)
+  {
+    if (c.index() == TYPE_INDEX_TUPLE)
+    {
+      return [] (const Constant& a, const Constant& b) -> bool
+      {
+        //b is the region, a is a tuple
+        return regionApplicable(Types::Region::get(b), Types::Tuple::get(a));
+      };
+    }
+    else if (c.index() == TYPE_INDEX_REGION)
+    {
+      return [] (const Constant& a, const Constant& b) -> bool
+      {
+        return regionSubset(Types::Region::get(a), Types::Region::get(b), 
+          true);
+      };
+    }
+
+    return &issubset_false;
+  }
+
+  IsSubsetFn 
+  subset_of_tuple(const Constant& c)
+  {
+    if (c.index() != TYPE_INDEX_TUPLE)
+    {
+      return &issubset_false;
+    }
+    else
+    {
+      return &tuple_subset_tuple;
+    }
+  }
+
+  IsSubsetFn
+  subset_of_range(const Constant& c)
+  {
+    //at the moment we can only do ranges of integers
+    
+    if (c.index() == TYPE_INDEX_INTMP)
+    {
+      //lambda functions to the rescue
+      return [] (const Constant& a, const Constant& b)
+        {
+          //a is an int, b is a range
+          return Types::Range::get(b).within(Types::Intmp::get(a));
+        }
+      ;
+    }
+    else if (c.index() == TYPE_INDEX_RANGE)
+    {
+      return [] (const Constant& a, const Constant& b)
+        {
+          //a is a range, b is a range
+          return Types::Range::get(b).within(Types::Range::get(a));
+        }
+      ;
+    }
+    else
+    {
+      return &issubset_false;
+    }
+  }
+
+  IsSubsetFn
+  subset_of_type(const Constant& c)
+  {
+    return [] (const Constant& a, const Constant& b)
+      {
+        if (a.index() == TYPE_INDEX_TYPE)
+        {
+          return a == b;
+        }
+        //b is a type, a is anything
+        return (a.index() == get_constant<type_index>(b));
+      }
+    ;
+  }
+
+  bool subset_union_constant(const Constant& a, const Constant& b)
+  {
+    //a is a union
+    const UnionType& u = Types::Union::get(b);
+
+    return u.contains(a);
+  }
+
+  bool subset_union_union(const Constant& a, const Constant& b)
+  {
+    return false;
+  }
+
+  IsSubsetFn
+  subset_of_union(const Constant& c)
+  {
+    if (c.index() == TYPE_INDEX_UNION)
+    {
+      return &subset_union_union;
+    }
+    else
+    {
+      return &subset_union_constant;
+    }
+  }
+
+  class TypeComparators
+  {
+    public:
+
+    TypeComparators()
+    {
+      m_funs = new IsSubsetOf[NUM_FUNS]
+        {
+          &isSubsetAtomic<TYPE_INDEX_ERROR>,
+          &isSubsetAtomic<TYPE_INDEX_BOOL>,
+          &isSubsetAtomic<TYPE_INDEX_SPECIAL>,
+          &isSubsetAtomic<TYPE_INDEX_INTMP>,
+          &isSubsetAtomic<TYPE_INDEX_UCHAR>,
+          &isSubsetAtomic<TYPE_INDEX_USTRING>,
+          &isSubsetAtomic<TYPE_INDEX_FLOATMP>,
+          &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
+          &subset_of_region,
+          &subset_of_tuple,
+          &subset_of_type,
+          &subset_of_range,
+          &subset_of_union
+        };
+    }
+
+    ~TypeComparators()
+    {
+      delete [] m_funs;
+    }
+
+    IsSubsetOf
+    getComparator(type_index t)
+    {
+      if (t < NUM_FUNS)
+      {
+        return m_funs[t];
+      }
+      else
+      {
+        return nullptr;
+      }
+    }
+
+    private:
+    static const int NUM_FUNS = TYPE_INDEX_UNION + 1;
+    IsSubsetOf* m_funs;
+  };
+
+  static TypeComparators typeCompare;
+}
 
 //TODO finish this
 //the choice of how to best fit will very much depend on properties of the
@@ -279,7 +549,7 @@ BestfitGroup::evaluate(Context& k)
 }
 
 template <typename... Delta>
-std::pair<bool, Tuple>
+std::pair<bool, std::shared_ptr<Region>>
 EquationGuard::evaluate(Context& k, Delta&&... delta) const
 {
   if (!m_compiled)
@@ -289,7 +559,7 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
 
   bool nonspecial = true;
   m_demands.clear();
-  tuple_t t = m_dimConstConst;
+  Region::Entries t = m_dimConstConst;
 
   if (m_guard)
   {
@@ -298,7 +568,7 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
     //evaluate the ones left
     for (const auto& constNon : m_dimConstNon)
     {
-      Constant ord = constNon.second->operator()(k, delta...);
+      Constant ord = constNon.second.second->operator()(k, delta...);
 
       if (ord.index() == TYPE_INDEX_DEMAND)
       {
@@ -307,7 +577,8 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
       }
       else
       {
-        t.insert(std::make_pair(constNon.first, ord));
+        t.insert(std::make_pair(constNon.first,
+          std::make_pair(constNon.second.first, ord)));
       }
     }
 
@@ -331,14 +602,15 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
           ? get_constant<dimension_index>(dim)
           : m_system->getDimensionIndex(dim);
 
-        t.insert(std::make_pair(index, nonConst.second));
+        t.insert(std::make_pair(index, 
+          std::make_pair(nonConst.second.first, nonConst.second.second)));
       }
     }
 
     for (const auto& nonNon : m_dimNonNon)
     {
       Constant dim = nonNon.first->operator()(k, delta...);
-      Constant ord = nonNon.second->operator()(k, delta...);
+      Constant ord = nonNon.second.second->operator()(k, delta...);
 
       if (dim.index() == TYPE_INDEX_SPECIAL)
       {
@@ -368,14 +640,15 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
           ? get_constant<dimension_index>(dim)
           : m_system->getDimensionIndex(dim);
 
-        t.insert(std::make_pair(index, ord));
+        t.insert(std::make_pair(index, 
+          std::make_pair(nonNon.second.first, ord)));
       }
     }
   }
 
   //the tuple doesn't matter here if nonspecial is false, the false
   //says ignore the result
-  return std::make_pair(nonspecial, Tuple(t));
+  return std::make_pair(nonspecial, std::make_shared<Region>(t));
 }
 
 //how to bestfit with a cache
@@ -419,7 +692,7 @@ ConditionalBestfitWS::bestfit(const applicable_list& applicable, Context& k,
     for (applicable_list::const_iterator j = applicable.begin();
          j != applicable.end(); ++j)
     {
-      if (i != j && !tupleRefines(std::get<0>(*i), std::get<0>(*j), true))
+      if (i != j && !regionSubset(*std::get<0>(*i), *std::get<0>(*j), true))
       {
         best = false;
       }
@@ -554,7 +827,7 @@ ConditionalBestfitWS::operator()(Context& k)
         const EquationGuard& guard = eqn_i->validContext();
         auto result = guard.evaluate(k);
 
-        if (result.first && tupleApplicable(result.second, k)
+        if (result.first && regionApplicable(*result.second, k)
           && booleanTrue(guard, k)
         )
         {
@@ -565,7 +838,7 @@ ConditionalBestfitWS::operator()(Context& k)
       else
       {
         applicable.push_back
-          (ApplicableTuple(Tuple(), eqn_i));
+          (ApplicableTuple(std::make_shared<Region>(), eqn_i));
       }
     }
   }
@@ -610,16 +883,15 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
 
         if (result.first)
         {
-          Tuple evalContext = result.second;
           std::copy(guard.demands().begin(), guard.demands().end(),
             std::back_inserter(demands));
 
-          potential.push_back(ApplicableTuple(evalContext, eqn_i));
+          potential.push_back(ApplicableTuple(result.second, eqn_i));
         }
       }
       else
       {
-        potential.push_back(ApplicableTuple(Tuple(), eqn_i));
+        potential.push_back(ApplicableTuple(std::make_shared<Region>(), eqn_i));
       }
     }
 
@@ -632,7 +904,7 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
     for (const auto& p : potential)
     {
       const auto& context = std::get<0>(p);
-      if (context.begin() == context.end())
+      if (context->begin() == context->end())
       {
         applicable.push_back(p);
       }
@@ -640,7 +912,7 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
       {
         //check that all the dimensions in context are in delta
         bool hasdemands = false;
-        for (const auto& index : context)
+        for (const auto& index : *context)
         {
           if (!delta.has_entry(index.first))
           {
@@ -651,7 +923,7 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
 
         //don't bother doing this if there are dimensions not available
         //booleanTrue returns false if there are demands
-        if (!hasdemands && tupleApplicable(context, kappa)
+        if (!hasdemands && regionApplicable(*context, kappa)
           && booleanTrue(std::get<1>(p)->validContext(), kappa, delta,
                demands)
         )
@@ -708,20 +980,20 @@ EquationGuard::compile() const
   k.perturb(DIM_TIME, Types::Intmp::create(0));
 
   //some trickery to evaluate guards at compile time
-  Workshops::TupleWS* t = dynamic_cast<Workshops::TupleWS*>(m_guard.get());
+  Workshops::RegionWS* t = dynamic_cast<Workshops::RegionWS*>(m_guard.get());
 
   //For now guards must be a literal tuple
   if (t != nullptr)
   {
-    const auto& pairs = t->getElements();
+    const auto& entries = t->getEntries();
     System& s = t->getSystem();
     m_system = &s;
 
-    for (const auto& val : pairs)
+    for (const auto& val : entries)
     {
       bool lhsConst = true;
       bool rhsConst = true;
-      Constant lhs = val.first->operator()(k);
+      Constant lhs = std::get<0>(val)->operator()(k);
 
       if (lhs.index() == TYPE_INDEX_SPECIAL)
       {
@@ -733,7 +1005,7 @@ EquationGuard::compile() const
         ? get_constant<dimension_index>(lhs)
         : s.getDimensionIndex(lhs);
 
-      Constant rhs = val.second->operator()(k);
+      Constant rhs = std::get<2>(val)->operator()(k);
 
       if (rhs.index() == TYPE_INDEX_SPECIAL)
       {
@@ -747,22 +1019,26 @@ EquationGuard::compile() const
       {
         if (rhsConst)
         {
-          m_dimConstConst.insert(std::make_pair(dimIndex, rhs));
+          m_dimConstConst.insert(std::make_pair(dimIndex, 
+            std::make_pair(std::get<1>(val), rhs)));
         }
         else
         {
-          m_dimConstNon.insert(std::make_pair(dimIndex, val.second));
+          m_dimConstNon.insert(std::make_pair(dimIndex, 
+            std::make_pair(std::get<1>(val), std::get<2>(val))));
         }
       }
       else
       {
         if (rhsConst)
         {
-          m_dimNonConst.insert(std::make_pair(val.first, rhs));
+          m_dimNonConst.insert(std::make_pair(std::get<0>(val), 
+            std::make_pair(std::get<1>(val), rhs)));
         }
         else
         {
-          m_dimNonNon.insert(std::make_pair(val.first, val.second));
+          m_dimNonNon.insert(std::make_pair(std::get<0>(val), 
+            std::make_pair(std::get<1>(val), std::get<2>(val))));
         }
       }
       #if 0
@@ -780,9 +1056,9 @@ EquationGuard::compile() const
     auto priorityIter = m_dimConstConst.find(DIM_PRIORITY);
     if (priorityIter != m_dimConstConst.end())
     {
-      if (priorityIter->second.index() == TYPE_INDEX_INTMP)
+      if (priorityIter->second.second.index() == TYPE_INDEX_INTMP)
       {
-        m_priority = Types::Intmp::get(priorityIter->second).get_si();
+        m_priority = Types::Intmp::get(priorityIter->second.second).get_si();
         m_dimConstConst.erase(priorityIter);
       }
     }
@@ -791,8 +1067,8 @@ EquationGuard::compile() const
   }
   else
   {
-    std::cerr << "guard is not a tuple" << std::endl;
-    throw "guard is not a tuple";
+    std::cerr << "guard is not a region" << std::endl;
+    throw "guard is not a region";
   }
 }
 
@@ -837,6 +1113,199 @@ CompiledEquationWS::CompiledEquationWS
 , m_provenance(provenance)
 , m_priority(0)
 {
+}
+
+//is region a a subset of region b?
+bool
+regionSubset(const Region& a, const Region& b, bool canequal)
+{
+  #if 0
+  std::cerr << "== tuple refines ==" << std::endl;
+  a.print(std::cerr);
+  std::cerr << std::endl;
+  b.print(std::cerr);
+  std::cerr << std::endl;
+  #endif
+  //for a to refine b, everything in b must be in a, and for the values that 
+  //are, they have to be either equal, or their ranges must be more specific
+  //but a cannot equal b
+  bool equal = true;
+  auto it1 = a.begin();
+  auto it2 = b.begin();
+  while (it1 != a.end() && it2 != b.end())
+  {
+    type_index d1 = it1->first;
+    type_index d2 = it2->first;
+
+    //std::cerr << "tuples have dimensions: " << d1 << " and " << d2 << 
+    //  std::endl;
+
+    //extra dimension in b
+    if (d2 < d1)
+    {
+      //std::cerr << "no by extra dimension" << std::endl;
+      return false;
+    }
+
+    //extra dimension in a
+    if (d2 > d1)
+    {
+      ++it1;
+      //a is more specific if the rest passes
+      equal = false;
+      //std::cerr << "not equal by dimension" << std::endl;
+      continue;
+    }
+
+    auto spec1 = it1->second.first;
+    auto spec2 = it2->second.first;
+
+    //first check if the specifiers are the same
+    if (spec1 != spec2)
+    {
+      //if they are different and they aren't "is" and ":", then we don't have
+      //a subset relationship
+      if (!(spec1 == Region::Containment::IS && 
+              (spec2 == Region::Containment::IN || 
+               spec2 == Region::Containment::IMP
+              )
+          ))
+      {
+        return false;
+      }
+      //otherwise a is an "is" and b is a ":", so continue
+    }
+    else
+    {
+      //if they are the same, then it depends on the exact values
+      if (!valueSmaller(it1->second.second, it1->second.first, 
+          it2->second.second))
+      {
+        //std::cerr << "no by not refines" << std::endl;
+        //std::cerr << it1->first << ", " << it2->first << std::endl;
+        //std::cerr << it1->second.index() << ", " << it2->second.index() 
+        //  << std::endl;
+        return false;
+      }
+      //if they both refine each other they are equal
+      else if (!valueSmaller(it2->second.second, it1->second.first,
+               it1->second.second))
+      {
+        //the a value is contained in the b value, so a is more
+        //specific as long as the rest passes
+        equal = false;
+        //std::cerr << "not equal by value" << std::endl;
+      }
+    }
+
+    ++it1;
+    ++it2;
+  }
+
+  if (it2 != b.end())
+  {
+    //b has stuff left, can't refine
+    //std::cerr << "no by b iter not at end" << std::endl;
+    return false;
+  }
+
+  if (it1 != a.end())
+  {
+    //there is stuff left in a that was never checked
+    //therefore it refines
+    //std::cerr << "refines" << std::endl;
+    return true;
+  }
+
+  //if we get here then a is either equal to b or refines it
+  //if not equal then the variable equal would have been changed somewhere
+  //std::cerr << (!equal ? "yes" : "no") << std::endl;
+  return !equal || canequal;
+}
+
+//does value a refine value b
+bool
+valueRefines(const Constant& a, const Constant& b)
+{
+  //this is implemented by creating a matrix of function pointers
+  //which is as big as the largest type index that we need to consider
+
+  //std::cerr << "== value refines ==" << std::endl;
+  //std::cerr << a << " r " << b << std::endl;
+  //if b is a range, a has to be a range and within or equal,
+  //or an int and inside, otherwise they have to be equal
+
+  IsSubsetOf f = typeCompare.getComparator(b.index());
+  if (f != 0)
+  {
+    IsSubsetFn sub = f(a);
+    return sub(a, b);
+  }
+  else
+  {
+    //there is no comparator, just check if they are equal
+    return a == b;
+  }
+}
+
+bool
+valueInside
+(
+  const Constant& smaller, 
+  Region::Containment specifier, 
+  const Constant& bigger
+)
+{
+  switch (specifier)
+  {
+    case Region::Containment::IN:
+    //here we check if smaller is a subset of bigger
+    return valueRefines(smaller, bigger);
+    break;
+
+    case Region::Containment::IS:
+    return smaller == bigger;
+    break;
+
+    case Region::Containment::IMP:
+    if (bigger.index() == TYPE_INDEX_TYPE)
+    {
+      return smaller.index() == get_constant<type_index>(bigger);
+    }
+    return false;
+    break;
+  }
+
+  //this is to satisfy the compiler that we have a return value
+  return false;
+}
+
+bool
+valueSmaller
+(
+  const Constant& smaller, 
+  Region::Containment specifier, 
+  const Constant& bigger
+)
+{
+  switch (specifier)
+  {
+    case Region::Containment::IN:
+    //here we check if smaller is a subset of bigger
+    return valueRefines(smaller, bigger);
+    break;
+
+    case Region::Containment::IS:
+    return smaller == bigger;
+    break;
+
+    case Region::Containment::IMP:
+    return smaller == bigger;
+    break;
+  }
+
+  //this is to satisfy the compiler that we have a return value
+  return false;
 }
 
 } //namespace TransLucid

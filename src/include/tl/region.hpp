@@ -1,5 +1,5 @@
 /* A region.
-   Copyright (C) 2009-2012 Jarryd Beck
+   Copyright (C) 2012 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -22,6 +22,14 @@ along with TransLucid; see the file COPYING.  If not see
  * The region object.
  */
 
+#ifndef TL_REGION_HPP_INCLUDED
+#define TL_REGION_HPP_INCLUDED
+
+#include <utility>
+#include <vector>
+
+#include <tl/types.hpp>
+
 namespace TransLucid
 {
   class Region
@@ -31,8 +39,58 @@ namespace TransLucid
     enum class Containment
     {
       IS,
-      SUBSET,
+      IN,
       IMP
     };
+
+    typedef std::map<dimension_index, std::pair<Containment, Constant>> 
+      Entries;
+
+    Region() = default;
+
+    Region(Entries entries)
+    : m_entries(entries)
+    {
+    }
+
+    bool
+    operator==(const Region& rhs) const;
+
+    bool
+    operator<(const Region& rhs) const;
+
+    size_t
+    hash() const;
+
+    private:
+    Entries m_entries;
+
+    public:
+
+    Entries::const_iterator
+    begin() const
+    {
+      return m_entries.begin();
+    }
+
+    Entries::const_iterator
+    end() const
+    {
+      return m_entries.end();
+    }
+
+    Entries::iterator
+    begin()
+    {
+      return m_entries.begin();
+    }
+
+    Entries::iterator
+    end()
+    {
+      return m_entries.end();
+    }
   };
 }
+
+#endif
