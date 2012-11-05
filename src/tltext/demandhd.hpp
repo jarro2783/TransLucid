@@ -46,7 +46,7 @@ namespace TransLucid
         return m_results.at(i);
       }
 
-      Tuple
+      Region
       variance() const;
 
       void

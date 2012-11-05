@@ -64,17 +64,22 @@ DemandHD::put(const Context& k, const Constant& c)
   }
 }
 
-Tuple
+Region
 DemandHD::variance() const
 {
   mpz_class lhs = 0;
 
-  tuple_t v
+  return Region
   {
-    {m_slot, Types::Range::create(Range(&lhs, nullptr))}
+    {
+      {m_slot, 
+        {
+          Region::Containment::IN,
+          Types::Range::create(Range(&lhs, nullptr))
+        }
+      }
+    }
   };
-
-  return Tuple(v);
 }
 
 void

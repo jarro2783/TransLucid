@@ -65,7 +65,7 @@ namespace TransLucid
     private:
     type m_array;
     std::vector<mpz_class> m_bounds;
-    Tuple m_variance;
+    Region m_variance;
     std::vector<dimension_index> m_dimensionOrder;
     std::function<Constant(const T&)> m_create;
     std::function<T(const Constant&)> m_get_func;
@@ -97,7 +97,7 @@ namespace TransLucid
     {
       assert(N == bounds.size() && N == dims.size());
 
-      tuple_t variance;
+      Region::Entries variance;
       for (size_t i = 0; i != bounds.size(); ++i)
       {
         dimension_index d = dimReg.getDimensionIndex(dims[i]);
@@ -108,7 +108,10 @@ namespace TransLucid
         mpz_class a = 0;
         mpz_class b = m_bounds[i]-1;
         variance.insert(std::make_pair(d,
-          Types::Range::create(Range(&a, &b))
+          std::make_pair(
+            Region::Containment::IN,
+            Types::Range::create(Range(&a, &b))
+          )
         ));
       }
 
@@ -181,7 +184,7 @@ namespace TransLucid
       return m_array[i];
     }
 
-    Tuple
+    Region
     variance() const
     {
       return m_variance;

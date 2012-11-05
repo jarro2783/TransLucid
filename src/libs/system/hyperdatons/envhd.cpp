@@ -35,10 +35,14 @@ EnvHD::EnvHD
 )
 : InputHD(1)
 , m_dimVariable(dimReg.getDimensionIndex(U"envvar"))
-, m_variance(tuple_t
+, m_variance(Region::Entries
     {
-      {m_dimVariable,
-        Types::Type::create(typeReg.getTypeIndex(U"ustring"))
+      {
+        {
+          m_dimVariable, 
+          {Region::Containment::IN,
+           Types::Type::create(typeReg.getTypeIndex(U"ustring"))}
+        }
       }
     })
 {
@@ -63,7 +67,7 @@ EnvHD::get(const Context& index) const
   }
 }
 
-Tuple
+Region
 EnvHD::variance() const
 {
   return m_variance;

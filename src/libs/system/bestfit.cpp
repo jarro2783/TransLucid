@@ -94,23 +94,6 @@ namespace
     }
   };
 
-  template <typename T>
-  bool
-  regionApplicable(const Region& r, const T& t)
-  {
-    for (const auto& set : r) 
-    {
-      Constant val = TupleLookup<T>()(t, set.first);
-      if (!valueInside(val, set.second.first, set.second.second))
-      {
-        return false;
-      }
-    }
-
-    //if def has nothing it is applicable
-    return true;
-  }
-
   //there are several types that can only be compared with something
   //of the same type, instead of writing the code several times for
   //each, we will use templates.
@@ -184,6 +167,12 @@ namespace
     {
       return &tuple_subset_tuple;
     }
+  }
+
+  IsSubsetFn
+  subset_of_numeric(const Constant& c)
+  {
+    return &issubset_false;
   }
 
   IsSubsetFn
@@ -275,6 +264,7 @@ namespace
           &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
           &subset_of_region,
           &subset_of_tuple,
+          &subset_of_numeric,
           &subset_of_type,
           &subset_of_range,
           &subset_of_union
@@ -1223,6 +1213,90 @@ regionSubset(const Region& a, const Region& b, bool canequal)
   return !equal || canequal;
 }
 
+//I know that this is almost the exact same code as above, but what can I do?
+//Maybe they can be combined into one function
+//does a refine b
+bool
+tupleRefines(const Tuple& a, const Tuple& b, bool canequal)
+{
+  #if 0
+  std::cerr << "== tuple refines ==" << std::endl;
+  a.print(std::cerr);
+  std::cerr << std::endl;
+  b.print(std::cerr);
+  std::cerr << std::endl;
+  #endif
+  //for a to refine b, everything in b must be in a, and for the values that 
+  //are, they have to be either equal, or their ranges must be more specific
+  //but a cannot equal b
+  bool equal = true;
+  Tuple::const_iterator it1 = a.begin();
+  Tuple::const_iterator it2 = b.begin();
+  while (it1 != a.end() && it2 != b.end())
+  {
+    type_index d1 = it1->first;
+    type_index d2 = it2->first;
+
+    //std::cerr << "tuples have dimensions: " << d1 << " and " << d2 << 
+    //  std::endl;
+
+    //extra dimension in b
+    if (d2 < d1)
+    {
+      //std::cerr << "no by extra dimension" << std::endl;
+      return false;
+    }
+
+    //extra dimension in a
+    if (d2 > d1)
+    {
+      ++it1;
+      //a is more specific if the rest passes
+      equal = false;
+      //std::cerr << "not equal by dimension" << std::endl;
+      continue;
+    }
+
+    if (!valueRefines(it1->second, it2->second))
+    {
+      //std::cerr << "no by not refines" << std::endl;
+      //std::cerr << it1->first << ", " << it2->first << std::endl;
+      //std::cerr << it1->second.index() << ", " << it2->second.index() 
+      //  << std::endl;
+      return false;
+    }
+    //if they both refine each other they are equal
+    else if (!valueRefines(it2->second, it1->second))
+    {
+      //the a value is contained in the b value, so a is more
+      //specific as long as the rest passes
+      equal = false;
+      //std::cerr << "not equal by value" << std::endl;
+    }
+    ++it1;
+    ++it2;
+  }
+
+  if (it2 != b.end())
+  {
+    //b has stuff left, can't refine
+    //std::cerr << "no by b iter not at end" << std::endl;
+    return false;
+  }
+
+  if (it1 != a.end())
+  {
+    //there is stuff left in a that was never checked
+    //therefore it refines
+    //std::cerr << "refines" << std::endl;
+    return true;
+  }
+
+  //if we get here then a is either equal to b or refines it
+  //if not equal then the variable equal would have been changed somewhere
+  //std::cerr << (!equal ? "yes" : "no") << std::endl;
+  return !equal || canequal;
+}
 //does value a refine value b
 bool
 valueRefines(const Constant& a, const Constant& b)
@@ -1306,6 +1380,23 @@ valueSmaller
 
   //this is to satisfy the compiler that we have a return value
   return false;
+}
+
+template <typename T>
+bool
+regionApplicable(const Region& r, const T& t)
+{
+  for (const auto& set : r) 
+  {
+    Constant val = TupleLookup<T>()(t, set.first);
+    if (!valueInside(val, set.second.first, set.second.second))
+    {
+      return false;
+    }
+  }
+
+  //if def has nothing it is applicable
+  return true;
 }
 
 } //namespace TransLucid

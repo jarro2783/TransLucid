@@ -56,6 +56,7 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+#if 0
 namespace
 {
   //is a a subset of b
@@ -391,6 +392,7 @@ tupleRefines(const Tuple& a, const Tuple& b, bool canequal)
   //std::cerr << (!equal ? "yes" : "no") << std::endl;
   return !equal || canequal;
 }
+#endif
 
 bool
 booleanTrue(const EquationGuard& g, Context& k)

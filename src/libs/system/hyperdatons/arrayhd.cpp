@@ -50,7 +50,7 @@ ArrayHD::initialise(
   m_bounds = bounds;
 
   //make the variance tuple
-  tuple_t variance;
+  Region::Entries variance;
   mpz_class a = 0;
   for (const auto& bound : m_bounds)
   {
@@ -58,7 +58,9 @@ ArrayHD::initialise(
     //std::cerr << "bounds are " << bound.first << ": " 
     //  << 0 << ".." << b << std::endl;
     variance.insert(std::make_pair(bound.first,
-      Types::Range::create(Range(&a, &b))));
+      std::make_pair(
+        Region::Containment::IN, Types::Range::create(Range(&a, &b))
+      )));
   }
 
   m_variance = variance;
@@ -126,7 +128,7 @@ ArrayHD::commit()
 {
 }
 
-Tuple
+Region
 ArrayHD::variance() const
 {
   return m_variance;

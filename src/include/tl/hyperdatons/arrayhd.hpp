@@ -68,7 +68,7 @@ namespace TransLucid
     void
     commit();
 
-    Tuple
+    Region
     variance() const;
 
     void
@@ -82,7 +82,7 @@ namespace TransLucid
     Constant* m_data;
     std::vector<std::pair<dimension_index, size_t>> m_bounds;
     std::vector<size_t> m_multipliers;
-    Tuple m_variance;
+    Region m_variance;
 
     public:
 

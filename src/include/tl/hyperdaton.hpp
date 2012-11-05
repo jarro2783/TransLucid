@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/context.hpp>
 #include <tl/range.hpp>
+#include <tl/region.hpp>
 #include <tl/registries.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/range.hpp>
@@ -44,7 +45,7 @@ namespace TransLucid
     }
 
     virtual
-    Tuple
+    Region
     variance() const = 0;
 
     protected:

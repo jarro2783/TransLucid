@@ -676,6 +676,15 @@ namespace TransLucid
     Region::Containment specifier, 
     const Constant& bigger
   );
+  
+  //is the region r applicable for the context t, T is either a Context
+  //or a Tuple
+  template <typename T>
+  bool
+  regionApplicable(const Region& r, const T& t);
+
+  bool
+  tupleRefines(const Tuple& a, const Tuple& b, bool canequal = false);
 }
 
 #endif // BESTFIT_HPP_INCLUDED

@@ -391,8 +391,8 @@ namespace TransLucid
     InputHDMap m_inputHDs;
 
     //input and output hd declarations, for now just have the valid range
-    std::unordered_map<u32string, Tuple> m_outputHDDecls;
-    std::unordered_map<u32string, Tuple> m_inputHDDecls;
+    std::unordered_map<u32string, Region> m_outputHDDecls;
+    std::unordered_map<u32string, Region> m_inputHDDecls;
 
     //---- the sets of all the uuids of objects ----
 

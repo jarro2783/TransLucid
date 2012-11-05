@@ -37,12 +37,12 @@ namespace TransLucid
     Constant
     get(const Context& k) const;
 
-    Tuple
+    Region
     variance() const;
 
     private:
     dimension_index m_dimVariable;
-    Tuple m_variance;
+    Region m_variance;
   };
 }
 

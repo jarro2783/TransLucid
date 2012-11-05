@@ -46,7 +46,8 @@ namespace {
     OutputHD* out
   )
   {
-    Tuple variance = out->variance();
+    //Tuple variance = out->variance();
+    Region variance;
 
     //all the ranges in order
     std::vector<Range> limits;
@@ -94,7 +95,7 @@ namespace {
 
       //is the demand valid for the hyperdaton, and is the demand valid for
       //the current context
-      if (tupleApplicable(variance, evalContext) && k <= evalContext)
+      if (regionApplicable(variance, evalContext) && k <= evalContext)
       {
         out->put(evalContext, compute(evalContext));
       }

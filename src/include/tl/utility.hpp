@@ -121,11 +121,8 @@ namespace TransLucid
     return new FunctorWS<T>(f);
   }
 
-  bool
-  tupleApplicable(const Tuple& def, const Context& c);
-
-  bool
-  tupleRefines(const Tuple& a, const Tuple& b, bool canequal = false);
+  //bool
+  //tupleApplicable(const Tuple& def, const Context& c);
 
   bool
   valueRefines(const Constant& a, const Constant& b);
