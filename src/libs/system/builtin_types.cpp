@@ -43,7 +43,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/hyperdatons.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/numbers.hpp>
-#include <tl/types/numeric.hpp>
 #include <tl/types/range.hpp>
 #include <tl/types/region.hpp>
 #include <tl/types/string.hpp>
@@ -1319,89 +1318,6 @@ namespace TransLucid
       }
     }
     
-    namespace Numeric
-    {
-      Constant
-      create(const mpz_class& i)
-      {
-        return make_constant_pointer
-          (i, &intmp_type_functions, TYPE_INDEX_INTMP);
-      }
-
-      Constant
-      create(int v)
-      {
-        return create(mpz_class(v));
-      }
-
-      Constant
-      create(const Constant& text)
-      {
-        if (text.index() == TYPE_INDEX_USTRING)
-        {
-          try {
-            return create(mpz_class(
-              u32_to_ascii(get_constant_pointer<u32string>(text))));
-          }
-          catch (...)
-          {
-            return Types::Special::create(SP_CONST);
-          }
-        }
-        else
-        {
-          return Types::Special::create(SP_CONST);
-        }
-      }
-
-      const mpz_class&
-      get(const Constant& i)
-      {
-        return get_constant_pointer<mpz_class>(i);
-      }
-
-      bool 
-      equality(const Constant& lhs, const Constant& rhs)
-      {
-        return get(lhs) == get(rhs);
-      }
-
-      size_t
-      hash(const Constant& c)
-      {
-        return std::hash<mpz_class>()(get(c));
-      }
-
-      void
-      destroy(void* p)
-      {
-        delete reinterpret_cast<mpz_class*>(p);
-      }
-
-      Constant
-      print(const Constant& c)
-      {
-        const mpz_class& z = get_constant_pointer<mpz_class>(c);
-
-        if (z < 0)
-        {
-          mpz_class pos = -z;
-          return Types::String::create(
-            U"~" + to_u32string(pos.get_str()));
-        }
-        else
-        {
-          return Types::String::create(to_u32string(z.get_str()));
-        }
-      }
-
-      bool
-      less(const Constant& lhs, const Constant& rhs)
-      {
-        return get(lhs) < get(rhs);
-      }
-    }
-
     namespace Intmp
     {
       Constant

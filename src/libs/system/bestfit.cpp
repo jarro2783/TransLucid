@@ -170,12 +170,6 @@ namespace
   }
 
   IsSubsetFn
-  subset_of_numeric(const Constant& c)
-  {
-    return &issubset_false;
-  }
-
-  IsSubsetFn
   subset_of_range(const Constant& c)
   {
     //at the moment we can only do ranges of integers
@@ -264,7 +258,6 @@ namespace
           &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
           &subset_of_region,
           &subset_of_tuple,
-          &subset_of_numeric,
           &subset_of_type,
           &subset_of_range,
           &subset_of_union

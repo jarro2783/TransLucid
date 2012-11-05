@@ -20,7 +20,7 @@ includesdir = $(prefix)/include/tl/types
 
 includes_HEADERS = boolean.hpp calc.hpp char.hpp demand.hpp dimension.hpp \
 fixed_number.hpp floatmp.hpp function.hpp hyperdatons.hpp \
-intension.hpp intmp.hpp numbers.hpp numeric.hpp \
+intension.hpp intmp.hpp numbers.hpp \
 range.hpp region.hpp special.hpp string.hpp tuple.hpp type.hpp union.hpp \
 uuid.hpp
 
