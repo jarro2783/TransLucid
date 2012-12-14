@@ -590,6 +590,9 @@ namespace TransLucid
       return (*m_eqn)(kappa, delta);
     }
 
+    Constant
+    operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
     int
     provenance() const
     {

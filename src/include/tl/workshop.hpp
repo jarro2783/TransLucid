@@ -26,6 +26,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  class Thread;
+  class Delta;
+
   class WS
   {
     public:
@@ -36,6 +39,9 @@ namespace TransLucid
 
     virtual Constant
     operator()(Context& kappa, Context& delta) = 0;
+
+    virtual Constant
+    operator()(Context& kappa, Delta& d, const Thread& w, size_t t) = 0;
   };
 } //namespace TransLucid
 
