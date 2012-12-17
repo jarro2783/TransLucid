@@ -80,6 +80,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
     };
 
     class DimensionWS : public WS
@@ -94,6 +97,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       Constant m_value;
@@ -111,6 +117,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& k, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       System::IdentifierLookup m_identifiers;
@@ -194,6 +203,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       System& m_system;
       WS* m_name;
@@ -231,6 +243,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       System& m_system;
       WS* m_rhs;
@@ -257,6 +272,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       WS* m_rhs;
@@ -301,6 +319,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       //WS* m_system;
       WS* m_condition;
@@ -343,6 +364,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       System& m_system;
       WS* m_e;
@@ -362,6 +386,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       System& m_system;
@@ -389,6 +416,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       System& m_system;
@@ -446,6 +476,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       System& m_system;
@@ -515,6 +548,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       WS* e2;
       WS* e1;
@@ -572,6 +608,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       System* m_system;
@@ -644,6 +683,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       System* m_system;
       u32string m_name;
@@ -691,6 +733,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       WS* m_lhs;
       WS* m_rhs;
@@ -716,6 +761,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
 
@@ -759,6 +807,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       WS* m_e2;

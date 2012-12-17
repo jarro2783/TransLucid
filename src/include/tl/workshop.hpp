@@ -32,6 +32,8 @@ namespace TransLucid
   class WS
   {
     public:
+    typedef std::pair<size_t, Constant> TimeConstant;
+
     virtual ~WS() {}
 
     virtual Constant
@@ -40,7 +42,7 @@ namespace TransLucid
     virtual Constant
     operator()(Context& kappa, Context& delta) = 0;
 
-    virtual Constant
+    virtual TimeConstant
     operator()(Context& kappa, Delta& d, const Thread& w, size_t t) = 0;
   };
 } //namespace TransLucid

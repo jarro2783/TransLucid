@@ -51,6 +51,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       Constant m_value;
     };
@@ -74,6 +77,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       Constant m_value;
     };
@@ -90,6 +96,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       Special m_value;
@@ -108,6 +117,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       Constant m_value;
     };
@@ -125,6 +137,9 @@ namespace TransLucid
       Constant
       operator()(Context& kappa, Context& delta);
 
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
       private:
       Constant m_value;
     };
@@ -139,6 +154,9 @@ namespace TransLucid
 
       Constant
       operator()(Context& kappa, Context& delta);
+
+      TimeConstant
+      operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
       private:
       Constant m_value;

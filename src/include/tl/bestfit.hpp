@@ -590,7 +590,7 @@ namespace TransLucid
       return (*m_eqn)(kappa, delta);
     }
 
-    Constant
+    TimeConstant
     operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
     int
@@ -631,6 +631,9 @@ namespace TransLucid
 
     Constant
     operator()(Context& kappa, Context& delta);
+
+    TimeConstant
+    operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
     private:
     typedef std::tuple<std::shared_ptr<Region>, Equations::iterator> 
