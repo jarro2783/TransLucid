@@ -1035,6 +1035,12 @@ IntmpConstWS::operator()(Context& kappa, Context& delta)
   return operator()(kappa);
 }
 
+TimeConstant
+IntmpConstWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  return std::make_pair(t, operator()(kappa));
+}
+
 Constant
 SpecialConstWS::operator()(Context& k)
 {
@@ -1045,6 +1051,12 @@ Constant
 SpecialConstWS::operator()(Context& k, Context& delta)
 {
   return operator()(k);
+}
+
+TimeConstant
+SpecialConstWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  return std::make_pair(t, operator()(kappa));
 }
 
 UStringConstWS::UStringConstWS(const u32string& s)
@@ -1285,6 +1297,39 @@ AtWS::operator()(Context& kappa, Context& delta)
   }
 }
 
+TimeConstant
+AtWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  auto rhs = (*e1)(kappa, d, w, t);
+
+  if (rhs.second.index() == TYPE_INDEX_DEMAND)
+  {
+    return rhs;
+  }
+
+  if (rhs.second.index() != TYPE_INDEX_TUPLE)
+  {
+    return std::make_pair(rhs.first, Types::Special::create(SP_TYPEERROR));
+  }
+
+  auto& tuple = Types::Tuple::get(rhs.second);
+  
+  //validate the time dimension
+  auto& change = tuple.tuple();
+  const auto& dimTime = change.find(DIM_TIME);
+  if (dimTime != change.end() && Types::Intmp::get(dimTime->second) > 
+    Types::Intmp::get(kappa.lookup(DIM_TIME)))
+  {
+    return std::make_pair(rhs.first, Types::Special::create(SP_ACCESS));
+  }
+
+  ContextPerturber pk(kappa, tuple);
+  DeltaPerturber pd(d);
+  pd.perturb(change);
+
+  return (*e2)(kappa, d, w, rhs.first);
+}
+
 Constant
 HostOpWS::operator()(Context& k)
 {
@@ -1309,6 +1354,11 @@ HostOpWS::operator()(Context& kappa, Context& delta)
   return operator()(kappa);
 }
 
+TimeConstant
+HostOpWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  return std::make_pair(t, operator()(kappa));
+}
 
 Constant
 BaseAbstractionWS::operator()(Context& k)
