@@ -293,6 +293,48 @@ namespace TransLucid
     std::vector<dimension_index> m_dims;
   };
 
+  class DeltaPerturber
+  {
+    public:
+    DeltaPerturber(Delta& d)
+    : m_delta(d)
+    {
+    }
+
+    ~DeltaPerturber()
+    {
+      for (auto v : m_perturbations)
+      {
+        if (v.second)
+        {
+          m_delta.erase(v.first);
+        }
+      }
+    }
+
+    void
+    perturb(dimension_index d)
+    {
+      auto result = m_delta.insert(d);
+
+      m_perturbations.insert(std::make_pair(d, result.second));
+    }
+
+    template <typename C>
+    void
+    perturb(const C& c)
+    {
+      for (auto d : c)
+      {
+        perturb(d.first);
+      }
+    }
+
+    private:
+    Delta& m_delta;
+    std::map<dimension_index, bool> m_perturbations;
+  };
+
   class MinimalContext
   {
     private:

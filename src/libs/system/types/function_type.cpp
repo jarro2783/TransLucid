@@ -157,6 +157,29 @@ ValueFunctionType::apply
   return Constant();
 }
 
+TimeConstant
+ValueFunctionType::apply
+(
+  Context& kappa, 
+  Delta& d, 
+  const Thread& w, 
+  size_t t,
+  const Constant& value
+) const
+{
+  //set m_dim = value in the context and evaluate the expr
+  ContextPerturber p{kappa, {{m_dim, value}}};
+  DeltaPerturber dp{d};
+
+  dp.perturb(m_dim);
+  dp.perturb(m_binds);
+
+  //set the bound dimensions
+  p.perturb(m_binds);
+
+  return (*m_expr)(kappa, d, w, t);
+}
+
 bool
 ValueFunctionType::less(const ValueFunctionType& rhs) const
 {

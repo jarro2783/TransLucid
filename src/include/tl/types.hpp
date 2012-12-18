@@ -24,6 +24,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <memory>
 #include <cstdint>
 #include <cstring>
+#include <set>
 #include <string>
 
 #include <tl/types_fwd.hpp>
@@ -313,6 +314,10 @@ namespace TransLucid
       memcpy(&data, &other.data, sizeof(data));
     }
   };
+
+  typedef std::pair<size_t, Constant> TimeConstant;
+
+  typedef std::set<dimension_index> Delta;
 
   #if 0
   inline size_t

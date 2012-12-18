@@ -77,6 +77,11 @@ namespace TransLucid
       return result;
     }
 
+    TimeConstant
+    operator()(Context& kappa, Delta& d, const Thread& w, size_t t) const
+    {
+    }
+
     private:
     System* m_system;
     WS* m_ws;

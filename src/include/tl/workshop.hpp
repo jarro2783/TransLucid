@@ -27,13 +27,10 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
   class Thread;
-  class Delta;
 
   class WS
   {
     public:
-    typedef std::pair<size_t, Constant> TimeConstant;
-
     virtual ~WS() {}
 
     virtual Constant

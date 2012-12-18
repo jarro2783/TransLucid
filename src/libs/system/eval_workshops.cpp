@@ -154,7 +154,7 @@ HashSymbolWS::operator()(Context& kappa, Context& delta)
   return Types::Tuple::create(Tuple(kappa));
 }
 
-WS::TimeConstant
+TimeConstant
 HashSymbolWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   //one cannot return the whole context in this cached mode
@@ -173,7 +173,7 @@ BoolConstWS::operator()(Context& k)
   return m_value;
 }
 
-WS::TimeConstant
+TimeConstant
 BoolConstWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   return TimeConstant(t, m_value);
@@ -191,7 +191,7 @@ TypeConstWS::operator()(Context& k)
   return m_value;
 }
 
-WS::TimeConstant
+TimeConstant
 TypeConstWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   return TimeConstant(t, m_value);
@@ -209,7 +209,7 @@ DimensionWS::operator()(Context& k, Context& delta)
   return operator()(delta);
 }
 
-WS::TimeConstant
+TimeConstant
 DimensionWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   return TimeConstant(t, m_value);
@@ -227,7 +227,7 @@ IdentWS::operator()(Context& k)
   return evaluate(k);
 }
 
-WS::TimeConstant
+TimeConstant
 IdentWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   if (m_e == nullptr)
@@ -524,7 +524,7 @@ BangOpWS::operator()(Context& k)
   }
 }
 
-WS::TimeConstant
+TimeConstant
 BangOpWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   //lookup function in the system and call it
@@ -604,65 +604,68 @@ BangOpWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
         if (iter->index() == TYPE_INDEX_SPECIAL)
         {
           Constant fn2 = applyFunction<FUN_VALUE>
-            (kappa, d, w, t, fn, currentValue).second;
+            (kappa, d, w, t, fn.second, currentValue).second;
           currentValue = applyFunction<FUN_VALUE>
             (kappa, d, w, t, fn2, *iter).second;
         }
         ++iter;
       }
 
-      return currentValue;
+      return std::make_pair(maxTime, currentValue);
     }
     else
     {
       if (args.size() == 1)
       {
         //Constant arg = (*m_args[0])(kappa);
-        return Types::BaseFunction::get(fn).apply(args.at(0).second);
+        return std::make_pair(maxTime, 
+          Types::BaseFunction::get(fn.second).apply(args.at(0)));
       }
       else
       {
-        return Types::BaseFunction::get(fn).apply(args);
+        return std::make_pair(maxTime, 
+          Types::BaseFunction::get(fn.second).apply(args));
       }
     }
   }
-  else if (fn.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
+  else if (fn.second.index() == TYPE_INDEX_TUPLE && m_args.size() == 1)
   {
     dimension_index dim = m_system.getDimensionIndex(args[0]);
-    const Tuple& lhs = Types::Tuple::get(fn);
+    const Tuple& lhs = Types::Tuple::get(fn.second);
     auto iter = lhs.find(dim);
     if (iter == lhs.end())
     {
-      return Types::Special::create(SP_DIMENSION);
+      return std::make_pair(maxTime, Types::Special::create(SP_DIMENSION));
     }
     else
     {
-      return iter->second;
+      return std::make_pair(maxTime, iter->second);
     }
   }
   else if (m_args.size() == 1)
   {
-    Constant rhs = (*m_args[0])(kappa, delta);
-
     System::IdentifierLookup lookup = m_system.lookupIdentifiers();
     WS* constant_bang = lookup.lookup(U"constant_bang");
 
     if (constant_bang == nullptr)
     {
-      return Types::Special::create(SP_UNDEF);
+      return std::make_pair(maxTime, Types::Special::create(SP_UNDEF));
     }
 
-    Constant theFun = (*constant_bang)(kappa, delta);
+    Constant theFun = (*constant_bang)(kappa, d, w, t).second;
 
-    return applyFunction<FUN_VALUE>(kappa, delta,
-      applyFunction<FUN_VALUE>(kappa, delta, theFun, fn),
-      rhs
-    );
+    return std::make_pair(maxTime, applyFunction<FUN_VALUE>(kappa, d, w, t,
+      applyFunction<FUN_VALUE>(kappa, d, w, t, theFun, fn.second).second,
+      args[0]
+    ).second);
   }
   else
   {
-    return Types::Special::create(SP_UNDEF);
+    return std::make_pair(maxTime, Types::Special::create(SP_UNDEF));
   }
+
+  //keep the compiler happy
+  return TimeConstant();
 }
 
 Constant
@@ -693,6 +696,53 @@ MakeIntenWS::operator()(Context& kappa, Context& delta)
   return Constant();
 }
 
+TimeConstant
+MakeIntenWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  std::vector<Constant> binds;
+  std::vector<dimension_index> demands;
+
+  size_t maxTime = 0;
+
+  for (auto& b : m_binds)
+  {
+    auto r = (*b)(kappa, d, w, t);
+
+    if (r.second.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(r.second, demands);
+    }
+
+    maxTime = std::max(maxTime, r.first);
+  }
+
+  if (!demands.empty())
+  {
+    return std::make_pair(maxTime, Types::Demand::create(demands));
+  }
+  else
+  {
+    for (auto& c : binds)
+    {
+      auto i = m_system.getDimensionIndex(c);
+
+      if (!kappa.has_entry(i))
+      {
+        demands.push_back(i);
+      }
+    }
+
+    if (!demands.empty())
+    {
+      return std::make_pair(maxTime, Types::Demand::create(demands));
+    }
+
+    return std::make_pair(maxTime,
+      Types::Intension::create(&m_system, m_rhs, std::move(binds), 
+        m_scope, kappa));
+  }
+}
+
 Constant
 EvalIntenWS::operator()(Context& k)
 {
@@ -716,6 +766,25 @@ EvalIntenWS::operator()(Context& kappa, Context& delta)
   #warning implement cache here
   #endif
   return Constant();
+}
+
+TimeConstant
+EvalIntenWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  auto rhs = (*m_rhs)(kappa, d, w, t);
+
+  if (rhs.second.index() == TYPE_INDEX_DEMAND)
+  {
+    return rhs;
+  }
+
+  if (rhs.second.index() != TYPE_INDEX_INTENSION)
+  {
+    return std::make_pair(t, Types::Special::create(SP_TYPEERROR));
+  }
+
+  const IntensionType& inten = Types::Intension::get(rhs.second);
+  return inten(kappa, d, w, t);
 }
 
 Constant
@@ -842,6 +911,72 @@ IfWS::operator()(Context& kappa, Context& delta)
   }
 }
 
+TimeConstant
+IfWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  auto condv = (*m_condition)(kappa, d, w, t);
+
+  if (condv.second.index() == TYPE_INDEX_DEMAND)
+  {
+    return condv;
+  }
+  else if (condv.second.index() == TYPE_INDEX_SPECIAL)
+  {
+    return condv;
+  }
+  else if (condv.second.index() == TYPE_INDEX_BOOL)
+  {
+    bool b = get_constant<bool>(condv.second);
+
+    if (b)
+    {
+      return (*m_then)(kappa, d, w, condv.first);
+      //result = makeValue(e->then->visit(this, d));
+    }
+    else
+    {
+      //run the elsifs and else
+      size_t maxTime = condv.first;
+      for (const auto& p : m_elsifs_2)
+      {
+        auto cond = p.first->operator()(kappa, d, w, condv.first);
+
+        type_index index = cond.second.index();
+
+        if (index == TYPE_INDEX_DEMAND)
+        {
+          return cond;
+        }
+        else if (index == TYPE_INDEX_SPECIAL)
+        {
+          return cond;
+        }
+        else if (index == TYPE_INDEX_BOOL)
+        {
+          bool bcond = get_constant<bool>(cond.second);
+          if (bcond)
+          {
+            return p.second->operator()(kappa, d, w, cond.first);
+          }
+        }
+        else
+        {
+          return std::make_pair(cond.first, 
+            Types::Special::create(SP_TYPEERROR));
+        }
+
+        maxTime = std::max(maxTime, cond.first);
+      }
+
+      return (*m_else)(kappa, d, w, maxTime);
+    }
+  }
+  else
+  {
+    return std::make_pair(condv.first, Types::Special::create(SP_TYPEERROR));
+  }
+}
+
 Constant
 HashWS::operator()(Context& k)
 {
@@ -867,6 +1002,25 @@ HashWS::operator()(Context& kappa, Context& delta)
   {
     return lookup_context(m_system, r, kappa);
   }
+}
+
+TimeConstant
+HashWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  auto r = (*m_e)(kappa, d, w, t);
+
+  if (r.second.index() == TYPE_INDEX_DEMAND)
+  {
+    return r;
+  }
+
+  auto dim = m_system.getDimensionIndex(r.second);
+  if (!kappa.has_entry(dim))
+  {
+    return std::make_pair(r.first, Types::Demand::create({dim}));
+  }
+
+  return std::make_pair(r.first, kappa.lookup(dim));
 }
 
 Constant
@@ -920,7 +1074,7 @@ UStringConstWS::operator()(Context& k, Context& delta)
   return operator()(k);
 }
 
-WS::TimeConstant
+TimeConstant
 UStringConstWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   return TimeConstant(t, m_value);
@@ -938,7 +1092,7 @@ UCharConstWS::operator()(Context& kappa, Context& delta)
   return operator()(kappa);
 }
 
-WS::TimeConstant
+TimeConstant
 UCharConstWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   return TimeConstant(t, m_value);

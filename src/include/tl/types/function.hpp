@@ -368,6 +368,10 @@ namespace TransLucid
     Constant
     apply(Context& kappa, Context& delta, const Constant& value) const;
 
+    TimeConstant
+    apply(Context& kappa, Delta& d, const Thread& w, size_t t,
+      const Constant& value) const;
+
     size_t
     hash() const
     {
@@ -599,6 +603,22 @@ namespace TransLucid
     }
   }
 
+  template <FnType Type>
+  TimeConstant
+  applyFunction(Context& kappa, Delta& d, const Thread& w, size_t t,
+    const Constant& lhs, const Constant& rhs)
+  {
+    if (lhs.index() == detail::apply_fun::FunIndex<Type>::value)
+    {
+      const auto& fnval = detail::apply_fun::GetValue<Type>::get(lhs);
+
+      return fnval.apply(kappa, d, w, t, rhs);
+    }
+    else
+    {
+      return TimeConstant(t, Types::Special::create(SP_TYPEERROR));
+    }
+  }
 }
 
 #endif
