@@ -1383,6 +1383,49 @@ BaseAbstractionWS::operator()(Context& kappa, Context& delta)
   return Constant();
 }
 
+TimeConstant
+BaseAbstractionWS::operator()
+(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  std::vector<dimension_index> binds;
+  std::vector<dimension_index> demands;
+  size_t maxTime = 0;
+
+  for (auto b : m_binds)
+  {
+    auto result = (*b)(kappa, d, w, t);
+    maxTime = std::max(maxTime, result.first);
+
+    if (result.second.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(result.second, demands);
+    }
+    else
+    {
+      m_system->getDimensionIndex(result.second);
+    }
+  }
+
+  if (!demands.empty())
+  {
+    return std::make_pair(maxTime, Types::Demand::create(demands));
+  }
+
+  //are the bound dimensions in the context?
+  for (auto dim : binds)
+  {
+    if (!kappa.has_entry(dim))
+    {
+      demands.push_back(dim);
+    }
+  }
+
+  if (!demands.empty())
+  {
+    return std::make_pair(maxTime, Types::Demand::create(demands));
+  }
+}
+
 Constant
 LambdaAbstractionWS::operator()(Context& k)
 {
@@ -1443,6 +1486,23 @@ LambdaAbstractionWS::operator()(Context& kappa, Context& delta)
     )
   );
   #endif
+}
+
+TimeConstant
+LambdaAbstractionWS::operator() 
+(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  return createValueFunctionCachedNew
+    (
+      m_system,
+      m_name,
+      m_argDim,
+      m_rhs,
+      m_binds,
+      m_scope,
+      kappa,
+      d, w, t
+    );
 }
 
 Constant

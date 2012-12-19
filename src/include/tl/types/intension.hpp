@@ -80,6 +80,13 @@ namespace TransLucid
     TimeConstant
     operator()(Context& kappa, Delta& d, const Thread& w, size_t t) const
     {
+      ContextPerturber pk(kappa); 
+      DeltaPerturber pd(d);
+
+      pk.perturb(m_bound);
+      pd.perturb(m_bound);
+
+      return (*m_ws)(kappa, d, w, t);
     }
 
     private:

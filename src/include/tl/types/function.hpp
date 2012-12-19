@@ -128,6 +128,29 @@ namespace TransLucid
       m_binds.push_back(std::make_pair(DIM_TIME, k.lookup(DIM_TIME)));
     }
 
+    BaseFunctionAbstraction
+    (
+      const std::vector<dimension_index>& dims,
+      const std::vector<dimension_index>& scope,
+      const std::vector<dimension_index>& binds,
+      WS* expr,
+      Context& k
+    )
+    : m_dims(dims)
+    , m_expr(expr)
+    {
+      for (auto b : binds)
+      {
+        m_binds.push_back(std::make_pair(b, k.lookup(b)));
+      }
+
+      for (auto d : scope)
+      {
+        m_binds.push_back(std::make_pair(d, k.lookup(d)));
+      }
+      m_binds.push_back(std::make_pair(DIM_TIME, k.lookup(DIM_TIME)));
+    }
+
     ~BaseFunctionAbstraction() throw() {}
 
     size_t
@@ -356,6 +379,32 @@ namespace TransLucid
       m_binds.push_back(std::make_pair(DIM_RHO, k.lookup(DIM_RHO)));
     }
 
+    ValueFunctionType
+    (
+      System* system,
+      const u32string& name, 
+      dimension_index argDim, 
+      WS* expr,
+      const std::vector<dimension_index>& binds,
+      const std::vector<dimension_index>& scope,
+      Context& k
+    )
+    : m_system(system)
+    , m_name(name)
+    , m_dim(argDim)
+    , m_expr(expr)
+    {
+      for (auto d : binds)
+      {
+        m_binds.push_back(std::make_pair(d, k.lookup(d)));
+      }
+
+      for (auto d : scope)
+      {
+        m_binds.push_back(std::make_pair(d, k.lookup(d)));
+      }
+    }
+
     ValueFunctionType*
     clone() const
     {
@@ -413,6 +462,21 @@ namespace TransLucid
     WS* expr,
     Context& kappa,
     Context& delta
+  );
+  
+  TimeConstant
+  createValueFunctionCachedNew
+  (
+    System *system,
+    const u32string& name, 
+    dimension_index argDim, 
+    WS* expr,
+    const std::vector<WS*>& binds,
+    const std::vector<dimension_index>& scope,
+    Context& kappa,
+    Delta& delta,
+    const Thread& w, 
+    size_t t
   );
 
   namespace Types

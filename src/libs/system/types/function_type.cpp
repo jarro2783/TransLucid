@@ -124,6 +124,71 @@ createValueFunctionCached
   return Constant();
 }
 
+//check for scope dimensions
+//evaluate free variables, checking for demands
+//then create the actual function
+TimeConstant
+createValueFunctionCachedNew
+(
+  System *system,
+  const u32string& name, 
+  dimension_index argDim, 
+  WS* expr,
+  const std::vector<WS*>& bindsws,
+  const std::vector<dimension_index>& scope,
+  Context& kappa,
+  Delta& delta,
+  const Thread& w, 
+  size_t t
+)
+{
+  //return Types::ValueFunction::create(
+  //  ValueFunctionType(system, name, argDim, expr, kappa)
+  //);
+  std::vector<dimension_index> binds;
+  std::vector<dimension_index> demands;
+  size_t maxTime = 0;
+
+  for (auto b : bindsws)
+  {
+    auto result = (*b)(kappa, delta, w, t);
+    maxTime = std::max(maxTime, result.first);
+    
+    if (result.second.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(result.second, demands);
+    }
+    else
+    {
+      binds.push_back(system->getDimensionIndex(result.second));
+    }
+  }
+
+  if (!demands.empty())
+  {
+    return std::make_pair(maxTime, Types::Demand::create(demands));
+  }
+
+  for (auto d : binds)
+  {
+    if (!kappa.has_entry(d))
+    {
+      demands.push_back(d);
+    }
+  }
+
+  if (!demands.empty())
+  {
+    return std::make_pair(maxTime, Types::Demand::create(demands));
+  }
+
+  return std::make_pair(maxTime, Types::ValueFunction::create(
+    ValueFunctionType(system, name, argDim, expr, binds, scope, kappa)
+  ));
+
+  return TimeConstant();
+}
+
 Constant
 ValueFunctionType::apply(Context& k, const Constant& value) const
 {
