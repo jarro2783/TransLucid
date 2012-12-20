@@ -44,6 +44,11 @@ ConsDefWS::operator()(Context& kappa, Context& delta)
   return m_bestfit(kappa, delta);
 }
 
+TimeConstant
+ConsDefWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+}
+
 Tree::Expr
 ConsDefWS::group(const std::list<EquationDefinition>& defs)
 {

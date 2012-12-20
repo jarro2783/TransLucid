@@ -41,6 +41,11 @@ OpDefWS::operator()(Context& kappa, Context& delta)
   return m_bestfit(kappa, delta);
 }
 
+TimeConstant
+OpDefWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+}
+
 bool 
 OpDefWS::del(uuid id, size_t time)
 {

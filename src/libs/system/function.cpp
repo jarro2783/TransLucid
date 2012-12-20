@@ -43,6 +43,11 @@ FunctionWS::operator()(Context& kappa, Context& delta)
   return m_bestfit(kappa, delta);
 }
 
+TimeConstant
+FunctionWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+}
+
 void
 FunctionWS::addEquation(uuid id, Parser::RawInput input, int time,
   ScopePtr scope)

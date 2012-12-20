@@ -1139,6 +1139,11 @@ RegionWS::operator()(Context& kappa, Context& delta)
   return Constant();
 }
 
+TimeConstant
+RegionWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+}
+
 Constant
 TupleWS::operator()(Context& k)
 {
@@ -1233,6 +1238,72 @@ TupleWS::operator()(Context& kappa, Context& delta)
   else
   {
     return Types::Demand::create(demands);
+  }
+}
+
+TimeConstant
+TupleWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  std::vector<dimension_index> demands;
+  tuple_t kp;
+  size_t maxTime = 0;
+
+  for(auto& pair : m_elements)
+  {
+    bool hasdemands = false;
+    //const Pair& p = v.first.value<Pair>();
+    auto left = (*pair.first)(kappa, d, w, t);
+    auto right = (*pair.second)(kappa, d, w, t);
+
+    maxTime = std::max(maxTime, left.first);
+    maxTime = std::max(maxTime, right.first);
+
+    if (left.second.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(left.second, demands);
+      hasdemands = true;
+    }
+
+    if (right.second.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(right.second, demands);
+      hasdemands = true;
+    }
+
+    if (!hasdemands)
+    {
+      if (left.second.index() == TYPE_INDEX_SPECIAL)
+      {
+        return std::make_pair(maxTime, left.second);
+      }
+
+      if (left.second.index() == TYPE_INDEX_SPECIAL)
+      {
+        return std::make_pair(maxTime, left.second);
+      }
+      else if (right.second.index() == TYPE_INDEX_SPECIAL)
+      {
+        return std::make_pair(maxTime, right.second);
+      }
+
+      if (left.second.index() == TYPE_INDEX_DIMENSION)
+      {
+        kp[get_constant<dimension_index>(left.second)] = right.second;
+      }
+      else
+      {
+        kp[m_system.getDimensionIndex(left.second)] = right.second;
+      }
+    }
+  }
+
+  if (demands.size() == 0)
+  {
+    return std::make_pair(maxTime, Types::Tuple::create(Tuple(kp)));
+  }
+  else
+  {
+    return std::make_pair(maxTime, Types::Demand::create(demands));
   }
 }
 
@@ -1557,6 +1628,41 @@ LambdaApplicationWS::operator()(Context& kappa, Context& delta)
   return f.apply(kappa, delta, rhs);
 }
 
+TimeConstant
+LambdaApplicationWS::operator()
+(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  auto lhs = (*m_lhs)(kappa, d, w, t);
+  auto rhs = (*m_rhs)(kappa, d, w, t);
+
+  std::vector<dimension_index> demands;
+
+  if (lhs.second.index() == TYPE_INDEX_DEMAND)
+  {
+    Types::Demand::append(lhs.second, demands);
+  }
+
+  if (rhs.second.index() == TYPE_INDEX_DEMAND)
+  {
+    Types::Demand::append(rhs.second, demands);
+  }
+
+  if (!demands.empty())
+  {
+    return std::make_pair(std::max(lhs.first, rhs.first), 
+      Types::Demand::create(demands));
+  }
+
+  if (lhs.second.index() != TYPE_INDEX_VALUE_FUNCTION)
+  {
+    return std::make_pair(lhs.first, Types::Special::create(SP_TYPEERROR));
+  }
+
+  const ValueFunctionType& f = Types::ValueFunction::get(lhs.second);
+
+  return f.apply(kappa, d, w, std::max(lhs.first, rhs.first), rhs.second);
+}
+
 Constant
 WhereWS::operator()(Context& k)
 {
@@ -1603,6 +1709,17 @@ Constant
 WhereWS::operator()(Context& kappa, Context& delta)
 {
   return Constant();
+}
+
+TimeConstant
+WhereWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  std::vector<dimension_index> demands;
+  std::vector<std::pair<dimension_index, Constant>> change;
+
+  for (auto v : m_dims)
+  {
+  }
 }
 
 Constant
@@ -1771,6 +1888,11 @@ AtTupleWS::~AtTupleWS()
     delete p.first;
     delete p.second;
   }
+}
+
+TimeConstant
+AtTupleWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
 }
 
 } //namespace Workshops
