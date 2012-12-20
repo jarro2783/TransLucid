@@ -46,6 +46,7 @@ FunctionWS::operator()(Context& kappa, Context& delta)
 TimeConstant
 FunctionWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
+  return m_bestfit(kappa, d, w, t);
 }
 
 void

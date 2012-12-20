@@ -1893,6 +1893,91 @@ AtTupleWS::~AtTupleWS()
 TimeConstant
 AtTupleWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
+  //evaluate the tuple into a vector of fixed size
+
+  bool access = false;
+
+  const Constant& dimTime = kappa.lookup(DIM_TIME);
+
+  std::vector<std::pair<dimension_index, Constant>> tuple;
+  std::set<dimension_index> demands;
+  std::vector<Constant> specials;
+  size_t maxTime = 0;
+
+  for (const auto& entry : m_tuple)
+  {
+    auto lhs = (*entry.first)(kappa, d, w, t);
+    auto rhs = (*entry.second)(kappa, d, w, t);
+
+    maxTime = std::max(lhs.first, maxTime);
+    maxTime = std::max(rhs.first, maxTime);
+
+    if (lhs.second.index() == TYPE_INDEX_SPECIAL)
+    {
+      specials.push_back(lhs.second);
+    }
+
+    if (rhs.second.index() == TYPE_INDEX_SPECIAL)
+    {
+      specials.push_back(rhs.second);
+    }
+
+    if (lhs.second.index() == TYPE_INDEX_DEMAND || 
+        rhs.second.index() == TYPE_INDEX_DEMAND)
+    {
+      if (lhs.second.index() == TYPE_INDEX_DEMAND)
+      {
+        Types::Demand::append(lhs.second, demands);
+      }
+
+      if (rhs.second.index() == TYPE_INDEX_DEMAND)
+      {
+        Types::Demand::append(rhs.second, demands);
+      }
+    }
+    else
+    {
+      if (lhs.second.index() == TYPE_INDEX_DIMENSION)
+      {
+        if (get_constant<dimension_index>(lhs.second) == DIM_TIME &&
+            Types::Intmp::get(rhs.second) > Types::Intmp::get(dimTime))
+        {
+          access = true;
+        }
+
+        tuple.push_back(
+          std::make_pair(
+            get_constant<dimension_index>(lhs.second), rhs.second));
+      }
+      else
+      {
+        tuple.push_back(
+          std::make_pair(this->m_system.getDimensionIndex(lhs.second), 
+            rhs.second));
+      }
+    }
+  }
+
+  if (demands.size() != 0)
+  {
+    return std::make_pair(maxTime, Types::Demand::create(
+      std::vector<dimension_index>(demands.begin(), demands.end())));
+  }
+
+  if (specials.size() > 0)
+  {
+    return std::make_pair(maxTime, specials.at(0));
+  }
+
+  if (access)
+  {
+    return std::make_pair(maxTime, Types::Special::create(SP_ACCESS));
+  }
+  else
+  {
+    ContextPerturber pkappa(kappa, tuple);
+    return (*m_e2)(kappa, d, w, maxTime);
+  }
 }
 
 } //namespace Workshops
