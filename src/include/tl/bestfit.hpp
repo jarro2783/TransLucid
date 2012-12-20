@@ -594,7 +594,10 @@ namespace TransLucid
     }
 
     TimeConstant
-    operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+    operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+    {
+      return (*m_eqn)(kappa, d, w, t);
+    }
 
     int
     provenance() const
