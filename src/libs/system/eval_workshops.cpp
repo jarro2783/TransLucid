@@ -1142,6 +1142,46 @@ RegionWS::operator()(Context& kappa, Context& delta)
 TimeConstant
 RegionWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
+  Region::Entries entries;
+
+  std::vector<dimension_index> demands;
+  size_t maxTime = 0;
+
+  for (const auto& entry : m_entries)
+  {
+    auto lhs = (*std::get<0>(entry))(kappa, d, w, t);
+    auto rhs = (*std::get<2>(entry))(kappa, d, w, t);
+
+    maxTime = std::max(maxTime, lhs.first);
+    maxTime = std::max(maxTime, rhs.first);
+
+    if (lhs.second.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(lhs.second, demands);
+    }
+
+    if (rhs.second.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(rhs.second, demands);
+    }
+
+    entries.insert(
+      std::make_pair(
+        m_system.getDimensionIndex(lhs.second), 
+        std::make_pair(
+          std::get<1>(entry), 
+          rhs.second
+        )
+      )
+    );
+  }
+
+  if (!demands.empty())
+  {
+    return std::make_pair(maxTime, Types::Demand::create(demands));
+  }
+
+  return std::make_pair(maxTime, Types::Region::create(Region(entries)));
 }
 
 Constant
