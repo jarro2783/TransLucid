@@ -467,6 +467,32 @@ BestfitGroup::operator()(Context& kappa, Context& delta)
   return Constant();
 }
 
+TimeConstant
+BestfitGroup::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+  if (m_compiling)
+  {
+    throw U"loop compiling BestfitGroup: " + m_name;
+  }
+
+  //if (m_parsed != m_definitions.size())
+  if (m_changes.size() > m_evaluators.size())
+  {
+    try
+    {
+      compile(kappa);
+    }
+    catch (const Parser::ParseError& e)
+    {
+      std::cerr << "exception parsing: " << e.m_pos.file << ":" << e.m_pos.line 
+                << ":" << e.m_pos.character << ":" << e.what() << std::endl;
+      throw e;
+    }
+  }
+
+  //return evaluate(k);
+}
+
 Constant
 BestfitGroup::evaluate(Context& k)
 {
@@ -925,6 +951,12 @@ ConditionalBestfitWS::operator()(Context& kappa, Context& delta)
 
   //now we have something valid and no demands are needed
   return bestfit(applicable, kappa, delta);
+}
+
+TimeConstant
+ConditionalBestfitWS::operator()
+  (Context& kappa, Delta& d, const Thread& w, size_t t)
+{
 }
 
 EquationGuard::EquationGuard(WS* g, WS* b)

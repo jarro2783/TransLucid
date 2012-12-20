@@ -617,6 +617,11 @@ CacheWS::operator()(Context& kappa, Context& delta)
   return v;
 }
 
+TimeConstant
+CacheWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+{
+}
+
 }
 
 }

@@ -61,7 +61,10 @@ namespace TransLucid
     }
 
     TimeConstant
-    operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+    operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+    {
+      return m_bestfit(kappa, d, w, t);
+    }
 
     void
     addEquation(uuid id, Parser::RawInput input, int time, 

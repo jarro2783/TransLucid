@@ -324,6 +324,9 @@ namespace TransLucid
     Constant
     operator()(Context& kappa, Context& delta);
 
+    TimeConstant
+    operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
+
     void
     setName(const u32string& name)
     {
