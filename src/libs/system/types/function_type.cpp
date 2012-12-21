@@ -171,7 +171,15 @@ createValueFunctionCachedNew
 
   for (auto d : binds)
   {
-    if (!kappa.has_entry(d))
+    if (delta.find(d) == delta.end())
+    {
+      demands.push_back(d);
+    }
+  }
+
+  for (auto d : scope)
+  {
+    if (delta.find(d) == delta.end())
     {
       demands.push_back(d);
     }

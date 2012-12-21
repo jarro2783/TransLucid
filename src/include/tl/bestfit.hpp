@@ -386,8 +386,9 @@ namespace TransLucid
     std::shared_ptr<WS>
     compileExpression(const Tree::Expr& expr, ScopePtr scope);
 
-    Constant
-    evaluate(Context& k);
+    template <typename... Args>
+    typename detail::EvalRetType<typename std::decay<Args>::type...>::type
+    evaluate(Context& k, Args&&... args);
 
     struct CompiledDefinition
     {

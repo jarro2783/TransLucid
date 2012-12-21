@@ -490,11 +490,12 @@ BestfitGroup::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
     }
   }
 
-  //return evaluate(k);
+  return evaluate(kappa, d, w, t);
 }
 
-Constant
-BestfitGroup::evaluate(Context& k)
+template <typename... Args>
+typename detail::EvalRetType<typename std::decay<Args>::type...>::type
+BestfitGroup::evaluate(Context& k, Args&&... args)
 {
   auto dimtime = k.lookup(DIM_TIME);
   int time = 0;
@@ -508,13 +509,13 @@ BestfitGroup::evaluate(Context& k)
   auto& last = m_evaluators.back();
   if (time >= last.start && (last.end == -1 || time <= last.end))
   {
-    return (*last.evaluator)(k);
+    return (*last.evaluator)(k, args...);
   }
 
   //make sure that it's not bigger than the last and smaller than the first
   if (time > last.start || time < m_evaluators.front().start)
   {
-    return Types::Special::create(SP_UNDEF);
+    return detail::cached_return(Types::Special::create(SP_UNDEF), args...);
   }
 
   //otherwise do a linear search backwards if small, binary search if big
@@ -524,11 +525,11 @@ BestfitGroup::evaluate(Context& k)
     {
       if (time >= i->start && time <= i->end)
       {
-        return (*i->evaluator)(k);
+        return (*i->evaluator)(k, args...);
       }
     }
     //if we got here then something broke
-    return Types::Special::create(SP_UNDEF);
+    return detail::cached_return(Types::Special::create(SP_UNDEF), args...);
   }
   else
   {
@@ -553,7 +554,7 @@ BestfitGroup::evaluate(Context& k)
     }
 
     //current is the match
-    return (*current->evaluator)(k);
+    return (*current->evaluator)(k, args...);
   }
 }
 

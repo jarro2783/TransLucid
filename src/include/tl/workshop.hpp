@@ -42,6 +42,38 @@ namespace TransLucid
     virtual TimeConstant
     operator()(Context& kappa, Delta& d, const Thread& w, size_t t) = 0;
   };
+
+  namespace detail
+  {
+    template <typename... Args>
+    struct EvalRetType;
+
+    template <>
+    struct EvalRetType<>
+    {
+      typedef Constant type;
+    };
+
+    template <>
+    struct EvalRetType<Delta, Thread, size_t>
+    {
+      typedef TimeConstant type;
+    };
+
+    inline
+    Constant
+    cached_return(Constant c)
+    {
+      return c;
+    }
+
+    inline
+    TimeConstant
+    cached_return(Constant c, Delta&, const Thread&, size_t t)
+    {
+      return std::make_pair(t, c);
+    }
+  }
 } //namespace TransLucid
 
 #endif // WORKSHOP_HPP_INCLUDED
