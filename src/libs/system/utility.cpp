@@ -444,7 +444,43 @@ booleanTrue
   {
     return true;
   }
+}
 
+bool
+booleanTrue
+(
+  const EquationGuard& g, 
+  Context& kappa, 
+  Delta& d,
+  const Thread& w,
+  size_t& t,
+  std::vector<dimension_index>& demands
+)
+{
+  WS* b = g.boolean();
+
+  if (b)
+  {
+    auto v = (*b)(kappa, d, w, t);// = i.evaluate(g.boolean(), c);
+
+    t = std::max(t, v.first);
+
+    if (v.second.index() == TYPE_INDEX_DEMAND)
+    {
+      const auto& newd = Types::Demand::get(v.second);
+      std::copy(newd.dims().begin(), newd.dims().end(), 
+        std::back_inserter(demands));
+
+      return false;
+    }
+
+    return v.second.index() == TYPE_INDEX_BOOL
+    && get_constant<bool>(v.second);
+  }
+  else
+  {
+    return true;
+  }
 }
 
 //these should go in charset.cpp

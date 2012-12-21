@@ -46,10 +46,7 @@ namespace TransLucid
   namespace detail
   {
     template <typename... Args>
-    struct EvalRetType;
-
-    template <>
-    struct EvalRetType<>
+    struct EvalRetType
     {
       typedef Constant type;
     };
@@ -63,6 +60,13 @@ namespace TransLucid
     inline
     Constant
     cached_return(Constant c)
+    {
+      return c;
+    }
+
+    inline
+    Constant
+    cached_return(Constant c, const Context&)
     {
       return c;
     }

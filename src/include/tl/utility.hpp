@@ -139,6 +139,17 @@ namespace TransLucid
     Context& delta, 
     std::vector<dimension_index>& demands
   );
+  
+  bool
+  booleanTrue
+  (
+    const EquationGuard& g, 
+    Context& kappa, 
+    Delta& d,
+    const Thread& w,
+    size_t& t,
+    std::vector<dimension_index>& demands
+  );
 
   //looks up a value in the current context
   Constant

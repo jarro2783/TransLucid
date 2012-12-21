@@ -661,6 +661,114 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
   return std::make_pair(nonspecial, std::make_shared<Region>(t));
 }
 
+std::pair<bool, std::pair<size_t, std::shared_ptr<Region>>>
+EquationGuard::evaluateCached(Context& k, Delta& d, const Thread& w, size_t t) 
+  const
+{
+  if (!m_compiled)
+  {
+    compile();
+  }
+
+  bool nonspecial = true;
+  m_demands.clear();
+  Region::Entries e = m_dimConstConst;
+  size_t maxTime = t;
+
+  if (m_guard)
+  {
+    //start with the const dimensions and evaluate the non-const ones
+
+    //evaluate the ones left
+    for (const auto& constNon : m_dimConstNon)
+    {
+      auto ord = constNon.second.second->operator()(k, d, w, t);
+
+      maxTime = std::max(maxTime, ord.first);
+
+      if (ord.second.index() == TYPE_INDEX_DEMAND)
+      {
+        const auto& dims = Types::Demand::get(ord.second).dims();
+        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
+      }
+      else
+      {
+        e.insert(std::make_pair(constNon.first,
+          std::make_pair(constNon.second.first, ord.second)));
+      }
+    }
+
+    for (const auto& nonConst : m_dimNonConst)
+    {
+      auto dim = nonConst.first->operator()(k, d, w, t);
+      maxTime = std::max(maxTime, dim.first);
+
+      if (dim.second.index() == TYPE_INDEX_DEMAND)
+      {
+        const auto& dims = Types::Demand::get(dim.second).dims();
+        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
+      }
+      else if (dim.second.index() == TYPE_INDEX_SPECIAL)
+      {
+        nonspecial = false;
+      }
+      else
+      {
+        dimension_index index =
+          dim.second.index() == TYPE_INDEX_DIMENSION 
+          ? get_constant<dimension_index>(dim.second)
+          : m_system->getDimensionIndex(dim.second);
+
+        e.insert(std::make_pair(index, 
+          std::make_pair(nonConst.second.first, nonConst.second.second)));
+      }
+    }
+
+    for (const auto& nonNon : m_dimNonNon)
+    {
+      auto dim = nonNon.first->operator()(k, d, w, t);
+      auto ord = nonNon.second.second->operator()(k, d, w, t);
+
+      if (dim.second.index() == TYPE_INDEX_SPECIAL)
+      {
+        nonspecial = false;
+      }
+
+      bool isdemand = false;
+
+      if (ord.second.index() == TYPE_INDEX_DEMAND)
+      {
+        const auto& dims = Types::Demand::get(ord.second).dims();
+        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
+        isdemand = true;
+      }
+
+      if (dim.second.index() == TYPE_INDEX_DEMAND)
+      {
+        const auto& dims = Types::Demand::get(dim.second).dims();
+        std::copy(dims.begin(), dims.end(), std::back_inserter(m_demands));
+        isdemand = true;
+      }
+
+      if (!isdemand)
+      {
+        dimension_index index =
+          dim.second.index() == TYPE_INDEX_DIMENSION 
+          ? get_constant<dimension_index>(dim.second)
+          : m_system->getDimensionIndex(dim.second);
+
+        e.insert(std::make_pair(index, 
+          std::make_pair(nonNon.second.first, ord.second)));
+      }
+    }
+  }
+
+  //the tuple doesn't matter here if nonspecial is false, the false
+  //says ignore the result
+  return std::make_pair(maxTime, 
+    std::make_pair(nonspecial, std::make_shared<Region>(e)));
+}
+
 //how to bestfit with a cache
 //  until we find a priority that has valid equations and there are no demands
 //  for dimensions, do:
@@ -670,7 +778,7 @@ EquationGuard::evaluate(Context& k, Delta&&... delta) const
 //4. if any of that requires dimensions then return
 //5. then bestfit
 template <typename... Delta>
-Constant
+typename detail::EvalRetType<typename std::decay<Delta>::type...>::type
 ConditionalBestfitWS::bestfit(const applicable_list& applicable, Context& k, 
   Delta&&... delta)
 {
@@ -683,7 +791,7 @@ ConditionalBestfitWS::bestfit(const applicable_list& applicable, Context& k,
   if (applicable.size() == 0)
   {
     //std::cerr << "undef for " << m_name << std::endl;
-    return Types::Special::create(SP_UNDEF);
+    return detail::cached_return(Types::Special::create(SP_UNDEF), delta...);
   }
   else if (applicable.size() == 1)
   {
@@ -740,7 +848,8 @@ ConditionalBestfitWS::bestfit(const applicable_list& applicable, Context& k,
     {
       //std::cerr << m_name << ": multiple newest" << std::endl;
 
-      return Types::Special::create(SP_MULTIDEF);
+      return detail::
+        cached_return(Types::Special::create(SP_MULTIDEF), delta...);
       //we can't do bestselect right now because these things aren't named
 
       #if 0
@@ -784,7 +893,7 @@ ConditionalBestfitWS::bestfit(const applicable_list& applicable, Context& k,
   else
   {
     //std::cerr << m_name << ": no best" << std::endl;
-    return Types::Special::create(SP_UNDEF);
+    return detail::cached_return(Types::Special::create(SP_UNDEF), delta...);
   }
  
   //std::cerr << "running equation " << std::get<1>(*bestIter)->id()
@@ -797,7 +906,7 @@ ConditionalBestfitWS::bestfit(const applicable_list& applicable, Context& k,
   else
   {
     //std::cerr << "multidef for " << m_name << std::endl;
-    return Types::Special::create(SP_MULTIDEF);
+    return detail::cached_return(Types::Special::create(SP_MULTIDEF), delta...);
   }
 }
 
@@ -958,6 +1067,103 @@ TimeConstant
 ConditionalBestfitWS::operator()
   (Context& kappa, Delta& d, const Thread& w, size_t t)
 {
+  applicable_list applicable;
+  applicable_list potential;
+  applicable.reserve(m_equations.size());
+  std::vector<dimension_index> demands;
+
+  size_t maxTime;
+
+  //find all the applicable ones
+
+  //for each priority...
+  //if nothing was found at this priority then look at the next one
+  for (auto priorityIter = m_priorityVars.rbegin();
+       priorityIter != m_priorityVars.rend() && applicable.empty();
+       ++priorityIter
+  )
+  {
+    //make sure there are no potentials from the previous priority
+    potential.clear();
+
+    //look at everything created before this time
+    const auto& thisPriority = priorityIter->second;
+    for (auto provenanceIter = thisPriority.begin();
+         provenanceIter != thisPriority.end();
+         ++provenanceIter
+    )
+    {
+      const auto& eqn_i = provenanceIter->second;
+
+      //if it has a non-empty context guard
+      if (eqn_i->validContext())
+      {
+        const EquationGuard& guard = eqn_i->validContext();
+        auto result = guard.evaluateCached(kappa, d, w, t);
+
+        if (result.first)
+        {
+          std::copy(guard.demands().begin(), guard.demands().end(),
+            std::back_inserter(demands));
+
+          potential.push_back(ApplicableTuple(result.second.second, eqn_i));
+
+          maxTime = std::max(maxTime, result.second.first);
+        }
+      }
+      else
+      {
+        potential.push_back(ApplicableTuple(std::make_shared<Region>(), eqn_i));
+      }
+    }
+
+    if (demands.size() > 0)
+    {
+      return std::make_pair(maxTime, Types::Demand::create(demands));
+    }
+
+    //go through the potential equations and check their applicability
+    for (const auto& p : potential)
+    {
+      const auto& context = std::get<0>(p);
+      if (context->begin() == context->end())
+      {
+        applicable.push_back(p);
+      }
+      else
+      {
+        //check that all the dimensions in context are in delta
+        bool hasdemands = false;
+        for (const auto& index : *context)
+        {
+          if (d.find(index.first) == d.end())
+          {
+            demands.push_back(index.first);
+            hasdemands = true;
+          }
+        }
+
+        //don't bother doing this if there are dimensions not available
+        //booleanTrue returns false if there are demands
+        if (!hasdemands && regionApplicable(*context, kappa)
+          && booleanTrue(std::get<1>(p)->validContext(), kappa, d, w, maxTime,
+               demands)
+        )
+        {
+          applicable.push_back(p);
+        }
+      }
+    }
+
+    //stop if looking at the tuples generated demands
+    if (demands.size() > 0)
+    {
+      return std::make_pair(maxTime, Types::Demand::create(demands));
+    }
+  }
+
+  //now we have something valid and no demands are needed
+  return bestfit(applicable, kappa, d, w, maxTime);
 }
 
 EquationGuard::EquationGuard(WS* g, WS* b)

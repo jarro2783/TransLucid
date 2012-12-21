@@ -493,6 +493,9 @@ namespace TransLucid
     std::pair<bool, std::shared_ptr<Region>>
     evaluate(Context& k, Delta&&... delta) const;
 
+    std::pair<bool, std::pair<size_t, std::shared_ptr<Region>>>
+    evaluateCached(Context& k, Delta&, const Thread& w, size_t t) const;
+
     /**
      * @brief Adds a system imposed dimension.
      *
@@ -653,7 +656,7 @@ namespace TransLucid
     typedef std::map<int, ProvenanceList> PriorityList;
 
     template <typename... Delta>
-    Constant
+    typename detail::EvalRetType<typename std::decay<Delta>::type...>::type
     bestfit(const applicable_list& applicable, Context& k, 
       Delta&&... delta);
 
