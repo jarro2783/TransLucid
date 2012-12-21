@@ -1525,7 +1525,15 @@ BaseAbstractionWS::operator()
   //are the bound dimensions in the context?
   for (auto dim : binds)
   {
-    if (!kappa.has_entry(dim))
+    if (d.find(dim) == d.end())
+    {
+      demands.push_back(dim);
+    }
+  }
+
+  for (auto dim : m_scope)
+  {
+    if (d.find(dim) == d.end())
     {
       demands.push_back(dim);
     }
@@ -1535,6 +1543,16 @@ BaseAbstractionWS::operator()
   {
     return std::make_pair(maxTime, Types::Demand::create(demands));
   }
+
+  return std::make_pair(maxTime, Types::BaseFunction::create(
+    BaseFunctionAbstraction
+    (
+      m_dims,
+      m_scope,
+      binds,
+      m_rhs,
+      kappa
+    )));
 }
 
 Constant
@@ -1756,10 +1774,30 @@ WhereWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 {
   std::vector<dimension_index> demands;
   std::vector<std::pair<dimension_index, Constant>> change;
+  size_t maxTime = 0;
 
   for (auto v : m_dims)
   {
+    auto init = (*v.second)(kappa, d, w, t);
+
+    maxTime = std::max(maxTime, init.first);
+
+    if (init.second.index() == TYPE_INDEX_DEMAND)
+    {
+      Types::Demand::append(init.second, demands);
+    }
   }
+
+  if (!demands.empty())
+  {
+    return std::make_pair(maxTime, Types::Demand::create(demands));
+  }
+
+  ContextPerturber pk(kappa, change);
+  DeltaPerturber pd(d);
+  pd.perturb(change);
+
+  return (*m_expr)(kappa, d, w, t);
 }
 
 Constant
@@ -2016,6 +2054,8 @@ AtTupleWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
   else
   {
     ContextPerturber pkappa(kappa, tuple);
+    DeltaPerturber pdelta(d);
+    pdelta.perturb(tuple);
     return (*m_e2)(kappa, d, w, maxTime);
   }
 }

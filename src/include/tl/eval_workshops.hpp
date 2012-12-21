@@ -747,7 +747,7 @@ namespace TransLucid
       WhereWS
       (
         WS* expr,
-        std::vector<std::pair<int, WS*>> dims,
+        std::vector<std::pair<dimension_index, WS*>> dims,
         System& system
       )
       : m_expr(expr)
@@ -768,7 +768,7 @@ namespace TransLucid
       private:
 
       WS* m_expr;
-      std::vector<std::pair<int, WS*>> m_dims;
+      std::vector<std::pair<dimension_index, WS*>> m_dims;
 
       System& m_system;
     };
