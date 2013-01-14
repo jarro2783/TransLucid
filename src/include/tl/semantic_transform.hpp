@@ -129,6 +129,9 @@ namespace TransLucid
     //which ones are call by name
     std::set<u32string> m_cbnscope;
 
+    //which ones are local dimenions
+    std::set<u32string> m_dimscope;
+
     //the renames
     //a hashmap would be better, but we need to hold on to iterators
     //while we're changing it and they can't be invalidated

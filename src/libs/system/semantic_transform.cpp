@@ -163,6 +163,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     //rename identifiers in scope
     //after visiting all the dimension initialisation expressions
     m_fnScope.insert(std::make_pair(renamed, *alloc)); 
+    m_dimscope.insert(renamed);
 
     //put the dim in scope too
     m_scope.push_back(*alloc);
@@ -244,7 +245,10 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   //remove the dims from rewriting
   for (auto v : e.dims)
   {
-    m_fnScope.erase(v.first);
+    const auto& renamed = getRenamed(v.first);
+    m_fnScope.erase(renamed);
+    m_dimscope.erase(renamed);
+    popScope(v.first);
   }
 
   //drop the dims to hold on to
