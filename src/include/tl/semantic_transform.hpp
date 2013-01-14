@@ -141,6 +141,9 @@ namespace TransLucid
 
     std::vector<std::pair<ScopePtr, Parser::Line>> m_newVars;
 
+    bool
+    caching() const;
+
     public:
     const decltype(m_newVars)&
     newVars() const

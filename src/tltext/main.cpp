@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
       /* TRANSLATORS: the help message for --args */
       _("arguments to pass to TransLucid in the CLARGS variable"))
     /* TRANSLATORS: the help message for --cache */
-    ("cache", _("use cache"))
+    ("cache", _("use cache, no testing is done to check if this is valid"))
     /* TRANSLATORS: the help message for --debug */
     ("debug,d", _("debug mode"))
     /* TRANSLATORS: the help message for --help */

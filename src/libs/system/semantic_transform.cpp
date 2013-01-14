@@ -46,6 +46,12 @@ SemanticTransform::transform(const Tree::Expr& e)
   return apply_visitor(*this, e);
 }
 
+bool 
+SemanticTransform::caching() const
+{
+  return m_system.cached();
+}
+
 Tree::Expr 
 SemanticTransform::operator()(const Tree::ParenExpr& e)
 {
@@ -283,6 +289,12 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
     {
       return Tree::EvalIntenExpr(
         Tree::HashExpr(Tree::DimensionExpr(iter->second)));
+    }
+
+    //is it a dimension and are we caching?
+    if (caching() && m_dimscope.find(unique) != m_dimscope.end())
+    {
+      return Tree::DimensionExpr(iter->second);
     }
 
     return Tree::HashExpr(Tree::DimensionExpr(iter->second));

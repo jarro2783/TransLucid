@@ -113,6 +113,12 @@ namespace TransLucid
     //don't want to copy
     System(const System&) = delete;
 
+    bool
+    cached()
+    {
+      return m_cached;
+    }
+
     //the registry interface
     type_index
     getTypeIndex(const u32string& name);
