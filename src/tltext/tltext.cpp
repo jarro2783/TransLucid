@@ -369,7 +369,7 @@ TLText::processDefinitions
             //how do I do this?
             if (result.index() == TYPE_INDEX_UUID)
             {
-              m_system.cacheIfVar(Types::UUID::get(result));
+              m_system.cacheObject(Types::UUID::get(result));
             }
           }
 

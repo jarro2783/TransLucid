@@ -110,6 +110,12 @@ namespace
       return m_object->repl(id, time, line);
     }
 
+    void
+    cache()
+    {
+      return m_object->cache();
+    }
+
     private:
     Iterator m_object;
 
@@ -952,13 +958,13 @@ System::cacheVar(const u32string& name)
 }
 
 void
-System::cacheIfVar(const uuid& id)
+System::cacheObject(const uuid& id)
 {
-  auto uiter = m_equationUUIDs.find(id);
+  auto uiter = m_objects.find(id);
 
-  if (uiter != m_equationUUIDs.end())
+  if (uiter != m_objects.end())
   {
-    cacheVar(uiter->second->first);
+    uiter->second->cache();
   }
 }
 

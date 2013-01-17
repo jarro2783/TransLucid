@@ -41,6 +41,13 @@ namespace TransLucid
 
     virtual bool
     repl(uuid id, int time, const Parser::RawInput& line) = 0;
+
+    //the default is to ignore
+    //the objects that can be cached will override this
+    virtual void
+    cache()
+    {
+    }
   };
 }
 

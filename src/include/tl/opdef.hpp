@@ -66,6 +66,12 @@ namespace TransLucid
       return m_bestfit.repl(id, time, line);
     }
 
+    //ignore the request to cache
+    void
+    cache()
+    {
+    }
+
     Tree::Expr
     group(const std::list<EquationDefinition>& defs);
 

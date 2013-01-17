@@ -334,6 +334,12 @@ namespace TransLucid
       m_name = name;
     }
 
+    void
+    cache()
+    {
+      m_cached = true;
+    }
+
     private:
 
     void

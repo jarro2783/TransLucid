@@ -271,6 +271,9 @@ namespace TransLucid
     cacheIfVar(const uuid& id);
 
     void
+    cacheObject(const uuid& id);
+
+    void
     disableCache();
 
     void 
