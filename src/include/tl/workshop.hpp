@@ -26,7 +26,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class Thread;
+  class Thread
+  {
+  };
 
   class WS
   {

@@ -219,6 +219,7 @@ namespace TransLucid
     , m_system(system)
     , m_parsed(0)
     , m_compiling(false)
+    , m_cached(false)
     {
     }
 
@@ -414,6 +415,8 @@ namespace TransLucid
     size_t m_parsed;
 
     bool m_compiling;
+
+    bool m_cached;
 
     u32string m_name;
   };

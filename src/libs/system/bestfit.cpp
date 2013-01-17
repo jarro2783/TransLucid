@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/bestfit.hpp>
+#include <tl/cache.hpp>
 #include <tl/eval_workshops.hpp>
 #include <tl/output.hpp>
 #include <tl/tree_printer.hpp>
@@ -408,7 +409,18 @@ BestfitGroup::compileExpression(const Tree::Expr& expr, ScopePtr scope)
 
   //compile the tree into a workshop
   WorkshopBuilder compile(&m_system);
-  std::shared_ptr<WS> ws(compile.build_workshops(fixed));
+
+  std::shared_ptr<WS> ws;
+
+  if (m_cached)
+  {
+    ws = std::make_shared<Workshops::CacheWS>(
+      compile.build_workshops(fixed), m_name, m_system);
+  }
+  else
+  {
+    ws = std::shared_ptr<WS>(compile.build_workshops(fixed));
+  }
 
   return ws;
 }

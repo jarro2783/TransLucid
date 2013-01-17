@@ -542,28 +542,31 @@ CacheWS::operator()(Context& kappa)
   //although maybe it can just call cached code with all the dimensions
   if (m_system.cacheEnabled())
   {
-    Constant c = operator()(kappa, kappa);
+    //we need to start a new thread and a new time
+    Thread w;
+    Delta delta;
+    auto c = operator()(kappa, delta, w, 0);
 
-    if (c.index() == TYPE_INDEX_DEMAND)
+    if (c.second.index() == TYPE_INDEX_DEMAND)
     {
       ContextPerturber p{kappa};
       //or not, we need to fill in the undefined dimensions and try again
-      while (c.index() == TYPE_INDEX_DEMAND)
+      while (c.second.index() == TYPE_INDEX_DEMAND)
       {
         //std::cerr << "a demand got through" << std::endl;
 
-        for (auto d : get_constant_pointer<DemandType>(c).dims())
+        for (auto d : get_constant_pointer<DemandType>(c.second).dims())
         {
           p.perturb(d, Types::Special::create(SP_UNDEF));
           //std::cerr << d << std::endl;
           //std::cerr << "in context: " << kappa.has_entry(d) << std::endl;
         }
 
-        c = operator()(kappa, kappa);
+        c = operator()(kappa, delta, w, 0);
       }
     }
 
-    return c;
+    return c.second;
   }
   else
   {
@@ -618,8 +621,59 @@ CacheWS::operator()(Context& kappa, Context& delta)
 }
 
 TimeConstant
-CacheWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
+CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
 {
+  Delta subdelta;
+  Context subcontext;
+  ContextPerturber p(subcontext);
+
+  while (true)
+  {
+    Constant d = m_cache.get(subcontext);
+
+    if (d.index() == TYPE_INDEX_CALC)
+    {
+      //std::cerr << "cache node: " << m_name << ": calc" << std::endl;
+      auto result = (*m_expr)(kappa, subdelta, w, t);
+      m_cache.set(subcontext, result.second);
+    }
+
+    if (d.index() == TYPE_INDEX_DEMAND)
+    {
+      //std::cerr << "cache node: " << m_name << ": demands:";
+      const auto& demands = Types::Demand::get(d);
+
+      subdelta.insert(demands.dims().begin(), demands.dims().end());
+
+      for (auto dim : demands.dims())
+      {
+        //std::cerr << " " << dim;
+        p.perturb(dim, kappa.lookup(dim));
+      }
+      //std::cerr << std::endl;
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  Context finalk;
+  ContextPerturber p2(finalk);
+
+  for (auto dim : delta)
+  {
+    p2.perturb(dim, kappa.lookup(dim));
+  }
+
+  Constant v = m_cache.get(finalk);
+
+  //if (v.index() == TYPE_INDEX_SPECIAL && get_constant<Special>(v) == SP_LOOP)
+  //{
+    //std::cerr << m_name << " loop" << std::endl;
+  //}
+
+  return std::make_pair(t, v);
 }
 
 }
