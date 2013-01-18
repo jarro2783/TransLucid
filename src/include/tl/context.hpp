@@ -161,6 +161,20 @@ namespace TransLucid
       return m_rho;
     }
 
+    void
+    fillDelta(Delta& d)
+    {
+      auto m = min();
+      ++m;
+      while (m != max())
+      {
+        if (has_entry(m))
+        {
+          d.insert(m);
+        }
+      }
+    }
+
     private:
 
     friend class ContextPerturber;

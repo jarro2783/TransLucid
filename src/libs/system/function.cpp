@@ -18,8 +18,8 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 /**
- * @file system.hpp
- * The System.
+ * @file function.cpp
+ * Function workshops.
  */
 
 #include <tl/function.hpp>

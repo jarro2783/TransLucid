@@ -777,8 +777,8 @@ EquationGuard::evaluateCached(Context& k, Delta& d, const Thread& w, size_t t)
 
   //the tuple doesn't matter here if nonspecial is false, the false
   //says ignore the result
-  return std::make_pair(maxTime, 
-    std::make_pair(nonspecial, std::make_shared<Region>(e)));
+  return std::make_pair(nonspecial, 
+    std::make_pair(maxTime, std::make_shared<Region>(e)));
 }
 
 //how to bestfit with a cache
@@ -1084,7 +1084,7 @@ ConditionalBestfitWS::operator()
   applicable.reserve(m_equations.size());
   std::vector<dimension_index> demands;
 
-  size_t maxTime;
+  size_t maxTime = t;
 
   //find all the applicable ones
 

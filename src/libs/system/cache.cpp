@@ -557,7 +557,8 @@ CacheWS::operator()(Context& kappa)
 
         for (auto d : get_constant_pointer<DemandType>(c.second).dims())
         {
-          p.perturb(d, Types::Special::create(SP_UNDEF));
+          p.perturb(d, kappa.lookup(d));
+          delta.insert(d);
           //std::cerr << d << std::endl;
           //std::cerr << "in context: " << kappa.has_entry(d) << std::endl;
         }
