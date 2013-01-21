@@ -569,6 +569,33 @@ CacheWS::operator()(Context& kappa)
 
     return c.second;
   }
+  #if 0
+  {
+    //we need to start a new thread and a new time
+    auto c = operator()(kappa, kappa);
+
+    if (c.index() == TYPE_INDEX_DEMAND)
+    {
+      ContextPerturber p{kappa};
+      //or not, we need to fill in the undefined dimensions and try again
+      while (c.index() == TYPE_INDEX_DEMAND)
+      {
+        //std::cerr << "a demand got through" << std::endl;
+
+        for (auto d : get_constant_pointer<DemandType>(c).dims())
+        {
+          p.perturb(d, kappa.lookup(d));
+          //std::cerr << d << std::endl;
+          //std::cerr << "in context: " << kappa.has_entry(d) << std::endl;
+        }
+
+        c = operator()(kappa, kappa);
+      }
+    }
+
+    return c;
+  }
+  #endif
   else
   {
     //we're not using the cache at the moment

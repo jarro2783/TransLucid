@@ -1015,7 +1015,7 @@ HashWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
   }
 
   auto dim = m_system.getDimensionIndex(r.second);
-  if (!kappa.has_entry(dim))
+  if (d.find(dim) == d.end())
   {
     return std::make_pair(r.first, Types::Demand::create({dim}));
   }
