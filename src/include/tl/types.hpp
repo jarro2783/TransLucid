@@ -319,6 +319,10 @@ namespace TransLucid
 
   typedef std::set<dimension_index> Delta;
 
+  //this is just for debugging, it doesn't do much
+  std::string
+  print_constant(const Constant& c);
+
   #if 0
   inline size_t
   hash_value(const Constant& c)

@@ -24,10 +24,13 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iostream>
 
+#include <tl/fixed_indexes.hpp>
 #include <tl/types.hpp>
+#include <tl/types/intmp.hpp>
 #include <tl/range.hpp>
 //#include <tl/system.hpp>
 #include <tl/exception.hpp>
+#include <gmpxx.h>
 
 namespace TransLucid
 {
@@ -254,6 +257,29 @@ Tuple::hash() const
 {
   std::hash<tuple_t> hasher;
   return hasher(*m_value);
+}
+
+std::string
+print_constant(const Constant& c)
+{
+  switch (c.index())
+  {
+    case TYPE_INDEX_INTMP:
+    return Types::Intmp::get(c).get_str();
+    break;
+
+    case TYPE_INDEX_CALC:
+    return "calc";
+    break;
+
+    case TYPE_INDEX_DEMAND:
+    return "demand";
+    break;
+
+    default:
+    return "unknown";
+    break;
+  }
 }
 
 } //namespace TransLucid

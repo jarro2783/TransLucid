@@ -663,7 +663,10 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
     {
       //std::cerr << "cache node: " << m_name << ": calc" << std::endl;
       auto result = (*m_expr)(kappa, subdelta, w, t);
+      //std::cerr << "cache node: " << m_name << ": result: " <<
+      //  print_constant(result.second) << std::endl;
       m_cache.set(subcontext, result.second);
+      d = result.second;
     }
 
     if (d.index() == TYPE_INDEX_DEMAND)
@@ -675,7 +678,7 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
 
       for (auto dim : demands.dims())
       {
-        //std::cerr << " " << dim;
+        //std::cerr << " " << dim << " = " << print_constant(kappa.lookup(dim));
         p.perturb(dim, kappa.lookup(dim));
       }
       //std::cerr << std::endl;
