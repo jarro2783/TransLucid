@@ -591,11 +591,37 @@ System::addAssignment(const Parser::Equation& eqn)
 
   WorkshopBuilder compile(this);
 
-  auto guardws = std::shared_ptr<WS>(compile.build_workshops(guard));
-  auto booleanws = std::shared_ptr<WS>(compile.build_workshops(boolean));
-  auto exprws = std::shared_ptr<WS>(compile.build_workshops(expr));
+  if (m_cached)
+  {
+    auto guardws = std::make_shared<Workshops::CacheWS>
+      (
+        compile.build_workshops(guard),
+        U"assignment_guard",
+        *this
+      );
+    auto booleanws = std::make_shared<Workshops::CacheWS>
+      (
+        compile.build_workshops(boolean),
+        U"assignment_boolean",
+        *this
+      );
+    auto exprws = std::make_shared<Workshops::CacheWS>
+      (
+        compile.build_workshops(expr),
+        U"assignment_expr",
+        *this
+      );
 
-  assign->second->addDefinition(guardws, booleanws, exprws);
+    assign->second->addDefinition(guardws, booleanws, exprws);
+  }
+  else
+  {
+    auto guardws = std::shared_ptr<WS>(compile.build_workshops(guard));
+    auto booleanws = std::shared_ptr<WS>(compile.build_workshops(boolean));
+    auto exprws = std::shared_ptr<WS>(compile.build_workshops(expr));
+
+    assign->second->addDefinition(guardws, booleanws, exprws);
+  }
 
   return Types::UUID::create(u);
 }

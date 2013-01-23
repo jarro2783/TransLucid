@@ -193,8 +193,6 @@ createValueFunctionCachedNew
   return std::make_pair(maxTime, Types::ValueFunction::create(
     ValueFunctionType(system, name, argDim, expr, binds, scope, kappa)
   ));
-
-  return TimeConstant();
 }
 
 Constant

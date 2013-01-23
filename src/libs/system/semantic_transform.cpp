@@ -169,6 +169,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     //rename identifiers in scope
     //after visiting all the dimension initialisation expressions
     m_fnScope.insert(std::make_pair(renamed, *alloc)); 
+    std::cerr << "adding " << renamed << " to dimensions" << std::endl;
     m_dimscope.insert(renamed);
 
     //put the dim in scope too
@@ -276,25 +277,26 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
 {
   //first get the renamed name
   auto unique = getRenamed(e.text);
-  //std::cerr << "replacing '" << e.text << "' with '" << unique 
-  //  << "'" << std::endl;
+  std::cerr << "replacing '" << e.text << "' with '" << unique 
+    << "'" << std::endl;
 
   //does this need to be replaced for a function parameter or dim
   auto iter = m_fnScope.find(unique);
   if (iter != m_fnScope.end())
   {
+    //is it a dimension and are we caching?
+    if (caching() && m_dimscope.find(unique) != m_dimscope.end())
+    {
+      std::cerr << unique << " is a dimension" << std::endl;
+      return Tree::DimensionExpr(iter->second);
+    }
+
     //is it a call by name?
     auto cbniter = m_cbnscope.find(unique);
     if (cbniter != m_cbnscope.end())
     {
       return Tree::EvalIntenExpr(
         Tree::HashExpr(Tree::DimensionExpr(iter->second)));
-    }
-
-    //is it a dimension and are we caching?
-    if (caching() && m_dimscope.find(unique) != m_dimscope.end())
-    {
-      return Tree::DimensionExpr(iter->second);
     }
 
     return Tree::HashExpr(Tree::DimensionExpr(iter->second));
@@ -508,7 +510,8 @@ SemanticTransform::makeScope() const
       m_cbnscope, 
       m_scope,
       m_fnScope,
-      renames
+      renames,
+      m_dimscope
     }
   );
 }
@@ -577,6 +580,7 @@ SemanticTransform::restoreScope(const ScopePtr& scope)
   m_cbnscope = scope->cbnParams;
   m_scope = scope->scopeDims;
   m_fnScope = scope->lookups;
+  m_dimscope = scope->dimscope;
 
   //initialise the stack of names
   for (const auto& r : scope->renames)

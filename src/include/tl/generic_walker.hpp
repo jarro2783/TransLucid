@@ -297,6 +297,8 @@ namespace TransLucid
         );
       }
 
+      cond.name = e.name;
+
       return cond;
     }
 

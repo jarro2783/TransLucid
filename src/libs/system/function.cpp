@@ -88,6 +88,8 @@ FunctionWS::group(const std::list<EquationDefinition>& defs)
 
   Tree::ConditionalBestfitExpr cond;
 
+  cond.name = m_name;
+
   std::map<u32string, dimension_index> rewrites;
 
   for (auto& eqn : defs)

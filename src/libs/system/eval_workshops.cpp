@@ -1780,6 +1780,8 @@ WhereWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
   {
     auto init = (*v.second)(kappa, d, w, t);
 
+    change.push_back(std::make_pair(v.first, init.second));
+
     maxTime = std::max(maxTime, init.first);
 
     if (init.second.index() == TYPE_INDEX_DEMAND)

@@ -103,6 +103,7 @@ VariableWS::group(const std::list<EquationDefinition>& lines)
 
   //create a conditional best fitter of all these equations
   Tree::ConditionalBestfitExpr best;
+  best.name = m_name;
   for (auto& l : lines)
   {
     auto eqn = get<Parser::Variable>(l.parsed().get());

@@ -654,6 +654,12 @@ namespace TransLucid
     TimeConstant
     operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
+    void
+    setName(const u32string& name)
+    {
+      m_name = name;
+    }
+
     private:
     typedef std::tuple<std::shared_ptr<Region>, Equations::iterator> 
       ApplicableTuple;
@@ -671,6 +677,7 @@ namespace TransLucid
 
     Equations m_equations;
     PriorityList m_priorityVars;
+    u32string m_name;
   };
 
   //is region a a subset of region b? this is under the assumption that

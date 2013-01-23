@@ -802,6 +802,7 @@ namespace TransLucid
       typedef std::tuple<int, Expr, Expr, Expr> Declaration;
 
       std::vector<Declaration> declarations;
+      u32string name;
     };
 
     /**

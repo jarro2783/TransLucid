@@ -367,6 +367,9 @@ WorkshopBuilder::operator()(const Tree::ConditionalBestfitExpr& e)
   auto bestfit = std::unique_ptr<ConditionalBestfitWS>(
     new ConditionalBestfitWS(compiled));
 
+  std::cerr << "conditional bestfit with name: '" << e.name << "'" << std::endl;
+  bestfit->setName(e.name);
+
   return bestfit.release();
 }
 

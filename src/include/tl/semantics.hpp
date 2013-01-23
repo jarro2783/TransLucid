@@ -50,6 +50,7 @@ namespace TransLucid
     std::vector<dimension_index> scopeDims; 
     std::unordered_map<u32string, dimension_index> lookups;
     std::unordered_map<u32string, u32string> renames;
+    std::set<u32string> dimscope;
   };
 
   typedef std::shared_ptr<Scope> ScopePtr;
