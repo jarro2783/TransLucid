@@ -419,7 +419,7 @@ class TreePrinter
   void
   operator()(const Tree::HashExpr& h)
   {
-    m_os << "#!";
+    m_os << "#.";
 
     parenPush(Precedence::FN_APP, Assoc::LEFT, Subtree::RIGHT);
 

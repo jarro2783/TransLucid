@@ -122,6 +122,10 @@ namespace
 DimensionWS::DimensionWS(System& system, dimension_index dim)
 : m_value(Types::Dimension::create(dim))
 {
+  if (dim == -148)
+  {
+    std::cerr << "initialising DimensionWS with -148" << std::endl;
+  }
 }
 
 DimensionWS::DimensionWS(System& system, const std::u32string& name)
@@ -237,6 +241,12 @@ IdentWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
 
   if (m_e != nullptr)
   {
+    if (m_name == U"33_uniqueid")
+    {
+      auto c = kappa.lookup(-114);
+      std::cerr << "dim d has value " << print_constant(c) << std::endl;
+    }
+
     return (*m_e)(kappa, d, w, t);
   }
   else
@@ -563,6 +573,12 @@ BangOpWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
     if (isDemand)
     {
       std::vector<dimension_index> demands;
+
+      if (fn.second.index() == TYPE_INDEX_DEMAND)
+      {
+        Types::Demand::append(fn.second, demands);
+      }
+
       for (const auto& c : args)
       {
         if (c.index() == TYPE_INDEX_DEMAND)
@@ -618,13 +634,13 @@ BangOpWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
       if (args.size() == 1)
       {
         //Constant arg = (*m_args[0])(kappa);
-        return std::make_pair(maxTime, 
-          Types::BaseFunction::get(fn.second).apply(args.at(0)));
+        return 
+          Types::BaseFunction::get(fn.second).apply(args.at(0), d, w, maxTime);
       }
       else
       {
-        return std::make_pair(maxTime, 
-          Types::BaseFunction::get(fn.second).apply(args));
+        return 
+          Types::BaseFunction::get(fn.second).apply(args, d, w, maxTime);
       }
     }
   }
@@ -712,6 +728,10 @@ MakeIntenWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
     {
       Types::Demand::append(r.second, demands);
     }
+    else
+    {
+      binds.push_back(r.second);
+    }
 
     maxTime = std::max(maxTime, r.first);
   }
@@ -726,7 +746,7 @@ MakeIntenWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
     {
       auto i = m_system.getDimensionIndex(c);
 
-      if (!kappa.has_entry(i))
+      if (d.find(i) == d.end())
       {
         demands.push_back(i);
       }
@@ -1513,7 +1533,7 @@ BaseAbstractionWS::operator()
     }
     else
     {
-      m_system->getDimensionIndex(result.second);
+      binds.push_back(m_system->getDimensionIndex(result.second));
     }
   }
 

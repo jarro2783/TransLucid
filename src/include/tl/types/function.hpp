@@ -49,7 +49,6 @@ namespace TransLucid
       return cloneSelf();
     }
 
-    //we ignore the context
     Constant
     apply(const Constant& c) const
     {
@@ -57,9 +56,24 @@ namespace TransLucid
     }
 
     Constant
-    apply(const std::vector<Constant>& args) const
+    apply(const std::vector<Constant>& params) const
     {
-      return applyFn(args);
+      return applyFn(params);
+    }
+
+    //we ignore the context
+    template <typename... T>
+    TimeConstant
+    apply(const Constant& c, T&&... args) const
+    {
+      return applyFn(c, args...);
+    }
+
+    template <typename... T>
+    TimeConstant
+    apply(const std::vector<Constant>& params, T&&... args) const
+    {
+      return applyFn(params, args...);
     }
 
     size_t
@@ -72,11 +86,19 @@ namespace TransLucid
     arity() const = 0;
 
     private:
+
     virtual Constant
     applyFn(const Constant& c) const = 0;
 
     virtual Constant
     applyFn(const std::vector<Constant>& args) const = 0;
+
+    virtual TimeConstant
+    applyFn(const Constant& c, Delta& d, const Thread& w, size_t t) const = 0;
+
+    virtual TimeConstant
+    applyFn(const std::vector<Constant>& args, Delta& d, 
+      const Thread& w, size_t t) const = 0;
 
     virtual BaseFunctionType*
     cloneSelf() const = 0;
@@ -186,6 +208,53 @@ namespace TransLucid
       }
 
       return (*m_expr)(newk);
+    }
+
+    TimeConstant
+    applyFn(const Constant& c, Delta& d, const Thread& w, size_t t) const
+    {
+      if (m_dims.size() != 1)
+      {
+        return std::make_pair(t, Types::Special::create(SP_TYPEERROR));
+      }
+
+      Context newk;
+      ContextPerturber p(newk, m_binds);
+      DeltaPerturber pd(d);
+
+      p.perturb({{m_dims.at(0), c}});
+      pd.perturb(m_dims.at(0));
+
+      return (*m_expr)(newk, d, w, t);
+    }
+
+    TimeConstant
+    applyFn(const std::vector<Constant>& args, Delta& d, 
+      const Thread& w, size_t t) 
+      const
+    {
+      if (m_dims.size() != args.size())
+      {
+        return std::make_pair(t, Types::Special::create(SP_TYPEERROR));
+      }
+
+      Context newk;
+      ContextPerturber p(newk, m_binds);
+      DeltaPerturber pd(d);
+
+      //these ranges are the same length because we just checked it
+      auto dimIter = m_dims.begin();
+      auto argIter = args.begin();
+
+      while (dimIter != m_dims.end())
+      {
+        p.perturb(*dimIter, *argIter);
+        pd.perturb(*dimIter);
+        ++dimIter;
+        ++argIter;
+      }
+
+      return (*m_expr)(newk, d, w, t);
     }
 
     BaseFunctionAbstraction*
@@ -333,6 +402,21 @@ namespace TransLucid
       }
 
       return detail::call_n_args<NumArgs>(m_fn, args);
+    }
+
+    TimeConstant
+    applyFn(const Constant& c, Delta& d, const Thread& w, size_t t) const
+    {
+      //ignore thread and time for builtin functions
+      return std::make_pair(t, applyFn(c));
+    }
+
+    TimeConstant
+    applyFn(const std::vector<Constant>& args, Delta& d,
+      const Thread& w, size_t t) const
+    {
+      //ignore thread and time for builtin functions
+      return std::make_pair(t, applyFn(args));
     }
 
     private:

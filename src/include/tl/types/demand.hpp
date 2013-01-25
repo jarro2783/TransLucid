@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <vector>
 #include <set>
+#include <iostream>
 
 #include <tl/types.hpp>
 #include <functional>
@@ -34,6 +35,10 @@ namespace TransLucid
     DemandType(const std::vector<dimension_index>& dims)
     : m_dims(dims.begin(), dims.end())
     {
+      if (dims.size() == 0)
+      {
+        std::cerr << "empty demand" << std::endl;
+      }
     }
 
     const std::set<dimension_index>&

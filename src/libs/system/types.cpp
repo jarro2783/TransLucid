@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <iostream>
+#include <sstream>
 
 #include <tl/fixed_indexes.hpp>
 #include <tl/types.hpp>
@@ -262,6 +263,7 @@ Tuple::hash() const
 std::string
 print_constant(const Constant& c)
 {
+  std::ostringstream str;
   switch (c.index())
   {
     case TYPE_INDEX_INTMP:
@@ -277,7 +279,8 @@ print_constant(const Constant& c)
     break;
 
     default:
-    return "unknown";
+    str << "unknown of index " << c.index();
+    return str.str();
     break;
   }
 }
