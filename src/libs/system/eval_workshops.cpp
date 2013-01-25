@@ -243,7 +243,7 @@ IdentWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
   {
     if (m_name == U"33_uniqueid")
     {
-      auto c = kappa.lookup(-114);
+      auto c = kappa.lookup(-96);
       std::cerr << "dim d has value " << print_constant(c) << std::endl;
     }
 
