@@ -122,10 +122,6 @@ namespace
 DimensionWS::DimensionWS(System& system, dimension_index dim)
 : m_value(Types::Dimension::create(dim))
 {
-  if (dim == -148)
-  {
-    std::cerr << "initialising DimensionWS with -148" << std::endl;
-  }
 }
 
 DimensionWS::DimensionWS(System& system, const std::u32string& name)
@@ -243,7 +239,7 @@ IdentWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
   {
     if (m_name == U"33_uniqueid")
     {
-      auto c = kappa.lookup(-96);
+      auto c = kappa.lookup(-115);
       std::cerr << "dim d has value " << print_constant(c) << std::endl;
     }
 

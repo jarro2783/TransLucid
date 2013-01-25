@@ -620,6 +620,8 @@ namespace TransLucid
     Constant
     mpz_gt(const Constant& a, const Constant& b)
     {
+      std::cerr << get_constant_pointer<mpz_class>(a) << " > " <<
+        get_constant_pointer<mpz_class>(b) << std::endl;
       return Types::Boolean::create(get_constant_pointer<mpz_class>(a) >
         get_constant_pointer<mpz_class>(b))
       ;

@@ -174,7 +174,14 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     m_dimscope.insert(renamed);
 
     //put the dim in scope too
-    m_scope.push_back(*alloc);
+
+    //we don't want to put this in scope if we're caching because now this
+    //is the actual dimension and not a dimension holding onto the actual
+    //dimension allocated
+    if (!caching())
+    {
+      m_scope.push_back(*alloc);
+    }
 
     ++alloc;
   }
@@ -260,7 +267,10 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   }
 
   //drop the dims to hold on to
-  m_scope.resize(m_scope.size() - e.dims.size());
+  if (!caching())
+  {
+    m_scope.resize(m_scope.size() - e.dims.size());
+  }
 
   w.e = expr;
 

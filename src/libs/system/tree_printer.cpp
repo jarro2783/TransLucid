@@ -617,24 +617,23 @@ class TreePrinter
     if (f.params.size() > 1)
     {
       m_os << "(";
-
-      size_t i = 0;
-      while (i != f.params.size())
-      {
-        m_os << f.params.at(i);
-
-        if (i + 1 != f.params.size())
-        {
-          m_os << ", ";
-        }
-        ++i;
-      }
-
-      m_os << ")";
     }
-    else
+
+    size_t i = 0;
+    while (i != f.params.size())
     {
-      m_os << f.params.at(0);
+      m_os << f.params.at(i) << "," << f.dims.at(i);
+
+      if (i + 1 != f.params.size())
+      {
+        m_os << "; ";
+      }
+      ++i;
+    }
+
+    if (f.params.size() > 1)
+    {
+      m_os << ")";
     }
 
     m_os << " -> ";
