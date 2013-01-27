@@ -169,8 +169,8 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     //rename identifiers in scope
     //after visiting all the dimension initialisation expressions
     m_fnScope.insert(std::make_pair(renamed, *alloc)); 
-    std::cerr << "adding " << renamed << " to dimensions, with index " 
-      << *alloc << std::endl;
+    //std::cerr << "adding " << renamed << " to dimensions, with index " 
+    //  << *alloc << std::endl;
     m_dimscope.insert(renamed);
 
     //put the dim in scope too
@@ -288,8 +288,8 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
 {
   //first get the renamed name
   auto unique = getRenamed(e.text);
-  std::cerr << "replacing '" << e.text << "' with '" << unique 
-    << "'" << std::endl;
+  //std::cerr << "replacing '" << e.text << "' with '" << unique 
+  //  << "'" << std::endl;
 
   //does this need to be replaced for a function parameter or dim
   auto iter = m_fnScope.find(unique);
@@ -298,7 +298,7 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
     //is it a dimension and are we caching?
     if (caching() && m_dimscope.find(unique) != m_dimscope.end())
     {
-      std::cerr << unique << " is a dimension" << std::endl;
+      //std::cerr << unique << " is a dimension" << std::endl;
       return Tree::DimensionExpr(iter->second);
     }
 
@@ -436,8 +436,6 @@ SemanticTransform::operator()(const Tree::LambdaExpr& e)
   //1. generate a new dimension
   dimension_index argDim = expr.argDim == 0 ? 
     m_system.nextHiddenDim() : expr.argDim;
-
-  std::cerr << e.name << " is replaced with dimension " << argDim << std::endl;
 
   m_fnScope.insert({unique, argDim});
 
