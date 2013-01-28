@@ -283,6 +283,11 @@ TLText::run()
             << std::endl;
           output(*m_error, OUTPUT_SILENT) << "Type index: " << c.index() 
             << std::endl;
+          if (c.index() == TYPE_INDEX_SPECIAL)
+          {
+            output(*m_error, OUTPUT_SILENT) << "special: " << 
+              get_constant<Special>(c) << std::endl;
+          }
         }
       }
 

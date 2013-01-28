@@ -1138,11 +1138,11 @@ ConditionalBestfitWS::operator()
     for (const auto& p : potential)
     {
       const auto& context = std::get<0>(p);
-      if (context->begin() == context->end())
-      {
-        applicable.push_back(p);
-      }
-      else
+      //if (context->begin() == context->end())
+      //{
+      //  applicable.push_back(p);
+      //}
+      //else
       {
         //check that all the dimensions in context are in delta
         bool hasdemands = false;
