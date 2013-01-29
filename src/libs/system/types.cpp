@@ -266,6 +266,11 @@ print_constant(const Constant& c)
   std::ostringstream str;
   switch (c.index())
   {
+    case TYPE_INDEX_DIMENSION:
+    str << "dimension: " << get_constant<dimension_index>(c);
+    return str.str();
+    break;
+
     case TYPE_INDEX_INTMP:
     return Types::Intmp::get(c).get_str();
     break;

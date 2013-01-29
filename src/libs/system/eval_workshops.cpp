@@ -741,6 +741,14 @@ MakeIntenWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
         demands.push_back(i);
       }
     }
+    
+    for (auto& c : m_scope)
+    {
+      if (d.find(c) == d.end())
+      {
+        demands.push_back(c);
+      }
+    }
 
     if (!demands.empty())
     {

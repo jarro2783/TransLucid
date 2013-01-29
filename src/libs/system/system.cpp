@@ -256,6 +256,12 @@ System::addVariableDeclInternal
   if (equationIter == m_variables.end())
   {
     var = std::make_shared<VariableWS>(name, *this);
+
+    if (m_cached)
+    {
+      var->cache();
+    }
+
     auto variter = m_variables.insert({name, var});
 
     //create a new VariableObject to manage the uuid

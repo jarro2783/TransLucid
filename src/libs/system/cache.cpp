@@ -661,27 +661,27 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
 
     if (d.index() == TYPE_INDEX_CALC)
     {
-      //std::cerr << "cache node: " << m_name << ": calc" << std::endl;
+      std::cerr << "cache node: " << m_name << ": calc" << std::endl;
       auto result = (*m_expr)(kappa, subdelta, w, t);
-      //std::cerr << "cache node: " << m_name << ": result: " <<
-      //  print_constant(result.second) << std::endl;
+      std::cerr << "cache node: " << m_name << ": result: " <<
+        print_constant(result.second) << std::endl;
       m_cache.set(subcontext, result.second);
       d = result.second;
     }
 
     if (d.index() == TYPE_INDEX_DEMAND)
     {
-      //std::cerr << "cache node: " << m_name << ": demands:";
+      std::cerr << "cache node: " << m_name << ": demands:";
       const auto& demands = Types::Demand::get(d);
 
       subdelta.insert(demands.dims().begin(), demands.dims().end());
 
       for (auto dim : demands.dims())
       {
-        //std::cerr << " " << dim << " = " << print_constant(kappa.lookup(dim));
+        std::cerr << " " << dim << " = " << print_constant(kappa.lookup(dim));
         p.perturb(dim, kappa.lookup(dim));
       }
-      //std::cerr << std::endl;
+      std::cerr << std::endl;
     }
     else
     {
