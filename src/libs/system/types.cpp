@@ -283,6 +283,10 @@ print_constant(const Constant& c)
     return "demand";
     break;
 
+    case TYPE_INDEX_INTENSION:
+    return "intension";
+    break;
+
     default:
     str << "unknown of index " << c.index();
     return str.str();

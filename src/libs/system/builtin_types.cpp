@@ -1484,13 +1484,13 @@ namespace TransLucid
       bool
       equality(const Constant& lhs, const Constant& rhs)
       {
-        return get(lhs).ws() == get(rhs).ws();
+        return get(lhs) == get(rhs);
       }
 
       bool
       less(const Constant& lhs, const Constant& rhs)
       {
-        return get(lhs).ws() < get(rhs).ws();
+        return get(lhs) < get(rhs);
       }
     }
 

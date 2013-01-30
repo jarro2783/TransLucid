@@ -54,6 +54,14 @@ namespace TransLucid
       }
 
       m_bound.push_back(std::make_pair(DIM_RHO, k.lookup(DIM_RHO)));
+
+      std::sort(m_bound.begin(), m_bound.end(), 
+        [] (const std::pair<dimension_index, Constant>& a,
+            const std::pair<dimension_index, Constant>& b) -> bool
+            {
+              return a.first < b.first;
+            }
+        );
     }
 
     WS* ws() const
@@ -87,6 +95,68 @@ namespace TransLucid
       pd.perturb(m_bound);
 
       return (*m_ws)(kappa, d, w, t);
+    }
+
+    bool
+    operator==(const IntensionType& rhs) const
+    {
+      //if the workshops are not equal then don't compare anything else
+      if (ws() != rhs.ws())
+      {
+        return false;
+      }
+
+      return m_bound == rhs.m_bound;
+    }
+
+    bool
+    operator<(const IntensionType& rhs) const
+    {
+      //first compare the workshops
+      if (ws() < rhs.ws())
+      {
+        return true;
+      }
+      else if (rhs.ws() < ws())
+      {
+        return false;
+      }
+      else
+      {
+        return std::lexicographical_compare
+        (
+          m_bound.begin(), m_bound.end(),
+          rhs.m_bound.begin(), rhs.m_bound.end(),
+          [] (const std::pair<dimension_index, Constant>& lhs,
+              const std::pair<dimension_index, Constant>& rhs)
+          {
+            if (lhs.first < rhs.first)
+            {
+              return true;
+            }
+            else if (rhs.first < lhs.first)
+            {
+              return false;
+            }
+            else
+            {
+              return lhs.second < rhs.second;
+            }
+          }
+        ) ;
+        #if 0
+        return m_bound < rhs.m_bound;
+        //if the workshops are the same then compare the bound dimensions
+        auto liter = m_bound.begin();
+        auto riter = rhs.m_bound.begin();
+
+        while (liter != m_bound.end() && riter != rhs.m_bound.end())
+        {
+          ++liter;
+          ++riter;
+        }
+        #endif
+      }
     }
 
     private:

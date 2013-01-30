@@ -538,7 +538,7 @@ SemanticTransform::pushScope(const u32string& id)
 
   auto unique = os.str();
 
-  std::cerr << "replacing " << id << " with " << unique << std::endl;
+  //std::cerr << "replacing " << id << " with " << unique << std::endl;
 
   auto iter = m_rename.find(id);
 
