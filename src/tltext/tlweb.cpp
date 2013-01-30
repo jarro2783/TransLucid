@@ -208,7 +208,8 @@ printForm(const std::string& program)
     << program <<
     "</textarea>\n"
     "<br />\n"
-    "<input type=\"submit\" />\n"
+    "<input type=\"submit\" />"
+    "<input type=\"checkbox\" name=\"cache\" value=\"yes\">\n"
     "</p>\n"
     "</form>";
 }
@@ -255,11 +256,22 @@ int main(int argc, char* argv[])
       exit(1);
     }
 
+    bool cached = false;
+    auto cache = invars.find("cache");
+    if (cache != invars.end())
+    {
+      std::cout << "cached value = \"" << cache->second << "\"" << std::endl;
+      if (cache->second == "yes")
+      {
+        cached = true;
+      }
+    }
+
     std::cout << "<h1>Output</h1>" << std::endl;
 
     std::ostringstream os;
 
-    TransLucid::TLText::TLText tl(argv[0], "TLWeb...");
+    TransLucid::TLText::TLText tl(argv[0], "TLWeb...", cached);
 
     std::istringstream progstream(prog->second);
     tl.set_input(&progstream, "<web>");

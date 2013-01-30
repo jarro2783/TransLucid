@@ -233,11 +233,6 @@ int main(int argc, char *argv[])
         }
       }
     }
-    
-    if (vm.count("cache"))
-    {
-      tltext.set_cached();
-    }
 
     if (vm.count("verbose"))
     {
