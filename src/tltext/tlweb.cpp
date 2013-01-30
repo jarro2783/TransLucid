@@ -193,7 +193,7 @@ defaultProgram()
 }
 
 void
-printForm(const std::string& program)
+printForm(const std::string& program, bool cached)
 {
   char* url = getenv("SCRIPT_NAME");
 
@@ -209,7 +209,9 @@ printForm(const std::string& program)
     "</textarea>\n"
     "<br />\n"
     "<input type=\"submit\" />"
-    "<input type=\"checkbox\" name=\"cache\" value=\"yes\">\n"
+    "<input type=\"checkbox\" name=\"cache\" value=\"yes\""
+    << (cached ? "checked" : "") <<
+    "> cached\n"
     "</p>\n"
     "</form>";
 }
@@ -225,7 +227,7 @@ int main(int argc, char* argv[])
   if (lengthstr == nullptr)
   {
     std::cout << "<h1>Run TransLucid on the Web</h1>" << std::endl;
-    printForm(defaultProgram());
+    printForm(defaultProgram(), false);
   }
   else
   {
@@ -260,7 +262,6 @@ int main(int argc, char* argv[])
     auto cache = invars.find("cache");
     if (cache != invars.end())
     {
-      std::cout << "cached value = \"" << cache->second << "\"" << std::endl;
       if (cache->second == "yes")
       {
         cached = true;
@@ -291,7 +292,7 @@ int main(int argc, char* argv[])
     htmlOut(os.str());
     std::cout << "</p>";
 
-    printForm(prog->second);
+    printForm(prog->second, cached);
   }
 
   std::cout << "</body></html>" << std::endl;
