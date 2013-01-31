@@ -105,10 +105,10 @@ namespace TransLucid
     ~Cache();
     
     Constant
-    get(Context& delta);
+    get(const Context& k, const Delta& delta);
 
     void
-    set(const Context& delta, const Constant& value);
+    set(const Context& k, const Delta& delta, const Constant& value);
 
     void
     garbageCollect();

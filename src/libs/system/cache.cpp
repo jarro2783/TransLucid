@@ -49,7 +49,8 @@ namespace
     std::map<Constant, CacheLevelNode>& entry,
     std::vector<dimension_index>::const_iterator iter,
     std::vector<dimension_index>::const_iterator end,
-    Context& delta
+    const Context& k,
+    const Delta& delta
   );
 
   bool
@@ -65,7 +66,8 @@ namespace
       CacheEntryMap& entry, 
       std::vector<dimension_index>::const_iterator iter,
       std::vector<dimension_index>::const_iterator end,
-      Context& delta,
+      const Context& k,
+      const Delta& delta,
       Cache& cache
     ) const;
 
@@ -75,7 +77,8 @@ namespace
       CacheEntry& entry, 
       std::vector<dimension_index>::const_iterator iter,
       std::vector<dimension_index>::const_iterator end,
-      Context& delta,
+      const Context& k,
+      const Delta& delta,
       Cache& cache
     ) const;
   };
@@ -85,7 +88,8 @@ namespace
     typedef Constant result_type;
 
     Constant
-    operator()(const Constant& c, Context& delta, Cache& cache) const
+    operator()(const Constant& c, const Context& k, const Delta& delta, 
+      Cache& cache) const
     {
       cache.hit();
 
@@ -98,12 +102,13 @@ namespace
     }
 
     Constant
-    operator()(CacheLevel& l, Context& delta, Cache& cache) const
+    operator()(CacheLevel& l, const Context& k, const Delta& delta, 
+      Cache& cache) const
     {
       std::vector<dimension_index> demands;
       for (auto d : l.dims)
       {
-        if (!delta.has_entry(d))
+        if (delta.find(d) == delta.end())
         {
           demands.push_back(d);
         }
@@ -121,7 +126,7 @@ namespace
         //  delta, cache);
 
         return apply_visitor(get_cache_level_visitor(), l.entry.entry,
-          l.dims.begin(), l.dims.end(), delta, cache);
+          l.dims.begin(), l.dims.end(), k, delta, cache);
       }
     }
   };
@@ -134,7 +139,8 @@ namespace
     operator()
     (
       CacheEntry& entry, 
-      const Context& delta, 
+      const Context& k, 
+      const Delta& delta,
       const Constant& value,
       std::vector<dimension_index>::const_iterator begin,
       std::vector<dimension_index>::const_iterator end
@@ -144,7 +150,8 @@ namespace
     operator()
     (
       CacheEntryMap& entrymap, 
-      const Context& delta, 
+      const Context& k, 
+      const Delta& delta,
       const Constant& value,
       std::vector<dimension_index>::const_iterator begin,
       std::vector<dimension_index>::const_iterator end
@@ -240,25 +247,26 @@ lookup_entry_map
   std::vector<dimension_index>::const_iterator iter,
   std::vector<dimension_index>::const_iterator end,
   decltype(CacheEntryMap::entry)& entry,
-  Context& delta,
+  const Context& k,
+  const Delta& delta,
   Cache& cache
 )
 {
   //find the value of the current dimension in the map
 
-  Constant c = delta.lookup(*iter);
+  Constant c = k.lookup(*iter);
 
   auto entryiter = entry.find(c);
 
   if (entryiter == entry.end())
   {
     cache.miss();
-    return set_calc(entry, iter, end, delta);
+    return set_calc(entry, iter, end, k, delta);
   }
   else
   {
     return apply_visitor(get_cache_level_visitor(), entryiter->second.entry,
-      ++iter, end, delta, cache);
+      ++iter, end, k, delta, cache);
   }
 }
 
@@ -268,14 +276,15 @@ set_calc
   std::map<Constant, CacheLevelNode>& entry,
   std::vector<dimension_index>::const_iterator iter,
   std::vector<dimension_index>::const_iterator end,
-  Context& delta
+  const Context& k,
+  const Delta& delta
 )
 {
   //iter will be the current dimension to consider
   //add an entry for delta(iter), we have already ensured that all the
   //dimensions needed exist
 
-  Constant val = delta.lookup(*iter);
+  Constant val = k.lookup(*iter);
 
   //if iter is the last thing, the end of this needs to be calc, otherwise
   //it's another map, and repeat
@@ -297,6 +306,7 @@ set_calc
       get<CacheEntryMap>(inserted.first->second.entry).entry,
       iter,
       end,
+      k,
       delta
     );
   }
@@ -308,7 +318,8 @@ get_cache_level_visitor::operator()
   CacheEntryMap& entry, 
   std::vector<dimension_index>::const_iterator iter,
   std::vector<dimension_index>::const_iterator end,
-  Context& delta,
+  const Context& k,
+  const Delta& delta,
   Cache& cache
 ) const
 {
@@ -321,7 +332,7 @@ get_cache_level_visitor::operator()
   }
 
   //otherwise look again at the next entry
-  return lookup_entry_map(iter, end, entry.entry, delta, cache);
+  return lookup_entry_map(iter, end, entry.entry, k, delta, cache);
 }
 
 Constant
@@ -330,7 +341,8 @@ get_cache_level_visitor::operator()
   CacheEntry& entry, 
   std::vector<dimension_index>::const_iterator iter,
   std::vector<dimension_index>::const_iterator end,
-  Context& delta,
+  const Context& k,
+  const Delta& delta,
   Cache& cache
 ) const
 {
@@ -346,14 +358,16 @@ get_cache_level_visitor::operator()
   entry.age = 0;
   
   //otherwise we are ready to look at the next level
-  return apply_visitor(get_cache_entry_visitor(), entry.entry, delta, cache);
+  return apply_visitor(get_cache_entry_visitor(), entry.entry, k, 
+    delta, cache);
 }
 
 void
 set_visit_top_entry
 (
   CacheEntry& entry, 
-  const Context& delta,
+  const Context& k,
+  const Delta& delta,
   const Constant& value
 );
 
@@ -383,7 +397,8 @@ void
 set_level_node::operator()
 (
   CacheEntry& entry, 
-  const Context& delta, 
+  const Context& k, 
+  const Delta& delta,
   const Constant& value,
   std::vector<dimension_index>::const_iterator begin,
   std::vector<dimension_index>::const_iterator end
@@ -396,7 +411,7 @@ set_level_node::operator()
           ": Cache error, entry reached before dims ran out";
   }
 
-  set_visit_top_entry(entry, delta, value);
+  set_visit_top_entry(entry, k, delta, value);
 }
 
 
@@ -404,7 +419,8 @@ void
 set_level_node::operator()
 (
   CacheEntryMap& entrymap, 
-  const Context& delta, 
+  const Context& k, 
+  const Delta& delta,
   const Constant& value,
   std::vector<dimension_index>::const_iterator begin,
   std::vector<dimension_index>::const_iterator end
@@ -416,7 +432,7 @@ set_level_node::operator()
           ": Cache error, traversing map but no more dims";
   }
 
-  auto iter = entrymap.entry.find(delta.lookup(*begin));
+  auto iter = entrymap.entry.find(k.lookup(*begin));
 
   if (iter == entrymap.entry.end())
   {
@@ -424,14 +440,15 @@ set_level_node::operator()
           ": Cache error, there isn't already a calc for this entry";
   }
 
-  apply_visitor(*this, iter->second.entry, delta, value, ++begin, end);
+  apply_visitor(*this, iter->second.entry, k, delta, value, ++begin, end);
 }
 
 void
 set_visit_top_entry
 (
   CacheEntry& entry, 
-  const Context& delta,
+  const Context& k,
+  const Delta& delta,
   const Constant& value
 )
 {
@@ -452,7 +469,7 @@ set_visit_top_entry
   else if (level != nullptr)
   {
     //traverse the level
-    apply_visitor(set_level_node(), level->entry.entry, delta, value,
+    apply_visitor(set_level_node(), level->entry.entry, k, delta, value,
       level->dims.begin(), level->dims.end());
   }
 }
@@ -471,7 +488,7 @@ Cache::~Cache()
 }
 
 Constant
-Cache::get(Context& delta)
+Cache::get(const Context& k, const Delta& delta)
 {
   if (!m_entry)
   {
@@ -480,12 +497,12 @@ Cache::get(Context& delta)
   }
   else
   {
-    return get_cache_entry_visitor()(*m_entry, delta, *this);
+    return get_cache_entry_visitor()(*m_entry, k, delta, *this);
   }
 }
 
 void
-Cache::set(const Context& delta, const Constant& value)
+Cache::set(const Context& k, const Delta& delta, const Constant& value)
 {
   if (!m_entry)
   {
@@ -497,6 +514,7 @@ Cache::set(const Context& delta, const Constant& value)
   (
     set_level_node(), 
     m_entry->entry.entry, 
+    k,
     delta, 
     value, 
     m_entry->dims.begin(),
@@ -606,6 +624,8 @@ CacheWS::operator()(Context& kappa)
 Constant
 CacheWS::operator()(Context& kappa, Context& delta)
 {
+//this code isn't used anymore
+#if 0
   Context subdelta;
   ContextPerturber p(subdelta);
 
@@ -646,6 +666,8 @@ CacheWS::operator()(Context& kappa, Context& delta)
   //}
 
   return v;
+#endif
+  return Constant();
 }
 
 TimeConstant
@@ -657,13 +679,13 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
 
   while (true)
   {
-    Constant d = m_cache.get(subcontext);
+    Constant d = m_cache.get(kappa, subdelta);
 
     if (d.index() == TYPE_INDEX_CALC)
     {
       //std::cerr << "cache node: " << m_name << ": calc" << std::endl;
       auto result = (*m_expr)(kappa, subdelta, w, t);
-      m_cache.set(subcontext, result.second);
+      m_cache.set(kappa, subdelta, result.second);
       d = result.second;
     }
     //std::cerr << "cache node: " << m_name << ": result: " <<
@@ -689,6 +711,7 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
     }
   }
 
+  #if 0
   Context finalk;
   ContextPerturber p2(finalk);
 
@@ -696,8 +719,9 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
   {
     p2.perturb(dim, kappa.lookup(dim));
   }
+  #endif
 
-  Constant v = m_cache.get(finalk);
+  Constant v = m_cache.get(kappa, delta);
 
   //if (v.index() == TYPE_INDEX_SPECIAL && get_constant<Special>(v) == SP_LOOP)
   //{
