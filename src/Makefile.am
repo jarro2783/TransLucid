@@ -15,9 +15,9 @@
 #   You should have received a copy of the GNU General Public License
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
-#   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+#   Copyright (C) 2009, 2010, 2013 Jarryd Beck and John Plaice
 
-SUBDIRS = include libs tests tltext
+SUBDIRS = include libs tltext tests
 
 PO_SUBDIRS=tltext libs
 
