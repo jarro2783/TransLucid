@@ -20,3 +20,4 @@ insert-header.sin
 quot.sed
 remove-potcdate.sin
 /CTestConfig.cmake
+test-driver
