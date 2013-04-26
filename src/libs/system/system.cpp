@@ -57,6 +57,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "tl/gettext_internal.h"
 
+extern char** environ;
+
 namespace TransLucid
 {
 
