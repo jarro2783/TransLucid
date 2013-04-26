@@ -27,7 +27,7 @@ libtlsystem_la_LDFLAGS = \
   $(TL_LDFLAGS)
 libtlsystem_la_LIBADD = \
   -lgmpxx -lgmp \
-  -lltdl $(TL_LIBS) -lrt $(BOOST_LDFLAGS)
+  -lltdl $(TL_LIBS) $(BOOST_LDFLAGS)
 
 libtlsystem_la_SOURCES = \
   assignment.cpp ast.cpp bestfit.cpp builtin_types.cpp \
