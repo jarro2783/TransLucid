@@ -17,6 +17,14 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/static_function.hpp>
+
 namespace TransLucid
 {
+  class DependencyFinder
+  {
+    public:
+    typedef std::set<u32string> IdentifierSet;
+    typedef std::pair<u32string, Static::Functor<IdentifierSet>> result_type;
+  };
 }
