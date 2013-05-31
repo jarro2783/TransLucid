@@ -39,20 +39,26 @@ TreeNodes = [
   "Tree::ConditionalBestfitExpr"
 ]
 
-if len(sys.argv) != NUMARGS:
-  print "Usage:", sys.argv[0], "class"
+if len(sys.argv) < NUMARGS:
+  print "Usage:", sys.argv[0], "class [default_result]"
   exit(1)
+
+default_return = ""
+
+if len(sys.argv) > NUMARGS:
+  default_return = "  return {};".format(sys.argv[2])
 
 # generate the header
 
 print "class", sys.argv[1]
 print "{"
 for i in range(0, len(TreeNodes)):
-  print "  result_type operator()(const {}&);".format(TreeNodes[i])
+  print "  result_type\n  operator()(const {}&);\n".format(TreeNodes[i])
 print "};\n"
 
 # generate the definitions
 
 for i in range(0, len(TreeNodes)):
-  print "{0}::result_type\n{0}::operator()(const {1}& e)\n{{\n}}\n".format(
-    sys.argv[1], TreeNodes[i])
+  print """{0}::result_type\n{0}::operator()(const {1}& e)\n
+{{\n{2}\n}}\n""".format(
+    sys.argv[1], TreeNodes[i], default_return)
