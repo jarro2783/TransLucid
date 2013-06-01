@@ -26,7 +26,17 @@ namespace TransLucid
   {
     public:
     typedef std::set<u32string> IdentifierSet;
-    typedef std::pair<u32string, Static::Functor<IdentifierSet>> result_type;
+    typedef std::list<Static::Functor<IdentifierSet>> FunctorList;
+    typedef std::pair<IdentifierSet, FunctorList> result_type;
+
+    // function types
+    typedef Static::Functions::Up<IdentifierSet> Up;
+
+    result_type
+    operator()(const Tree::nil&)
+    {
+      return result_type();
+    }
 
     result_type
     operator()(const bool&);
@@ -111,5 +121,9 @@ namespace TransLucid
 
     result_type
     operator()(const Tree::ConditionalBestfitExpr&);
+
+    private:
+    
+    std::map<u32string, result_type> m_idDeps;
   };
 }

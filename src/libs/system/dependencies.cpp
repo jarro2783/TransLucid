@@ -68,21 +68,30 @@ DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::DimensionExpr& e)
 
 {
-  return result_type();
+  return std::make_pair(IdentifierSet(), 
+    FunctorList{Static::Functions::Param{e.dim}});
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::IdentExpr& e)
-
 {
-  return result_type();
+  auto iter = m_idDeps.find(e.text);
+
+  if (iter == m_idDeps.end())
+  {
+    throw U"undeclared identifier: " + e.text;
+  }
+
+  auto idents = iter->second.first;
+  idents.insert(e.text);
+  return std::make_pair(idents, iter->second.second);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::HashSymbol& e)
 
 {
-  return result_type();
+  throw U"context appears by itself";
 }
 
 DependencyFinder::result_type
@@ -96,28 +105,43 @@ DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::ParenExpr& e)
 
 {
-  return result_type();
+  return apply_visitor(*this, e.e);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::UnaryOpExpr& e)
 
 {
-  return result_type();
+  throw U"error: unary op expression seen in DependencyFinder";
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::BinaryOpExpr& e)
 
 {
-  return result_type();
+  throw U"error: binary op expression seen in DependencyFinder";
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::MakeIntenExpr& e)
 
 {
-  return result_type();
+  IdentifierSet idents;
+  FunctorList funcs;
+
+  for (const auto& expr : e.binds)
+  {
+    auto deps = apply_visitor(*this, expr);
+
+    idents.insert(deps.first.begin(), deps.first.end());
+    funcs.insert(funcs.end(), deps.second.begin(), deps.second.end());
+  }
+
+  auto body = apply_visitor(*this, e.expr);
+
+  funcs.push_back(Up{body.first, body.second});
+
+  return result_type(idents, funcs);
 }
 
 DependencyFinder::result_type
