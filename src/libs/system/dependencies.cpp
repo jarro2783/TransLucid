@@ -148,15 +148,48 @@ DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::EvalIntenExpr& e)
 
 {
-  //evals_down
-  return result_type();
+  IdentifierSet resultX;
+
+  auto deps = apply_visitor(*this, e.expr);
+  auto eval = Static::Functions::evals_down(deps.second);
+
+  resultX = deps.first;
+  resultX.insert(eval.first.begin(), eval.first.end());
+
+  return result_type(resultX, eval.second);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::IfExpr& e)
 
 {
-  return result_type();
+  IdentifierSet X;
+  FunctorList F;
+
+  auto cond = apply_visitor(*this, e.condition);
+  X.insert(cond.first.begin(), cond.first.end());
+  F.insert(F.end(), cond.second.begin(), cond.second.end());
+
+  auto then = apply_visitor(*this, e.then);
+  X.insert(then.first.begin(), then.first.end());
+  F.insert(F.end(), then.second.begin(), then.second.end());
+  
+  for (const auto& branch : e.else_ifs)
+  {
+    auto result = apply_visitor(*this, branch.first);
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+
+    result = apply_visitor(*this, branch.second);
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+  }
+
+  auto else_ = apply_visitor(*this, e.else_);
+  X.insert(else_.first.begin(), else_.first.end());
+  F.insert(F.end(), else_.second.begin(), else_.second.end());
+
+  return std::make_pair(X, F);
 }
 
 DependencyFinder::result_type
