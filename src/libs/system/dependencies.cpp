@@ -24,49 +24,42 @@ namespace TransLucid
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const bool& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Special& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const mpz_class& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const char32_t& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const u32string& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::LiteralExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::DimensionExpr& e)
-
 {
   return std::make_pair(IdentifierSet(), 
     FunctorList{Static::Functions::Param{e.dim}});
@@ -96,35 +89,30 @@ DependencyFinder::operator()(const Tree::HashSymbol& e)
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::HostOpExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::ParenExpr& e)
-
 {
   return apply_visitor(*this, e.e);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::UnaryOpExpr& e)
-
 {
   throw U"error: unary op expression seen in DependencyFinder";
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::BinaryOpExpr& e)
-
 {
   throw U"error: binary op expression seen in DependencyFinder";
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::MakeIntenExpr& e)
-
 {
   IdentifierSet idents;
   FunctorList funcs;
@@ -146,7 +134,6 @@ DependencyFinder::operator()(const Tree::MakeIntenExpr& e)
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::EvalIntenExpr& e)
-
 {
   IdentifierSet resultX;
 
@@ -161,7 +148,6 @@ DependencyFinder::operator()(const Tree::EvalIntenExpr& e)
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::IfExpr& e)
-
 {
   IdentifierSet X;
   FunctorList F;
@@ -194,63 +180,56 @@ DependencyFinder::operator()(const Tree::IfExpr& e)
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::HashExpr& e)
-
 {
-  return result_type();
+  auto result = apply_visitor(*this, e.e);
+
+  return std::make_pair(result.first, FunctorList{Static::Functions::Topfun()});
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::RegionExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::TupleExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::AtExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::LambdaExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::PhiExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::BaseAbstractionExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::BangAppExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
-
 {
   auto lhs = apply_visitor(*this, e.lhs);
   auto rhs = apply_visitor(*this, e.rhs);
@@ -260,21 +239,18 @@ DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::PhiAppExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::WhereExpr& e)
-
 {
   return result_type();
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::ConditionalBestfitExpr& e)
-
 {
   return result_type();
 }
