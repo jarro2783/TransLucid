@@ -189,31 +189,84 @@ DependencyFinder::operator()(const Tree::HashExpr& e)
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::RegionExpr& e)
 {
-  return result_type();
+  IdentifierSet X;
+  FunctorList F;
+
+  for (const auto& entry : e.entries)
+  {
+    auto result = apply_visitor(*this, std::get<0>(entry));
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+
+    result = apply_visitor(*this, std::get<2>(entry));
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+  }
+
+  return std::make_pair(X, F);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::TupleExpr& e)
 {
-  return result_type();
+  IdentifierSet X;
+  FunctorList F;
+
+  for (const auto& entry : e.pairs)
+  {
+    auto result = apply_visitor(*this, entry.first);
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+
+    result = apply_visitor(*this, entry.second);
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+  }
+
+  return std::make_pair(X, F);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::AtExpr& e)
 {
-  return result_type();
+  IdentifierSet X;
+  FunctorList F;
+
+  auto result = apply_visitor(*this, e.lhs);
+  X.insert(result.first.begin(), result.first.end());
+  F.insert(F.end(), result.second.begin(), result.second.end());
+
+  result = apply_visitor(*this, e.rhs);
+  X.insert(result.first.begin(), result.first.end());
+  F.insert(F.end(), result.second.begin(), result.second.end());
+
+  return std::make_pair(X, F);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::LambdaExpr& e)
 {
-  return result_type();
+  IdentifierSet X;
+  FunctorList F;
+
+  for (const auto& bind : e.binds)
+  {
+    auto result = apply_visitor(*this, bind);
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+  }
+
+  auto body = apply_visitor(*this, e.rhs);
+  F.push_back(Static::Functions::CBV<IdentifierSet>
+    {e.argDim, body.first, body.second});
+
+  return std::make_pair(X, F);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::PhiExpr& e)
 {
-  return result_type();
+  throw "cbn function in dependency checker";
 }
 
 DependencyFinder::result_type
