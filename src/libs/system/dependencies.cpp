@@ -148,6 +148,7 @@ DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::EvalIntenExpr& e)
 
 {
+  //evals_down
   return result_type();
 }
 
@@ -218,6 +219,9 @@ DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
 
 {
+  auto lhs = apply_visitor(*this, e.lhs);
+  auto rhs = apply_visitor(*this, e.rhs);
+  evals_applyv(lhs.second, rhs.second);
   return result_type();
 }
 

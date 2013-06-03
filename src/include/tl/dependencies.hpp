@@ -26,7 +26,7 @@ namespace TransLucid
   {
     public:
     typedef std::set<u32string> IdentifierSet;
-    typedef std::list<Static::Functor<IdentifierSet>> FunctorList;
+    typedef Static::Functions::FunctorList<IdentifierSet> FunctorList;
     typedef std::pair<IdentifierSet, FunctorList> result_type;
 
     // function types
