@@ -7,7 +7,7 @@ if WANT_TLWEB
 endif
 
 TLTEXT_LIBS = $(top_builddir)/src/libs/system/libtlsystem.la \
-$(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(LTLIBINTL)
+$(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
 
 tltext_LDFLAGS = $(TLTEXT_LIBS) $(TL_LDFLAGS) -export-dynamic
 
