@@ -31,6 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/range.hpp>
 //#include <tl/system.hpp>
 #include <tl/exception.hpp>
+#include <tl/utility.hpp>
 #include <gmpxx.h>
 
 namespace TransLucid
@@ -304,10 +305,16 @@ namespace std
     size_t h = 0;
     for(auto& v : t)
     {
-      std::_Hash_impl::__hash_combine(v.first, h);
-      std::_Hash_impl::__hash_combine(v.second, h);
+      TransLucid::hash_combine(v.first, h);
+      TransLucid::hash_combine(v.second, h);
     }
 
     return h;
+  }
+
+  size_t
+  hash<mpz_class>::operator()(const mpz_class& m) const
+  {
+    return std::hash<std::string>()(m.get_str());
   }
 }

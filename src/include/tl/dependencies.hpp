@@ -32,6 +32,9 @@ namespace TransLucid
     // function types
     typedef Static::Functions::Up<IdentifierSet> Up;
 
+    void
+    computeDependencies();
+
     result_type
     operator()(const Tree::nil&)
     {

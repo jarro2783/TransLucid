@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
  */
 
 #include <tl/region.hpp>
+#include <tl/utility.hpp>
 
 namespace TransLucid
 {
@@ -124,9 +125,9 @@ Region::hash() const
 
   for (const auto& entry : m_entries)
   {
-    std::_Hash_impl::__hash_combine(entry.first, value);
-    std::_Hash_impl::__hash_combine(entry.second.first, value);
-    std::_Hash_impl::__hash_combine(entry.second.second, value);
+    hash_combine(entry.first, value);
+    hash_combine(entry.second.first, value);
+    hash_combine(entry.second.second, value);
   }
 
   return value;

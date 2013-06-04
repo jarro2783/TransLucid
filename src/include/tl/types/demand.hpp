@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 
 #include <tl/types.hpp>
+#include <tl/utility.hpp>
 #include <functional>
 
 namespace TransLucid
@@ -60,7 +61,7 @@ namespace TransLucid
 
       for (const auto& v : m_dims)
       {
-        std::_Hash_impl::__hash_combine(v, h);
+        hash_combine(v, h);
       }
 
       return h;

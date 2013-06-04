@@ -14,4 +14,14 @@ template <> class __gmp_expr<mpf_t, mpf_t>;
 
 typedef __gmp_expr<mpf_t, mpf_t> mpf_class;
 
+namespace std
+{
+  template <>
+  struct hash<mpz_class>
+  {
+    size_t
+    operator()(const mpz_class& i) const;
+  };
+}
+
 #endif

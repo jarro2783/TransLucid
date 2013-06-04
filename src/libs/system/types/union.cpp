@@ -156,11 +156,10 @@ size_t
 UnionType::hash() const
 {
   size_t h = 0;
-  std::hash<Constant> hasher;
 
   for (const auto& v : m_types)
   {
-    std::_Hash_impl::__hash_combine(v, hasher(v));
+    hash_combine(v, h);
   }
      
   return h;

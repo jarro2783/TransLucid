@@ -93,4 +93,27 @@ namespace TransLucid
   };
 }
 
+namespace std
+{
+  template <>
+  struct hash<TransLucid::Region::Containment>
+  {
+    size_t
+    operator()(TransLucid::Region::Containment c)
+    {
+      switch (c)
+      {
+        case TransLucid::Region::Containment::IS:
+        return 0;
+        case TransLucid::Region::Containment::IN:
+        return 1;
+        case TransLucid::Region::Containment::IMP:
+        return 2;
+      }
+
+      return 0;
+    }
+  };
+}
+
 #endif

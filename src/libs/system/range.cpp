@@ -21,12 +21,13 @@ along with TransLucid; see the file COPYING.  If not see
  * The range object. Defines a set of integers in a range.
  */
 
+#include <functional>
+
 #include <gmpxx.h>
 
 #include <tl/output.hpp>
 #include <tl/range.hpp>
-
-#include <functional>
+#include <tl/utility.hpp>
 
 namespace TransLucid
 {
@@ -109,20 +110,20 @@ Range::hash() const
   size_t seed = 0;
 
   if (m_lower == nullptr) {
-    std::_Hash_impl::__hash_combine(0, seed);
+    hash_combine(0, seed);
   }
   else
   {
-    std::_Hash_impl::__hash_combine(*m_lower, seed);
+    hash_combine(*m_lower, seed);
   }
 
   if (m_upper == nullptr)
   {
-    std::_Hash_impl::__hash_combine(0, seed);
+    hash_combine(0, seed);
   }
   else
   {
-    std::_Hash_impl::__hash_combine(*m_upper, seed);
+    hash_combine(*m_upper, seed);
   }
 
   return seed;

@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_CHI_HPP_INCLUDED
 
 #include <tl/types.hpp>
+#include <tl/utility.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -53,7 +54,7 @@ namespace TransLucid
 
       for (auto v : m_stack)
       {
-        std::_Hash_impl::__hash_combine(v, value);
+        hash_combine(v, value);
       }
 
       return value;

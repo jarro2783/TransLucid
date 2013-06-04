@@ -373,16 +373,6 @@ namespace TransLucid
 
 namespace std
 {
-  template<>
-  struct hash<mpz_class>
-  {
-    size_t
-    operator()(const mpz_class& v) const
-    {
-      return std::hash<std::string>()(v.get_str());
-    }
-  };
-
   template <>
   struct hash<mpf_class>
   {
@@ -1701,21 +1691,6 @@ init_builtin_types(System& s)
 
 namespace std
 {
-  #if 0
-  template <>
-  size_t
-  hash<basic_string<unsigned int>>::operator()
-  (const basic_string<unsigned int> s) const
-  {
-    size_t val = 0;
-    for(unsigned int c : s)
-    {
-      val = _Hash_impl::__hash_combine(c, val);
-    }
-    return val;
-  }
-  #endif
-
   size_t
   hash<TransLucid::Special>::operator()
   (TransLucid::Special v) const

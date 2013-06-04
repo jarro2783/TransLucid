@@ -214,6 +214,15 @@ namespace TransLucid
     ExtraTreeInformation
   >
   fixupTree(System& s, const Tree::Expr& e, ScopePtr scope = ScopePtr());
+
+  //the magic hash combine from boost
+  template <class T>
+  inline void 
+  hash_combine(const T& v, std::size_t& seed)
+  {
+    std::hash<T> hasher;
+    seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+  }
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED
