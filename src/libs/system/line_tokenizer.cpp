@@ -455,29 +455,28 @@ LineTokenizer::readInterpretedString()
   m_state = State::READ_SCANNING;
 }
 
-} //namespace TransLucid
-
 std::ostream&
-operator<<(std::ostream& os, TransLucid::LineType l)
+operator<<(std::ostream& os, LineType l)
 {
   switch (l)
   {
-    case TransLucid::LineType::LINE:
+    case LineType::LINE:
     os << "LineType::LINE";
     break;
 
-    case TransLucid::LineType::DOUBLE_DOLLAR:
+    case LineType::DOUBLE_DOLLAR:
     os << "LineType::DOUBLE_DOLLAR";
     break;
 
-    case TransLucid::LineType::DOUBLE_PERCENT:
+    case LineType::DOUBLE_PERCENT:
     os << "LineType::DOUBLE_PERCENT";
     break;
 
-    case TransLucid::LineType::EMPTY:
+    case LineType::EMPTY:
     os << "LineType::EMPTY";
     break;
   }
   return os;
 }
 
+} //namespace TransLucid
