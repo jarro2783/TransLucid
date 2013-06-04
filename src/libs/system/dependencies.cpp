@@ -272,13 +272,47 @@ DependencyFinder::operator()(const Tree::PhiExpr& e)
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::BaseAbstractionExpr& e)
 {
-  return result_type();
+  IdentifierSet X;
+  FunctorList F;
+
+  for (const auto& bind : e.binds)
+  {
+    auto result = apply_visitor(*this, bind);
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+  }
+
+  auto body = apply_visitor(*this, e.body);
+  F.push_back(Static::Functions::Base<IdentifierSet>{e.dims, 
+    body.first, body.second});
+
+  return std::make_pair(X, F);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::BangAppExpr& e)
 {
-  return result_type();
+  IdentifierSet X;
+  FunctorList F;
+
+  FunctorList F_0;
+  std::vector<FunctorList> F_j;
+  F_j.reserve(e.args.size());
+
+  auto result = apply_visitor(*this, e.name);
+  X.insert(result.first.begin(), result.first.end());
+  F_0 = result.second;
+
+  for (const auto& expr : e.args)
+  {
+    result = apply_visitor(*this, expr);
+    X.insert(result.first.begin(), result.first.end());
+    F_j.push_back(result.second);
+  }
+
+  result = Static::Functions::evals_applyb(F_0, F_j);
+
+  return std::make_pair(X, F);
 }
 
 DependencyFinder::result_type
@@ -293,19 +327,53 @@ DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::PhiAppExpr& e)
 {
-  return result_type();
+  throw "cbn application in dependency checker";
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::WhereExpr& e)
 {
-  return result_type();
+  //this is just a wheredim now
+
+  IdentifierSet X;
+  FunctorList F;
+
+  auto result = apply_visitor(*this, e.e);
+  X.insert(result.first.begin(), result.first.end());
+  F.insert(F.end(), result.second.begin(), result.second.end());
+
+  for (const auto& dim : e.dims)
+  {
+    result = apply_visitor(*this, dim.second);    
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+  }
+
+  return std::make_pair(X, F);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::ConditionalBestfitExpr& e)
 {
-  return result_type();
+  IdentifierSet X;
+  FunctorList F;
+
+  for (const auto& decl : e.declarations)
+  {
+    auto result = apply_visitor(*this, std::get<1>(decl));
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+
+    result = apply_visitor(*this, std::get<2>(decl));
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+
+    result = apply_visitor(*this, std::get<3>(decl));
+    X.insert(result.first.begin(), result.first.end());
+    F.insert(F.end(), result.second.begin(), result.second.end());
+  }
+
+  return std::make_pair(X, F);
 }
 
 }
