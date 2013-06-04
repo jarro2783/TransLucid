@@ -36,7 +36,7 @@ namespace TransLucid
     const_iterator begin() const { return data; }
     const_iterator end() const { return data + static_size; }
 
-    constexpr size_t size() { return static_size; }
+    constexpr size_t size() const { return static_size; }
 
     private:
     uint8_t data[static_size];

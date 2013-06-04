@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/ast.hpp>
 #include <tl/static_function.hpp>
+#include <tl/system.hpp>
 
 namespace TransLucid
 {
@@ -31,8 +32,17 @@ namespace TransLucid
 
     // function types
     typedef Static::Functions::Up<IdentifierSet> Up;
+    typedef Static::Functions::Up<IdentifierSet> CBV;
+    typedef Static::Functions::Up<IdentifierSet> Base;
 
-    void
+    typedef std::map<u32string, result_type> DependencyMap;
+
+    DependencyFinder(System* s)
+    : m_system(s)
+    {
+    }
+
+    DependencyMap
     computeDependencies();
 
     result_type
@@ -127,6 +137,7 @@ namespace TransLucid
 
     private:
     
-    std::map<u32string, result_type> m_idDeps;
+    DependencyMap m_idDeps;
+    System* m_system;
   };
 }

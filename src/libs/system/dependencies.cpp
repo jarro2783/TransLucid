@@ -22,6 +22,14 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
 
+DependencyFinder::DependencyMap
+DependencyFinder::computeDependencies()
+{
+  m_idDeps.clear();
+  m_system->lookupIdentifiers();
+  return m_idDeps;
+}
+
 DependencyFinder::result_type
 DependencyFinder::operator()(const bool& e)
 {
