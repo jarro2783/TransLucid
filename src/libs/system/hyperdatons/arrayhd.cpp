@@ -22,6 +22,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <algorithm>
 #include <iostream>
+#include <numeric>
 
 #include <gmpxx.h>
 
