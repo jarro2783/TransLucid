@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <iostream>
 #include <tl/line_tokenizer.hpp>
 
 namespace TransLucid
@@ -454,28 +455,29 @@ LineTokenizer::readInterpretedString()
   m_state = State::READ_SCANNING;
 }
 
+} //namespace TransLucid
+
 std::ostream&
-operator<<(std::ostream& os, LineType l)
+operator<<(std::ostream& os, TransLucid::LineType l)
 {
   switch (l)
   {
-    case LineType::LINE:
+    case TransLucid::LineType::LINE:
     os << "LineType::LINE";
     break;
 
-    case LineType::DOUBLE_DOLLAR:
+    case TransLucid::LineType::DOUBLE_DOLLAR:
     os << "LineType::DOUBLE_DOLLAR";
     break;
 
-    case LineType::DOUBLE_PERCENT:
+    case TransLucid::LineType::DOUBLE_PERCENT:
     os << "LineType::DOUBLE_PERCENT";
     break;
 
-    case LineType::EMPTY:
+    case TransLucid::LineType::EMPTY:
     os << "LineType::EMPTY";
     break;
   }
   return os;
 }
 
-} //namespace TransLucid
