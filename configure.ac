@@ -39,7 +39,7 @@ GCC_CHECK_TEXT=`$srcdir/checks/generate_gcc_min_version_check`
 # check for the correct version of gcc
 AC_MSG_CHECKING([for an appropriate compiler])
 #GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
-CXXFLAGS="-std=gnu++11"
+CXXFLAGS="-std=c++11"
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([$GCC_CHECK_TEXT])], 
   [AC_MSG_RESULT([yes])],
   [AC_MSG_ERROR([no suitable compiler found, see config.log for more
@@ -127,9 +127,9 @@ AC_COMPILE_IFELSE(
 
 CPPFLAGS=${OLD_CPPFLAGS}
 
-TL_LDFLAGS="-std=gnu++11"
+TL_LDFLAGS="-std=c++11"
 TL_LIBS="${ICU_LIBS} ${LTLIBINTL}"
-TL_CFLAGS="-std=gnu++11 -fno-strict-aliasing ${ICU_CFLAGS} \
+TL_CFLAGS="-std=c++11 -fno-strict-aliasing ${ICU_CFLAGS} \
   ${UNUSED_TYPEDEF_FLAG}"
 
 AC_SUBST(TL_LDFLAGS)
