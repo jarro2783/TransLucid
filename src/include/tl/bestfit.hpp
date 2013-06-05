@@ -405,6 +405,7 @@ namespace TransLucid
       int start;
       int end;
       std::shared_ptr<WS> evaluator;
+      Tree::Expr expr;
     };
 
     DefinitionGrouper* m_grouper;
@@ -475,8 +476,6 @@ namespace TransLucid
     EquationGuard(const EquationGuard&);
 
     ~EquationGuard() = default;
-
-    //EquationGuard& operator=(const EquationGuard&);
 
     /**
      * @brief Determines if there are any dimensions in the guard.

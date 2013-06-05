@@ -394,7 +394,8 @@ BestfitGroup::compile(Context& k)
       std::shared_ptr<WS> evaluator = compileExpression(expression, 
         m_definitions.front().getScope());
 
-      m_evaluators.push_back(CompiledDefinition{start, end, evaluator});
+      m_evaluators.push_back(CompiledDefinition{start, end, evaluator, 
+        expression});
 
       ++change;
     }
