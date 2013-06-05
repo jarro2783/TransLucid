@@ -356,6 +356,12 @@ BestfitGroup::parse(Context& k)
   }
 }
 
+Tree::Expr
+BestfitGroup::getEquation(Context& k)
+{
+  return Tree::Expr();
+}
+
 void
 BestfitGroup::compile(Context& k)
 {

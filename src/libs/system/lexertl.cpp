@@ -215,7 +215,9 @@ namespace
         throw "invalid character literal";
       }
       id = TOKEN_CONSTANT;
-      return std::make_pair(U"uchar", u32string(1,value));
+      //return std::make_pair(U"uchar", u32string(1,value));
+      return TokenValue(
+        std::pair<u32string, u32string>(U"uchar", u32string(1, value)));
     }
 
     static TokenValue

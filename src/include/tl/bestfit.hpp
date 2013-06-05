@@ -328,6 +328,9 @@ namespace TransLucid
     TimeConstant
     operator()(Context& kappa, Delta& d, const Thread& w, size_t t);
 
+    Tree::Expr
+    getEquation(Context& k);
+
     void
     setName(const u32string& name)
     {
@@ -473,7 +476,7 @@ namespace TransLucid
 
     ~EquationGuard() = default;
 
-    EquationGuard& operator=(const EquationGuard&);
+    //EquationGuard& operator=(const EquationGuard&);
 
     /**
      * @brief Determines if there are any dimensions in the guard.

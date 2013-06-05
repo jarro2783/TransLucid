@@ -83,6 +83,12 @@ VariableWS::addEquation(uuid id, Parser::RawInput input, int time,
   m_bestfit.addEquation(id, input, time, scope);
 }
 
+Tree::Expr
+VariableWS::getEquation(size_t time)
+{
+  return Tree::Expr();
+}
+
 bool
 VariableWS::del(uuid id, size_t time)
 {

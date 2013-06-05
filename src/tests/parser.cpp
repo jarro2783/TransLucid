@@ -801,12 +801,13 @@ TEST_CASE ( "constants", "check the built in constants" )
   TL::u32string input = U"`hello` 'a' '\\U00000041' '\\u0041' '\\xC2\\xA2'"
                         U"\"text\\u00E4\\xC2\\xA2\"";
   Checker checker({
-    std::make_pair(U"ustring", U"hello"),
-    std::make_pair(U"uchar", U"a"),
-    std::make_pair(U"uchar", U"\u0041"),
-    std::make_pair(U"uchar", U"\u0041"),
-    std::make_pair(U"uchar", U"\u00a2"),
-    std::make_pair(U"ustring", U"text\u00e4\u00a2")
+    std::make_pair(TL::u32string(U"ustring"), TL::u32string(U"hello")),
+    std::make_pair(TL::u32string(U"uchar"), TL::u32string(U"a")),
+    std::make_pair(TL::u32string(U"uchar"), TL::u32string(U"\u0041")),
+    std::make_pair(TL::u32string(U"uchar"), TL::u32string(U"\u0041")),
+    std::make_pair(TL::u32string(U"uchar"), TL::u32string(U"\u00a2")),
+    std::make_pair(TL::u32string(U"ustring"), 
+      TL::u32string(U"text\u00e4\u00a2"))
   });
 
   check(input, checker);
@@ -896,8 +897,8 @@ TEST_CASE ( "mixed", "random test" )
     TOKEN_LARROW,
     mpz_class(5),
     TOKEN_RSQUARE,
-    std::make_pair(U"dim", U"arg0"),
-    std::make_pair(U"dim", U"arg1")
+    std::make_pair(TL::u32string(U"dim"), TL::u32string(U"arg0")),
+    std::make_pair(TL::u32string(U"dim"), TL::u32string(U"arg1"))
   });
 
   check(input, checker);

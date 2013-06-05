@@ -33,15 +33,15 @@ namespace TransLucid
 
 namespace
 {
-  Constant
-  lookup_entry_map
-  (
-    std::vector<dimension_index>::const_iterator iter,
-    std::vector<dimension_index>::const_iterator end,
-    decltype(CacheEntryMap::entry)& entry,
-    Context& delta,
-    Cache& cache
-  );
+  //Constant
+  //lookup_entry_map
+  //(
+  //  std::vector<dimension_index>::const_iterator iter,
+  //  std::vector<dimension_index>::const_iterator end,
+  //  decltype(CacheEntryMap::entry)& entry,
+  //  Context& delta,
+  //  Cache& cache
+  //);
 
   Constant
   set_calc
