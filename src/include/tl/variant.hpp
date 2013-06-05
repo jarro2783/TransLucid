@@ -163,8 +163,9 @@ namespace TransLucid
     typedef typename std::conditional
     <
       std::is_const<
-        typename std::remove_extent<
-          typename std::remove_reference<Storage>::type>::type
+        typename std::remove_pointer<
+          typename std::remove_reference<Storage>::type
+        >::type
       >::value,
       const T,
       T
@@ -474,7 +475,7 @@ namespace TransLucid
     typename Visitor::result_type
     apply_visitor(Visitor& visitor, Args&&... args)
     {
-      return do_visit<First, Types...>()(Internal(), m_which, m_storage,
+      return do_visit<First, Types...>()(Internal(), m_which, &m_storage,
         visitor, std::forward<Args>(args)...);
     }
 
@@ -482,7 +483,7 @@ namespace TransLucid
     typename Visitor::result_type
     apply_visitor(Visitor& visitor, Args&&... args) const
     {
-      return do_visit<First, Types...>()(Internal(), m_which, m_storage,
+      return do_visit<First, Types...>()(Internal(), m_which, &m_storage,
         visitor, std::forward<Args>(args)...);
     }
 
@@ -490,12 +491,15 @@ namespace TransLucid
 
     //TODO implement with alignas when it is implemented in gcc
     //alignas(max<Alignof, First, Types...>::value) char[m_size];
-    union
-    {
-      char m_storage[m_size]; //max of size + alignof for each of Types...
+    typename 
+      std::aligned_storage<m_size, max<Alignof, First, Types...>::value>::type
+      m_storage;
+    //union
+    //{
+    //  char m_storage[m_size]; //max of size + alignof for each of Types...
       //the type with the max alignment
-      typename max<Alignof, First, Types...>::type m_align; 
-    };
+    //  typename max<Alignof, First, Types...>::type m_align; 
+    //};
 
     int m_which;
 
@@ -503,8 +507,8 @@ namespace TransLucid
 
     void indicate_which(int which) {m_which = which;}
 
-    void* address() {return m_storage;}
-    const void* address() const {return m_storage;}
+    void* address() {return &m_storage;}
+    const void* address() const {return &m_storage;}
 
     template <typename Visitor>
     typename Visitor::result_type
@@ -532,7 +536,7 @@ namespace TransLucid
     construct(T&& t)
     {
       typedef typename std::remove_reference<T>::type type;
-      new(m_storage) type(std::forward<T>(t));
+      new(&m_storage) type(std::forward<T>(t));
     }
   };
 
