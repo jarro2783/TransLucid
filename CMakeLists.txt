@@ -36,7 +36,7 @@ execute_process(COMMAND
 
 try_compile(GCC_IS_CORRECT_VERSION ${CMAKE_BINARY_DIR}
   ${CMAKE_BINARY_DIR}/version.cpp
-  COMPILE_DEFINITIONS "-std=gnu++11"
+  COMPILE_DEFINITIONS "-std=c++11"
 )
 
 if (NOT GCC_IS_CORRECT_VERSION)
@@ -54,7 +54,7 @@ if (HAS_NO_UNUSED_LOCAL)
   set(W_NO_UNUSED_LOCAL -Wno-unused-local-typedefs)
 endif()
 
-set(TLCFLAGS -Wall ${W_NO_UNUSED_LOCAL} -std=gnu++11 
+set(TLCFLAGS -Wall ${W_NO_UNUSED_LOCAL} -std=c++11 
   -DPACKAGE_VERSION=\"${VERSION}\"
   -DHAVE_CONFIG_H)
 
@@ -77,7 +77,7 @@ pkg_check_modules(ICU REQUIRED icu-uc)
 if (NOT ICU_FOUND)
   message(FATAL_ERROR "ICU not found")
 endif()
-set(TLLIBS -std=gnu++11 ${ICU_LDFLAGS})
+set(TLLIBS -std=c++11 ${ICU_LDFLAGS})
 
 # do we build tlweb
 #option (ENABLE_TLWEB "Build the tlweb application" OFF)

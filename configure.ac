@@ -39,7 +39,7 @@ GCC_CHECK_TEXT=`$srcdir/checks/generate_gcc_min_version_check`
 # check for the correct version of gcc
 AC_MSG_CHECKING([for an appropriate compiler])
 #GCC_CHECK_TEXT=`cat $srcdir/checks/version.cpp`
-CXXFLAGS="-std=gnu++11"
+CXXFLAGS="${CXXFLAGS} -std=gnu++11"
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([$GCC_CHECK_TEXT])], 
   [AC_MSG_RESULT([yes])],
   [AC_MSG_ERROR([no suitable compiler found, see config.log for more

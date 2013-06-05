@@ -1,5 +1,5 @@
 $(builddir)/generate_lexer: lexertl.cpp
-	$(CXX) $(AM_CXXFLAGS) $(TL_CFLAGS) -I$(top_srcdir)/src/include \
+	$(CXX) $(AM_CXXFLAGS) $(CXXFLAGS) $(TL_CFLAGS) -I$(top_srcdir)/src/include \
   -I$(srcdir)/.. $< -o $@
 
 BUILT_SOURCES=$(srcdir)/static_lexer.hpp
