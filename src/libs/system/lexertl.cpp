@@ -623,7 +623,7 @@ nextToken
   bool interpret
 )
 {
-  lexertl::basic_match_results<StreamPosIterator, uint32_t> results(begin, end);
+  lexertl::match_results<StreamPosIterator, uint32_t> results(begin, end);
 
   translucid_lex(results);
 
