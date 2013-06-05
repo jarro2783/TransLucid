@@ -9,7 +9,8 @@ endif
 TLTEXT_LIBS = $(top_builddir)/src/libs/system/libtlsystem.la \
 $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
 
-tltext_LDFLAGS = $(TLTEXT_LIBS) $(TL_LDFLAGS) -export-dynamic
+tltext_LDFLAGS = $(TL_LDFLAGS) -export-dynamic
+tltext_LDADD = $(TLTEXT_LIBS)
 
 tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -DPREFIX=\"$(prefix)\" \
