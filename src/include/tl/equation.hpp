@@ -96,7 +96,7 @@ namespace TransLucid
     group(const std::list<EquationDefinition>& lines);
 
     Tree::Expr
-    getEquation(size_t time);
+    getEquation(Context& k);
 
     private:
     u32string m_name;

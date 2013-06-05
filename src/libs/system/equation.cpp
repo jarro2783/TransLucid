@@ -84,9 +84,9 @@ VariableWS::addEquation(uuid id, Parser::RawInput input, int time,
 }
 
 Tree::Expr
-VariableWS::getEquation(size_t time)
+VariableWS::getEquation(Context& k)
 {
-  return Tree::Expr();
+  return m_bestfit.getEquation(k);
 }
 
 bool
