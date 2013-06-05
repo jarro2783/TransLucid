@@ -359,6 +359,43 @@ BestfitGroup::parse(Context& k)
 Tree::Expr
 BestfitGroup::getEquation(Context& k)
 {
+  preEvalCheck(k);
+
+  auto dimtime = k.lookup(DIM_TIME);
+  int time = 0;
+
+  if (dimtime.index() == TYPE_INDEX_INTMP)
+  {
+    time = Types::Intmp::get(dimtime).get_si();
+  }
+  else
+  {
+    return Tree::Expr();
+  }
+
+  //first check the last definition
+  auto& last = m_evaluators.back();
+  if (time >= last.start && (last.end == -1 || time <= last.end))
+  {
+    return last.expr;
+  }
+
+  //make sure that it's not bigger than the last and smaller than the first
+  if (time > last.start || time < m_evaluators.front().start)
+  {
+    return Tree::Expr();
+  }
+
+  //otherwise do a linear search backwards if small, binary search if big
+  for (auto i = m_evaluators.rbegin(); i != m_evaluators.rend(); ++i)
+  {
+    if (time >= i->start && time <= i->end)
+    {
+      return i->expr;
+    }
+  }
+  //if we got here then something broke
+
   return Tree::Expr();
 }
 
@@ -451,8 +488,8 @@ BestfitGroup::compileInstant(int time)
   return m_grouper->group(valid);
 }
 
-Constant
-BestfitGroup::operator()(Context& k)
+void
+BestfitGroup::preEvalCheck(Context& k)
 {
   if (m_compiling)
   {
@@ -473,6 +510,12 @@ BestfitGroup::operator()(Context& k)
       throw e;
     }
   }
+}
+
+Constant
+BestfitGroup::operator()(Context& k)
+{
+  preEvalCheck(k);
 
   return evaluate(k);
 }

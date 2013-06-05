@@ -387,6 +387,9 @@ namespace TransLucid
     }
 
     void
+    preEvalCheck(Context& k);
+
+    void
     compile(Context& k);
 
     //compiles all the equations valid for the instant time
