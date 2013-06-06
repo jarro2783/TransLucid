@@ -23,10 +23,41 @@ namespace TransLucid
 {
 
 DependencyFinder::DependencyMap
-DependencyFinder::computeDependencies()
+DependencyFinder::computeDependencies(Context& k)
 {
+  typedef std::unordered_map<u32string, Tree::Expr> NameExpr;
+  NameExpr exprs;
+
   m_idDeps.clear();
-  m_system->lookupIdentifiers();
+
+  auto vars = m_system->getVariables();
+  auto funs = m_system->getFunctions();
+
+  for (const auto& var : vars)
+  {
+    exprs.insert(std::make_pair(var.first, var.second->getEquation(k)));
+  }
+
+  for (const auto& fun : funs)
+  {
+    exprs.insert(std::make_pair(fun.first, fun.second->getEquation(k)));
+  }
+
+  for (const auto& nameExpr : exprs)
+  {
+    m_idDeps.insert(std::make_pair(nameExpr.first, result_type()));
+  }
+
+  DependencyMap current;
+
+  for (const auto& nameExpr : exprs)
+  {
+    current.insert(std::make_pair(nameExpr.first, 
+      apply_visitor(*this, nameExpr.second)));
+  }
+
+  m_idDeps = std::move(current);
+
   return m_idDeps;
 }
 

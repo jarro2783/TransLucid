@@ -301,6 +301,18 @@ namespace TransLucid
       return m_whereCounter++;
     }
 
+    const VariableMap&
+    getVariables() const
+    {
+      return m_variables;
+    }
+
+    const FunctionMap&
+    getFunctions() const
+    {
+      return m_functions;
+    }
+
     private:
 
     typedef std::unordered_map<u32string, size_t> BaseFunctionCounter;

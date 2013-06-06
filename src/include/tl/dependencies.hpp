@@ -43,7 +43,7 @@ namespace TransLucid
     }
 
     DependencyMap
-    computeDependencies();
+    computeDependencies(Context& k);
 
     result_type
     operator()(const Tree::nil&)

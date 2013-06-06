@@ -86,6 +86,12 @@ namespace TransLucid
     Tree::Expr
     group(const std::list<EquationDefinition>& defs);
 
+    Tree::Expr
+    getEquation(Context& k)
+    {
+      return m_bestfit.getEquation(k);
+    }
+
     private:
     u32string m_name;
     System& m_system;
