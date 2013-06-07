@@ -152,6 +152,8 @@ int main(int argc, char *argv[])
     ("cache", _("use cache, no testing is done to check if this is valid"))
     /* TRANSLATORS: the help message for --debug */
     ("debug,d", _("debug mode"))
+    /* TRANSLATORS: the help message for --deps */
+    ("deps", _("compute dependencies"))
     /* TRANSLATORS: the help message for --help */
     ("help,h", _("show this message"))
     /* TRANSLATORS: the help message for --no-builtin-header */
@@ -247,6 +249,11 @@ int main(int argc, char *argv[])
     if (vm.count("uuid"))
     {
       tltext.uuids(true);
+    }
+
+    if (vm.count("deps"))
+    {
+      tltext.compute_deps();
     }
 
     std::unique_ptr<std::ifstream> input;

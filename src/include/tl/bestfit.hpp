@@ -396,7 +396,7 @@ namespace TransLucid
     Tree::Expr
     compileInstant(int time);
 
-    std::shared_ptr<WS>
+    std::pair<Tree::Expr, std::shared_ptr<WS>>
     compileExpression(const Tree::Expr& expr, ScopePtr scope);
 
     template <typename... Args>

@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/ast.hpp>
+#include <tl/dependencies.hpp>
 #include <tl/hyperdatons/multi_arrayhd_fwd.hpp>
 #include <tl/hyperdatons/envhd.hpp>
 #include <tl/library.hpp>
@@ -228,6 +229,12 @@ namespace TransLucid
         m_cached = cached;
       }
 
+      void
+      compute_deps()
+      {
+        m_deps = new Static::DependencyFinder(&m_system);
+      }
+
       private:
       std::string m_myname;
 
@@ -280,8 +287,13 @@ namespace TransLucid
       VerboseOutput
       output(std::ostream& os, int level);
 
+      void
+      computeDependencies();
+
       DemandHD* m_demands;
       DemandHD* m_returnhd;
+
+      Static::DependencyFinder* m_deps;
 
       std::vector<std::string> m_headers;
       std::vector<std::string> m_clargs;

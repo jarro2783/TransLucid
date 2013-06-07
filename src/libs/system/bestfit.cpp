@@ -428,11 +428,11 @@ BestfitGroup::compile(Context& k)
       Tree::Expr expression = compileInstant(m_changes[change]);
 
       //make this into a workshop
-      std::shared_ptr<WS> evaluator = compileExpression(expression, 
+      auto compiled = compileExpression(expression, 
         m_definitions.front().getScope());
 
-      m_evaluators.push_back(CompiledDefinition{start, end, evaluator, 
-        expression});
+      m_evaluators.push_back(CompiledDefinition{start, end, compiled.second, 
+        compiled.first});
 
       ++change;
     }
@@ -441,7 +441,7 @@ BestfitGroup::compile(Context& k)
   m_compiling = false;
 }
 
-std::shared_ptr<WS>
+std::pair<Tree::Expr, std::shared_ptr<WS>>
 BestfitGroup::compileExpression(const Tree::Expr& expr, ScopePtr scope)
 {
   //fixup the ast
@@ -466,7 +466,7 @@ BestfitGroup::compileExpression(const Tree::Expr& expr, ScopePtr scope)
     ws = std::shared_ptr<WS>(compile.build_workshops(fixed));
   }
 
-  return ws;
+  return std::make_pair(fixed, ws);
 }
 
 Tree::Expr

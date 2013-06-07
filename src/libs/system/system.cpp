@@ -620,7 +620,11 @@ System::addAssignment(const Parser::Equation& eqn)
         *this
       );
 
-    assign->second->addDefinition(guardws, booleanws, exprws);
+    assign->second->addDefinition(Assignment::Definition
+      {
+        guard, boolean, expr,
+        guardws, booleanws, exprws
+      });
   }
   else
   {
@@ -628,7 +632,11 @@ System::addAssignment(const Parser::Equation& eqn)
     auto booleanws = std::shared_ptr<WS>(compile.build_workshops(boolean));
     auto exprws = std::shared_ptr<WS>(compile.build_workshops(expr));
 
-    assign->second->addDefinition(guardws, booleanws, exprws);
+    assign->second->addDefinition(Assignment::Definition
+      {
+        guard, boolean, expr,
+        guardws, booleanws, exprws
+      });
   }
 
   return Types::UUID::create(u);
@@ -1372,6 +1380,26 @@ System::replDecl
   }
 
   return Types::Boolean::create(object->second->repl(id, m_time, input));
+}
+
+Tree::Expr
+System::getIdentifierTree(const u32string& x)
+{
+  //currently we only look in variables and functions
+
+  auto variter = m_variables.find(x);
+  if (variter != m_variables.end())
+  {
+    return variter->second->getEquation(m_defaultk);
+  }
+
+  auto funiter = m_functions.find(x);
+  if (funiter != m_functions.end())
+  {
+    return funiter->second->getEquation(m_defaultk);
+  }
+
+  return Tree::Expr();
 }
 
 } //namespace TransLucid

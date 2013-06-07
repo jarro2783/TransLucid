@@ -17,46 +17,48 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/assignment.hpp>
 #include <tl/dependencies.hpp>
+#include <tl/output.hpp>
 
 namespace TransLucid
 {
 
+namespace Static
+{
+
 DependencyFinder::DependencyMap
-DependencyFinder::computeDependencies(Context& k)
+DependencyFinder::computeDependencies()
 {
   typedef std::unordered_map<u32string, Tree::Expr> NameExpr;
   NameExpr exprs;
 
   m_idDeps.clear();
 
-  auto vars = m_system->getVariables();
-  auto funs = m_system->getFunctions();
+  DependencyMap currentDeps;
 
-  for (const auto& var : vars)
+  IdentifierSet demandDeps;
+
+  auto assigns = m_system->getAssignments();
+
+  for (const auto& assign: assigns)
   {
-    exprs.insert(std::make_pair(var.first, var.second->getEquation(k)));
+    for (const auto& def : assign.second->definitions())
+    {
+      auto current = apply_visitor(*this, def.bodyExpr);
+      demandDeps.insert(current.first.begin(), current.first.end());
+    }
   }
 
-  for (const auto& fun : funs)
-  {
-    exprs.insert(std::make_pair(fun.first, fun.second->getEquation(k)));
+  //compute the dependencies of everything in demandDeps
+  std::cout << "demand deps" << std::endl;
+  for (const auto& x : demandDeps)
+  { auto expr = m_system->getIdentifierTree(x);
+    currentDeps[x] = apply_visitor(*this, expr);
+    std::cout << x << std::endl;
   }
 
-  for (const auto& nameExpr : exprs)
-  {
-    m_idDeps.insert(std::make_pair(nameExpr.first, result_type()));
-  }
-
-  DependencyMap current;
-
-  for (const auto& nameExpr : exprs)
-  {
-    current.insert(std::make_pair(nameExpr.first, 
-      apply_visitor(*this, nameExpr.second)));
-  }
-
-  m_idDeps = std::move(current);
+  m_idDeps = std::move(currentDeps);
 
   return m_idDeps;
 }
@@ -111,12 +113,14 @@ DependencyFinder::operator()(const Tree::IdentExpr& e)
 
   if (iter == m_idDeps.end())
   {
-    throw U"undeclared identifier: " + e.text;
+    return std::make_pair(IdentifierSet{e.text}, FunctorList{});
   }
-
-  auto idents = iter->second.first;
-  idents.insert(e.text);
-  return std::make_pair(idents, iter->second.second);
+  else
+  {
+    auto idents = iter->second.first;
+    idents.insert(e.text);
+    return std::make_pair(idents, iter->second.second);
+  }
 }
 
 DependencyFinder::result_type
@@ -415,4 +419,5 @@ DependencyFinder::operator()(const Tree::ConditionalBestfitExpr& e)
   return std::make_pair(X, F);
 }
 
-}
+} //namespace Static
+} //namespace TransLucid

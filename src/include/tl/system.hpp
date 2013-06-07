@@ -301,18 +301,6 @@ namespace TransLucid
       return m_whereCounter++;
     }
 
-    const VariableMap&
-    getVariables() const
-    {
-      return m_variables;
-    }
-
-    const FunctionMap&
-    getFunctions() const
-    {
-      return m_functions;
-    }
-
     private:
 
     typedef std::unordered_map<u32string, size_t> BaseFunctionCounter;
@@ -584,6 +572,12 @@ namespace TransLucid
       return m_defaultk;
     }
 
+    const AssignmentMap&
+    getAssignments() const
+    {
+      return m_assignments;
+    }
+
     struct IdentifierLookup
     {
       IdentifierLookup
@@ -617,6 +611,9 @@ namespace TransLucid
     {
       return IdentifierLookup(m_identifiers, m_cachedVars);
     }
+
+    Tree::Expr
+    getIdentifierTree(const u32string& x);
 
     //template <size_t N>
     //auto

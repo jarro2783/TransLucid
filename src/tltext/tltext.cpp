@@ -77,6 +77,7 @@ TLText::TLText
  ,m_system(m_cached)
  ,m_time(0)
  ,m_lastLibLoaded(0)
+ ,m_deps(nullptr)
  ,m_argsHD(0)
  ,m_envHD(0)
 {
@@ -118,6 +119,7 @@ TLText::~TLText()
   delete m_argsHD;
   delete m_envHD;
   delete m_returnhd;
+  delete m_deps;
 }
 
 VerboseOutput
@@ -257,6 +259,8 @@ TLText::run()
         ));
         ++slot;
       }
+
+      computeDependencies();
 
       //run the demands
       m_system.go();
@@ -536,6 +540,27 @@ void
 TLText::add_argument(const u32string& arg, const u32string& value)
 {
   m_system.addEnvVar(arg, Types::String::create(value));
+}
+
+void
+TLText::computeDependencies()
+{
+  if (m_deps)
+  {
+    auto result = m_deps->computeDependencies();
+
+    std::cout << "Dependencies:\n";
+    for (const auto& dep : result)
+    {
+      std::cout << dep.first << ": ";
+
+      for (const auto& x : dep.second.first)
+      {
+        std::cout << x << " ";
+      }
+      std::cout << std::endl;
+    }
+  }
 }
 
 } //namespace TLText

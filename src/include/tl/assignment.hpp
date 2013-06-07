@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_ASSIGNMENT_HPP_INCLUDED
 #define TL_ASSIGNMENT_HPP_INCLUDED
 
+#include <tl/ast.hpp>
 #include <tl/workshop.hpp>
 
 #include <memory>
@@ -35,19 +36,24 @@ namespace TransLucid
   {
     public:
 
+    struct Definition
+    {
+      Tree::Expr booleanExpr;
+      Tree::Expr guardExpr;
+      Tree::Expr bodyExpr;
+      std::shared_ptr<WS> guardWS;
+      std::shared_ptr<WS> booleanWS;
+      std::shared_ptr<WS> bodyWS;
+    };
+
     Assignment(u32string name)
     : m_name(name) 
     {}
 
     void
-    addDefinition
-    (
-      std::shared_ptr<WS> guard,
-      std::shared_ptr<WS> boolean,
-      std::shared_ptr<WS> expr
-    )
+    addDefinition(Definition d)
     {
-      m_definitions.push_back(std::make_tuple(guard, boolean, expr));
+      m_definitions.push_back(d);
     }
 
     void
@@ -57,15 +63,13 @@ namespace TransLucid
       Context& k
     );
 
-    private:
+    const std::vector<Definition>&
+    definitions() const
+    {
+      return m_definitions;
+    }
 
-    typedef std::tuple
-    <
-      std::shared_ptr<WS>,
-      std::shared_ptr<WS>,
-      std::shared_ptr<WS>
-    >
-    Definition;
+    private:
 
     u32string m_name;
     std::vector<Definition> m_definitions;

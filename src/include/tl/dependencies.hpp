@@ -23,121 +23,124 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
-  class DependencyFinder
+  namespace Static
   {
-    public:
-    typedef std::set<u32string> IdentifierSet;
-    typedef Static::Functions::FunctorList<IdentifierSet> FunctorList;
-    typedef std::pair<IdentifierSet, FunctorList> result_type;
-
-    // function types
-    typedef Static::Functions::Up<IdentifierSet> Up;
-    typedef Static::Functions::Up<IdentifierSet> CBV;
-    typedef Static::Functions::Up<IdentifierSet> Base;
-
-    typedef std::map<u32string, result_type> DependencyMap;
-
-    DependencyFinder(System* s)
-    : m_system(s)
+    class DependencyFinder
     {
-    }
+      public:
+      typedef std::set<u32string> IdentifierSet;
+      typedef Static::Functions::FunctorList<IdentifierSet> FunctorList;
+      typedef std::pair<IdentifierSet, FunctorList> result_type;
 
-    DependencyMap
-    computeDependencies(Context& k);
+      // function types
+      typedef Static::Functions::Up<IdentifierSet> Up;
+      typedef Static::Functions::Up<IdentifierSet> CBV;
+      typedef Static::Functions::Up<IdentifierSet> Base;
 
-    result_type
-    operator()(const Tree::nil&)
-    {
-      return result_type();
-    }
+      typedef std::map<u32string, result_type> DependencyMap;
 
-    result_type
-    operator()(const bool&);
+      DependencyFinder(System* s)
+      : m_system(s)
+      {
+      }
 
-    result_type
-    operator()(const Special&);
+      DependencyMap
+      computeDependencies();
 
-    result_type
-    operator()(const mpz_class&);
+      result_type
+      operator()(const Tree::nil&)
+      {
+        return result_type();
+      }
 
-    result_type
-    operator()(const char32_t&);
+      result_type
+      operator()(const bool&);
 
-    result_type
-    operator()(const u32string&);
+      result_type
+      operator()(const Special&);
 
-    result_type
-    operator()(const Tree::LiteralExpr&);
+      result_type
+      operator()(const mpz_class&);
 
-    result_type
-    operator()(const Tree::DimensionExpr&);
+      result_type
+      operator()(const char32_t&);
 
-    result_type
-    operator()(const Tree::IdentExpr&);
+      result_type
+      operator()(const u32string&);
 
-    result_type
-    operator()(const Tree::HashSymbol&);
+      result_type
+      operator()(const Tree::LiteralExpr&);
 
-    result_type
-    operator()(const Tree::HostOpExpr&);
+      result_type
+      operator()(const Tree::DimensionExpr&);
 
-    result_type
-    operator()(const Tree::ParenExpr&);
+      result_type
+      operator()(const Tree::IdentExpr&);
 
-    result_type
-    operator()(const Tree::UnaryOpExpr&);
+      result_type
+      operator()(const Tree::HashSymbol&);
 
-    result_type
-    operator()(const Tree::BinaryOpExpr&);
+      result_type
+      operator()(const Tree::HostOpExpr&);
 
-    result_type
-    operator()(const Tree::MakeIntenExpr&);
+      result_type
+      operator()(const Tree::ParenExpr&);
 
-    result_type
-    operator()(const Tree::EvalIntenExpr&);
+      result_type
+      operator()(const Tree::UnaryOpExpr&);
 
-    result_type
-    operator()(const Tree::IfExpr&);
+      result_type
+      operator()(const Tree::BinaryOpExpr&);
 
-    result_type
-    operator()(const Tree::HashExpr&);
+      result_type
+      operator()(const Tree::MakeIntenExpr&);
 
-    result_type
-    operator()(const Tree::RegionExpr&);
+      result_type
+      operator()(const Tree::EvalIntenExpr&);
 
-    result_type
-    operator()(const Tree::TupleExpr&);
+      result_type
+      operator()(const Tree::IfExpr&);
 
-    result_type
-    operator()(const Tree::AtExpr&);
+      result_type
+      operator()(const Tree::HashExpr&);
 
-    result_type
-    operator()(const Tree::LambdaExpr&);
+      result_type
+      operator()(const Tree::RegionExpr&);
 
-    result_type
-    operator()(const Tree::PhiExpr&);
+      result_type
+      operator()(const Tree::TupleExpr&);
 
-    result_type
-    operator()(const Tree::BaseAbstractionExpr&);
+      result_type
+      operator()(const Tree::AtExpr&);
 
-    result_type
-    operator()(const Tree::BangAppExpr&);
+      result_type
+      operator()(const Tree::LambdaExpr&);
 
-    result_type
-    operator()(const Tree::LambdaAppExpr&);
+      result_type
+      operator()(const Tree::PhiExpr&);
 
-    result_type
-    operator()(const Tree::PhiAppExpr&);
+      result_type
+      operator()(const Tree::BaseAbstractionExpr&);
 
-    result_type
-    operator()(const Tree::WhereExpr&);
+      result_type
+      operator()(const Tree::BangAppExpr&);
 
-    result_type
-    operator()(const Tree::ConditionalBestfitExpr&);
+      result_type
+      operator()(const Tree::LambdaAppExpr&);
 
-    private:
-    
-    DependencyMap m_idDeps;
-    System* m_system;
-  };
+      result_type
+      operator()(const Tree::PhiAppExpr&);
+
+      result_type
+      operator()(const Tree::WhereExpr&);
+
+      result_type
+      operator()(const Tree::ConditionalBestfitExpr&);
+
+      private:
+      
+      DependencyMap m_idDeps;
+      System* m_system;
+    };
+  }
 }

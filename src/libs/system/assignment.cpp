@@ -153,7 +153,7 @@ Assignment::evaluate
   for (auto& assign : m_definitions)
   {
     //const Tuple& constraint = m_outputHDDecls.find(ident.first)->second;
-    const auto& guard = std::get<0>(assign);
+    const auto& guard = assign.guardWS;
 
     if (guard)
     {
@@ -163,7 +163,7 @@ Assignment::evaluate
       {
         //the demand could have ranges, so we need to enumerate them
         enumerateContextSet(Types::Region::get(ctxts), theContext, 
-          *std::get<2>(assign), hd);
+          *assign.bodyWS, hd);
       }
     }
   }
