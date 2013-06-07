@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#ifndef TL_STATIC_FUNCTION_HPP
+#define TL_STATIC_FUNCTION_HPP
+
 #include <tl/variant.hpp>
 #include <tl/types.hpp>
 
@@ -64,6 +67,10 @@ namespace TransLucid
         recursive_wrapper<Functions::CBV<Prop>>,
         recursive_wrapper<Functions::Base<Prop>>
       >;
+
+    template <typename Prop>
+    u32string
+    print_functor(const Functor<Prop>& f);
 
     namespace Functions
     {
@@ -455,3 +462,5 @@ namespace TransLucid
     }
   }
 }
+
+#endif

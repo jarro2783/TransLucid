@@ -34,7 +34,8 @@ includes_HEADERS = \
   parser_api.hpp parser_defs.hpp parser_iterator.hpp \
   range.hpp region.hpp registries.hpp rename.hpp semantic_transform.hpp \
   semantics.hpp \
-  set_types.hpp static_function.hpp system.hpp system_object.hpp \
+  set_types.hpp static_function.hpp static_function_printer.hpp \
+  system.hpp system_object.hpp \
   system_util.hpp \
   tree_printer.hpp tree_rewriter.hpp tree_to_wstree.hpp trie.hpp \
   types.hpp types_basic.hpp types_fwd.hpp types_util.hpp utility.hpp \

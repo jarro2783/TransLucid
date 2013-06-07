@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/assignment.hpp>
 #include <tl/dependencies.hpp>
 #include <tl/output.hpp>
+#include <tl/static_function_printer.hpp>
 
 namespace TransLucid
 {
@@ -53,9 +54,19 @@ DependencyFinder::computeDependencies()
   //compute the dependencies of everything in demandDeps
   std::cout << "demand deps" << std::endl;
   for (const auto& x : demandDeps)
-  { auto expr = m_system->getIdentifierTree(x);
-    currentDeps[x] = apply_visitor(*this, expr);
-    std::cout << x << std::endl;
+  { 
+    try
+    {
+      std::cout << x << std::endl;
+      auto expr = m_system->getIdentifierTree(x);
+      currentDeps[x] = apply_visitor(*this, expr);
+    }
+    catch (const char* e)
+    {
+      std::cerr << "exception checking dependencies of '" << x << "':\n"
+        << e << std::endl;
+      throw;
+    }
   }
 
   m_idDeps = std::move(currentDeps);
