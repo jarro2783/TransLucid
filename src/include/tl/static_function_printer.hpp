@@ -64,7 +64,20 @@ namespace TransLucid
         u32string
         operator()(const Functions::ApplyV<Prop>& applyv) const
         {
-          return U"";
+          std::ostringstream os;
+
+          os << "applyv ";
+
+          os << apply_visitor(*this, applyv.lhs);
+
+          os << " {";
+
+          print_container(os, applyv.rhs);
+
+          os << "})";
+          
+          auto str = os.str();
+          return u32string(str.begin(), str.end());
         }
 
         u32string
@@ -115,6 +128,8 @@ namespace TransLucid
 
           print_container(os, cbv.functions);
 
+          os << "})";
+
           auto str = os.str();
 
           return u32string(str.begin(), str.end());
@@ -137,6 +152,8 @@ namespace TransLucid
           os << "} {";
 
           print_container(os, base.functions);
+
+          os << "})";
 
           auto str = os.str();
 
