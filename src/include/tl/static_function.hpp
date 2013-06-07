@@ -362,7 +362,7 @@ namespace TransLucid
 
         for (const auto& f : F_0)
         {
-          auto c = get<const CBV<Prop>*>(f);
+          auto c = get<const CBV<Prop>>(&f);
 
           if (c == nullptr)
           {
@@ -392,7 +392,7 @@ namespace TransLucid
 
         for (const auto& f : F_0)
         {
-          auto base = get<const Base<Prop>*>(f);
+          auto base = get<const Base<Prop>>(&f);
 
           if (base == nullptr)
           {
@@ -436,7 +436,7 @@ namespace TransLucid
 
         for (const auto& f : F_0)
         {
-          auto up = get<const Up<Prop>*>(f);
+          auto up = get<const Up<Prop>>(&f);
 
           if (up == nullptr)
           {

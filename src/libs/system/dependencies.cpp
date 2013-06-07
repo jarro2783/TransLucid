@@ -361,10 +361,17 @@ DependencyFinder::operator()(const Tree::BangAppExpr& e)
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
 {
+  IdentifierSet X;
+
   auto lhs = apply_visitor(*this, e.lhs);
   auto rhs = apply_visitor(*this, e.rhs);
-  evals_applyv(lhs.second, rhs.second);
-  return result_type();
+  auto eval_result = evals_applyv(lhs.second, rhs.second);
+
+  X = lhs.first;
+  X.insert(rhs.first.begin(), rhs.first.end());
+  X.insert(eval_result.first.begin(), eval_result.first.end());
+
+  return result_type(X, eval_result.second);
 }
 
 DependencyFinder::result_type
