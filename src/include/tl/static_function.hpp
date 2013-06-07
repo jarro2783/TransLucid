@@ -447,7 +447,7 @@ namespace TransLucid
 
           if (up == nullptr)
           {
-            throw "non up found in down";
+            throw U"non up found in down: " + print_functor(f);
           }
           else
           {

@@ -30,6 +30,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <sstream>
 
 #include <tl/charset.hpp>
 #include <tl/types.hpp>
@@ -66,6 +67,24 @@ namespace TransLucid
     }
     return os;
   }
+
+  template <typename C>
+  void
+  print_container(std::ostream& os, const C& c)
+  {
+    auto iter = c.begin();
+    while (iter != c.end())
+    {
+      os << *iter;
+
+      if (++iter != c.end())
+      {
+        os << ", ";
+      }
+    }
+  }
+
+  typedef std::basic_ostringstream<char32_t> ostringstream32;
 }
 
 #endif

@@ -19,8 +19,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/assignment.hpp>
 #include <tl/dependencies.hpp>
-#include <tl/output.hpp>
 #include <tl/static_function_printer.hpp>
+#include <tl/output.hpp>
 
 namespace TransLucid
 {
@@ -60,8 +60,10 @@ DependencyFinder::computeDependencies()
       std::cout << x << std::endl;
       auto expr = m_system->getIdentifierTree(x);
       currentDeps[x] = apply_visitor(*this, expr);
+
+      //print_container(std::cout, currentDeps[x].second);
     }
-    catch (const char* e)
+    catch (const u32string& e)
     {
       std::cerr << "exception checking dependencies of '" << x << "':\n"
         << e << std::endl;
