@@ -66,7 +66,7 @@ namespace TransLucid
         {
           std::ostringstream os;
 
-          os << "applyv ";
+          os << "(applyv ";
 
           os << apply_visitor(*this, applyv.lhs);
 
@@ -83,13 +83,37 @@ namespace TransLucid
         u32string
         operator()(const Functions::ApplyB<Prop>& applyb) const
         {
-          return U"";
+          std::ostringstream os;
+
+          os << "(applyb ";
+
+          os << apply_visitor(*this, applyb.lhs);
+
+          for (const auto& param : applyb.params)
+          {
+            os << " {";
+
+            print_container(os, param);
+
+            os << "}";
+          }
+
+          os << ")";
+          
+          auto str = os.str();
+          return u32string(str.begin(), str.end());
         }
 
         u32string
         operator()(const Functions::Down<Prop>& down) const
         {
-          return U"";
+          std::ostringstream os;
+          os << "(down ";
+          os << apply_visitor(*this, down.body);
+          os << ")";
+
+          auto str = os.str();
+          return u32string(str.begin(), str.end());
         }
 
         u32string
