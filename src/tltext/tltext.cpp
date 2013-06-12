@@ -554,7 +554,7 @@ TLText::computeDependencies()
     {
       std::cout << dep.first << ": ";
 
-      for (const auto& x : dep.second.first)
+      for (const auto& x : std::get<0>(dep.second))
       {
         std::cout << x << " ";
       }

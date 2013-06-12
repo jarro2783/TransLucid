@@ -92,6 +92,7 @@ namespace TransLucid
         dimension_index dim;
         Prop property;
         FunctorList<Prop> functions;
+        FunctorList<Prop> fundeps;
       };
 
       template <typename Prop>
@@ -100,6 +101,7 @@ namespace TransLucid
         std::vector<dimension_index> dims;
         Prop property;
         FunctorList<Prop> functions;
+        FunctorList<Prop> fundeps;
       };
 
       template <typename Prop>
@@ -107,6 +109,7 @@ namespace TransLucid
       {
         Prop property;
         FunctorList<Prop> functions;
+        FunctorList<Prop> fundeps;
       };
 
       template <typename Prop>
@@ -157,6 +160,29 @@ namespace TransLucid
 
         return all;
       }
+
+      struct is_app
+      {
+        template <typename Prop>
+        bool
+        operator()(const Functor<Prop>& f) const
+        {
+          if (get<ApplyB<Prop>>(&f) != nullptr)
+          {
+            return true;
+          }
+          else if (get<ApplyV<Prop>>(&f) != nullptr)
+          {
+            return true;
+          }
+          else if (get<Down<Prop>>(&f) != nullptr)
+          {
+            return true;
+          }
+          
+          return false;
+        }
+      };
 
       namespace detail
       {
@@ -274,7 +300,7 @@ namespace TransLucid
       }
 
       template <typename Prop>
-      std::pair<Prop, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
       eval(const Functor<Prop>& f);
 
       template <typename Prop>
@@ -282,60 +308,77 @@ namespace TransLucid
       {
         public:
 
-        typedef std::pair<Prop, FunctorList<Prop>> result_type;
+        typedef std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>> 
+          result_type;
 
         template <typename T>
         result_type
         operator()(const T& t)
         {
-          return std::make_pair(Prop(), FunctorList<Prop>{t});
+          return std::make_tuple(Prop(), FunctorList<Prop>{t}, 
+            FunctorList<Prop>{});
         }
 
         result_type
         operator()(const Down<Prop>& down)
         {
           Prop property;
+          FunctorList<Prop> Fcal;
 
           auto a = eval(down.body);
-          auto b = evals_down(a.second);
+          auto b = evals_down(std::get<1>(a));
 
-          prop_append(property, a.first);
-          prop_append(property, b.first);
+          prop_append(property, std::get<0>(a));
+          prop_append(property, std::get<0>(b));
 
-          return std::make_pair(property, b.second);
+          Fcal = std::get<2>(a);
+          Fcal.insert(Fcal.end(), std::get<2>(b).begin(), 
+            std::get<2>(b).end());
+
+          return std::make_tuple(property, std::get<1>(b), Fcal);
         }
 
         result_type
         operator()(const ApplyB<Prop>& applyb)
         {
           Prop property;
+          FunctorList<Prop> Fcal;
 
           auto a = eval(applyb.lhs);
-          auto b = evals_applyb(a.second, applyb.params);
+          auto b = evals_applyb(std::get<1>(a), applyb.params);
 
-          prop_append(property, a.first);
-          prop_append(property, b.first);
+          prop_append(property, std::get<0>(a));
+          prop_append(property, std::get<0>(b));
 
-          return std::make_pair(property, b.second);
+          Fcal = std::get<2>(a);
+          Fcal.insert(Fcal.end(), std::get<2>(b).begin(), 
+            std::get<2>(b).end());
+
+          return std::make_tuple(property, std::get<1>(b), Fcal);
         }
 
         result_type
         operator()(const ApplyV<Prop>& applyv)
         {
           Prop property;
+          FunctorList<Prop> Fcal;
 
           auto a = eval(applyv.lhs);
-          auto b = evals_applyv(a.second, applyv.rhs);
+          auto b = evals_applyv(std::get<1>(a), applyv.rhs);
 
-          prop_append(property, a.first);
-          prop_append(property, b.first);
+          prop_append(property, std::get<0>(a));
+          prop_append(property, std::get<0>(b));
 
-          return std::make_pair(property, b.second);
+          Fcal = std::get<2>(a);
+          Fcal.insert(Fcal.end(), std::get<2>(b).begin(), 
+            std::get<2>(b).end());
+
+          return std::make_tuple(property, std::get<1>(b), Fcal);
         }
       };
 
       template <typename Prop>
-      std::pair<Prop, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
       eval(const Functor<Prop>& f)
       {
         EvalHelper<Prop> helper;
@@ -343,29 +386,33 @@ namespace TransLucid
       }
 
       template<typename Prop>
-      std::pair<Prop, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
       evalall(const FunctorList<Prop>& F)
       {
         Prop prop;
         FunctorList<Prop> funcs;
+        FunctorList<Prop> Fcal;
 
         for (const auto& f : F)
         {
           auto result = eval(f);
-          prop_append(prop, result.first);
-          funcs.insert(funcs.end(), result.second.begin(), 
-            result.second.end());
+          prop_append(prop, std::get<0>(result));
+          funcs.insert(funcs.end(), std::get<1>(result).begin(), 
+            std::get<1>(result).end());
+          funcs.insert(funcs.end(), std::get<2>(result).begin(), 
+            std::get<2>(result).end());
         }
 
-        return std::make_pair(prop, funcs);
+        return std::make_tuple(prop, funcs, Fcal);
       }
       
       template<typename Prop>
-      std::pair<Prop, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
       evals_applyv(const FunctorList<Prop>& F_0, const FunctorList<Prop>& F_1)
       {
         Prop property;
         FunctorList<Prop> funcs;
+        FunctorList<Prop> Fcal;
 
         for (const auto& f : F_0)
         {
@@ -379,23 +426,40 @@ namespace TransLucid
           {
             prop_append(property, c->property);
             Substitution<Prop> p{{c->dim, F_1}};
+
             auto result = evalall(subs(c->functions, p));
-            prop_append(property, result.first);
-            funcs.insert(funcs.end(), result.second.begin(), 
-              result.second.end());
+            prop_append(property, std::get<0>(result));
+            funcs.insert(funcs.end(), std::get<1>(result).begin(), 
+              std::get<1>(result).end());
+            Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
+              std::get<2>(result).end());
+
+            result = evalall(subs(c->functions, p));
+            prop_append(property, std::get<0>(result));
+            Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
+              std::get<2>(result).end());
+              
+            std::copy_if(
+              std::get<1>(result).begin(), 
+              std::get<1>(result).end(),
+              std::back_inserter(Fcal),
+              is_app()
+            );
+
           }
         }
 
-        return std::make_pair(property, funcs);
+        return std::make_tuple(property, funcs, Fcal);
       }
 
       template <typename Prop>
-      std::pair<Prop, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
       evals_applyb(const FunctorList<Prop>& F_0, 
         const std::vector<FunctorList<Prop>>& args)
       {
         Prop property;
         FunctorList<Prop> funcs;
+        FunctorList<Prop> Fcal;
 
         for (const auto& f : F_0)
         {
@@ -424,22 +488,36 @@ namespace TransLucid
 
             auto result = evalall(subs(base->functions, p));
 
-            prop_append(property, result.first);
+            prop_append(property, std::get<0>(result));
             prop_append(property, base->property);
-            funcs.insert(funcs.end(), result.second.begin(), 
-              result.second.end());
+            funcs.insert(funcs.end(), std::get<1>(result).begin(), 
+              std::get<1>(result).end());
+
+            result = evalall(subs(base->fundeps, p));
+
+            prop_append(property, std::get<0>(result));
+            Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
+              std::get<2>(result).end());
+
+            std::copy_if(
+              std::get<1>(result).begin(), 
+              std::get<1>(result).end(),
+              std::back_inserter(Fcal),
+              is_app()
+            );
           }
         }
 
-        return std::make_pair(property, funcs);
+        return std::make_tuple(property, funcs, Fcal);
       }
 
       template <typename Prop>
-      std::pair<Prop, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
       evals_down(const FunctorList<Prop>& F_0)
       {
         Prop property;
         FunctorList<Prop> funcs;
+        FunctorList<Prop> Fcal;
 
         for (const auto& f : F_0)
         {
@@ -454,10 +532,11 @@ namespace TransLucid
             prop_append(property, up->property);
             funcs.insert(funcs.end(), up->functions.begin(), 
               up->functions.end());
+            Fcal.insert(Fcal.end(), up->fundeps.begin(), up->fundeps.end());
           }
         }
 
-        return std::make_pair(property, funcs);
+        return std::make_tuple(property, funcs, Fcal);
       }
     }
   }

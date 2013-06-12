@@ -55,10 +55,12 @@ namespace TransLucid
         u32string
         operator()(const Functions::Param& p) const
         {
-          ostringstream32 os;
+          std::ostringstream os;
           os << "(param " << p.dim << ")";
-          //return u32string(os.str().begin(), os.str().end());
-          return os.str();
+
+          auto str = os.str();
+
+          return u32string(str.begin(), str.end());
         }
 
         u32string

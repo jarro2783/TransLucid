@@ -30,12 +30,18 @@ namespace TransLucid
       public:
       typedef std::set<u32string> IdentifierSet;
       typedef Static::Functions::FunctorList<IdentifierSet> FunctorList;
-      typedef std::pair<IdentifierSet, FunctorList> result_type;
+
+      //0. the identifiers depended on, 1. the direct function values,
+      //2. the indirect function values
+      typedef std::tuple<IdentifierSet, FunctorList, FunctorList> result_type;
 
       // function types
       typedef Static::Functions::Up<IdentifierSet> Up;
-      typedef Static::Functions::Up<IdentifierSet> CBV;
-      typedef Static::Functions::Up<IdentifierSet> Base;
+      typedef Static::Functions::CBV<IdentifierSet> CBV;
+      typedef Static::Functions::Base<IdentifierSet> Base;
+      typedef Static::Functions::Down<IdentifierSet> Down;
+      typedef Static::Functions::ApplyV<IdentifierSet> ApplyV;
+      typedef Static::Functions::ApplyB<IdentifierSet> ApplyB;
 
       typedef std::map<u32string, result_type> DependencyMap;
 
