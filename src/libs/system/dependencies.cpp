@@ -40,7 +40,8 @@ DependencyFinder::computeDependencies()
 
   DependencyMap currentDeps;
 
-  IdentifierSet demandDeps;
+  IdentifierSet seenVars;
+  IdentifierSet currentSeenVars;
 
   auto assigns = m_system->getAssignments();
 
@@ -49,30 +50,39 @@ DependencyFinder::computeDependencies()
     for (const auto& def : assign.second->definitions())
     {
       auto current = apply_visitor(*this, def.bodyExpr);
-      demandDeps.insert(std::get<0>(current).begin(), 
+      currentSeenVars.insert(std::get<0>(current).begin(), 
         std::get<0>(current).end());
     }
   }
 
   int lastVarCount = 0;
-  int currentVarCount = demandDeps.size();
+  int currentVarCount = seenVars.size();
 
-  while (lastVarCount != currentVarCount)
+  lastVarCount = currentVarCount;
+  //compute the dependencies of everything in seenVars until a 
+  //least-fixed point
+  int i = 0;
+  while (currentSeenVars.size() != seenVars.size())
   {
-    lastVarCount = currentVarCount;
-    //compute the dependencies of everything in demandDeps
-    std::cout << "demand deps" << std::endl;
-    for (const auto& x : demandDeps)
+    seenVars = currentSeenVars;
+    for (const auto& x : seenVars)
     { 
       try
       {
-        std::cout << x << std::endl;
         auto expr = m_system->getIdentifierTree(x);
-        currentDeps[x] = apply_visitor(*this, expr);
+        auto& deps = currentDeps[x] = apply_visitor(*this, expr);
 
-        currentVarCount += std::get<0>(currentDeps[x]).size();
+        for (const auto& f : std::get<1>(deps))
+        {
+          Static::Functions::collect_properties(
+            f, currentSeenVars);
+        }
 
-        //print_container(std::cout, currentDeps[x].second);
+        for (const auto& f : std::get<2>(deps))
+        {
+          Static::Functions::collect_properties(
+            f, currentSeenVars);
+        }
       }
       catch (const u32string& e)
       {
@@ -83,8 +93,11 @@ DependencyFinder::computeDependencies()
     }
 
     m_idDeps = std::move(currentDeps);
+    ++i;
   }
 
+  std::cout << "took " << i << " iterations to compute dependencies" << 
+    std::endl;
 
   return m_idDeps;
 }
@@ -452,11 +465,14 @@ DependencyFinder::operator()(const Tree::BangAppExpr& e)
   FunctorList F;
   FunctorList Fcal;
 
+  FunctorList bases;
+
   FunctorList F_0;
   std::vector<FunctorList> F_j;
   F_j.reserve(e.args.size());
 
   auto result = apply_visitor(*this, e.name);
+
   X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
   F_0 = std::get<1>(result);
   Fcal = std::get<2>(result);
@@ -470,31 +486,67 @@ DependencyFinder::operator()(const Tree::BangAppExpr& e)
       std::get<2>(result).end());
   }
 
-  result = Static::Functions::evals_applyb(F_0, F_j);
+  for (const auto& f : std::get<1>(result))
+  {
+    auto base = get<Base>(&f);
 
-  return std::make_tuple(X, std::get<1>(result), Fcal);
+    if (base == nullptr)
+    {
+      F.push_back(ApplyB{f, F_j});
+    }
+    else
+    {
+      bases.push_back(*base);
+    }
+  }
+
+  result = Static::Functions::evals_applyb(bases, F_j);
+
+  F.insert(F.end(), std::get<1>(result).begin(), std::get<1>(result).end());
+
+  return std::make_tuple(X, F, Fcal);
 }
 
 DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
 {
   IdentifierSet X;
+  FunctorList F;
   FunctorList Fcal;
+  FunctorList cbvs;
 
   auto lhs = apply_visitor(*this, e.lhs);
   auto rhs = apply_visitor(*this, e.rhs);
-  auto eval_result = evals_applyv(std::get<1>(lhs), std::get<1>(rhs));
+
+  for (const auto& f : std::get<1>(lhs))
+  {
+    auto cbv = get<CBV>(&f);
+
+    if (cbv == nullptr)
+    {
+      F.push_back(ApplyV{f, std::get<1>(rhs)});
+    }
+    else
+    {
+      cbvs.push_back(*cbv);
+    }
+  }
+
+  auto eval_result = evals_applyv(cbvs, std::get<1>(rhs));
 
   X = std::get<0>(lhs);
   X.insert(std::get<0>(rhs).begin(), std::get<0>(rhs).end());
   X.insert(std::get<0>(eval_result).begin(), std::get<0>(eval_result).end());
+
+  F.insert(F.end(), std::get<1>(eval_result).begin(), 
+    std::get<1>(eval_result).end());
 
   Fcal = std::get<2>(lhs);
   Fcal.insert(Fcal.end(), std::get<2>(rhs).begin(), std::get<2>(rhs).end());
   Fcal.insert(Fcal.end(), std::get<2>(eval_result).begin(), 
     std::get<2>(eval_result).end());
 
-  return std::make_tuple(X, std::get<1>(eval_result), Fcal);
+  return std::make_tuple(X, F, Fcal);
 }
 
 DependencyFinder::result_type

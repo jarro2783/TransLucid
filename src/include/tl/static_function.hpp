@@ -139,6 +139,118 @@ namespace TransLucid
         dest.insert(source.begin(), source.end());
       }
 
+      namespace detail
+      {
+        class Collector
+        {
+          public:
+
+          typedef void result_type;
+
+          //this is for param and topfun
+          template <typename T, typename C>
+          void
+          operator()(const T& t, C& c)
+          {
+          }
+
+          template <typename Prop, typename C>
+          void
+          operator()(const ApplyV<Prop>& applyv, C& c)
+          {
+            apply_visitor(*this, applyv.lhs, c);
+
+            for (const auto& r : applyv.rhs)
+            {
+              apply_visitor(*this, r, c);
+            }
+          }
+
+          template <typename Prop, typename C>
+          void
+          operator()(const ApplyB<Prop>& applyb, C& c)
+          {
+            apply_visitor(*this, applyb.lhs, c);
+
+            for (const auto& param : applyb.params)
+            {
+              for (const auto& f : param)
+              {
+                apply_visitor(*this, f, c);
+              }
+            }
+          }
+
+          template <typename Prop, typename C>
+          void
+          operator()(const Down<Prop>& down, C& c)
+          {
+            apply_visitor(*this, down.body, c);
+          }
+
+          template <typename Prop, typename C>
+          void
+          operator()(const Base<Prop>& base, C& c)
+          {
+            c.insert(base.property.begin(), base.property.end());
+
+            for (const auto& f : base.functions)
+            {
+              apply_visitor(*this, f, c);
+            }
+
+            for (const auto& f : base.fundeps)
+            {
+              apply_visitor(*this, f, c);
+            }
+          }
+
+          template <typename Prop, typename C>
+          void
+          operator()(const Up<Prop>& up, C& c)
+          {
+            c.insert(up.property.begin(), up.property.end());
+
+            for (const auto& f : up.functions)
+            {
+              apply_visitor(*this, f, c);
+            }
+
+            for (const auto& f : up.fundeps)
+            {
+              apply_visitor(*this, f, c);
+            }
+          }
+
+          template <typename Prop, typename C>
+          void
+          operator()(const CBV<Prop>& cbv, C& c)
+          {
+            c.insert(cbv.property.begin(), cbv.property.end());
+
+            for (const auto& f : cbv.functions)
+            {
+              apply_visitor(*this, f, c);
+            }
+
+            for (const auto& f : cbv.fundeps)
+            {
+              apply_visitor(*this, f, c);
+            }
+          }
+
+        };
+      }
+
+      template <typename Prop, typename C>
+      void
+      collect_properties(const Functor<Prop>& f, C& c)
+      {
+        detail::Collector collect;
+
+        apply_visitor(collect, f, c);
+      }
+
       template <typename Prop>
       using Substitution = std::map<dimension_index, FunctorList<Prop>>;
 
@@ -467,7 +579,8 @@ namespace TransLucid
 
           if (base == nullptr)
           {
-            throw "non base in applyb";
+            //throw U"non base in applyb: " + print_functor(f);
+            funcs.push_back(ApplyB<Prop>{f, args});
           }
           else
           {
