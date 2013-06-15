@@ -166,9 +166,10 @@ namespace TransLucid
         {
           std::ostringstream os;
           os << "(base (";
-          std::copy(base.dims.begin(), base.dims.end(),
-            std::ostream_iterator<typename decltype(base.dims)::value_type>
-              (os, ", "));
+          //std::copy(base.dims.begin(), base.dims.end(),
+          //  std::ostream_iterator<typename decltype(base.dims)::value_type>
+          //    (os, ", "));
+          print_container(os, base.dims);
 
           os << ") {";
 

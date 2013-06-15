@@ -43,6 +43,9 @@ DependencyFinder::computeDependencies()
   IdentifierSet seenVars;
   IdentifierSet currentSeenVars;
 
+  size_t numObjects = 0;
+  size_t currentNumObjects = 0;
+
   auto assigns = m_system->getAssignments();
 
   for (const auto& assign: assigns)
@@ -52,17 +55,17 @@ DependencyFinder::computeDependencies()
       auto current = apply_visitor(*this, def.bodyExpr);
       currentSeenVars.insert(std::get<0>(current).begin(), 
         std::get<0>(current).end());
+
+      currentNumObjects += Static::Functions::count_objects(
+        std::get<1>(current));
     }
   }
 
-  int lastVarCount = 0;
-  int currentVarCount = seenVars.size();
-
-  lastVarCount = currentVarCount;
   //compute the dependencies of everything in seenVars until a 
   //least-fixed point
   int i = 0;
-  while (currentSeenVars.size() != seenVars.size())
+  while (currentSeenVars.size() != seenVars.size() &&
+    numObjects != currentNumObjects)
   {
     seenVars = currentSeenVars;
     for (const auto& x : seenVars)
@@ -254,10 +257,13 @@ DependencyFinder::operator()(const Tree::EvalIntenExpr& e)
   fundeps.insert(fundeps.end(), std::get<2>(eval).begin(), 
     std::get<2>(eval).end());
 
+  resultF.insert(resultF.end(), std::get<1>(eval).begin(), 
+    std::get<1>(eval).end());
+
   resultX = std::get<0>(deps);
   resultX.insert(std::get<0>(eval).begin(), std::get<0>(eval).end());
 
-  return result_type(resultX, std::get<1>(eval), fundeps);
+  return result_type(resultX, resultF, fundeps);
 }
 
 DependencyFinder::result_type
@@ -486,7 +492,7 @@ DependencyFinder::operator()(const Tree::BangAppExpr& e)
       std::get<2>(result).end());
   }
 
-  for (const auto& f : std::get<1>(result))
+  for (const auto& f : F_0)
   {
     auto base = get<Base>(&f);
 

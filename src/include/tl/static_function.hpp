@@ -140,6 +140,9 @@ namespace TransLucid
         dest.insert(source.begin(), source.end());
       }
 
+      template <typename T>
+      struct PropertyCounter;
+
       namespace detail
       {
         class Collector
@@ -239,7 +242,93 @@ namespace TransLucid
               apply_visitor(*this, f, c);
             }
           }
+        };
 
+        struct Accumulator
+        {
+          Accumulator(size_t& value)
+          : m_value(value)
+          {
+          }
+
+          void
+          operator()(size_t n)
+          {
+            m_value += n;
+          }
+
+          private:
+
+          size_t& m_value;
+        };
+
+        //The number of objects is 1 (for self) + the number of objects in
+        //the children, plus the size of the properties
+        struct ObjectCounter
+        {
+          typedef size_t result_type;
+
+          //for all the single depth objects
+          template <typename T>
+          size_t
+          operator()(const T& t)
+          {
+            return 1;
+          }
+
+          template <typename Prop>
+          size_t
+          operator()(const CBV<Prop>& cbv)
+          {
+            using std::placeholders::_1;
+            size_t count = PropertyCounter<Prop>()(cbv.property);
+
+            Accumulator accum(count);
+
+            std::for_each(cbv.functions.begin(), cbv.functions.end(),
+              std::bind(accum, std::bind(visitor_applier(), *this, _1)));
+
+            std::for_each(cbv.fundeps.begin(), cbv.fundeps.end(),
+              std::bind(accum, std::bind(visitor_applier(), *this, _1)));
+
+            return count + 1;
+          }
+
+          template <typename Prop>
+          size_t
+          operator()(const Base<Prop>& base)
+          {
+            using std::placeholders::_1;
+            size_t count = PropertyCounter<Prop>()(base.property);
+
+            Accumulator accum(count);
+
+            std::for_each(base.functions.begin(), base.functions.end(),
+              std::bind(accum, std::bind(visitor_applier(), *this, _1)));
+
+            std::for_each(base.fundeps.begin(), base.fundeps.end(),
+              std::bind(accum, std::bind(visitor_applier(), *this, _1)));
+
+            return count + 1;
+          }
+
+          template <typename Prop>
+          size_t
+          operator()(const Up<Prop>& up)
+          {
+            using std::placeholders::_1;
+            size_t count = PropertyCounter<Prop>()(up.property);
+
+            Accumulator accum(count);
+
+            std::for_each(up.functions.begin(), up.functions.end(),
+              std::bind(accum, std::bind(visitor_applier(), *this, _1)));
+
+            std::for_each(up.fundeps.begin(), up.fundeps.end(),
+              std::bind(accum, std::bind(visitor_applier(), *this, _1)));
+
+            return count + 1;
+          }
         };
       }
 
@@ -250,6 +339,30 @@ namespace TransLucid
         detail::Collector collect;
 
         apply_visitor(collect, f, c);
+      }
+
+      template <typename Prop>
+      size_t
+      count_objects(const Functor<Prop>& f)
+      {
+        detail::ObjectCounter count;
+
+        return apply_visitor(count, f);
+      }
+
+      template <typename Prop>
+      size_t
+      count_objects(const FunctorList<Prop>& F)
+      {
+        size_t result = 0;
+        std::for_each(F.begin(), F.end(), 
+          [&result] (const Functor<Prop>& f) -> void
+          {
+            result += count_objects(f);
+          }
+        );
+
+        return result;
       }
 
       template <typename Prop>
@@ -580,8 +693,8 @@ namespace TransLucid
 
           if (base == nullptr)
           {
-            //throw U"non base in applyb: " + print_functor(f);
-            funcs.push_back(ApplyB<Prop>{f, args});
+            throw U"non base in applyb: " + print_functor(f);
+            //funcs.push_back(ApplyB<Prop>{f, args});
           }
           else
           {
@@ -598,6 +711,7 @@ namespace TransLucid
             while (dimsiter != base->dims.end())
             {
               p.insert(std::make_pair(*dimsiter, *argsiter));
+              ++dimsiter;
             }
 
             auto result = evalall(subs(base->functions, p));

@@ -148,5 +148,18 @@ namespace TransLucid
       DependencyMap m_idDeps;
       System* m_system;
     };
+
+    namespace Functions
+    {
+      template <>
+      struct PropertyCounter<DependencyFinder::IdentifierSet>
+      {
+        size_t
+        operator()(const DependencyFinder::IdentifierSet& s)
+        {
+          return s.size();
+        }
+      };
+    }
   }
 }

@@ -1684,7 +1684,7 @@ init_builtin_types(System& s)
 
   add_file_io(s);
 
-  registerIntegers(s);
+  //registerIntegers(s);
 }
 
 } //namespace TransLucid
