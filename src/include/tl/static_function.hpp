@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/variant.hpp>
 #include <tl/types.hpp>
 
+#include <algorithm>
 #include <vector>
 #include <set>
 
