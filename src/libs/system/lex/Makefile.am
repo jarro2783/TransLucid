@@ -1,6 +1,6 @@
 $(builddir)/generate_lexer: lexertl.cpp
 	$(CXX) $(AM_CXXFLAGS) $(CXXFLAGS) $(TL_CFLAGS) -I$(top_srcdir)/src/include \
-  -I$(srcdir)/.. $< -o $@
+  -I$(srcdir)/.. $(LDFLAGS) $< -o $@
 
 BUILT_SOURCES=$(srcdir)/static_lexer.hpp
 EXTRA_DIST=$(BUILT_SOURCES) lexertl.cpp CMakeLists.txt
