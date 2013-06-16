@@ -329,6 +329,46 @@ namespace TransLucid
 
             return count + 1;
           }
+
+          template <typename Prop>
+          size_t
+          operator()(const ApplyV<Prop>& applyv)
+          {
+            using std::placeholders::_1;
+            size_t count = apply_visitor(*this, applyv.lhs);
+
+            Accumulator accum(count);
+
+            std::for_each(applyv.rhs.begin(), applyv.rhs.end(),
+              std::bind(accum, std::bind(visitor_applier(), *this, _1)));
+
+            return count + 1;
+          }
+
+          template <typename Prop>
+          size_t
+          operator()(const ApplyB<Prop>& applyb)
+          {
+            using std::placeholders::_1;
+            size_t count = apply_visitor(*this, applyb.lhs);
+
+            Accumulator accum(count);
+
+            for (const auto& F : applyb.params)
+            {
+              std::for_each(F.begin(), F.end(),
+                std::bind(accum, std::bind(visitor_applier(), *this, _1)));
+            }
+
+            return count + 1;
+          }
+
+          template <typename Prop>
+          size_t
+          operator()(const Down<Prop>& down)
+          {
+            return apply_visitor(*this, down.body) + 1;
+          }
         };
       }
 

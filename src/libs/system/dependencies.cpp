@@ -61,13 +61,19 @@ DependencyFinder::computeDependencies()
     }
   }
 
+  std::cout << "After demands, number of objects: " 
+    << currentNumObjects << std::endl;
+
   //compute the dependencies of everything in seenVars until a 
   //least-fixed point
   int i = 0;
-  while (currentSeenVars.size() != seenVars.size() &&
-    numObjects != currentNumObjects)
+  while (currentSeenVars.size() != seenVars.size()
+    || numObjects != currentNumObjects)
   {
+    numObjects = currentNumObjects;
+    currentNumObjects = 0;
     seenVars = currentSeenVars;
+
     for (const auto& x : seenVars)
     { 
       try
@@ -79,13 +85,16 @@ DependencyFinder::computeDependencies()
         {
           Static::Functions::collect_properties(
             f, currentSeenVars);
+          currentNumObjects += Static::Functions::count_objects(f);
         }
 
         for (const auto& f : std::get<2>(deps))
         {
           Static::Functions::collect_properties(
             f, currentSeenVars);
+          currentNumObjects += Static::Functions::count_objects(f);
         }
+
       }
       catch (const u32string& e)
       {
@@ -95,12 +104,16 @@ DependencyFinder::computeDependencies()
       }
     }
 
+    std::cout << "Number of objects: " << currentNumObjects << std::endl;
+    std::cout << "Number of seen vars: " << currentSeenVars.size() << std::endl;
     m_idDeps = std::move(currentDeps);
     ++i;
   }
 
   std::cout << "took " << i << " iterations to compute dependencies" << 
     std::endl;
+
+  //compute the dependencies of the demands one last time
 
   return m_idDeps;
 }
