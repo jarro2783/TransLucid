@@ -1,5 +1,5 @@
 /* The System.
-   Copyright (C) 2009--2012 Jarryd Beck
+   Copyright (C) 2009--2013 Jarryd Beck
 
 This file is part of TransLucid.
 

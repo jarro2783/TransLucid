@@ -18,6 +18,6 @@
 
 includesdir = $(prefix)/include/tl/tyinf
 
-includes_HEADERS = 
+includes_HEADERS = constraint_graph.hpp
 
 EXTRA_DIST = CMakeLists.txt
