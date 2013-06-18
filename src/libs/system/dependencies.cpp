@@ -21,7 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/assignment.hpp>
 #include <tl/dependencies.hpp>
-#include <tl/static_function_printer.hpp>
+#include <tl/static/function_printer.hpp>
 #include <tl/output.hpp>
 
 namespace TransLucid

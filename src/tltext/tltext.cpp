@@ -31,7 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/types/uuid.hpp>
 #include <tl/types_util.hpp>
-#include <tl/static_function_printer.hpp>
+#include <tl/static/function_printer.hpp>
 #include <tl/system.hpp>
 
 #include <iterator>

@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_STATIC_FUNCTION_PRINTER_HPP
 #define TL_STATIC_FUNCTION_PRINTER_HPP
 
-#include <tl/static_function.hpp>
+#include <tl/static/function.hpp>
 #include <tl/output.hpp>
 
 namespace TransLucid

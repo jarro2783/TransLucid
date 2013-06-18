@@ -18,7 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/ast.hpp>
-#include <tl/static_function.hpp>
+#include <tl/static/function.hpp>
 #include <tl/system.hpp>
 
 namespace TransLucid
