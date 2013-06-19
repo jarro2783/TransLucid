@@ -37,6 +37,14 @@ namespace TransLucid
     //3. the set of constraints in C\downarrow(alpha)
     class ConstraintGraph
     {
+      public:
+
+      //Makes a union with another constraint graph.
+      //The type variables must be disjoint.
+      //The current one becomes the result.
+      void
+      make_union(ConstraintGraph&);
+
       private:
 
       struct ConstraintNode

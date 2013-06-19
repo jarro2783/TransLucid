@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_TYINF_TYPE_INFERENCE_HPP_INCLUDED
 #define TL_TYINF_TYPE_INFERENCE_HPP_INCLUDED
 
+#include <tl/ast.hpp>
 #include <tl/tyinf/type.hpp>
 #include <tl/tyinf/type_variable.hpp>
 
@@ -31,6 +32,15 @@ namespace TransLucid
     {
       public:
       typedef Type result_type;
+
+      result_type
+      infer(const Tree::Expr& e);
+
+      template <typename T>
+      result_type
+      operator()(const T& t)
+      {
+      }
     };
   }
 }

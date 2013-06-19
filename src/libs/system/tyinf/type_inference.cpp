@@ -24,5 +24,10 @@ namespace TransLucid
 namespace TypeInference
 {
 
+TypeInferrer::result_type
+TypeInferrer::infer(const Tree::Expr& e)
+{
+}
+
 }
 }

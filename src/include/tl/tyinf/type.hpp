@@ -27,6 +27,16 @@ namespace TransLucid
 {
   namespace TypeInference
   {
+    //The types are
+    //var
+    //glb(t, ..., t)
+    //lub(t, ..., t)
+    //t ->^v t
+    //(t_j) ->^b t
+    //inten t
+    //dim t
+    //a .. b
+    //c
     typedef Variant<TypeVariable> Type;
   }
 }
