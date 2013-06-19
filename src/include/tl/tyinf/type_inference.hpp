@@ -40,7 +40,7 @@ namespace TransLucid
       {
       }
 
-      size_t
+      TypeVariable
       fresh()
       {
         return m_varCounter++;

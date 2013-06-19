@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/fixed_indexes.hpp>
 #include <tl/tyinf/type_inference.hpp>
 
 namespace TransLucid
@@ -39,7 +40,13 @@ TypeInferrer::operator()(const Tree::nil& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const bool& e)
 {
+  TypeVariable t = fresh();
 
+  ConstraintGraph c;
+
+  c.add_constraint(t, Constant(e, TYPE_INDEX_BOOL));
+
+  std::make_tuple(TypeContext(), t, c);
 }
 
 TypeInferrer::result_type

@@ -31,6 +31,21 @@ ConstraintGraph::add_constraint(Type t1, Type t2)
 {
 }
 
+void
+ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b)
+{
+}
+
+void
+ConstraintGraph::add_constraint(Type t, TypeVariable b)
+{
+}
+
+void
+ConstraintGraph::add_constraint(TypeVariable a, Type t)
+{
+}
+
 }
 
 }

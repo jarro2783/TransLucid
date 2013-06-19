@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_TYINF_TYPE_HPP_INCLUDED
 #define TL_TYINF_TYPE_HPP_INCLUDED
 
+#include <tl/types.hpp>
 #include <tl/tyinf/type_variable.hpp>
 #include <tl/variant.hpp>
 
@@ -37,7 +38,7 @@ namespace TransLucid
     //dim t
     //a .. b
     //c
-    typedef Variant<TypeVariable> Type;
+    typedef Variant<TypeVariable, Constant> Type;
   }
 }
 
