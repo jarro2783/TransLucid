@@ -59,6 +59,6 @@ print "};\n"
 # generate the definitions
 
 for i in range(0, len(TreeNodes)):
-  print """{0}::result_type\n{0}::operator()(const {1}& e)\n
+  print """{0}::result_type\n{0}::operator()(const {1}& e)
 {{\n{2}\n}}\n""".format(
     sys.argv[1], TreeNodes[i], default_return)
