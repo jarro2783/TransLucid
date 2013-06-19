@@ -27,6 +27,181 @@ namespace TypeInference
 TypeInferrer::result_type
 TypeInferrer::infer(const Tree::Expr& e)
 {
+  apply_visitor(*this, e);
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::nil& e)
+{
+  return result_type();
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const bool& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Special& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const mpz_class& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const char32_t& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const u32string& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::LiteralExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::DimensionExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::IdentExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::HashSymbol& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::HostOpExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::ParenExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::UnaryOpExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::BinaryOpExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::MakeIntenExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::EvalIntenExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::IfExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::HashExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::RegionExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::TupleExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::AtExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::LambdaExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::PhiExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::BaseAbstractionExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::BangAppExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::LambdaAppExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::PhiAppExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::WhereExpr& e)
+{
+
+}
+
+TypeInferrer::result_type
+TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
+{
+
 }
 
 }
