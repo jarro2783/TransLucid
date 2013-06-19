@@ -45,6 +45,19 @@ namespace TransLucid
       void
       make_union(ConstraintGraph&);
 
+      void
+      add_constraint(TypeVariable a, TypeVariable b);
+
+      void
+      add_constraint(Type t, TypeVariable b);
+
+      void
+      add_constraint(TypeVariable a, Type t);
+
+      //this one only works if t1 and t2 are one of the above three cases
+      void
+      add_constraint(Type t1, Type t2);
+
       private:
 
       struct ConstraintNode

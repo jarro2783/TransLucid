@@ -18,3 +18,19 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/tyinf/constraint_graph.hpp>
+
+namespace TransLucid
+{
+
+namespace TypeInference
+{
+
+//this one only works if t1 and t2 are one of the above three cases
+void
+ConstraintGraph::add_constraint(Type t1, Type t2)
+{
+}
+
+}
+
+}
