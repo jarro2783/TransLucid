@@ -104,6 +104,27 @@ DependencyFinder::computeDependencies()
       }
     }
 
+// temporary printing code
+    #if 0
+    std::cout << "Iteration " << i << std::endl;
+    for (const auto& dep : currentDeps)
+    {
+      std::cout << dep.first << ": ";
+
+      for (const auto& x : std::get<0>(dep.second))
+      {
+        std::cout << x << " ";
+      }
+      std::cout << std::endl;
+      
+      print_container(std::cout, std::get<1>(dep.second));
+      std::cout << std::endl;
+    }
+    std::cout << "End iteration " << i << std::endl;
+    #endif
+
+// end temporary printing code
+
     std::cout << "Number of objects: " << currentNumObjects << std::endl;
     std::cout << "Number of seen vars: " << currentSeenVars.size() << std::endl;
     m_idDeps = std::move(currentDeps);

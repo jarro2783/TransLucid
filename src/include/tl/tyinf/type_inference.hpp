@@ -1,4 +1,4 @@
-/* Constraint graph for type inference.
+/* Type inference algorithm.
    Copyright (C) 2013 Jarryd Beck
 
 This file is part of TransLucid.
@@ -17,11 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TL_TYINF_CONSTRAINT_GRAPH_HPP_INCLUDED
-#define TL_TYINF_CONSTRAINT_GRAPH_HPP_INCLUDED
-
-#include <map>
-#include <vector>
+#ifndef TL_TYINF_TYPE_INFERENCE_HPP_INCLUDED
+#define TL_TYINF_TYPE_INFERENCE_HPP_INCLUDED
 
 #include <tl/tyinf/type.hpp>
 #include <tl/tyinf/type_variable.hpp>
@@ -30,23 +27,10 @@ namespace TransLucid
 {
   namespace TypeInference
   {
-    //a constraint graph is usually sparse, so it will be stored here as
-    //a map from type variables alpha to a struct holding three things:
-    //1. a list of <= type variables
-    //2. the set of constraints in C\uparrow(alpha)
-    //3. the set of constraints in C\downarrow(alpha)
-    class ConstraintGraph
+    class TypeInferrer
     {
-      private:
-
-      struct ConstraintNode
-      {
-        std::vector<TypeVariable> less;
-        Type pos;
-        Type neg;
-      };
-
-      std::map<TypeVariable, ConstraintNode> m_graph;
+      public:
+      typedef Type result_type;
     };
   }
 }
