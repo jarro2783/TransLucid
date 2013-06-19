@@ -43,7 +43,7 @@ namespace TransLucid
       //The type variables must be disjoint.
       //The current one becomes the result.
       void
-      make_union(ConstraintGraph&);
+      make_union(const ConstraintGraph&);
 
       void
       add_constraint(TypeVariable a, TypeVariable b);

@@ -21,7 +21,9 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_TYINF_TYPE_INFERENCE_HPP_INCLUDED
 
 #include <tl/ast.hpp>
+#include <tl/tyinf/constraint_graph.hpp>
 #include <tl/tyinf/type.hpp>
+#include <tl/tyinf/type_context.hpp>
 #include <tl/tyinf/type_variable.hpp>
 
 namespace TransLucid
@@ -31,7 +33,18 @@ namespace TransLucid
     class TypeInferrer
     {
       public:
-      typedef Type result_type;
+      typedef std::tuple<TypeContext, Type, ConstraintGraph> result_type;
+
+      TypeInferrer()
+      : m_varCounter(0)
+      {
+      }
+
+      size_t
+      fresh()
+      {
+        return m_varCounter++;
+      }
 
       result_type
       infer(const Tree::Expr& e);
@@ -122,6 +135,9 @@ namespace TransLucid
 
       result_type
       operator()(const Tree::ConditionalBestfitExpr&);
+
+      private:
+      size_t m_varCounter;
     };
   }
 }
