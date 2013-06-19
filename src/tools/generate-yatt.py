@@ -9,6 +9,7 @@ import sys
 NUMARGS = 2
 
 TreeNodes = [
+  "Tree::nil",
   "bool",
   "Special",
   "mpz_class",
