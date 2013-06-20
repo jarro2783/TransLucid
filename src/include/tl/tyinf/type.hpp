@@ -54,13 +54,26 @@ namespace TransLucid
       recursive_wrapper<TypeLUB>
     > Type;
 
+    //a glb or lub type can never be equal
     struct TypeGLB
     {
+      bool
+      operator==(const TypeGLB& rhs) const
+      {
+        return false;
+      }
+
       std::vector<Type> types;
     };
 
     struct TypeLUB
     {
+      bool
+      operator==(const TypeLUB& rhs) const
+      {
+        return false;
+      }
+
       std::vector<Type> types;
     };
 

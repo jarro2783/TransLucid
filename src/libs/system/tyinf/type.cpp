@@ -50,11 +50,25 @@ namespace
     bool
     operator()(const TypeGLB& glb, Type b)
     {
+      for (const auto& t : glb.types)
+      {
+        if (b == t)
+        {
+          return true;
+        }
+      }
     }
 
     bool 
     operator()(const TypeLUB& lub, Type b)
     {
+      for (const auto& t : lub.types)
+      {
+        if (b == t)
+        {
+          return true;
+        }
+      }
     }
   };
 }
@@ -62,10 +76,10 @@ namespace
 bool
 type_term_contains(Type a, Type b)
 {
-  //if (a == b)
-  //{
-  //  return true;
-  //}
+  if (a == b)
+  {
+    return true;
+  }
 
   ContainsCheck check;
   return apply_visitor(check, a, b);

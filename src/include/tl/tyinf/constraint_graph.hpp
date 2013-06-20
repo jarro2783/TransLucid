@@ -31,6 +31,16 @@ namespace TransLucid
 {
   namespace TypeInference
   {
+    //represents the constraint that lhs <= rhs
+    struct Constraint
+    {
+      Type lhs;
+      Type rhs;
+    };
+
+    void
+    subc(const Constraint& c, std::vector<Constraint>& result);
+
     //a constraint graph is usually sparse, so it will be stored here as
     //a map from type variables alpha to a struct holding three things:
     //1. a list of <= type variables
@@ -62,7 +72,7 @@ namespace TransLucid
 
       private:
 
-      typedef std::queue<std::pair<Type, Type>> ConstraintQueue;
+      typedef std::queue<Constraint> ConstraintQueue;
 
       struct ConstraintNode
       {

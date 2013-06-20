@@ -42,6 +42,11 @@ ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b,
   auto a_data = get_make_entry(a);
   auto b_data = get_make_entry(b);
 
+  std::vector<Constraint> toadd;
+  subc(Constraint{a_data->second.lower, b_data->second.upper}, toadd);
+
+  push_range(toadd.begin(), toadd.end(), q);
+
   //we go through every pair of a less and b greater
   for (const auto ap : a_data->second.greater)
   {
@@ -82,6 +87,11 @@ ConstraintGraph::add_constraint(TypeVariable a, Type t, ConstraintQueue& q)
     return ;
   }
 
+  std::vector<Constraint> toadd;
+  subc(Constraint{iter->second.lower, t}, toadd);
+
+  push_range(toadd.begin(), toadd.end(), q);
+
   //for each ap less than a, its upper is (upper ap) glb t
   for (const auto ap : iter->second.less)
   {
@@ -101,6 +111,11 @@ ConstraintGraph::add_constraint(Type t, TypeVariable b, ConstraintQueue& q)
     return ;
   }
 
+  std::vector<Constraint> toadd;
+  subc(Constraint{t, iter->second.upper}, toadd);
+
+  push_range(toadd.begin(), toadd.end(), q);
+
   //for each bp greater than b, its lower is (lower bp) lub t
   for (const auto bp : iter->second.greater)
   {
@@ -117,7 +132,7 @@ void
 ConstraintGraph::add_to_closure(Type t1, Type t2)
 {
   ConstraintQueue q;
-  q.push(std::make_pair(t1, t2));
+  q.push({t1, t2});
 
   while (!q.empty())
   {
@@ -183,6 +198,11 @@ ConstraintGraph::get_make_entry(TypeVariable a)
   }
 
   return iter;
+}
+
+void
+subc(const Constraint& c, std::vector<Constraint>& result)
+{
 }
 
 }

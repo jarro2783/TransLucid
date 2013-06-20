@@ -107,6 +107,12 @@ namespace TransLucid
       return *this;
     }
 
+    bool
+    operator==(const recursive_wrapper& rhs) const
+    {
+      return *m_t == *rhs.m_t;
+    }
+
     T& get() { return *m_t; }
     const T& get() const { return *m_t; }
 
@@ -345,6 +351,26 @@ namespace TransLucid
       int m_rhs_which;
     };
 
+    struct equality
+    {
+      typedef bool result_type;
+
+      equality(const Variant& self)
+      : m_self(self)
+      {
+      }
+
+      template <typename Rhs>
+      bool
+      operator()(Rhs& rhs) const
+      {
+        return *reinterpret_cast<Rhs*>(m_self.address()) == rhs;
+      }
+
+      private:
+      const Variant& m_self;
+    };
+
     struct destroyer
     {
       typedef void result_type;
@@ -467,6 +493,18 @@ namespace TransLucid
         indicate_which(rhs.which());
       }
       return *this;
+    }
+
+    bool
+    operator==(const Variant& rhs) const
+    {
+      if (which() != rhs.which())
+      {
+        return false;
+      }
+
+      equality eq(*this);
+      return rhs.apply_visitor_internal(eq);
     }
 
     int which() const {return m_which;}

@@ -236,6 +236,17 @@ namespace TransLucid
       c.insert(iter, std::forward<T>(t));
     }
   }
+
+  template <typename Iterator, typename Queue>
+  void
+  push_range(Iterator begin, Iterator end, Queue& q)
+  {
+    while (begin != end)
+    {
+      q.push(*begin);
+      ++begin;
+    }
+  }
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED
