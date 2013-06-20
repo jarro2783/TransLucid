@@ -72,13 +72,31 @@ ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b)
 }
 
 void
-ConstraintGraph::add_constraint(Type t, TypeVariable b)
+ConstraintGraph::add_constraint(TypeVariable a, Type t)
 {
+  auto iter = get_make_entry(a);
+
+  //for each ap less than a, its upper is (upper ap) glb t
+  for (const auto ap : iter->second.less)
+  {
+    auto ap_data = m_graph.find(ap);
+
+    ap_data->second.upper = construct_glb(ap_data->second.upper, t);
+  }
 }
 
 void
-ConstraintGraph::add_constraint(TypeVariable a, Type t)
+ConstraintGraph::add_constraint(Type t, TypeVariable b)
 {
+  auto iter = get_make_entry(b);
+
+  //for each bp greater than b, its lower is (lower bp) lub t
+  for (const auto bp : iter->second.greater)
+  {
+    auto bp_data = m_graph.find(bp);
+
+    bp_data->second.lower = construct_lub(bp_data->second.lower, t);
+  }
 }
 
 //this one only works if t1 and t2 are one of the above three cases
