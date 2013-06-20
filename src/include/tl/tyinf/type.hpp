@@ -20,6 +20,8 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_TYINF_TYPE_HPP_INCLUDED
 #define TL_TYINF_TYPE_HPP_INCLUDED
 
+#include <vector>
+
 #include <tl/types.hpp>
 #include <tl/tyinf/type_variable.hpp>
 #include <tl/variant.hpp>
@@ -29,7 +31,7 @@ namespace TransLucid
   namespace TypeInference
   {
     //The types are
-    //var
+    //tyvar
     //glb(t, ..., t)
     //lub(t, ..., t)
     //t ->^v t
@@ -38,13 +40,39 @@ namespace TransLucid
     //dim t
     //a .. b
     //c
-    typedef Variant<TypeVariable, Constant> Type;
+    //top
+    //bot
+    //base type
+
+    struct TypeGLB;
+    struct TypeLUB;
+
+    typedef Variant<
+      TypeVariable,
+      Constant,
+      recursive_wrapper<TypeGLB>,
+      recursive_wrapper<TypeLUB>
+    > Type;
+
+    struct TypeGLB
+    {
+      std::vector<Type> types;
+    };
+
+    struct TypeLUB
+    {
+      std::vector<Type> types;
+    };
 
     Type
     construct_lub(Type a, Type b);
 
     Type
     construct_glb(Type a, Type b);
+
+    // does a contain b
+    bool
+    type_term_contains(Type a, Type b);
   }
 }
 

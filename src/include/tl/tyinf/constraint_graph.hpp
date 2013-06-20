@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_TYINF_CONSTRAINT_GRAPH_HPP_INCLUDED
 
 #include <map>
+#include <queue>
 #include <vector>
 
 #include <tl/tyinf/type.hpp>
@@ -61,6 +62,8 @@ namespace TransLucid
 
       private:
 
+      typedef std::queue<std::pair<Type, Type>> ConstraintQueue;
+
       struct ConstraintNode
       {
         //store both the less and the greater because we need
@@ -72,13 +75,13 @@ namespace TransLucid
       };
 
       void
-      add_constraint(TypeVariable a, TypeVariable b);
+      add_constraint(TypeVariable a, TypeVariable b, ConstraintQueue&);
 
       void
-      add_constraint(Type t, TypeVariable b);
+      add_constraint(Type t, TypeVariable b, ConstraintQueue&);
 
       void
-      add_constraint(TypeVariable a, Type t);
+      add_constraint(TypeVariable a, Type t, ConstraintQueue&);
 
       void
       add_less(TypeVariable a, TypeVariable b);

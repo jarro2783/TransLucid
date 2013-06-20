@@ -29,7 +29,8 @@ namespace TypeInference
 {
 
 void
-ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b)
+ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b, 
+  ConstraintQueue& q)
 {
   if (less(a, b))
   {
@@ -72,9 +73,14 @@ ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b)
 }
 
 void
-ConstraintGraph::add_constraint(TypeVariable a, Type t)
+ConstraintGraph::add_constraint(TypeVariable a, Type t, ConstraintQueue& q)
 {
   auto iter = get_make_entry(a);
+
+  if (type_term_contains(iter->second.upper, t))
+  {
+    return ;
+  }
 
   //for each ap less than a, its upper is (upper ap) glb t
   for (const auto ap : iter->second.less)
@@ -86,9 +92,14 @@ ConstraintGraph::add_constraint(TypeVariable a, Type t)
 }
 
 void
-ConstraintGraph::add_constraint(Type t, TypeVariable b)
+ConstraintGraph::add_constraint(Type t, TypeVariable b, ConstraintQueue& q)
 {
   auto iter = get_make_entry(b);
+
+  if (type_term_contains(iter->second.lower, t))
+  {
+    return ;
+  }
 
   //for each bp greater than b, its lower is (lower bp) lub t
   for (const auto bp : iter->second.greater)
@@ -105,6 +116,34 @@ ConstraintGraph::add_constraint(Type t, TypeVariable b)
 void
 ConstraintGraph::add_to_closure(Type t1, Type t2)
 {
+  ConstraintQueue q;
+  q.push(std::make_pair(t1, t2));
+
+  while (!q.empty())
+  {
+    auto c = q.front();
+    q.pop();
+
+    auto tv1 = get<TypeVariable>(&t1);
+    auto tv2 = get<TypeVariable>(&t2);
+
+    if (tv1 != nullptr && tv2 != nullptr)
+    {
+      add_constraint(*tv1, *tv2, q);
+    }
+    else if (tv1 != nullptr)
+    {
+      add_constraint(*tv1, t2, q);
+    }
+    else if (tv2 != nullptr)
+    {
+      add_constraint(t1, *tv2, q);
+    }
+    else
+    {
+      throw "Attempt to add invalid constraint";
+    }
+  }
 }
 
 bool

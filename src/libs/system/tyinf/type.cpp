@@ -34,5 +34,42 @@ construct_glb(Type a, Type b)
 {
 }
 
+namespace
+{
+  struct ContainsCheck
+  {
+    typedef bool result_type;
+
+    template <typename T>
+    bool
+    operator()(const T& t, Type b)
+    {
+      return false;
+    }
+
+    bool
+    operator()(const TypeGLB& glb, Type b)
+    {
+    }
+
+    bool 
+    operator()(const TypeLUB& lub, Type b)
+    {
+    }
+  };
+}
+
+bool
+type_term_contains(Type a, Type b)
+{
+  //if (a == b)
+  //{
+  //  return true;
+  //}
+
+  ContainsCheck check;
+  return apply_visitor(check, a, b);
+}
+
 }
 }
