@@ -39,6 +39,12 @@ namespace TransLucid
     //a .. b
     //c
     typedef Variant<TypeVariable, Constant> Type;
+
+    Type
+    construct_lub(Type a, Type b);
+
+    Type
+    construct_glb(Type a, Type b);
   }
 }
 

@@ -44,7 +44,7 @@ TypeInferrer::operator()(const bool& e)
 
   ConstraintGraph c;
 
-  c.add_constraint(t, Constant(e, TYPE_INDEX_BOOL));
+  c.add_to_closure(t, Constant(e, TYPE_INDEX_BOOL));
 
   std::make_tuple(TypeContext(), t, c);
 }

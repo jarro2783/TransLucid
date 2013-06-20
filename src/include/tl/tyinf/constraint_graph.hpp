@@ -45,6 +45,32 @@ namespace TransLucid
       void
       make_union(const ConstraintGraph&);
 
+      //this one only works if t1 and t2 are one of the above three cases
+      void
+      add_to_closure(Type t1, Type t2);
+
+      Type
+      upper(TypeVariable a) const;
+
+      Type
+      lower(TypeVariable b) const;
+
+      //is a < b in this graph?
+      bool
+      less(TypeVariable a, TypeVariable b) const;
+
+      private:
+
+      struct ConstraintNode
+      {
+        //store both the less and the greater because we need
+        //to look up both
+        std::vector<TypeVariable> less;
+        std::vector<TypeVariable> greater;
+        Type lower;
+        Type upper;
+      };
+
       void
       add_constraint(TypeVariable a, TypeVariable b);
 
@@ -54,20 +80,13 @@ namespace TransLucid
       void
       add_constraint(TypeVariable a, Type t);
 
-      //this one only works if t1 and t2 are one of the above three cases
       void
-      add_constraint(Type t1, Type t2);
-
-      private:
-
-      struct ConstraintNode
-      {
-        std::vector<TypeVariable> less;
-        Type pos;
-        Type neg;
-      };
+      add_less(TypeVariable a, TypeVariable b);
 
       std::map<TypeVariable, ConstraintNode> m_graph;
+
+      decltype(m_graph)::iterator
+      get_make_entry(TypeVariable a);
     };
   }
 }

@@ -33,6 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/types/special.hpp>
 
+#include <algorithm>
 #include <vector>
 
 namespace TransLucid
@@ -222,6 +223,18 @@ namespace TransLucid
   {
     std::hash<T> hasher;
     seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+  }
+
+  template <typename C, typename T>
+  void
+  insert_sorted(C& c, T&& t)
+  {
+    auto iter = std::lower_bound(c.begin(), c.end(), t);
+
+    if (iter != c.end() && *iter != t)
+    {
+      c.insert(iter, std::forward<T>(t));
+    }
   }
 }
 
