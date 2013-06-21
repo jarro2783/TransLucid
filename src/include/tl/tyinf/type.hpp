@@ -47,7 +47,26 @@ namespace TransLucid
     struct TypeGLB;
     struct TypeLUB;
 
+    struct TagTop { };
+
+    struct TagBot { };
+
+    template <typename T>
+    struct TypeNullary
+    {
+      bool
+      operator==(const TypeNullary&) const
+      {
+        return true;
+      }
+    };
+
+    typedef TypeNullary<TagTop> TypeTop;
+    typedef TypeNullary<TagBot> TypeBot;
+
     typedef Variant<
+      TypeTop,
+      TypeBot,
       TypeVariable,
       Constant,
       recursive_wrapper<TypeGLB>,
@@ -83,9 +102,13 @@ namespace TransLucid
     Type
     construct_glb(Type a, Type b);
 
-    // does a contain b
+    // does t contain tp for negative types
     bool
-    type_term_contains(Type a, Type b);
+    type_term_contains_neg(Type t, Type tp);
+
+    // does t contain tp for positive types
+    bool
+    type_term_contains_pos(Type t, Type tp);
   }
 }
 

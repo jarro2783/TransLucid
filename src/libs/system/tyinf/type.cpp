@@ -27,6 +27,7 @@ namespace TypeInference
 Type
 construct_lub(Type a, Type b)
 {
+   
 }
 
 Type
@@ -73,16 +74,22 @@ namespace
   };
 }
 
+// does t contain tp for negative types
 bool
-type_term_contains(Type a, Type b)
+type_term_contains_neg(Type t, Type tp)
 {
-  if (a == b)
-  {
-    return true;
-  }
+  auto glb = construct_glb(t, tp);
 
-  ContainsCheck check;
-  return apply_visitor(check, a, b);
+  return glb == t;
+}
+
+// does t contain tp for positive types
+bool
+type_term_contains_pos(Type t, Type tp)
+{
+  auto lub = construct_lub(t, tp);
+
+  return lub == t;
 }
 
 }

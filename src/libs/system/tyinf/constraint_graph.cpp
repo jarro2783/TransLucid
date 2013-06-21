@@ -82,7 +82,7 @@ ConstraintGraph::add_constraint(TypeVariable a, Type t, ConstraintQueue& q)
 {
   auto iter = get_make_entry(a);
 
-  if (type_term_contains(iter->second.upper, t))
+  if (type_term_contains_neg(iter->second.upper, t))
   {
     return ;
   }
@@ -106,7 +106,7 @@ ConstraintGraph::add_constraint(Type t, TypeVariable b, ConstraintQueue& q)
 {
   auto iter = get_make_entry(b);
 
-  if (type_term_contains(iter->second.lower, t))
+  if (type_term_contains_pos(iter->second.lower, t))
   {
     return ;
   }
