@@ -27,7 +27,9 @@ namespace TypeInference
 Type
 construct_lub(Type a, Type b)
 {
-   
+  if (variant_is_type<TypeLUB>(a))
+  {
+  }
 }
 
 Type

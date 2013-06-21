@@ -679,6 +679,13 @@ namespace TransLucid
     }
   };
 
+  template <typename T, typename V>
+  bool
+  variant_is_type(const V& v)
+  {
+    return get<T>(&v) != nullptr;
+  }
+
 }
 
 #endif

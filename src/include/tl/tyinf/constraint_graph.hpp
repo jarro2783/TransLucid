@@ -76,6 +76,12 @@ namespace TransLucid
 
       struct ConstraintNode
       {
+        ConstraintNode()
+        : lower(TypeBot())
+        , upper(TypeTop())
+        {
+        }
+
         //store both the less and the greater because we need
         //to look up both
         std::vector<TypeVariable> less;
