@@ -24,56 +24,185 @@ namespace TransLucid
 namespace TypeInference
 {
 
+namespace
+{
+
+//builds lub with current and join, current could be TypeNothing
+Type
+build_lub_constructed(Type current, Type join)
+{
+  if (variant_is_type<TypeNothing>(current))
+  {
+    return join;
+  }
+
+  TypeCBV* a = get<TypeCBV>(&current);
+  TypeCBV* b = get<TypeCBV>(&join);
+
+  if (a != nullptr && b != nullptr)
+  {
+    return TypeCBV
+      {
+        construct_glb(a->lhs, b->lhs),
+        construct_lub(a->rhs, b->rhs)
+      };
+  }
+
+  throw "Invalid types in build lub";
+}
+
+Type
+build_glb_constructed(Type current, Type join)
+{
+  if (variant_is_type<TypeNothing>(current))
+  {
+    return join;
+  }
+
+  TypeCBV* a = get<TypeCBV>(&current);
+  TypeCBV* b = get<TypeCBV>(&join);
+
+  if (a != nullptr && b != nullptr)
+  {
+    return TypeCBV
+      {
+        construct_lub(a->lhs, b->lhs),
+        construct_glb(a->rhs, b->rhs)
+      };
+  }
+
+  throw "Invalid types in build glb";
+}
+}
+
 Type
 construct_lub(Type a, Type b)
 {
-  if (variant_is_type<TypeLUB>(a))
+  //look for top
+  if (variant_is_type<TypeTop>(a) || variant_is_type<TypeTop>(b))
   {
+    return TypeTop();
   }
+
+  //look for bottom
+  int valid = 0;
+  Type join[2];
+
+  if (!variant_is_type<TypeBot>(a))
+  {
+    join[valid] = a;
+    ++valid;
+  }
+
+  if (!variant_is_type<TypeBot>(b))
+  {
+    join[valid] = b;
+    ++valid;
+  }
+
+  //lub of nothing is bottom
+  if (valid == 0)
+  {
+    return TypeBot();
+  }
+
+  //lub of one thing is that thing
+  if (valid == 1)
+  {
+    return join[0];
+  }
+
+  //now we have some actual terms to work with
+  //we will definately have a lub term now
+  TypeLUB lub;
+
+  for (size_t i = 0; i != 2; ++i)
+  {
+    TypeLUB* l = get<TypeLUB>(&join[i]);
+    TypeVariable* v = get<TypeVariable>(&join[i]);
+
+    if (l != nullptr)
+    {
+      lub.vars.insert(l->vars.begin(), l->vars.end());
+    }
+    else if (v != nullptr)
+    {
+      lub.vars.insert(*v);
+    }
+    else
+    {
+      //the type by this point cannot be top, bot, lub, glb, or TypeVariable,
+      //so whatever it is belongs in the constructed spot
+      lub.constructed = build_lub_constructed(lub.constructed, join[i]);
+    }
+  }
+  
+  return lub;
 }
 
 Type
 construct_glb(Type a, Type b)
 {
-}
-
-namespace
-{
-  struct ContainsCheck
+  //look for bottom
+  if (variant_is_type<TypeBot>(a) || variant_is_type<TypeBot>(b))
   {
-    typedef bool result_type;
+    return TypeBot();
+  }
 
-    template <typename T>
-    bool
-    operator()(const T& t, Type b)
-    {
-      return false;
-    }
+  //look for top
+  int valid = 0;
+  Type join[2];
 
-    bool
-    operator()(const TypeGLB& glb, Type b)
-    {
-      for (const auto& t : glb.types)
-      {
-        if (b == t)
-        {
-          return true;
-        }
-      }
-    }
+  if (!variant_is_type<TypeTop>(a))
+  {
+    join[valid] = a;
+    ++valid;
+  }
 
-    bool 
-    operator()(const TypeLUB& lub, Type b)
+  if (!variant_is_type<TypeTop>(b))
+  {
+    join[valid] = b;
+    ++valid;
+  }
+
+  //glb of nothing is top
+  if (valid == 0)
+  {
+    return TypeTop();
+  }
+
+  //glb of one thing is that thing
+  if (valid == 1)
+  {
+    return join[0];
+  }
+
+  //now we have some actual terms to work with
+  //we will definately have a lub term now
+  TypeGLB glb;
+
+  for (size_t i = 0; i != 2; ++i)
+  {
+    TypeGLB* g = get<TypeGLB>(&join[i]);
+    TypeVariable* v = get<TypeVariable>(&join[i]);
+
+    if (g != nullptr)
     {
-      for (const auto& t : lub.types)
-      {
-        if (b == t)
-        {
-          return true;
-        }
-      }
+      glb.vars.insert(g->vars.begin(), g->vars.end());
     }
-  };
+    else if (v != nullptr)
+    {
+      glb.vars.insert(*v);
+    }
+    else
+    {
+      //the type by this point cannot be top, bot, lub, glb, or TypeVariable,
+      //so whatever it is belongs in the constructed spot
+      glb.constructed = build_glb_constructed(glb.constructed, join[i]);
+    }
+  }
+  
+  return glb;
 }
 
 // does t contain tp for negative types

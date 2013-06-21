@@ -46,10 +46,13 @@ namespace TransLucid
 
     struct TypeGLB;
     struct TypeLUB;
+    struct TypeCBV;
 
     struct TagTop { };
 
     struct TagBot { };
+
+    struct TagNothing { };
 
     template <typename T>
     struct TypeNullary
@@ -63,14 +66,17 @@ namespace TransLucid
 
     typedef TypeNullary<TagTop> TypeTop;
     typedef TypeNullary<TagBot> TypeBot;
+    typedef TypeNullary<TagNothing> TypeNothing;
 
     typedef Variant<
+      TypeNothing,
       TypeTop,
       TypeBot,
       TypeVariable,
       Constant,
       recursive_wrapper<TypeGLB>,
-      recursive_wrapper<TypeLUB>
+      recursive_wrapper<TypeLUB>,
+      recursive_wrapper<TypeCBV>
     > Type;
 
     //a glb or lub type can never be equal
@@ -79,10 +85,11 @@ namespace TransLucid
       bool
       operator==(const TypeGLB& rhs) const
       {
-        return false;
+        return vars == rhs.vars && constructed == rhs.constructed;
       }
 
-      std::vector<Type> types;
+      std::set<TypeVariable> vars;
+      Type constructed;
     };
 
     struct TypeLUB
@@ -90,15 +97,30 @@ namespace TransLucid
       bool
       operator==(const TypeLUB& rhs) const
       {
-        return false;
+        return vars == rhs.vars && constructed == rhs.constructed;
       }
 
-      std::vector<Type> types;
+      std::set<TypeVariable> vars;
+      Type constructed;
     };
 
+    struct TypeCBV
+    {
+      Type lhs;
+      Type rhs;
+
+      bool
+      operator==(const TypeCBV& other) const
+      {
+        return lhs == other.lhs && rhs == other.rhs;
+      }
+    };
+
+    //constructs and normalises
     Type
     construct_lub(Type a, Type b);
 
+    //constructs and normalises
     Type
     construct_glb(Type a, Type b);
 

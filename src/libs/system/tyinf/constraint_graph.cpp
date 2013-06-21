@@ -28,6 +28,16 @@ namespace TransLucid
 namespace TypeInference
 {
 
+namespace
+{
+
+bool
+is_elementary(Constraint c)
+{
+}
+
+}
+
 void
 ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b, 
   ConstraintQueue& q)
@@ -92,6 +102,9 @@ ConstraintGraph::add_constraint(TypeVariable a, Type t, ConstraintQueue& q)
 
   push_range(toadd.begin(), toadd.end(), q);
 
+  //put itself in the constraints
+  iter->second.upper = construct_glb(iter->second.upper, t);
+
   //for each ap less than a, its upper is (upper ap) glb t
   for (const auto ap : iter->second.less)
   {
@@ -115,6 +128,9 @@ ConstraintGraph::add_constraint(Type t, TypeVariable b, ConstraintQueue& q)
   subc(Constraint{t, iter->second.upper}, toadd);
 
   push_range(toadd.begin(), toadd.end(), q);
+
+  //put itself in the constraints
+  iter->second.lower = construct_lub(iter->second.lower, t);
 
   //for each bp greater than b, its lower is (lower bp) lub t
   for (const auto bp : iter->second.greater)
@@ -203,6 +219,45 @@ ConstraintGraph::get_make_entry(TypeVariable a)
 void
 subc(const Constraint& c, std::vector<Constraint>& result)
 {
+  const TypeLUB* lub = nullptr;
+  const TypeGLB* glb = nullptr;
+
+  if((lub = get<TypeLUB>(&c.lhs)) != nullptr)
+  {
+    for (const auto& t : lub->vars)
+    {
+      subc(Constraint{t, c.rhs}, result);
+    }
+
+    if (!variant_is_type<TypeNothing>(lub->constructed))
+    {
+      subc(Constraint{lub->constructed, c.rhs}, result);
+    }
+  }
+  else if ((glb = get<TypeGLB>(&c.rhs)) != nullptr)
+  {
+    for (const auto& t : glb->vars)
+    {
+      subc(Constraint{c.lhs, t}, result);
+    }
+
+    if (!variant_is_type<TypeNothing>(glb->constructed))
+    {
+      subc(Constraint{c.lhs, glb->constructed}, result);
+    }
+  }
+  else if (is_elementary(c))
+  {
+    result.push_back(c);
+  }
+  else if (variant_is_type<TypeTop>(c.rhs))
+  {
+    //there is actually nothing to do here
+  }
+  else if (variant_is_type<TypeBot>(c.rhs))
+  {
+    //there is actually nothing to do here
+  }
 }
 
 }
