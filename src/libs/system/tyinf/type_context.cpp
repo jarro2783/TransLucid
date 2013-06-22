@@ -28,16 +28,53 @@ namespace TypeInference
 void
 TypeContext::add(dimension_index d, Type t)
 {
+  m_lambdas[d] = t;
 }
 
 void
 TypeContext::join(const TypeContext& other)
 {
+  for (const auto& p : other.m_lambdas)
+  {
+    auto iter = m_lambdas.find(p.first);
+
+    if (iter != m_lambdas.end())
+    {
+      iter->second = construct_glb(p.second, iter->second);
+    }
+    else
+    {
+      m_lambdas.insert(p);
+    }
+  }
+
+  for (const auto& p : other.m_vars)
+  {
+    auto iter = m_vars.find(p.first);
+
+    if (iter != m_vars.end())
+    {
+      iter->second = construct_glb(p.second, iter->second);
+    }
+    else
+    {
+      m_vars.insert(p);
+    }
+  }
 }
 
 Type
 TypeContext::lookup(dimension_index d)
 {
+  auto iter = m_lambdas.find(d);
+  if (iter != m_lambdas.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return TypeTop();
+  }
 }
 
 }
