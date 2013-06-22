@@ -58,7 +58,7 @@ namespace TransLucid
 
       //this one only works if t1 and t2 are one of the above three cases
       void
-      add_to_closure(Type t1, Type t2);
+      add_to_closure(const Constraint& c);
 
       Type
       upper(TypeVariable a) const;

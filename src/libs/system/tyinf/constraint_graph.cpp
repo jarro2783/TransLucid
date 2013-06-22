@@ -32,8 +32,38 @@ namespace
 {
 
 bool
-is_elementary(Constraint c)
+is_constructed(const Type& t)
 {
+  return !(
+    variant_is_type<TypeVariable>(t) ||
+    variant_is_type<TypeBot>(t) ||
+    variant_is_type<TypeTop>(t) ||
+    variant_is_type<TypeLUB>(t) ||
+    variant_is_type<TypeGLB>(t)
+  );
+    
+}
+
+bool
+is_elementary(const Constraint& c)
+{
+  if (variant_is_type<TypeVariable>(c.lhs) &&
+      variant_is_type<TypeVariable>(c.rhs))
+  {
+    return true;
+  }
+
+  if (variant_is_type<TypeVariable>(c.lhs))
+  {
+    return is_constructed(c.rhs);
+  }
+
+  if (variant_is_type<TypeVariable>(c.rhs))
+  {
+    return is_constructed(c.lhs);
+  }
+
+  return false;
 }
 
 }
@@ -145,18 +175,18 @@ ConstraintGraph::add_constraint(Type t, TypeVariable b, ConstraintQueue& q)
 //this is where the main algorithm happens, it takes care of calling subc
 //and adding any extra constraints
 void
-ConstraintGraph::add_to_closure(Type t1, Type t2)
+ConstraintGraph::add_to_closure(const Constraint& constraint)
 {
   ConstraintQueue q;
-  q.push({t1, t2});
+  q.push(constraint);
 
   while (!q.empty())
   {
     auto c = q.front();
     q.pop();
 
-    auto tv1 = get<TypeVariable>(&t1);
-    auto tv2 = get<TypeVariable>(&t2);
+    auto tv1 = get<TypeVariable>(&c.lhs);
+    auto tv2 = get<TypeVariable>(&c.rhs);
 
     if (tv1 != nullptr && tv2 != nullptr)
     {
@@ -164,11 +194,11 @@ ConstraintGraph::add_to_closure(Type t1, Type t2)
     }
     else if (tv1 != nullptr)
     {
-      add_constraint(*tv1, t2, q);
+      add_constraint(*tv1, c.rhs, q);
     }
     else if (tv2 != nullptr)
     {
-      add_constraint(t1, *tv2, q);
+      add_constraint(c.lhs, *tv2, q);
     }
     else
     {
@@ -221,6 +251,8 @@ subc(const Constraint& c, std::vector<Constraint>& result)
 {
   const TypeLUB* lub = nullptr;
   const TypeGLB* glb = nullptr;
+  const TypeCBV* cbvlhs = nullptr;
+  const TypeCBV* cbvrhs = nullptr;
 
   if((lub = get<TypeLUB>(&c.lhs)) != nullptr)
   {
@@ -257,6 +289,16 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   else if (variant_is_type<TypeBot>(c.rhs))
   {
     //there is actually nothing to do here
+  }
+  else if ((cbvlhs = get<TypeCBV>(&c.lhs)) != nullptr && 
+           (cbvrhs = get<TypeCBV>(&c.rhs)) != nullptr)
+  {
+    subc(Constraint{cbvrhs->lhs, cbvlhs->lhs}, result);
+    subc(Constraint{cbvlhs->rhs, cbvrhs->rhs}, result);
+  }
+  else
+  {
+    throw "Invalid constraint in subc";
   }
 }
 

@@ -17,38 +17,28 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#ifndef TL_TYINF_TYPE_CONTEXT_HPP_INCLUDED
-#define TL_TYINF_TYPE_CONTEXT_HPP_INCLUDED
-
-#include <map>
-#include <unordered_map>
-
-#include <tl/types.hpp>
-#include <tl/tyinf/type.hpp>
+#include <tl/tyinf/type_context.hpp>
 
 namespace TransLucid
 {
-  namespace TypeInference
-  {
-    class TypeContext
-    {
-      public:
 
-      void
-      add(dimension_index d, Type t);
+namespace TypeInference
+{
 
-      //inserts other into the current
-      void
-      join(const TypeContext& other);
-
-      Type
-      lookup(dimension_index d);
-
-      private:
-      std::map<dimension_index, Type> m_lambdas;
-      std::unordered_map<u32string, Type> m_vars;
-    };
-  }
+void
+TypeContext::add(dimension_index d, Type t)
+{
 }
 
-#endif
+void
+TypeContext::join(const TypeContext& other)
+{
+}
+
+Type
+TypeContext::lookup(dimension_index d)
+{
+}
+
+}
+}

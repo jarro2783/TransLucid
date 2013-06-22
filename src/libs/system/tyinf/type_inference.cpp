@@ -44,7 +44,7 @@ TypeInferrer::operator()(const bool& e)
 
   ConstraintGraph c;
 
-  c.add_to_closure(t, Constant(e, TYPE_INDEX_BOOL));
+  c.add_to_closure(Constraint{t, Constant(e, TYPE_INDEX_BOOL)});
 
   std::make_tuple(TypeContext(), t, c);
 }
@@ -166,7 +166,14 @@ TypeInferrer::operator()(const Tree::AtExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::LambdaExpr& e)
 {
+  auto t_0 = apply_visitor(*this, e.rhs);
 
+  auto& C = std::get<2>(t_0);
+  auto& context = std::get<0>(t_0);
+
+  C.add_to_closure(Constraint{
+    TypeCBV{context.lookup(e.argDim), std::get<1>(t_0)}, 
+    fresh()});
 }
 
 TypeInferrer::result_type
