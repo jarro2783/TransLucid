@@ -302,6 +302,12 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   }
 }
 
+void
+ConstraintGraph::make_union(const ConstraintGraph& other)
+{
+  m_graph.insert(other.m_graph.begin(), other.m_graph.end());
+}
+
 }
 
 }

@@ -20,10 +20,29 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/fixed_indexes.hpp>
 #include <tl/tyinf/type_inference.hpp>
 
+#include <tl/types/boolean.hpp>
+#include <tl/types/char.hpp>
+#include <tl/types/intmp.hpp>
+#include <tl/types/string.hpp>
+#include <tl/types/special.hpp>
+
 namespace TransLucid
 {
 namespace TypeInference
 {
+
+template <typename T>
+TypeInferrer::result_type
+TypeInferrer::make_constant(T&& v)
+{
+  TypeVariable t = fresh();
+
+  ConstraintGraph c;
+
+  c.add_to_closure(Constraint{t, std::forward<T>(v)});
+
+  return std::make_tuple(TypeContext(), t, c);
+}
 
 TypeInferrer::result_type
 TypeInferrer::infer(const Tree::Expr& e)
@@ -40,25 +59,19 @@ TypeInferrer::operator()(const Tree::nil& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const bool& e)
 {
-  TypeVariable t = fresh();
-
-  ConstraintGraph c;
-
-  c.add_to_closure(Constraint{t, Constant(e, TYPE_INDEX_BOOL)});
-
-  std::make_tuple(TypeContext(), t, c);
+  return make_constant(Types::Boolean::create(e));
 }
 
 TypeInferrer::result_type
 TypeInferrer::operator()(const Special& e)
 {
-
+  return make_constant(Types::Special::create(e));
 }
 
 TypeInferrer::result_type
 TypeInferrer::operator()(const mpz_class& e)
 {
-
+  return make_constant(Types::Intmp::create(e));
 }
 
 TypeInferrer::result_type
@@ -171,9 +184,15 @@ TypeInferrer::operator()(const Tree::LambdaExpr& e)
   auto& C = std::get<2>(t_0);
   auto& context = std::get<0>(t_0);
 
+  auto alpha = fresh();
+
   C.add_to_closure(Constraint{
     TypeCBV{context.lookup(e.argDim), std::get<1>(t_0)}, 
-    fresh()});
+    alpha});
+
+  context.remove(e.argDim);
+
+  return std::make_tuple(context, alpha, C);
 }
 
 TypeInferrer::result_type
@@ -197,7 +216,23 @@ TypeInferrer::operator()(const Tree::BangAppExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::LambdaAppExpr& e)
 {
+  auto t_0 = apply_visitor(*this, e.lhs);
+  auto t_1 = apply_visitor(*this, e.rhs);
 
+  auto& context = std::get<0>(t_0);
+  context.join(std::get<0>(t_1));
+
+  auto& C = std::get<2>(t_0);
+  C.make_union(std::get<2>(t_1));
+
+  auto gamma = fresh();
+  auto alpha = fresh();
+
+  C.add_to_closure(Constraint{alpha, gamma});
+  C.add_to_closure(Constraint{std::get<1>(t_0), 
+    TypeCBV{std::get<1>(t_1), alpha}});
+
+  return std::make_tuple(context, gamma, C);
 }
 
 TypeInferrer::result_type

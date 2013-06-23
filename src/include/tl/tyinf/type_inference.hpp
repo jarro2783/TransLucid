@@ -138,6 +138,10 @@ namespace TransLucid
 
       private:
       size_t m_varCounter;
+
+      template <typename T>
+      result_type
+      make_constant(T&& v);
     };
   }
 }

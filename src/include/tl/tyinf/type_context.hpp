@@ -37,6 +37,12 @@ namespace TransLucid
       void
       add(dimension_index d, Type t);
 
+      void
+      remove(dimension_index d)
+      {
+        m_lambdas.erase(d);
+      }
+
       //inserts other into the current
       void
       join(const TypeContext& other);
