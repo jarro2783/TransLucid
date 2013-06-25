@@ -72,6 +72,7 @@ namespace TransLucid
     //the type for a whole implementation atomic type
     struct TypeAtomic
     {
+      u32string name;
       type_index index;
 
       bool
@@ -173,6 +174,12 @@ namespace TransLucid
     // does t contain tp for positive types
     bool
     type_term_contains_pos(Type t, Type tp);
+
+    u32string
+    print_type(const Type& t);
+
+    std::ostream&
+    operator<<(std::ostream& os, const Type& t);
   }
 }
 

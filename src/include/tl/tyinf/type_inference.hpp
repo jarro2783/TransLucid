@@ -28,6 +28,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TransLucid
 {
+  class TypeRegistry;
+
   namespace TypeInference
   {
     class TypeInferrer
@@ -146,6 +148,9 @@ namespace TransLucid
 
       System& m_system;
     };
+
+    TypeAtomic
+    makeAtomic(TypeRegistry& reg, const u32string& name);
   }
 }
 

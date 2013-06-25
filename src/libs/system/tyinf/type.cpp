@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/tyinf/type.hpp>
+#include <tl/output.hpp>
 
 namespace TransLucid
 {
@@ -221,6 +222,164 @@ type_term_contains_pos(Type t, Type tp)
   auto lub = construct_lub(t, tp);
 
   return lub == t;
+}
+
+namespace
+{
+  class TypePrinter
+  {
+    public:
+
+    typedef void result_type;
+
+    u32string
+    print(const Type& t)
+    {
+      apply_visitor(*this, t);
+      return m_result;
+    }
+
+    void
+    operator()(const TypeNothing& n)
+    {
+      m_result += U"_";
+    }
+
+    void
+    operator()(const TypeTop& top)
+    {
+      m_result += U"⊤";
+    }
+
+    void
+    operator()(const TypeBot& bot)
+    {
+      m_result += U"⊥";
+    }
+
+    void
+    operator()(const TypeVariable& var)
+    {
+      std::ostringstream os;
+      os << "v_" << var;
+      
+      m_result += utf8_to_utf32(os.str());
+    }
+
+    void
+    operator()(const Constant& c)
+    {
+      //how do I print a constant?
+    }
+
+    void
+    operator()(const TypeAtomic& atomic)
+    {
+      m_result += U"atomic<" + atomic.name + U">";
+    }
+
+    void
+    operator()(const TypeGLB& glb)
+    {
+      m_result += U"⊔{";
+
+      if (!variant_is_type<TypeNothing>(glb.constructed))
+      {
+        apply_visitor(*this, glb.constructed);
+      }
+
+      for (const auto& v : glb.vars)
+      {
+        m_result += U", ";
+        operator()(v);
+      }
+
+      m_result += U"}";
+    }
+
+    void
+    operator()(const TypeLUB& lub)
+    {
+      m_result += U"⊓{";
+
+      if (!variant_is_type<TypeNothing>(lub.constructed))
+      {
+        apply_visitor(*this, lub.constructed);
+      }
+
+      for (const auto& v : lub.vars)
+      {
+        m_result += U", ";
+        operator()(v);
+      }
+
+      m_result += U"}";
+    }
+
+    void
+    operator()(const TypeIntension& inten)
+    {
+      m_result += U"↑ ";
+      apply_visitor(*this, inten.body);
+    }
+
+    void
+    operator()(const TypeCBV& cbv)
+    {
+      m_result += U"(";
+
+      apply_visitor(*this, cbv.lhs);
+
+      m_result += U" → ";
+
+      apply_visitor(*this, cbv.rhs);
+
+      m_result += U")";
+    }
+
+    void
+    operator()(const TypeBase& base)
+    {
+      m_result += U"((";
+
+      auto iter = base.lhs.begin();
+
+      if (iter != base.lhs.end())
+      {
+        apply_visitor(*this, *iter);
+        ++iter;
+      }
+
+      while (iter != base.lhs.end())
+      {
+        m_result += U", ";
+        apply_visitor(*this, *iter);
+        ++iter;
+      }
+
+      m_result += U") ↦ ";
+
+      apply_visitor(*this, base.rhs);
+      m_result += U")";
+    }
+
+    private:
+    u32string m_result;
+  };
+}
+
+u32string
+print_type(const Type& t)
+{
+  TypePrinter p;
+  return p.print(t);
+}
+
+std::ostream&
+operator<<(std::ostream& os, const Type& t)
+{
+  os << print_type(t);
+  return os;
 }
 
 }

@@ -198,8 +198,7 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
   C.make_union(std::get<2>(then_type));
 
   //make a boolean less than type var
-  C.add_to_closure(Constraint{beta, 
-    TypeAtomic{m_system.getTypeIndex(U"bool")}});
+  C.add_to_closure(Constraint{beta, makeAtomic(m_system, U"bool")});
 
   C.add_to_closure(Constraint{std::get<1>(then_type), alpha});
 
@@ -373,6 +372,12 @@ TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 {
 
+}
+
+TypeAtomic
+makeAtomic(TypeRegistry& reg, const u32string& name)
+{
+  return TypeAtomic{name, reg.getTypeIndex(name)};
 }
 
 }
