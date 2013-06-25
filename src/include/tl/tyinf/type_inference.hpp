@@ -35,8 +35,9 @@ namespace TransLucid
       public:
       typedef std::tuple<TypeContext, Type, ConstraintGraph> result_type;
 
-      TypeInferrer()
+      TypeInferrer(System& system)
       : m_varCounter(0)
+      , m_system(system)
       {
       }
 
@@ -142,6 +143,8 @@ namespace TransLucid
       template <typename T>
       result_type
       make_constant(T&& v);
+
+      System& m_system;
     };
   }
 }

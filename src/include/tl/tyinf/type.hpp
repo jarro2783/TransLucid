@@ -44,16 +44,21 @@ namespace TransLucid
     //bot
     //base type
 
+    //bound types
     struct TypeGLB;
     struct TypeLUB;
+
+    //function types
     struct TypeCBV;
+    struct TypeIntension;
+    struct TypeBase;
 
+    //tags for single value empty types
     struct TagTop { };
-
     struct TagBot { };
-
     struct TagNothing { };
 
+    //single value empty types
     template <typename T>
     struct TypeNullary
     {
@@ -61,6 +66,18 @@ namespace TransLucid
       operator==(const TypeNullary&) const
       {
         return true;
+      }
+    };
+
+    //the type for a whole implementation atomic type
+    struct TypeAtomic
+    {
+      type_index index;
+
+      bool
+      operator==(const TypeAtomic& rhs) const
+      {
+        return index == rhs.index;
       }
     };
 
@@ -74,9 +91,12 @@ namespace TransLucid
       TypeBot,
       TypeVariable,
       Constant,
+      TypeAtomic,
       recursive_wrapper<TypeGLB>,
       recursive_wrapper<TypeLUB>,
-      recursive_wrapper<TypeCBV>
+      recursive_wrapper<TypeIntension>,
+      recursive_wrapper<TypeCBV>,
+      recursive_wrapper<TypeBase>
     > Type;
 
     //a glb or lub type can never be equal
@@ -113,6 +133,28 @@ namespace TransLucid
       operator==(const TypeCBV& other) const
       {
         return lhs == other.lhs && rhs == other.rhs;
+      }
+    };
+
+    struct TypeBase
+    {
+      std::vector<Type> lhs;
+      Type rhs;
+
+      bool operator==(const TypeBase& other) const
+      {
+        return lhs == other.lhs && rhs == other.rhs;
+      }
+    };
+
+    struct TypeIntension
+    {
+      Type body;
+
+      bool
+      operator==(const TypeIntension& rhs) const
+      {
+        return body == rhs.body;
       }
     };
 
