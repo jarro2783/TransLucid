@@ -19,6 +19,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/tyinf/type.hpp>
 #include <tl/output.hpp>
+#include <tl/system.hpp>
 
 namespace TransLucid
 {
@@ -232,6 +233,11 @@ namespace
 
     typedef void result_type;
 
+    TypePrinter(System& s)
+    : m_system(s)
+    {
+    }
+
     u32string
     print(const Type& t)
     {
@@ -269,7 +275,7 @@ namespace
     void
     operator()(const Constant& c)
     {
-      //how do I print a constant?
+      m_result += m_system.printConstant(c);
     }
 
     void
@@ -365,21 +371,15 @@ namespace
 
     private:
     u32string m_result;
+    System& m_system;
   };
 }
 
 u32string
-print_type(const Type& t)
+print_type(const Type& t, System& system)
 {
-  TypePrinter p;
+  TypePrinter p(system);
   return p.print(t);
-}
-
-std::ostream&
-operator<<(std::ostream& os, const Type& t)
-{
-  os << print_type(t);
-  return os;
 }
 
 }

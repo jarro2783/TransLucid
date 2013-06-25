@@ -176,10 +176,7 @@ namespace TransLucid
     type_term_contains_pos(Type t, Type tp);
 
     u32string
-    print_type(const Type& t);
-
-    std::ostream&
-    operator<<(std::ostream& os, const Type& t);
+    print_type(const Type& t, System& system);
   }
 }
 
