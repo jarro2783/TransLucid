@@ -1800,6 +1800,27 @@ LexerIterator::readOne()
   //otherwise leave the stream at end
 }
 
+Tree::Expr
+parse_expr(System& system, const u32string& expr)
+{
+  Parser p(system);
+  
+  U32Iterator ubegin(makeUTF32Iterator(expr.begin()));
+  U32Iterator uend(makeUTF32Iterator(expr.end()));
+
+  StreamPosIterator posbegin(ubegin, expr);
+  StreamPosIterator posend(uend);
+
+  LexerIterator lexbegin(posbegin, posend, system.getDefaultContext(), 
+    system.lookupIdentifiers());
+  LexerIterator lexend = lexbegin.makeEnd();
+
+  Tree::Expr result;
+  p.parse_expr(lexbegin, lexend, result);
+
+  return result;
+}
+
 }
       
 }

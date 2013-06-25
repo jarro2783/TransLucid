@@ -17,11 +17,17 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/parser_api.hpp>
 #include <tl/system.hpp>
 #include <tl/tyinf/type_inference.hpp>
 
 int main(int argc, char *argv[])
 {
   TransLucid::System system;
+  TransLucid::TypeInference::TypeInferrer infer(system);
+
+  TransLucid::Tree::Expr e = TransLucid::Parser::parse_expr(system, 
+    UR"*((\x -> x)!42)*");
+
   return 0;
 }

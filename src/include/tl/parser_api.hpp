@@ -250,6 +250,9 @@ namespace TransLucid
       public:
       ExpectedExpr(const Position& pos, const std::string& text);
     };
+
+    Tree::Expr
+    parse_expr(System& system, const u32string& expr);
   }
 
   typedef std::pair<Parser::Equation, TranslatedEquation> PTEquation;
