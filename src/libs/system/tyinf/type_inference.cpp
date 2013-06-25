@@ -289,6 +289,7 @@ TypeInferrer::operator()(const Tree::BaseAbstractionExpr& e)
   auto& C = std::get<2>(t_0);
 
   std::vector<Type> lhs;
+  lhs.reserve(e.dims.size());
 
   //remove the dimensions from the context and build a type
   for (auto d : e.dims)
@@ -307,7 +308,31 @@ TypeInferrer::operator()(const Tree::BaseAbstractionExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::BangAppExpr& e)
 {
+  auto t_0 = apply_visitor(*this, e.name);
 
+  TypeContext A = std::get<0>(t_0);
+  ConstraintGraph C = std::get<2>(t_0);
+
+  std::vector<Type> args;
+  args.reserve(e.args.size());
+
+  for (auto arg : e.args)
+  {
+    auto t_i = apply_visitor(*this, arg);
+    C.make_union(std::get<2>(t_i));
+    A.join(std::get<0>(t_i));
+
+    args.push_back(std::get<1>(t_i));
+  }
+
+  auto alpha = fresh();
+  auto gamma = fresh();
+
+  C.add_to_closure(Constraint{std::get<1>(t_0),
+    TypeBase{args, alpha}});
+  C.add_to_closure(Constraint{alpha, gamma});
+
+  return std::make_tuple(A, gamma, C);
 }
 
 TypeInferrer::result_type
