@@ -88,16 +88,21 @@ ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b,
 
   push_range(toadd.begin(), toadd.end(), q);
 
+  //add_less(a, b);
+
+  auto a_less = a_data->second.less;
+  a_less.push_back(a);
+  auto b_greater = b_data->second.greater; 
+  b_greater.push_back(b);
+
   //we go through every pair of a less and b greater
-  for (const auto ap : a_data->second.greater)
+  for (const auto ap : a_less)
   {
-    for (const auto bp : b_data->second.less)
+    for (const auto bp : b_greater)
     {
       add_less(ap, bp);
     }
   }
-
-  add_less(a, b);
 
   //for each bp in the greater of b, its lower is (lower bp) lub (lower a)
   for (const auto bp : b_data->second.greater)
@@ -316,13 +321,13 @@ ConstraintGraph::print(System& system) const
   for (const auto& var : m_graph)
   {
     //print less than
+    result += print_type(var.second.lower, system) + U", ";
     result += print_type_variable_list(var.second.less);
-    result += U", " + print_type(var.second.lower, system);
     result += U" ≤ ";
     result += print_type_variable(var.first);
     result += U" ≤ ";
-    result += U", " + print_type(var.second.upper, system);
     result += print_type_variable_list(var.second.greater);
+    result += U", " + print_type(var.second.upper, system);
 
     result += U"\n";
   }

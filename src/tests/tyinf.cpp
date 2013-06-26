@@ -90,6 +90,7 @@ cgraph(TransLucid::System& system)
   ConstraintGraph C;
 
   C.add_to_closure(Constraint{1, 2});
+  C.add_to_closure(Constraint{2, 3});
 
   std::cout << C.print(system) << std::endl;
 }
