@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <algorithm>
 
 #include <tl/tyinf/constraint_graph.hpp>
+#include <tl/tyinf/type_error.hpp>
 #include <tl/utility.hpp>
 
 namespace TransLucid
@@ -286,7 +287,7 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   {
     //there is actually nothing to do here
   }
-  else if (variant_is_type<TypeBot>(c.rhs))
+  else if (variant_is_type<TypeBot>(c.lhs))
   {
     //there is actually nothing to do here
   }
@@ -298,7 +299,7 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   }
   else
   {
-    throw "Invalid constraint in subc";
+    throw SubcInvalid{c};
   }
 }
 
@@ -306,6 +307,27 @@ void
 ConstraintGraph::make_union(const ConstraintGraph& other)
 {
   m_graph.insert(other.m_graph.begin(), other.m_graph.end());
+}
+
+u32string
+ConstraintGraph::print(System& system) const
+{
+  u32string result;
+  for (const auto& var : m_graph)
+  {
+    //print less than
+    result += print_type_variable_list(var.second.less);
+    result += U", " + print_type(var.second.lower, system);
+    result += U" ≤ ";
+    result += print_type_variable(var.first);
+    result += U" ≤ ";
+    result += U", " + print_type(var.second.upper, system);
+    result += print_type_variable_list(var.second.greater);
+
+    result += U"\n";
+  }
+
+  return result;
 }
 
 }

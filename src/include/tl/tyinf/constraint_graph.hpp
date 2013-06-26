@@ -70,6 +70,9 @@ namespace TransLucid
       bool
       less(TypeVariable a, TypeVariable b) const;
 
+      u32string
+      print(System& system) const;
+
       private:
 
       typedef std::queue<Constraint> ConstraintQueue;

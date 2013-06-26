@@ -959,7 +959,9 @@ System::printConstant(const Constant& c)
 
   if (iter == m_identifiers.end())
   {
-    return utf8_to_utf32(_("no print function defined"));
+    std::ostringstream os;
+    os << "Constant(" << c.index() << ")";
+    return utf8_to_utf32(os.str());
   }
 
   Constant func = (*iter->second)(m_defaultk);

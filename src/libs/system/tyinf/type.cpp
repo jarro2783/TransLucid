@@ -266,10 +266,7 @@ namespace
     void
     operator()(const TypeVariable& var)
     {
-      std::ostringstream os;
-      os << "v_" << var;
-      
-      m_result += utf8_to_utf32(os.str());
+      m_result += print_type_variable(var);
     }
 
     void
@@ -380,6 +377,15 @@ print_type(const Type& t, System& system)
 {
   TypePrinter p(system);
   return p.print(t);
+}
+
+u32string
+print_type_variable(TypeVariable var)
+{
+  std::ostringstream os;
+  os << "v_" << var;
+  
+  return utf8_to_utf32(os.str());
 }
 
 }

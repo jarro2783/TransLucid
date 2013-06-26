@@ -23,7 +23,6 @@ along with TransLucid; see the file COPYING.  If not see
  * Higher-order multidimensional programming
  * The input tree must:
  * 1. Have names renamed so that they are unique,
- * 2. Have free variables marked in functions
  *
  * The output is a tree rewritten according to the transformation. Any extra
  * equations added by where clauses and functions are recorded in a list.

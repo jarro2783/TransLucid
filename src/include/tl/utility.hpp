@@ -231,7 +231,14 @@ namespace TransLucid
   {
     auto iter = std::lower_bound(c.begin(), c.end(), t);
 
-    if (iter != c.end() && *iter != t)
+    if (iter != c.end())
+    {
+      if (*iter != t)
+      {
+        c.insert(iter, std::forward<T>(t));
+      }
+    }
+    else
     {
       c.insert(iter, std::forward<T>(t));
     }

@@ -177,6 +177,32 @@ namespace TransLucid
 
     u32string
     print_type(const Type& t, System& system);
+
+    u32string
+    print_type_variable(TypeVariable var);
+
+    template <typename C>
+    u32string
+    print_type_variable_list(const C& c)
+    {
+      u32string result;
+
+      auto iter = c.begin();
+
+      if (iter != c.end())
+      {
+        result += print_type_variable(*iter);
+        ++iter;
+      }
+      
+      while (iter != c.end())
+      {
+        result += U", " + print_type_variable(*iter);
+        ++iter;
+      }
+
+      return result;
+    }
   }
 }
 

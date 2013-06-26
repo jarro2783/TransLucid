@@ -234,7 +234,27 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::HashExpr& e)
 {
+  //at the moment we only handle #.d
 
+  const Tree::DimensionExpr* dim = get<Tree::DimensionExpr>(&e.e);
+
+  if (dim == nullptr)
+  {
+    throw "Invalid #.E";
+  }
+  else
+  {
+    TypeContext A;
+    ConstraintGraph C;
+
+    auto alpha = fresh();
+    auto gamma = fresh();
+
+    A.add(dim->dim, alpha);
+    C.add_to_closure(Constraint{alpha, gamma});
+
+    return std::make_tuple(A, gamma, C);
+  }
 }
 
 TypeInferrer::result_type

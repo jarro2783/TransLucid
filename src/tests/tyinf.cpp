@@ -18,16 +18,78 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/parser_api.hpp>
+#include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
+#include <tl/tyinf/type_error.hpp>
 #include <tl/tyinf/type_inference.hpp>
+#include <tl/output.hpp>
+
+void
+inference(TransLucid::System& system);
+
+void
+infer(TransLucid::System& system, const TransLucid::u32string& expr);
+
+void
+cgraph(TransLucid::System& system);
 
 int main(int argc, char *argv[])
 {
   TransLucid::System system;
+
+  try
+  {
+    cgraph(system);
+    inference(system);
+  }
+  catch (const TransLucid::TypeInference::TypeError& e)
+  {
+    std::cerr << "Type error in type inference: " << e.print(system) 
+      << std::endl;
+  }
+  catch (const char* c)
+  {
+    std::cerr << "Terminated with exception: " << c << std::endl;
+  }
+
+  return 0;
+}
+
+void
+infer(TransLucid::System& system, const TransLucid::u32string& expr)
+{
+  TransLucid::SemanticTransform transform(system);
   TransLucid::TypeInference::TypeInferrer infer(system);
 
   TransLucid::Tree::Expr e = TransLucid::Parser::parse_expr(system, 
-    UR"*((\x -> x)!42)*");
+    expr);
 
-  return 0;
+  auto et = transform.transform(e);
+
+  auto t = infer.infer(et);
+
+  std::cout << print_type(std::get<1>(t), system) << std::endl <<
+    std::get<2>(t).print(system) << std::endl;
+}
+
+void
+inference(TransLucid::System& system)
+{
+  infer(system, UR"*(\x -> x)*");
+  infer(system, UR"*((\x -> x)!42)*");
+}
+
+void
+cgraph(TransLucid::System& system)
+{
+  using TransLucid::TypeInference::ConstraintGraph;
+  using TransLucid::TypeInference::Constraint;
+
+  std::cout << "closure test" << std::endl;
+
+  ConstraintGraph C;
+
+  C.add_to_closure(Constraint{1, 2});
+
+  std::cout << C.print(system) << std::endl;
 }
