@@ -199,6 +199,7 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
 
   //make a boolean less than type var
   C.add_to_closure(Constraint{beta, makeAtomic(m_system, U"bool")});
+  C.add_to_closure(Constraint{std::get<1>(cond_type), beta});
 
   C.add_to_closure(Constraint{std::get<1>(then_type), alpha});
 
