@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
 void
 infer(TransLucid::System& system, const TransLucid::u32string& expr)
 {
+  std::cout << expr << std::endl;
   TransLucid::SemanticTransform transform(system);
   TransLucid::TypeInference::TypeInferrer infer(system);
 
@@ -75,6 +76,7 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr)
 void
 inference(TransLucid::System& system)
 {
+  infer(system, U"42");
   infer(system, UR"*(\x -> x)*");
   infer(system, UR"*((\x -> x)!42)*");
 }
@@ -84,6 +86,7 @@ cgraph(TransLucid::System& system)
 {
   using TransLucid::TypeInference::ConstraintGraph;
   using TransLucid::TypeInference::Constraint;
+  using TransLucid::TypeInference::TypeCBV;
 
   std::cout << "closure test" << std::endl;
 
@@ -91,6 +94,8 @@ cgraph(TransLucid::System& system)
 
   C.add_to_closure(Constraint{1, 2});
   C.add_to_closure(Constraint{2, 3});
+  C.add_to_closure(Constraint{TypeCBV{4, 5}, 1});
+  C.add_to_closure(Constraint{3, TypeCBV{6, 7}});
 
   std::cout << C.print(system) << std::endl;
 }

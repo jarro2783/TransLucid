@@ -42,7 +42,7 @@ TypeInferrer::make_constant(T&& v)
 
   ConstraintGraph c;
 
-  c.add_to_closure(Constraint{t, std::forward<T>(v)});
+  c.add_to_closure(Constraint{std::forward<T>(v), t});
 
   return std::make_tuple(TypeContext(), t, c);
 }
