@@ -73,9 +73,6 @@ namespace TransLucid
       u32string
       print(System& system) const;
 
-      void
-      canonise();
-
       private:
 
       typedef std::queue<Constraint> ConstraintQueue;

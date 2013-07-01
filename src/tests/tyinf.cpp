@@ -59,8 +59,9 @@ void
 infer(TransLucid::System& system, const TransLucid::u32string& expr)
 {
   std::cout << expr << std::endl;
+  TransLucid::TypeInference::FreshTypeVars fresh;
   TransLucid::SemanticTransform transform(system);
-  TransLucid::TypeInference::TypeInferrer infer(system);
+  TransLucid::TypeInference::TypeInferrer infer(system, fresh);
 
   TransLucid::Tree::Expr e = TransLucid::Parser::parse_expr(system, 
     expr);

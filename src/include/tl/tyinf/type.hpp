@@ -161,6 +161,25 @@ namespace TransLucid
       }
     };
 
+    class FreshTypeVars
+    {
+      public:
+
+      FreshTypeVars()
+      : m_var(0)
+      {
+      }
+
+      size_t
+      fresh()
+      {
+        return m_var++;
+      }
+
+      private:
+      size_t m_var;
+    };
+
     //constructs and normalises
     Type
     construct_lub(Type a, Type b);

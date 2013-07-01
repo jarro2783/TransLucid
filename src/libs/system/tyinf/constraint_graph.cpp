@@ -67,72 +67,6 @@ is_elementary(const Constraint& c)
   return false;
 }
 
-struct TagNegative {};
-struct TagPositive {};
-
-struct CanoniseReplaced
-{
-  TypeVariable gamma;
-  TypeVariable lambda;
-};
-
-class CanoniseVars
-{
-  public:
-
-  CanoniseReplaced
-  lookup(const VarSet& vars)
-  {
-    auto iter = m_rewrites.find(vars);
-
-    if (iter == m_rewrites.end())
-    {
-      //generate fresh gamma and lambda
-    }
-
-    return iter->second;
-  }
-
-  private:
-  std::map<VarSet, CanoniseReplaced> m_rewrites;
-};
-
-class Canonise
-{
-  public:
-
-  typedef Type result_type;
-
-  Canonise(CanoniseVars& vars)
-  : m_vars(vars)
-  {
-  }
-
-  //for all the types that do not get rewritten and are the same regardless
-  //of polarity
-  template <typename Type, typename Tag>
-  Type
-  operator()(const Type& type, Tag tag)
-  {
-    return type;
-  }
-
-  Type
-  operator()(const TypeLUB& lub, TagPositive)
-  {
-    return m_vars.lookup(lub.vars).lambda;
-  }
-
-  Type
-  operator()(const TypeGLB& glb, TagNegative)
-  {
-    return m_vars.lookup(glb.vars).gamma;
-  }
-
-  private:
-  CanoniseVars& m_vars;
-};
-
 }
 
 void
@@ -406,13 +340,6 @@ ConstraintGraph::print(System& system) const
   }
 
   return result;
-}
-
-void
-ConstraintGraph::canonise()
-{
-  CanoniseVars vars;
-  Canonise canon(vars);
 }
 
 }

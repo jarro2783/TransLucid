@@ -32,13 +32,15 @@ namespace TransLucid
 
   namespace TypeInference
   {
+    typedef std::tuple<TypeContext, Type, ConstraintGraph> TypeScheme;
+
     class TypeInferrer
     {
       public:
-      typedef std::tuple<TypeContext, Type, ConstraintGraph> result_type;
+      typedef TypeScheme result_type;
 
-      TypeInferrer(System& system)
-      : m_varCounter(0)
+      TypeInferrer(System& system, FreshTypeVars& freshVars)
+      : m_freshVars(freshVars)
       , m_system(system)
       {
       }
@@ -46,7 +48,7 @@ namespace TransLucid
       TypeVariable
       fresh()
       {
-        return m_varCounter++;
+        return m_freshVars.fresh();
       }
 
       result_type
@@ -140,7 +142,7 @@ namespace TransLucid
       operator()(const Tree::ConditionalBestfitExpr&);
 
       private:
-      size_t m_varCounter;
+      FreshTypeVars& m_freshVars;
 
       template <typename T>
       result_type
@@ -151,6 +153,9 @@ namespace TransLucid
 
     TypeAtomic
     makeAtomic(TypeRegistry& reg, const u32string& name);
+
+    TypeScheme
+    canonise(const TypeScheme& t, FreshTypeVars& fresh);
   }
 }
 

@@ -401,5 +401,161 @@ makeAtomic(TypeRegistry& reg, const u32string& name)
   return TypeAtomic{name, reg.getTypeIndex(name)};
 }
 
+namespace
+{
+
+struct CanoniseReplaced
+{
+  TypeVariable gamma;
+  TypeVariable lambda;
+};
+
+typedef std::map<VarSet, CanoniseReplaced> CanoniseRewrites;
+typedef std::queue<CanoniseRewrites::value_type> RewriteQueue;
+
+struct TagNegative {};
+struct TagPositive {};
+
+class CanoniseVars
+{
+  public:
+
+  CanoniseVars(RewriteQueue& q, FreshTypeVars& fresh)
+  : m_queue(q), m_fresh(fresh)
+  {
+  }
+
+  CanoniseReplaced
+  lookup(const VarSet& vars)
+  {
+    auto iter = m_rewrites.find(vars);
+
+    if (iter == m_rewrites.end())
+    {
+      //generate fresh gamma and lambda
+      //add to queue to generate new constraints
+
+      auto gamma = m_fresh.fresh();
+      auto lambda = m_fresh.fresh();
+
+      iter = m_rewrites.insert
+        (std::make_pair(vars, CanoniseReplaced{gamma, lambda})).first;
+    }
+
+    return iter->second;
+  }
+
+  private:
+  CanoniseRewrites m_rewrites;
+  RewriteQueue m_queue;
+  FreshTypeVars m_fresh;
+};
+
+class Canonise
+{
+  public:
+
+  typedef Type result_type;
+
+  Canonise(CanoniseVars& vars)
+  : m_vars(vars)
+  {
+  }
+
+  //for all the types that do not get rewritten and are the same regardless
+  //of polarity
+  template <typename Type, typename Tag>
+  Type
+  operator()(const Type& type, Tag tag)
+  {
+    return type;
+  }
+
+  Type
+  operator()(const TypeLUB& lub, TagPositive)
+  {
+    return m_vars.lookup(lub.vars).lambda;
+  }
+
+  Type
+  operator()(const TypeGLB& glb, TagNegative)
+  {
+    return m_vars.lookup(glb.vars).gamma;
+  }
+
+  Type
+  operator()(const TypeIntension& inten, TagPositive)
+  {
+    return TypeIntension{apply_visitor(*this, inten.body, TagPositive())};
+  }
+
+  Type
+  operator()(const TypeIntension& inten, TagNegative)
+  {
+    return TypeIntension{apply_visitor(*this, inten.body, TagNegative())};
+  }
+
+  Type
+  operator()(const TypeCBV& cbv, TagPositive)
+  {
+    return TypeCBV
+    {
+      apply_visitor(*this, cbv.lhs, TagNegative()),
+      apply_visitor(*this, cbv.rhs, TagPositive())
+    };
+  }
+
+  Type
+  operator()(const TypeCBV& cbv, TagNegative)
+  {
+    return TypeCBV
+    {
+      apply_visitor(*this, cbv.lhs, TagPositive()),
+      apply_visitor(*this, cbv.rhs, TagNegative())
+    };
+  }
+
+  Type
+  operator()(const TypeBase& base, TagPositive)
+  {
+    std::vector<Type> lhs;
+    lhs.reserve(base.lhs.size());
+
+    for (auto t : base.lhs)
+    {
+      lhs.push_back(apply_visitor(*this, t, TagNegative()));
+    }
+
+    return TypeBase{lhs, apply_visitor(*this, base.rhs, TagPositive())};
+  }
+
+  Type
+  operator()(const TypeBase& base, TagNegative)
+  {
+    std::vector<Type> lhs;
+    lhs.reserve(base.lhs.size());
+
+    for (auto t : base.lhs)
+    {
+      lhs.push_back(apply_visitor(*this, t, TagPositive()));
+    }
+
+    return TypeBase{lhs, apply_visitor(*this, base.rhs, TagNegative())};
+  }
+
+  private:
+  CanoniseVars& m_vars;
+};
+
+}
+
+TypeScheme
+canonise(const TypeScheme& t, FreshTypeVars& fresh)
+{
+  RewriteQueue queue;
+  CanoniseVars vars(queue, fresh);
+  Canonise canon(vars);
+}
+
 }
 }
