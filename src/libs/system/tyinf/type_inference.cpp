@@ -555,6 +555,15 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
   RewriteQueue queue;
   CanoniseVars vars(queue, fresh);
   Canonise canon(vars);
+
+  //rewrite A as negative, t as positive, then add
+  //constraints until the queue is empty
+
+  auto typecanon = apply_visitor(canon, std::get<1>(t), TagPositive());
+  auto context = TypeContext::rewrite(std::get<0>(t), 
+    std::bind(visitor_applier(), std::ref(canon), std::placeholders::_1,
+      TagNegative())
+  );
 }
 
 }

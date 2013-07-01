@@ -50,6 +50,26 @@ namespace TransLucid
       Type
       lookup(dimension_index d);
 
+      template <typename Rewriter>
+      static
+      TypeContext
+      rewrite(const TypeContext& c, Rewriter r)
+      {
+        TypeContext result;
+
+        for (const auto& v : c.m_lambdas)
+        {
+          result.m_lambdas.insert(std::make_pair(v.first, r(v.second)));
+        }
+
+        for (const auto& v : c.m_vars)
+        {
+          result.m_vars.insert(std::make_pair(v.first, r(v.second)));
+        }
+
+        return result;
+      }
+
       private:
       std::map<dimension_index, Type> m_lambdas;
       std::unordered_map<u32string, Type> m_vars;
