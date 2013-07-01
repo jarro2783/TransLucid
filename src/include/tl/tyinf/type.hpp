@@ -100,6 +100,8 @@ namespace TransLucid
       recursive_wrapper<TypeBase>
     > Type;
 
+    typedef std::set<TypeVariable> VarSet;
+
     //a glb or lub type can never be equal
     struct TypeGLB
     {
@@ -109,7 +111,7 @@ namespace TransLucid
         return vars == rhs.vars && constructed == rhs.constructed;
       }
 
-      std::set<TypeVariable> vars;
+      VarSet vars;
       Type constructed;
     };
 
@@ -121,7 +123,7 @@ namespace TransLucid
         return vars == rhs.vars && constructed == rhs.constructed;
       }
 
-      std::set<TypeVariable> vars;
+      VarSet vars;
       Type constructed;
     };
 
