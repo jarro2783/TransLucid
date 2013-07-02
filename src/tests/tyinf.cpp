@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_api.hpp>
 #include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
+#include <tl/tyinf/garbage_collect.hpp>
 #include <tl/tyinf/type_error.hpp>
 #include <tl/tyinf/type_inference.hpp>
 #include <tl/output.hpp>
