@@ -342,6 +342,93 @@ ConstraintGraph::print(System& system) const
   return result;
 }
 
+
+Type
+ConstraintGraph::upper(TypeVariable a) const
+{
+  auto iter = m_graph.find(a);
+
+  if (iter == m_graph.end())
+  {
+    return TypeTop();
+  }
+  else
+  {
+    return iter->second.upper;
+  }
+}
+
+Type
+ConstraintGraph::lower(TypeVariable b) const
+{
+  auto iter = m_graph.find(b);
+
+  if (iter == m_graph.end())
+  {
+    return TypeBot();
+  }
+  else
+  {
+    return iter->second.lower;
+  }
+}
+
+void
+ConstraintGraph::setUpper(TypeVariable a, Type t)
+{
+  auto iter = get_make_entry(a);
+
+  iter->second.upper = t;
+}
+
+void
+ConstraintGraph::setLower(TypeVariable a, Type t)
+{
+  auto iter = get_make_entry(a);
+
+  iter->second.lower = t;
+}
+
+
+//when anything in S is less than any variable a in the graph, set
+//gamma < a
+void
+ConstraintGraph::rewrite_lub(TypeVariable gamma, const VarSet& S)
+{
+  for (const auto& v : m_graph)
+  {
+    bool found = false;
+    auto iter = S.begin();
+    while (!found && iter != S.end())
+    {
+      if (less(*iter, v.first))
+      {
+        found = true;
+        add_less(gamma, v.first);
+      }
+    }
+  }
+}
+
+//when any variable a is less than anything in S, set a < lambda
+void
+ConstraintGraph::rewrite_glb(TypeVariable lambda, const VarSet& S)
+{
+  for (const auto& v : m_graph)
+  {
+    bool found = false;
+    auto iter = S.begin();
+    while (!found && iter != S.end())
+    {
+      if (less(v.first, *iter))
+      {
+        found = true;
+        add_less(v.first, lambda);
+      }
+    }
+  }
+}
+
 }
 
 }

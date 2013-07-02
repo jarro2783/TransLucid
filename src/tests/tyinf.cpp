@@ -68,7 +68,7 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr)
 
   auto et = transform.transform(e);
 
-  auto t = infer.infer(et);
+  auto t = TransLucid::TypeInference::canonise(infer.infer(et), fresh);
 
   std::cout << print_type(std::get<1>(t), system) << std::endl <<
     std::get<2>(t).print(system) << std::endl;

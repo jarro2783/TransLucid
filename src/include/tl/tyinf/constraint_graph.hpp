@@ -73,6 +73,32 @@ namespace TransLucid
       u32string
       print(System& system) const;
 
+      void
+      setUpper(TypeVariable a, Type t);
+
+      void
+      setLower(TypeVariable a, Type t);
+
+      template <typename Lower, typename Upper>
+      void
+      rewrite_bounds(Lower rl, Upper ru)
+      {
+        for (auto& c : m_graph)
+        {
+          c.second.lower = rl(c.second.lower);
+          c.second.upper = ru(c.second.upper);
+        }
+      }
+
+      //when anything in S is less than any variable a in the graph, set
+      //gamma < a
+      void
+      rewrite_lub(TypeVariable gamma, const VarSet& S);
+
+      //when any variable a is less than anything in S, set a < lambda
+      void
+      rewrite_glb(TypeVariable lambda, const VarSet& S);
+
       private:
 
       typedef std::queue<Constraint> ConstraintQueue;

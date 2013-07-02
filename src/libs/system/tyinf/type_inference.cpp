@@ -440,6 +440,8 @@ class CanoniseVars
 
       iter = m_rewrites.insert
         (std::make_pair(vars, CanoniseReplaced{gamma, lambda})).first;
+
+      m_queue.push(*iter);
     }
 
     return iter->second;
@@ -556,7 +558,8 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
   CanoniseVars vars(queue, fresh);
   Canonise canon(vars);
 
-  //rewrite A as negative, t as positive, then add
+  //rewrite A as negative, t as positive, all the lower and upper bounds in
+  //C as positive and negative respectively, then add
   //constraints until the queue is empty
 
   auto typecanon = apply_visitor(canon, std::get<1>(t), TagPositive());
@@ -564,6 +567,46 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
     std::bind(visitor_applier(), std::ref(canon), std::placeholders::_1,
       TagNegative())
   );
+
+  //rewrite everything in C
+  auto C = std::get<2>(t);
+  C.rewrite_bounds
+  (
+    std::bind(visitor_applier(), std::ref(canon), std::placeholders::_1,
+      TagPositive()),
+    std::bind(visitor_applier(), std::ref(canon), std::placeholders::_1,
+      TagNegative())
+  );
+
+  while (!queue.empty())
+  {
+    auto current = queue.front();
+    queue.pop();
+
+    //upper bound of gamma is the negative rewrite of the glb of all the 
+    //upper bounds of the variables in S
+
+    //lower bound of lambda is the positive rewrite of the lub of all the
+    //lower bounds of the variables in S
+    Type glb = TypeTop();
+    Type lub = TypeBot();
+
+    for (auto v : current.first)
+    {
+      glb = construct_glb(glb, C.upper(v));
+      lub = construct_lub(lub, C.lower(v));
+    }
+
+    C.setUpper(current.second.gamma, apply_visitor(canon, glb, TagNegative()));
+    C.setLower(current.second.lambda, 
+      apply_visitor(canon, glb, TagPositive()));
+
+    //if there exists a beta in S < a, set gamma < a
+    //if there exists a beta in S > a, set a < gamma
+    C.rewrite_lub(current.second.gamma, current.first);
+  }
+
+  return std::make_tuple(context, typecanon, C);
 }
 
 }
