@@ -733,18 +733,23 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
   auto itera = rewrites.begin();
   auto iterb = itera;
 
-  if (iterb != rewrites.end())
+  while (itera != rewrites.end())
   {
-    ++iterb;
-  }
+    //iterb = itera;
+    //if (iterb != rewrites.end())
+    //{
+      ++iterb;
+    //}
 
-  while (iterb != rewrites.end())
-  {
-    C.rewrite_lub_glb(itera->second.gamma, itera->first, 
-      iterb->second.lambda, iterb->first);
-
+    while (iterb != rewrites.end())
+    {
+      C.rewrite_lub_glb(itera->second.gamma, itera->first, 
+        iterb->second.lambda, iterb->first);
+      C.rewrite_lub_glb(iterb->second.gamma, iterb->first, 
+        itera->second.lambda, itera->first);
+      ++iterb;
+    }
     ++itera;
-    ++iterb;
   }
 
   return std::make_tuple(context, typecanon, C);
