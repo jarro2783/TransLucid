@@ -138,6 +138,12 @@ construct_lub(Type a, Type b)
       lub.constructed = build_lub_constructed(lub.constructed, join[i]);
     }
   }
+
+  //however we might be left with something that is just the constructed term
+  if (lub.vars.size() == 0)
+  {
+    return lub.constructed;
+  }
   
   return lub;
 }
@@ -203,7 +209,13 @@ construct_glb(Type a, Type b)
       glb.constructed = build_glb_constructed(glb.constructed, join[i]);
     }
   }
-  
+
+  //however we might be left with something that is just the constructed term
+  if (glb.vars.size() == 0)
+  {
+    return glb.constructed;
+  }
+
   return glb;
 }
 

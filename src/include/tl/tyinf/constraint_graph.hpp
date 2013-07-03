@@ -102,6 +102,11 @@ namespace TransLucid
       void
       rewrite_glb(TypeVariable lambda, const VarSet& S);
 
+      //if anything in S is less than anything in T then gamma < lambda
+      void
+      rewrite_lub_glb(TypeVariable gamma, const VarSet& S,
+        TypeVariable lambda, const VarSet& T);
+
       template <typename F, typename Cond>
       void
       for_each_lower_if(F f, Cond c) const

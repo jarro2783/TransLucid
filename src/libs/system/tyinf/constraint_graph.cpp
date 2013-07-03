@@ -412,6 +412,7 @@ ConstraintGraph::rewrite_lub(TypeVariable gamma, const VarSet& S)
         found = true;
         add_less(gamma, v.first);
       }
+      ++iter;
     }
   }
 }
@@ -430,6 +431,29 @@ ConstraintGraph::rewrite_glb(TypeVariable lambda, const VarSet& S)
       {
         found = true;
         add_less(v.first, lambda);
+      }
+      ++iter;
+    }
+  }
+}
+
+void
+ConstraintGraph::rewrite_lub_glb
+(
+  TypeVariable gamma, 
+  const VarSet& S,
+  TypeVariable lambda, 
+  const VarSet& T
+)
+{
+  for (auto s : S)
+  {
+    for (auto t : T)
+    {
+      if (s == t || less(s, t))
+      {
+        add_less(gamma, lambda);
+        break;
       }
     }
   }

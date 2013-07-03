@@ -449,10 +449,16 @@ class CanoniseVars
     return iter->second;
   }
 
+  const CanoniseRewrites&
+  rewrites() const
+  {
+    return m_rewrites;
+  }
+
   private:
   CanoniseRewrites m_rewrites;
-  RewriteQueue m_queue;
-  FreshTypeVars m_fresh;
+  RewriteQueue& m_queue;
+  FreshTypeVars& m_fresh;
 };
 
 class Canonise
@@ -718,6 +724,27 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
     //if there exists a beta in S < a, set gamma < a
     //if there exists a beta in S > a, set a < gamma
     C.rewrite_lub(current.second.gamma, current.first);
+    C.rewrite_glb(current.second.lambda, current.first);
+  }
+
+  //for everything rewritten, gamma_S < lambda_T if 
+  //something in S < something in T
+  auto& rewrites = vars.rewrites();
+  auto itera = rewrites.begin();
+  auto iterb = itera;
+
+  if (iterb != rewrites.end())
+  {
+    ++iterb;
+  }
+
+  while (iterb != rewrites.end())
+  {
+    C.rewrite_lub_glb(itera->second.gamma, itera->first, 
+      iterb->second.lambda, iterb->first);
+
+    ++itera;
+    ++iterb;
   }
 
   return std::make_tuple(context, typecanon, C);
