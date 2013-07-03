@@ -96,11 +96,11 @@ namespace TransLucid
       //when anything in S is less than any variable a in the graph, set
       //gamma < a
       void
-      rewrite_lub(TypeVariable gamma, const VarSet& S);
+      rewrite_less(TypeVariable gamma, const VarSet& S);
 
       //when any variable a is less than anything in S, set a < lambda
       void
-      rewrite_glb(TypeVariable lambda, const VarSet& S);
+      rewrite_greater(TypeVariable lambda, const VarSet& S);
 
       //if anything in S is less than anything in T then gamma < lambda
       void
@@ -164,6 +164,9 @@ namespace TransLucid
 
       void
       add_less(TypeVariable a, TypeVariable b);
+
+      void
+      add_less_closed(TypeVariable a, TypeVariable b);
 
       std::map<TypeVariable, ConstraintNode> m_graph;
 

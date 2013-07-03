@@ -440,6 +440,10 @@ class CanoniseVars
       auto gamma = m_fresh.fresh();
       auto lambda = m_fresh.fresh();
 
+      std::cout << "S = {";
+      print_container(std::cout, vars);
+      std::cout << "} |-> (" << gamma << ", " << lambda << ")" << std::endl;
+
       iter = m_rewrites.insert
         (std::make_pair(vars, CanoniseReplaced{gamma, lambda})).first;
 
@@ -721,10 +725,10 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
     C.setLower(current.second.lambda, 
       apply_visitor(canon, glb, TagPositive()));
 
-    //if there exists a beta in S < a, set gamma < a
-    //if there exists a beta in S > a, set a < gamma
-    C.rewrite_lub(current.second.gamma, current.first);
-    C.rewrite_glb(current.second.lambda, current.first);
+    //if there exists a beta in S such that beta < a, set gamma < a
+    //if there exists a beta in S such that a < beta, set a < lambda
+    C.rewrite_less(current.second.gamma, current.first);
+    C.rewrite_greater(current.second.lambda, current.first);
   }
 
   //for everything rewritten, gamma_S < lambda_T if 

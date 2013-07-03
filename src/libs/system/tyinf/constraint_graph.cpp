@@ -23,6 +23,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/tyinf/type_error.hpp>
 #include <tl/utility.hpp>
 
+#include <iostream>
+
 namespace TransLucid
 {
 
@@ -88,27 +90,16 @@ ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b,
 
   push_range(toadd.begin(), toadd.end(), q);
 
-  //add_less(a, b);
-
   auto a_less = a_data->second.less;
-  a_less.push_back(a);
   auto b_greater = b_data->second.greater; 
-  b_greater.push_back(b);
+
+  add_less_closed(a, b);
 
   //add the constraints to the upper and lower bounds of a and b
   a_data->second.upper = construct_glb(a_data->second.upper, 
     b_data->second.upper);
   b_data->second.lower = construct_lub(b_data->second.lower,
     a_data->second.lower);
-
-  //we go through every pair of a less and b greater
-  for (const auto ap : a_less)
-  {
-    for (const auto bp : b_greater)
-    {
-      add_less(ap, bp);
-    }
-  }
 
   //for each bp in the greater of b, its lower is (lower bp) lub (lower a)
   for (const auto bp : b_data->second.greater)
@@ -229,7 +220,7 @@ ConstraintGraph::less(TypeVariable a, TypeVariable b) const
     return false;
   }
 
-  const auto& lessthan = iter->second.less;
+  const auto& lessthan = iter->second.greater;
   
   return std::binary_search(lessthan.begin(), lessthan.end(), b);
 }
@@ -243,6 +234,28 @@ ConstraintGraph::add_less(TypeVariable a, TypeVariable b)
 
   insert_sorted(a_data->second.greater, b);
   insert_sorted(b_data->second.less, a);
+}
+
+void
+ConstraintGraph::add_less_closed(TypeVariable a, TypeVariable b)
+{
+  auto a_data = get_make_entry(a);
+  auto b_data = get_make_entry(b);
+
+  //include a < a and b < b
+  auto a_less = a_data->second.less;
+  a_less.push_back(a);
+  auto b_greater = b_data->second.greater; 
+  b_greater.push_back(b);
+
+  //we go through every pair of a less and b greater
+  for (const auto ap : a_less)
+  {
+    for (const auto bp : b_greater)
+    {
+      add_less(ap, bp);
+    }
+  }
 }
 
 decltype(ConstraintGraph::m_graph)::iterator
@@ -399,7 +412,7 @@ ConstraintGraph::setLower(TypeVariable a, Type t)
 //when anything in S is less than any variable a in the graph, set
 //gamma < a
 void
-ConstraintGraph::rewrite_lub(TypeVariable gamma, const VarSet& S)
+ConstraintGraph::rewrite_less(TypeVariable gamma, const VarSet& S)
 {
   for (const auto& v : m_graph)
   {
@@ -407,10 +420,13 @@ ConstraintGraph::rewrite_lub(TypeVariable gamma, const VarSet& S)
     auto iter = S.begin();
     while (!found && iter != S.end())
     {
+      std::cout << "checking " << *iter << " < " << v.first << std::endl;
       if (less(*iter, v.first))
       {
         found = true;
-        add_less(gamma, v.first);
+        std::cout << *iter << " < " << v.first << ", adding " << gamma << " < "
+          << v.first << std::endl;
+        add_less_closed(gamma, v.first);
       }
       ++iter;
     }
@@ -419,7 +435,7 @@ ConstraintGraph::rewrite_lub(TypeVariable gamma, const VarSet& S)
 
 //when any variable a is less than anything in S, set a < lambda
 void
-ConstraintGraph::rewrite_glb(TypeVariable lambda, const VarSet& S)
+ConstraintGraph::rewrite_greater(TypeVariable lambda, const VarSet& S)
 {
   for (const auto& v : m_graph)
   {
@@ -430,7 +446,9 @@ ConstraintGraph::rewrite_glb(TypeVariable lambda, const VarSet& S)
       if (less(v.first, *iter))
       {
         found = true;
-        add_less(v.first, lambda);
+        std::cout << v.first << " < " << *iter << ", adding " << 
+          v.first << " < " << lambda << std::endl;
+        add_less_closed(v.first, lambda);
       }
       ++iter;
     }
@@ -452,7 +470,7 @@ ConstraintGraph::rewrite_lub_glb
     {
       if (s == t || less(s, t))
       {
-        add_less(gamma, lambda);
+        add_less_closed(gamma, lambda);
         break;
       }
     }

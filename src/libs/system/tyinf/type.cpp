@@ -296,7 +296,7 @@ namespace
     void
     operator()(const TypeGLB& glb)
     {
-      m_result += U"⊔{";
+      m_result += U"⊓{";
 
       if (!variant_is_type<TypeNothing>(glb.constructed))
       {
@@ -315,7 +315,7 @@ namespace
     void
     operator()(const TypeLUB& lub)
     {
-      m_result += U"⊓{";
+      m_result += U"⊔{";
 
       if (!variant_is_type<TypeNothing>(lub.constructed))
       {
