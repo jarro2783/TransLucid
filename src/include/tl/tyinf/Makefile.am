@@ -18,7 +18,7 @@
 
 includesdir = $(prefix)/include/tl/tyinf
 
-includes_HEADERS = constraint_graph.hpp garbage_collect.hpp type.hpp \
+includes_HEADERS = constraint_graph.hpp type.hpp \
 type_context.hpp \
 type_inference.hpp type_variable.hpp 
 

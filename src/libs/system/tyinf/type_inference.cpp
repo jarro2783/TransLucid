@@ -27,6 +27,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/string.hpp>
 #include <tl/types/special.hpp>
 
+#include <tl/output.hpp>
+
 #include <tl/system.hpp>
 
 namespace TransLucid
@@ -549,6 +551,118 @@ class Canonise
   CanoniseVars& m_vars;
 };
 
+class MarkPolarity
+{
+  public:
+
+  //positive, negative
+  typedef std::pair<VarSet, VarSet> result_type;
+
+  template <typename T, typename Polarity>
+  result_type
+  operator()(const T& t, Polarity)
+  {
+    return result_type();
+  }
+
+  result_type
+  operator()(TypeVariable v, TagPositive)
+  {
+    return {{v}, {}};
+  }
+
+  result_type
+  operator()(TypeVariable v, TagNegative)
+  {
+    return {{}, {v}};
+  }
+
+  result_type
+  operator()(const TypeCBV& cbv, TagPositive)
+  {
+    auto lhs = apply_visitor(*this, cbv.lhs, TagNegative());
+    auto rhs = apply_visitor(*this, cbv.rhs, TagPositive());
+
+    VarSet pos = lhs.first;
+    pos.insert(rhs.first.begin(), rhs.first.end());
+
+    VarSet neg = lhs.second;
+    neg.insert(rhs.second.begin(), rhs.second.end());
+
+    return {pos, neg};
+  }
+
+  result_type
+  operator()(const TypeCBV& cbv, TagNegative)
+  {
+    auto lhs = apply_visitor(*this, cbv.lhs, TagPositive());
+    auto rhs = apply_visitor(*this, cbv.rhs, TagNegative());
+    
+    VarSet pos = lhs.first;
+    pos.insert(rhs.first.begin(), rhs.first.end());
+
+    VarSet neg = lhs.second;
+    neg.insert(rhs.second.begin(), rhs.second.end());
+
+    return {pos, neg};
+  }
+
+  result_type
+  operator()(const TypeBase& base, TagPositive)
+  {
+    VarSet pos;
+    VarSet neg;
+
+    for (const auto& t : base.lhs)
+    {
+      auto polarity = apply_visitor(*this, t, TagNegative());
+      pos.insert(polarity.first.begin(), polarity.first.end());
+      neg.insert(polarity.second.begin(), polarity.second.end());
+    }
+
+    auto rhs = apply_visitor(*this, base.rhs, TagPositive());
+    
+    pos.insert(rhs.first.begin(), rhs.first.end());
+    neg.insert(rhs.second.begin(), rhs.second.end());
+
+    return {pos, neg};
+  }
+
+  result_type
+  operator()(const TypeBase& base, TagNegative)
+  {
+    VarSet pos;
+    VarSet neg;
+
+    for (const auto& t : base.lhs)
+    {
+      auto polarity = apply_visitor(*this, t, TagPositive());
+      pos.insert(polarity.first.begin(), polarity.first.end());
+      neg.insert(polarity.second.begin(), polarity.second.end());
+    }
+
+    auto rhs = apply_visitor(*this, base.rhs, TagNegative());
+    
+    pos.insert(rhs.first.begin(), rhs.first.end());
+    neg.insert(rhs.second.begin(), rhs.second.end());
+
+    return {pos, neg};
+  }
+
+  result_type
+  operator()(const TypeIntension& inten, TagPositive)
+  {
+    return apply_visitor(*this, inten.body, TagPositive());
+  }
+
+  result_type
+  operator()(const TypeIntension& inten, TagNegative)
+  {
+    return apply_visitor(*this, inten.body, TagNegative());
+  }
+
+};
+
 }
 
 TypeScheme
@@ -607,6 +721,95 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
   }
 
   return std::make_tuple(context, typecanon, C);
+}
+
+TypeScheme
+garbage_collect(const TypeScheme& t)
+{
+  struct VarInSet
+  {
+    VarInSet(const VarSet& v)
+    : m_v(v)
+    {
+    }
+
+    template <typename T>
+    bool
+    operator()(const T& t)
+    {
+      return m_v.find(t.first) != m_v.end();
+    }
+
+    const VarSet& m_v;
+  };
+
+  MarkPolarity mark;
+
+  VarSet pos;
+  VarSet neg;
+
+  auto tpol = apply_visitor(mark, std::get<1>(t), TagPositive());
+
+  pos = tpol.first;
+  neg = tpol.second;
+
+  auto gatherneg = [&] (const Type& t, VarSet& p, VarSet& n) -> void
+    {
+      auto result = apply_visitor(mark, t, TagNegative());
+
+      p.insert(result.first.begin(), result.first.end());
+      n.insert(result.second.begin(), result.second.end());
+    };
+
+  auto gatherpos = [&] (const Type& t, VarSet& p, VarSet& n) -> void
+    {
+      auto result = apply_visitor(mark, t, TagPositive());
+
+      pos.insert(result.first.begin(), result.first.end());
+      neg.insert(result.second.begin(), result.second.end());
+    };
+
+  std::get<0>(t).for_each(
+    std::bind(gatherneg, std::placeholders::_1, std::ref(pos), std::ref(neg)));
+
+  VarSet currentPos;
+  VarSet currentNeg;
+
+  while (pos.size() != currentPos.size() && neg.size() != currentNeg.size())
+  {
+    currentPos = pos;
+    currentNeg = neg;
+
+    std::get<2>(t).for_each_lower_if(
+      std::bind(gatherpos, 
+        std::placeholders::_1,
+        std::ref(pos),
+        std::ref(neg)
+      ),
+      VarInSet(currentPos)
+    );
+
+    std::get<2>(t).for_each_upper_if(
+      std::bind(gatherneg, 
+        std::placeholders::_1,
+        std::ref(pos),
+        std::ref(neg)
+      ),
+      VarInSet(currentNeg)
+    );
+  }
+
+  std::cout << "positive variables" << std::endl;
+  print_container(std::cout, pos);
+  std::cout << std::endl;
+  std::cout << "negative variables" << std::endl;
+  print_container(std::cout, neg);
+  std::cout << std::endl;
+
+  auto C = std::get<2>(t);
+  C.collect(pos, neg);
+
+  return std::make_tuple(std::get<0>(t), std::get<1>(t), C);
 }
 
 }

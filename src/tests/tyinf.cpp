@@ -20,7 +20,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_api.hpp>
 #include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
-#include <tl/tyinf/garbage_collect.hpp>
 #include <tl/tyinf/type_error.hpp>
 #include <tl/tyinf/type_inference.hpp>
 #include <tl/output.hpp>
@@ -69,10 +68,24 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr)
 
   auto et = transform.transform(e);
 
-  auto t = TransLucid::TypeInference::canonise(infer.infer(et), fresh);
+  auto t = infer.infer(et);
 
-  std::cout << print_type(std::get<1>(t), system) << std::endl <<
+  std::cout << "after type inference\n" << 
+    print_type(std::get<1>(t), system) << std::endl <<
     std::get<2>(t).print(system) << std::endl;
+  
+  auto canon = TransLucid::TypeInference::canonise(t, fresh);
+
+  std::cout << "after canonisation\n" << 
+    print_type(std::get<1>(canon), system) << std::endl <<
+    std::get<2>(canon).print(system) << std::endl;
+
+  auto collected = TransLucid::TypeInference::garbage_collect(canon);
+
+  std::cout << "after garbage collection\n" << 
+    print_type(std::get<1>(collected), system) << std::endl <<
+    std::get<2>(collected).print(system) << std::endl;
+
 }
 
 void

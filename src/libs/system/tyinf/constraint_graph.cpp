@@ -429,6 +429,50 @@ ConstraintGraph::rewrite_glb(TypeVariable lambda, const VarSet& S)
   }
 }
 
+void
+ConstraintGraph::collect(const VarSet& pos, const VarSet& neg)
+{
+  VarSet toRemove;
+
+  //only keep lower bounds if the variable is positive
+  //only keep upper bounds if the variable is negative
+  for (auto& v : m_graph)
+  {
+    //only keep < if it is neg < pos
+    if (pos.find(v.first) != pos.end())
+    {
+      //throw out all greater if positive
+      v.second.greater.clear();
+
+      //remove the upper bound
+      v.second.upper = TypeTop();
+
+      //then only keep less if they are negative
+    }
+    else if (neg.find(v.first) != neg.end())
+    {
+      //throw out all less if negative
+      v.second.less.clear();
+
+      //remove the lower bound
+      v.second.lower = TypeBot();
+
+      //then only keep greater if they are positive
+    }
+    else
+    {
+      //we don't even need this one at all if neutral
+      toRemove.insert(v.first);
+    }
+  }
+
+  for (auto v : toRemove)
+  {
+    m_graph.erase(v);
+  }
+
+}
+
 }
 
 }

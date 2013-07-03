@@ -156,6 +156,9 @@ namespace TransLucid
 
     TypeScheme
     canonise(const TypeScheme& t, FreshTypeVars& fresh);
+
+    TypeScheme
+    garbage_collect(const TypeScheme& t);
   }
 }
 

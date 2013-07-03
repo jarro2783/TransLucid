@@ -70,6 +70,21 @@ namespace TransLucid
         return result;
       }
 
+      template <typename F>
+      void
+      for_each(F f) const
+      {
+        for (const auto& v : m_lambdas)
+        {
+          f(v.second);
+        }
+
+        for (const auto& v : m_vars)
+        {
+          f(v.second);
+        }
+      }
+
       private:
       std::map<dimension_index, Type> m_lambdas;
       std::unordered_map<u32string, Type> m_vars;

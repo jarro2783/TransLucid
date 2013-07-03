@@ -31,7 +31,8 @@ range.cpp region.cpp rename.cpp semantic_transform.cpp
 system.cpp system_util.cpp
 tree_printer.cpp tree_rewriter.cpp
 tree_to_wstree.cpp 
-tyinf/constraint_graph.cpp tyinf/type.cpp tyinf/type_context.cpp
+tyinf/constraint_graph.cpp
+tyinf/type.cpp tyinf/type_context.cpp
 tyinf/type_error.cpp tyinf/type_inference.cpp
 types/function_type.cpp types/numbers.cpp types/union.cpp
 types.cpp utility.cpp uuid.cpp

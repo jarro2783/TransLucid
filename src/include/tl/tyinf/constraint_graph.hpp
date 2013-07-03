@@ -60,6 +60,9 @@ namespace TransLucid
       void
       add_to_closure(const Constraint& c);
 
+      void
+      collect(const VarSet& pos, const VarSet& neg);
+
       Type
       upper(TypeVariable a) const;
 
@@ -98,6 +101,32 @@ namespace TransLucid
       //when any variable a is less than anything in S, set a < lambda
       void
       rewrite_glb(TypeVariable lambda, const VarSet& S);
+
+      template <typename F, typename Cond>
+      void
+      for_each_lower_if(F f, Cond c) const
+      {
+        for (const auto& v : m_graph)
+        {
+          if (c(v))
+          {
+            f(v.second.lower);
+          }
+        }
+      }
+
+      template <typename F, typename Cond>
+      void
+      for_each_upper_if(F f, Cond c) const
+      {
+        for (const auto& v : m_graph)
+        {
+          if (c(v))
+          {
+            f(v.second.upper);
+          }
+        }
+      }
 
       private:
 
