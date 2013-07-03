@@ -775,7 +775,7 @@ garbage_collect(const TypeScheme& t)
   VarSet currentPos;
   VarSet currentNeg;
 
-  while (pos.size() != currentPos.size() && neg.size() != currentNeg.size())
+  while (pos.size() != currentPos.size() || neg.size() != currentNeg.size())
   {
     currentPos = pos;
     currentNeg = neg;

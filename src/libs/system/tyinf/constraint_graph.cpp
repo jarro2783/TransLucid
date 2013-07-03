@@ -95,6 +95,12 @@ ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b,
   auto b_greater = b_data->second.greater; 
   b_greater.push_back(b);
 
+  //add the constraints to the upper and lower bounds of a and b
+  a_data->second.upper = construct_glb(a_data->second.upper, 
+    b_data->second.upper);
+  b_data->second.lower = construct_lub(b_data->second.lower,
+    a_data->second.lower);
+
   //we go through every pair of a less and b greater
   for (const auto ap : a_less)
   {

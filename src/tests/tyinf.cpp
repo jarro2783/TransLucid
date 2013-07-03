@@ -109,10 +109,10 @@ cgraph(TransLucid::System& system)
 
   ConstraintGraph C;
 
-  C.add_to_closure(Constraint{1, 2});
-  C.add_to_closure(Constraint{2, 3});
   C.add_to_closure(Constraint{TypeCBV{4, 5}, 1});
   C.add_to_closure(Constraint{3, TypeCBV{6, 7}});
+  C.add_to_closure(Constraint{1, 2});
+  C.add_to_closure(Constraint{2, 3});
 
   std::cout << C.print(system) << std::endl;
 }
