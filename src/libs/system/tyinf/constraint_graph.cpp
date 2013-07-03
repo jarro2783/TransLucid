@@ -448,6 +448,14 @@ ConstraintGraph::collect(const VarSet& pos, const VarSet& neg)
       v.second.upper = TypeTop();
 
       //then only keep less if they are negative
+      auto end = std::remove_if(v.second.less.begin(), v.second.less.end(),
+        [&neg] (const TypeVariable& t)
+        {
+          return neg.find(t) == neg.end();
+        }
+      );
+
+      v.second.less.erase(end, v.second.less.end());
     }
     else if (neg.find(v.first) != neg.end())
     {
@@ -458,6 +466,15 @@ ConstraintGraph::collect(const VarSet& pos, const VarSet& neg)
       v.second.lower = TypeBot();
 
       //then only keep greater if they are positive
+      auto end = std::remove_if(
+      v.second.greater.begin(), v.second.greater.end(),
+        [&pos] (const TypeVariable& t)
+        {
+          return pos.find(t) == pos.end();
+        }
+      );
+
+      v.second.greater.erase(end, v.second.greater.end());
     }
     else
     {
