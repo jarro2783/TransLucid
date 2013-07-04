@@ -723,7 +723,7 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
 
     C.setUpper(current.second.gamma, apply_visitor(canon, glb, TagNegative()));
     C.setLower(current.second.lambda, 
-      apply_visitor(canon, glb, TagPositive()));
+      apply_visitor(canon, lub, TagPositive()));
 
     //if there exists a beta in S such that beta < a, set gamma < a
     //if there exists a beta in S such that a < beta, set a < lambda

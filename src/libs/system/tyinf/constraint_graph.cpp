@@ -420,12 +420,9 @@ ConstraintGraph::rewrite_less(TypeVariable gamma, const VarSet& S)
     auto iter = S.begin();
     while (!found && iter != S.end())
     {
-      std::cout << "checking " << *iter << " < " << v.first << std::endl;
       if (less(*iter, v.first))
       {
         found = true;
-        std::cout << *iter << " < " << v.first << ", adding " << gamma << " < "
-          << v.first << std::endl;
         add_less_closed(gamma, v.first);
       }
       ++iter;
@@ -446,8 +443,6 @@ ConstraintGraph::rewrite_greater(TypeVariable lambda, const VarSet& S)
       if (less(v.first, *iter))
       {
         found = true;
-        std::cout << v.first << " < " << *iter << ", adding " << 
-          v.first << " < " << lambda << std::endl;
         add_less_closed(v.first, lambda);
       }
       ++iter;
