@@ -96,6 +96,9 @@ inference(TransLucid::System& system)
   infer(system, UR"*(\x -> if true then x else x fi)*");
   infer(system, UR"*(if true then \x -> x else \x -> x fi)*");
   infer(system, UR"*((\_(x, y) -> y).(1, 2))*");
+  infer(system, UR"*(\x -> ↓x)*");
+  infer(system, UR"*(↑42)*");
+  infer(system, UR"*((\x -> ↓x)!(↑42))*");
 }
 
 void

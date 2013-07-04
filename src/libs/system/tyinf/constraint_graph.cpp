@@ -280,6 +280,10 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   const TypeCBV* cbvrhs = nullptr;
   const TypeAtomic* atomic = nullptr;
   const Constant* constant = nullptr;
+  const TypeBase* baselhs = nullptr;
+  const TypeBase* baserhs = nullptr;
+  const TypeIntension* intenlhs = nullptr;
+  const TypeIntension* intenrhs = nullptr;
 
   if((lub = get<TypeLUB>(&c.lhs)) != nullptr)
   {
@@ -327,6 +331,26 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   {
     subc(Constraint{cbvrhs->lhs, cbvlhs->lhs}, result);
     subc(Constraint{cbvlhs->rhs, cbvrhs->rhs}, result);
+  }
+  else if ((baselhs = get<TypeBase>(&c.lhs)) != nullptr &&
+           (baserhs = get<TypeBase>(&c.rhs)) != nullptr &&
+           baselhs->lhs.size() == baserhs->lhs.size())
+  {
+    auto li = baselhs->lhs.begin();
+    auto ri = baserhs->lhs.begin();
+    while (li != baselhs->lhs.end())
+    {
+      subc(Constraint{*ri, *li}, result);
+      ++li;
+      ++ri;
+    }
+
+    subc(Constraint{baselhs->rhs, baserhs->rhs}, result);
+  }
+  else if ((intenlhs = get<TypeIntension>(&c.lhs)) != nullptr &&
+           (intenrhs = get<TypeIntension>(&c.rhs)) != nullptr)
+  {
+    subc(Constraint{intenlhs->body, intenrhs->body}, result);
   }
   else
   {
