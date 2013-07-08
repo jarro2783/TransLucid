@@ -85,6 +85,12 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr)
   std::cout << "after garbage collection\n" << 
     print_type(std::get<1>(collected), system) << std::endl <<
     std::get<2>(collected).print(system) << std::endl;
+
+  auto minimised = TransLucid::TypeInference::minimise(collected);
+
+//  std::cout << "after minimisation\n" <<
+//    print_type(std::get<1>(collected), system) << std::endl <<
+//    std::get<2>(collected).print(system) << std::endl;
 }
 
 void

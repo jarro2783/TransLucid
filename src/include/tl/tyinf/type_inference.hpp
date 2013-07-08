@@ -157,8 +157,14 @@ namespace TransLucid
     TypeScheme
     canonise(const TypeScheme& t, FreshTypeVars& fresh);
 
+    std::pair<VarSet, VarSet>
+    polarity(const TypeScheme& t);
+
     TypeScheme
     garbage_collect(const TypeScheme& t);
+
+    TypeScheme
+    minimise(const TypeScheme& t);
   }
 }
 

@@ -738,6 +738,234 @@ class MarkPolarity
 
 };
 
+enum class HeadOrder
+{
+  TYPE_NOTHING,
+  TYPE_TOP,
+  TYPE_BOT,
+  TYPE_VARIABLE,
+  CONSTANT,
+  TYPE_ATOMIC,
+  TYPE_REGION,
+  TYPE_TUPLE,
+  TYPE_GLB,
+  TYPE_LUB,
+  TYPE_INTENSION,
+  TYPE_CBV,
+  TYPE_BASE
+};
+
+struct GetTypeOrder
+{
+  typedef HeadOrder result_type;
+
+  result_type
+  operator()(TypeNothing const&)
+  {
+    return HeadOrder::TYPE_NOTHING;
+  }
+
+  result_type
+  operator()(TypeTop const&)
+  {
+    return HeadOrder::TYPE_TOP;
+  }
+
+  result_type
+  operator()(TypeBot const&)
+  {
+    return HeadOrder::TYPE_BOT;
+  }
+
+  result_type
+  operator()(TypeVariable const&)
+  {
+    return HeadOrder::TYPE_VARIABLE;
+  }
+
+  result_type
+  operator()(Constant const&)
+  {
+    return HeadOrder::CONSTANT;
+  }
+
+  result_type
+  operator()(TypeAtomic const&)
+  {
+    return HeadOrder::TYPE_ATOMIC;
+  }
+
+  result_type
+  operator()(TypeRegion const&)
+  {
+    return HeadOrder::TYPE_REGION;
+  }
+
+  result_type
+  operator()(TypeTuple const&)
+  {
+    return HeadOrder::TYPE_TUPLE;
+  }
+
+  result_type
+  operator()(TypeGLB const&)
+  {
+    return HeadOrder::TYPE_GLB;
+  }
+
+  result_type
+  operator()(TypeLUB const&)
+  {
+    return HeadOrder::TYPE_LUB;
+  }
+
+  result_type
+  operator()(TypeIntension const&)
+  {
+    return HeadOrder::TYPE_INTENSION;
+  }
+
+  result_type
+  operator()(TypeCBV const&)
+  {
+    return HeadOrder::TYPE_CBV;
+  }
+
+  result_type
+  operator()(TypeBase const&)
+  {
+    return HeadOrder::TYPE_BASE;
+  }
+};
+
+struct MinimiseCompare
+{
+  bool
+  operator()(TypeVariable a, TypeVariable b)
+  {
+    //sort by predecessor first
+    auto preda = C.predecessor(a);
+    auto predb = C.predecessor(b);
+
+    if (std::lexicographical_compare(preda.begin(), preda.end(),
+          predb.begin(), predb.end()))
+    {
+      return true;
+    }
+    else if (preda != predb)
+    {
+      return false;
+    }
+
+    //then by successor
+    auto succa = C.successor(a);
+    auto succb = C.successor(b);
+
+    if (std::lexicographical_compare(succa.begin(), succa.end(),
+          succb.begin(), succb.end()))
+    {
+      return true;
+    }
+    else if (succa != succb)
+    {
+      return false;
+    }
+
+    //sort negatives less than positives
+    bool aNeg = neg.find(a) != neg.end();
+    bool bNeg = neg.find(b) != neg.end();
+    if (aNeg && !bNeg)
+    {
+      return true;
+    }
+
+    if (!aNeg && bNeg)
+    {
+      return false;
+    }
+
+    //otherwise they are equal, so continue
+    GetTypeOrder headOrder;
+
+    //then sort by head of lower bound
+    HeadOrder aLowerHead = apply_visitor(headOrder, C.lower(a));
+    HeadOrder bLowerHead = apply_visitor(headOrder, C.lower(b));
+
+    if (aLowerHead < bLowerHead)
+    {
+      return true;
+    }
+    else if (bLowerHead < aLowerHead)
+    {
+      return false;
+    }
+
+    //then by head of upper bound
+    HeadOrder aUpperHead = apply_visitor(headOrder, C.upper(a));
+    HeadOrder bUpperHead = apply_visitor(headOrder, C.upper(b));
+
+    if (aUpperHead < bUpperHead)
+    {
+      return true;
+    }
+    else if (bUpperHead < aUpperHead)
+    {
+      return false;
+    }
+
+    //if all else fails they are equal
+    return false;
+  }
+
+  bool
+  equal(TypeVariable a, TypeVariable b)
+  {
+    //check predecessor first
+    auto preda = C.predecessor(a);
+    auto predb = C.predecessor(b);
+
+    if (preda != predb)
+    {
+      return false;
+    }
+
+    //then successor
+    auto succa = C.successor(a);
+    auto succb = C.successor(b);
+    
+    if (succa != succb)
+    {
+      return false;
+    }
+
+    //they both have to be positive or negative
+    if ((neg.find(a) != neg.end())
+        != (neg.find(b) != neg.end()))
+    {
+      return false;
+    }
+
+    GetTypeOrder headOrder;
+
+    if (apply_visitor(headOrder, C.lower(a)) != 
+        apply_visitor(headOrder, C.lower(b)))
+    {
+      return false;
+    }
+
+    if (apply_visitor(headOrder, C.upper(a)) != 
+        apply_visitor(headOrder, C.upper(b)))
+    {
+      return false;
+    }
+    
+    return true;
+  }
+
+  const VarSet& neg;
+  const ConstraintGraph& C;
+};
+
 }
 
 TypeScheme
@@ -824,8 +1052,9 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
   return std::make_tuple(context, typecanon, C);
 }
 
-TypeScheme
-garbage_collect(const TypeScheme& t)
+//(neg, pos)
+std::pair<VarSet, VarSet>
+polarity(const TypeScheme& t)
 {
   struct VarInSet
   {
@@ -907,10 +1136,89 @@ garbage_collect(const TypeScheme& t)
   print_container(std::cout, neg);
   std::cout << std::endl;
 
+  return std::make_pair(neg, pos);
+}
+
+TypeScheme
+garbage_collect(const TypeScheme& t)
+{
+  auto p = polarity(t);
+
   auto C = std::get<2>(t);
-  C.collect(pos, neg);
+  C.collect(p.first, p.second);
 
   return std::make_tuple(std::get<0>(t), std::get<1>(t), C);
+}
+
+TypeScheme
+minimise(const TypeScheme& t)
+{
+  //finite state automata minimisation, but with the "transition functions" 
+  //being that the components of the upper and lower bounds fall within
+  //the same block
+  auto& C = std::get<2>(t);
+
+  auto p = polarity(t);
+
+  auto vars = C.domain();
+
+  MinimiseCompare compare{p.first, C};
+
+  //if there is only zero or one variable our job is done
+  if (vars.size() <= 1)
+  {
+    return t;
+  }
+
+  //first sort the type variables to get the initial partition
+  std::sort(vars.begin(), vars.end(), compare);
+
+  std::cout << "sorted vars:" << std::endl;
+  std::copy(vars.begin(), vars.end(), 
+    std::ostream_iterator<TypeVariable>(std::cout, ", "));
+  std::cout << std::endl;
+
+  //divide into acceptable blocks
+  std::vector<std::pair<
+    std::vector<TypeVariable>::iterator,
+    std::vector<TypeVariable>::iterator>
+  > blocks;
+
+  auto iter = vars.begin();
+  auto start = iter;
+
+  //there are at least two variables here
+  ++iter;
+
+  while (iter != vars.end())
+  {
+    if (!compare.equal(*start, *iter))
+    {
+      if (iter - start > 1)
+      {
+        blocks.push_back(std::make_pair(start, iter));
+      }
+      start = iter;
+    }
+
+    ++iter;
+  }
+
+  //put the last range in
+  if (start - iter > 1)
+  {
+    blocks.push_back(std::make_pair(start, iter));
+  }
+
+  //now we try to reduce the size of the blocks we already have
+  //first sort within the blocks by value so that we can search inside blocks
+  //easily
+  for (auto b : blocks)
+  {
+    std::sort(b.first, b.second);
+  }
+
+  return t;
 }
 
 }

@@ -497,7 +497,7 @@ ConstraintGraph::rewrite_lub_glb
 }
 
 void
-ConstraintGraph::collect(const VarSet& pos, const VarSet& neg)
+ConstraintGraph::collect(const VarSet& neg, const VarSet& pos)
 {
   VarSet toRemove;
 

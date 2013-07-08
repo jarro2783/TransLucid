@@ -69,6 +69,36 @@ namespace TransLucid
       Type
       lower(TypeVariable b) const;
 
+      std::vector<TypeVariable>
+      predecessor(TypeVariable a) const
+      {
+        auto iter = m_graph.find(a);
+
+        if (iter != m_graph.end())
+        {
+          return iter->second.less;
+        }
+        else
+        {
+          return {};
+        }
+      }
+
+      std::vector<TypeVariable>
+      successor(TypeVariable a) const
+      {
+        auto iter = m_graph.find(a);
+
+        if (iter != m_graph.end())
+        {
+          return iter->second.greater;
+        }
+        else
+        {
+          return {};
+        }
+      }
+
       //is a < b in this graph?
       bool
       less(TypeVariable a, TypeVariable b) const;
@@ -131,6 +161,19 @@ namespace TransLucid
             f(v.second.upper);
           }
         }
+      }
+
+      std::vector<TypeVariable>
+      domain() const
+      {
+        std::vector<TypeVariable> d;
+
+        for (const auto& v : m_graph)
+        {
+          d.push_back(v.first);
+        }
+
+        return d;
       }
 
       private:
