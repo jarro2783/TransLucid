@@ -99,6 +99,7 @@ inference(TransLucid::System& system)
   infer(system, UR"*(\x -> ↓x)*");
   infer(system, UR"*(↑42)*");
   infer(system, UR"*((\x -> ↓x)!(↑42))*");
+  infer(system, UR"*(\\f -> (\\x -> f (x x)) (\\x -> f (x x)))*");
 }
 
 void

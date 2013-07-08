@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/tyinf/type.hpp>
+#include <tl/tyinf/type_error.hpp>
 #include <tl/output.hpp>
 #include <tl/system.hpp>
 
@@ -38,19 +39,29 @@ build_lub_constructed(Type current, Type join)
     return join;
   }
 
-  TypeCBV* a = get<TypeCBV>(&current);
-  TypeCBV* b = get<TypeCBV>(&join);
+  TypeCBV* acbv = get<TypeCBV>(&current);
+  TypeCBV* bcbv = get<TypeCBV>(&join);
+  TypeIntension *ainten = get<TypeIntension>(&current);
+  TypeIntension *binten = get<TypeIntension>(&join);
 
-  if (a != nullptr && b != nullptr)
+  if (acbv != nullptr && bcbv != nullptr)
   {
     return TypeCBV
       {
-        construct_glb(a->lhs, b->lhs),
-        construct_lub(a->rhs, b->rhs)
+        construct_glb(acbv->lhs, bcbv->lhs),
+        construct_lub(acbv->rhs, bcbv->rhs)
       };
   }
 
-  throw "Invalid types in build lub";
+  if (ainten != nullptr && binten != nullptr)
+  {
+    return TypeIntension
+      {
+        construct_lub(ainten->body, binten->body)
+      };
+  }
+
+  throw BoundInvalid{BoundInvalid::LUB, current, join};
 }
 
 Type
@@ -61,20 +72,31 @@ build_glb_constructed(Type current, Type join)
     return join;
   }
 
-  TypeCBV* a = get<TypeCBV>(&current);
-  TypeCBV* b = get<TypeCBV>(&join);
+  TypeCBV* acbv = get<TypeCBV>(&current);
+  TypeCBV* bcbv = get<TypeCBV>(&join);
+  TypeIntension *ainten = get<TypeIntension>(&current);
+  TypeIntension *binten = get<TypeIntension>(&join);
 
-  if (a != nullptr && b != nullptr)
+  if (acbv != nullptr && bcbv != nullptr)
   {
     return TypeCBV
       {
-        construct_lub(a->lhs, b->lhs),
-        construct_glb(a->rhs, b->rhs)
+        construct_lub(acbv->lhs, bcbv->lhs),
+        construct_glb(acbv->rhs, bcbv->rhs)
       };
   }
 
-  throw "Invalid types in build glb";
+  if (ainten != nullptr && binten != nullptr)
+  {
+    return TypeIntension
+      {
+        construct_glb(ainten->body, binten->body)
+      };
+  }
+
+  throw BoundInvalid{BoundInvalid::GLB, current, join};
 }
+
 }
 
 Type
@@ -144,7 +166,13 @@ construct_lub(Type a, Type b)
   {
     return lub.constructed;
   }
-  
+  else if (lub.vars.size() == 1 
+           && variant_is_type<TypeNothing>(lub.constructed))
+  {
+    //and if there is only one variable, return that
+    return *lub.vars.begin();
+  }
+
   return lub;
 }
 
@@ -214,6 +242,12 @@ construct_glb(Type a, Type b)
   if (glb.vars.size() == 0)
   {
     return glb.constructed;
+  }
+  else if (glb.vars.size() == 1 
+           && variant_is_type<TypeNothing>(glb.constructed))
+  {
+    //and if there is only one variable, return that
+    return *glb.vars.begin();
   }
 
   return glb;
@@ -291,6 +325,18 @@ namespace
     operator()(const TypeAtomic& atomic)
     {
       m_result += U"atomic<" + atomic.name + U">";
+    }
+
+    void
+    operator()(const TypeRegion& atomic)
+    {
+      m_result += U"region";
+    }
+
+    void
+    operator()(const TypeTuple& atomic)
+    {
+      m_result += U"tuple";
     }
 
     void

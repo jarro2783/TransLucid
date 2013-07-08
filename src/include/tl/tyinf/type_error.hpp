@@ -42,5 +42,27 @@ namespace TransLucid
 
       Constraint c;
     };
+
+    struct BoundInvalid : public TypeError
+    {
+      enum BoundType
+      {
+        GLB,
+        LUB
+      };
+
+      BoundInvalid(BoundType t, Type a, Type b)
+      : type(t), a(a), b(b)
+      {
+      }
+
+      BoundType type;
+
+      Type a;
+      Type b;
+
+      u32string
+      print(System& system) const;
+    };
   }
 }

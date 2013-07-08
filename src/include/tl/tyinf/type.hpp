@@ -57,6 +57,8 @@ namespace TransLucid
     struct TagTop { };
     struct TagBot { };
     struct TagNothing { };
+    struct TagRegion { };
+    struct TagTuple { };
 
     //single value empty types
     template <typename T>
@@ -85,6 +87,8 @@ namespace TransLucid
     typedef TypeNullary<TagTop> TypeTop;
     typedef TypeNullary<TagBot> TypeBot;
     typedef TypeNullary<TagNothing> TypeNothing;
+    typedef TypeNullary<TagRegion> TypeRegion;
+    typedef TypeNullary<TagTuple> TypeTuple;
 
     typedef Variant<
       TypeNothing,
@@ -93,6 +97,8 @@ namespace TransLucid
       TypeVariable,
       Constant,
       TypeAtomic,
+      TypeRegion,
+      TypeTuple,
       recursive_wrapper<TypeGLB>,
       recursive_wrapper<TypeLUB>,
       recursive_wrapper<TypeIntension>,

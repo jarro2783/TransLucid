@@ -114,7 +114,7 @@ TypeInferrer::operator()(const Tree::DimensionExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::IdentExpr& e)
 {
-
+  auto alpha = fresh();
 }
 
 TypeInferrer::result_type
@@ -263,19 +263,37 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::RegionExpr& e)
 {
+  auto alpha = fresh();
+  ConstraintGraph C;
+  C.add_to_closure(Constraint{TypeRegion(), alpha});
 
+  return std::make_tuple(TypeContext(), alpha, C);
 }
 
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::TupleExpr& e)
 {
+  auto alpha = fresh();
+  ConstraintGraph C;
+  C.add_to_closure(Constraint{TypeTuple(), alpha});
 
+  return std::make_tuple(TypeContext(), alpha, C);
 }
 
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::AtExpr& e)
 {
+  auto t_1 = apply_visitor(*this, e.rhs);
+  auto t_0 = apply_visitor(*this, e.lhs);
 
+  auto& C = std::get<2>(t_0);
+  C.make_union(std::get<2>(t_1));
+  C.add_to_closure(Constraint{std::get<1>(t_1), TypeTuple()});
+
+  auto& A = std::get<0>(t_0);
+  A.join(std::get<0>(t_1));
+
+  return std::make_tuple(A, std::get<1>(t_0), C);
 }
 
 TypeInferrer::result_type
@@ -388,13 +406,60 @@ TypeInferrer::operator()(const Tree::PhiAppExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::WhereExpr& e)
 {
+  auto t_0 = apply_visitor(*this, e.e);
 
+  auto& A = std::get<0>(t_0);
+  auto& C = std::get<2>(t_0);
+
+  for (const auto& d : e.dims)
+  {
+    auto t = apply_visitor(*this, d.second);
+
+    A.join(std::get<0>(t));
+    C.make_union(std::get<2>(t));
+  }
+
+  return std::make_tuple(A, std::get<1>(t_0), C);
 }
 
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 {
+  TypeContext A;
+  ConstraintGraph C;
 
+  auto alpha = fresh();
+
+  for (const auto& d : e.declarations)
+  {
+    auto t_0 = apply_visitor(*this, std::get<1>(d));
+    auto t_1 = apply_visitor(*this, std::get<2>(d));
+    auto t_2 = apply_visitor(*this, std::get<3>(d));
+
+    if (!variant_is_type<TypeNothing>(std::get<1>(t_0)))
+    {
+      A.join(std::get<0>(t_0));
+      C.make_union(std::get<2>(t_0));
+
+      C.add_to_closure(Constraint{std::get<1>(t_0), TypeRegion()});
+    }
+    if (!variant_is_type<TypeNothing>(std::get<1>(t_1)))
+    {
+      A.join(std::get<0>(t_1));
+      C.make_union(std::get<2>(t_1));
+
+      C.add_to_closure(Constraint{std::get<1>(t_0), 
+        TypeAtomic{U"bool", m_system.getTypeIndex(U"bool")}
+      });
+    }
+
+    A.join(std::get<0>(t_2));
+    C.make_union(std::get<2>(t_2));
+
+    C.add_to_closure(Constraint{std::get<1>(t_0), alpha});
+  }
+
+  return std::make_tuple(A, alpha, C);
 }
 
 TypeAtomic
