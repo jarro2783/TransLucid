@@ -966,6 +966,29 @@ struct MinimiseCompare
   const ConstraintGraph& C;
 };
 
+struct MinimiseBlock
+{
+  std::set<TypeVariable> vars;
+};
+
+struct MinimiseMapper
+{
+  void
+  addToMappings(TypeVariable s, std::vector<std::vector<TypeVariable>>& m)
+  {
+  }
+
+  const ConstraintGraph& C;
+};
+
+typedef std::map<TypeVariable, std::set<TypeVariable>> InverseSet;
+
+InverseSet
+generateInverse(const ConstraintGraph& C)
+{
+  MinimiseMapper m{C};
+}
+
 }
 
 TypeScheme
@@ -1164,6 +1187,8 @@ minimise(const TypeScheme& t)
 
   MinimiseCompare compare{p.first, C};
 
+  InverseSet inverse;
+
   //if there is only zero or one variable our job is done
   if (vars.size() <= 1)
   {
@@ -1179,26 +1204,42 @@ minimise(const TypeScheme& t)
   std::cout << std::endl;
 
   //divide into acceptable blocks
-  std::vector<std::pair<
-    std::vector<TypeVariable>::iterator,
-    std::vector<TypeVariable>::iterator>
-  > blocks;
+  std::map<size_t, MinimiseBlock> blocks;
+  std::map<TypeVariable, size_t> inverseBlocks;
 
+  size_t b = 0;
+  size_t maxDist = 0;
+  size_t maxBlock = 0;
   auto iter = vars.begin();
   auto start = iter;
 
-  //there are at least two variables here
+  //there are at least two variables to deal with, so ++iter is defined
   ++iter;
 
   while (iter != vars.end())
   {
     if (!compare.equal(*start, *iter))
     {
-      if (iter - start > 1)
+      auto dist = iter - start;
+
+      //make the block
+      blocks.insert(std::make_pair(b, MinimiseBlock{{start, iter}}));
+
+      //record which block each variable is in
+      while (start != iter)
       {
-        blocks.push_back(std::make_pair(start, iter));
+        inverseBlocks.insert(std::make_pair(*start, b));
+        ++start;
       }
-      start = iter;
+
+      ++b;
+
+      //keep track of the biggest block
+      if (dist > maxDist)
+      {
+        maxBlock = b;
+        maxDist = dist;
+      }
     }
 
     ++iter;
@@ -1207,15 +1248,66 @@ minimise(const TypeScheme& t)
   //put the last range in
   if (start - iter > 1)
   {
-    blocks.push_back(std::make_pair(start, iter));
+    blocks.insert(std::make_pair(b, MinimiseBlock{{start, iter}}));
   }
 
   //now we try to reduce the size of the blocks we already have
-  //first sort within the blocks by value so that we can search inside blocks
-  //easily
-  for (auto b : blocks)
+  std::set<size_t> toSplit;
+
+  //partition with respect to all but the biggest and every seen variable
+  for (const auto& block : blocks)
   {
-    std::sort(b.first, b.second);
+    if (block.first != maxBlock)
+    {
+      toSplit.insert(block.first);
+    }
+  }
+
+  MinimiseMapper mapper{C};
+
+  while (!toSplit.empty())
+  {
+    //pick something out of the list
+    auto currentSplit = *toSplit.begin();
+
+    //remove the first one from the list
+    toSplit.erase(toSplit.begin());
+
+    //get the inverse of all functions for all the symbols 
+    //in the current block
+    std::set<TypeVariable> currentInverse;
+    for (auto s : blocks.find(currentSplit)->second.vars)
+    {
+      auto inverseIter = inverse.find(s);
+
+      currentInverse.insert(inverseIter->second.begin(), 
+        inverseIter->second.end());
+    }
+
+    //gather the blocks in the inverse
+    std::set<size_t> seenBlocks;
+    for (auto s : currentInverse)
+    {
+      seenBlocks.insert(inverseBlocks.find(s)->second);
+    }
+
+    //for every s in each block, evaluate their functions and determine
+    //if any block needs to be split
+    //a block is split if for any function f, f(s, a) maps to the current block
+    //for some s and a different block for other s
+    //if for all s, f(s, a) is a different block it isn't considered
+    for (auto b : seenBlocks)
+    {
+      auto currentBlock = blocks.find(b);
+
+      //for the current block B for each element s of B, all the mappings 
+      //for each function f(s)
+      std::vector<std::vector<TypeVariable>> mappings;
+      for (auto s : currentBlock->second.vars)
+      {
+        mapper.addToMappings(s, mappings);
+      }
+    }
   }
 
   return t;
