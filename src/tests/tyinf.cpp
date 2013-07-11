@@ -106,6 +106,13 @@ inference(TransLucid::System& system)
   infer(system, UR"*(↑42)*");
   infer(system, UR"*((\x -> ↓x)!(↑42))*");
   infer(system, UR"*(\\f -> (\\x -> f (x x)) (\\x -> f (x x)))*");
+  infer(system, UR"*((\\f -> (\\x -> f (x x)) (\\x -> f (x x))) 
+    (\\f -> \n -> f n))*");
+  infer(system, 
+    UR"*(\f -> (\x -> f!(\v -> (x!x)!v))!(\x -> f!(\v -> (x!x)!v)))*");
+  infer(system, 
+    UR"*((\f -> (\x -> f!(\v -> (x!x)!v))!(\x -> f!(\v -> (x!x)!v)))!
+      (\f -> \n -> f!n))*");
 }
 
 void

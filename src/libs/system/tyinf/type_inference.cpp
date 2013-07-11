@@ -981,12 +981,19 @@ struct MinimiseMapper
   const ConstraintGraph& C;
 };
 
-typedef std::map<TypeVariable, std::set<TypeVariable>> InverseSet;
+//a mapping from type variables to their inverse for each particular function
+typedef std::map<TypeVariable, std::map<size_t, std::set<TypeVariable>>> 
+  InverseSet;
 
-InverseSet
+//returns the set and the number of functions
+std::pair<InverseSet, size_t>
 generateInverse(const ConstraintGraph& C)
 {
   MinimiseMapper m{C};
+
+  InverseSet inverse;
+
+  return std::make_pair(inverse, 0);
 }
 
 }
@@ -1185,15 +1192,17 @@ minimise(const TypeScheme& t)
 
   auto vars = C.domain();
 
-  MinimiseCompare compare{p.first, C};
-
-  InverseSet inverse;
-
   //if there is only zero or one variable our job is done
   if (vars.size() <= 1)
   {
     return t;
   }
+
+  MinimiseCompare compare{p.first, C};
+
+  auto inverseResult = generateInverse(C);
+  InverseSet& inverse = inverseResult.first;
+  auto functions = inverseResult.second;
 
   //first sort the type variables to get the initial partition
   std::sort(vars.begin(), vars.end(), compare);
@@ -1203,7 +1212,7 @@ minimise(const TypeScheme& t)
     std::ostream_iterator<TypeVariable>(std::cout, ", "));
   std::cout << std::endl;
 
-  //divide into acceptable blocks
+  //divide into the initial partition of acceptable blocks
   std::map<size_t, MinimiseBlock> blocks;
   std::map<TypeVariable, size_t> inverseBlocks;
 
@@ -1252,36 +1261,61 @@ minimise(const TypeScheme& t)
   }
 
   //now we try to reduce the size of the blocks we already have
-  std::set<size_t> toSplit;
+  //the blocks mapped to the functions to split by
+  std::map<size_t, std::set<size_t>> toSplit;
+
+  //also keep a list of iterators into the splits so that we can keep a queue
+  //easily
+  std::list<
+    std::pair<decltype(toSplit)::iterator,
+      decltype(toSplit)::mapped_type::iterator>>
+  splitQueue;
+
+  //initially partition by all functions
+  std::set<size_t> funpart;
+  for (size_t f = 0; f != functions; ++f)
+  {
+    funpart.insert(f);
+  }
+  
 
   //partition with respect to all but the biggest and every seen variable
   for (const auto& block : blocks)
   {
     if (block.first != maxBlock)
     {
-      toSplit.insert(block.first);
+      auto result = toSplit.insert(std::make_pair(block.first, funpart)).first;
+
+      auto iter = result->second.begin();
+      while (iter != result->second.end())
+      {
+        splitQueue.push_back(std::make_pair(result, iter));
+        ++iter;
+      }
     }
   }
 
   MinimiseMapper mapper{C};
 
-  while (!toSplit.empty())
+  while (!splitQueue.empty())
   {
     //pick something out of the list
-    auto currentSplit = *toSplit.begin();
+    auto currentSplit = *splitQueue.begin();
 
     //remove the first one from the list
-    toSplit.erase(toSplit.begin());
+    splitQueue.pop_front();
+    currentSplit.first->second.erase(currentSplit.second);
 
-    //get the inverse of all functions for all the symbols 
-    //in the current block
+    //get the inverse of the current block and symbol
     std::set<TypeVariable> currentInverse;
-    for (auto s : blocks.find(currentSplit)->second.vars)
+    for (auto s : blocks.find(currentSplit.first->first)->second.vars)
     {
       auto inverseIter = inverse.find(s);
 
-      currentInverse.insert(inverseIter->second.begin(), 
-        inverseIter->second.end());
+      auto inverseFunIter = inverseIter->second.find(*currentSplit.second);
+
+      currentInverse.insert(inverseFunIter->second.begin(), 
+        inverseFunIter->second.end());
     }
 
     //gather the blocks in the inverse
@@ -1291,11 +1325,9 @@ minimise(const TypeScheme& t)
       seenBlocks.insert(inverseBlocks.find(s)->second);
     }
 
-    //for every s in each block, evaluate their functions and determine
-    //if any block needs to be split
-    //a block is split if for any function f, f(s, a) maps to the current block
-    //for some s and a different block for other s
-    //if for all s, f(s, a) is a different block it isn't considered
+    //for each s in the inverse, if all of the states in its block are
+    //mapped then do nothing, if they are not all mapped then move s to
+    //its block's twin
     for (auto b : seenBlocks)
     {
       auto currentBlock = blocks.find(b);
