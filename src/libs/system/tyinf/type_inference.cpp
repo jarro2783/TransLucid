@@ -1328,6 +1328,8 @@ minimise(const TypeScheme& t)
     //for each s in the inverse, if all of the states in its block are
     //mapped then do nothing, if they are not all mapped then move s to
     //its block's twin
+
+    //start by caching whether the seen blocks map all
     for (auto b : seenBlocks)
     {
       auto currentBlock = blocks.find(b);
