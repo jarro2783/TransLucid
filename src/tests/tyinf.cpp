@@ -84,7 +84,7 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr)
 
   std::cout << "after garbage collection\n" << 
     print_type(std::get<1>(collected), system) << std::endl <<
-    std::get<2>(collected).print(system) << std::endl;
+    std::get<2>(collected).print(system) << "\n" << std::endl;
 
   auto minimised = TransLucid::TypeInference::minimise(collected);
 
@@ -94,8 +94,31 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr)
 }
 
 void
+infer_system(TransLucid::System& system, 
+  const std::set<TransLucid::u32string>& vars)
+{
+  TransLucid::TypeInference::FreshTypeVars fresh;
+  TransLucid::SemanticTransform transform(system);
+  TransLucid::TypeInference::TypeInferrer infer(system, fresh);
+
+  infer.infer_system(vars);
+}
+
+void
 inference(TransLucid::System& system)
 {
+  namespace Tree = TransLucid::Tree;
+
+  system.addParsedDecl(TransLucid::Parser::Variable{
+    TransLucid::Parser::Equation{
+    U"X", Tree::Expr(), Tree::Expr(), mpz_class(5)}},
+    nullptr);
+  system.addParsedDecl(TransLucid::Parser::Variable{
+    TransLucid::Parser::Equation{
+    U"Y", Tree::Expr(), Tree::Expr(), 
+      Tree::IdentExpr(U"X")}},
+    nullptr);
+
   infer(system, U"42");
   infer(system, UR"*(\x -> x)*");
   infer(system, UR"*((\x -> x)!42)*");
@@ -113,6 +136,8 @@ inference(TransLucid::System& system)
   infer(system, 
     UR"*((\f -> (\x -> f!(\v -> (x!x)!v))!(\x -> f!(\v -> (x!x)!v)))!
       (\f -> \n -> f!n))*");
+
+  infer_system(system, {U"X", U"Y"});
 }
 
 void

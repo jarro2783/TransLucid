@@ -60,6 +60,7 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 
   std::map<u32string, Type> types;
 
+  std::cout << "infer_system" << std::endl;
   for (const auto& x : ids)
   {
     auto e = m_system.getIdentifierTree(x);
@@ -68,6 +69,11 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 
     A.join(std::get<0>(t));
     C.make_union(std::get<2>(t));
+
+    types.insert(std::make_pair(x, std::get<1>(t)));
+    
+    std::cout << x << " : " << print_type(std::get<1>(t), m_system) 
+      << std::endl;
   }
 
   for (const auto& xt : types)
@@ -81,6 +87,8 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
     C.add_to_closure(Constraint{alpha, gamma});
     C.add_to_closure(Constraint{gamma, A.lookup(xt.first)});
   }
+
+  std::cout << C.print(m_system) << std::endl;
 }
 
 TypeInferrer::result_type
@@ -148,17 +156,20 @@ TypeInferrer::operator()(const Tree::DimensionExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::IdentExpr& e)
 {
-  auto alpha = fresh();
-  auto gamma = fresh();
+  if (indecl)
+  {
+    auto alpha = fresh();
+    auto gamma = fresh();
 
-  TypeContext A;
+    TypeContext A;
 
-  A.add(e.text, alpha);
+    A.add(e.text, alpha);
 
-  ConstraintGraph C;
-  C.add_to_closure(Constraint{alpha, gamma});
+    ConstraintGraph C;
+    C.add_to_closure(Constraint{alpha, gamma});
 
-  return std::make_tuple(A, gamma, C);
+    return std::make_tuple(A, gamma, C);
+  }
 }
 
 TypeInferrer::result_type
@@ -500,7 +511,7 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
     A.join(std::get<0>(t_2));
     C.make_union(std::get<2>(t_2));
 
-    C.add_to_closure(Constraint{std::get<1>(t_0), alpha});
+    C.add_to_closure(Constraint{std::get<1>(t_2), alpha});
   }
 
   return std::make_tuple(A, alpha, C);
@@ -780,6 +791,23 @@ class MarkPolarity
     return apply_visitor(*this, inten.body, TagNegative());
   }
 
+};
+
+struct VarInSet
+{
+  VarInSet(const VarSet& v)
+  : m_v(v)
+  {
+  }
+
+  template <typename T>
+  bool
+  operator()(const T& t)
+  {
+    return m_v.find(t.first) != m_v.end();
+  }
+
+  const VarSet& m_v;
 };
 
 enum class HeadOrder
@@ -1130,23 +1158,7 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
 std::pair<VarSet, VarSet>
 polarity(const TypeScheme& t)
 {
-  struct VarInSet
-  {
-    VarInSet(const VarSet& v)
-    : m_v(v)
-    {
-    }
-
-    template <typename T>
-    bool
-    operator()(const T& t)
-    {
-      return m_v.find(t.first) != m_v.end();
-    }
-
-    const VarSet& m_v;
-  };
-
+  
   MarkPolarity mark;
 
   VarSet pos;
@@ -1261,7 +1273,7 @@ minimise(const TypeScheme& t)
   std::map<TypeVariable, size_t> inverseBlocks;
 
   size_t b = 0;
-  size_t maxDist = 0;
+  int maxDist = 0;
   size_t maxBlock = 0;
   auto iter = vars.begin();
   auto start = iter;
