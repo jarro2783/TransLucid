@@ -43,12 +43,18 @@ namespace TransLucid
         m_lambdas.erase(d);
       }
 
+      void
+      add(const u32string& x, Type t);
+
       //inserts other into the current
       void
       join(const TypeContext& other);
 
       Type
       lookup(dimension_index d);
+
+      Type
+      lookup(const u32string& x);
 
       template <typename Rewriter>
       static

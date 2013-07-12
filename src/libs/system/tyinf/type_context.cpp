@@ -32,6 +32,12 @@ TypeContext::add(dimension_index d, Type t)
 }
 
 void
+TypeContext::add(const u32string& x, Type t)
+{
+  m_vars[x] = t;
+}
+
+void
 TypeContext::join(const TypeContext& other)
 {
   for (const auto& p : other.m_lambdas)
@@ -68,6 +74,21 @@ TypeContext::lookup(dimension_index d)
 {
   auto iter = m_lambdas.find(d);
   if (iter != m_lambdas.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return TypeTop();
+  }
+}
+
+Type
+TypeContext::lookup(const u32string& x)
+{
+  auto iter = m_vars.find(x);
+
+  if (iter != m_vars.end())
   {
     return iter->second;
   }
