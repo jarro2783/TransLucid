@@ -49,6 +49,40 @@ TypeInferrer::make_constant(T&& v)
   return std::make_tuple(TypeContext(), t, c);
 }
 
+void
+TypeInferrer::infer_system(const std::set<u32string>& ids)
+{
+  indecl = true;
+
+  //build up C and A as we go
+  TypeContext A;
+  ConstraintGraph C;
+
+  std::map<u32string, Type> types;
+
+  for (const auto& x : ids)
+  {
+    auto e = m_system.getIdentifierTree(x);
+
+    auto t = apply_visitor(*this, e);
+
+    A.join(std::get<0>(t));
+    C.make_union(std::get<2>(t));
+  }
+
+  for (const auto& xt : types)
+  {
+    //each x is allocated an alpha and a gamma type variable
+    auto alpha = fresh();
+    auto gamma = fresh();
+
+    //then we link up the type from the context to the return types
+    C.add_to_closure(Constraint{xt.second, alpha});
+    C.add_to_closure(Constraint{alpha, gamma});
+    C.add_to_closure(Constraint{gamma, A.lookup(xt.first)});
+  }
+}
+
 TypeInferrer::result_type
 TypeInferrer::infer(const Tree::Expr& e)
 {
@@ -115,6 +149,16 @@ TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::IdentExpr& e)
 {
   auto alpha = fresh();
+  auto gamma = fresh();
+
+  TypeContext A;
+
+  A.add(e.text, alpha);
+
+  ConstraintGraph C;
+  C.add_to_closure(Constraint{alpha, gamma});
+
+  return std::make_tuple(A, gamma, C);
 }
 
 TypeInferrer::result_type

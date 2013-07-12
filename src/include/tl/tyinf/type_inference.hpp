@@ -42,6 +42,7 @@ namespace TransLucid
       TypeInferrer(System& system, FreshTypeVars& freshVars)
       : m_freshVars(freshVars)
       , m_system(system)
+      , indecl(false)
       {
       }
 
@@ -50,6 +51,9 @@ namespace TransLucid
       {
         return m_freshVars.fresh();
       }
+
+      void
+      infer_system(const std::set<u32string>& ids);
 
       result_type
       infer(const Tree::Expr& e);
@@ -149,6 +153,8 @@ namespace TransLucid
       make_constant(T&& v);
 
       System& m_system;
+
+      bool indecl;
     };
 
     TypeAtomic
