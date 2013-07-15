@@ -54,6 +54,8 @@ op && = OpInfix."bool_and".true.AssocLeft.20;;
 op || = OpInfix."bool_or".true.AssocLeft.15;;
 op ¬ = OpPrefix."negate".false ;;
 
+op >> = OpInfix."concatenate".false.AssocLeft.100 ;;
+
 op .. = OpInfix."range_construct".false.AssocLeft.0;;
 
 op ∪ = OpInfix."union_construct".false.AssocLeft. ~100;;
@@ -237,7 +239,7 @@ fun eq!a!b [a imp bool, b imp bool] = bool_eq.(a,b);;
 fun bool_and a b = if a then b else false fi;;
 fun bool_or a b = if a then true else b fi;;
 
-fun plus!a!b [a imp ustring, b imp ustring] = ustring_plus.(a,b);;
+fun concatenate!a!b [a imp ustring, b imp ustring] = ustring_plus.(a,b);;
 
 fun abs!a [a imp floatmp] = floatmp_abs.a;;
 
@@ -330,13 +332,13 @@ fun construct_literal!t!v [t is "floatmp"] = construct_floatmp.v;;
 
 //the print equations
 fun canonical_print!c [c imp intmp]   = print!c;;
-fun canonical_print!c [c imp ustring] = `"` + escape_string!(print!c) + `"`;;
-fun canonical_print!c [c imp uchar]   = "'" + escape_string!(print!c) + "'";;
+fun canonical_print!c [c imp ustring] = `"` >> escape_string!(print!c) >> `"`;;
+fun canonical_print!c [c imp uchar]   = "'" >> escape_string!(print!c) >> "'";;
 fun canonical_print!c [c imp bool]    = print!c;;
 fun canonical_print!c [c imp range]   = print!c;;
 fun canonical_print!c [c imp tuple]   = "[I don't know how to print a tuple]";;
-fun canonical_print!c               = print_typename!c + `"` + 
-                                      escape_string!(print!c) + `"`;;
+fun canonical_print!c               = print_typename!c >> `"` >> 
+                                      escape_string!(print!c) >> `"`;;
 fun canonical_print!c [c imp special] = print!c;;
 fun canonical_print!c [c is infty] = "infty";;
 fun canonical_print!c [c is neginfty] = "neginfty";;
