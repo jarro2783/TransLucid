@@ -26,12 +26,15 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef FIXED_INDEXES_HPP_INCLUDED
 #define FIXED_INDEXES_HPP_INCLUDED
 
+#include <utility>
+
 namespace TransLucid
 {
 
   //predefined unique indexes
   //IMPORTANT: if you change these, then you must also
   //change the bestfitting function table TypeComparators in bestfit.cpp
+  //and the type strings in types.cpp
   enum TypeIndexes
   {
     //types
@@ -62,6 +65,17 @@ namespace TransLucid
     //the last one
     TYPE_INDEX_LAST
   };
+
+  //this is defined in types.cpp and must be changed if the set of
+  //fixed types are changed
+  extern char32_t const* const type_index_names[];
+
+  inline
+  std::pair<char32_t const*, TypeIndexes>
+  type_name_pair(TypeIndexes t)
+  {
+    return std::make_pair(type_index_names[t], t);
+  }
 
   //if you change something here, make sure to update the names in
   //src/libs/system/dimtranslator.cpp

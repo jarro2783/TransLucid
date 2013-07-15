@@ -26,6 +26,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types.hpp>
 
+#include <tl/tyinf/type_inference.hpp>
+
 #include <vector>
 #include <functional>
 
@@ -34,9 +36,10 @@ namespace TransLucid
   class BaseFunctionType
   {
     public:
-    BaseFunctionType
-    (
-    )
+    BaseFunctionType() = default;
+
+    BaseFunctionType(const std::vector<type_index>& type)
+    : m_funtype(type)
     {
     }
 
@@ -85,6 +88,9 @@ namespace TransLucid
     virtual size_t
     arity() const = 0;
 
+    TypeInference::TypeScheme
+    type() const;
+
     private:
 
     virtual Constant
@@ -102,6 +108,8 @@ namespace TransLucid
 
     virtual BaseFunctionType*
     cloneSelf() const = 0;
+
+    std::vector<type_index> m_funtype;
   };
 
   class BaseFunctionAbstraction : public BaseFunctionType
@@ -340,8 +348,9 @@ namespace TransLucid
     typedef typename detail::make_const_func_n<NumArgs>::type func_type;
 
     template <typename Fun>
-    constexpr BuiltinBaseFunction(Fun&& f)
-    : m_fn(f)
+    BuiltinBaseFunction(Fun&& f, std::vector<type_index> type)
+    : BaseFunctionType(type)
+    , m_fn(f)
     {
     }
 

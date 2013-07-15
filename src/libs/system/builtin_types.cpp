@@ -67,66 +67,107 @@ namespace TransLucid
     using namespace TransLucid::BuiltinOps;
 
     BuiltinBaseFunction<1> construct_integer{
-      static_cast<Constant (*)(const Constant&)>(&Types::Intmp::create)
+      static_cast<Constant (*)(const Constant&)>(&Types::Intmp::create),
+      {TYPE_INDEX_USTRING, TYPE_INDEX_INTMP}
     };
 
     BuiltinBaseFunction<1> construct_special{
-      static_cast<Constant (*)(const Constant&)>(&Types::Special::create)
+      static_cast<Constant (*)(const Constant&)>(&Types::Special::create),
+      {TYPE_INDEX_USTRING, TYPE_INDEX_SPECIAL}
     };
 
     BuiltinBaseFunction<1> construct_uuid {
-      static_cast<Constant (*)(const Constant&)>(&Types::UUID::create)
+      static_cast<Constant (*)(const Constant&)>(&Types::UUID::create),
+      {TYPE_INDEX_USTRING, TYPE_INDEX_UUID}
     };
 
     BuiltinBaseFunction<1> construct_floatmp {
-      static_cast<Constant (*)(const Constant&)>(&Types::Floatmp::create)
+      static_cast<Constant (*)(const Constant&)>(&Types::Floatmp::create),
+      {TYPE_INDEX_USTRING, TYPE_INDEX_FLOATMP}
     };
 
-    BuiltinBaseFunction<1> print_intmp{&Types::Intmp::print};
-    BuiltinBaseFunction<1> print_uchar{&Types::UChar::print};
+    BuiltinBaseFunction<1> print_intmp{&Types::Intmp::print,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_USTRING}};
+    BuiltinBaseFunction<1> print_uchar{&Types::UChar::print,
+      {TYPE_INDEX_UCHAR, TYPE_INDEX_USTRING}};
     //BuiltinBaseFunction<1> print_special_base{&Types::Special::print};
-    BuiltinBaseFunction<1> print_bool{&Types::Boolean::print};
-    BuiltinBaseFunction<1> print_range{&Types::Range::print};
-    BuiltinBaseFunction<1> print_typetype{&Types::Type::print};
-    BuiltinBaseFunction<1> print_error{&print_error_value};
-    BuiltinBaseFunction<1> print_uuid{&Types::UUID::print};
-    BuiltinBaseFunction<1> print_floatmp{&Types::Floatmp::print};
+    BuiltinBaseFunction<1> print_bool{&Types::Boolean::print,
+      {TYPE_INDEX_BOOL, TYPE_INDEX_USTRING}};
+    BuiltinBaseFunction<1> print_range{&Types::Range::print,
+      {TYPE_INDEX_RANGE, TYPE_INDEX_USTRING}};
+    BuiltinBaseFunction<1> print_typetype{&Types::Type::print,
+      {TYPE_INDEX_TYPE, TYPE_INDEX_USTRING}};
+    BuiltinBaseFunction<1> print_error{&print_error_value,
+      {TYPE_INDEX_ERROR, TYPE_INDEX_USTRING}};
+    BuiltinBaseFunction<1> print_uuid{&Types::UUID::print,
+      {TYPE_INDEX_UUID, TYPE_INDEX_USTRING}};
+    BuiltinBaseFunction<1> print_floatmp{&Types::Floatmp::print,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_USTRING}};
 
-    BuiltinBaseFunction<2> integer_plus{&mpz_plus};
-    BuiltinBaseFunction<2> integer_minus{&mpz_minus};
-    BuiltinBaseFunction<2> integer_times{&mpz_times};
-    BuiltinBaseFunction<2> integer_divide{&mpz_divide};
-    BuiltinBaseFunction<2> integer_modulus{&mpz_modulus};
-    BuiltinBaseFunction<2> integer_lte{&mpz_lte};
-    BuiltinBaseFunction<2> integer_lt{&mpz_lt};
-    BuiltinBaseFunction<2> integer_gte{&mpz_gte};
-    BuiltinBaseFunction<2> integer_gt{&mpz_gt};
-    BuiltinBaseFunction<2> integer_eq{&mpz_eq};
-    BuiltinBaseFunction<2> integer_ne{&mpz_ne};
-    BuiltinBaseFunction<1> integer_uminus{&mpz_uminus};
+    BuiltinBaseFunction<2> integer_plus{&mpz_plus,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_minus{&mpz_minus,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_times{&mpz_times,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_divide{&mpz_divide,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_modulus{&mpz_modulus,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_lte{&mpz_lte,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_lt{&mpz_lt,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_gte{&mpz_gte,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_gt{&mpz_gt,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_eq{&mpz_eq,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<2> integer_ne{&mpz_ne,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+    BuiltinBaseFunction<1> integer_uminus{&mpz_uminus,
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
 
-    BuiltinBaseFunction<2> float_plus{&mpf_plus};
-    BuiltinBaseFunction<2> float_minus{&mpf_minus};
-    BuiltinBaseFunction<2> float_times{&mpf_times};
-    BuiltinBaseFunction<2> float_divide{&mpf_divide};
-    BuiltinBaseFunction<2> float_lte{&mpf_lte};
-    BuiltinBaseFunction<2> float_lt{&mpf_lt};
-    BuiltinBaseFunction<2> float_gte{&mpf_gte};
-    BuiltinBaseFunction<2> float_gt{&mpf_gt};
-    BuiltinBaseFunction<2> float_eq{&mpf_eq};
-    BuiltinBaseFunction<2> float_ne{&mpf_ne};
-    BuiltinBaseFunction<1> float_sqrt{&mpf_sqrt};
-    BuiltinBaseFunction<1> float_abs{&mpf_abs};
-    BuiltinBaseFunction<1> float_uminus{&mpf_uminus};
-    BuiltinBaseFunction<1> float_convert_intmp{&mpf_convert_intmp};
+    BuiltinBaseFunction<2> float_plus{&mpf_plus,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_minus{&mpf_minus,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_times{&mpf_times,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_divide{&mpf_divide,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_lte{&mpf_lte,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_lt{&mpf_lt,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_gte{&mpf_gte,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_gt{&mpf_gt,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_eq{&mpf_eq,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<2> float_ne{&mpf_ne,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<1> float_sqrt{&mpf_sqrt,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<1> float_abs{&mpf_abs,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<1> float_uminus{&mpf_uminus,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+    BuiltinBaseFunction<1> float_convert_intmp{&mpf_convert_intmp,
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_INTMP}};
 
-    BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus};
+    BuiltinBaseFunction<2> ustring_plus_fn{&ustring_plus,
+      {TYPE_INDEX_USTRING, TYPE_INDEX_USTRING, TYPE_INDEX_USTRING}};
 
-    BuiltinBaseFunction<2> boolean_eq{&bool_eq};
+    BuiltinBaseFunction<2> boolean_eq{&bool_eq,
+      {TYPE_INDEX_BOOL, TYPE_INDEX_BOOL, TYPE_INDEX_BOOL}};
 
     BuiltinBaseFunction<2> range_create{
       static_cast<Constant (*)(const Constant&, const Constant&)>
-        (&Types::Range::create)
+        (&Types::Range::create),
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_RANGE}
     };
 
     BuiltinBaseFunction<1> range_create_inf{
@@ -134,7 +175,8 @@ namespace TransLucid
       {
         const mpz_class* lhsp = &get_constant_pointer<mpz_class>(lhs);
         return Types::Range::create(TransLucid::Range(lhsp, nullptr));
-      }
+      },
+      {TYPE_INDEX_INTMP, TYPE_INDEX_RANGE}
     };
 
     BuiltinBaseFunction<1> range_create_neginf{
@@ -142,14 +184,16 @@ namespace TransLucid
       {
         const mpz_class* rhsp = &get_constant_pointer<mpz_class>(rhs);
         return Types::Range::create(TransLucid::Range(nullptr, rhsp));
-      }
+      },
+      {TYPE_INDEX_INTMP, TYPE_INDEX_RANGE}
     };
 
     BuiltinBaseFunction<0> range_create_infinity{
       [] () -> Constant
       {
         return Types::Range::create(TransLucid::Range(nullptr, nullptr));
-      }
+      },
+      {TYPE_INDEX_RANGE}
     };
 
     BuiltinBaseFunction<1> icu_is_printable{
@@ -163,7 +207,8 @@ namespace TransLucid
         {
           return Types::Boolean::create(u_isprint(get_constant<char32_t>(c)));
         }
-      }
+      },
+      {TYPE_INDEX_UCHAR, TYPE_INDEX_BOOL}
     };
 
     BuiltinBaseFunction<1> uchar_code_point{
@@ -177,7 +222,8 @@ namespace TransLucid
         {
           return Types::Intmp::create(get_constant<char32_t>(c));
         }
-      }
+      },
+      {TYPE_INDEX_UCHAR, TYPE_INDEX_INTMP}
     };
 
     BuiltinBaseFunction<2> string_at_base{
@@ -201,7 +247,8 @@ namespace TransLucid
             return Types::Special::create(Special::SP_UNDEF);
           }
         }
-      }
+      },
+      {TYPE_INDEX_USTRING, TYPE_INDEX_INTMP, TYPE_INDEX_UCHAR}
     };
 
     BuiltinBaseFunction<3> substring_base{
@@ -223,7 +270,9 @@ namespace TransLucid
           return Types::String::create(string.substr(
             startz.get_si(), lengthz.get_si()));
         }
-      }
+      },
+      {TYPE_INDEX_USTRING, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, 
+        TYPE_INDEX_USTRING}
     };
 
     BuiltinBaseFunction<2> substring_toend_base{
@@ -243,7 +292,8 @@ namespace TransLucid
           return Types::String::create(string.substr(number.get_si(), 
                    u32string::npos));
         }
-      }
+      },
+      {TYPE_INDEX_USTRING, TYPE_INDEX_INTMP, TYPE_INDEX_USTRING}
     };
 
     Constant code_point_n(const Constant& c, int numDigits)
@@ -280,17 +330,20 @@ namespace TransLucid
       [] (const Constant& c) -> Constant
       {
         return code_point_n(c, 4);
-      }
+      },
+      {TYPE_INDEX_UCHAR, TYPE_INDEX_USTRING}
     };
 
     BuiltinBaseFunction<1> code_point_8{
       [] (const Constant& c) -> Constant
       {
         return code_point_n(c, 8);
-      }
+      },
+      {TYPE_INDEX_UCHAR, TYPE_INDEX_USTRING}
     };
 
-    BuiltinBaseFunction<2> construct_union{&Types::Union::create};
+    BuiltinBaseFunction<2> construct_union{&Types::Union::create,
+      {TYPE_INDEX_UNION, TYPE_INDEX_UNION, TYPE_INDEX_UNION}};
 
     struct BuiltinFunction
     {
@@ -1625,7 +1678,8 @@ add_builtin_literals(System& s, const std::vector<u32string>& types)
       type_index t = s.getTypeIndex(get_constant_pointer<u32string>(text));
 
       return Types::Type::create(t);
-    }
+    },
+    {TYPE_INDEX_USTRING, TYPE_INDEX_TYPE}
   };
 
   add_one_base_function(s, U"construct_typetype", &construct_typetype);

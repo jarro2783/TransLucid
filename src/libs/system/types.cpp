@@ -295,6 +295,33 @@ print_constant(const Constant& c)
   }
 }
 
+char32_t const* const type_index_names[] =
+{
+ U"error",
+ U"bool",
+ U"special",
+ U"intmp",
+ U"uchar",
+ U"ustring",
+ U"floatmp",
+ U"dim",
+ U"region",
+ U"tuple",
+ U"typetype",
+ U"range",
+ U"union",
+ U"basefun",
+ U"cbv",
+ U"cbn",
+ U"uuid",
+ U"intension",
+ U"inhd",
+ U"iohd",
+ U"outhd",
+ U"calc",
+ U"demand",
+};
+
 } //namespace TransLucid
 
 namespace std

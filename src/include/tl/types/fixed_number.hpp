@@ -193,11 +193,12 @@ namespace TransLucid
     (
       System& s, 
       const u32string& name, 
-      F f
+      F f,
+      std::vector<type_index> type
     )
     {
       //add host function
-      BuiltinBaseFunction<N> fun(createFunction(f));
+      BuiltinBaseFunction<N> fun(createFunction(f), type);
 
       s.addHostFunction(name, &fun, N);
     }
@@ -281,9 +282,11 @@ namespace TransLucid
       m_n.init(m_index, m_typename);
 
       m_n. template 
-        makeEquation<1>(s, U"construct_" + name, &FixedNumeric<T>::construct);
+        makeEquation<1>(s, U"construct_" + name, &FixedNumeric<T>::construct,
+          {TYPE_INDEX_USTRING, m_index});
       m_n. template 
-        makeEquation<1>(s, U"print_" + name, &FixedNumeric<T>::print);
+        makeEquation<1>(s, U"print_" + name, &FixedNumeric<T>::print,
+          {m_index, TYPE_INDEX_USTRING});
 
       registerArithmeticOperation<2, std::plus>(s, U"_plus");
       registerArithmeticOperation<2, std::minus>(s, U"_minus");
@@ -326,8 +329,17 @@ namespace TransLucid
       type_index outIndex
     )
     {
+      std::vector<type_index> type;
+
+      for (int i = 0; i != N-1; ++i)
+      {
+        type.push_back(inIndex);
+      }
+
+      type.push_back(outIndex);
+
       m_n. template makeEquation<N>(s, m_typename + op, 
-        NumericOperation<T, F>(inIndex, outIndex));
+        NumericOperation<T, F>(inIndex, outIndex), type);
 
       addIntegerFunction<
         std::is_signed<T>::value,
@@ -365,9 +377,11 @@ namespace TransLucid
       m_n.init(m_index, m_typename);
 
       m_n. template 
-        makeEquation<1>(s, U"construct_" + name, &FixedNumeric<T>::construct);
+        makeEquation<1>(s, U"construct_" + name, &FixedNumeric<T>::construct, 
+          {TYPE_INDEX_USTRING, m_index});
       m_n. template 
-        makeEquation<1>(s, U"print_" + name, &FixedNumeric<T>::print);
+        makeEquation<1>(s, U"print_" + name, &FixedNumeric<T>::print,
+          {m_index, TYPE_INDEX_USTRING});
 
       registerArithmeticOperation<2, std::plus>(s, U"_plus");
       registerArithmeticOperation<2, std::minus>(s, U"_minus");
@@ -410,8 +424,17 @@ namespace TransLucid
       type_index outIndex
     )
     {
+      std::vector<type_index> type;
+
+      for (int i = 0; i != N-1; ++i)
+      {
+        type.push_back(inIndex);
+      }
+
+      type.push_back(outIndex);
+
       m_n. template makeEquation<N>(s, m_typename + op, 
-        NumericOperation<T, F>(inIndex, outIndex));
+        NumericOperation<T, F>(inIndex, outIndex), type);
 
       addFloatFunction<
         sizeof(T) * 8
