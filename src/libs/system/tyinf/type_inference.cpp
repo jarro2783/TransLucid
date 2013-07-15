@@ -19,10 +19,12 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/fixed_indexes.hpp>
 #include <tl/tyinf/type_inference.hpp>
+#include <tl/tyinf/type_rename.hpp>
 
 #include <tl/types/boolean.hpp>
 #include <tl/types/char.hpp>
 #include <tl/types/dimension.hpp>
+#include <tl/types/function.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/string.hpp>
 #include <tl/types/special.hpp>
@@ -35,6 +37,61 @@ namespace TransLucid
 {
 namespace TypeInference
 {
+
+namespace
+{
+
+TypeScheme
+make_host_op_type(const std::vector<type_index>& funtype, FreshTypeVars& fresh)
+{
+  using namespace TypeInference;
+
+  ConstraintGraph C;
+
+  if (funtype.size() == 0)
+  {
+    return std::make_tuple(TypeContext(), TypeTop(), ConstraintGraph());
+  }
+  else if (funtype.size() == 1)
+  {
+    auto t = fresh.fresh();
+    //constants, but specified as a no arg base function
+    C.add_to_closure(Constraint{TypeAtomic{type_index_names[funtype[0]]}, 
+      t});
+
+    return std::make_tuple(TypeContext(), t, C);
+  }
+
+  //construct a base function type
+  //(x_0, ... x_{n-1}) -> x_n where x_i in funtype
+
+  std::vector<Type> args;
+
+  auto last = funtype.end();
+  --last;
+
+  auto iter = funtype.begin();
+  while (iter != last)
+  {
+    auto v = fresh.fresh();
+    args.push_back(v);
+
+    C.add_to_closure(Constraint{v, TypeAtomic{type_index_names[*iter], *iter}});
+
+    ++iter;
+  }
+
+  auto result = fresh.fresh();
+  C.add_to_closure(Constraint{TypeAtomic{type_index_names[*last], *last}, 
+    result});
+
+  auto t = fresh.fresh();
+  C.add_to_closure(Constraint{TypeBase{args, result}, t});
+
+  return std::make_tuple(TypeContext(), t, C);
+}
+
+}
 
 template <typename T>
 TypeInferrer::result_type
@@ -181,7 +238,18 @@ TypeInferrer::operator()(const Tree::HashSymbol& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::HostOpExpr& e)
 {
+  auto f = m_system.lookupBaseFunction(e.name);
 
+  if (f == nullptr)
+  {
+    auto t = fresh();
+    return std::make_tuple(TypeContext(), t, ConstraintGraph());
+  }
+  else
+  {
+    auto t = make_host_op_type(f->type(), m_freshVars);
+    return t;
+  }
 }
 
 TypeInferrer::result_type
@@ -504,7 +572,7 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
       C.make_union(std::get<2>(t_1));
 
       C.add_to_closure(Constraint{std::get<1>(t_0), 
-        TypeAtomic{U"bool", m_system.getTypeIndex(U"bool")}
+        makeAtomic(m_system, U"bool")
       });
     }
 

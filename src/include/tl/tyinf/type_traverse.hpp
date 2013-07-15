@@ -28,7 +28,49 @@ namespace TransLucid
   {
     class GenericTypeWalker
     {
-      
+      public:
+
+      typedef Type result_type;
+
+      template <typename T>
+      Type
+      operator()(const T& t) const
+      {
+        return t;
+      }
+
+      Type
+      operator()(const TypeIntension& i)
+      {
+        return TypeIntension{apply_visitor(*this, i.body)};
+      }
+
+      Type
+      operator()(const TypeCBV& cbv)
+      {
+        return TypeCBV
+        {
+          apply_visitor(*this, cbv.lhs), 
+          apply_visitor(*this, cbv.rhs)
+        };
+      }
+
+      Type
+      operator()(const TypeBase& base)
+      {
+        std::vector<Type> args;
+
+        for (const auto& t : base.lhs)
+        {
+          args.push_back(apply_visitor(*this, t));
+        }
+
+        return TypeBase
+        {
+          args,
+          apply_visitor(*this, base.rhs)
+        };
+      }
     };
   }
 }

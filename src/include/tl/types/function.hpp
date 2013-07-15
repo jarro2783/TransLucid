@@ -26,8 +26,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/special.hpp>
 #include <tl/types.hpp>
 
-#include <tl/tyinf/type_inference.hpp>
-
 #include <vector>
 #include <functional>
 
@@ -88,8 +86,11 @@ namespace TransLucid
     virtual size_t
     arity() const = 0;
 
-    TypeInference::TypeScheme
-    type() const;
+    const std::vector<type_index>&
+    type() const
+    {
+      return m_funtype;
+    }
 
     private:
 

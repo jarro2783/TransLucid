@@ -176,6 +176,22 @@ namespace TransLucid
         return d;
       }
 
+      //finish this
+      #if 0
+      template <typename Vars, typename Types>
+      static
+      void
+      rewrite_variables(const ConstraintGraph& g, Vars vars, Types types)
+      {
+        ConstraintGraph C;
+
+        for (const auto& v : g.m_graph)
+        {
+          ConstraintNode node;
+        }
+      }
+      #endif
+
       private:
 
       typedef std::queue<Constraint> ConstraintQueue;

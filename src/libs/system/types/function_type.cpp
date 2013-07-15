@@ -84,59 +84,6 @@ bool function_less
 
 }
 
-TypeInference::TypeScheme
-BaseFunctionType::type() const
-{
-  using namespace TypeInference;
-
-  FreshTypeVars fresh;
-  ConstraintGraph C;
-
-  if (m_funtype.size() == 0)
-  {
-    return std::make_tuple(TypeContext(), TypeTop(), ConstraintGraph());
-  }
-  else if (m_funtype.size() == 1)
-  {
-    auto t = fresh.fresh();
-    //constants, but specified as a no arg base function
-    C.add_to_closure(Constraint{TypeAtomic{type_index_names[m_funtype[0]]}, 
-      t});
-
-    return std::make_tuple(TypeContext(), t, C);
-  }
-
-  //construct a base function type
-  //(x_0, ... x_{n-1}) -> x_n where x_i in m_funtype
-
-  //the type variables can clash here because they will be renamed by the
-  //type inference algorithm when used
-  std::vector<Type> args;
-
-  auto last = m_funtype.end();
-  --last;
-
-  auto iter = m_funtype.begin();
-  while (iter != last)
-  {
-    auto v = fresh.fresh();
-    args.push_back(v);
-
-    C.add_to_closure(Constraint{v, TypeAtomic{type_index_names[*iter], *iter}});
-
-    ++iter;
-  }
-
-  auto result = fresh.fresh();
-  C.add_to_closure(Constraint{TypeAtomic{type_index_names[*last], *last}, 
-    result});
-
-  auto t = fresh.fresh();
-  C.add_to_closure(Constraint{TypeBase{args, result}, t});
-
-  return std::make_tuple(TypeContext(), t, C);
-}
-
 Constant
 createValueFunction
 (
