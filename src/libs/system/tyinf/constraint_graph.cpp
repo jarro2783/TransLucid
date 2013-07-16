@@ -322,7 +322,13 @@ subc(const Constraint& c, std::vector<Constraint>& result)
     //there is actually nothing to do here
   }
   else if ((constant = get<Constant>(&c.lhs)) != nullptr &&
-           (atomic = get<TypeAtomic>(&c.rhs)) != nullptr)
+           (atomic = get<TypeAtomic>(&c.rhs)) != nullptr &&
+            constant->index() == atomic->index)
+  {
+    //nothing to do here
+  }
+  else if (variant_is_type<TypeRegion>(c.lhs) && 
+           variant_is_type<TypeRegion>(c.rhs) )
   {
     //nothing to do here
   }

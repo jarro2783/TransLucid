@@ -44,6 +44,12 @@ build_lub_constructed(Type current, Type join)
   TypeIntension *ainten = get<TypeIntension>(&current);
   TypeIntension *binten = get<TypeIntension>(&join);
 
+  Constant *aconst = nullptr;
+  Constant *bconst = nullptr;
+
+  TypeAtomic *aatom = nullptr;
+  TypeAtomic *batom = nullptr;
+
   if (acbv != nullptr && bcbv != nullptr)
   {
     return TypeCBV
@@ -60,6 +66,22 @@ build_lub_constructed(Type current, Type join)
         construct_lub(ainten->body, binten->body)
       };
   }
+
+  aconst = get<Constant>(&current);
+  bconst = get<Constant>(&join);
+
+  if (aconst != nullptr && bconst != nullptr &&
+      (aconst->index() == bconst->index()))
+  {
+    return TypeAtomic
+      {
+        U"",
+        aconst->index()
+      };
+  }
+
+  aatom = get<TypeAtomic>(&current);
+  batom = get<TypeAtomic>(&join);
 
   throw BoundInvalid{BoundInvalid::LUB, current, join};
 }
@@ -324,7 +346,11 @@ namespace
     void
     operator()(const TypeAtomic& atomic)
     {
-      m_result += U"atomic<" + atomic.name + U">";
+      std::ostringstream os;
+      os << U"atomic<" + atomic.name + U",";
+      os << atomic.index << ">";
+
+      m_result += utf8_to_utf32(os.str());
     }
 
     void

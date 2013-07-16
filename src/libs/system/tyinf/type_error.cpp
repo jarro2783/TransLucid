@@ -42,7 +42,7 @@ BoundInvalid::print(System& system) const
   }
   else
   {
-    result += U" ⊓ ";
+    result += U" ⊔ ";
   }
 
   result += print_type(b, system);

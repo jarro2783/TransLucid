@@ -970,7 +970,10 @@ System::printConstant(const Constant& c)
 
   if (result.index() != TYPE_INDEX_USTRING)
   {
-    return utf8_to_utf32(_("canonical_print didn't return a string"));
+    std::ostringstream os;
+    os << _("canonical_print error: ") << "Constant(" 
+      << *m_typeRegistry.reverseLookup(c.index()) << ")";
+    return utf8_to_utf32(os.str());
   }
 
   return Types::String::get(result);

@@ -263,9 +263,9 @@ fun next.d X = X @ [d <- #.d + 1];;
 
 fun escape_character!c | is_printable.c = print!c;;
 fun escape_character!c | is_printable.c == false && code_point.c <= 0GFFFF 
-  = `\u` + code_point_4.c;;
+  = `\u` >> code_point_4.c;;
 fun escape_character!c | is_printable.c == false && code_point.c > 0GFFFF 
-  = `\U` + code_point_8.c;;
+  = `\U` >> code_point_8.c;;
 fun escape_character!c [c is '\n'] = `\n`;;
 fun escape_character!c [c is '\t'] = `\t`;;
 fun escape_character!c [c is '\r'] = `\r`;;
@@ -280,7 +280,7 @@ fun substring!s!start!length [s imp ustring, start imp intmp, length is infty]
   = substring_toend_base.(s, start);;
 
 fun escape_string!s = escape_character!(string_at!s!0)
-  + escape_string!(substring!s!1!infty)
+  >> escape_string!(substring!s!1!infty)
 ;;
 fun escape_string!s [s is ""] = "";;
 
