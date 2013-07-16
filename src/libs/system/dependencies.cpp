@@ -61,8 +61,8 @@ DependencyFinder::computeDependencies()
     }
   }
 
-  std::cout << "After demands, number of objects: " 
-    << currentNumObjects << std::endl;
+  //std::cout << "After demands, number of objects: " 
+  //  << currentNumObjects << std::endl;
 
   //compute the dependencies of everything in seenVars until a 
   //least-fixed point
@@ -125,14 +125,15 @@ DependencyFinder::computeDependencies()
 
 // end temporary printing code
 
-    std::cout << "Number of objects: " << currentNumObjects << std::endl;
-    std::cout << "Number of seen vars: " << currentSeenVars.size() << std::endl;
+    //std::cout << "Number of objects: " << currentNumObjects << std::endl;
+    //std::cout << "Number of seen vars: " << currentSeenVars.size() 
+    //  << std::endl;
     m_idDeps = std::move(currentDeps);
     ++i;
   }
 
-  std::cout << "took " << i << " iterations to compute dependencies" << 
-    std::endl;
+  //std::cout << "took " << i << " iterations to compute dependencies" << 
+  //  std::endl;
 
   //compute the dependencies of the demands one last time
 

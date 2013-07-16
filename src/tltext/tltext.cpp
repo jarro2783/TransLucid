@@ -34,6 +34,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/static/function_printer.hpp>
 #include <tl/system.hpp>
 
+#include <tl/tyinf/type_inference.hpp>
+#include <tl/tyinf/type_error.hpp>
+
 #include <iterator>
 #include <iostream>
 #include <fstream>
@@ -70,6 +73,7 @@ TLText::TLText
  ,m_uuids(false)
  ,m_debug(false)
  ,m_cached(cached)
+ ,m_infer(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_error(&std::cerr)
@@ -78,7 +82,7 @@ TLText::TLText
  ,m_system(m_cached)
  ,m_time(0)
  ,m_lastLibLoaded(0)
- ,m_deps(nullptr)
+ ,m_depFinder(nullptr)
  ,m_argsHD(0)
  ,m_envHD(0)
 {
@@ -120,7 +124,7 @@ TLText::~TLText()
   delete m_argsHD;
   delete m_envHD;
   delete m_returnhd;
-  delete m_deps;
+  delete m_depFinder;
 }
 
 VerboseOutput
@@ -153,6 +157,19 @@ TLText::setup_hds()
 
 void 
 TLText::run()
+{
+  try
+  {
+    main_loop();
+  }
+  catch (TypeInference::TypeError& e)
+  {
+    *m_error << "Type error: " << e.print(m_system) << std::endl;
+  }
+}
+
+void
+TLText::main_loop()
 {
   setup_hds();
 
@@ -262,6 +279,7 @@ TLText::run()
       }
 
       computeDependencies();
+      typeInference();
 
       //run the demands
       m_system.go();
@@ -546,24 +564,46 @@ TLText::add_argument(const u32string& arg, const u32string& value)
 void
 TLText::computeDependencies()
 {
-  if (m_deps)
+  if (m_depFinder)
   {
-    auto result = m_deps->computeDependencies();
+    m_deps = m_depFinder->computeDependencies();
 
-    std::cout << "Dependencies:\n";
-    for (const auto& dep : result)
+    output(*m_os, OUTPUT_VERBOSE) << "Dependencies:\n";
+
+    if (m_verbose >= OUTPUT_VERBOSE)
     {
-      std::cout << dep.first << ": ";
-
-      for (const auto& x : std::get<0>(dep.second))
+      for (const auto& dep : m_deps)
       {
-        std::cout << x << " ";
+        *m_os << dep.first << ": ";
+
+        for (const auto& x : std::get<0>(dep.second))
+        {
+          *m_os << x << " ";
+        }
+        *m_os << std::endl;
+        
+        print_container(*m_os, std::get<1>(dep.second));
+        *m_os << std::endl;
       }
-      std::cout << std::endl;
-      
-      print_container(std::cout, std::get<1>(dep.second));
-      std::cout << std::endl;
     }
+  }
+}
+
+void
+TLText::typeInference()
+{
+  if (m_infer)
+  {
+    TypeInference::FreshTypeVars fresh;
+    TypeInference::TypeInferrer infer(m_system, fresh);
+
+    std::set<u32string> vars;
+    for (const auto& dep : m_deps)
+    {
+      vars.insert(dep.first);
+    }
+
+    infer.infer_system(vars);
   }
 }
 

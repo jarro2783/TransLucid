@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     /* TRANSLATORS: the help message for --output */
     ("output,o", po::value<std::string>(), _("output file"))
     /* TRANSLATORS: the help message for --tyinf */
-    ("tyinf", po::value<std::string>(), _("enable type inference"))
+    ("tyinf", _("enable type inference"))
     /* TRANSLATORS: the help message for --uuid */
     ("uuid", _("print uuids"))
     /* TRANSLATORS: the help message for --verbose */
@@ -263,6 +263,11 @@ int main(int argc, char *argv[])
     if (vm.count("deps"))
     {
       tltext.compute_deps();
+    }
+
+    if (tyinf)
+    {
+      tltext.infer_types();
     }
 
     std::unique_ptr<std::ifstream> input;

@@ -137,7 +137,7 @@ namespace TransLucid
 
       /**
        * Set verbose.
-       * @param v @b true to turn verbose on, @b false to turn it off.
+       * @param v The verbosity level
        */
       void 
       verbose(int v)
@@ -232,7 +232,17 @@ namespace TransLucid
       void
       compute_deps()
       {
-        m_deps = new Static::DependencyFinder(&m_system);
+        if (!m_depFinder)
+        {
+          m_depFinder = new Static::DependencyFinder(&m_system);
+        }
+      }
+
+      void
+      infer_types()
+      {
+        compute_deps();
+        m_infer = true;
       }
 
       private:
@@ -242,6 +252,7 @@ namespace TransLucid
       bool m_uuids;
       bool m_debug;
       bool m_cached;
+      bool m_infer;
 
       std::istream* m_is;
       std::ostream* m_os;
@@ -290,10 +301,17 @@ namespace TransLucid
       void
       computeDependencies();
 
+      void
+      typeInference();
+
+      void
+      main_loop();
+
       DemandHD* m_demands;
       DemandHD* m_returnhd;
 
-      Static::DependencyFinder* m_deps;
+      Static::DependencyFinder* m_depFinder;
+      Static::DependencyFinder::DependencyMap m_deps;
 
       std::vector<std::string> m_headers;
       std::vector<std::string> m_clargs;
