@@ -25,7 +25,8 @@ includes_HEADERS = \
   cache.hpp \
   charset.hpp chi.hpp collapse.hpp constws.hpp context.hpp datadef.hpp \
   dimtranslator.hpp equation.hpp exception.hpp \
-  eval_workshops.hpp fixed_indexes.hpp function.hpp function_registry.hpp \
+  eval_workshops.hpp fixed_indexes.hpp free_variables.hpp \
+  function.hpp function_registry.hpp \
 	function_transform.hpp generic_walker.hpp \
   gmpxx_fwd.hpp header_parser.hpp hyperdaton.hpp \
   internal_strings.hpp lexer_util.hpp library.hpp \
