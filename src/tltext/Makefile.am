@@ -50,7 +50,7 @@ TESTS_ENVIRONMENT = TLTEXT=$(top_builddir)/src/tltext/tltext \
   $(SHELL) -x
 
 tltextdatadir = $(pkgdatadir)/tltext
-dist_tltextdata_DATA = header.tl
+dist_tltextdata_DATA = header.tl header-tyinf.tl
 
 EXTRA_DIST = CMakeLists.txt tltext-tests.sh runtests.sh gettext.h tests \
 po/CMakeLists.txt examples caching

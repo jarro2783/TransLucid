@@ -55,3 +55,4 @@ install(TARGETS tltext
 )
 
 install(FILES header.tl DESTINATION share/tl/tltext)
+install(FILES header-tyinf.tl DESTINATION share/tl/tltext)

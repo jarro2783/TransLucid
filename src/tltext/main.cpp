@@ -164,6 +164,8 @@ int main(int argc, char *argv[])
     ("input,i", po::value<std::string>(), _("input file"))
     /* TRANSLATORS: the help message for --output */
     ("output,o", po::value<std::string>(), _("output file"))
+    /* TRANSLATORS: the help message for --tyinf */
+    ("tyinf", po::value<std::string>(), _("enable type inference"))
     /* TRANSLATORS: the help message for --uuid */
     ("uuid", _("print uuids"))
     /* TRANSLATORS: the help message for --verbose */
@@ -211,10 +213,17 @@ int main(int argc, char *argv[])
 
   try
   {
+    bool tyinf = false;
     bool cached = false;
+
     if (vm.count("cache"))
     {
       cached = true;
+    }
+
+    if (vm.count("tyinf"))
+    {
+      tyinf = true;
     }
 
     TransLucid::TLText::TLText tltext(argv[0], "TLtext...", cached);
@@ -278,7 +287,14 @@ int main(int argc, char *argv[])
     
     if (vm.count("no-builtin-header") == 0)
     {
-      tltext.add_header(PREFIX "/share/tl/tltext/header.tl");
+      if (tyinf)
+      {
+        tltext.add_header(PREFIX "/share/tl/tltext/header-tyinf.tl");
+      }
+      else
+      {
+        tltext.add_header(PREFIX "/share/tl/tltext/header.tl");
+      }
     }
 
     if (vm.count("header") > 0)
