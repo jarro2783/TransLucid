@@ -22,8 +22,8 @@ along with TransLucid; see the file COPYING.  If not see
  * The System.
  */
 
-#ifndef SYSTEM_HPP_INCLUDED
-#define SYSTEM_HPP_INCLUDED
+#ifndef TL_SYSTEM_HPP_INCLUDED
+#define TL_SYSTEM_HPP_INCLUDED
 
 #include <tl/ast_fwd.hpp>
 #include <tl/chi.hpp>

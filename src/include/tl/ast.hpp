@@ -279,7 +279,7 @@ namespace TransLucid
        * Construct an identifier expression.
        * @param t The name of the identifier.
        */
-      IdentExpr(const u32string& t)
+      explicit IdentExpr(const u32string& t)
       : text(t)
       {}
 

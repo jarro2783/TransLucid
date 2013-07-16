@@ -20,7 +20,7 @@ set (SYSTEM_SOURCES
 assignment.cpp ast.cpp bestfit.cpp builtin_types.cpp cache.cpp charset.cpp
 chi.cpp context.cpp datadef.cpp dependencies.cpp dimtranslator.cpp 
 equation.cpp
-eval_workshops.cpp
+eval_workshops.cpp free_variables.cpp
 function.cpp
 hyperdatons/arrayhd.cpp
 hyperdatons/envhd.cpp

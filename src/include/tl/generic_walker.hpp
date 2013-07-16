@@ -324,6 +324,141 @@ namespace TransLucid
     }
 
   };
+
+  //visit a tree and do nothing
+  //this only makes sense if the derived class does something interesting
+  //with some of the nodes as a side effect
+  template <typename Self>
+  class GenericTreeVisitor
+  {
+    template <typename T>
+    void
+    operator()(const T&)
+    {
+    }
+
+    void
+    operator()(const Tree::ParenExpr& e)
+    {
+      apply_visitor(*reinterpret_cast<Self*>(this), e.e);
+    }
+
+    void
+    operator()(const Tree::MakeIntenExpr& e)
+    {
+      for (const auto& b : e.binds)
+      {
+        apply_visitor(*reinterpret_cast<Self*>(this), b);
+      }
+
+      apply_visitor(*reinterpret_cast<Self*>(this), e.expr);
+    }
+
+    void
+    operator()(const Tree::EvalIntenExpr& e)
+    {
+      apply_visitor(*reinterpret_cast<Self*>(this), e.expr);
+    }
+
+    void
+    operator()(const Tree::IfExpr& e)
+    {
+      apply_visitor(*reinterpret_cast<Self*>(this), e.condition);
+      apply_visitor(*reinterpret_cast<Self*>(this), e.then);
+
+      for (const auto& eifs : e.else_ifs)
+      {
+        apply_visitor(*reinterpret_cast<Self*>(this), eifs.first);
+        apply_visitor(*reinterpret_cast<Self*>(this), eifs.second);
+      }
+
+      apply_visitor(*reinterpret_cast<Self*>(this), e.else_);
+    }
+
+    void
+    operator()(const Tree::HashExpr& e)
+    {
+      apply_visitor(*reinterpret_cast<Self*>(this), e.e);
+    }
+
+    void
+    operator()(const Tree::RegionExpr& e)
+    {
+      for (const auto& entry : e.entries)
+      {
+        apply_visitor(*reinterpret_cast<Self*>(this), std::get<0>(entry));
+        apply_visitor(*reinterpret_cast<Self*>(this), std::get<2>(entry));
+      }
+    }
+
+    void
+    operator()(const Tree::TupleExpr& e)
+    {
+      for (const auto& entry : e.pairs)
+      {
+        apply_visitor(*reinterpret_cast<Self*>(this), entry.first);
+        apply_visitor(*reinterpret_cast<Self*>(this), entry.second);
+      }
+    }
+
+    void
+    operator()(const Tree::AtExpr& e)
+    {
+      apply_visitor(*reinterpret_cast<Self*>(this), e.lhs);
+      apply_visitor(*reinterpret_cast<Self*>(this), e.rhs);
+    }
+
+    void
+    operator()(const Tree::LambdaExpr& e)
+    {
+      for (const auto& b : e.binds)
+      {
+        apply_visitor(*reinterpret_cast<Self*>(this), b);
+      }
+
+      apply_visitor(*reinterpret_cast<Self*>(this), e.rhs);
+    }
+
+    void
+    operator()(const Tree::BaseAbstractionExpr& e)
+    {
+      for (const auto& b : e.binds)
+      {
+        apply_visitor(*reinterpret_cast<Self*>(this), b);
+      }
+
+      apply_visitor(*reinterpret_cast<Self*>(this), e.body);
+    }
+
+    void
+    operator()(const Tree::BangAppExpr& e)
+    {
+      for (const auto& a : e.args)
+      {
+        apply_visitor(*reinterpret_cast<Self*>(this), a);
+      }
+
+      apply_visitor(*reinterpret_cast<Self*>(this), e.name);
+    }
+
+    void
+    operator()(const Tree::LambdaAppExpr& e)
+    {
+      apply_visitor(*reinterpret_cast<Self*>(this), e.lhs);
+      apply_visitor(*reinterpret_cast<Self*>(this), e.rhs);
+    }
+
+    void
+    operator()(const Tree::ConditionalBestfitExpr& e)
+    {
+      for (const auto& d : e.declarations)
+      {
+        apply_visitor(*reinterpret_cast<Self*>(this), std::get<1>(d));
+        apply_visitor(*reinterpret_cast<Self*>(this), std::get<2>(d));
+        apply_visitor(*reinterpret_cast<Self*>(this), std::get<3>(d));
+      }
+    }
+  };
 }
 
 #endif
