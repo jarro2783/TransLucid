@@ -26,6 +26,7 @@ namespace TransLucid
 {
   namespace TypeInference
   {
+    template <typename Self>
     class GenericTypeWalker
     {
       public:
@@ -42,7 +43,8 @@ namespace TransLucid
       Type
       operator()(const TypeIntension& i)
       {
-        return TypeIntension{apply_visitor(*this, i.body)};
+        return TypeIntension{apply_visitor(*reinterpret_cast<Self*>(this), 
+          i.body)};
       }
 
       Type
@@ -50,8 +52,8 @@ namespace TransLucid
       {
         return TypeCBV
         {
-          apply_visitor(*this, cbv.lhs), 
-          apply_visitor(*this, cbv.rhs)
+          apply_visitor(*reinterpret_cast<Self*>(this), cbv.lhs), 
+          apply_visitor(*reinterpret_cast<Self*>(this), cbv.rhs)
         };
       }
 
@@ -62,13 +64,13 @@ namespace TransLucid
 
         for (const auto& t : base.lhs)
         {
-          args.push_back(apply_visitor(*this, t));
+          args.push_back(apply_visitor(*reinterpret_cast<Self*>(this), t));
         }
 
         return TypeBase
         {
           args,
-          apply_visitor(*this, base.rhs)
+          apply_visitor(*reinterpret_cast<Self*>(this), base.rhs)
         };
       }
     };

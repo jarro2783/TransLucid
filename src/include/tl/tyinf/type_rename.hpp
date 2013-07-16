@@ -27,7 +27,7 @@ namespace TransLucid
 {
   namespace TypeInference
   {
-    class Rename : public GenericTypeWalker
+    class Rename : private GenericTypeWalker<Rename>
     {
       public:
 
