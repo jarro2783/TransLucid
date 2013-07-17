@@ -34,6 +34,7 @@ namespace
 Type
 build_lub_constructed(Type current, Type join)
 {
+  //this could all be replaced with a double dispatch
   if (variant_is_type<TypeNothing>(current))
   {
     return join;
@@ -82,6 +83,16 @@ build_lub_constructed(Type current, Type join)
 
   aatom = get<TypeAtomic>(&current);
   batom = get<TypeAtomic>(&join);
+
+  if (aconst != nullptr && batom != nullptr && aconst->index() == batom->index)
+  {
+    return *batom;
+  }
+
+  if (aatom != nullptr && bconst != nullptr && aatom->index == bconst->index())
+  {
+    return *aatom;
+  }
 
   throw BoundInvalid{BoundInvalid::LUB, current, join};
 }

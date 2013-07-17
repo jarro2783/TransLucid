@@ -18,6 +18,9 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/fixed_indexes.hpp>
+#include <tl/free_variables.hpp>
+#include <tl/output.hpp>
+
 #include <tl/tyinf/type_inference.hpp>
 #include <tl/tyinf/type_rename.hpp>
 
@@ -118,19 +121,30 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
   std::map<u32string, Type> types;
 
   std::cout << "infer_system" << std::endl;
+
+  generate_recurse_groups(ids);
+
   for (const auto& x : ids)
   {
-    auto e = m_system.getIdentifierTree(x);
+    try
+    {
+      auto e = m_system.getIdentifierTree(x);
 
-    auto t = apply_visitor(*this, e);
+      auto t = apply_visitor(*this, e);
 
-    A.join(std::get<0>(t));
-    C.make_union(std::get<2>(t));
+      A.join(std::get<0>(t));
+      C.make_union(std::get<2>(t));
 
-    types.insert(std::make_pair(x, std::get<1>(t)));
-    
-    std::cout << x << " : " << print_type(std::get<1>(t), m_system) 
-      << std::endl;
+      types.insert(std::make_pair(x, std::get<1>(t)));
+      
+      std::cout << x << " : " << print_type(std::get<1>(t), m_system) 
+        << std::endl;
+    }
+    catch (...)
+    {
+      std::cerr << "Error checking type of " << x << std::endl;
+      throw;
+    }
   }
 
   for (const auto& xt : types)
@@ -146,6 +160,69 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
   }
 
   std::cout << C.print(m_system) << std::endl;
+}
+
+void
+TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
+{
+  FreeVariables free;
+
+  //get the free variables in each variable
+  std::map<u32string, std::set<u32string>> freeVariables;
+
+  for (const auto& v : ids)
+  {
+    freeVariables[v] = free.findFree(m_system.getIdentifierTree(v));
+  }
+
+  //construct a graph out of the free variables, but make the graph with
+  //integers. So we need to keep a mapping from integers to their strings
+  std::map<u32string, int> stringIndices;
+  std::vector<u32string> indexToString;
+
+  auto updateIndex = [&] (const u32string& s) -> int
+    {
+      auto iter = stringIndices.find(s);
+      if (iter == stringIndices.end())
+      {
+        int index = indexToString.size();
+        indexToString.push_back(s);
+        stringIndices.insert(std::make_pair(s, index));
+        return index;
+      }
+
+      return iter->second;
+    };
+
+  //vertex list for dependency graph
+  std::vector<std::vector<size_t>> depGraph(ids.size());
+
+  for (const auto& var : freeVariables)
+  {
+    std::cout << var.first << ": ";
+    int index = updateIndex(var.first);
+
+    for (const auto& f : var.second)
+    {
+      int fi = updateIndex(f);
+
+      std::cout << f << ", ";
+
+      depGraph[index].push_back(fi);
+    }
+    std::cout << std::endl;
+  }
+
+  auto connected = generate_strongly_connected(depGraph);
+
+  for (const auto& component : connected)
+  {
+    std::cout << "strongly connected component:" << std::endl;
+    for (const auto& v : component)
+    {
+      std::cout << indexToString[v] << std::endl;
+    }
+  }
 }
 
 TypeInferrer::result_type
@@ -571,7 +648,7 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
       A.join(std::get<0>(t_1));
       C.make_union(std::get<2>(t_1));
 
-      C.add_to_closure(Constraint{std::get<1>(t_0), 
+      C.add_to_closure(Constraint{std::get<1>(t_1), 
         makeAtomic(m_system, U"bool")
       });
     }

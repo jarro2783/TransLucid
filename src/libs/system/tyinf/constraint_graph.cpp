@@ -205,7 +205,7 @@ ConstraintGraph::add_to_closure(const Constraint& constraint)
     }
     else
     {
-      throw "Attempt to add invalid constraint";
+      throw InvalidConstraint(constraint);
     }
   }
 }

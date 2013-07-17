@@ -26,9 +26,13 @@ along with TransLucid; see the file COPYING.  If not see
 namespace TransLucid
 {
   //finds the free variables inside an expression, ignoring where clauses
+  //this only works for transformed expressions, meaning that the free
+  //variables are basically any identifier that appears
   class FreeVariables : private GenericTreeVisitor<FreeVariables>
   {
     public:
+
+    using GenericTreeVisitor::operator();
 
     typedef void result_type;
 

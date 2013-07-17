@@ -146,6 +146,10 @@ namespace TransLucid
       operator()(const Tree::ConditionalBestfitExpr&);
 
       private:
+
+      void
+      generate_recurse_groups(const std::set<u32string>& ids);
+
       FreshTypeVars& m_freshVars;
 
       template <typename T>

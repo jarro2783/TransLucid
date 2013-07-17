@@ -64,5 +64,18 @@ namespace TransLucid
       u32string
       print(System& system) const;
     };
+    
+    struct InvalidConstraint : public TypeError
+    {
+      InvalidConstraint(Constraint con)
+      : c(std::move(con))
+      {
+      }
+
+      u32string
+      print(System& system) const;
+
+      Constraint c;
+    };
   }
 }

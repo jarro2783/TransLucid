@@ -1,5 +1,5 @@
 /* Utility functions.
-   Copyright (C) 2009--2012 Jarryd Beck
+   Copyright (C) 2009--2013 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -28,7 +28,6 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iostream>
 
-#include <tl/collapse.hpp>
 #include <tl/equation.hpp>
 #include <tl/function_transform.hpp>
 #include <tl/rename.hpp>
@@ -743,6 +742,113 @@ fixupTree(System& s, const Tree::Expr& e, ScopePtr scope)
       transform.newVars()
     }
   };
+}
+
+namespace
+{
+  struct StrongConnectNode
+  {
+    int index;
+    int lowlink;
+    bool instack;
+  };
+
+  class StrongConnect
+  {
+    public:
+
+    StrongConnect
+    (
+      const std::vector<std::vector<size_t>>& graph
+    )
+    : m_index(0)
+    , m_graph(graph)
+    , m_nodes(graph.size(), StrongConnectNode{-1, -1, false})
+    {
+    }
+
+    void
+    operator()
+    (
+      size_t v
+    )
+    {
+      m_nodes[v].index = m_index;
+      m_nodes[v].lowlink = m_index;
+      ++m_index;
+      m_S.push(v);
+      m_nodes[v].instack = true;
+
+      for (auto w : m_graph[v])
+      {
+        if (m_nodes[w].index == -1)
+        {
+          operator()(w);
+          m_nodes[v].lowlink = 
+            std::min(m_nodes[v].lowlink, m_nodes[w].lowlink);
+        }
+        else if (m_nodes[w].instack)
+        {
+          m_nodes[v].lowlink = 
+            std::min(m_nodes[v].lowlink, m_nodes[w].lowlink);
+        }
+      }
+
+      if (m_nodes[v].lowlink == m_nodes[v].index)
+      {
+        std::vector<size_t> connected;
+        size_t w = m_S.top();
+
+        m_S.pop();
+        m_nodes[w].instack = false;
+        connected.push_back(w);
+
+        while (w != v)
+        {
+          w = m_S.top();
+          m_nodes[w].instack = false;
+          connected.push_back(w);
+        }
+
+        m_result.push_back(connected);
+      }
+    }
+
+    const std::vector<std::vector<size_t>>& 
+    result() const
+    {
+      return m_result;
+    }
+
+    const std::vector<StrongConnectNode>&
+    nodes() const
+    {
+      return m_nodes;
+    }
+    
+    private:
+    int m_index;
+    const std::vector<std::vector<size_t>>& m_graph;
+    std::vector<StrongConnectNode> m_nodes;
+    std::vector<std::vector<size_t>> m_result;
+    std::stack<size_t> m_S;
+  };
+}
+
+std::vector<std::vector<size_t>>
+generate_strongly_connected(const std::vector<std::vector<size_t>>& graph)
+{
+  StrongConnect connect(graph);
+
+  for (size_t i = 0; i != graph.size(); ++i)
+  {
+    if (connect.nodes()[i].index == -1)
+    {
+      connect(i);
+    }
+  }
+
+  return connect.result();
 }
 
 }

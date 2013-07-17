@@ -32,6 +32,13 @@ SubcInvalid::print(System& system) const
 }
 
 u32string
+InvalidConstraint::print(System& system) const
+{
+  return U"Invalid constraint: " + 
+    print_type(c.lhs, system) + U" ≤ " + print_type(c.rhs, system);
+}
+
+u32string
 BoundInvalid::print(System& system) const
 {
   u32string result = print_type(a, system);

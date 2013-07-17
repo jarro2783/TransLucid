@@ -254,6 +254,9 @@ namespace TransLucid
       ++begin;
     }
   }
+
+  std::vector<std::vector<size_t>>
+  generate_strongly_connected(const std::vector<std::vector<size_t>>& graph);
 }
 
 #endif // TL_UTILITY_HPP_INCLUDED

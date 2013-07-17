@@ -331,6 +331,8 @@ namespace TransLucid
   template <typename Self>
   class GenericTreeVisitor
   {
+    public:
+
     template <typename T>
     void
     operator()(const T&)
