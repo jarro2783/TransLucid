@@ -125,9 +125,9 @@ Region::hash() const
 
   for (const auto& entry : m_entries)
   {
-    hash_combine(entry.first, value);
-    hash_combine(entry.second.first, value);
-    hash_combine(entry.second.second, value);
+    hash_combine_hasher(entry.first, value);
+    hash_combine_hasher(entry.second.first, value);
+    hash_combine_hasher(entry.second.second, value);
   }
 
   return value;

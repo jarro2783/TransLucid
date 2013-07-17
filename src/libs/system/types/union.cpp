@@ -159,7 +159,7 @@ UnionType::hash() const
 
   for (const auto& v : m_types)
   {
-    hash_combine(v, h);
+    hash_combine_hasher(v, h);
   }
      
   return h;

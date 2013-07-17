@@ -217,12 +217,31 @@ namespace TransLucid
   fixupTree(System& s, const Tree::Expr& e, ScopePtr scope = ScopePtr());
 
   //the magic hash combine from boost
-  template <class T>
   inline void 
-  hash_combine(const T& v, std::size_t& seed)
+  hash_combine(size_t v, std::size_t& seed)
   {
-    std::hash<T> hasher;
-    seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    seed ^= v + 0x9e3779b9 + (seed<<6) + (seed>>2);
+  }
+
+  template <typename T>
+  inline void
+  hash_combine_hasher(const T& v, std::size_t& seed)
+  {
+    hash_combine(std::hash<T>()(v), seed);
+  }
+
+  template <typename C, typename Hash = std::hash<typename C::value_type>>
+  inline size_t
+  hash_container(const C& t)
+  {
+    Hash hasher;
+    size_t h = 0;
+    for (const auto& v : t)
+    {
+      hash_combine(hasher(v), h);
+    }
+
+    return h;
   }
 
   template <typename C, typename T>

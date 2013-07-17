@@ -22,10 +22,12 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/variant.hpp>
 #include <tl/types.hpp>
+#include <tl/utility.hpp>
 
 #include <algorithm>
 #include <vector>
 #include <set>
+#include <unordered_set>
 
 namespace TransLucid
 {
@@ -76,15 +78,44 @@ namespace TransLucid
     namespace Functions
     {
       template <typename Prop>
+      struct FunctorHashHelper;
+
+      struct FunctorHash
+      {
+        template <typename Prop>
+        size_t
+        operator()(const Functor<Prop>& f) const
+        {
+          FunctorHashHelper<Prop> h;
+
+          return apply_visitor(h, f);
+        }
+      };
+
+      template <typename Prop>
       using FunctorList = std::vector<Functor<Prop>>;
+
+      template <typename Prop>
+      using FunctorSet = std::unordered_set<Functor<Prop>, FunctorHash>;
 
       struct Param
       {
         dimension_index dim;
+
+        bool
+        operator==(const Param& rhs) const
+        {
+          return dim == rhs.dim;
+        }
       };
 
       struct Topfun
       {
+        bool
+        operator==(const Topfun&) const
+        {
+          return true;
+        }
       };
 
       template <typename Prop>
@@ -93,7 +124,16 @@ namespace TransLucid
         dimension_index dim;
         Prop property;
         FunctorList<Prop> functions;
-        FunctorList<Prop> fundeps;
+        FunctorSet<Prop> fundeps;
+
+        bool
+        operator==(const CBV& rhs) const
+        {
+          return dim == rhs.dim &&
+                 property == rhs.property &&
+                 functions == rhs.functions &&
+                 fundeps == rhs.fundeps;
+        }
       };
 
       template <typename Prop>
@@ -102,7 +142,16 @@ namespace TransLucid
         std::vector<dimension_index> dims;
         Prop property;
         FunctorList<Prop> functions;
-        FunctorList<Prop> fundeps;
+        FunctorSet<Prop> fundeps;
+
+        bool
+        operator==(const Base& rhs) const
+        {
+          return dims == rhs.dims &&
+                 property == rhs.property &&
+                 functions == rhs.functions &&
+                 fundeps == rhs.fundeps;
+        }
       };
 
       template <typename Prop>
@@ -110,7 +159,15 @@ namespace TransLucid
       {
         Prop property;
         FunctorList<Prop> functions;
-        FunctorList<Prop> fundeps;
+        FunctorSet<Prop> fundeps;
+
+        bool
+        operator==(const Up& rhs) const
+        {
+          return property == rhs.property &&
+                 functions == rhs.functions &&
+                 fundeps == rhs.fundeps;
+        }
       };
 
       template <typename Prop>
@@ -118,6 +175,13 @@ namespace TransLucid
       {
         Functor<Prop> lhs;
         FunctorList<Prop> rhs;
+
+        bool
+        operator==(const ApplyV& other) const
+        {
+          return lhs == other.lhs &&
+                 rhs == other.rhs;
+        }
       };
 
       template <typename Prop>
@@ -125,19 +189,125 @@ namespace TransLucid
       {
         Functor<Prop> lhs;
         std::vector<FunctorList<Prop>> params;
+
+        bool
+        operator==(const ApplyB& rhs) const
+        {
+          return lhs == rhs.lhs &&
+                 params == rhs.params;
+        }
       };
 
       template <typename Prop>
       struct Down
       {
         Functor<Prop> body;
+
+        bool
+        operator==(const Down& rhs) const
+        {
+          return body == rhs.body;
+        }
+      };
+      
+      template <typename Prop>
+      struct FunctorHashHelper
+      {
+        typedef size_t result_type;
+
+        template <typename T>
+        size_t
+        functor_hash_container(const T& t)
+        {
+          return hash_container<T, FunctorHash>(t);
+        }
+
+        size_t
+        operator()(const Param& p)
+        {
+          return p.dim;
+        }
+
+        size_t
+        operator()(const Topfun& t)
+        {
+          //some magic number that's hopefully different to other stuff
+          return 0xdeadbeef;
+        }
+
+        size_t
+        operator()(const Base<Prop>& base)
+        {
+          size_t h = hash_container(base.dims);
+          hash_combine(hash_container(base.property), h);
+          hash_combine(functor_hash_container(base.functions), h);
+          hash_combine(functor_hash_container(base.fundeps), h);
+
+          return h;
+        }
+
+        size_t
+        operator()(const CBV<Prop>& cbv)
+        {
+          size_t h = cbv.dim;
+          hash_combine(hash_container(cbv.property), h);
+          hash_combine(functor_hash_container(cbv.functions), h);
+          hash_combine(functor_hash_container(cbv.fundeps), h);
+
+          return h;
+        }
+
+        size_t
+        operator()(const Up<Prop>& up)
+        {
+          size_t h = 0;
+          hash_combine(hash_container(up.property), h);
+          hash_combine(functor_hash_container(up.functions), h);
+          hash_combine(functor_hash_container(up.fundeps), h);
+
+          return h;
+        }
+
+        size_t
+        operator()(const ApplyB<Prop>& applyb)
+        {
+          auto h = apply_visitor(*this, applyb.lhs);
+          for (const auto& arg : applyb.params)
+          {
+            hash_combine(functor_hash_container(arg), h);
+          }
+
+          return h;
+        }
+
+        size_t
+        operator()(const ApplyV<Prop>& applyv)
+        {
+          auto h = apply_visitor(*this, applyv.lhs);
+          hash_combine(functor_hash_container(applyv.rhs), h);
+
+          return h;
+        }
+
+        size_t
+        operator()(const Down<Prop>& down)
+        {
+          return apply_visitor(*this, down.body);
+        }
       };
 
-      template <typename P>
+      template <typename D, typename T>
       void
-      prop_append(std::set<P>& dest, const std::set<P>& source)
+      prop_append(D& dest, const std::set<T>& source)
       {
         dest.insert(source.begin(), source.end());
+      }
+
+      template <typename D, typename T>
+      void
+      prop_append(D& dest, const T& t)
+      {
+        dest.insert(t);
       }
 
       template <typename T>
@@ -412,16 +582,18 @@ namespace TransLucid
       FunctorList<Prop>
       sub(const Functor<Prop>& f, const Substitution<Prop>& P);
 
-      template <typename Prop>
-      FunctorList<Prop>
-      subs(const FunctorList<Prop>& F, const Substitution<Prop>& P)
+      template <typename T, typename Prop>
+      T
+      subs(const T& F, const Substitution<Prop>& P)
       {
-        FunctorList<Prop> all;
+        T all;
 
         for (const auto& f : F)
         {
           auto result = sub(f, P);
-          all.insert(all.end(), result.begin(), result.end());
+          std::copy(result.begin(), result.end(),
+            std::inserter(all, all.end()));
+          //all.insert(all.end(), result.begin(), result.end());
         }
 
         return all;
@@ -566,7 +738,7 @@ namespace TransLucid
       }
 
       template <typename Prop>
-      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorSet<Prop>>
       eval(const Functor<Prop>& f);
 
       template <typename Prop>
@@ -574,7 +746,7 @@ namespace TransLucid
       {
         public:
 
-        typedef std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>> 
+        typedef std::tuple<Prop, FunctorList<Prop>, FunctorSet<Prop>> 
           result_type;
 
         template <typename T>
@@ -582,14 +754,14 @@ namespace TransLucid
         operator()(const T& t)
         {
           return std::make_tuple(Prop(), FunctorList<Prop>{t}, 
-            FunctorList<Prop>{});
+            FunctorSet<Prop>{});
         }
 
         result_type
         operator()(const Down<Prop>& down)
         {
           Prop property;
-          FunctorList<Prop> Fcal;
+          FunctorSet<Prop> Fcal;
 
           auto a = eval(down.body);
           auto b = evals_down(std::get<1>(a));
@@ -598,8 +770,7 @@ namespace TransLucid
           prop_append(property, std::get<0>(b));
 
           Fcal = std::get<2>(a);
-          Fcal.insert(Fcal.end(), std::get<2>(b).begin(), 
-            std::get<2>(b).end());
+          Fcal.insert(std::get<2>(b).begin(), std::get<2>(b).end());
 
           return std::make_tuple(property, std::get<1>(b), Fcal);
         }
@@ -608,7 +779,7 @@ namespace TransLucid
         operator()(const ApplyB<Prop>& applyb)
         {
           Prop property;
-          FunctorList<Prop> Fcal;
+          FunctorSet<Prop> Fcal;
 
           auto a = eval(applyb.lhs);
           auto b = evals_applyb(std::get<1>(a), applyb.params);
@@ -617,8 +788,7 @@ namespace TransLucid
           prop_append(property, std::get<0>(b));
 
           Fcal = std::get<2>(a);
-          Fcal.insert(Fcal.end(), std::get<2>(b).begin(), 
-            std::get<2>(b).end());
+          Fcal.insert(std::get<2>(b).begin(), std::get<2>(b).end());
 
           return std::make_tuple(property, std::get<1>(b), Fcal);
         }
@@ -627,7 +797,7 @@ namespace TransLucid
         operator()(const ApplyV<Prop>& applyv)
         {
           Prop property;
-          FunctorList<Prop> Fcal;
+          FunctorSet<Prop> Fcal;
 
           auto a = eval(applyv.lhs);
           auto b = evals_applyv(std::get<1>(a), applyv.rhs);
@@ -636,28 +806,27 @@ namespace TransLucid
           prop_append(property, std::get<0>(b));
 
           Fcal = std::get<2>(a);
-          Fcal.insert(Fcal.end(), std::get<2>(b).begin(), 
-            std::get<2>(b).end());
+          Fcal.insert(std::get<2>(b).begin(), std::get<2>(b).end());
 
           return std::make_tuple(property, std::get<1>(b), Fcal);
         }
       };
 
       template <typename Prop>
-      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorSet<Prop>>
       eval(const Functor<Prop>& f)
       {
         EvalHelper<Prop> helper;
         return apply_visitor(helper, f);
       }
 
-      template<typename Prop>
-      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
-      evalall(const FunctorList<Prop>& F)
+      template<template <typename...> class T, typename Prop, typename... Args>
+      std::tuple<Prop, FunctorList<Prop>, FunctorSet<Prop>>
+      evalall(const T<Functor<Prop>, Args...>& F)
       {
         Prop prop;
         FunctorList<Prop> funcs;
-        FunctorList<Prop> Fcal;
+        FunctorSet<Prop> Fcal;
 
         for (const auto& f : F)
         {
@@ -673,12 +842,12 @@ namespace TransLucid
       }
       
       template<typename Prop>
-      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorSet<Prop>>
       evals_applyv(const FunctorList<Prop>& F_0, const FunctorList<Prop>& F_1)
       {
         Prop property;
         FunctorList<Prop> funcs;
-        FunctorList<Prop> Fcal;
+        FunctorSet<Prop> Fcal;
 
         for (const auto& f : F_0)
         {
@@ -697,18 +866,18 @@ namespace TransLucid
             prop_append(property, std::get<0>(result));
             funcs.insert(funcs.end(), std::get<1>(result).begin(), 
               std::get<1>(result).end());
-            Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
+            Fcal.insert(std::get<2>(result).begin(), 
               std::get<2>(result).end());
 
-            result = evalall(subs(c->functions, p));
+            result = evalall(subs(c->fundeps, p));
             prop_append(property, std::get<0>(result));
-            Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
+            Fcal.insert(std::get<2>(result).begin(), 
               std::get<2>(result).end());
               
             std::copy_if(
               std::get<1>(result).begin(), 
               std::get<1>(result).end(),
-              std::back_inserter(Fcal),
+              std::inserter(Fcal, Fcal.end()),
               is_app()
             );
 
@@ -719,13 +888,13 @@ namespace TransLucid
       }
 
       template <typename Prop>
-      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorSet<Prop>>
       evals_applyb(const FunctorList<Prop>& F_0, 
         const std::vector<FunctorList<Prop>>& args)
       {
         Prop property;
         FunctorList<Prop> funcs;
-        FunctorList<Prop> Fcal;
+        FunctorSet<Prop> Fcal;
 
         for (const auto& f : F_0)
         {
@@ -764,13 +933,13 @@ namespace TransLucid
             result = evalall(subs(base->fundeps, p));
 
             prop_append(property, std::get<0>(result));
-            Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
+            Fcal.insert(std::get<2>(result).begin(), 
               std::get<2>(result).end());
 
             std::copy_if(
               std::get<1>(result).begin(), 
               std::get<1>(result).end(),
-              std::back_inserter(Fcal),
+              std::inserter(Fcal, Fcal.end()),
               is_app()
             );
           }
@@ -780,12 +949,12 @@ namespace TransLucid
       }
 
       template <typename Prop>
-      std::tuple<Prop, FunctorList<Prop>, FunctorList<Prop>>
+      std::tuple<Prop, FunctorList<Prop>, FunctorSet<Prop>>
       evals_down(const FunctorList<Prop>& F_0)
       {
         Prop property;
         FunctorList<Prop> funcs;
-        FunctorList<Prop> Fcal;
+        FunctorSet<Prop> Fcal;
 
         for (const auto& f : F_0)
         {
@@ -800,7 +969,7 @@ namespace TransLucid
             prop_append(property, up->property);
             funcs.insert(funcs.end(), up->functions.begin(), 
               up->functions.end());
-            Fcal.insert(Fcal.end(), up->fundeps.begin(), up->fundeps.end());
+            Fcal.insert(up->fundeps.begin(), up->fundeps.end());
           }
         }
 
@@ -809,5 +978,19 @@ namespace TransLucid
     }
   }
 }
+
+#if 0
+namespace std
+{
+  template <typename Prop>
+  struct hash<TransLucid::Static::Functor<Prop>>
+  {
+    size_t
+    operator()(const TransLucid::Static::Functor<Prop>& f)
+    {
+    }
+  };
+}
+#endif
 
 #endif

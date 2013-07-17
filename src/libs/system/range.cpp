@@ -110,20 +110,20 @@ Range::hash() const
   size_t seed = 0;
 
   if (m_lower == nullptr) {
-    hash_combine(0, seed);
+    hash_combine_hasher(0, seed);
   }
   else
   {
-    hash_combine(*m_lower, seed);
+    hash_combine_hasher(*m_lower, seed);
   }
 
   if (m_upper == nullptr)
   {
-    hash_combine(0, seed);
+    hash_combine_hasher(0, seed);
   }
   else
   {
-    hash_combine(*m_upper, seed);
+    hash_combine_hasher(*m_upper, seed);
   }
 
   return seed;

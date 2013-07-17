@@ -332,8 +332,8 @@ namespace std
     size_t h = 0;
     for(auto& v : t)
     {
-      TransLucid::hash_combine(v.first, h);
-      TransLucid::hash_combine(v.second, h);
+      TransLucid::hash_combine_hasher(v.first, h);
+      TransLucid::hash_combine_hasher(v.second, h);
     }
 
     return h;

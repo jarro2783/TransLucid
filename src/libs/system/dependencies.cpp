@@ -105,7 +105,7 @@ DependencyFinder::computeDependencies()
     }
 
 // temporary printing code
-    #if 0
+//    #if 0
     std::cout << "Iteration " << i << std::endl;
     for (const auto& dep : currentDeps)
     {
@@ -121,13 +121,13 @@ DependencyFinder::computeDependencies()
       std::cout << std::endl;
     }
     std::cout << "End iteration " << i << std::endl;
-    #endif
+//    #endif
 
 // end temporary printing code
 
-    //std::cout << "Number of objects: " << currentNumObjects << std::endl;
-    //std::cout << "Number of seen vars: " << currentSeenVars.size() 
-    //  << std::endl;
+    std::cout << "Number of objects: " << currentNumObjects << std::endl;
+    std::cout << "Number of seen vars: " << currentSeenVars.size() 
+      << std::endl;
     m_idDeps = std::move(currentDeps);
     ++i;
   }
@@ -180,7 +180,7 @@ DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::DimensionExpr& e)
 {
   return std::make_tuple(IdentifierSet(), 
-    FunctorList{Static::Functions::Param{e.dim}}, FunctorList{});
+    FunctorList{Static::Functions::Param{e.dim}}, FunctorSet{});
 }
 
 DependencyFinder::result_type
@@ -190,7 +190,7 @@ DependencyFinder::operator()(const Tree::IdentExpr& e)
 
   if (iter == m_idDeps.end())
   {
-    return std::make_tuple(IdentifierSet{e.text}, FunctorList{}, FunctorList{});
+    return std::make_tuple(IdentifierSet{e.text}, FunctorList{}, FunctorSet{});
   }
   else
   {
@@ -237,7 +237,7 @@ DependencyFinder::operator()(const Tree::MakeIntenExpr& e)
 {
   IdentifierSet idents;
   FunctorList funcs;
-  FunctorList fundeps;
+  FunctorSet fundeps;
 
   for (const auto& expr : e.binds)
   {
@@ -249,8 +249,7 @@ DependencyFinder::operator()(const Tree::MakeIntenExpr& e)
     std::copy_if(std::get<1>(deps).begin(), std::get<1>(deps).end(),
       std::inserter(fundeps, fundeps.end()), Static::Functions::is_app());
 
-    fundeps.insert(fundeps.end(), std::get<2>(deps).begin(), 
-      std::get<2>(deps).end());
+    fundeps.insert(std::get<2>(deps).begin(), std::get<2>(deps).end());
   }
 
   auto body = apply_visitor(*this, e.expr);
@@ -265,7 +264,7 @@ DependencyFinder::operator()(const Tree::EvalIntenExpr& e)
 {
   IdentifierSet resultX;
   FunctorList resultF;
-  FunctorList fundeps;
+  FunctorSet fundeps;
 
   auto deps = apply_visitor(*this, e.expr);
 
@@ -289,8 +288,7 @@ DependencyFinder::operator()(const Tree::EvalIntenExpr& e)
 
   fundeps = std::get<2>(deps);
 
-  fundeps.insert(fundeps.end(), std::get<2>(eval).begin(), 
-    std::get<2>(eval).end());
+  fundeps.insert(std::get<2>(eval).begin(), std::get<2>(eval).end());
 
   resultF.insert(resultF.end(), std::get<1>(eval).begin(), 
     std::get<1>(eval).end());
@@ -306,20 +304,20 @@ DependencyFinder::operator()(const Tree::IfExpr& e)
 {
   IdentifierSet X;
   FunctorList F;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   //copy the apps from the F result into Fcal
   auto cond = apply_visitor(*this, e.condition);
   X.insert(std::get<0>(cond).begin(), std::get<0>(cond).end());
   std::copy_if(std::get<1>(cond).begin(), std::get<1>(cond).end(), 
     std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
-  Fcal.insert(Fcal.end(), std::get<2>(cond).begin(), std::get<2>(cond).end());
+  Fcal.insert(std::get<2>(cond).begin(), std::get<2>(cond).end());
 
   //these ones are just passed along
   auto then = apply_visitor(*this, e.then);
   X.insert(std::get<0>(then).begin(), std::get<0>(then).end());
   F.insert(F.end(), std::get<1>(then).begin(), std::get<1>(then).end());
-  Fcal.insert(Fcal.end(), std::get<2>(then).begin(), std::get<2>(then).end());
+  Fcal.insert(std::get<2>(then).begin(), std::get<2>(then).end());
   
   for (const auto& branch : e.else_ifs)
   {
@@ -328,22 +326,19 @@ DependencyFinder::operator()(const Tree::IfExpr& e)
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(), 
       std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
-    Fcal.insert(
-      Fcal.end(), std::get<2>(result).begin(), std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
 
     //these ones are just passed along
     result = apply_visitor(*this, branch.second);
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     F.insert(F.end(), std::get<1>(result).begin(), std::get<1>(result).end());
-    Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-      std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
   }
 
   auto else_ = apply_visitor(*this, e.else_);
   X.insert(std::get<0>(else_).begin(), std::get<0>(else_).end());
   F.insert(F.end(), std::get<1>(else_).begin(), std::get<1>(else_).end());
-  Fcal.insert(Fcal.end(), std::get<2>(else_).begin(), 
-    std::get<2>(else_).end());
+  Fcal.insert(std::get<2>(else_).begin(), std::get<2>(else_).end());
 
   return std::make_tuple(X, F, Fcal);
 }
@@ -357,7 +352,7 @@ DependencyFinder::operator()(const Tree::HashExpr& e)
   if (dimbody != nullptr)
   {
     return std::make_tuple(IdentifierSet(), 
-      FunctorList{Static::Functions::Param{dimbody->dim}}, FunctorList{});
+      FunctorList{Static::Functions::Param{dimbody->dim}}, FunctorSet{});
   }
 
   auto result = apply_visitor(*this, e.e);
@@ -373,7 +368,7 @@ DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::RegionExpr& e)
 {
   IdentifierSet X;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   for (const auto& entry : e.entries)
   {
@@ -381,16 +376,14 @@ DependencyFinder::operator()(const Tree::RegionExpr& e)
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
       std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
-    Fcal.insert(Fcal.end(), 
-      std::get<2>(result).begin(), std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
 
 
     result = apply_visitor(*this, std::get<2>(entry));
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
       std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
-    Fcal.insert(Fcal.end(), 
-      std::get<2>(result).begin(), std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
   }
 
   return std::make_tuple(X, FunctorList{}, Fcal);
@@ -400,7 +393,7 @@ DependencyFinder::result_type
 DependencyFinder::operator()(const Tree::TupleExpr& e)
 {
   IdentifierSet X;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   for (const auto& entry : e.pairs)
   {
@@ -408,15 +401,13 @@ DependencyFinder::operator()(const Tree::TupleExpr& e)
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
       std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
-    Fcal.insert(Fcal.end(), 
-      std::get<2>(result).begin(), std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
 
     result = apply_visitor(*this, entry.second);
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
       std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
-    Fcal.insert(Fcal.end(), 
-      std::get<2>(result).begin(), std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
   }
 
   return std::make_tuple(X, FunctorList{}, Fcal);
@@ -427,20 +418,18 @@ DependencyFinder::operator()(const Tree::AtExpr& e)
 {
   IdentifierSet X;
   FunctorList F;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   auto result = apply_visitor(*this, e.lhs);
   X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
   F.insert(F.end(), std::get<1>(result).begin(), std::get<1>(result).end());
-  Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-    std::get<2>(result).end());
+  Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
 
   result = apply_visitor(*this, e.rhs);
   X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
   std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
     std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
-  Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-    std::get<2>(result).end());
+  Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
 
   return std::make_tuple(X, F, Fcal);
 }
@@ -450,16 +439,15 @@ DependencyFinder::operator()(const Tree::LambdaExpr& e)
 {
   IdentifierSet X;
   FunctorList F;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   for (const auto& bind : e.binds)
   {
     auto result = apply_visitor(*this, bind);
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
-      std::back_inserter(Fcal), Static::Functions::is_app());
-    Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-      std::get<2>(result).end());
+      std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
   }
 
   auto body = apply_visitor(*this, e.rhs);
@@ -480,16 +468,15 @@ DependencyFinder::operator()(const Tree::BaseAbstractionExpr& e)
 {
   IdentifierSet X;
   FunctorList F;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   for (const auto& bind : e.binds)
   {
     auto result = apply_visitor(*this, bind);
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
-      std::back_inserter(Fcal), Static::Functions::is_app());
-    Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-      std::get<2>(result).end());
+      std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
   }
 
   auto body = apply_visitor(*this, e.body);
@@ -504,7 +491,7 @@ DependencyFinder::operator()(const Tree::BangAppExpr& e)
 {
   IdentifierSet X;
   FunctorList F;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   FunctorList bases;
 
@@ -523,8 +510,7 @@ DependencyFinder::operator()(const Tree::BangAppExpr& e)
     result = apply_visitor(*this, expr);
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     F_j.push_back(std::get<1>(result));
-    Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-      std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
   }
 
   for (const auto& f : F_0)
@@ -553,7 +539,7 @@ DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
 {
   IdentifierSet X;
   FunctorList F;
-  FunctorList Fcal;
+  FunctorSet Fcal;
   FunctorList cbvs;
 
   auto lhs = apply_visitor(*this, e.lhs);
@@ -583,8 +569,8 @@ DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
     std::get<1>(eval_result).end());
 
   Fcal = std::get<2>(lhs);
-  Fcal.insert(Fcal.end(), std::get<2>(rhs).begin(), std::get<2>(rhs).end());
-  Fcal.insert(Fcal.end(), std::get<2>(eval_result).begin(), 
+  Fcal.insert(std::get<2>(rhs).begin(), std::get<2>(rhs).end());
+  Fcal.insert(std::get<2>(eval_result).begin(), 
     std::get<2>(eval_result).end());
 
   return std::make_tuple(X, F, Fcal);
@@ -603,13 +589,12 @@ DependencyFinder::operator()(const Tree::WhereExpr& e)
 
   IdentifierSet X;
   FunctorList F;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   auto result = apply_visitor(*this, e.e);
   X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
   F.insert(F.end(), std::get<1>(result).begin(), std::get<1>(result).end());
-  Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-    std::get<2>(result).end());
+  Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
 
   for (const auto& dim : e.dims)
   {
@@ -617,9 +602,8 @@ DependencyFinder::operator()(const Tree::WhereExpr& e)
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     //F.insert(F.end(), std::get<1>(result).begin(), std::get<1>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
-      std::back_inserter(Fcal), Static::Functions::is_app());
-    Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-      std::get<2>(result).end());
+      std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
   }
 
   return std::make_tuple(X, F, Fcal);
@@ -630,27 +614,24 @@ DependencyFinder::operator()(const Tree::ConditionalBestfitExpr& e)
 {
   IdentifierSet X;
   FunctorList F;
-  FunctorList Fcal;
+  FunctorSet Fcal;
 
   for (const auto& decl : e.declarations)
   {
     auto result = apply_visitor(*this, std::get<1>(decl));
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     std::copy_if(std::get<1>(result).begin(), std::get<1>(result).end(),
-      std::back_inserter(Fcal), Static::Functions::is_app());
-    Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-      std::get<2>(result).end());
+      std::inserter(Fcal, Fcal.end()), Static::Functions::is_app());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
 
     result = apply_visitor(*this, std::get<2>(decl));
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
-    Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-      std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
 
     result = apply_visitor(*this, std::get<3>(decl));
     X.insert(std::get<0>(result).begin(), std::get<0>(result).end());
     F.insert(F.end(), std::get<1>(result).begin(), std::get<1>(result).end());
-    Fcal.insert(Fcal.end(), std::get<2>(result).begin(), 
-      std::get<2>(result).end());
+    Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
   }
 
   return std::make_tuple(X, F, Fcal);
