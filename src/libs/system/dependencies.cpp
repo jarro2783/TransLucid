@@ -109,15 +109,18 @@ DependencyFinder::computeDependencies()
     std::cout << "Iteration " << i << std::endl;
     for (const auto& dep : currentDeps)
     {
-      std::cout << dep.first << ": ";
+      std::cout << dep.first << ": X = ";
 
       for (const auto& x : std::get<0>(dep.second))
       {
         std::cout << x << " ";
       }
-      std::cout << std::endl;
+      std::cout << std::endl << "F = ";
       
       print_container(std::cout, std::get<1>(dep.second));
+      std::cout << std::endl << "Fcal = ";
+      
+      print_container(std::cout, std::get<2>(dep.second));
       std::cout << std::endl;
     }
     std::cout << "End iteration " << i << std::endl;
@@ -132,8 +135,8 @@ DependencyFinder::computeDependencies()
     ++i;
   }
 
-  //std::cout << "took " << i << " iterations to compute dependencies" << 
-  //  std::endl;
+  std::cout << "took " << i << " iterations to compute dependencies" << 
+    std::endl;
 
   //compute the dependencies of the demands one last time
 

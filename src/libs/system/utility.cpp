@@ -808,6 +808,7 @@ namespace
           w = m_S.top();
           m_nodes[w].instack = false;
           connected.push_back(w);
+          m_S.pop();
         }
 
         m_result.push_back(connected);

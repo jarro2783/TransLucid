@@ -332,6 +332,11 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   {
     //nothing to do here
   }
+  else if (variant_is_type<TypeTuple>(c.lhs) && 
+           variant_is_type<TypeTuple>(c.rhs) )
+  {
+    //nothing to do here
+  }
   else if ((cbvlhs = get<TypeCBV>(&c.lhs)) != nullptr && 
            (cbvrhs = get<TypeCBV>(&c.rhs)) != nullptr)
   {

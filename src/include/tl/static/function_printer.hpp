@@ -134,6 +134,10 @@ namespace TransLucid
           //std::copy(up.property.begin(), up.property.end(),
           //  std::ostream_iterator<Functor<Prop>>(os, ", "));
 
+          os << "} {";
+
+          print_container(os, up.fundeps);
+
           os << "})";
           
           auto str = os.str();
@@ -153,6 +157,10 @@ namespace TransLucid
           os << "} {";
 
           print_container(os, cbv.functions);
+
+          os << "} {";
+
+          print_container(os, cbv.fundeps);
 
           os << "})";
 
@@ -179,6 +187,10 @@ namespace TransLucid
           os << "} {";
 
           print_container(os, base.functions);
+
+          os << "} {";
+
+          print_container(os, base.fundeps);
 
           os << "})";
 

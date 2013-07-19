@@ -656,7 +656,8 @@ namespace TransLucid
           {
             return result_type
             {
-              CBV<Prop>{cbv.dim, cbv.property, subs(cbv.functions, p)}
+              CBV<Prop>{cbv.dim, cbv.property, subs(cbv.functions, p),
+                subs(cbv.fundeps, p)}
             };
           }
 
@@ -665,14 +666,16 @@ namespace TransLucid
           {
             return result_type
             {
-              Base<Prop>{base.dims, base.property, subs(base.functions, p)}
+              Base<Prop>{base.dims, base.property, subs(base.functions, p),
+                subs(base.fundeps, p)}
             };
           }
 
           result_type
           operator()(const Up<Prop>& up, const Substitution<Prop>& p)
           {
-            return result_type{Up<Prop>{up.property, subs(up.functions, p)}};
+            return result_type{Up<Prop>{up.property, subs(up.functions, p),
+              subs(up.fundeps, p)}};
           }
 
           result_type
@@ -834,8 +837,7 @@ namespace TransLucid
           prop_append(prop, std::get<0>(result));
           funcs.insert(funcs.end(), std::get<1>(result).begin(), 
             std::get<1>(result).end());
-          funcs.insert(funcs.end(), std::get<2>(result).begin(), 
-            std::get<2>(result).end());
+          Fcal.insert(std::get<2>(result).begin(), std::get<2>(result).end());
         }
 
         return std::make_tuple(prop, funcs, Fcal);

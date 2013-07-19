@@ -147,7 +147,7 @@ namespace TransLucid
 
       private:
 
-      void
+      std::vector<std::vector<u32string>>
       generate_recurse_groups(const std::set<u32string>& ids);
 
       FreshTypeVars& m_freshVars;
@@ -159,6 +159,8 @@ namespace TransLucid
       System& m_system;
 
       bool indecl;
+
+      std::map<u32string, TypeScheme> m_environment;
     };
 
     TypeAtomic

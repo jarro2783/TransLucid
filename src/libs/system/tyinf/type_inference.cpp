@@ -114,55 +114,66 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 {
   indecl = true;
 
-  //build up C and A as we go
-  TypeContext A;
-  ConstraintGraph C;
-
-  std::map<u32string, Type> types;
-
   std::cout << "infer_system" << std::endl;
 
-  generate_recurse_groups(ids);
+  auto recursion_groups = generate_recurse_groups(ids);
 
-  for (const auto& x : ids)
+  for (const auto& group : recursion_groups)
   {
-    try
+    //build up C and A as we go
+    TypeContext A;
+    ConstraintGraph C;
+    std::map<u32string, Type> types;
+
+    for (const auto& x : group)
     {
-      auto e = m_system.getIdentifierTree(x);
 
-      auto t = apply_visitor(*this, e);
+      try
+      {
+        auto e = m_system.getIdentifierTree(x);
 
-      A.join(std::get<0>(t));
-      C.make_union(std::get<2>(t));
+        auto t = apply_visitor(*this, e);
 
-      types.insert(std::make_pair(x, std::get<1>(t)));
-      
-      std::cout << x << " : " << print_type(std::get<1>(t), m_system) 
-        << std::endl;
+        A.join(std::get<0>(t));
+        C.make_union(std::get<2>(t));
+
+        types.insert(std::make_pair(x, std::get<1>(t)));
+
+        std::cout << x << " : " << print_type(std::get<1>(t), m_system) 
+          << std::endl;
+      }
+      catch (...)
+      {
+        std::cerr << "Error checking type of " << x << std::endl;
+        throw;
+      }
     }
-    catch (...)
+
+    if (types.size() > 1)
     {
-      std::cerr << "Error checking type of " << x << std::endl;
-      throw;
+      for (const auto& xt : types)
+      {
+        //each x is allocated an alpha and a gamma type variable
+        auto alpha = fresh();
+        auto gamma = fresh();
+
+        //then we link up the type from the context to the return types
+        C.add_to_closure(Constraint{xt.second, alpha});
+        C.add_to_closure(Constraint{alpha, gamma});
+        C.add_to_closure(Constraint{gamma, A.lookup(xt.first)});
+      }
+    }
+
+    for (const auto& xt : types)
+    {
+      m_environment[xt.first] = std::make_tuple(A, xt.second, C);
     }
   }
 
-  for (const auto& xt : types)
-  {
-    //each x is allocated an alpha and a gamma type variable
-    auto alpha = fresh();
-    auto gamma = fresh();
-
-    //then we link up the type from the context to the return types
-    C.add_to_closure(Constraint{xt.second, alpha});
-    C.add_to_closure(Constraint{alpha, gamma});
-    C.add_to_closure(Constraint{gamma, A.lookup(xt.first)});
-  }
-
-  std::cout << C.print(m_system) << std::endl;
+//  std::cout << C.print(m_system) << std::endl;
 }
 
-void
+std::vector<std::vector<u32string>>
 TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
 {
   FreeVariables free;
@@ -215,14 +226,19 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
 
   auto connected = generate_strongly_connected(depGraph);
 
+  std::vector<std::vector<u32string>> groups;
+
   for (const auto& component : connected)
   {
-    std::cout << "strongly connected component:" << std::endl;
+    std::vector<u32string> oneGroup;
     for (const auto& v : component)
     {
-      std::cout << indexToString[v] << std::endl;
+      oneGroup.push_back(indexToString[v]);
     }
+    groups.push_back(oneGroup);
   }
+
+  return groups;
 }
 
 TypeInferrer::result_type
@@ -290,7 +306,8 @@ TypeInferrer::operator()(const Tree::DimensionExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::IdentExpr& e)
 {
-  if (indecl)
+  auto iter = m_environment.find(e.text);
+  if (iter == m_environment.end())
   {
     auto alpha = fresh();
     auto gamma = fresh();
@@ -303,6 +320,10 @@ TypeInferrer::operator()(const Tree::IdentExpr& e)
     C.add_to_closure(Constraint{alpha, gamma});
 
     return std::make_tuple(A, gamma, C);
+  }
+  else
+  {
+    //rename the type scheme and return
   }
 }
 
