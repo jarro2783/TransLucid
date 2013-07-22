@@ -145,6 +145,12 @@ namespace TransLucid
       result_type
       operator()(const Tree::ConditionalBestfitExpr&);
 
+      const std::map<u32string, TypeScheme>&
+      environment() const
+      {
+        return m_environment;
+      }
+
       private:
 
       std::vector<std::vector<u32string>>

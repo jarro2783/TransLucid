@@ -302,7 +302,7 @@ namespace TransLucid
       computeDependencies();
 
       void
-      typeInference();
+      typeInference(const std::vector<Tree::Expr>& exprs);
 
       void
       main_loop();

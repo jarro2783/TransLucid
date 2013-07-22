@@ -279,7 +279,7 @@ TLText::main_loop()
       }
 
       computeDependencies();
-      typeInference();
+      typeInference(exprs);
 
       //run the demands
       m_system.go();
@@ -590,7 +590,7 @@ TLText::computeDependencies()
 }
 
 void
-TLText::typeInference()
+TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 {
   if (m_infer)
   {
@@ -604,6 +604,19 @@ TLText::typeInference()
     }
 
     infer.infer_system(vars);
+
+    for (const auto& e : exprs)
+    {
+      auto t = infer.infer(m_system.fixupTreeAndAdd(e));
+
+      t = TypeInference::garbage_collect(TypeInference::canonise(t, fresh));
+      *m_os << print_type(std::get<1>(t), m_system) << std::endl
+        << std::get<2>(t).print(m_system) << std::endl;
+
+      *m_os << "In context: ";
+      print_container(*m_os, std::get<0>(t).getDimensions());
+      *m_os << std::endl << std::endl;
+    }
   }
 }
 

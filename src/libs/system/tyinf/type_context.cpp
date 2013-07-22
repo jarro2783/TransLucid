@@ -67,6 +67,8 @@ TypeContext::join(const TypeContext& other)
       m_vars.insert(p);
     }
   }
+
+  m_dimensions.insert(other.m_dimensions.begin(), other.m_dimensions.end());
 }
 
 Type

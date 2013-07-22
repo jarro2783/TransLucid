@@ -178,8 +178,6 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
     std::cerr << "Error checking type of " << *currentId << std::endl;
     throw;
   }
-
-  //std::cout << C.print(m_system) << std::endl;
 }
 
 std::vector<std::vector<u32string>>
@@ -895,6 +893,18 @@ class MarkPolarity
   operator()(TypeVariable v, TagNegative)
   {
     return {{}, {v}};
+  }
+
+  result_type
+  operator()(const TypeDim& dim, TagPositive)
+  {
+    return apply_visitor(*this, dim.body, TagPositive());
+  }
+
+  result_type
+  operator()(const TypeDim& dim, TagNegative)
+  {
+    return apply_visitor(*this, dim.body, TagNegative());
   }
 
   result_type
