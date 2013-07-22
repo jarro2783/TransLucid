@@ -35,6 +35,12 @@ namespace TransLucid
       public:
 
       void
+      addDimension(TypeVariable t)
+      {
+        m_dimensions.insert(t);
+      }
+
+      void
       add(dimension_index d, Type t);
 
       void
@@ -73,6 +79,11 @@ namespace TransLucid
           result.m_vars.insert(std::make_pair(v.first, r(v.second)));
         }
 
+        for (auto v : c.m_dimensions)
+        {
+          result.m_dimensions.insert(get<TypeVariable>(r(Type(v))));
+        }
+
         return result;
       }
 
@@ -91,9 +102,16 @@ namespace TransLucid
         }
       }
 
+      const std::set<TypeVariable>&
+      getDimensions() const
+      {
+        return m_dimensions;
+      }
+
       private:
       std::map<dimension_index, Type> m_lambdas;
       std::unordered_map<u32string, Type> m_vars;
+      std::set<TypeVariable> m_dimensions;
     };
   }
 }

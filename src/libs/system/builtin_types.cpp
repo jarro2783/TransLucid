@@ -115,17 +115,17 @@ namespace TransLucid
     BuiltinBaseFunction<2> integer_modulus{&mpz_modulus,
       {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
     BuiltinBaseFunction<2> integer_lte{&mpz_lte,
-      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> integer_lt{&mpz_lt,
-      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> integer_gte{&mpz_gte,
-      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> integer_gt{&mpz_gt,
-      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> integer_eq{&mpz_eq,
-      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> integer_ne{&mpz_ne,
-      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<1> integer_uminus{&mpz_uminus,
       {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}};
 
@@ -138,17 +138,17 @@ namespace TransLucid
     BuiltinBaseFunction<2> float_divide{&mpf_divide,
       {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
     BuiltinBaseFunction<2> float_lte{&mpf_lte,
-      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> float_lt{&mpf_lt,
-      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> float_gte{&mpf_gte,
-      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> float_gt{&mpf_gt,
-      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> float_eq{&mpf_eq,
-      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<2> float_ne{&mpf_ne,
-      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
+      {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP, TYPE_INDEX_BOOL}};
     BuiltinBaseFunction<1> float_sqrt{&mpf_sqrt,
       {TYPE_INDEX_FLOATMP, TYPE_INDEX_FLOATMP}};
     BuiltinBaseFunction<1> float_abs{&mpf_abs,

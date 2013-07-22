@@ -33,6 +33,23 @@ namespace TransLucid
 
       typedef Type result_type;
 
+      struct Rewriter
+      {
+        TypeVariable
+        rename_var(TypeVariable v)
+        {
+          return self.rename_typevar(v);
+        }
+
+        Type
+        rewrite_type(Type t)
+        {
+          return apply_visitor(self, t);
+        }
+
+        Rename& self;
+      };
+
       using GenericTypeWalker::operator();
 
       Rename(FreshTypeVars& fresh)
@@ -48,12 +65,8 @@ namespace TransLucid
         TypeContext A = TypeContext::rewrite(std::get<0>(t),
           std::bind(visitor_applier(), std::ref(*this), _1));
 
-        ConstraintGraph C = std::get<2>(t);
-        C.rewrite_bounds
-        (
-          std::bind(visitor_applier(), std::ref(*this), _1),
-          std::bind(visitor_applier(), std::ref(*this), _1)
-        );
+        ConstraintGraph C = ConstraintGraph::rename_vars(std::get<2>(t), 
+          Rewriter{*this});
 
         auto tr = apply_visitor(*this, std::get<1>(t));
 
@@ -66,18 +79,31 @@ namespace TransLucid
         return rename_typevar(v);
       }
 
-//finish this
-#if 0
       result_type
       operator()(const TypeGLB& glb)
       {
+        VarSet vars;
+
+        for (auto v : glb.vars)
+        {
+          vars.insert(rename_typevar(v));
+        }
+
+        return TypeGLB{vars, apply_visitor(*this, glb.constructed)};
       }
 
       result_type
       operator()(const TypeLUB& lub)
       {
+        VarSet vars;
+
+        for (auto v : lub.vars)
+        {
+          vars.insert(rename_typevar(v));
+        }
+
+        return TypeLUB{vars, apply_visitor(*this, lub.constructed)};
       }
-#endif
 
       TypeVariable
       rename_typevar(TypeVariable v)

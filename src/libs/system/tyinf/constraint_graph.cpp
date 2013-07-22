@@ -278,7 +278,8 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   const TypeGLB* glb = nullptr;
   const TypeCBV* cbvlhs = nullptr;
   const TypeCBV* cbvrhs = nullptr;
-  const TypeAtomic* atomic = nullptr;
+  const TypeAtomic* atomiclhs = nullptr;
+  const TypeAtomic* atomicrhs = nullptr;
   const Constant* constant = nullptr;
   const TypeBase* baselhs = nullptr;
   const TypeBase* baserhs = nullptr;
@@ -322,8 +323,19 @@ subc(const Constraint& c, std::vector<Constraint>& result)
     //there is actually nothing to do here
   }
   else if ((constant = get<Constant>(&c.lhs)) != nullptr &&
-           (atomic = get<TypeAtomic>(&c.rhs)) != nullptr &&
-            constant->index() == atomic->index)
+           (atomicrhs = get<TypeAtomic>(&c.rhs)) != nullptr &&
+            constant->index() == atomicrhs->index)
+  {
+    //nothing to do here
+  }
+  else if ((atomiclhs = get<TypeAtomic>(&c.lhs)) != nullptr &&
+           (atomicrhs = get<TypeAtomic>(&c.rhs)) != nullptr &&
+            atomiclhs->index == atomicrhs-> index)
+  {
+    //nothing to do here
+  }
+  else if (variant_is_type<Constant>(c.lhs) && 
+           variant_is_type<TypeDim>(c.rhs) )
   {
     //nothing to do here
   }

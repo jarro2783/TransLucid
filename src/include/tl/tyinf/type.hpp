@@ -53,6 +53,8 @@ namespace TransLucid
     struct TypeIntension;
     struct TypeBase;
 
+    struct TypeDim;
+
     //tags for single value empty types
     struct TagTop { };
     struct TagBot { };
@@ -103,7 +105,8 @@ namespace TransLucid
       recursive_wrapper<TypeLUB>,
       recursive_wrapper<TypeIntension>,
       recursive_wrapper<TypeCBV>,
-      recursive_wrapper<TypeBase>
+      recursive_wrapper<TypeBase>,
+      recursive_wrapper<TypeDim>
     > Type;
 
     typedef std::set<TypeVariable> VarSet;
@@ -162,6 +165,17 @@ namespace TransLucid
 
       bool
       operator==(const TypeIntension& rhs) const
+      {
+        return body == rhs.body;
+      }
+    };
+
+    struct TypeDim
+    {
+      Type body;
+
+      bool
+      operator==(const TypeDim& rhs) const
       {
         return body == rhs.body;
       }

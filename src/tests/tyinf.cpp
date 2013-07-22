@@ -137,6 +137,9 @@ inference(TransLucid::System& system)
   infer(system, 
     UR"*((\f -> (\x -> f!(\v -> (x!x)!v))!(\x -> f!(\v -> (x!x)!v)))!
       (\f -> \n -> f!n))*");
+  infer(system, U"#.1");
+  infer(system, UR"*(\x -> #.x)*");
+  infer(system, UR"*((\x -> #.x)!5)*");
 
   infer_system(system, {U"X", U"Y"});
 }

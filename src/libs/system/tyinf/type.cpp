@@ -71,14 +71,20 @@ build_lub_constructed(Type current, Type join)
   aconst = get<Constant>(&current);
   bconst = get<Constant>(&join);
 
-  if (aconst != nullptr && bconst != nullptr &&
-      (aconst->index() == bconst->index()))
+  if (aconst != nullptr && bconst != nullptr)
   {
-    return TypeAtomic
-      {
-        U"",
-        aconst->index()
-      };
+    if ((aconst->index() == bconst->index()))
+    {
+      return TypeAtomic
+        {
+          U"",
+          aconst->index()
+        };
+    }
+    else
+    {
+      return TypeTop();
+    }
   }
 
   aatom = get<TypeAtomic>(&current);
@@ -92,6 +98,18 @@ build_lub_constructed(Type current, Type join)
   if (aatom != nullptr && bconst != nullptr && aatom->index == bconst->index())
   {
     return *aatom;
+  }
+
+  if (aatom != nullptr && batom != nullptr)
+  {
+    if (aatom->index == batom->index)
+    {
+      return *aatom;
+    }
+    else
+    {
+      return TypeTop();
+    }
   }
 
   throw BoundInvalid{BoundInvalid::LUB, current, join};
@@ -110,6 +128,12 @@ build_glb_constructed(Type current, Type join)
   TypeIntension *ainten = get<TypeIntension>(&current);
   TypeIntension *binten = get<TypeIntension>(&join);
 
+  Constant *aconst = nullptr;
+  Constant *bconst = nullptr;
+
+  TypeAtomic *aatom = nullptr;
+  TypeAtomic *batom = nullptr;
+
   if (acbv != nullptr && bcbv != nullptr)
   {
     return TypeCBV
@@ -126,6 +150,51 @@ build_glb_constructed(Type current, Type join)
         construct_glb(ainten->body, binten->body)
       };
   }
+
+  aconst = get<Constant>(&current);
+  bconst = get<Constant>(&join);
+
+  if (aconst != nullptr && bconst != nullptr)
+  {
+    if ((aconst->index() == bconst->index()))
+    {
+      return TypeAtomic
+        {
+          U"",
+          aconst->index()
+        };
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
+
+  aatom = get<TypeAtomic>(&current);
+  batom = get<TypeAtomic>(&join);
+
+  if (aconst != nullptr && batom != nullptr && aconst->index() == batom->index)
+  {
+    return *aconst;
+  }
+
+  if (aatom != nullptr && bconst != nullptr && aatom->index == bconst->index())
+  {
+    return *bconst;
+  }
+
+  if (aatom != nullptr && batom != nullptr)
+  {
+    if (aatom->index == batom->index)
+    {
+      return *aatom;
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
+
 
   throw BoundInvalid{BoundInvalid::GLB, current, join};
 }
@@ -458,6 +527,16 @@ namespace
       m_result += U") ↦ ";
 
       apply_visitor(*this, base.rhs);
+      m_result += U")";
+    }
+
+    void
+    operator()(const TypeDim& dim)
+    {
+      m_result += U"dim(";
+
+      apply_visitor(*this, dim.body);
+
       m_result += U")";
     }
 

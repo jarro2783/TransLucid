@@ -27,6 +27,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/tyinf/type.hpp>
 #include <tl/tyinf/type_variable.hpp>
 
+#include <tl/utility.hpp>
+
 namespace TransLucid
 {
   namespace TypeInference
@@ -121,6 +123,38 @@ namespace TransLucid
           c.second.lower = rl(c.second.lower);
           c.second.upper = ru(c.second.upper);
         }
+      }
+
+      template <typename Rewriter>
+      static
+      ConstraintGraph
+      rename_vars(const ConstraintGraph& C, Rewriter rewrite)
+      {
+        ConstraintGraph result;
+
+        for (const auto& v : C.m_graph)
+        {
+          ConstraintNode node;
+
+          auto r = rewrite.rename_var(v.first);
+
+          for (auto t : v.second.less)
+          {
+            insert_sorted(node.less, rewrite.rename_var(t));
+          }
+
+          for (auto t : v.second.greater)
+          {
+            insert_sorted(node.greater, rewrite.rename_var(t));
+          }
+
+          node.lower = rewrite.rewrite_type(v.second.lower);
+          node.upper = rewrite.rewrite_type(v.second.upper);
+
+          result.m_graph[r] = node;
+        }
+
+        return result;
       }
 
       //when anything in S is less than any variable a in the graph, set

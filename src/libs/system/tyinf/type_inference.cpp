@@ -118,18 +118,21 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 
   auto recursion_groups = generate_recurse_groups(ids);
 
-  for (const auto& group : recursion_groups)
+  const u32string* currentId = nullptr;
+
+  try
   {
-    //build up C and A as we go
-    TypeContext A;
-    ConstraintGraph C;
-    std::map<u32string, Type> types;
 
-    for (const auto& x : group)
+    for (const auto& group : recursion_groups)
     {
+      //build up C and A as we go
+      TypeContext A;
+      ConstraintGraph C;
+      std::map<u32string, Type> types;
 
-      try
+      for (const auto& x : group)
       {
+        currentId = &x;
         auto e = m_system.getIdentifierTree(x);
 
         auto t = apply_visitor(*this, e);
@@ -142,35 +145,41 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         std::cout << x << " : " << print_type(std::get<1>(t), m_system) 
           << std::endl;
       }
-      catch (...)
+        
+      if (types.size() > 1)
       {
-        std::cerr << "Error checking type of " << x << std::endl;
-        throw;
-      }
-    }
+        for (const auto& xt : types)
+        {
+          currentId = &xt.first;
+          //each x is allocated an alpha and a gamma type variable
+          auto alpha = fresh();
+          auto gamma = fresh();
 
-    if (types.size() > 1)
-    {
+          //then we link up the type from the context to the return types
+          C.add_to_closure(Constraint{xt.second, alpha});
+          C.add_to_closure(Constraint{alpha, gamma});
+          C.add_to_closure(Constraint{gamma, A.lookup(xt.first)});
+        }
+      }
+
       for (const auto& xt : types)
       {
-        //each x is allocated an alpha and a gamma type variable
-        auto alpha = fresh();
-        auto gamma = fresh();
-
-        //then we link up the type from the context to the return types
-        C.add_to_closure(Constraint{xt.second, alpha});
-        C.add_to_closure(Constraint{alpha, gamma});
-        C.add_to_closure(Constraint{gamma, A.lookup(xt.first)});
+        auto S = canonise(
+          garbage_collect(std::make_tuple(A, xt.second, C)),
+          m_freshVars
+        );
+        std::cout << std::get<2>(S).print(m_system) << std::endl;
+        m_environment[xt.first] = S;
       }
     }
-
-    for (const auto& xt : types)
-    {
-      m_environment[xt.first] = std::make_tuple(A, xt.second, C);
-    }
+  } 
+  catch (...)
+  {
+    std::cerr << "Error checking type of " << *currentId << std::endl;
+    throw;
   }
 
-//  std::cout << C.print(m_system) << std::endl;
+  //std::cout << C.print(m_system) << std::endl;
 }
 
 std::vector<std::vector<u32string>>
@@ -250,7 +259,8 @@ TypeInferrer::infer(const Tree::Expr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::nil& e)
 {
-  return result_type();
+  auto alpha = fresh();
+  return result_type(TypeContext(), alpha, ConstraintGraph());
 }
 
 TypeInferrer::result_type
@@ -323,7 +333,9 @@ TypeInferrer::operator()(const Tree::IdentExpr& e)
   }
   else
   {
+    Rename r(m_freshVars);
     //rename the type scheme and return
+    return r.rename(iter->second);
   }
 }
 
@@ -464,7 +476,19 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
 
   if (dim == nullptr)
   {
-    throw "Invalid #.E";
+    auto t = apply_visitor(*this, e.e);
+
+    auto alpha = fresh();
+    auto gamma = fresh();
+
+    ConstraintGraph& C = std::get<2>(t);
+    TypeContext& A = std::get<0>(t);
+
+    C.add_to_closure(Constraint{std::get<1>(t), TypeDim{alpha}});
+    C.add_to_closure(Constraint{std::get<1>(t), gamma});
+    A.addDimension(gamma);
+
+    return std::make_tuple(A, alpha, C);
   }
   else
   {
@@ -990,7 +1014,8 @@ enum class HeadOrder
   TYPE_LUB,
   TYPE_INTENSION,
   TYPE_CBV,
-  TYPE_BASE
+  TYPE_BASE,
+  TYPE_DIM
 };
 
 struct GetTypeOrder
@@ -1073,6 +1098,12 @@ struct GetTypeOrder
   operator()(TypeBase const&)
   {
     return HeadOrder::TYPE_BASE;
+  }
+
+  result_type
+  operator()(TypeDim const&)
+  {
+    return HeadOrder::TYPE_DIM;
   }
 };
 
@@ -1351,8 +1382,13 @@ polarity(const TypeScheme& t)
       neg.insert(result.second.begin(), result.second.end());
     };
 
+  //mark the variables used as inputs to functions as negative
   std::get<0>(t).for_each(
     std::bind(gatherneg, std::placeholders::_1, std::ref(pos), std::ref(neg)));
+
+  //mark dimensions in the context as positive
+  const auto& dims = std::get<0>(t).getDimensions();
+  pos.insert(dims.begin(), dims.end());
 
   VarSet currentPos;
   VarSet currentNeg;
