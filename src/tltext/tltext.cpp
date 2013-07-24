@@ -597,6 +597,8 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
     TypeInference::FreshTypeVars fresh;
     TypeInference::TypeInferrer infer(m_system, fresh);
 
+    predefined_types(infer);
+
     std::set<u32string> vars;
     for (const auto& dep : m_deps)
     {
@@ -607,17 +609,41 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 
     for (const auto& e : exprs)
     {
-      auto t = infer.infer(m_system.fixupTreeAndAdd(e));
+      auto eFixed = m_system.fixupTreeAndAdd(e);
+      auto t = infer.infer(eFixed);
 
       t = TypeInference::garbage_collect(TypeInference::canonise(t, fresh));
+      *m_os << Printer::print_expr_tree(eFixed) << " ::\n";
       *m_os << print_type(std::get<1>(t), m_system) << std::endl
         << std::get<2>(t).print(m_system) << std::endl;
 
       *m_os << "In context: ";
-      print_container(*m_os, std::get<0>(t).getDimensions());
+      //print_container(*m_os, std::get<0>(t).getDimensions());
+      for (const auto& v : std::get<0>(t).getDimensions())
+      {
+        *m_os << "(" << v.first << ", " << v.second << ") ";
+      }
       *m_os << std::endl << std::endl;
     }
   }
+}
+
+void
+TLText::predefined_types(TypeInference::TypeInferrer& infer)
+{
+  using namespace TypeInference;
+
+  //print :: top -> string
+
+  ConstraintGraph C;
+
+  auto a = infer.fresh();
+  auto b = infer.fresh();
+  auto c = infer.fresh();
+
+  C.add_to_closure(Constraint{TypeAtomic{U"ustring", TYPE_INDEX_USTRING}, b});
+  C.add_to_closure(Constraint{TypeCBV{a, b}, c});
+  infer.setType(U"print", std::make_tuple(TypeContext(), c, C));
 }
 
 } //namespace TLText

@@ -43,6 +43,11 @@ namespace TransLucid
 
   class LineTokenizer;
 
+  namespace TypeInference
+  {
+    class TypeInferrer;
+  }
+
   /**
    * The TLText namespace. Contains all of the tlcore implementation.
    */
@@ -303,6 +308,9 @@ namespace TransLucid
 
       void
       typeInference(const std::vector<Tree::Expr>& exprs);
+
+      void
+      predefined_types(TypeInference::TypeInferrer&);
 
       void
       main_loop();

@@ -41,6 +41,13 @@ namespace TransLucid
       }
 
       Type
+      operator()(const TypeDim& dim)
+      {
+        return TypeDim{apply_visitor(*reinterpret_cast<Self*>(this),
+          dim.body)};
+      }
+
+      Type
       operator()(const TypeIntension& i)
       {
         return TypeIntension{apply_visitor(*reinterpret_cast<Self*>(this), 

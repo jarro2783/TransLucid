@@ -151,6 +151,12 @@ namespace TransLucid
         return m_environment;
       }
 
+      void
+      setType(const u32string& x, const TypeScheme& S)
+      {
+        m_environment[x] = S;
+      }
+
       private:
 
       std::vector<std::vector<u32string>>

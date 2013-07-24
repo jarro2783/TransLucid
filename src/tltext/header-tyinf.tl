@@ -262,9 +262,9 @@ fun prev.d X = X @ [d <- #.d - 1];;
 fun next.d X = X @ [d <- #.d + 1];;
 
 fun escape_character!c | is_printable.c = print!c;;
-fun escape_character!c | is_printable.c == false && code_point.c <= 0GFFFF 
+fun escape_character!c | ¬ (is_printable.c) && code_point.c <= 0GFFFF 
   = `\u` >> code_point_4.c;;
-fun escape_character!c | is_printable.c == false && code_point.c > 0GFFFF 
+fun escape_character!c | ¬ (is_printable.c) && code_point.c > 0GFFFF 
   = `\U` >> code_point_8.c;;
 fun escape_character!c [c is '\n'] = `\n`;;
 fun escape_character!c [c is '\t'] = `\t`;;

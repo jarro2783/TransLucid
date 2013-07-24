@@ -132,17 +132,36 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 
       for (const auto& x : group)
       {
-        currentId = &x;
-        auto e = m_system.getIdentifierTree(x);
+        //we can cheat sometimes and provide appropriate types when we
+        //know that they can't be inferred properly
 
-        auto t = apply_visitor(*this, e);
+        decltype(types.begin()) typeInserted;
 
-        A.join(std::get<0>(t));
-        C.make_union(std::get<2>(t));
+        auto iter = m_environment.find(x);
+        if (iter != m_environment.end())
+        {
+          Rename rename(m_freshVars);
+          auto S = rename.rename(iter->second);
 
-        types.insert(std::make_pair(x, std::get<1>(t)));
+          A.join(std::get<0>(S));
+          C.make_union(std::get<2>(S));
+          typeInserted = types.insert(std::make_pair(x, std::get<1>(S))).first;
+        }
+        else
+        {
+          currentId = &x;
+          auto e = m_system.getIdentifierTree(x);
 
-        std::cout << x << " : " << print_type(std::get<1>(t), m_system) 
+          auto t = apply_visitor(*this, e);
+
+          A.join(std::get<0>(t));
+          C.make_union(std::get<2>(t));
+
+          typeInserted = types.insert(std::make_pair(x, std::get<1>(t))).first;
+        }
+
+        std::cout << x << " : " << 
+          print_type(typeInserted->second, m_system) 
           << std::endl;
       }
         
@@ -164,11 +183,18 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 
       for (const auto& xt : types)
       {
-        auto S = canonise(
-          garbage_collect(std::make_tuple(A, xt.second, C)),
-          m_freshVars
-        );
-        std::cout << std::get<2>(S).print(m_system) << std::endl;
+        auto S = 
+          garbage_collect(canonise(
+            std::make_tuple(A, xt.second, C)
+          , m_freshVars))
+        ;
+
+        std::cout << std::get<2>(S).print(m_system) << "\nContext: ";
+        for (const auto& d : std::get<0>(S).getDimensions())
+        {
+          std::cout << "(" << d.first << ", " << d.second << ") ";
+        }
+        std::cout << "\n" << std::endl;
         m_environment[xt.first] = S;
       }
     }
@@ -468,8 +494,7 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::HashExpr& e)
 {
-  //at the moment we only handle #.d
-
+  //treat #.d and #.E differently
   const Tree::DimensionExpr* dim = get<Tree::DimensionExpr>(&e.e);
 
   if (dim == nullptr)
@@ -477,14 +502,16 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
     auto t = apply_visitor(*this, e.e);
 
     auto alpha = fresh();
+    auto beta = fresh();
     auto gamma = fresh();
 
     ConstraintGraph& C = std::get<2>(t);
     TypeContext& A = std::get<0>(t);
 
-    C.add_to_closure(Constraint{std::get<1>(t), TypeDim{alpha}});
+    C.add_to_closure(Constraint{beta, TypeDim{alpha}});
+    C.add_to_closure(Constraint{gamma, beta});
     C.add_to_closure(Constraint{std::get<1>(t), gamma});
-    A.addDimension(gamma);
+    A.addDimension(gamma, beta);
 
     return std::make_tuple(A, alpha, C);
   }
@@ -675,19 +702,19 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 
   for (const auto& d : e.declarations)
   {
-    auto t_0 = apply_visitor(*this, std::get<1>(d));
-    auto t_1 = apply_visitor(*this, std::get<2>(d));
     auto t_2 = apply_visitor(*this, std::get<3>(d));
 
-    if (!variant_is_type<TypeNothing>(std::get<1>(t_0)))
+    if (!variant_is_type<Tree::nil>(std::get<1>(d)))
     {
+      auto t_0 = apply_visitor(*this, std::get<1>(d));
       A.join(std::get<0>(t_0));
       C.make_union(std::get<2>(t_0));
 
       C.add_to_closure(Constraint{std::get<1>(t_0), TypeRegion()});
     }
-    if (!variant_is_type<TypeNothing>(std::get<1>(t_1)))
+    if (!variant_is_type<Tree::nil>(std::get<2>(d)))
     {
+      auto t_1 = apply_visitor(*this, std::get<2>(d));
       A.join(std::get<0>(t_1));
       C.make_union(std::get<2>(t_1));
 
@@ -1398,7 +1425,11 @@ polarity(const TypeScheme& t)
 
   //mark dimensions in the context as positive
   const auto& dims = std::get<0>(t).getDimensions();
-  pos.insert(dims.begin(), dims.end());
+  for (const auto& d : dims)
+  {
+    pos.insert(d.first);
+    neg.insert(d.second);
+  }
 
   VarSet currentPos;
   VarSet currentNeg;
