@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2012-12-15 09:39+1100\n"
+"POT-Creation-Date: 2013-07-24 10:16+1000\n"
 "PO-Revision-Date: 2012-02-08 11:56+11\n"
 "Last-Translator: Jarryd Beck <jarrydb@cse.unsw.edu.au>\n"
 "Language-Team: French <translucid@cse.unsw.edu.au>\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:266
+#: src/tltext/tltext.cpp:289
 msgid "// instant %1% beginning"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which demand we are printing
-#: src/tltext/tltext.cpp:273
+#: src/tltext/tltext.cpp:296
 msgid "// demand %1%"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:291
+#: src/tltext/tltext.cpp:319
 msgid "// instant %1% end"
 msgstr ""
 
@@ -47,7 +47,7 @@ msgstr ""
 
 #. TRANSLATORS: the help message for --cache
 #: src/tltext/main.cpp:152
-msgid "use cache"
+msgid "use cache, no testing is done to check if this is valid"
 msgstr ""
 
 #. TRANSLATORS: the help message for --debug
@@ -55,42 +55,52 @@ msgstr ""
 msgid "debug mode"
 msgstr ""
 
-#. TRANSLATORS: the help message for --help
+#. TRANSLATORS: the help message for --deps
 #: src/tltext/main.cpp:156
+msgid "compute dependencies"
+msgstr ""
+
+#. TRANSLATORS: the help message for --help
+#: src/tltext/main.cpp:158
 msgid "show this message"
 msgstr "afficher ce message"
 
 #. TRANSLATORS: the help message for --no-builtin-header
-#: src/tltext/main.cpp:158
+#: src/tltext/main.cpp:160
 msgid "don't use the standard header"
 msgstr ""
 
 #. TRANSLATORS: the help message for --header
-#: src/tltext/main.cpp:160
+#: src/tltext/main.cpp:162
 msgid "load another header"
 msgstr ""
 
 #. TRANSLATORS: the help message for --input
-#: src/tltext/main.cpp:162
+#: src/tltext/main.cpp:164
 msgid "input file"
 msgstr ""
 
 #. TRANSLATORS: the help message for --output
-#: src/tltext/main.cpp:164
+#: src/tltext/main.cpp:166
 msgid "output file"
 msgstr ""
 
+#. TRANSLATORS: the help message for --tyinf
+#: src/tltext/main.cpp:168
+msgid "enable type inference"
+msgstr ""
+
 #. TRANSLATORS: the help message for --uuid
-#: src/tltext/main.cpp:166
+#: src/tltext/main.cpp:170
 msgid "print uuids"
 msgstr "afficher les UUIDs"
 
 #. TRANSLATORS: the help message for --verbose
-#: src/tltext/main.cpp:168
+#: src/tltext/main.cpp:172
 msgid "level of verbosity"
 msgstr ""
 
 #. TRANSLATORS: the help message for --version
-#: src/tltext/main.cpp:170
+#: src/tltext/main.cpp:174
 msgid "show version"
 msgstr ""
