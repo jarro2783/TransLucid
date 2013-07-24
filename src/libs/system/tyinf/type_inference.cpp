@@ -704,8 +704,13 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
   {
     auto t_2 = apply_visitor(*this, std::get<3>(d));
 
-    if (!variant_is_type<Tree::nil>(std::get<1>(d)))
+    if (variant_is_type<Tree::RegionExpr>(std::get<1>(d)))
     {
+      //get the dimensions out of the region, and the type that this
+      //expression accepts is the union of all the types guarded for
+      //at the same time, the type in this guard for that dimension must
+      //be less than the required type for the dimension in the body
+
       auto t_0 = apply_visitor(*this, std::get<1>(d));
       A.join(std::get<0>(t_0));
       C.make_union(std::get<2>(t_0));
@@ -1295,7 +1300,7 @@ typedef std::map<TypeVariable, std::map<size_t, std::set<TypeVariable>>>
 std::pair<InverseSet, size_t>
 generateInverse(const ConstraintGraph& C)
 {
-  MinimiseMapper m{C};
+//  MinimiseMapper m{C};
 
   InverseSet inverse;
 
