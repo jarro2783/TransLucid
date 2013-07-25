@@ -62,6 +62,12 @@ namespace TransLucid
       Type
       lookup(const u32string& x);
 
+      bool
+      has_entry(dimension_index d);
+
+      bool
+      has_entry(const u32string& x);
+
       template <typename Rewriter>
       static
       TypeContext

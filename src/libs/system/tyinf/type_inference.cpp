@@ -94,6 +94,17 @@ make_host_op_type(const std::vector<type_index>& funtype, FreshTypeVars& fresh)
   return std::make_tuple(TypeContext(), t, C);
 }
 
+void
+process_region_guard(const Tree::RegionExpr& r)
+{
+  for (const auto& e : r.entries)
+  {
+    if (variant_is_type<Tree::DimensionExpr>(std::get<0>(e)))
+    {
+    }
+  }
+}
+
 }
 
 template <typename T>
@@ -576,8 +587,10 @@ TypeInferrer::operator()(const Tree::LambdaExpr& e)
 
   auto alpha = fresh();
 
+  auto dim = context.has_entry(e.argDim) ? context.lookup(e.argDim) : fresh();
+
   C.add_to_closure(Constraint{
-    TypeCBV{context.lookup(e.argDim), std::get<1>(t_0)}, 
+    TypeCBV{dim, std::get<1>(t_0)}, 
     alpha});
 
   context.remove(e.argDim);
@@ -710,6 +723,8 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
       //expression accepts is the union of all the types guarded for
       //at the same time, the type in this guard for that dimension must
       //be less than the required type for the dimension in the body
+
+      process_region_guard(get<Tree::RegionExpr>(std::get<1>(d)));
 
       auto t_0 = apply_visitor(*this, std::get<1>(d));
       A.join(std::get<0>(t_0));

@@ -101,5 +101,17 @@ TypeContext::lookup(const u32string& x)
   }
 }
 
+bool
+TypeContext::has_entry(dimension_index d)
+{
+  return m_lambdas.find(d) != m_lambdas.end();
+}
+
+bool
+TypeContext::has_entry(const u32string& x)
+{
+  return m_vars.find(x) != m_vars.end();
+}
+
 }
 }
