@@ -617,7 +617,8 @@ TypeInferrer::operator()(const Tree::BaseAbstractionExpr& e)
   //remove the dimensions from the context and build a type
   for (auto d : e.dims)
   {
-    lhs.push_back(A.lookup(d));
+    auto dim = A.has_entry(d) ? A.lookup(d) : fresh();
+    lhs.push_back(dim);
     A.remove(d);
   }
 
