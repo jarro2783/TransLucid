@@ -38,6 +38,16 @@ namespace TransLucid
       return e;
     }
 
+    Tree::Expr operator()(const Tree::LiteralExpr& e)
+    {
+      return Tree::LiteralExpr
+        {
+          e.type,
+          e.text,
+          apply_visitor(*reinterpret_cast<Derived*>(this), e.rewritten)
+        };
+    }
+
     Tree::Expr operator()(const Tree::ParenExpr& e)
     {
       return Tree::ParenExpr(

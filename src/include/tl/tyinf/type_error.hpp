@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/ast_fwd.hpp>
+
 #include <tl/tyinf/type.hpp>
 #include <tl/tyinf/constraint_graph.hpp>
 
@@ -76,6 +78,19 @@ namespace TransLucid
       print(System& system) const;
 
       Constraint c;
+    };
+
+    struct RegionImpInvalid : public TypeError
+    {
+      RegionImpInvalid(const Tree::Expr& e)
+      : e(e)
+      {
+      }
+
+      u32string
+      print(System& system) const;
+
+      Tree::Expr e;
     };
   }
 }

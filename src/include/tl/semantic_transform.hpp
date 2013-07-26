@@ -68,9 +68,6 @@ namespace TransLucid
     operator()(const Tree::ParenExpr& e);
 
     Tree::Expr 
-    operator()(const Tree::LiteralExpr& e);
-
-    Tree::Expr 
     operator()(const Tree::UnaryOpExpr& e);
 
     Tree::Expr 

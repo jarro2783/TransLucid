@@ -101,9 +101,7 @@ WorkshopBuilder::operator()(const Tree::HostOpExpr& e)
 WS*
 WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 {
-  //return new Workshops::TypedValueWS(m_system, e.type, e.text);
-  std::cerr << "warning: compiling literal node" << std::endl;
-  return nullptr;
+  return apply_visitor(*this, e.rewritten);
 }
 
 WS*

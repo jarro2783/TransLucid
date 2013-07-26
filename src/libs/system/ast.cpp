@@ -29,6 +29,15 @@ namespace TransLucid
 namespace Tree
 {
 
+LiteralExpr::LiteralExpr(const u32string& type, const u32string& text)
+: type(type), text(text)
+{
+  rewritten =
+    Tree::LambdaAppExpr( 
+      Tree::LambdaAppExpr(Tree::IdentExpr(U"construct_literal"), type),
+      text);
+}
+
 Expr
 insert_binary_operator
 (

@@ -17,10 +17,13 @@ You should have received a copy of the GNU General Public License
 along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include <tl/ast.hpp>
 #include <tl/fixed_indexes.hpp>
 #include <tl/free_variables.hpp>
 #include <tl/output.hpp>
+#include <tl/workshop_builder.hpp>
 
+#include <tl/tyinf/type_error.hpp>
 #include <tl/tyinf/type_inference.hpp>
 #include <tl/tyinf/type_rename.hpp>
 
@@ -92,17 +95,6 @@ make_host_op_type(const std::vector<type_index>& funtype, FreshTypeVars& fresh)
   C.add_to_closure(Constraint{TypeBase{args, result}, t});
 
   return std::make_tuple(TypeContext(), t, C);
-}
-
-void
-process_region_guard(const Tree::RegionExpr& r)
-{
-  for (const auto& e : r.entries)
-  {
-    if (variant_is_type<Tree::DimensionExpr>(std::get<0>(e)))
-    {
-    }
-  }
 }
 
 }
@@ -285,6 +277,59 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
   return groups;
 }
 
+void
+TypeInferrer::process_region_guard
+(
+  const Tree::RegionExpr& r,
+  std::vector<std::pair<dimension_index, Type>>& result
+)
+{
+  for (const auto& e : r.entries)
+  {
+    if (variant_is_type<Tree::DimensionExpr>(std::get<0>(e)))
+    {
+      //this only works if these objects are constants, i.e., the lower bound
+      //of this type is a Constant object
+      auto d = get<Tree::DimensionExpr>(std::get<0>(e)).dim;
+      auto rhs = apply_visitor(*this, std::get<2>(e));
+
+      auto t = std::get<2>(rhs).lower(get<TypeVariable>(std::get<1>(rhs)));
+
+      Type currentType;
+
+      if (variant_is_type<Constant>(t))
+      {
+        //now we can get to work
+
+        const auto& c = get<Constant>(t);
+        switch (std::get<1>(e))
+        {
+          case Region::Containment::IMP:
+          //this has to be an atomic type, otherwise it is a type error
+          if (c.index() == TYPE_INDEX_TYPE)
+          {
+            auto baseType = get_constant<type_index>(c);
+            currentType = TypeAtomic{m_system.getTypeName(baseType), baseType};
+            result.push_back(std::make_pair(d, currentType));
+          }
+          else
+          {
+            throw RegionImpInvalid(r);
+          }
+          break;
+
+          case Region::Containment::IS:
+          //this one is easy, it is exactly equal to the object
+          break;
+
+          case Region::Containment::IN:
+          break;
+        }
+      }
+    }
+  }
+}
+
 TypeInferrer::result_type
 TypeInferrer::infer(const Tree::Expr& e)
 {
@@ -331,7 +376,19 @@ TypeInferrer::operator()(const u32string& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::LiteralExpr& e)
 {
-  throw "Literal expression in type checker";
+  //evaluate the literal, and that is its type
+  WorkshopBuilder compile(&m_system);
+
+  std::shared_ptr<WS> ws(compile.build_workshops(e.rewritten));
+
+  Constant result = (*ws)(m_system.getDefaultContext());
+
+  ConstraintGraph C;
+  auto t = fresh();
+
+  C.add_to_closure(Constraint{result, t});
+
+  return std::make_tuple(TypeContext(), t, C);
 }
 
 TypeInferrer::result_type
@@ -716,6 +773,7 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 
   for (const auto& d : e.declarations)
   {
+    std::vector<std::pair<dimension_index, Type>> currentRegionType;
     auto t_2 = apply_visitor(*this, std::get<3>(d));
 
     if (variant_is_type<Tree::RegionExpr>(std::get<1>(d)))
@@ -725,7 +783,8 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
       //at the same time, the type in this guard for that dimension must
       //be less than the required type for the dimension in the body
 
-      process_region_guard(get<Tree::RegionExpr>(std::get<1>(d)));
+      process_region_guard(get<Tree::RegionExpr>(std::get<1>(d)),
+        currentRegionType);
 
       auto t_0 = apply_visitor(*this, std::get<1>(d));
       A.join(std::get<0>(t_0));

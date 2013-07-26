@@ -20,7 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #ifndef TL_TYINF_TYPE_INFERENCE_HPP_INCLUDED
 #define TL_TYINF_TYPE_INFERENCE_HPP_INCLUDED
 
-#include <tl/ast.hpp>
+#include <tl/ast_fwd.hpp>
 #include <tl/tyinf/constraint_graph.hpp>
 #include <tl/tyinf/type.hpp>
 #include <tl/tyinf/type_context.hpp>
@@ -161,6 +161,13 @@ namespace TransLucid
 
       std::vector<std::vector<u32string>>
       generate_recurse_groups(const std::set<u32string>& ids);
+
+      void
+      process_region_guard
+      (
+        const Tree::RegionExpr& r,
+        std::vector<std::pair<dimension_index, Type>>& result
+      );
 
       FreshTypeVars& m_freshVars;
 

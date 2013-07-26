@@ -123,6 +123,9 @@ namespace TransLucid
     type_index
     getTypeIndex(const u32string& name);
 
+    u32string
+    getTypeName(type_index t);
+
     dimension_index
     getDimensionIndex(const u32string& name);
 

@@ -648,6 +648,21 @@ System::getTypeIndex(const u32string& name)
   return m_typeRegistry(name);
 }
 
+u32string
+System::getTypeName(type_index t)
+{
+  auto n = m_typeRegistry.reverseLookup(t);
+
+  if (n)
+  {
+    return *n;
+  }
+  else
+  {
+    return U"";
+  }
+}
+
 dimension_index
 System::getDimensionIndex(const u32string& name)
 {

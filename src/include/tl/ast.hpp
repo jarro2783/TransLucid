@@ -212,36 +212,6 @@ namespace TransLucid
     };
 
     /**
-     * A constant expression node. The representation of type<value> 
-     * after being parsed.
-     */
-    struct LiteralExpr
-    {
-      LiteralExpr() = default;
-
-      /**
-       * LiteralExpr constructor.
-       * @param type type name.
-       * @param text the text in the <>.
-       */
-      LiteralExpr(const u32string& type, const u32string& text)
-      : type(type), text(text)
-      {}
-
-      /**
-       * Construct a LiteralExpr from a pair.
-       * @param value The pair representing the constant.
-       */
-      LiteralExpr(const std::pair<u32string, u32string>& value)
-      : type(value.first), text(value.second)
-      {
-      }
-
-      u32string type; /**< The typename.*/
-      u32string text; /**< The text in the angle brackets.*/
-    };
-
-    /**
      * A dimension. An identifier that has been declared in the header as a
      * dimension will be parsed to DimensionExpr.
      */
@@ -302,6 +272,48 @@ namespace TransLucid
     };
 
     //the actualy Expr is defined in ast_fwd.hpp
+
+    /**
+     * A constant expression node. The representation of type<value> 
+     * after being parsed.
+     */
+    struct LiteralExpr
+    {
+      LiteralExpr() = default;
+
+      /**
+       * LiteralExpr constructor.
+       * @param type type name.
+       * @param text the text in the <>.
+       */
+      LiteralExpr(const u32string& type, const u32string& text);
+
+      /**
+       * Construct a LiteralExpr from a pair.
+       * @param value The pair representing the constant.
+       */
+      LiteralExpr(const std::pair<u32string, u32string>& value)
+      : LiteralExpr(value.first, value.second)
+      {
+      }
+
+      LiteralExpr
+      (
+        const u32string& type, 
+        const u32string& text, 
+        const Tree::Expr& e
+      ) 
+      : type(type)
+      , text(text)
+      , rewritten(e)
+      {
+      }
+
+      u32string type; /**< The typename.*/
+      u32string text; /**< The text in the angle brackets.*/
+
+      Expr rewritten;
+    };
 
     /**
      * A parenthesised expression.

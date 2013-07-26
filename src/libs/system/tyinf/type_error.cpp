@@ -18,6 +18,7 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/tyinf/type_error.hpp>
+#include <tl/tree_printer.hpp>
 
 namespace TransLucid
 {
@@ -55,6 +56,13 @@ BoundInvalid::print(System& system) const
   result += print_type(b, system);
 
   return result;
+}
+
+u32string
+RegionImpInvalid::print(System& system) const
+{
+  return U"Atomic guard in region not guarded by atomic type: in expression:\n"
+    + utf8_to_utf32(Printer::print_expr_tree(e));
 }
 
 }

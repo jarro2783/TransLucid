@@ -60,17 +60,6 @@ SemanticTransform::operator()(const Tree::ParenExpr& e)
 }
 
 Tree::Expr 
-SemanticTransform::operator()(const Tree::LiteralExpr& e)
-{
-  Tree::Expr rewritten =
-    Tree::LambdaAppExpr( 
-      Tree::LambdaAppExpr(Tree::IdentExpr(U"construct_literal"), e.type),
-      e.text);
-
-  return apply_visitor(*this, rewritten);
-}
-
-Tree::Expr 
 SemanticTransform::operator()(const Tree::UnaryOpExpr& e)
 {
   //(FN1 ! (#arg0)) @ [fnname <- e.op.op, arg0 <- T(e.e)]

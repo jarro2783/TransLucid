@@ -76,11 +76,11 @@ namespace TransLucid
       mpz_class,          //replaces IntegerExpr
       char32_t,           //replaces UcharExpr
       u32string,          //replaces StringExpr
-      LiteralExpr,
       DimensionExpr,
       IdentExpr,
       HashSymbol,
       HostOpExpr,
+      recursive_wrapper<LiteralExpr>,
       recursive_wrapper<ParenExpr>,
       recursive_wrapper<UnaryOpExpr>,
       recursive_wrapper<BinaryOpExpr>,
