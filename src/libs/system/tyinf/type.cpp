@@ -195,6 +195,57 @@ build_glb_constructed(Type current, Type join)
     }
   }
 
+  //we now have the glb of atomic unions, this is the intersection
+  //of the types in them
+  //
+  // c ⊓ U = c when c \in U
+  // A ⊓ U = A when c \in U
+
+  TypeAtomicUnion* aU = get<TypeAtomicUnion>(&current);
+  TypeAtomicUnion* bU = get<TypeAtomicUnion>(&join);
+
+  if (aU != nullptr && bU != nullptr)
+  {
+    return TypeAtomicUnion::intersection(*aU, *bU);
+  }
+
+  TypeAtomicUnion* unionJoin = nullptr;
+  Type* other = nullptr;
+
+  if (aU != nullptr)
+  {
+    unionJoin = aU;
+    other = &join;
+  }
+  else if (bU != nullptr)
+  {
+    unionJoin = bU;
+    other = &current;
+  }
+
+  if ((aconst = get<Constant>(other)) != nullptr)
+  {
+    if (unionJoin->in(*aconst))
+    {
+      return *aconst;
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
+
+  if ((aatom = get<TypeAtomic>(other)) != nullptr)
+  {
+    if (unionJoin->in(*aatom))
+    {
+      return *aatom;
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
 
   throw BoundInvalid{BoundInvalid::GLB, current, join};
 }
@@ -446,6 +497,42 @@ namespace
     }
 
     void
+    operator()(const TypeAtomicUnion& u)
+    {
+      m_result += U"Union::";
+
+      if (u.constants.size() != 0)
+      {
+        m_result += U"Constants = {";
+      }
+      for (const auto& c : u.constants)
+      {
+        operator()(c);
+        m_result += U" ";
+      }
+      if (u.constants.size() != 0)
+      {
+        m_result += U"}";
+      }
+
+      if (u.atomics.size() != 0)
+      {
+        m_result += U"Base Types = {";
+      }
+      for (const auto& a : u.atomics)
+      {
+        std::ostringstream os;
+        os << a << " ";
+        auto s = os.str();
+        m_result += u32string(s.begin(), s.end());
+      }
+      if (u.atomics.size() != 0)
+      {
+        m_result += U"}";
+      }
+    }
+
+    void
     operator()(const TypeGLB& glb)
     {
       m_result += U"⊓{";
@@ -560,6 +647,85 @@ print_type_variable(TypeVariable var)
   os << "v_" << var;
   
   return utf8_to_utf32(os.str());
+}
+
+void
+TypeAtomicUnion::add(const Type& t)
+{
+  if (variant_is_type<TypeAtomic>(t))
+  {
+    const auto& a = get<TypeAtomic>(t);
+
+    atomics.insert(a.index);
+
+    //keep normalised, i.e., remove any constants that are covered by an
+    //atomic
+    auto iter = atomic_map.find(a.index);
+    if (iter != atomic_map.end())
+    {
+      for (const auto& v : iter->second)
+      {
+        constants.erase(v);
+      }
+
+      atomic_map.erase(iter);
+    }
+  }
+  else if (variant_is_type<Constant>(t))
+  {
+    const Constant& c = get<Constant>(t);
+    if (atomics.find(c.index()) == atomics.end())
+    {
+      auto result = constants.insert(c);
+
+      if (result.second)
+      {
+        atomic_map[c.index()].push_back(result.first);
+      }
+    }
+  }
+}
+
+bool
+TypeAtomicUnion::in(const Type& t) const
+{
+  const Constant* c = nullptr;
+  const TypeAtomic* a = nullptr;
+
+  if ((c = get<Constant>(&t)) != nullptr &&
+      (atomics.find(c->index()) != atomics.end() ||
+       constants.find(*c) != constants.end()) 
+    )
+  {
+    return true;
+  }
+  else if ((a = get<TypeAtomic>(&t)) != nullptr && 
+            atomics.find(a->index) != atomics.end())
+  {
+    return true;
+  }
+  
+  return false;
+}
+
+TypeAtomicUnion
+TypeAtomicUnion::intersection
+(
+  const TypeAtomicUnion& a, 
+  const TypeAtomicUnion& b
+)
+{
+  TypeAtomicUnion result;
+
+  std::set_intersection(a.constants.begin(), a.constants.end(),
+    b.constants.begin(), b.constants.end(),
+    std::inserter(result.constants, result.constants.end()));
+
+  std::set_intersection(a.atomics.begin(), a.atomics.end(),
+    b.atomics.begin(), b.atomics.end(),
+    std::inserter(result.atomics, result.atomics.end()));
+
+  return result;
 }
 
 }

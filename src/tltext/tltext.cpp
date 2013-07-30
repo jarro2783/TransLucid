@@ -613,7 +613,7 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       auto t = infer.infer(eFixed);
 
       t = TypeInference::garbage_collect(TypeInference::canonise(t, fresh));
-      *m_os << Printer::print_expr_tree(eFixed) << " ::\n";
+      *m_os << Printer::print_expr_tree(eFixed, false) << " ::\n";
       *m_os << print_type(std::get<1>(t), m_system) << std::endl
         << std::get<2>(t).print(m_system) << std::endl;
 
@@ -643,7 +643,7 @@ TLText::predefined_types(TypeInference::TypeInferrer& infer)
 
   C.add_to_closure(Constraint{TypeAtomic{U"ustring", TYPE_INDEX_USTRING}, b});
   C.add_to_closure(Constraint{TypeCBV{a, b}, c});
-  infer.setType(U"print", std::make_tuple(TypeContext(), c, C));
+  //infer.setType(U"print", std::make_tuple(TypeContext(), c, C));
 }
 
 } //namespace TLText

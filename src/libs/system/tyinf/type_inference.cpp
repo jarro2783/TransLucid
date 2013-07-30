@@ -62,8 +62,8 @@ make_host_op_type(const std::vector<type_index>& funtype, FreshTypeVars& fresh)
   {
     auto t = fresh.fresh();
     //constants, but specified as a no arg base function
-    C.add_to_closure(Constraint{TypeAtomic{type_index_names[funtype[0]]}, 
-      t});
+    C.add_to_closure(Constraint{TypeAtomic{type_index_names[funtype[0]], 
+      funtype[0]}, t});
 
     return std::make_tuple(TypeContext(), t, C);
   }
@@ -320,11 +320,19 @@ TypeInferrer::process_region_guard
 
           case Region::Containment::IS:
           //this one is easy, it is exactly equal to the object
+          result.push_back(std::make_pair(d, c));
           break;
 
           case Region::Containment::IN:
           break;
         }
+      }
+      else if (variant_is_type<TypeAtomic>(t) && 
+        get<TypeAtomic>(t).index == TYPE_INDEX_REGION)
+      {
+        //if we see a region, accept integers
+        result.push_back(std::make_pair(d,
+          TypeAtomic{U"intmp", TYPE_INDEX_INTMP}));
       }
     }
   }
@@ -771,6 +779,9 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 
   auto alpha = fresh();
 
+  std::map<dimension_index, Type> regionTypes;
+  std::map<dimension_index, size_t> dimCounter;
+
   for (const auto& d : e.declarations)
   {
     std::vector<std::pair<dimension_index, Type>> currentRegionType;
@@ -785,6 +796,34 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 
       process_region_guard(get<Tree::RegionExpr>(std::get<1>(d)),
         currentRegionType);
+
+      //put the current types into the region
+      for (const auto& dt : currentRegionType)
+      {
+        ++dimCounter[dt.first];
+        auto iter = regionTypes.find(dt.first);
+        if (iter == regionTypes.end())
+        {
+          regionTypes[dt.first] = dt.second;
+        }
+        else
+        {
+          //make atomic union
+          if (variant_is_type<TypeAtomicUnion>(iter->second))
+          {
+            //add to union
+            get<TypeAtomicUnion>(iter->second).add(dt.second);
+          }
+          else
+          {
+            //make a new union
+            TypeAtomicUnion u;
+            u.add(iter->second);
+            u.add(dt.second);
+            iter->second = u;
+          }
+        }
+      }
 
       auto t_0 = apply_visitor(*this, std::get<1>(d));
       A.join(std::get<0>(t_0));
@@ -807,6 +846,19 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
     C.make_union(std::get<2>(t_2));
 
     C.add_to_closure(Constraint{std::get<1>(t_2), alpha});
+  }
+
+  for (const auto& rt : regionTypes)
+  {
+    //only add this dimension if it was mentioned in every guard
+    //if it wasn't, then there is a guard that will accept it even if none
+    //of the others match, therefore the accepted input is top
+    auto tyvar = fresh();
+    if (dimCounter[rt.first] == e.declarations.size())
+    {
+      C.add_to_closure(Constraint{tyvar, rt.second});
+    }
+    A.add(rt.first, tyvar);
   }
 
   return std::make_tuple(A, alpha, C);
@@ -1127,6 +1179,7 @@ enum class HeadOrder
   TYPE_ATOMIC,
   TYPE_REGION,
   TYPE_TUPLE,
+  TYPE_ATOMIC_UNION,
   TYPE_GLB,
   TYPE_LUB,
   TYPE_INTENSION,
@@ -1185,6 +1238,12 @@ struct GetTypeOrder
   operator()(TypeTuple const&)
   {
     return HeadOrder::TYPE_TUPLE;
+  }
+
+  result_type
+  operator()(TypeAtomicUnion const&)
+  {
+    return HeadOrder::TYPE_ATOMIC_UNION;
   }
 
   result_type

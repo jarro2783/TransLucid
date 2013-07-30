@@ -86,6 +86,8 @@ namespace TransLucid
       }
     };
 
+    struct TypeAtomicUnion;
+
     typedef TypeNullary<TagTop> TypeTop;
     typedef TypeNullary<TagBot> TypeBot;
     typedef TypeNullary<TagNothing> TypeNothing;
@@ -101,6 +103,7 @@ namespace TransLucid
       TypeAtomic,
       TypeRegion,
       TypeTuple,
+      TypeAtomicUnion,
       recursive_wrapper<TypeGLB>,
       recursive_wrapper<TypeLUB>,
       recursive_wrapper<TypeIntension>,
@@ -108,6 +111,34 @@ namespace TransLucid
       recursive_wrapper<TypeBase>,
       recursive_wrapper<TypeDim>
     > Type;
+
+    //a union of constants and atomic types
+    struct TypeAtomicUnion
+    {
+      std::set<Constant> constants;
+      std::set<type_index> atomics;
+
+      bool
+      operator==(const TypeAtomicUnion& rhs) const
+      {
+        return constants == rhs.constants && atomics == rhs.atomics;
+      }
+
+      void
+      add(const Type& t);
+
+      bool
+      in(const Type& t) const;
+
+      static
+      TypeAtomicUnion
+      intersection(const TypeAtomicUnion& a, const TypeAtomicUnion& b);
+
+      private:
+
+      std::map<type_index, std::vector<decltype(constants)::iterator>> 
+        atomic_map;
+    };
 
     typedef std::set<TypeVariable> VarSet;
 
