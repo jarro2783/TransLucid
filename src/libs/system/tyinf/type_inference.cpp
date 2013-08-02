@@ -184,12 +184,21 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         }
       }
 
+      //remove each var from the context
+      for (const auto& xt : types)
+      {
+        A.remove(xt.first);
+      }
+
       for (const auto& xt : types)
       {
         auto S = 
-          garbage_collect(canonise(
-            std::make_tuple(A, xt.second, C)
-          , m_freshVars))
+          garbage_collect(
+            canonise(
+              std::make_tuple(A, xt.second, C)
+              , m_freshVars
+            )
+          )
         ;
 
         std::cout << std::get<2>(S).print(m_system) << "\nContext: ";
@@ -197,6 +206,13 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         {
           std::cout << "(" << d.first << ", " << d.second << ") ";
         }
+        std::get<0>(S).for_each
+        (
+          [this] (Type t) -> void
+          {
+            std::cout << print_type(t, m_system) << " ";
+          }
+        );
         std::cout << "\n" << std::endl;
         m_environment[xt.first] = S;
       }
@@ -658,6 +674,9 @@ TypeInferrer::operator()(const Tree::LambdaExpr& e)
     TypeCBV{dim, std::get<1>(t_0)}, 
     alpha});
 
+  std::cout << "at lambda expression: dimension " << e.argDim << " has type "
+    << print_type(context.lookup(e.argDim), m_system) << std::endl;
+
   context.remove(e.argDim);
 
   return std::make_tuple(context, alpha, C);
@@ -777,6 +796,8 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
   TypeContext A;
   ConstraintGraph C;
 
+  TypeContext nonGuarded;
+
   auto alpha = fresh();
 
   std::map<dimension_index, Type> regionTypes;
@@ -834,7 +855,7 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
     if (!variant_is_type<Tree::nil>(std::get<2>(d)))
     {
       auto t_1 = apply_visitor(*this, std::get<2>(d));
-      A.join(std::get<0>(t_1));
+      nonGuarded.join(std::get<0>(t_1));
       C.make_union(std::get<2>(t_1));
 
       C.add_to_closure(Constraint{std::get<1>(t_1), 
@@ -842,7 +863,16 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
       });
     }
 
-    A.join(std::get<0>(t_2));
+    auto& A2 = std::get<0>(t_2);
+
+    //anything mentioned in the guard comes out of non guarded
+    for (const auto& g : currentRegionType)
+    {
+      //C.add_to_closure(
+      A2.remove(g.first);
+    }
+
+    nonGuarded.join(A2);
     C.make_union(std::get<2>(t_2));
 
     C.add_to_closure(Constraint{std::get<1>(t_2), alpha});
@@ -850,16 +880,39 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 
   for (const auto& rt : regionTypes)
   {
+    TypeContext Atemp;
     //only add this dimension if it was mentioned in every guard
     //if it wasn't, then there is a guard that will accept it even if none
     //of the others match, therefore the accepted input is top
+
+    //if it is mentioned in every guard, then it is the union type from the
+    //guards, otherwise, it is the glb of the types based on their usage
     auto tyvar = fresh();
     if (dimCounter[rt.first] == e.declarations.size())
     {
+      //if every guard mentioned it then use the union type
       C.add_to_closure(Constraint{tyvar, rt.second});
+      Atemp.add(rt.first, tyvar);
+      A.join(Atemp);
     }
-    A.add(rt.first, tyvar);
+    else
+    {
+      //otherwise use the required types from nonGuarded
+      if (nonGuarded.has_entry(rt.first))
+      {
+        A.add(rt.first, nonGuarded.lookup(rt.first));
+      }
+    }
+
+    nonGuarded.remove(rt.first);
   }
+
+  //put in anything left that wasn't even mentioned in the guards
+  A.join(nonGuarded);
+
+      std::cout << "dimension -139 has type at end " 
+        << print_type(A.lookup(-139), m_system)
+        << std::endl;
 
   return std::make_tuple(A, alpha, C);
 }
@@ -1558,11 +1611,11 @@ polarity(const TypeScheme& t)
       neg.insert(result.second.begin(), result.second.end());
     };
 
-  //mark the variables used as inputs to functions as negative
+  //mark the variables used as inputs to functions (type context) as negative
   std::get<0>(t).for_each(
     std::bind(gatherneg, std::placeholders::_1, std::ref(pos), std::ref(neg)));
 
-  //mark dimensions in the context as positive
+  //mark dimensions in the TL context
   const auto& dims = std::get<0>(t).getDimensions();
   for (const auto& d : dims)
   {

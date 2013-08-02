@@ -50,6 +50,12 @@ namespace TransLucid
       }
 
       void
+      remove(const u32string& x)
+      {
+        m_vars.erase(x);
+      }
+
+      void
       add(const u32string& x, Type t);
 
       //inserts other into the current
