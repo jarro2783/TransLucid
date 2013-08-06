@@ -25,7 +25,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_GNU_GETTEXT_VERSION([0.18.2])
 AM_GNU_GETTEXT([external])
 
-AM_INIT_AUTOMAKE([dist-bzip2 dist-xz -Wno-portability serial-tests])
+AM_INIT_AUTOMAKE([dist-bzip2 dist-xz -Wno-portability serial-tests subdir-objects])
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
