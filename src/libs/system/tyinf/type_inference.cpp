@@ -635,11 +635,40 @@ TypeInferrer::operator()(const Tree::RegionExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::TupleExpr& e)
 {
-  auto alpha = fresh();
+  TypeContext A;
   ConstraintGraph C;
-  C.add_to_closure(Constraint{TypeTuple(), alpha});
 
-  return std::make_tuple(TypeContext(), alpha, C);
+  TypeTuple result;
+
+  result.record = fresh();
+
+  for (const auto& p : e.pairs)
+  {
+    auto t_1 = apply_visitor(*this, p.first);
+    auto t_2 = apply_visitor(*this, p.second);
+
+    A.join(std::get<0>(t_1));
+    A.join(std::get<0>(t_2));
+
+    C.make_union(std::get<2>(t_1));
+    C.make_union(std::get<2>(t_2));
+
+    //t_1.tau is positive, so if it has a unique lower bound
+    //that is a constant we have a constant dimension
+    auto dimType = get<TypeVariable>(std::get<1>(t_1));
+    Type lower = C.lower(dimType);
+    if (C.predecessor(dimType).size() == 0 && C.successor(dimType).size() == 0
+        && variant_is_type<Constant>(lower))
+    {
+      auto d = m_system.getDimensionIndex(get<Constant>(lower));
+      result.types[d] = std::get<1>(t_2);
+    }
+  }
+
+  auto alpha = fresh();
+  C.add_to_closure(Constraint{result, alpha});
+
+  return std::make_tuple(A, alpha, C);
 }
 
 TypeInferrer::result_type
@@ -1835,6 +1864,12 @@ minimise(const TypeScheme& t)
     }
   }
 
+  return t;
+}
+
+TypeScheme
+display_type(const TypeScheme& t)
+{
   return t;
 }
 

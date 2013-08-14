@@ -107,7 +107,7 @@ namespace TransLucid
     typedef std::unordered_map<u32string, std::shared_ptr<Assignment>>
       AssignmentMap;
 
-    System(bool cached = false);
+    System(bool cached = false, bool simplify = false);
     ~System();
 
     //don't want to copy
@@ -116,7 +116,13 @@ namespace TransLucid
     bool
     cached()
     {
-      return m_cached;
+      return m_cacheEnabled;
+    }
+
+    bool
+    simplified()
+    {
+      return m_simplified;
     }
 
     //the registry interface
@@ -371,8 +377,9 @@ namespace TransLucid
     toWSTreePlusExtras(const Tree::Expr& e, TreeToWSTree& tows,
       Renames&&... renames);
 
-    bool m_cached;
+    //bool m_cached;
     bool m_cacheEnabled;
+    bool m_simplified;
 
     ObjectMap m_objects;
     IdentifierMap m_identifiers;

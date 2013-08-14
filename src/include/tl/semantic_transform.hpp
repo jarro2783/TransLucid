@@ -140,6 +140,9 @@ namespace TransLucid
     bool
     caching() const;
 
+    bool 
+    simplified() const;
+
     public:
     const decltype(m_newVars)&
     newVars() const

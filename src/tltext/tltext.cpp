@@ -65,7 +65,8 @@ TLText::TLText
 (
   const std::string& progname, 
   const std::string& initOut,
-  bool cached
+  bool cached,
+  bool tyinf
 )
 : 
   m_myname(progname)
@@ -73,7 +74,7 @@ TLText::TLText
  ,m_uuids(false)
  ,m_debug(false)
  ,m_cached(cached)
- ,m_infer(false)
+ ,m_infer(tyinf)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_error(&std::cerr)
@@ -116,6 +117,11 @@ TLText::TLText
   );
 
   m_system.addEnvVars();
+
+  if (tyinf)
+  {
+    compute_deps();
+  }
 }
 
 TLText::~TLText()

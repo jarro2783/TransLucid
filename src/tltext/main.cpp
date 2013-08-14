@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
       tyinf = true;
     }
 
-    TransLucid::TLText::TLText tltext(argv[0], "TLtext...", cached);
+    TransLucid::TLText::TLText tltext(argv[0], "TLtext...", cached, tyinf);
  
     for (const auto& s : options)
     {
@@ -263,11 +263,6 @@ int main(int argc, char *argv[])
     if (vm.count("deps"))
     {
       tltext.compute_deps();
-    }
-
-    if (tyinf)
-    {
-      tltext.infer_types();
     }
 
     std::unique_ptr<std::ifstream> input;

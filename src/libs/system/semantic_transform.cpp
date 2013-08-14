@@ -47,6 +47,12 @@ SemanticTransform::transform(const Tree::Expr& e)
 }
 
 bool 
+SemanticTransform::simplified() const
+{
+  return m_system.simplified();
+}
+
+bool 
 SemanticTransform::caching() const
 {
   return m_system.cached();
@@ -167,7 +173,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     //we don't want to put this in scope if we're caching because now this
     //is the actual dimension and not a dimension holding onto the actual
     //dimension allocated
-    if (!caching())
+    if (!simplified())
     {
       m_scope.push_back(*alloc);
     }

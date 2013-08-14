@@ -196,6 +196,9 @@ namespace TransLucid
 
     TypeScheme
     minimise(const TypeScheme& t);
+
+    TypeScheme
+    display_type(const TypeScheme& t);
   }
 }
 

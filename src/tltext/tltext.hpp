@@ -135,7 +135,8 @@ namespace TransLucid
       (
         const std::string& progname, 
         const std::string& initOut,
-        bool cached = false
+        bool cached = false,
+        bool tyinf = false
       );
 
       ~TLText();
@@ -241,13 +242,6 @@ namespace TransLucid
         {
           m_depFinder = new Static::DependencyFinder(&m_system);
         }
-      }
-
-      void
-      infer_types()
-      {
-        compute_deps();
-        m_infer = true;
       }
 
       private:

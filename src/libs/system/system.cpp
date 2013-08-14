@@ -259,7 +259,7 @@ System::addVariableDeclInternal
   {
     var = std::make_shared<VariableWS>(name, *this);
 
-    if (m_cached)
+    if (cached())
     {
       var->cache();
     }
@@ -380,8 +380,8 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
 }
 
 //TODO this type registry stuff should go somewhere that is easier to find
-System::System(bool cached)
-: m_cached(cached),
+System::System(bool cached, bool simplify)
+: m_simplified(cached | simplify),
   m_cacheEnabled(cached),
   m_nextTypeIndex(-1),
   m_typeRegistry(m_nextTypeIndex,
@@ -599,7 +599,7 @@ System::addAssignment(const Parser::Equation& eqn)
 
   WorkshopBuilder compile(this);
 
-  if (m_cached)
+  if (cached())
   {
     auto guardws = std::make_shared<Workshops::CacheWS>
       (

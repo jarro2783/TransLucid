@@ -55,12 +55,13 @@ namespace TransLucid
 
     struct TypeDim;
 
+    struct TypeTuple;
+
     //tags for single value empty types
     struct TagTop { };
     struct TagBot { };
     struct TagNothing { };
     struct TagRegion { };
-    struct TagTuple { };
 
     //single value empty types
     template <typename T>
@@ -92,7 +93,6 @@ namespace TransLucid
     typedef TypeNullary<TagBot> TypeBot;
     typedef TypeNullary<TagNothing> TypeNothing;
     typedef TypeNullary<TagRegion> TypeRegion;
-    typedef TypeNullary<TagTuple> TypeTuple;
 
     typedef Variant<
       TypeNothing,
@@ -102,14 +102,14 @@ namespace TransLucid
       Constant,
       TypeAtomic,
       TypeRegion,
-      TypeTuple,
       TypeAtomicUnion,
       recursive_wrapper<TypeGLB>,
       recursive_wrapper<TypeLUB>,
       recursive_wrapper<TypeIntension>,
       recursive_wrapper<TypeCBV>,
       recursive_wrapper<TypeBase>,
-      recursive_wrapper<TypeDim>
+      recursive_wrapper<TypeDim>,
+      recursive_wrapper<TypeTuple>
     > Type;
 
     //a union of constants and atomic types
@@ -210,6 +210,18 @@ namespace TransLucid
       {
         return body == rhs.body;
       }
+    };
+
+    struct TypeTuple
+    {
+      bool
+      operator==(const TypeTuple& rhs) const
+      {
+        return types == rhs.types && record == rhs.record;
+      }
+
+      std::map<dimension_index, Type> types;
+      TypeVariable record;
     };
 
     class FreshTypeVars
