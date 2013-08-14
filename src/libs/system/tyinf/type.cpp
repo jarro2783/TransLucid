@@ -209,41 +209,44 @@ build_glb_constructed(Type current, Type join)
     return TypeAtomicUnion::intersection(*aU, *bU);
   }
 
-  TypeAtomicUnion* unionJoin = nullptr;
-  Type* other = nullptr;
+  if (aU != nullptr || bU != nullptr)
+  {
+    TypeAtomicUnion* unionJoin = nullptr;
+    Type* other = nullptr;
 
-  if (aU != nullptr)
-  {
-    unionJoin = aU;
-    other = &join;
-  }
-  else if (bU != nullptr)
-  {
-    unionJoin = bU;
-    other = &current;
-  }
+    if (aU != nullptr)
+    {
+      unionJoin = aU;
+      other = &join;
+    }
+    else if (bU != nullptr)
+    {
+      unionJoin = bU;
+      other = &current;
+    }
 
-  if ((aconst = get<Constant>(other)) != nullptr)
-  {
-    if (unionJoin->in(*aconst))
+    if ((aconst = get<Constant>(other)) != nullptr)
     {
-      return *aconst;
+      if (unionJoin->in(*aconst))
+      {
+        return *aconst;
+      }
+      else
+      {
+        return TypeBot();
+      }
     }
-    else
-    {
-      return TypeBot();
-    }
-  }
 
-  if ((aatom = get<TypeAtomic>(other)) != nullptr)
-  {
-    if (unionJoin->in(*aatom))
+    if ((aatom = get<TypeAtomic>(other)) != nullptr)
     {
-      return *aatom;
-    }
-    else
-    {
-      return TypeBot();
+      if (unionJoin->in(*aatom))
+      {
+        return *aatom;
+      }
+      else
+      {
+        return TypeBot();
+      }
     }
   }
 
