@@ -34,6 +34,69 @@ namespace TypeInference
 namespace
 {
 
+// put the double visit code here until it works, then move it into variant
+
+template <typename Visitor, typename Visitable>
+struct DoubleVisitor
+{
+  typedef typename Visitor::result_type result_type;
+
+  DoubleVisitor(Visitor&& visitor, Visitable&& visitable)
+  : v(visitor)
+  , visitable(visitable)
+  {
+  }
+
+  template <typename T>
+  result_type
+  operator()(const T& t)
+  {
+    return apply_visitor(v, visitable, t);
+  }
+
+  private:
+
+  Visitor& v;
+  Visitable& visitable;
+};
+
+template 
+<
+  typename Visitor,
+  typename Visitable1,
+  typename Visitable2
+>
+typename Visitor::result_type
+apply_visitor_double(Visitor&& visitor, Visitable1&& v1, Visitable2&& v2)
+{
+  DoubleVisitor<Visitor, Visitable1> v{
+    std::forward<Visitor>(visitor), 
+    std::forward<Visitable1>(v1)
+  };
+
+  return apply_visitor(v, std::forward<Visitable2>(v2));
+}
+
+//head comparison for conditional constraints
+//this could perhaps go in type.hpp
+struct HeadCompare
+{
+  typedef bool result_type;
+
+  template <typename A, typename B>
+  bool
+  operator()(const A& a, const B& b)
+  {
+    return false;
+  }
+
+  bool
+  operator()(const TypeCBV&, const TypeCBV&)
+  {
+    return true;
+  }
+};
+
 bool
 is_constructed(const Type& t)
 {
@@ -98,16 +161,16 @@ ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b,
   //add the constraints to the upper and lower bounds of a and b
   a_data->second.upper = construct_glb(a_data->second.upper, 
     b_data->second.upper);
-  b_data->second.lower = construct_lub(b_data->second.lower,
-    a_data->second.lower);
+  new_lower_closed(b_data, construct_lub(b_data->second.lower,
+    a_data->second.lower));
 
   //for each bp in the greater of b, its lower is (lower bp) lub (lower a)
   for (const auto bp : b_data->second.greater)
   {
     auto bp_data = m_graph.find(bp);
 
-    bp_data->second.lower = construct_lub(bp_data->second.lower, 
-      a_data->second.lower);
+    new_lower_closed(bp_data, construct_lub(bp_data->second.lower, 
+      a_data->second.lower));
   }
 
   //for each ap in the less of a, its upper is (upper ap) glb (upper b)
@@ -170,7 +233,7 @@ ConstraintGraph::add_constraint(Type t, TypeVariable b, ConstraintQueue& q)
   {
     auto bp_data = m_graph.find(bp);
 
-    bp_data->second.lower = construct_lub(bp_data->second.lower, t);
+    new_lower_closed(bp_data, construct_lub(bp_data->second.lower, t));
   }
 }
 
@@ -209,6 +272,39 @@ ConstraintGraph::add_to_closure(const Constraint& constraint)
     }
   }
 }
+
+void
+ConstraintGraph::add_conditional(const CondConstraint& cc)
+{
+  auto data = get_make_entry(cc.a);
+  data->second.conditions.push_back(cc);
+
+  //if the condition is already satisfied, add its implications
+  check_single_conditional(data, cc);
+}
+
+void
+ConstraintGraph::check_conditionals(decltype(m_graph)::iterator var)
+{
+  for (const auto& cc : var->second.conditions)
+  {
+    check_single_conditional(var, cc);
+  }
+}
+
+void
+ConstraintGraph::check_single_conditional
+(
+  decltype(m_graph)::iterator var,
+  const CondConstraint& cc
+)
+{
+  if (apply_visitor_double(HeadCompare(), cc.s, var->second.lower))
+  {
+    add_to_closure(Constraint{cc.lhs, cc.rhs});
+  }
+}
+
 
 bool
 ConstraintGraph::less(TypeVariable a, TypeVariable b) const

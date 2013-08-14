@@ -40,6 +40,17 @@ namespace TransLucid
       Type rhs;
     };
 
+    // s <= a ? lhs <= rhs
+    // s is less than a implies that lhs is less than rhs
+    struct CondConstraint
+    {
+      Type s;
+      TypeVariable a;
+      
+      Type lhs;
+      Type rhs;
+    };
+
     void
     subc(const Constraint& c, std::vector<Constraint>& result);
 
@@ -61,6 +72,9 @@ namespace TransLucid
       //this one only works if t1 and t2 are one of the above three cases
       void
       add_to_closure(const Constraint& c);
+
+      void
+      add_conditional(const CondConstraint& cc);
 
       void
       collect(const VarSet& pos, const VarSet& neg);
@@ -244,6 +258,9 @@ namespace TransLucid
         std::vector<TypeVariable> greater;
         Type lower;
         Type upper;
+
+        //all the conditional constraints relating to this type var
+        std::vector<CondConstraint> conditions;
       };
 
       void
@@ -265,6 +282,23 @@ namespace TransLucid
 
       decltype(m_graph)::iterator
       get_make_entry(TypeVariable a);
+
+      void
+      new_lower_closed(decltype(m_graph)::iterator var, Type bound)
+      {
+        var->second.lower = bound;
+        check_conditionals(var);
+      }
+
+      void
+      check_conditionals(decltype(m_graph)::iterator var);
+
+      void
+      check_single_conditional
+      (
+        decltype(m_graph)::iterator var,
+        const CondConstraint& cc
+      );
     };
   }
 }
