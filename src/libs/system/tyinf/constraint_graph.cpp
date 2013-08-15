@@ -95,6 +95,12 @@ struct HeadCompare
   {
     return true;
   }
+
+  bool
+  operator()(const Constant& a, const Constant& b)
+  {
+    return a == b;
+  }
 };
 
 bool
@@ -495,14 +501,28 @@ ConstraintGraph::print(System& system) const
   u32string result;
   for (const auto& var : m_graph)
   {
-    //print less than
+    //lower bound
     result += print_type(var.second.lower, system) + U", ";
+    //less than
     result += print_type_variable_list(var.second.less);
     result += U" ≤ ";
+    //the var
     result += print_type_variable(var.first);
     result += U" ≤ ";
+    //greater than
     result += print_type_variable_list(var.second.greater);
+    //upper bound
     result += U", " + print_type(var.second.upper, system);
+
+    //conditional constraints
+    for (const auto& cc : var.second.conditions)
+    {
+      result += U"\n";
+      result += print_type(cc.s, system) + U" ≤ " + print_type(cc.a, system);
+      result += U" ? ";
+      result += print_type(cc.lhs, system) + U" ≤ " 
+        + print_type(cc.rhs, system);
+    }
 
     result += U"\n";
   }

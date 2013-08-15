@@ -190,15 +190,20 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         A.remove(xt.first);
       }
 
+      #define TL_TYINF_NO_SIMPLIFY
       for (const auto& xt : types)
       {
         auto S = 
+        #ifndef TL_TYINF_NO_SIMPLIFY
           garbage_collect(
             canonise(
+        #endif
               std::make_tuple(A, xt.second, C)
+        #ifndef TL_TYINF_NO_SIMPLIFY
               , m_freshVars
             )
           )
+        #endif
         ;
 
         std::cout << std::get<2>(S).print(m_system) << "\nContext: ";
@@ -545,17 +550,31 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
   auto alpha = fresh();
   auto beta = fresh();
 
+  auto latestUpper = alpha;
+  auto latestCond = get<TypeVariable>(std::get<1>(cond_type));
+
   C.make_union(std::get<2>(cond_type));
   C.make_union(std::get<2>(then_type));
 
   //make a boolean less than type var
   C.add_to_closure(Constraint{beta, makeAtomic(m_system, U"bool")});
+
+  //the condition is less than bool
   C.add_to_closure(Constraint{std::get<1>(cond_type), beta});
 
-  C.add_to_closure(Constraint{std::get<1>(then_type), alpha});
+  //if true is less than t_0, the then is in the type
+  C.add_conditional(CondConstraint
+    {
+      Types::Boolean::create(true),
+      latestCond,
+      std::get<1>(then_type), 
+      alpha
+    });
 
   for (const auto& p : e.else_ifs)
   {
+    auto elseBound = fresh();
+
     auto elseif_cond_type = apply_visitor(*this, p.first);
     auto elseif_then_type = apply_visitor(*this, p.second);
 
@@ -568,8 +587,28 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
     //each condition is less than boolean
     C.add_to_closure(Constraint{std::get<1>(elseif_cond_type), beta});
 
-    //each result has some common upper bound
-    C.add_to_closure(Constraint{std::get<1>(elseif_then_type), alpha});
+    //the else if type only comes into play if the condition is true and the
+    //previous condition is false
+
+    C.add_conditional(CondConstraint
+      {
+        Types::Boolean::create(false),
+        latestCond,
+        elseBound,
+        latestUpper
+      });
+
+    latestCond = get<TypeVariable>(std::get<1>(elseif_cond_type));
+
+    C.add_conditional(CondConstraint
+      {
+        Types::Boolean::create(true),
+        latestCond,
+        std::get<1>(elseif_then_type),
+        elseBound
+      });
+
+    latestUpper = elseBound;
   }
 
   auto else_type = apply_visitor(*this, e.else_);
@@ -578,7 +617,15 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
   
   C.make_union(std::get<2>(else_type));
 
-  C.add_to_closure(Constraint{std::get<1>(else_type), alpha});
+  //the else type occurs if the latest condition is false (which will be
+  //alpha if there were no else ifs
+  C.add_conditional(CondConstraint
+    {
+      Types::Boolean::create(false),
+      latestCond,
+      std::get<1>(else_type),
+      latestUpper
+    });
 
   return std::make_tuple(A, alpha, C);
 }
