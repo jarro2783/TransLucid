@@ -44,17 +44,16 @@ namespace TransLucid
 
     // s <= a ? lhs <= rhs
     // s is less than a implies that lhs is less than rhs
-    // the same constraint will be added for multiple a's, so we don't
-    // store the a
+    // the same constraint will be added for multiple a's, but this is
+    // an external interface to a conditional constraint, so we store 
+    // everything
     struct CondConstraint
     {
       Type s;
-      
-      Type lhs;
-      Type rhs;
+      TypeVariable a; 
+      TypeVariable lhs;
+      TypeVariable rhs;
     };
-
-    typedef std::shared_ptr<CondConstraint> CondConstraintP;
 
     void
     subc(const Constraint& c, std::vector<Constraint>& result);
@@ -151,6 +150,25 @@ namespace TransLucid
       {
         ConstraintGraph result;
 
+        std::map<ConditionalNode*, ConditionalNode*> noderewrites;
+
+        //rewrite the conditional constraints
+        for (auto ccn : C.m_conditionals)
+        {
+          std::unique_ptr<ConditionalNode> p(new ConditionalNode(
+            ccn->s, 
+            rewrite.rename_var(ccn->lhs),
+            rewrite.rename_var(ccn->rhs),
+            &result
+          ));
+
+          result.m_conditionals.insert(p.get());
+          
+          noderewrites[ccn] = p.get();
+
+          p.release();
+        }
+
         for (const auto& v : C.m_graph)
         {
           ConstraintNode node;
@@ -170,16 +188,7 @@ namespace TransLucid
           node.lower = rewrite.rewrite_type(v.second.lower);
           node.upper = rewrite.rewrite_type(v.second.upper);
 
-          for (const auto& cc : v.second.conditions)
-          {
-            node.conditions.push_back(CondConstraint
-              {
-                cc.s,
-                rewrite.rename_var(cc.a),
-                rewrite.rewrite_type(cc.lhs),
-                rewrite.rewrite_type(cc.rhs)
-              });
-          }
+          node.conditions = v.second.conditions;
 
           result.m_graph[r] = node;
         }
@@ -272,6 +281,34 @@ namespace TransLucid
       private:
 
       typedef std::queue<Constraint> ConstraintQueue;
+      
+      struct ConditionalNode
+      {
+        ConditionalNode
+        (
+          Type s, 
+          TypeVariable lhs, 
+          TypeVariable rhs,
+          ConstraintGraph* owner
+        )
+        : s(s)
+        , lhs(lhs)
+        , rhs(rhs)
+        , m_owner(owner)
+        {
+        }
+
+        Type s;
+        TypeVariable lhs;
+        TypeVariable rhs;
+
+        int counter = 0;
+        ConstraintGraph *m_owner;
+      };
+
+      typedef boost::intrusive_ptr<ConditionalNode> CondNodeP;
+
+      friend struct ConditionalNode;
 
       struct ConstraintNode
       {
@@ -289,7 +326,7 @@ namespace TransLucid
         Type upper;
 
         //all the conditional constraints relating to this type var
-        std::set<CondConstraintP> conditions;
+        std::set<CondNodeP> conditions;
       };
 
       void
@@ -309,6 +346,8 @@ namespace TransLucid
 
       std::map<TypeVariable, ConstraintNode> m_graph;
 
+      std::set<ConditionalNode*> m_conditionals;
+
       decltype(m_graph)::iterator
       get_make_entry(TypeVariable a);
 
@@ -326,7 +365,7 @@ namespace TransLucid
       check_single_conditional
       (
         decltype(m_graph)::iterator var,
-        const CondConstraintP& cc
+        const CondNodeP& cc
       );
     };
   }
