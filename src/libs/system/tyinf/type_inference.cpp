@@ -1653,6 +1653,9 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
     ++itera;
   }
 
+  //conditional constraints remain as they are, because no constraint can have
+  //a glb or lub term in it
+
   return std::make_tuple(context, typecanon, C);
 }
 
@@ -1683,8 +1686,17 @@ polarity(const TypeScheme& t)
     {
       auto result = apply_visitor(mark, t, TagPositive());
 
-      pos.insert(result.first.begin(), result.first.end());
-      neg.insert(result.second.begin(), result.second.end());
+      p.insert(result.first.begin(), result.first.end());
+      n.insert(result.second.begin(), result.second.end());
+    };
+
+  auto gathercond = [&] (const std::vector<CondConstraint>& ccs) -> void
+    {
+      for (const auto& cc : ccs)
+      {
+        pos.insert(get<TypeVariable>(cc.lhs));
+        neg.insert(get<TypeVariable>(cc.rhs));
+      }
     };
 
   //mark the variables used as inputs to functions (type context) as negative
@@ -1722,6 +1734,11 @@ polarity(const TypeScheme& t)
         std::ref(pos),
         std::ref(neg)
       ),
+      VarInSet(currentNeg)
+    );
+
+    std::get<2>(t).for_each_condition_if(
+      gathercond,
       VarInSet(currentNeg)
     );
   }

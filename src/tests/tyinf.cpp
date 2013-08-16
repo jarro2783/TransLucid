@@ -24,6 +24,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/tyinf/type_inference.hpp>
 #include <tl/output.hpp>
 
+#include <tl/types/boolean.hpp>
+
 void
 inference(TransLucid::System& system);
 
@@ -33,6 +35,9 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr);
 void
 cgraph(TransLucid::System& system);
 
+void
+conditionals(TransLucid::System& system);
+
 int main(int argc, char *argv[])
 {
   TransLucid::System system;
@@ -41,6 +46,7 @@ int main(int argc, char *argv[])
   {
     cgraph(system);
     inference(system);
+    conditionals(system);
   }
   catch (const TransLucid::TypeInference::TypeError& e)
   {
@@ -159,6 +165,27 @@ cgraph(TransLucid::System& system)
   C.add_to_closure(Constraint{3, TypeCBV{6, 7}});
   C.add_to_closure(Constraint{1, 2});
   C.add_to_closure(Constraint{2, 3});
+
+  std::cout << C.print(system) << std::endl;
+}
+
+void
+conditionals(TransLucid::System& system)
+{
+  using TransLucid::TypeInference::ConstraintGraph;
+  using TransLucid::TypeInference::Constraint;
+  using TransLucid::TypeInference::CondConstraint;
+  using TransLucid::TypeInference::TypeCBV;
+
+  std::cout << "== Testing conditional constraints ==" << std::endl;
+
+  ConstraintGraph C;
+
+  C.add_to_closure(Constraint{1, 2});
+  C.add_to_closure(Constraint{2, 3});
+  C.add_conditional(CondConstraint{
+    TransLucid::Types::Boolean::create(true), 2, 4, 5});
+  C.add_to_closure(Constraint{0, 1});
 
   std::cout << C.print(system) << std::endl;
 }

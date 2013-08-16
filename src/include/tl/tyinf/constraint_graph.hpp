@@ -29,6 +29,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/utility.hpp>
 
+#include <boost/intrusive_ptr.hpp>
+
 namespace TransLucid
 {
   namespace TypeInference
@@ -42,14 +44,17 @@ namespace TransLucid
 
     // s <= a ? lhs <= rhs
     // s is less than a implies that lhs is less than rhs
+    // the same constraint will be added for multiple a's, so we don't
+    // store the a
     struct CondConstraint
     {
       Type s;
-      TypeVariable a;
       
       Type lhs;
       Type rhs;
     };
+
+    typedef std::shared_ptr<CondConstraint> CondConstraintP;
 
     void
     subc(const Constraint& c, std::vector<Constraint>& result);
@@ -74,7 +79,7 @@ namespace TransLucid
       add_to_closure(const Constraint& c);
 
       void
-      add_conditional(const CondConstraint& cc);
+      add_conditional(TypeVariable a, const CondConstraint& cc);
 
       void
       collect(const VarSet& pos, const VarSet& neg);
@@ -165,6 +170,17 @@ namespace TransLucid
           node.lower = rewrite.rewrite_type(v.second.lower);
           node.upper = rewrite.rewrite_type(v.second.upper);
 
+          for (const auto& cc : v.second.conditions)
+          {
+            node.conditions.push_back(CondConstraint
+              {
+                cc.s,
+                rewrite.rename_var(cc.a),
+                rewrite.rewrite_type(cc.lhs),
+                rewrite.rewrite_type(cc.rhs)
+              });
+          }
+
           result.m_graph[r] = node;
         }
 
@@ -207,6 +223,19 @@ namespace TransLucid
           if (c(v))
           {
             f(v.second.upper);
+          }
+        }
+      }
+
+      template <typename F, typename Cond>
+      void
+      for_each_condition_if(F f, Cond c) const
+      {
+        for (const auto& v : m_graph)
+        {
+          if (c(v))
+          {
+            f(v.second.conditions);
           }
         }
       }
@@ -260,7 +289,7 @@ namespace TransLucid
         Type upper;
 
         //all the conditional constraints relating to this type var
-        std::vector<CondConstraint> conditions;
+        std::set<CondConstraintP> conditions;
       };
 
       void
@@ -297,7 +326,7 @@ namespace TransLucid
       check_single_conditional
       (
         decltype(m_graph)::iterator var,
-        const CondConstraint& cc
+        const CondConstraintP& cc
       );
     };
   }

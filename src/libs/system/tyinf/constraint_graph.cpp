@@ -280,13 +280,23 @@ ConstraintGraph::add_to_closure(const Constraint& constraint)
 }
 
 void
-ConstraintGraph::add_conditional(const CondConstraint& cc)
+ConstraintGraph::add_conditional(TypeVariable a, const CondConstraint& cc)
 {
-  auto data = get_make_entry(cc.a);
-  data->second.conditions.push_back(cc);
+  auto data = get_make_entry(a);
+
+  auto p = std::make_shared<CondConstraint>(cc);
+
+  data->second.conditions.push_back(p);
 
   //if the condition is already satisfied, add its implications
-  check_single_conditional(data, cc);
+  check_single_conditional(data, p);
+
+  //propagate to less thans
+  for (const auto less : data->second.less)
+  {
+    auto ldata = get_make_entry(less);
+    ldata->second.conditions.push_back(p);
+  }
 }
 
 void
@@ -302,12 +312,12 @@ void
 ConstraintGraph::check_single_conditional
 (
   decltype(m_graph)::iterator var,
-  const CondConstraint& cc
+  const CondConstraintP& cc
 )
 {
-  if (apply_visitor_double(HeadCompare(), cc.s, var->second.lower))
+  if (apply_visitor_double(HeadCompare(), cc->s, var->second.lower))
   {
-    add_to_closure(Constraint{cc.lhs, cc.rhs});
+    add_to_closure(Constraint{cc->lhs, cc->rhs});
   }
 }
 
@@ -336,6 +346,22 @@ ConstraintGraph::add_less(TypeVariable a, TypeVariable b)
 
   insert_sorted(a_data->second.greater, b);
   insert_sorted(b_data->second.less, a);
+
+  //add any constraints in b to a
+  for (const auto& cc : b_data->second.conditions)
+  {
+    a_data->second.conditions.push_back(CondConstraint
+      {
+        cc.s,
+        a,
+        cc.lhs,
+        cc.rhs
+      });
+  }
+
+  a_data->second.conditions.insert(a_data->second.conditions.end(),
+    b_data->second.conditions.begin(),
+    b_data->second.conditions.end());
 }
 
 void
