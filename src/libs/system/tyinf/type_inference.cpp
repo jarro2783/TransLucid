@@ -567,7 +567,7 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
     {
       Types::Boolean::create(true),
       latestCond,
-      std::get<1>(then_type), 
+      get<TypeVariable>(std::get<1>(then_type)), 
       alpha
     });
 
@@ -604,7 +604,7 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
       {
         Types::Boolean::create(true),
         latestCond,
-        std::get<1>(elseif_then_type),
+        get<TypeVariable>(std::get<1>(elseif_then_type)),
         elseBound
       });
 
@@ -623,7 +623,7 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
     {
       Types::Boolean::create(false),
       latestCond,
-      std::get<1>(else_type),
+      get<TypeVariable>(std::get<1>(else_type)),
       latestUpper
     });
 
@@ -1694,8 +1694,8 @@ polarity(const TypeScheme& t)
     {
       for (const auto& cc : ccs)
       {
-        pos.insert(get<TypeVariable>(cc.lhs));
-        neg.insert(get<TypeVariable>(cc.rhs));
+        pos.insert(cc.lhs);
+        neg.insert(cc.rhs);
       }
     };
 

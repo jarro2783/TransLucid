@@ -141,6 +141,22 @@ is_elementary(const Constraint& c)
 }
 
 void
+intrusive_ptr_add_ref(ConstraintGraph::ConditionalNode* p)
+{
+  ++p->counter;
+}
+
+void
+intrusive_ptr_release(ConstraintGraph::ConditionalNode* p)
+{
+  if (--p->counter == 0)
+  {
+    p->m_owner->m_conditionals.erase(p);
+    delete p;
+  }
+}
+
+void
 ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b, 
   ConstraintQueue& q)
 {
@@ -280,13 +296,13 @@ ConstraintGraph::add_to_closure(const Constraint& constraint)
 }
 
 void
-ConstraintGraph::add_conditional(TypeVariable a, const CondConstraint& cc)
+ConstraintGraph::add_conditional(const CondConstraint& cc)
 {
-  auto data = get_make_entry(a);
+  auto data = get_make_entry(cc.a);
 
-  auto p = std::make_shared<CondConstraint>(cc);
+  CondNodeP p(new ConditionalNode(cc.s, cc.lhs, cc.rhs, this));
 
-  data->second.conditions.push_back(p);
+  data->second.conditions.insert(p.get());
 
   //if the condition is already satisfied, add its implications
   check_single_conditional(data, p);
@@ -295,7 +311,7 @@ ConstraintGraph::add_conditional(TypeVariable a, const CondConstraint& cc)
   for (const auto less : data->second.less)
   {
     auto ldata = get_make_entry(less);
-    ldata->second.conditions.push_back(p);
+    ldata->second.conditions.insert(p);
   }
 }
 
@@ -312,7 +328,7 @@ void
 ConstraintGraph::check_single_conditional
 (
   decltype(m_graph)::iterator var,
-  const CondConstraintP& cc
+  const CondNodeP& cc
 )
 {
   if (apply_visitor_double(HeadCompare(), cc->s, var->second.lower))
@@ -348,20 +364,16 @@ ConstraintGraph::add_less(TypeVariable a, TypeVariable b)
   insert_sorted(b_data->second.less, a);
 
   //add any constraints in b to a
-  for (const auto& cc : b_data->second.conditions)
+  for (const auto& p : b_data->second.conditions)
   {
-    a_data->second.conditions.push_back(CondConstraint
-      {
-        cc.s,
-        a,
-        cc.lhs,
-        cc.rhs
-      });
+    a_data->second.conditions.insert(p);
   }
 
-  a_data->second.conditions.insert(a_data->second.conditions.end(),
+  a_data->second.conditions.insert
+  (
     b_data->second.conditions.begin(),
-    b_data->second.conditions.end());
+    b_data->second.conditions.end()
+  );
 }
 
 void
@@ -544,10 +556,11 @@ ConstraintGraph::print(System& system) const
     for (const auto& cc : var.second.conditions)
     {
       result += U"\n";
-      result += print_type(cc.s, system) + U" ≤ " + print_type(cc.a, system);
+      result += print_type(cc->s, system) + U" ≤ " + 
+        print_type(var.first, system);
       result += U" ? ";
-      result += print_type(cc.lhs, system) + U" ≤ " 
-        + print_type(cc.rhs, system);
+      result += print_type(cc->lhs, system) + U" ≤ " 
+        + print_type(cc->rhs, system);
     }
 
     result += U"\n";

@@ -78,7 +78,7 @@ namespace TransLucid
       add_to_closure(const Constraint& c);
 
       void
-      add_conditional(TypeVariable a, const CondConstraint& cc);
+      add_conditional(const CondConstraint& cc);
 
       void
       collect(const VarSet& pos, const VarSet& neg);
@@ -244,7 +244,17 @@ namespace TransLucid
         {
           if (c(v))
           {
-            f(v.second.conditions);
+            std::vector<CondConstraint> result;
+            std::transform(v.second.conditions.begin(), 
+              v.second.conditions.end(),
+              std::back_inserter(result),
+              [&v] (const CondNodeP& n) -> CondConstraint
+              {
+                return CondConstraint{n->s, v.first, n->lhs, n->rhs};
+              }
+            );
+
+            f(result);
           }
         }
       }
@@ -306,9 +316,10 @@ namespace TransLucid
         ConstraintGraph *m_owner;
       };
 
-      typedef boost::intrusive_ptr<ConditionalNode> CondNodeP;
+      friend void intrusive_ptr_add_ref(ConditionalNode*);
+      friend void intrusive_ptr_release(ConditionalNode*);
 
-      friend struct ConditionalNode;
+      typedef boost::intrusive_ptr<ConditionalNode> CondNodeP;
 
       struct ConstraintNode
       {
