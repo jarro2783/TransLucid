@@ -65,12 +65,17 @@ namespace TransLucid
         TypeContext A = TypeContext::rewrite(std::get<0>(t),
           std::bind(visitor_applier(), std::ref(*this), _1));
 
-        ConstraintGraph C = ConstraintGraph::rename_vars(std::get<2>(t), 
-          Rewriter{*this});
+        ConstraintGraph C = rename_graph(std::get<2>(t));
 
         auto tr = apply_visitor(*this, std::get<1>(t));
 
         return std::make_tuple(A, tr, C);
+      }
+
+      ConstraintGraph
+      rename_graph(const ConstraintGraph& C)
+      {
+        return ConstraintGraph::rename_vars(C, Rewriter{*this});
       }
 
       result_type

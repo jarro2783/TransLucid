@@ -229,7 +229,12 @@ namespace TransLucid
       public:
 
       FreshTypeVars()
-      : m_var(0)
+      : FreshTypeVars(0)
+      {
+      }
+
+      FreshTypeVars(size_t initial)
+      : m_var(initial)
       {
       }
 
@@ -237,6 +242,12 @@ namespace TransLucid
       fresh()
       {
         return m_var++;
+      }
+
+      size_t
+      operator()()
+      {
+        return fresh();
       }
 
       private:

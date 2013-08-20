@@ -20,6 +20,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_api.hpp>
 #include <tl/semantic_transform.hpp>
 #include <tl/system.hpp>
+#include <tl/tyinf/type_rename.hpp>
 #include <tl/tyinf/type_error.hpp>
 #include <tl/tyinf/type_inference.hpp>
 #include <tl/output.hpp>
@@ -45,8 +46,8 @@ int main(int argc, char *argv[])
   try
   {
     cgraph(system);
-    inference(system);
     conditionals(system);
+    inference(system);
   }
   catch (const TransLucid::TypeInference::TypeError& e)
   {
@@ -97,6 +98,7 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr)
 //  std::cout << "after minimisation\n" <<
 //    print_type(std::get<1>(collected), system) << std::endl <<
 //    std::get<2>(collected).print(system) << std::endl;
+  std::cout << "== end inference ==\n" << std::endl;
 }
 
 void
@@ -186,6 +188,15 @@ conditionals(TransLucid::System& system)
   C.add_conditional(CondConstraint{
     TransLucid::Types::Boolean::create(true), 2, 4, 5});
   C.add_to_closure(Constraint{0, 1});
+  C.add_to_closure(
+    Constraint{TransLucid::Types::Boolean::create(true), 0});
 
   std::cout << C.print(system) << std::endl;
+
+  TransLucid::TypeInference::FreshTypeVars fresh(6);
+  TransLucid::TypeInference::Rename rename(fresh);
+
+  ConstraintGraph D = rename.rename_graph(C);
+
+  std::cout << D.print(system) << std::endl;
 }

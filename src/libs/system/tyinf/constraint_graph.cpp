@@ -157,6 +157,71 @@ intrusive_ptr_release(ConstraintGraph::ConditionalNode* p)
 }
 
 void
+ConstraintGraph::copy_contents(const ConstraintGraph& other)
+{
+  //copy the conditional nodes and update their owners
+  std::map<ConditionalNode*, ConditionalNode*> rewrites;
+
+  for (const auto& c : other.m_conditionals)
+  {
+    std::unique_ptr<ConditionalNode> p(new ConditionalNode(
+      c->s,
+      c->lhs,
+      c->rhs,
+      this)
+    );
+
+    rewrites[c] = p.get();
+    m_conditionals.insert(p.get());
+
+    p.release();
+  }
+
+  for (const auto& v : other.m_graph)
+  {
+    decltype(v.second.conditions) cond;
+
+    for (const auto& c : v.second.conditions)
+    {
+      auto r = rewrites[c.get()];
+      assert(r != nullptr);
+
+      cond.insert(r);
+    }
+
+    m_graph.insert(std::make_pair(v.first, ConstraintNode
+      {
+        v.second.less, 
+        v.second.greater,
+        v.second.lower,
+        v.second.upper,
+        cond
+      }
+     ));
+  }
+}
+
+ConstraintGraph::ConstraintGraph(const ConstraintGraph& rhs)
+{
+  copy_contents(rhs);
+}
+
+ConstraintGraph&
+ConstraintGraph::operator=(const ConstraintGraph& rhs)
+{
+  if (this == &rhs)
+  {
+    return *this;
+  }
+
+  m_graph.clear();
+  assert(m_conditionals.empty());
+  copy_contents(rhs);
+
+  return *this;
+}
+
+void
 ConstraintGraph::add_constraint(TypeVariable a, TypeVariable b, 
   ConstraintQueue& q)
 {
@@ -300,19 +365,24 @@ ConstraintGraph::add_conditional(const CondConstraint& cc)
 {
   auto data = get_make_entry(cc.a);
 
-  CondNodeP p(new ConditionalNode(cc.s, cc.lhs, cc.rhs, this));
+  std::unique_ptr<ConditionalNode> p(
+    new ConditionalNode(cc.s, cc.lhs, cc.rhs, this));
 
+  m_conditionals.insert(p.get());
   data->second.conditions.insert(p.get());
 
+  auto node = p.release();
+
   //if the condition is already satisfied, add its implications
-  check_single_conditional(data, p);
+  check_single_conditional(data, node);
 
   //propagate to less thans
   for (const auto less : data->second.less)
   {
     auto ldata = get_make_entry(less);
-    ldata->second.conditions.insert(p);
+    ldata->second.conditions.insert(node);
   }
+
 }
 
 void
@@ -530,7 +600,7 @@ subc(const Constraint& c, std::vector<Constraint>& result)
 void
 ConstraintGraph::make_union(const ConstraintGraph& other)
 {
-  m_graph.insert(other.m_graph.begin(), other.m_graph.end());
+  copy_contents(other);
 }
 
 u32string

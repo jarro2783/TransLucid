@@ -67,6 +67,12 @@ namespace TransLucid
     {
       public:
 
+      ConstraintGraph() = default;
+      ConstraintGraph(const ConstraintGraph&);
+
+      ConstraintGraph&
+      operator=(const ConstraintGraph& rhs);
+
       //Makes a union with another constraint graph.
       //The type variables must be disjoint.
       //The current one becomes the result.
@@ -188,7 +194,12 @@ namespace TransLucid
           node.lower = rewrite.rewrite_type(v.second.lower);
           node.upper = rewrite.rewrite_type(v.second.upper);
 
-          node.conditions = v.second.conditions;
+          for (const auto& cc : v.second.conditions)
+          {
+            auto rewritten = noderewrites[cc.get()];
+            assert(rewritten != nullptr);
+            node.conditions.insert(CondNodeP(rewritten));
+          }
 
           result.m_graph[r] = node;
         }
@@ -329,6 +340,22 @@ namespace TransLucid
         {
         }
 
+        ConstraintNode
+        (
+          const std::vector<TypeVariable>& less,
+          const std::vector<TypeVariable>& greater,
+          const Type& lower,
+          const Type& upper,
+          const std::set<CondNodeP>& conditions
+        )
+        : less(less)
+        , greater(greater)
+        , lower(lower)
+        , upper(upper)
+        , conditions(conditions)
+        {
+        }
+
         //store both the less and the greater because we need
         //to look up both
         std::vector<TypeVariable> less;
@@ -339,6 +366,9 @@ namespace TransLucid
         //all the conditional constraints relating to this type var
         std::set<CondNodeP> conditions;
       };
+
+      void
+      copy_contents(const ConstraintGraph& other);
 
       void
       add_constraint(TypeVariable a, TypeVariable b, ConstraintQueue&);
@@ -355,9 +385,8 @@ namespace TransLucid
       void
       add_less_closed(TypeVariable a, TypeVariable b);
 
-      std::map<TypeVariable, ConstraintNode> m_graph;
-
       std::set<ConditionalNode*> m_conditionals;
+      std::map<TypeVariable, ConstraintNode> m_graph;
 
       decltype(m_graph)::iterator
       get_make_entry(TypeVariable a);
