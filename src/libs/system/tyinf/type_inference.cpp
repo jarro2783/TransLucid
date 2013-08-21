@@ -190,7 +190,7 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         A.remove(xt.first);
       }
 
-      #define TL_TYINF_NO_SIMPLIFY
+      //#define TL_TYINF_NO_SIMPLIFY
       for (const auto& xt : types)
       {
         auto S = 
