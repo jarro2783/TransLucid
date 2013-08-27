@@ -647,12 +647,11 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
     ConstraintGraph& C = std::get<2>(t);
     TypeContext& A = std::get<0>(t);
 
-    //C.add_to_closure(Constraint{beta, TypeDim{alpha}});
-    C.add_to_closure(Constraint{gamma, beta});
+    C.add_to_closure(Constraint{alpha, beta});
     C.add_to_closure(Constraint{std::get<1>(t), gamma});
     A.addDimension(gamma, beta);
 
-    return std::make_tuple(A, alpha, C);
+    return std::make_tuple(A, beta, C);
   }
   else
   {
