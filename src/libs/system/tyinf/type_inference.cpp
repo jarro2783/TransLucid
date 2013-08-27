@@ -23,6 +23,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 #include <tl/workshop_builder.hpp>
 
+#include <tl/tyinf/free_type_variable.hpp>
 #include <tl/tyinf/type_error.hpp>
 #include <tl/tyinf/type_inference.hpp>
 #include <tl/tyinf/type_rename.hpp>
@@ -1933,6 +1934,7 @@ minimise(const TypeScheme& t)
 TypeScheme
 display_type(const TypeScheme& t)
 {
+  //need to find free variables in types
   return t;
 }
 

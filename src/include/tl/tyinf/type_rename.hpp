@@ -27,7 +27,7 @@ namespace TransLucid
 {
   namespace TypeInference
   {
-    class Rename : private GenericTypeWalker<Rename>
+    class Rename : private GenericTypeTransformer<Rename>
     {
       public:
 
@@ -50,7 +50,7 @@ namespace TransLucid
         Rename& self;
       };
 
-      using GenericTypeWalker::operator();
+      using GenericTypeTransformer::operator();
 
       Rename(FreshTypeVars& fresh)
       : m_fresh(fresh)
