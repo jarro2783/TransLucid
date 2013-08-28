@@ -381,8 +381,9 @@ System::init_dimensions(const std::initializer_list<u32string>& args)
 
 //TODO this type registry stuff should go somewhere that is easier to find
 System::System(bool cached, bool simplify)
-: m_simplified(cached | simplify),
+: 
   m_cacheEnabled(cached),
+  m_simplified(cached | simplify),
   m_nextTypeIndex(-1),
   m_typeRegistry(m_nextTypeIndex,
   std::vector<std::pair<u32string, type_index>>{
