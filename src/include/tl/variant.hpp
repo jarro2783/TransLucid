@@ -152,6 +152,30 @@ namespace TransLucid
     {
       return t.get();
     }
+    
+    template <typename Visitor, typename Visitable>
+    struct DoubleVisitor
+    {
+      typedef typename Visitor::result_type result_type;
+
+      DoubleVisitor(Visitor&& visitor, Visitable&& visitable)
+      : v(visitor)
+      , visitable(visitable)
+      {
+      }
+
+      template <typename T>
+      result_type
+      operator()(const T& t)
+      {
+        return apply_visitor(v, visitable, t);
+      }
+
+      private:
+
+      Visitor& v;
+      Visitable& visitable;
+    };
   }
 
   template 
@@ -507,6 +531,12 @@ namespace TransLucid
       return rhs.apply_visitor_internal(eq);
     }
 
+    bool
+    operator!=(const Variant& rhs) const
+    {
+      return !(*this == rhs);
+    }
+
     int which() const {return m_which;}
 
     template <typename Internal, typename Visitor, typename... Args>
@@ -686,6 +716,23 @@ namespace TransLucid
     return get<T>(&v) != nullptr;
   }
 
+
+  template 
+  <
+    typename Visitor,
+    typename Visitable1,
+    typename Visitable2
+  >
+  typename Visitor::result_type
+  apply_visitor_double(Visitor& visitor, Visitable1&& v1, Visitable2&& v2)
+  {
+    detail::DoubleVisitor<Visitor, Visitable1> v{
+      std::forward<Visitor>(visitor), 
+      std::forward<Visitable1>(v1)
+    };
+
+    return apply_visitor(v, std::forward<Visitable2>(v2));
+  }
 }
 
 #endif

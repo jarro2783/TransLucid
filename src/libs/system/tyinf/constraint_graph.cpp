@@ -34,49 +34,6 @@ namespace TypeInference
 namespace
 {
 
-// put the double visit code here until it works, then move it into variant
-
-template <typename Visitor, typename Visitable>
-struct DoubleVisitor
-{
-  typedef typename Visitor::result_type result_type;
-
-  DoubleVisitor(Visitor&& visitor, Visitable&& visitable)
-  : v(visitor)
-  , visitable(visitable)
-  {
-  }
-
-  template <typename T>
-  result_type
-  operator()(const T& t)
-  {
-    return apply_visitor(v, visitable, t);
-  }
-
-  private:
-
-  Visitor& v;
-  Visitable& visitable;
-};
-
-template 
-<
-  typename Visitor,
-  typename Visitable1,
-  typename Visitable2
->
-typename Visitor::result_type
-apply_visitor_double(Visitor&& visitor, Visitable1&& v1, Visitable2&& v2)
-{
-  DoubleVisitor<Visitor, Visitable1> v{
-    std::forward<Visitor>(visitor), 
-    std::forward<Visitable1>(v1)
-  };
-
-  return apply_visitor(v, std::forward<Visitable2>(v2));
-}
-
 //head comparison for conditional constraints
 //this could perhaps go in type.hpp
 struct HeadCompare
@@ -401,7 +358,8 @@ ConstraintGraph::check_single_conditional
   const CondNodeP& cc
 )
 {
-  if (apply_visitor_double(HeadCompare(), cc->s, var->second.lower))
+  HeadCompare head;
+  if (apply_visitor_double(head, cc->s, var->second.lower))
   {
     add_to_closure(Constraint{cc->lhs, cc->rhs});
   }
