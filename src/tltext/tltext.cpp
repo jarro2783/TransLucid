@@ -617,7 +617,7 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
     {
       auto eFixed = m_system.fixupTreeAndAdd(e);
 
-      *m_os << Printer::print_expr_tree(eFixed, false) << " ::\n";
+      *m_os << Printer::print_expr_tree(eFixed, false) << " :: ";
       auto t = infer.infer(eFixed);
 
       t = TypeInference::garbage_collect(TypeInference::canonise(t, fresh));

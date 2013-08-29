@@ -194,7 +194,7 @@ conditionals(TransLucid::System& system)
   std::cout << C.print(system) << std::endl;
 
   TransLucid::TypeInference::FreshTypeVars fresh(6);
-  TransLucid::TypeInference::Rename rename(fresh);
+  auto rename = TransLucid::TypeInference::make_renamer_all(fresh);
 
   ConstraintGraph D = rename.rename_graph(C);
 

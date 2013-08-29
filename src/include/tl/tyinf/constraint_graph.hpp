@@ -95,6 +95,12 @@ namespace TransLucid
       Type
       lower(TypeVariable b) const;
 
+      void
+      erase_var(TypeVariable a)
+      {
+        m_graph.erase(a);
+      }
+
       std::vector<TypeVariable>
       predecessor(TypeVariable a) const
       {

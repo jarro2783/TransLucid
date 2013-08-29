@@ -144,8 +144,9 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         auto iter = m_environment.find(x);
         if (iter != m_environment.end())
         {
-          Rename rename(m_freshVars);
-          auto S = rename.rename(iter->second);
+          auto S = rename_scheme(iter->second, m_freshVars);
+          //Rename rename(m_freshVars);
+          //auto S = rename.rename(iter->second);
 
           A.join(std::get<0>(S));
           C.make_union(std::get<2>(S));
@@ -196,12 +197,14 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
       {
         auto S = 
         #ifndef TL_TYINF_NO_SIMPLIFY
-          garbage_collect(
-            canonise(
+          minimise(
+            garbage_collect(
+              canonise(
         #endif
-              std::make_tuple(A, xt.second, C)
+                std::make_tuple(A, xt.second, C)
         #ifndef TL_TYINF_NO_SIMPLIFY
-              , m_freshVars
+                , m_freshVars
+              )
             )
           )
         #endif
@@ -455,9 +458,8 @@ TypeInferrer::operator()(const Tree::IdentExpr& e)
   }
   else
   {
-    Rename r(m_freshVars);
     //rename the type scheme and return
-    return r.rename(iter->second);
+    return rename_scheme(iter->second, m_freshVars);
   }
 }
 
@@ -750,8 +752,8 @@ TypeInferrer::operator()(const Tree::LambdaExpr& e)
     TypeCBV{dim, std::get<1>(t_0)}, 
     alpha});
 
-  std::cout << "at lambda expression: dimension " << e.argDim << " has type "
-    << print_type(context.lookup(e.argDim), m_system) << std::endl;
+  //std::cout << "at lambda expression: dimension " << e.argDim << " has type "
+  //  << print_type(context.lookup(e.argDim), m_system) << std::endl;
 
   context.remove(e.argDim);
 
@@ -986,10 +988,6 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
   //put in anything left that wasn't even mentioned in the guards
   A.join(nonGuarded);
 
-      std::cout << "dimension -139 has type at end " 
-        << print_type(A.lookup(-139), m_system)
-        << std::endl;
-
   return std::make_tuple(A, alpha, C);
 }
 
@@ -1036,9 +1034,9 @@ class CanoniseVars
       auto gamma = m_fresh.fresh();
       auto lambda = m_fresh.fresh();
 
-      std::cout << "S = {";
-      print_container(std::cout, vars);
-      std::cout << "} |-> (" << gamma << ", " << lambda << ")" << std::endl;
+      //std::cout << "S = {";
+      //print_container(std::cout, vars);
+      //std::cout << "} |-> (" << gamma << ", " << lambda << ")" << std::endl;
 
       iter = m_rewrites.insert
         (std::make_pair(vars, CanoniseReplaced{gamma, lambda})).first;
@@ -1412,6 +1410,31 @@ struct GetTypeOrder
   }
 };
 
+struct CompareHead
+{
+  typedef bool result_type;
+
+  bool
+  less(const Type& a, const Type& b) const
+  {
+    return apply_visitor_double(*this, a, b);
+  }
+
+  bool
+  operator()(const Constant& a, const Constant& b) const
+  {
+    return a < b;
+  }
+
+  template <typename A, typename B>
+  bool
+  operator()(const A& a, const B& b) const
+  {
+    GetTypeOrder order;
+    return order(a) < order(b);
+  }
+};
+
 struct MinimiseCompare
 {
   bool
@@ -1459,30 +1482,31 @@ struct MinimiseCompare
     }
 
     //otherwise they are equal, so continue
-    GetTypeOrder headOrder;
 
     //then sort by head of lower bound
-    HeadOrder aLowerHead = apply_visitor(headOrder, C.lower(a));
-    HeadOrder bLowerHead = apply_visitor(headOrder, C.lower(b));
+    CompareHead head;
 
-    if (aLowerHead < bLowerHead)
+    const auto& aLower = C.lower(a);
+    const auto& bLower = C.lower(b);
+
+    if (head.less(aLower, bLower))
     {
       return true;
     }
-    else if (bLowerHead < aLowerHead)
+    else if (head.less(bLower, aLower))
     {
       return false;
     }
 
     //then by head of upper bound
-    HeadOrder aUpperHead = apply_visitor(headOrder, C.upper(a));
-    HeadOrder bUpperHead = apply_visitor(headOrder, C.upper(b));
+    const auto& aUpper = C.upper(a);
+    const auto& bUpper = C.upper(b);
 
-    if (aUpperHead < bUpperHead)
+    if (head.less(aUpper, bUpper))
     {
       return true;
     }
-    else if (bUpperHead < aUpperHead)
+    else if (head.less(bUpper, aUpper))
     {
       return false;
     }
@@ -1560,6 +1584,7 @@ typedef std::map<TypeVariable, std::map<size_t, std::set<TypeVariable>>>
   InverseSet;
 
 //returns the set and the number of functions
+#if 0
 std::pair<InverseSet, size_t>
 generateInverse(const ConstraintGraph& C)
 {
@@ -1569,6 +1594,7 @@ generateInverse(const ConstraintGraph& C)
 
   return std::make_pair(inverse, 0);
 }
+#endif
 
 }
 
@@ -1743,12 +1769,14 @@ polarity(const TypeScheme& t)
     );
   }
 
+  #if 0
   std::cout << "positive variables" << std::endl;
   print_container(std::cout, pos);
   std::cout << std::endl;
   std::cout << "negative variables" << std::endl;
   print_container(std::cout, neg);
   std::cout << std::endl;
+  #endif
 
   return std::make_pair(neg, pos);
 }
@@ -1784,9 +1812,9 @@ minimise(const TypeScheme& t)
 
   MinimiseCompare compare{p.first, C};
 
-  auto inverseResult = generateInverse(C);
-  InverseSet& inverse = inverseResult.first;
-  auto functions = inverseResult.second;
+  //auto inverseResult = generateInverse(C);
+  //InverseSet& inverse = inverseResult.first;
+  //auto functions = inverseResult.second;
 
   //first sort the type variables to get the initial partition
   std::sort(vars.begin(), vars.end(), compare);
@@ -1797,6 +1825,7 @@ minimise(const TypeScheme& t)
   std::cout << std::endl;
 
   //divide into the initial partition of acceptable blocks
+  //a block is a block number and a set of variables in that block
   std::map<size_t, MinimiseBlock> blocks;
   std::map<TypeVariable, size_t> inverseBlocks;
 
@@ -1809,6 +1838,7 @@ minimise(const TypeScheme& t)
   //there are at least two variables to deal with, so ++iter is defined
   ++iter;
 
+  std::cout << "blocks:" << std::endl;
   while (iter != vars.end())
   {
     if (!compare.equal(*start, *iter))
@@ -1818,14 +1848,13 @@ minimise(const TypeScheme& t)
       //make the block
       blocks.insert(std::make_pair(b, MinimiseBlock{{start, iter}}));
 
-      //record which block each variable is in
-      while (start != iter)
-      {
-        inverseBlocks.insert(std::make_pair(*start, b));
-        ++start;
-      }
+      std::cout << "(";
+      std::copy(start, iter, std::ostream_iterator<int>(std::cout, ", "));
+      std::cout << ") ";
 
       ++b;
+
+      start = iter;
 
       //keep track of the biggest block
       if (dist > maxDist)
@@ -1839,11 +1868,84 @@ minimise(const TypeScheme& t)
   }
 
   //put the last range in
-  if (start - iter > 1)
+  if (iter - start >= 1)
   {
     blocks.insert(std::make_pair(b, MinimiseBlock{{start, iter}}));
+
+    std::cout << "(";
+    std::copy(start, iter, std::ostream_iterator<int>(std::cout, ", "));
+    std::cout << ") ";
+  }
+  std::cout << std::endl;
+
+  //record which block each variable is in
+  for (const auto& block : blocks)
+  {
+    for (auto v : block.second.vars)
+    {
+      inverseBlocks.insert(std::make_pair(v, block.first));
+    }
   }
 
+  //for now, only consider blocks that have their upper and lower exactly 
+  //equal, therefore, this will only work for constants, top and bottom
+
+  std::map<TypeVariable, TypeVariable> replace;
+
+  for (const auto& b : blocks)
+  {
+    if (b.second.vars.size() > 1)
+    {
+      auto iter = b.second.vars.begin();
+      auto lower = C.lower(*iter);
+      auto upper = C.upper(*iter);
+
+      bool equivalent = true;
+      ++iter;
+
+      while (iter != b.second.vars.end())
+      {
+        if ((lower != C.lower(*iter)) || (upper != C.upper(*iter)))
+        {
+          equivalent = false;
+          break;
+        }
+        ++iter;
+      }
+
+      if (equivalent)
+      {
+        //replace every occurence of variables in the block with the
+        //first variable
+        iter = b.second.vars.begin();
+        auto first = *iter;
+
+        ++iter;
+
+        while (iter != b.second.vars.end())
+        {
+          replace.insert(std::make_pair(*iter, first));
+          ++iter;
+        }
+      }
+    }
+  }
+
+  ConstraintGraph C1 = C;
+
+  for (const auto& r : replace)
+  {
+    //first remove all variables in dom replace
+    C1.erase_var(r.first);
+  }
+
+  RenamePolicyPreserve policy{replace};
+  auto renamer = make_renamer(policy);
+  auto t2 = renamer.rename(TypeScheme(std::get<0>(t), std::get<1>(t), C1));
+
+  return t2;
+
+  #if 0
   //now we try to reduce the size of the blocks we already have
   //the blocks mapped to the functions to split by
   std::map<size_t, std::set<size_t>> toSplit;
@@ -1929,6 +2031,8 @@ minimise(const TypeScheme& t)
   }
 
   return t;
+
+  #endif
 }
 
 TypeScheme

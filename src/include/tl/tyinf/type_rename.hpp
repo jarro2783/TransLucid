@@ -27,7 +27,8 @@ namespace TransLucid
 {
   namespace TypeInference
   {
-    class Rename : private GenericTypeTransformer<Rename>
+    template <typename Policy>
+    class Rename : private GenericTypeTransformer<Rename<Policy>>
     {
       public:
 
@@ -50,10 +51,10 @@ namespace TransLucid
         Rename& self;
       };
 
-      using GenericTypeTransformer::operator();
+      using GenericTypeTransformer<Rename<Policy>>::operator();
 
-      Rename(FreshTypeVars& fresh)
-      : m_fresh(fresh)
+      Rename(Policy& policy)
+      : m_policy(policy)
       {
       }
 
@@ -113,6 +114,24 @@ namespace TransLucid
       TypeVariable
       rename_typevar(TypeVariable v)
       {
+        return m_policy.rename_typevar(v);
+      }
+
+      private:
+
+      Policy& m_policy;
+    };
+
+    struct RenamePolicyAll
+    {
+      RenamePolicyAll(FreshTypeVars& fresh)
+      : m_fresh(fresh)
+      {
+      }
+
+      TypeVariable
+      rename_typevar(TypeVariable v)
+      {
         auto iter = m_renames.find(v);
         
         if (iter == m_renames.end())
@@ -128,11 +147,53 @@ namespace TransLucid
         }
       }
 
-      private:
       FreshTypeVars& m_fresh;
 
       std::map<TypeVariable, TypeVariable> m_renames;
     };
+
+    struct RenamePolicyPreserve
+    {
+      TypeVariable
+      rename_typevar(TypeVariable v)
+      {
+        auto iter = m_renames.find(v);
+
+        if (iter == m_renames.end())
+        {
+          return v;
+        }
+        else
+        {
+          return iter->second;
+        }
+      }
+
+      std::map<TypeVariable, TypeVariable> m_renames;
+    };
+
+    template <typename Policy>
+    Rename<Policy>
+    make_renamer(Policy& p)
+    {
+      return Rename<Policy>(p);
+    }
+
+    Rename<RenamePolicyAll>
+    make_renamer_all(FreshTypeVars& fresh)
+    {
+      RenamePolicyAll policy(fresh);
+      return make_renamer(policy);
+    }
+
+    TypeScheme
+    rename_scheme(const TypeScheme& t, FreshTypeVars& fresh)
+    {
+      RenamePolicyAll policy(fresh);
+      auto rename = make_renamer(policy);
+
+      return rename.rename(t);
+    }
   }
 }
 
