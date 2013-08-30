@@ -119,7 +119,7 @@ namespace TransLucid
 
       private:
 
-      Policy& m_policy;
+      Policy m_policy;
     };
 
     struct RenamePolicyAll

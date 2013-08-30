@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include "config.h"
 #endif
 
+#include <tl/free_variables.hpp>
 #include <tl/hyperdatons/multi_arrayhd.hpp>
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>
@@ -117,11 +118,6 @@ TLText::TLText
   );
 
   m_system.addEnvVars();
-
-  if (tyinf)
-  {
-    compute_deps();
-  }
 }
 
 TLText::~TLText()
@@ -595,9 +591,32 @@ TLText::computeDependencies()
   }
 }
 
+namespace
+{
+
+std::set<u32string> 
+findFree(const std::vector<Tree::Expr>& exprs)
+{
+  FreeVariables f;
+  
+  std::set<u32string> vars;
+
+  for (const auto& e : exprs)
+  {
+    auto result = f.findFree(e);
+    vars.insert(result.begin(), result.end());
+  }
+
+  return vars;
+}
+
+}
+
 void
 TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 {
+  std::set<u32string> freeVars = findFree(exprs);
+
   if (m_infer)
   {
     TypeInference::FreshTypeVars fresh;
@@ -605,13 +624,7 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 
     predefined_types(infer);
 
-    std::set<u32string> vars;
-    for (const auto& dep : m_deps)
-    {
-      vars.insert(dep.first);
-    }
-
-    infer.infer_system(vars);
+    infer.infer_system(freeVars);
 
     for (const auto& e : exprs)
     {
@@ -620,7 +633,9 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       *m_os << Printer::print_expr_tree(eFixed, false) << " :: ";
       auto t = infer.infer(eFixed);
 
-      t = TypeInference::garbage_collect(TypeInference::canonise(t, fresh));
+      t = TypeInference::minimise(
+        TypeInference::garbage_collect(TypeInference::canonise(t, fresh))
+      );
       *m_os << print_type(std::get<1>(t), m_system) << std::endl
         << std::get<2>(t).print(m_system) << std::endl;
 

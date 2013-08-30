@@ -24,6 +24,8 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/static/function_printer.hpp>
 #include <tl/output.hpp>
 
+#include <tl/tree_printer.hpp>
+
 namespace TransLucid
 {
 
@@ -562,21 +564,44 @@ DependencyFinder::operator()(const Tree::LambdaAppExpr& e)
     }
   }
 
-  auto eval_result = evals_applyv(cbvs, std::get<1>(rhs));
+  try
+  {
+    auto eval_result = evals_applyv(cbvs, std::get<1>(rhs));
+  
+    X = std::get<0>(lhs);
+    X.insert(std::get<0>(rhs).begin(), std::get<0>(rhs).end());
+    X.insert(std::get<0>(eval_result).begin(), std::get<0>(eval_result).end());
 
-  X = std::get<0>(lhs);
-  X.insert(std::get<0>(rhs).begin(), std::get<0>(rhs).end());
-  X.insert(std::get<0>(eval_result).begin(), std::get<0>(eval_result).end());
+    F.insert(F.end(), std::get<1>(eval_result).begin(), 
+      std::get<1>(eval_result).end());
 
-  F.insert(F.end(), std::get<1>(eval_result).begin(), 
-    std::get<1>(eval_result).end());
+    Fcal = std::get<2>(lhs);
+    Fcal.insert(std::get<2>(rhs).begin(), std::get<2>(rhs).end());
+    Fcal.insert(std::get<2>(eval_result).begin(), 
+      std::get<2>(eval_result).end());
 
-  Fcal = std::get<2>(lhs);
-  Fcal.insert(std::get<2>(rhs).begin(), std::get<2>(rhs).end());
-  Fcal.insert(std::get<2>(eval_result).begin(), 
-    std::get<2>(eval_result).end());
+    return std::make_tuple(X, F, Fcal);
+  
+  } catch (const u32string& error)
+  {
+    std::cerr << "Exception checking dependencies: " << u32string(error) <<
+      "\nin\n";
+    std::cerr << Printer::print_expr_tree(e) << std::endl;
 
-  return std::make_tuple(X, F, Fcal);
+    std::cerr << "Dependency:\nLHS:\n";
+    for (const auto& f : cbvs)
+    {
+      std::cerr << print_functor(f) << "\n";
+    }
+    std::cerr << "RHS:\n";
+    for (const auto& f : std::get<1>(rhs))
+    {
+      std::cerr << print_functor(f) << "\n";
+    }
+    std::cerr << std::endl;
+
+    throw;
+  }
 }
 
 DependencyFinder::result_type

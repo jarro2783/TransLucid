@@ -95,9 +95,9 @@ infer(TransLucid::System& system, const TransLucid::u32string& expr)
 
   auto minimised = TransLucid::TypeInference::minimise(collected);
 
-//  std::cout << "after minimisation\n" <<
-//    print_type(std::get<1>(collected), system) << std::endl <<
-//    std::get<2>(collected).print(system) << std::endl;
+  std::cout << "after minimisation\n" <<
+    print_type(std::get<1>(minimised), system) << std::endl <<
+    std::get<2>(minimised).print(system) << std::endl;
   std::cout << "== end inference ==\n" << std::endl;
 }
 
