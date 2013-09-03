@@ -115,9 +115,189 @@ build_lub_constructed(Type current, Type join)
   throw BoundInvalid{BoundInvalid::LUB, current, join};
 }
 
-Type
-build_glb_constructed(Type current, Type join)
+template <typename T>
+struct is_union_valid;
+
+template <>
+struct is_union_valid<Constant>
 {
+  typedef void type;
+};
+
+template <>
+struct is_union_valid<TypeAtomic>
+{
+  typedef void type;
+};
+
+struct GLBConstructed
+{
+  typedef Type result_type;
+
+  template <typename A, typename B>
+  Type
+  invalid(const A& a, const B& b) const
+  {
+    throw BoundInvalid{BoundInvalid::GLB, a, b};
+  }
+
+  template <typename A, typename B>
+  Type
+  operator()(const A& a, const B& b) const
+  {
+    return invalid(a, b);
+  }
+
+  template <typename T>
+  Type
+  operator()(const TypeNothing& n, const T& t) const
+  {
+    return t;
+  }
+
+  Type
+  operator()(const TypeCBV& a, const TypeCBV& b) const
+  {
+    return TypeCBV
+      {
+        construct_lub(a.lhs, b.lhs),
+        construct_glb(a.rhs, b.rhs)
+      };
+  }
+
+  Type
+  operator()(const TypeIntension& a, const TypeIntension& b) const
+  {
+    return TypeIntension
+      {
+        construct_glb(a.body, b.body)
+      };
+  }
+
+  Type
+  operator()(const TypeBase& a, const TypeBase& b) const
+  {
+    if (a.lhs.size() == b.lhs.size())
+    {
+      std::vector<Type> lhs;
+      for (size_t i = 0; i != a.lhs.size(); ++i)
+      {
+        lhs.push_back(construct_lub(a.lhs.at(i), b.lhs.at(i)));
+
+      }
+      
+      return TypeBase
+        {
+          lhs,
+          construct_glb(a.rhs, b.rhs)
+        };
+
+    }
+    else
+    {
+      return invalid(a, b);
+    }
+  }
+
+  Type
+  operator()(const Constant& a, const Constant& b) const
+  {
+    if (a == b)
+    {
+      return a;
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
+
+  Type
+  operator()(const TypeAtomic& a, const TypeAtomic& b) const
+  {
+    if (a.index == b.index)
+    {
+      return a;
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
+
+  Type
+  operator()(const TypeAtomic& a, const Constant& b) const
+  {
+    if (b.index() == a.index)
+    {
+      return b;
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
+
+  Type
+  operator()(const Constant& a, const TypeAtomic& b) const
+  {
+    return operator()(b, a);
+  }
+
+  Type
+  operator()(const TypeAtomicUnion& a, const TypeAtomicUnion& b) const
+  {
+    return TypeAtomicUnion::intersection(a, b);
+  }
+
+  Type
+  join_union(const TypeAtomicUnion& a, const Constant& b)
+  {
+    if (a.in(b))
+    {
+      return b;
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
+
+  Type
+  join_union(const TypeAtomicUnion& a, const TypeAtomic& b)
+  {
+    if (a.in(b))
+    {
+      return b;
+    }
+    else
+    {
+      return TypeBot();
+    }
+  }
+
+  template <typename T, typename Dummy = typename is_union_valid<T>::type>
+  Type
+  operator()(const TypeAtomicUnion& a, const T& b)
+  {
+    return join_union(a, b);
+  }
+
+  template <typename T, typename Dummy = typename is_union_valid<T>::type>
+  Type
+  operator()(const T& a, const TypeAtomicUnion& b)
+  {
+    return join_union(b, a);
+  }
+};
+
+Type
+build_glb_constructed(const Type& current, const Type& join)
+{
+  GLBConstructed construct;
+  return apply_visitor_double(construct, current, join);
+
+  #if 0
   if (variant_is_type<TypeNothing>(current))
   {
     return join;
@@ -269,6 +449,7 @@ build_glb_constructed(Type current, Type join)
   }
 
   throw BoundInvalid{BoundInvalid::GLB, current, join};
+  #endif
 }
 
 }

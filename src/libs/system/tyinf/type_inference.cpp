@@ -242,9 +242,27 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
   //get the free variables in each variable
   std::map<u32string, std::set<u32string>> freeVariables;
 
-  for (const auto& v : ids)
+  std::vector<u32string> newVars;
+  std::vector<u32string> currentRound(ids.begin(), ids.end());
+
+  while (!currentRound.empty())
   {
-    freeVariables[v] = free.findFree(m_system.getIdentifierTree(v));
+    for (const auto& v : currentRound)
+    {
+      auto result = freeVariables.insert(
+        std::make_pair(v, free.findFree(m_system.getIdentifierTree(v))));
+
+      for (const auto& f : result.first->second)
+      {
+        if (freeVariables.find(f) == freeVariables.end())
+        {
+          newVars.push_back(f);
+        }
+      }
+    }
+
+    currentRound = newVars;
+    newVars.clear();
   }
 
   //construct a graph out of the free variables, but make the graph with
@@ -267,36 +285,36 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
         index = iter->second;
       }
 
-      std::cout << "string : '" << s << "' has index " << index << std::endl;
-      
       return index;
     };
 
   //vertex list for dependency graph
   std::vector<std::vector<size_t>> depGraph(ids.size());
 
-  std::cout << "dep graph has " << depGraph.size() << " nodes" << std::endl;
-
   for (const auto& var : freeVariables)
   {
-    std::cout << var.first << ": ";
     size_t index = updateIndex(var.first);
+
+    //make sure that there is an entry for this identifier
+    if (depGraph.size() <= index)
+    {
+      depGraph.resize(index+1);
+    }
 
     for (const auto& f : var.second)
     {
       size_t fi = updateIndex(f);
 
-      std::cout << f << ", ";
-
-      if (depGraph.size() <= index)
-      {
-        depGraph.resize(index+1);
-      }
-
       depGraph[index].push_back(fi);
     }
-    std::cout << std::endl;
   }
+
+  std::cout << "Free variables: ";
+  for (const auto& s : stringIndices)
+  {
+    std::cout << "(" << s.first << ", " << s.second << ")" << ", ";
+  }
+  std::cout << std::endl;
 
   auto connected = generate_strongly_connected(depGraph);
 
@@ -311,6 +329,18 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
     }
     groups.push_back(oneGroup);
   }
+
+  std::cout << "In inference order: ";
+  for (const auto& group : groups)
+  {
+    std::cout << "(";
+    for (const auto& v : group)
+    {
+      std::cout << v << ", ";
+    }
+    std::cout << ")";
+  }
+  std::cout << std::endl;
 
   return groups;
 }
@@ -1933,14 +1963,14 @@ polarity(const TypeScheme& t)
     );
   }
 
-  #if 0
+ // #if 0
   std::cout << "positive variables" << std::endl;
   print_container(std::cout, pos);
   std::cout << std::endl;
   std::cout << "negative variables" << std::endl;
   print_container(std::cout, neg);
   std::cout << std::endl;
-  #endif
+ // #endif
 
   return std::make_pair(neg, pos);
 }
@@ -1983,10 +2013,10 @@ minimise(const TypeScheme& t)
   //first sort the type variables to get the initial partition
   std::sort(vars.begin(), vars.end(), compare);
 
-  std::cout << "sorted vars:" << std::endl;
-  std::copy(vars.begin(), vars.end(), 
-    std::ostream_iterator<TypeVariable>(std::cout, ", "));
-  std::cout << std::endl;
+  //std::cout << "sorted vars:" << std::endl;
+  //std::copy(vars.begin(), vars.end(), 
+  //  std::ostream_iterator<TypeVariable>(std::cout, ", "));
+  //std::cout << std::endl;
 
   //divide into the initial partition of acceptable blocks
   //a block is a block number and a set of variables in that block
@@ -2070,15 +2100,15 @@ minimise(const TypeScheme& t)
     }
   }
 
-  std::cout << "Partition by:" << std::endl;
-  for (auto s : splitQueue)
-  {
-    std::cout << s.first->first << ", " << *s.second << std::endl;
-  }
+  //std::cout << "Partition by:" << std::endl;
+  //for (auto s : splitQueue)
+  //{
+  //  std::cout << s.first->first << ", " << *s.second << std::endl;
+  //}
 
   auto addToQueue = [&] (TypeVariable var, size_t fun) -> void
   {
-    std::cout << "adding split (" << var << ", " << fun << ")" << std::endl;
+    //std::cout << "adding split (" << var << ", " << fun << ")" << std::endl;
     auto r1 = toSplit.insert(std::make_pair(var, std::set<size_t>()));
 
     auto r2 = r1.first->second.insert(fun);

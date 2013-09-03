@@ -841,6 +841,22 @@ generate_strongly_connected(const std::vector<std::vector<size_t>>& graph)
 {
   StrongConnect connect(graph);
 
+  std::cout << "graph:" << std::endl;
+  size_t i = 0;
+  while (i != graph.size())
+  {
+    std::cout << i << ": ";
+    size_t j = 0;
+    auto& v = graph[i];
+    while (j != v.size())
+    {
+      std::cout << v[j] << ", ";
+      ++j;
+    }
+    std::cout << std::endl;
+    ++i;
+  }
+
   for (size_t i = 0; i != graph.size(); ++i)
   {
     if (connect.nodes()[i].index == -1)

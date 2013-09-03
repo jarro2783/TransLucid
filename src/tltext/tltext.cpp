@@ -633,9 +633,10 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       *m_os << Printer::print_expr_tree(eFixed, false) << " :: ";
       auto t = infer.infer(eFixed);
 
-      t = TypeInference::minimise(
+      t = //TypeInference::minimise(
         TypeInference::garbage_collect(TypeInference::canonise(t, fresh))
-      );
+      //)
+      ;
       *m_os << print_type(std::get<1>(t), m_system) << std::endl
         << std::get<2>(t).print(m_system) << std::endl;
 
