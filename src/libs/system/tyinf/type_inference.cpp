@@ -249,36 +249,49 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
 
   //construct a graph out of the free variables, but make the graph with
   //integers. So we need to keep a mapping from integers to their strings
-  std::map<u32string, int> stringIndices;
+  std::map<u32string, size_t> stringIndices;
   std::vector<u32string> indexToString;
 
-  auto updateIndex = [&] (const u32string& s) -> int
+  auto updateIndex = [&] (const u32string& s) -> size_t
     {
+      size_t index = 0;
       auto iter = stringIndices.find(s);
       if (iter == stringIndices.end())
       {
-        int index = indexToString.size();
+        index = indexToString.size();
         indexToString.push_back(s);
         stringIndices.insert(std::make_pair(s, index));
-        return index;
+      }
+      else
+      {
+        index = iter->second;
       }
 
-      return iter->second;
+      std::cout << "string : '" << s << "' has index " << index << std::endl;
+      
+      return index;
     };
 
   //vertex list for dependency graph
   std::vector<std::vector<size_t>> depGraph(ids.size());
 
+  std::cout << "dep graph has " << depGraph.size() << " nodes" << std::endl;
+
   for (const auto& var : freeVariables)
   {
     std::cout << var.first << ": ";
-    int index = updateIndex(var.first);
+    size_t index = updateIndex(var.first);
 
     for (const auto& f : var.second)
     {
-      int fi = updateIndex(f);
+      size_t fi = updateIndex(f);
 
       std::cout << f << ", ";
+
+      if (depGraph.size() <= index)
+      {
+        depGraph.resize(index+1);
+      }
 
       depGraph[index].push_back(fi);
     }
@@ -1569,32 +1582,183 @@ struct MinimiseBlock
   std::set<TypeVariable> vars;
 };
 
-struct MinimiseMapper
-{
-  void
-  addToMappings(TypeVariable s, std::vector<std::vector<TypeVariable>>& m)
-  {
-  }
-
-  const ConstraintGraph& C;
-};
-
 //a mapping from type variables to their inverse for each particular function
 typedef std::map<TypeVariable, std::map<size_t, std::set<TypeVariable>>> 
   InverseSet;
 
+struct MinimiseTransitions
+{
+  typedef TypeVariable result_type;
+
+  TypeVariable
+  map(const Type& t, size_t f) const
+  {
+    return apply_visitor(*this, t, f);
+  }
+
+  template <typename T>
+  TypeVariable
+  operator()(const T&, size_t f) const
+  {
+    return non;
+  }
+
+  TypeVariable
+  operator()(const TypeCBV& cbv, size_t f) const
+  {
+    switch (f)
+    {
+      case 0:
+      return get<TypeVariable>(cbv.lhs);
+
+      case 1:
+      return get<TypeVariable>(cbv.rhs);
+
+      default:
+      return non;
+    }
+  }
+
+  TypeVariable
+  operator()(const TypeBase& base, size_t f) const
+  {
+    if (base.lhs.size() < f)
+    {
+      return non;
+    }
+
+    if (f == 0)
+    {
+      return get<TypeVariable>(base.rhs);
+    }
+    else
+    {
+      return get<TypeVariable>(base.lhs.at(f-1));
+    }
+  }
+
+  TypeVariable
+  operator()(const TypeIntension& inten, size_t f) const
+  {
+    if (f == 0)
+    {
+      return get<TypeVariable>(inten.body);
+    }
+
+    return 0;
+  }
+
+  private:
+  TypeVariable non = 0;
+};
+
+struct MinimiseCountFunctions
+{
+  typedef size_t result_type;
+
+  size_t
+  count(const Type& t) const
+  {
+    return apply_visitor(*this, t);
+  }
+
+  template <typename T>
+  size_t
+  operator()(const T&) const
+  {
+    return 0;
+  }
+
+  size_t
+  operator()(const TypeCBV& cbv) const
+  {
+    return 2;
+  }
+
+  size_t
+  operator()(const TypeBase& base) const
+  {
+    return base.lhs.size() + 1;
+  }
+
+  size_t
+  operator()(const TypeIntension& inten) const
+  {
+    return 1;
+  }
+};
+
+TypeVariable
+minimise_transition(const ConstraintGraph& C, TypeVariable v, int f)
+{
+  MinimiseTransitions transition;
+  MinimiseCountFunctions counter;
+
+  auto lower = C.lower(v);
+  auto upper = C.upper(v);
+
+  auto l = counter.count(lower);
+  auto u = counter.count(upper);
+
+  if (l > u)
+  {
+    return transition.map(lower, f);
+  }
+  else
+  {
+    return transition.map(upper, f);
+  }
+}
+
 //returns the set and the number of functions
-#if 0
 std::pair<InverseSet, size_t>
 generateInverse(const ConstraintGraph& C)
 {
-//  MinimiseMapper m{C};
-
   InverseSet inverse;
+  MinimiseCountFunctions counter;
+  MinimiseTransitions transition;
 
-  return std::make_pair(inverse, 0);
+  size_t maxFuns = 0;
+
+  auto vars = C.domain();
+
+  for (auto v : vars)
+  {
+    auto lower = C.lower(v);
+    auto upper = C.upper(v);
+
+    auto l = counter.count(lower);
+    auto u = counter.count(upper);
+
+    //only l or u will have a meaningful type, the one with a count greater
+    //than 0 will be it
+    Type* toMap = nullptr;
+    size_t numFuns = 0;
+    if (l != 0 || u != 0)
+    {
+      if (l > u)
+      {
+        toMap = &lower;
+        numFuns = l;
+      }
+      else
+      {
+        toMap = &upper;
+        numFuns = u;
+      }
+
+      maxFuns = std::max(maxFuns, numFuns);
+
+      for (size_t i = 0; i != numFuns; ++i)
+      {
+        auto r = transition.map(*toMap, i);
+        (inverse[r][i]).insert(v);
+      }
+    }
+  }
+
+  return std::make_pair(inverse, maxFuns);
 }
-#endif
 
 }
 
@@ -1812,9 +1976,9 @@ minimise(const TypeScheme& t)
 
   MinimiseCompare compare{p.first, C};
 
-  //auto inverseResult = generateInverse(C);
-  //InverseSet& inverse = inverseResult.first;
-  //auto functions = inverseResult.second;
+  auto inverseResult = generateInverse(C);
+  InverseSet& inverse = inverseResult.first;
+  auto numFunctions = inverseResult.second;
 
   //first sort the type variables to get the initial partition
   std::sort(vars.begin(), vars.end(), compare);
@@ -1829,54 +1993,36 @@ minimise(const TypeScheme& t)
   std::map<size_t, MinimiseBlock> blocks;
   std::map<TypeVariable, size_t> inverseBlocks;
 
-  size_t b = 0;
+  size_t bAlloc = 0;
   int maxDist = 0;
   size_t maxBlock = 0;
   auto iter = vars.begin();
   auto start = iter;
 
-  //there are at least two variables to deal with, so ++iter is defined
-  ++iter;
-
-  std::cout << "blocks:" << std::endl;
-  while (iter != vars.end())
+  while (start != vars.end())
   {
-    if (!compare.equal(*start, *iter))
+    //there are at least two variables to deal with, so ++iter is defined
+    ++iter;
+
+    if (iter == vars.end() || !compare.equal(*start, *iter))
     {
       auto dist = iter - start;
 
       //make the block
-      blocks.insert(std::make_pair(b, MinimiseBlock{{start, iter}}));
+      blocks.insert(std::make_pair(bAlloc, MinimiseBlock{{start, iter}}));
 
-      std::cout << "(";
-      std::copy(start, iter, std::ostream_iterator<int>(std::cout, ", "));
-      std::cout << ") ";
-
-      ++b;
+      ++bAlloc;
 
       start = iter;
 
       //keep track of the biggest block
       if (dist > maxDist)
       {
-        maxBlock = b;
+        maxBlock = bAlloc;
         maxDist = dist;
       }
     }
-
-    ++iter;
   }
-
-  //put the last range in
-  if (iter - start >= 1)
-  {
-    blocks.insert(std::make_pair(b, MinimiseBlock{{start, iter}}));
-
-    std::cout << "(";
-    std::copy(start, iter, std::ostream_iterator<int>(std::cout, ", "));
-    std::cout << ") ";
-  }
-  std::cout << std::endl;
 
   //record which block each variable is in
   for (const auto& block : blocks)
@@ -1887,67 +2033,9 @@ minimise(const TypeScheme& t)
     }
   }
 
-  //for now, only consider blocks that have their upper and lower exactly 
-  //equal, therefore, this will only work for constants, top and bottom
-
-  std::map<TypeVariable, TypeVariable> replace;
-
-  for (const auto& b : blocks)
-  {
-    if (b.second.vars.size() > 1)
-    {
-      auto iter = b.second.vars.begin();
-      auto lower = C.lower(*iter);
-      auto upper = C.upper(*iter);
-
-      bool equivalent = true;
-      ++iter;
-
-      while (iter != b.second.vars.end())
-      {
-        if ((lower != C.lower(*iter)) || (upper != C.upper(*iter)))
-        {
-          equivalent = false;
-          break;
-        }
-        ++iter;
-      }
-
-      if (equivalent)
-      {
-        //replace every occurence of variables in the block with the
-        //first variable
-        iter = b.second.vars.begin();
-        auto first = *iter;
-
-        ++iter;
-
-        while (iter != b.second.vars.end())
-        {
-          replace.insert(std::make_pair(*iter, first));
-          ++iter;
-        }
-      }
-    }
-  }
-
-  ConstraintGraph C1 = C;
-
-  for (const auto& r : replace)
-  {
-    //first remove all variables in dom replace
-    C1.erase_var(r.first);
-  }
-
-  RenamePolicyPreserve policy{replace};
-  auto renamer = make_renamer(policy);
-  auto t2 = renamer.rename(TypeScheme(std::get<0>(t), std::get<1>(t), C1));
-
-  return t2;
-
-  #if 0
   //now we try to reduce the size of the blocks we already have
-  //the blocks mapped to the functions to split by
+
+  //all the splits left to do: each block mapped to each function
   std::map<size_t, std::set<size_t>> toSplit;
 
   //also keep a list of iterators into the splits so that we can keep a queue
@@ -1959,11 +2047,12 @@ minimise(const TypeScheme& t)
 
   //initially partition by all functions
   std::set<size_t> funpart;
-  for (size_t f = 0; f != functions; ++f)
+  for (size_t f = 0; f != numFunctions; ++f)
   {
     funpart.insert(f);
   }
   
+  // == Initialise ==
 
   //partition with respect to all but the biggest and every seen variable
   for (const auto& block : blocks)
@@ -1981,28 +2070,56 @@ minimise(const TypeScheme& t)
     }
   }
 
-  MinimiseMapper mapper{C};
+  std::cout << "Partition by:" << std::endl;
+  for (auto s : splitQueue)
+  {
+    std::cout << s.first->first << ", " << *s.second << std::endl;
+  }
 
+  auto addToQueue = [&] (TypeVariable var, size_t fun) -> void
+  {
+    std::cout << "adding split (" << var << ", " << fun << ")" << std::endl;
+    auto r1 = toSplit.insert(std::make_pair(var, std::set<size_t>()));
+
+    auto r2 = r1.first->second.insert(fun);
+
+    splitQueue.push_back(std::make_pair(r1.first, r2.first));
+  };
+
+  // == while L != empty do ==
   while (!splitQueue.empty())
   {
+    // == b: Pick one pair (B_j, a) \in L ==
     //pick something out of the list
     auto currentSplit = *splitQueue.begin();
+    auto currentBlock = currentSplit.first->first;
+    auto currentFun = *currentSplit.second;
 
     //remove the first one from the list
     splitQueue.pop_front();
     currentSplit.first->second.erase(currentSplit.second);
 
     //get the inverse of the current block and symbol
+    // == c: Determine splittings of all blocks wrt (B_j, a) ==
     std::set<TypeVariable> currentInverse;
     for (auto s : blocks.find(currentSplit.first->first)->second.vars)
     {
       auto inverseIter = inverse.find(s);
 
-      auto inverseFunIter = inverseIter->second.find(*currentSplit.second);
+      //we might not have an inverse
+      if (inverseIter != inverse.end())
+      {
+        auto inverseFunIter = inverseIter->second.find(currentFun);
 
-      currentInverse.insert(inverseFunIter->second.begin(), 
-        inverseFunIter->second.end());
+        if (inverseFunIter != inverseIter->second.end())
+        {
+          currentInverse.insert(inverseFunIter->second.begin(), 
+            inverseFunIter->second.end());
+        }
+      }
     }
+
+    // == e: Split each block as determined in c ==
 
     //gather the blocks in the inverse
     std::set<size_t> seenBlocks;
@@ -2016,23 +2133,108 @@ minimise(const TypeScheme& t)
     //its block's twin
 
     //start by caching whether the seen blocks map all
+    std::map<size_t, std::set<TypeVariable>> twins;
     for (auto b : seenBlocks)
     {
-      auto currentBlock = blocks.find(b);
+      auto bi = blocks.find(b);
 
       //for the current block B for each element s of B, all the mappings 
       //for each function f(s)
       std::vector<std::vector<TypeVariable>> mappings;
-      for (auto s : currentBlock->second.vars)
+      for (auto s : bi->second.vars)
       {
-        mapper.addToMappings(s, mappings);
+        auto mapped = minimise_transition(C, s, currentFun);
+
+        if (inverseBlocks[mapped] == currentBlock)
+        {
+          //nothing to do here
+        }
+        else
+        {
+          //move this block to its twin
+          twins[b].insert(s);
+        }
+      }
+    }
+
+    // == f: Fix L according to splits that occurred ==
+    //make the twins and split
+    for (const auto& bi : twins)
+    {
+      auto i = blocks.find(bi.first);
+      std::for_each(bi.second.begin(), bi.second.end(),
+        [&] (TypeVariable v) -> void
+        {
+          i->second.vars.erase(v);
+        }
+      );
+      blocks[bAlloc].vars = bi.second;
+      auto bk = bAlloc;
+      ++bAlloc;
+
+      for (size_t c = 0; c != numFunctions; ++c)
+      {
+        //if (bi,c) \in L then add (bk,c)
+        //otherwise add the smaller
+        auto biter = toSplit.find(bi.first);
+
+        if (biter != toSplit.end() && 
+            biter->second.find(c) != biter->second.end())
+        {
+          //toSplit[bk].insert(c);
+          addToQueue(bk, c);
+        }
+        else
+        {
+          if (bi.second.size() > i->second.vars.size())
+          {
+            //toSplit[i->first].insert(c);
+            addToQueue(i->first, c);
+          }
+          else
+          {
+            //toSplit[bk].insert(c);
+            addToQueue(bk, c);
+          }
+        }
       }
     }
   }
 
-  return t;
+  std::map<TypeVariable, TypeVariable> replace;
 
-  #endif
+  for (const auto& b : blocks)
+  {
+    if (b.second.vars.size() > 1)
+    {
+      //replace every occurence of variables in the block with the
+      //first variable
+      auto iter = b.second.vars.begin();
+      auto first = *iter;
+
+      ++iter;
+
+      while (iter != b.second.vars.end())
+      {
+        replace.insert(std::make_pair(*iter, first));
+        ++iter;
+      }
+    }
+  }
+
+  ConstraintGraph C1 = C;
+
+  for (const auto& r : replace)
+  {
+    //first remove all variables in dom replace
+    C1.erase_var(r.first);
+  }
+
+  RenamePolicyPreserve policy{replace};
+  auto renamer = make_renamer(policy);
+  auto t2 = renamer.rename(TypeScheme(std::get<0>(t), std::get<1>(t), C1));
+
+  return t2;
 }
 
 TypeScheme

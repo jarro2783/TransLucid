@@ -51,7 +51,7 @@ class TreePrinter
   private:
   std::ostringstream m_os;
 
-  bool m_verbose;
+  bool m_verbose = false;
 
   enum class Subtree
   {

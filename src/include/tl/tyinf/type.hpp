@@ -229,7 +229,7 @@ namespace TransLucid
       public:
 
       FreshTypeVars()
-      : FreshTypeVars(0)
+      : FreshTypeVars(1)
       {
       }
 

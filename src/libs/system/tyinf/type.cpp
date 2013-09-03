@@ -127,6 +127,8 @@ build_glb_constructed(Type current, Type join)
   TypeCBV* bcbv = get<TypeCBV>(&join);
   TypeIntension *ainten = get<TypeIntension>(&current);
   TypeIntension *binten = get<TypeIntension>(&join);
+  TypeBase* abase = get<TypeBase>(&current);
+  TypeBase* bbase = get<TypeBase>(&join);
 
   Constant *aconst = nullptr;
   Constant *bconst = nullptr;
@@ -149,6 +151,22 @@ build_glb_constructed(Type current, Type join)
       {
         construct_glb(ainten->body, binten->body)
       };
+  }
+
+  if (abase != nullptr && bbase != nullptr && 
+      abase->lhs.size() == bbase->lhs.size())
+  {
+    std::vector<Type> lhs;
+    for (size_t i = 0; i != abase->lhs.size(); ++i)
+    {
+      lhs.push_back(construct_lub(abase->lhs.at(i), bbase->lhs.at(i)));
+
+      return TypeBase
+      {
+        lhs,
+        construct_glb(abase->rhs, bbase->rhs)
+      };
+    }
   }
 
   aconst = get<Constant>(&current);
