@@ -309,13 +309,6 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
     }
   }
 
-  std::cout << "Free variables: ";
-  for (const auto& s : stringIndices)
-  {
-    std::cout << "(" << s.first << ", " << s.second << ")" << ", ";
-  }
-  std::cout << std::endl;
-
   auto connected = generate_strongly_connected(depGraph);
 
   std::vector<std::vector<u32string>> groups;
@@ -329,18 +322,6 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
     }
     groups.push_back(oneGroup);
   }
-
-  std::cout << "In inference order: ";
-  for (const auto& group : groups)
-  {
-    std::cout << "(";
-    for (const auto& v : group)
-    {
-      std::cout << v << ", ";
-    }
-    std::cout << ")";
-  }
-  std::cout << std::endl;
 
   return groups;
 }
@@ -1963,14 +1944,14 @@ polarity(const TypeScheme& t)
     );
   }
 
- // #if 0
+  #if 0
   std::cout << "positive variables" << std::endl;
   print_container(std::cout, pos);
   std::cout << std::endl;
   std::cout << "negative variables" << std::endl;
   print_container(std::cout, neg);
   std::cout << std::endl;
- // #endif
+  #endif
 
   return std::make_pair(neg, pos);
 }
