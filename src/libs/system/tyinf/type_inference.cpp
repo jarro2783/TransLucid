@@ -1771,6 +1771,106 @@ generateInverse(const ConstraintGraph& C)
   return std::make_pair(inverse, maxFuns);
 }
 
+struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
+{
+  typedef Type result_type;
+  using GenericTypeTransformer::operator();
+
+  ReplaceDisplay(const std::pair<VarSet, VarSet>& polarities,
+    const ConstraintGraph& C,
+    const std::map<TypeVariable, VarSet>& freeVars)
+  : m_p(polarities)
+  , m_C(C)
+  , m_freeVars(freeVars)
+  {
+  }
+
+  Type
+  replace(const Type& t)
+  {
+    return apply_visitor(*this, t);
+  }
+
+#if 0
+  template <typename T>
+  Type
+  operator()(const T& t)
+  {
+    return t;
+  }
+#endif
+
+  Type
+  operator()(TypeVariable v)
+  {
+    auto iter = m_freeVars.find(v);
+    if (iter == m_freeVars.end() ||
+        iter->second.find(v) == iter->second.end())
+    {
+      if (m_p.first.find(v) != m_p.first.end())
+      {
+        //negative uses upper bound
+        auto upper = m_C.upper(v);
+        auto succ = m_C.successor(v);
+        if (succ.size() == 0)
+        {
+          return replace(upper);
+        }
+        else if (succ.size() == 1 && (get<TypeTop>(&upper) != nullptr))
+        {
+          return succ[0];
+        }
+        else
+        {
+          m_notreplaced.insert(v);
+          return v;
+        }
+      }
+      else
+      {
+        //positive uses lower bound
+        auto pred = m_C.predecessor(v);
+        auto lower = m_C.lower(v);
+        if (pred.size() == 0)
+        {
+          return replace(lower);
+        }
+        else if (pred.size() == 1 && (get<TypeBot>(&lower) != nullptr))
+        {
+          //don't replace with the lower bound in this case,
+          //we replace with the upper bound in the opposite case,
+          //this way variables that are the same stay the same
+          return v;
+        }
+        else
+        {
+          m_notreplaced.insert(v);
+          return v;
+        }
+      }
+    }
+    else
+    {
+      m_notreplaced.insert(v);
+      return v;
+    }
+  }
+
+  VarSet
+  unreplaced() const
+  {
+    return m_notreplaced;
+  }
+
+  private:
+
+  const std::pair<VarSet, VarSet>& m_p;
+  const ConstraintGraph& m_C;
+  const std::map<TypeVariable, VarSet>& m_freeVars;
+
+  VarSet m_notreplaced;
+};
+
 }
 
 TypeScheme
@@ -2251,8 +2351,47 @@ minimise(const TypeScheme& t)
 TypeScheme
 display_type(const TypeScheme& t)
 {
-  //need to find free variables in types
-  return t;
+  FreeTypeVariables findFree;
+
+  // (neg, pos)
+  auto p = polarity(t);
+
+  //keep a map of the free variables in each variable's constructed bound
+  const auto& C = std::get<2>(t);
+  auto domain = C.domain();
+
+  std::map<TypeVariable, VarSet> freeVars;
+
+  for (auto v : domain)
+  {
+    Type bound;
+    if (p.first.find(v) != p.first.end())
+    {
+      bound = C.upper(v);
+    }
+    else
+    {
+      //because of mono-polarity and garbage collection, if it's not
+      //negative, it's positive
+      bound = C.lower(v);
+    }
+
+    freeVars[v] = findFree.free(bound);
+  }
+
+  ReplaceDisplay replace(p, C, freeVars);
+
+  Type display = replace.replace(std::get<1>(t));
+  ConstraintGraph resultC;
+
+  auto unreplaced = replace.unreplaced();
+  while (!unreplaced.empty())
+  {
+    std::cout << "recursive type" << std::endl;
+    unreplaced.clear();
+  }
+
+  return std::make_tuple(TypeContext(), display, resultC);
 }
 
 }
