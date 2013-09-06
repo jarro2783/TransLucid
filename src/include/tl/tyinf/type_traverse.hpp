@@ -33,51 +33,56 @@ namespace TransLucid
 
       typedef Type result_type;
 
-      template <typename T>
+      template <typename T, typename... Args>
       Type
-      operator()(const T& t) const
+      operator()(const T& t, Args&... args) const
       {
         return t;
       }
 
+      template <typename... Args>
       Type
-      operator()(const TypeDim& dim)
+      operator()(const TypeDim& dim, Args&... args)
       {
         return TypeDim{apply_visitor(*reinterpret_cast<Self*>(this),
-          dim.body)};
+          dim.body, args...)};
       }
 
+      template <typename... Args>
       Type
-      operator()(const TypeIntension& i)
+      operator()(const TypeIntension& i, Args&... args)
       {
         return TypeIntension{apply_visitor(*reinterpret_cast<Self*>(this), 
-          i.body)};
+          i.body, args...)};
       }
 
+      template <typename... Args>
       Type
-      operator()(const TypeCBV& cbv)
+      operator()(const TypeCBV& cbv, Args&... args)
       {
         return TypeCBV
         {
-          apply_visitor(*reinterpret_cast<Self*>(this), cbv.lhs), 
-          apply_visitor(*reinterpret_cast<Self*>(this), cbv.rhs)
+          apply_visitor(*reinterpret_cast<Self*>(this), cbv.lhs, args...), 
+          apply_visitor(*reinterpret_cast<Self*>(this), cbv.rhs, args...)
         };
       }
 
+      template <typename... Args>
       Type
-      operator()(const TypeBase& base)
+      operator()(const TypeBase& base, Args&... args)
       {
-        std::vector<Type> args;
+        std::vector<Type> lhs;
 
         for (const auto& t : base.lhs)
         {
-          args.push_back(apply_visitor(*reinterpret_cast<Self*>(this), t));
+          lhs.push_back(apply_visitor(*reinterpret_cast<Self*>(this), t, 
+            args...));
         }
 
         return TypeBase
         {
-          args,
-          apply_visitor(*reinterpret_cast<Self*>(this), base.rhs)
+          lhs,
+          apply_visitor(*reinterpret_cast<Self*>(this), base.rhs, args...)
         };
       }
     };

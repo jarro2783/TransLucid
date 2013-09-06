@@ -39,6 +39,9 @@ cgraph(TransLucid::System& system);
 void
 conditionals(TransLucid::System& system);
 
+void
+display(TransLucid::System& system);
+
 int main(int argc, char *argv[])
 {
   TransLucid::System system;
@@ -48,6 +51,7 @@ int main(int argc, char *argv[])
     cgraph(system);
     conditionals(system);
     inference(system);
+    display(system);
   }
   catch (const TransLucid::TypeInference::TypeError& e)
   {

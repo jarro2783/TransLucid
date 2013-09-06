@@ -40,6 +40,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/system.hpp>
 
+#include <stack>
+
 namespace TransLucid
 {
 namespace TypeInference
@@ -1771,10 +1773,35 @@ generateInverse(const ConstraintGraph& C)
   return std::make_pair(inverse, maxFuns);
 }
 
+template <typename Set, typename T>
+struct SetCaller
+{
+  SetCaller(Set& s, const T& t)
+  : m_s(s), m_t(t)
+  {
+    s.insert(t);
+  }
+
+  ~SetCaller()
+  {
+    m_s.erase(m_t);
+  }
+
+  operator Set& ()
+  {
+    return m_s;
+  }
+
+  Set m_s;
+  T m_t;
+};
+
 struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
 {
   typedef Type result_type;
   using GenericTypeTransformer::operator();
+
+  typedef SetCaller<std::set<TypeVariable>, TypeVariable> MySetCaller;
 
   ReplaceDisplay(const std::pair<VarSet, VarSet>& polarities,
     const ConstraintGraph& C,
@@ -1788,7 +1815,14 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
   Type
   replace(const Type& t)
   {
-    return apply_visitor(*this, t);
+    std::set<TypeVariable> s;
+    return replace(t, s);
+  }
+
+  Type
+  replace(const Type& t, std::set<TypeVariable>& s)
+  {
+    return apply_visitor(*this, t, s);
   }
 
 #if 0
@@ -1801,11 +1835,18 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
 #endif
 
   Type
-  operator()(TypeVariable v)
+  operator()(TypeVariable v, std::set<TypeVariable>& s)
   {
-    auto iter = m_freeVars.find(v);
-    if (iter == m_freeVars.end() ||
-        iter->second.find(v) == iter->second.end())
+    Type bound;
+    if (s.find(v) != s.end())
+    {
+      //we're already computing the unique bound for this variable
+      //which also means that we now know that its unique bound is itself
+      m_uniqueBounds[v] = v;
+      m_notreplaced.insert(v);
+      return v;
+    }
+    else
     {
       if (m_p.first.find(v) != m_p.first.end())
       {
@@ -1814,16 +1855,18 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         auto succ = m_C.successor(v);
         if (succ.size() == 0)
         {
-          return replace(upper);
+          bound = replace(upper, MySetCaller(s, v));
         }
         else if (succ.size() == 1 && (get<TypeTop>(&upper) != nullptr))
         {
-          return succ[0];
+          bound = succ[0];
+          m_uniqueBounds[v] = succ[0];
         }
         else
         {
+          //variable has no unique bound, in which case it is itself
+          m_uniqueBounds[v] = v;
           m_notreplaced.insert(v);
-          return v;
         }
       }
       else
@@ -1833,26 +1876,34 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         auto lower = m_C.lower(v);
         if (pred.size() == 0)
         {
-          return replace(lower);
+          bound = replace(lower);
         }
         else if (pred.size() == 1 && (get<TypeBot>(&lower) != nullptr))
         {
           //don't replace with the lower bound in this case,
           //we replace with the upper bound in the opposite case,
           //this way variables that are the same stay the same
-          return v;
+          bound = v;
+          m_uniqueBounds[v] = v;
         }
         else
         {
           m_notreplaced.insert(v);
-          return v;
         }
       }
     }
+
+    //now if we still don't know the unique bound of v, it is v, otherwise
+    //it is the bound
+    auto iter = m_uniqueBounds.find(v);
+    if (iter != m_uniqueBounds.end())
+    {
+      return iter->second;
+    }
     else
     {
-      m_notreplaced.insert(v);
-      return v;
+      m_uniqueBounds[v] = bound;
+      return bound;
     }
   }
 
@@ -1869,6 +1920,8 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
   const std::map<TypeVariable, VarSet>& m_freeVars;
 
   VarSet m_notreplaced;
+
+  std::map<TypeVariable, Type> m_uniqueBounds;
 };
 
 }
