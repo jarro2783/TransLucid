@@ -1208,18 +1208,6 @@ class MarkPolarity
   }
 
   result_type
-  operator()(const TypeDim& dim, TagPositive)
-  {
-    return apply_visitor(*this, dim.body, TagPositive());
-  }
-
-  result_type
-  operator()(const TypeDim& dim, TagNegative)
-  {
-    return apply_visitor(*this, dim.body, TagNegative());
-  }
-
-  result_type
   operator()(const TypeCBV& cbv, TagPositive)
   {
     auto lhs = apply_visitor(*this, cbv.lhs, TagNegative());
@@ -1427,12 +1415,6 @@ struct GetTypeOrder
   operator()(TypeBase const&)
   {
     return HeadOrder::TYPE_BASE;
-  }
-
-  result_type
-  operator()(TypeDim const&)
-  {
-    return HeadOrder::TYPE_DIM;
   }
 };
 
@@ -1792,7 +1774,7 @@ struct SetCaller
     return m_s;
   }
 
-  Set m_s;
+  Set& m_s;
   T m_t;
 };
 
@@ -1803,26 +1785,75 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
 
   typedef SetCaller<std::set<TypeVariable>, TypeVariable> MySetCaller;
 
-  ReplaceDisplay(const std::pair<VarSet, VarSet>& polarities,
-    const ConstraintGraph& C,
-    const std::map<TypeVariable, VarSet>& freeVars)
-  : m_p(polarities)
-  , m_C(C)
-  , m_freeVars(freeVars)
+  ReplaceDisplay(const TypeScheme& t)
+  : m_p(polarity(t))
+  , m_A(std::get<0>(t))
+  , m_type(std::get<1>(t))
+  , m_C(std::get<2>(t))
   {
   }
 
-  Type
-  replace(const Type& t)
+  TypeScheme
+  replace()
   {
-    std::set<TypeVariable> s;
-    return replace(t, s);
-  }
+    //replace the type, then the type context, then try to replace
+    //what is left in the context
+    auto t = replace(m_type);
 
-  Type
-  replace(const Type& t, std::set<TypeVariable>& s)
-  {
-    return apply_visitor(*this, t, s);
+    ConstraintGraph C;
+
+    std::map
+    <
+      TypeVariable, 
+      std::pair<std::vector<TypeVariable>, std::vector<TypeVariable>>
+    > inGraph;
+
+    VarSet inGraphVars;
+
+    while (!m_unreplaced.empty())
+    {
+      auto v = *m_unreplaced.begin();
+
+      inGraphVars.insert(v);
+
+      auto lower = replace(m_C.lower(v));
+      auto upper = replace(m_C.upper(v));
+
+      //we only need any successors and predecessors if they are mentioned
+      //in the graph, but we can't know that unless we have visited everything
+      C.setLower(v, lower);
+      C.setUpper(v, upper);
+
+      inGraph[v] = std::make_pair(m_C.predecessor(v), m_C.successor(v));
+
+      m_unreplaced.erase(v);
+    }
+
+    //now we can go through the variables that still appear, and only set their
+    //predecessors and successors if they also appear in the graph
+
+    for (const auto& vv : inGraph)
+    {
+      std::vector<TypeVariable> remains;
+
+      //use the intersection of the successor and predecessor with the 
+      //variables actually used
+      std::set_intersection(inGraphVars.begin(), inGraphVars.end(),
+        vv.second.first.begin(), vv.second.first.end(),
+        std::back_inserter(remains));
+
+      C.setPredecessor(vv.first, remains);
+
+      remains.clear();
+
+      std::set_intersection(inGraphVars.begin(), inGraphVars.end(),
+        vv.second.second.begin(), vv.second.second.end(),
+        std::back_inserter(remains));
+
+      C.setSuccessor(vv.first, remains);
+    }
+
+    return std::make_tuple(TypeContext(), t, C);
   }
 
 #if 0
@@ -1843,7 +1874,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
       //we're already computing the unique bound for this variable
       //which also means that we now know that its unique bound is itself
       m_uniqueBounds[v] = v;
-      m_notreplaced.insert(v);
+      m_unreplaced.insert(v);
       return v;
     }
     else
@@ -1865,8 +1896,9 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         else
         {
           //variable has no unique bound, in which case it is itself
+          bound = v;
           m_uniqueBounds[v] = v;
-          m_notreplaced.insert(v);
+          m_unreplaced.insert(v);
         }
       }
       else
@@ -1876,7 +1908,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         auto lower = m_C.lower(v);
         if (pred.size() == 0)
         {
-          bound = replace(lower);
+          bound = replace(lower, MySetCaller(s, v));
         }
         else if (pred.size() == 1 && (get<TypeBot>(&lower) != nullptr))
         {
@@ -1888,7 +1920,8 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         }
         else
         {
-          m_notreplaced.insert(v);
+          bound = v;
+          m_unreplaced.insert(v);
         }
       }
     }
@@ -1907,19 +1940,27 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
     }
   }
 
-  VarSet
-  unreplaced() const
-  {
-    return m_notreplaced;
-  }
-
   private:
 
-  const std::pair<VarSet, VarSet>& m_p;
-  const ConstraintGraph& m_C;
-  const std::map<TypeVariable, VarSet>& m_freeVars;
+  Type
+  replace(const Type& t)
+  {
+    std::set<TypeVariable> s;
+    return replace(t, s);
+  }
 
-  VarSet m_notreplaced;
+  Type
+  replace(const Type& t, std::set<TypeVariable>& s)
+  {
+    return apply_visitor(*this, t, s);
+  }
+
+  const std::pair<VarSet, VarSet> m_p;
+  const TypeContext& m_A;
+  Type m_type;
+  const ConstraintGraph& m_C;
+
+  VarSet m_unreplaced;
 
   std::map<TypeVariable, Type> m_uniqueBounds;
 };
@@ -2097,14 +2138,14 @@ polarity(const TypeScheme& t)
     );
   }
 
-  #if 0
+  //#if 0
   std::cout << "positive variables" << std::endl;
   print_container(std::cout, pos);
   std::cout << std::endl;
   std::cout << "negative variables" << std::endl;
   print_container(std::cout, neg);
   std::cout << std::endl;
-  #endif
+  //#endif
 
   return std::make_pair(neg, pos);
 }
@@ -2404,47 +2445,12 @@ minimise(const TypeScheme& t)
 TypeScheme
 display_type(const TypeScheme& t)
 {
-  FreeTypeVariables findFree;
-
-  // (neg, pos)
-  auto p = polarity(t);
-
   //keep a map of the free variables in each variable's constructed bound
-  const auto& C = std::get<2>(t);
-  auto domain = C.domain();
+  ReplaceDisplay replace(t);
 
-  std::map<TypeVariable, VarSet> freeVars;
+  auto display = replace.replace();
 
-  for (auto v : domain)
-  {
-    Type bound;
-    if (p.first.find(v) != p.first.end())
-    {
-      bound = C.upper(v);
-    }
-    else
-    {
-      //because of mono-polarity and garbage collection, if it's not
-      //negative, it's positive
-      bound = C.lower(v);
-    }
-
-    freeVars[v] = findFree.free(bound);
-  }
-
-  ReplaceDisplay replace(p, C, freeVars);
-
-  Type display = replace.replace(std::get<1>(t));
-  ConstraintGraph resultC;
-
-  auto unreplaced = replace.unreplaced();
-  while (!unreplaced.empty())
-  {
-    std::cout << "recursive type" << std::endl;
-    unreplaced.clear();
-  }
-
-  return std::make_tuple(TypeContext(), display, resultC);
+  return display;
 }
 
 }

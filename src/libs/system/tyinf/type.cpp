@@ -819,16 +819,6 @@ namespace
       m_result += U")";
     }
 
-    void
-    operator()(const TypeDim& dim)
-    {
-      m_result += U"dim(";
-
-      apply_visitor(*this, dim.body);
-
-      m_result += U")";
-    }
-
     private:
     u32string m_result;
     System& m_system;

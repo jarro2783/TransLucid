@@ -53,8 +53,6 @@ namespace TransLucid
     struct TypeIntension;
     struct TypeBase;
 
-    struct TypeDim;
-
     struct TypeTuple;
 
     //tags for single value empty types
@@ -108,7 +106,6 @@ namespace TransLucid
       recursive_wrapper<TypeIntension>,
       recursive_wrapper<TypeCBV>,
       recursive_wrapper<TypeBase>,
-      recursive_wrapper<TypeDim>,
       recursive_wrapper<TypeTuple>
     > Type;
 
@@ -196,17 +193,6 @@ namespace TransLucid
 
       bool
       operator==(const TypeIntension& rhs) const
-      {
-        return body == rhs.body;
-      }
-    };
-
-    struct TypeDim
-    {
-      Type body;
-
-      bool
-      operator==(const TypeDim& rhs) const
       {
         return body == rhs.body;
       }

@@ -42,14 +42,6 @@ namespace TransLucid
 
       template <typename... Args>
       Type
-      operator()(const TypeDim& dim, Args&... args)
-      {
-        return TypeDim{apply_visitor(*reinterpret_cast<Self*>(this),
-          dim.body, args...)};
-      }
-
-      template <typename... Args>
-      Type
       operator()(const TypeIntension& i, Args&... args)
       {
         return TypeIntension{apply_visitor(*reinterpret_cast<Self*>(this), 
@@ -98,12 +90,6 @@ namespace TransLucid
       void
       operator()(const T& t) const
       {
-      }
-
-      void
-      operator()(const TypeDim& dim)
-      {
-        apply_visitor(*reinterpret_cast<Self*>(this), dim.body);
       }
 
       void

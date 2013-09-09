@@ -144,6 +144,28 @@ namespace TransLucid
       void
       setLower(TypeVariable a, Type t);
 
+      void
+      setPredecessor(TypeVariable a, const std::vector<TypeVariable>& pred);
+
+      void
+      setSuccessor(TypeVariable a, const std::vector<TypeVariable>& succ);
+
+      void
+      setVariable
+      (
+        TypeVariable v,
+        const Type& lower,
+        const Type& upper,
+        const std::vector<TypeVariable>& pred,
+        const std::vector<TypeVariable>& succ
+      )
+      {
+        m_graph[v] = ConstraintNode
+          {
+            pred, succ, lower, upper
+          };
+      }
+
       template <typename Lower, typename Upper>
       void
       rewrite_bounds(Lower rl, Upper ru)
@@ -343,6 +365,20 @@ namespace TransLucid
         ConstraintNode()
         : lower(TypeBot())
         , upper(TypeTop())
+        {
+        }
+
+        ConstraintNode
+        (
+          const std::vector<TypeVariable>& less,
+          const std::vector<TypeVariable>& greater,
+          const Type& lower,
+          const Type& upper
+        )
+        : less(less)
+        , greater(greater)
+        , lower(lower)
+        , upper(upper)
         {
         }
 

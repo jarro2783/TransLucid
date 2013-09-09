@@ -204,3 +204,34 @@ conditionals(TransLucid::System& system)
 
   std::cout << D.print(system) << std::endl;
 }
+
+void
+display(TransLucid::System& system)
+{
+  using namespace TransLucid;
+  using namespace TypeInference;
+
+  ConstraintGraph C;
+
+  std::cout << "== Testing display types ==" << std::endl;
+
+  //make a -> b <= d
+  //c -> b <= b
+  //a-, b+, c-
+  //b <= a, b <= c
+
+  C.add_to_closure(Constraint{0, 1});
+  C.add_to_closure(Constraint{2, 1});
+
+  C.setLower(3, TypeCBV{0, 1});
+  C.setLower(1, TypeCBV{2, 1});
+
+  std::cout << "C = \n" << 
+    C.print(system) << "\n" << std::endl;
+
+  auto t = display_type(std::make_tuple(TypeContext(), 3, C));
+
+  std::cout << print_type(std::get<1>(t), system) 
+    << std::endl << std::get<2>(t).print(system) << std::endl;
+}
+

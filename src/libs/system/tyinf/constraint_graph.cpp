@@ -508,11 +508,6 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   {
     //nothing to do here
   }
-  else if (variant_is_type<Constant>(c.lhs) && 
-           variant_is_type<TypeDim>(c.rhs) )
-  {
-    //nothing to do here
-  }
   else if (variant_is_type<TypeRegion>(c.lhs) && 
            variant_is_type<TypeRegion>(c.rhs) )
   {
@@ -642,6 +637,30 @@ ConstraintGraph::setLower(TypeVariable a, Type t)
   auto iter = get_make_entry(a);
 
   iter->second.lower = t;
+}
+
+void
+ConstraintGraph::setPredecessor
+(
+  TypeVariable a, 
+  const std::vector<TypeVariable>& pred
+)
+{
+  auto iter = get_make_entry(a);
+
+  iter->second.less = pred;
+}
+
+void
+ConstraintGraph::setSuccessor
+(
+  TypeVariable a, 
+  const std::vector<TypeVariable>& succ
+)
+{
+  auto iter = get_make_entry(a);
+
+  iter->second.greater = succ;
 }
 
 
