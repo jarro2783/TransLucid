@@ -215,8 +215,11 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         std::cout << std::get<2>(S).print(m_system) << "\nContext: ";
         for (const auto& d : std::get<0>(S).getDimensions())
         {
-          std::cout << "(" << d.first << ", " << d.second << ") ";
+          std::cout << "(" << d.first << ", ";
+          print_container(std::cout, d.second);
+          std::cout << ") ";
         }
+
         std::get<0>(S).for_each
         (
           [this] (Type t) -> void
@@ -2103,7 +2106,12 @@ polarity(const TypeScheme& t)
   for (const auto& d : dims)
   {
     pos.insert(d.first);
-    neg.insert(d.second);
+    std::for_each(d.second.begin(), d.second.end(), 
+      [&] (TypeVariable v) -> void
+      {
+        neg.insert(v);
+      }
+    );
   }
 
   VarSet currentPos;

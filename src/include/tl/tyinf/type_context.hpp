@@ -37,7 +37,7 @@ namespace TransLucid
       void
       addDimension(TypeVariable a, TypeVariable b)
       {
-        m_dimensions.push_back(std::make_pair(a, b));
+        m_dimensions[a].insert(b);
       }
 
       void
@@ -93,10 +93,23 @@ namespace TransLucid
 
         for (auto v : c.m_dimensions)
         {
+          //result.m_dimensions[get<TypeVariable>(r(Type(v.first)))].insert(
+          //  get<TypeVariable>(r(Type(v.second)))
+          //);
+
+          for (auto s : v.second)
+          {
+            result.m_dimensions[get<TypeVariable>(r(Type(v.first)))].insert(
+              get<TypeVariable>(r(Type(s)))
+            );
+          }
+
+          #if 0
           result.m_dimensions.push_back(std::make_pair(
             get<TypeVariable>(r(Type(v.first))),
             get<TypeVariable>(r(Type(v.second)))
             ));
+          #endif
         }
 
         return result;
@@ -117,16 +130,18 @@ namespace TransLucid
         }
       }
 
-      const std::vector<std::pair<TypeVariable, TypeVariable>>&
+      private:
+      std::map<dimension_index, Type> m_lambdas;
+      std::unordered_map<u32string, Type> m_vars;
+      std::map<TypeVariable, std::set<TypeVariable>> m_dimensions;
+      //std::vector<std::pair<TypeVariable, TypeVariable>> m_dimensions;
+
+      public:
+      const decltype(m_dimensions)&
       getDimensions() const
       {
         return m_dimensions;
       }
-
-      private:
-      std::map<dimension_index, Type> m_lambdas;
-      std::unordered_map<u32string, Type> m_vars;
-      std::vector<std::pair<TypeVariable, TypeVariable>> m_dimensions;
     };
   }
 }

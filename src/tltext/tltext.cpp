@@ -649,7 +649,9 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       //print_container(*m_os, std::get<0>(t).getDimensions());
       for (const auto& v : std::get<0>(t).getDimensions())
       {
-        *m_os << "(" << v.first << ", " << v.second << ") ";
+        std::cout << "(" << v.first << ", ";
+        print_container(std::cout, v.second);
+        std::cout << ") ";
       }
       *m_os << std::endl << std::endl;
     }
