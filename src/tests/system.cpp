@@ -25,6 +25,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <gmpxx.h>
 
 #include <tl/context.hpp>
+#include <tl/free_variables.hpp>
 #include <tl/line_tokenizer.hpp>
 #include <tl/output.hpp>
 #include <tl/parser_iterator.hpp>
@@ -376,4 +377,32 @@ TEST_CASE( "context manipulation", "perturb and restore some contexts")
   k.perturb(t3);
   CHECK(k.lookup(-6) == v1);
   CHECK(k.lookup(-2) == v2);
+}
+
+TEST_CASE( "free variables", "find free variables in expressions" )
+{
+  TL::System system;
+
+  TL::Tree::Expr e = TL::Parser::parse_expr(system, 
+    U"(merge.0 A B) @ [0 <- 2]");
+
+  TL::FreeVariables f;
+
+  auto vars = f.findFree(e);
+
+  auto iter = vars.begin();
+
+  REQUIRE(iter != vars.end());
+  CHECK(*iter == U"A");
+  ++iter;
+
+  REQUIRE(iter != vars.end());
+  CHECK(*iter == U"B");
+  ++iter;
+
+  REQUIRE(iter != vars.end());
+  CHECK(*iter == U"merge");
+  ++iter;
+
+  CHECK(iter == vars.end());
 }

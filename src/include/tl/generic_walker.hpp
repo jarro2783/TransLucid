@@ -461,6 +461,13 @@ namespace TransLucid
     }
 
     void
+    operator()(const Tree::PhiAppExpr& e)
+    {
+      apply_visitor(*reinterpret_cast<Self*>(this), e.lhs);
+      apply_visitor(*reinterpret_cast<Self*>(this), e.rhs);
+    }
+
+    void
     operator()(const Tree::ConditionalBestfitExpr& e)
     {
       for (const auto& d : e.declarations)

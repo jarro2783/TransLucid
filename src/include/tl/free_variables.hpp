@@ -39,13 +39,6 @@ namespace TransLucid
     std::set<u32string>
     findFree(const Tree::Expr& e);
 
-    template <typename T>
-    result_type
-    operator()(const T&) const
-    {
-      return result_type();
-    }
-
     result_type
     operator()(const Tree::IdentExpr&);
 

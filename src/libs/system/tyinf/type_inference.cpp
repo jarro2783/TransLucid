@@ -42,6 +42,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <stack>
 
+//define this to turn off type simplification
+//#define TL_TYINF_NO_SIMPLIFY
+
 namespace TransLucid
 {
 namespace TypeInference
@@ -122,6 +125,10 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 
   std::cout << "infer_system" << std::endl;
 
+  std::cout << "inferring types of : ";
+  print_container(std::cout, ids);
+  std::cout << std::endl;
+
   auto recursion_groups = generate_recurse_groups(ids);
 
   const u32string* currentId = nullptr;
@@ -194,7 +201,6 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         A.remove(xt.first);
       }
 
-      //#define TL_TYINF_NO_SIMPLIFY
       for (const auto& xt : types)
       {
         auto S = 
@@ -395,7 +401,24 @@ TypeInferrer::process_region_guard
 TypeInferrer::result_type
 TypeInferrer::infer(const Tree::Expr& e)
 {
-  return apply_visitor(*this, e);
+  auto t = apply_visitor(*this, e);
+  
+  auto S = 
+  #ifndef TL_TYINF_NO_SIMPLIFY
+    minimise(
+      garbage_collect(
+        canonise(
+  #endif
+          t
+  #ifndef TL_TYINF_NO_SIMPLIFY
+          , m_freshVars
+        )
+      )
+    )
+  #endif
+  ;
+
+  return S;
 }
 
 TypeInferrer::result_type

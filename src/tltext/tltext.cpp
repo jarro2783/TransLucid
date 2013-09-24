@@ -633,11 +633,6 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       *m_os << Printer::print_expr_tree(eFixed, false) << " :: ";
       auto t = infer.infer(eFixed);
 
-      t = TypeInference::minimise(
-        TypeInference::garbage_collect(TypeInference::canonise(t, fresh))
-      )
-      ;
-
       auto display = TypeInference::display_type(t);
 
       *m_os << print_type(std::get<1>(display), m_system) << "\n\n";
@@ -645,15 +640,18 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       *m_os << print_type(std::get<1>(t), m_system) << std::endl
         << std::get<2>(t).print(m_system) << std::endl;
 
-      *m_os << "In context: ";
-      //print_container(*m_os, std::get<0>(t).getDimensions());
-      for (const auto& v : std::get<0>(t).getDimensions())
+      const auto& dims = std::get<0>(t).getDimensions();
+      if (dims.size() > 0)
       {
-        std::cout << "(" << v.first << ", ";
-        print_container(std::cout, v.second);
-        std::cout << ") ";
+        *m_os << "In context: ";
+        for (const auto& v : dims)
+        {
+          std::cout << "(" << v.first << ", ";
+          print_container(std::cout, v.second);
+          std::cout << ") ";
+        }
+        *m_os << std::endl << std::endl;
       }
-      *m_os << std::endl << std::endl;
     }
   }
 }
