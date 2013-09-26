@@ -221,9 +221,9 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         std::cout << std::get<2>(S).print(m_system) << "\nContext: ";
         for (const auto& d : std::get<0>(S).getDimensions())
         {
-          std::cout << "(" << d.first << ", ";
+          std::cout << "(" << d.first << ", (";
           print_container(std::cout, d.second);
-          std::cout << ") ";
+          std::cout << ")) ";
         }
 
         std::get<0>(S).for_each
@@ -1460,6 +1460,12 @@ struct CompareHead
     return a < b;
   }
 
+  bool
+  operator()(const TypeAtomic& a, const TypeAtomic& b) const
+  {
+    return a.index < b.index;
+  }
+
   template <typename A, typename B>
   bool
   operator()(const A& a, const B& b) const
@@ -1577,20 +1583,20 @@ struct MinimiseCompare
       return false;
     }
 
-    GetTypeOrder headOrder;
+    CompareHead head;
 
-    if (apply_visitor(headOrder, C.lower(a)) != 
-        apply_visitor(headOrder, C.lower(b)))
+    //a < b and b < a should be false, making them equal
+    //otherwise they are not equal
+    if (head.less(C.lower(a), C.lower(b)) || head.less(C.lower(b), C.lower(a)))
     {
       return false;
     }
 
-    if (apply_visitor(headOrder, C.upper(a)) != 
-        apply_visitor(headOrder, C.upper(b)))
+    if (head.less(C.upper(a), C.upper(b)) || head.less(C.upper(b), C.upper(a)))
     {
       return false;
     }
-    
+
     return true;
   }
 
@@ -2169,15 +2175,6 @@ polarity(const TypeScheme& t)
     );
   }
 
-  //#if 0
-  std::cout << "positive variables" << std::endl;
-  print_container(std::cout, pos);
-  std::cout << std::endl;
-  std::cout << "negative variables" << std::endl;
-  print_container(std::cout, neg);
-  std::cout << std::endl;
-  //#endif
-
   return std::make_pair(neg, pos);
 }
 
@@ -2185,6 +2182,15 @@ TypeScheme
 garbage_collect(const TypeScheme& t)
 {
   auto p = polarity(t);
+
+  //#if 0
+  std::cout << "positive: ";
+  print_container(std::cout, p.second);
+  std::cout << std::endl;
+  std::cout << "negative: ";
+  print_container(std::cout, p.first);
+  std::cout << std::endl;
+  //#endif
 
   auto C = std::get<2>(t);
   C.collect(p.first, p.second);
@@ -2288,13 +2294,38 @@ minimise(const TypeScheme& t)
     funpart.insert(f);
   }
   
+  #if 0
+  std::cout << "blocks: ";
+  for (const auto& b : blocks)
+  {
+    std::cout << "(";
+    print_container(std::cout, b.second.vars);
+    std::cout << ") ";
+  }
+  std::cout << std::endl;
+  #endif
+
   // == Initialise ==
+
+  auto addToQueue = [&] (size_t b, size_t fun) -> void
+  {
+    //std::cout << "adding split (" << b << ", " << fun << ") (";
+    //print_container(std::cout, blocks[b].vars);
+    //std::cout << ")" << std::endl;
+
+    auto r1 = toSplit.insert(std::make_pair(b, std::set<size_t>()));
+
+    auto r2 = r1.first->second.insert(fun);
+
+    splitQueue.push_back(std::make_pair(r1.first, r2.first));
+  };
 
   //partition with respect to all but the biggest and every seen variable
   for (const auto& block : blocks)
   {
     if (block.first != maxBlock)
     {
+      #if 0
       auto result = toSplit.insert(std::make_pair(block.first, funpart)).first;
 
       auto iter = result->second.begin();
@@ -2303,24 +2334,24 @@ minimise(const TypeScheme& t)
         splitQueue.push_back(std::make_pair(result, iter));
         ++iter;
       }
+      #endif
+
+      auto iter = funpart.begin();
+      while (iter != funpart.end())
+      {
+        addToQueue(block.first, *iter);
+        ++iter;
+      }
     }
   }
 
-  //std::cout << "Partition by:" << std::endl;
-  //for (auto s : splitQueue)
-  //{
-  //  std::cout << s.first->first << ", " << *s.second << std::endl;
-  //}
-
-  auto addToQueue = [&] (TypeVariable var, size_t fun) -> void
+  #if 0
+  std::cout << "Partition by:" << std::endl;
+  for (auto s : splitQueue)
   {
-    //std::cout << "adding split (" << var << ", " << fun << ")" << std::endl;
-    auto r1 = toSplit.insert(std::make_pair(var, std::set<size_t>()));
-
-    auto r2 = r1.first->second.insert(fun);
-
-    splitQueue.push_back(std::make_pair(r1.first, r2.first));
-  };
+    std::cout << s.first->first << ", " << *s.second << std::endl;
+  }
+  #endif
 
   // == while L != empty do ==
   while (!splitQueue.empty())
@@ -2334,6 +2365,9 @@ minimise(const TypeScheme& t)
     //remove the first one from the list
     splitQueue.pop_front();
     currentSplit.first->second.erase(currentSplit.second);
+
+    //std::cout << "splitting by (" << currentBlock << ", " 
+    //  << currentFun << ")" << std::endl;
 
     //get the inverse of the current block and symbol
     // == c: Determine splittings of all blocks wrt (B_j, a) ==
@@ -2374,6 +2408,8 @@ minimise(const TypeScheme& t)
     {
       auto bi = blocks.find(b);
 
+      //std::cout << "checking block " << b << std::endl;
+
       //for the current block B for each element s of B, all the mappings 
       //for each function f(s)
       std::vector<std::vector<TypeVariable>> mappings;
@@ -2387,7 +2423,8 @@ minimise(const TypeScheme& t)
         }
         else
         {
-          //move this block to its twin
+          //move this var to its twin
+          //std::cout << "moving var " << s << " to twin" << std::endl;
           twins[b].insert(s);
         }
       }
@@ -2401,7 +2438,10 @@ minimise(const TypeScheme& t)
       std::for_each(bi.second.begin(), bi.second.end(),
         [&] (TypeVariable v) -> void
         {
+          //remove the variable from the current block
           i->second.vars.erase(v);
+          //move each variables inverse block to the new block
+          inverseBlocks[v] = bAlloc;
         }
       );
       blocks[bAlloc].vars = bi.second;
@@ -2439,8 +2479,13 @@ minimise(const TypeScheme& t)
 
   std::map<TypeVariable, TypeVariable> replace;
 
+  //std::cout << "blocks: ";
   for (const auto& b : blocks)
   {
+    //std::cout << "(";
+    //print_container(std::cout, b.second.vars);
+    //std::cout << ") ";
+
     if (b.second.vars.size() > 1)
     {
       //replace every occurence of variables in the block with the
@@ -2457,6 +2502,7 @@ minimise(const TypeScheme& t)
       }
     }
   }
+  std::cout << std::endl;
 
   ConstraintGraph C1 = C;
 
@@ -2471,6 +2517,7 @@ minimise(const TypeScheme& t)
   auto t2 = renamer.rename(TypeScheme(std::get<0>(t), std::get<1>(t), C1));
 
   return t2;
+  //return t;
 }
 
 TypeScheme
