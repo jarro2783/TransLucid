@@ -742,13 +742,28 @@ namespace
       if (!variant_is_type<TypeNothing>(glb.constructed))
       {
         apply_visitor(*this, glb.constructed);
+
+        if (glb.vars.size() != 0)
+        {
+          m_result += U", ";
+        }
       }
 
-      for (const auto& v : glb.vars)
+      auto iter = glb.vars.begin();
+      while (iter != glb.vars.end())
       {
-        m_result += U", ";
-        operator()(v);
+        operator()(*iter);
+        if (++iter != glb.vars.end())
+        {
+          m_result += U", ";
+        }
       }
+
+      //for (const auto& v : glb.vars)
+      //{
+      //  m_result += U", ";
+      //  operator()(v);
+      //}
 
       m_result += U"}";
     }
@@ -761,12 +776,21 @@ namespace
       if (!variant_is_type<TypeNothing>(lub.constructed))
       {
         apply_visitor(*this, lub.constructed);
+
+        if (lub.vars.size() != 0)
+        {
+          m_result += U", ";
+        }
       }
 
-      for (const auto& v : lub.vars)
+      auto iter = lub.vars.begin();
+      while (iter != lub.vars.end())
       {
-        m_result += U", ";
-        operator()(v);
+        operator()(*iter);
+        if (++iter != lub.vars.end())
+        {
+          m_result += U", ";
+        }
       }
 
       m_result += U"}";

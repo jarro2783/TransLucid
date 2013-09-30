@@ -37,7 +37,7 @@ namespace TransLucid
       void
       addDimension(TypeVariable a, TypeVariable b)
       {
-        m_dimensions[a].insert(b);
+        m_dimensions[a] = construct_glb(m_dimensions[a], b);
       }
 
       void
@@ -83,33 +83,24 @@ namespace TransLucid
 
         for (const auto& v : c.m_lambdas)
         {
-          result.m_lambdas.insert(std::make_pair(v.first, r(v.second)));
+          result.m_lambdas.insert(std::make_pair(v.first, 
+            r.rewrite_type(v.second)));
         }
 
         for (const auto& v : c.m_vars)
         {
-          result.m_vars.insert(std::make_pair(v.first, r(v.second)));
+          result.m_vars.insert(std::make_pair(v.first, 
+            r.rewrite_type(v.second)));
         }
 
         for (auto v : c.m_dimensions)
         {
-          //result.m_dimensions[get<TypeVariable>(r(Type(v.first)))].insert(
-          //  get<TypeVariable>(r(Type(v.second)))
-          //);
-
-          for (auto s : v.second)
-          {
-            result.m_dimensions[get<TypeVariable>(r(Type(v.first)))].insert(
-              get<TypeVariable>(r(Type(s)))
+          auto rewritten = r.rename_var(v.first);
+          result.m_dimensions[rewritten] = 
+            construct_glb(
+              result.m_dimensions[rewritten], 
+              r.rewrite_type(v.second)
             );
-          }
-
-          #if 0
-          result.m_dimensions.push_back(std::make_pair(
-            get<TypeVariable>(r(Type(v.first))),
-            get<TypeVariable>(r(Type(v.second)))
-            ));
-          #endif
         }
 
         return result;
@@ -133,7 +124,7 @@ namespace TransLucid
       private:
       std::map<dimension_index, Type> m_lambdas;
       std::unordered_map<u32string, Type> m_vars;
-      std::map<TypeVariable, std::set<TypeVariable>> m_dimensions;
+      std::map<TypeVariable, Type> m_dimensions;
       //std::vector<std::pair<TypeVariable, TypeVariable>> m_dimensions;
 
       public:

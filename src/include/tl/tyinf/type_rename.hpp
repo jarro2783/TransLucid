@@ -63,8 +63,7 @@ namespace TransLucid
       {
         using std::placeholders::_1;
 
-        TypeContext A = TypeContext::rewrite(std::get<0>(t),
-          std::bind(visitor_applier(), std::ref(*this), _1));
+        TypeContext A = TypeContext::rewrite(std::get<0>(t), Rewriter{*this});
 
         ConstraintGraph C = rename_graph(std::get<2>(t));
 

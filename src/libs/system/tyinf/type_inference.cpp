@@ -221,9 +221,8 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         std::cout << std::get<2>(S).print(m_system) << "\nContext: ";
         for (const auto& d : std::get<0>(S).getDimensions())
         {
-          std::cout << "(" << d.first << ", (";
-          print_container(std::cout, d.second);
-          std::cout << ")) ";
+          std::cout << "(" << d.first << ", " << print_type(d.second, m_system)
+            << ") ";
         }
 
         std::get<0>(S).for_each
@@ -1207,6 +1206,40 @@ class Canonise
   CanoniseVars& m_vars;
 };
 
+class CanoniseRewriter
+{
+  public:
+
+  CanoniseRewriter(Canonise& canon, bool positive)
+  : m_canon(canon)
+  , m_pos(positive)
+  {
+  }
+
+  TypeVariable
+  rename_var(TypeVariable v)
+  {
+    return get<TypeVariable>(rewrite_type(v));
+  }
+
+  Type
+  rewrite_type(const Type& t)
+  {
+    if (m_pos)
+    {
+      return apply_visitor(m_canon, t, TagPositive());
+    }
+    else
+    {
+      return apply_visitor(m_canon, t, TagNegative());
+    }
+  }
+
+  private:
+  Canonise& m_canon;
+  bool m_pos;
+};
+
 class MarkPolarity
 {
   public:
@@ -2012,9 +2045,11 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
 
   auto typecanon = apply_visitor(canon, std::get<1>(t), TagPositive());
   auto context = TypeContext::rewrite(std::get<0>(t), 
-    std::bind(visitor_applier(), std::ref(canon), std::placeholders::_1,
-      TagNegative())
-  );
+    CanoniseRewriter(canon, false));
+
+  //  std::bind(visitor_applier(), std::ref(canon), std::placeholders::_1,
+  //    TagNegative())
+  //);
 
   //rewrite everything in C
   auto C = std::get<2>(t);
@@ -2135,12 +2170,14 @@ polarity(const TypeScheme& t)
   for (const auto& d : dims)
   {
     pos.insert(d.first);
-    std::for_each(d.second.begin(), d.second.end(), 
-      [&] (TypeVariable v) -> void
-      {
-        neg.insert(v);
-      }
-    );
+    gatherneg(d.second, pos, neg);
+
+    //std::for_each(d.second.vars.begin(), d.second.vars.end(), 
+    //  [&] (TypeVariable v) -> void
+    //  {
+    //    neg.insert(v);
+    //  }
+    //);
   }
 
   VarSet currentPos;
@@ -2183,14 +2220,14 @@ garbage_collect(const TypeScheme& t)
 {
   auto p = polarity(t);
 
-  //#if 0
+  #if 0
   std::cout << "positive: ";
   print_container(std::cout, p.second);
   std::cout << std::endl;
   std::cout << "negative: ";
   print_container(std::cout, p.first);
   std::cout << std::endl;
-  //#endif
+  #endif
 
   auto C = std::get<2>(t);
   C.collect(p.first, p.second);

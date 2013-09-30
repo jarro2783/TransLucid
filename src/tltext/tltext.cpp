@@ -646,9 +646,8 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
         *m_os << "In context: ";
         for (const auto& v : dims)
         {
-          std::cout << "(" << v.first << ", ";
-          print_container(std::cout, v.second);
-          std::cout << ") ";
+          std::cout << "(" << v.first << ", " <<
+          print_type(v.second, m_system) << ") ";
         }
         *m_os << std::endl << std::endl;
       }
