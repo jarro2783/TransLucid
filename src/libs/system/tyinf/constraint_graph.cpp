@@ -54,6 +54,12 @@ struct HeadCompare
   }
 
   bool
+  operator()(const Constant& a, const TypeAtomic& b)
+  {
+    return a.index() == b.index;
+  }
+
+  bool
   operator()(const Constant& a, const Constant& b)
   {
     return a == b;

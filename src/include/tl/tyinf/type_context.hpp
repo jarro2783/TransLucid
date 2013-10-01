@@ -35,9 +35,21 @@ namespace TransLucid
       public:
 
       void
-      addDimension(TypeVariable a, TypeVariable b)
+      addDimension(TypeVariable dim, 
+        std::pair<Type, Type> value)
       {
-        m_dimensions[a] = construct_glb(m_dimensions[a], b);
+        auto iter = m_dimensions.find(dim);
+
+        if (iter == m_dimensions.end())
+        {
+          iter = m_dimensions.insert(std::make_pair(dim, 
+            std::make_pair(Type(), Type()))).first;
+        }
+
+        iter->second = std::make_pair(
+          construct_lub(iter->second.first, value.first),
+          construct_glb(iter->second.second, value.second)
+        );
       }
 
       void
@@ -96,11 +108,12 @@ namespace TransLucid
         for (auto v : c.m_dimensions)
         {
           auto rewritten = r.rename_var(v.first);
-          result.m_dimensions[rewritten] = 
-            construct_glb(
-              result.m_dimensions[rewritten], 
-              r.rewrite_type(v.second)
-            );
+          result.addDimension(rewritten, 
+            std::make_pair(
+              r.rewrite_type(v.second.first), 
+              r.rewrite_type(v.second.second)
+            )
+          );
         }
 
         return result;
@@ -124,7 +137,7 @@ namespace TransLucid
       private:
       std::map<dimension_index, Type> m_lambdas;
       std::unordered_map<u32string, Type> m_vars;
-      std::map<TypeVariable, Type> m_dimensions;
+      std::map<TypeVariable, std::pair<Type, Type>> m_dimensions;
       //std::vector<std::pair<TypeVariable, TypeVariable>> m_dimensions;
 
       public:

@@ -221,8 +221,10 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         std::cout << std::get<2>(S).print(m_system) << "\nContext: ";
         for (const auto& d : std::get<0>(S).getDimensions())
         {
-          std::cout << "(" << d.first << ", " << print_type(d.second, m_system)
-            << ") ";
+          std::cout << "(" << d.first << ", (" << 
+            print_type(d.second.first, m_system) << ", " <<
+            print_type(d.second.second, m_system)
+            << ")) ";
         }
 
         std::get<0>(S).for_each
@@ -703,7 +705,7 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
 
     C.add_to_closure(Constraint{alpha, beta});
     C.add_to_closure(Constraint{std::get<1>(t), gamma});
-    A.addDimension(gamma, beta);
+    A.addDimension(gamma, std::make_pair(alpha, beta));
 
     return std::make_tuple(A, beta, C);
   }
@@ -914,6 +916,13 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
 
     A.join(std::get<0>(t));
     C.make_union(std::get<2>(t));
+
+    // pull d out of the type context, allocate a new variable alpha, and set
+    // inferred type of d <= alpha <= required type of d
+    auto alpha = fresh();
+    C.add_to_closure(Constraint{alpha, A.lookup(d.first)});
+    C.add_to_closure(Constraint{std::get<1>(t), alpha});
+    A.remove(d.first);
   }
 
   return std::make_tuple(A, std::get<1>(t_0), C);
@@ -2170,7 +2179,8 @@ polarity(const TypeScheme& t)
   for (const auto& d : dims)
   {
     pos.insert(d.first);
-    gatherneg(d.second, pos, neg);
+    gatherpos(d.second.first, pos, neg);
+    gatherneg(d.second.second, pos, neg);
 
     //std::for_each(d.second.vars.begin(), d.second.vars.end(), 
     //  [&] (TypeVariable v) -> void
