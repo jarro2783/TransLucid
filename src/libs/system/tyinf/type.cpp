@@ -75,11 +75,18 @@ build_lub_constructed(Type current, Type join)
   {
     if ((aconst->index() == bconst->index()))
     {
-      return TypeAtomic
-        {
-          U"",
-          aconst->index()
-        };
+      if (*aconst == *bconst)
+      {
+        return *aconst;
+      }
+      else
+      {
+        return TypeAtomic
+          {
+            U"",
+            aconst->index()
+          };
+      }
     }
     else
     {

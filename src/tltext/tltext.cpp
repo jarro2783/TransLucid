@@ -640,6 +640,9 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       *m_os << print_type(std::get<1>(t), m_system) << std::endl
         << std::get<2>(t).print(m_system) << std::endl;
 
+      *m_os << std::get<0>(t).print_context(m_system) << std::endl;
+
+      #if 0
       const auto& dims = std::get<0>(t).getDimensions();
       if (dims.size() > 0)
       {
@@ -653,6 +656,7 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
         }
         *m_os << std::endl << std::endl;
       }
+      #endif
     }
   }
 }

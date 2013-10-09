@@ -118,6 +118,34 @@ TypeInferrer::make_constant(T&& v)
   return std::make_tuple(TypeContext(), t, c);
 }
 
+TypeScheme
+TypeInferrer::simplify(TypeScheme t)
+{
+  std::get<0>(t).fix_context(std::get<2>(t));
+  auto S = 
+  #ifndef TL_TYINF_NO_SIMPLIFY
+    minimise(
+      garbage_collect(
+        canonise(
+  #endif
+          t
+  #ifndef TL_TYINF_NO_SIMPLIFY
+          , m_freshVars
+        )
+      )
+    )
+  #endif
+  ;
+
+  //now, to sort out the TL context, rerun simplification
+
+  #ifndef TL_TYINF_NO_SIMPLIFY
+  //S = minimise(garbage_collect(canonise(S, m_freshVars)));
+  #endif
+
+  return S;
+}
+
 void
 TypeInferrer::infer_system(const std::set<u32string>& ids)
 {
@@ -203,22 +231,30 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 
       for (const auto& xt : types)
       {
-        auto S = 
+        auto S =  simplify(
+        #if 0
         #ifndef TL_TYINF_NO_SIMPLIFY
           minimise(
             garbage_collect(
               canonise(
         #endif
+        #endif
                 std::make_tuple(A, xt.second, C)
+        #if 0
         #ifndef TL_TYINF_NO_SIMPLIFY
                 , m_freshVars
               )
             )
           )
         #endif
+        #endif
+        )
         ;
 
-        std::cout << std::get<2>(S).print(m_system) << "\nContext: ";
+        std::cout << std::get<2>(S).print(m_system) << "\n";
+        std::cout << "\nContext: ";
+        std::cout << std::get<0>(S).print_context(m_system) << std::endl;
+        #if 0 
         for (const auto& d : std::get<0>(S).getDimensions())
         {
           std::cout << "(" << d.first << ", (" << 
@@ -226,6 +262,7 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
             print_type(d.second.second, m_system)
             << ")) ";
         }
+        #endif
 
         std::get<0>(S).for_each
         (
@@ -403,23 +440,8 @@ TypeInferrer::result_type
 TypeInferrer::infer(const Tree::Expr& e)
 {
   auto t = apply_visitor(*this, e);
-  
-  auto S = 
-  #ifndef TL_TYINF_NO_SIMPLIFY
-    minimise(
-      garbage_collect(
-        canonise(
-  #endif
-          t
-  #ifndef TL_TYINF_NO_SIMPLIFY
-          , m_freshVars
-        )
-      )
-    )
-  #endif
-  ;
 
-  return S;
+  return simplify(t);
 }
 
 TypeInferrer::result_type
@@ -689,27 +711,14 @@ TypeInferrer::operator()(const Tree::IfExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::HashExpr& e)
 {
-  //treat #.d and #.E differently
+  //#.d, #.(#.d), and #.E are all different
+  //#.d means we are retrieving a parameter
+  //#.(#.d) means we are looking up a passed parameter in the context
+  //#.E means we are looking up a constant dimension given by an expression
   const Tree::DimensionExpr* dim = get<Tree::DimensionExpr>(&e.e);
+  const Tree::HashExpr* hash = get<Tree::HashExpr>(&e.e);
 
-  if (dim == nullptr)
-  {
-    auto t = apply_visitor(*this, e.e);
-
-    auto alpha = fresh();
-    auto beta = fresh();
-    auto gamma = fresh();
-
-    ConstraintGraph& C = std::get<2>(t);
-    TypeContext& A = std::get<0>(t);
-
-    C.add_to_closure(Constraint{alpha, beta});
-    C.add_to_closure(Constraint{std::get<1>(t), gamma});
-    A.addDimension(gamma, std::make_pair(alpha, beta));
-
-    return std::make_tuple(A, beta, C);
-  }
-  else
+  if (dim != nullptr)
   {
     TypeContext A;
     ConstraintGraph C;
@@ -721,6 +730,85 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
     C.add_to_closure(Constraint{alpha, gamma});
 
     return std::make_tuple(A, gamma, C);
+  }
+  else if (hash != nullptr)
+  {
+    //is it #.(#.d) ?
+    dim = get<Tree::DimensionExpr>(&hash->e);
+
+    if (dim != nullptr)
+    {
+      TypeContext A;
+      ConstraintGraph C;
+
+      //variables for parameter lookup
+      auto alpha = fresh();
+      auto gamma = fresh();
+
+      A.add(dim->dim, alpha);
+      C.add_to_closure(Constraint{gamma, alpha});
+
+      //the variables for the dimension query
+      auto value = fresh();
+      auto upper = fresh();
+      auto thedim = fresh();
+
+      A.addParamDim(dim->dim, thedim, value, upper);
+      C.add_to_closure(Constraint{upper, value});
+      C.add_to_closure(Constraint{alpha, thedim});
+
+      return std::make_tuple(A, value, C);
+    }
+    else
+    {
+      //this is an error
+      throw "Non constant dimension used in context";
+    }
+  }
+  else
+  {
+    auto t = apply_visitor(*this, e.e);
+
+    //the type of E must be a constant, se we look for its unique bound
+    //it is positive, so we want the lower constructed bound to be a constant
+
+    auto& A = std::get<0>(t);
+    auto& C = std::get<2>(t);
+    TypeVariable var = get<TypeVariable>(std::get<1>(t));
+    auto lower = C.lower(var);
+    const Constant* lowerConstant = get<Constant>(&lower);
+
+    if (C.predecessor(var).size() == 0 && lowerConstant != nullptr)
+    {
+      auto alpha = fresh();
+      auto beta = fresh();
+
+      A.addConstantDim(*lowerConstant, alpha, beta);
+
+      C.add_to_closure(Constraint{beta, alpha});
+      
+      return std::make_tuple(A, alpha, C);
+    }
+    else
+    {
+      throw "Non constant dimension used in context";
+    }
+
+#if 0
+    auto alpha = fresh();
+    auto beta = fresh();
+    auto gamma = fresh();
+
+    ConstraintGraph& C = std::get<2>(t);
+    TypeContext& A = std::get<0>(t);
+
+    //C.add_to_closure(Constraint{alpha, beta});
+    C.add_to_closure(Constraint{beta, alpha});
+    C.add_to_closure(Constraint{std::get<1>(t), gamma});
+    A.addDimension(gamma, std::make_pair(alpha, beta));
+
+    return std::make_tuple(A, alpha, C);
+#endif
   }
 }
 
@@ -776,17 +864,68 @@ TypeInferrer::operator()(const Tree::TupleExpr& e)
 TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::AtExpr& e)
 {
-  auto t_1 = apply_visitor(*this, e.rhs);
-  auto t_0 = apply_visitor(*this, e.lhs);
+  //the right hand side must be a tuple
+  const Tree::TupleExpr* rhs = get<Tree::TupleExpr>(&e.rhs);
 
-  auto& C = std::get<2>(t_0);
-  C.make_union(std::get<2>(t_1));
-  C.add_to_closure(Constraint{std::get<1>(t_1), TypeTuple()});
+  if (rhs == nullptr)
+  {
+    throw "Right hand side of @ not a tuple";
+  }
 
-  auto& A = std::get<0>(t_0);
-  A.join(std::get<0>(t_1));
+  auto lhst = apply_visitor(*this, e.lhs);
 
-  return std::make_tuple(A, std::get<1>(t_0), C);
+  TypeContext& A = std::get<0>(lhst);
+  ConstraintGraph& C = std::get<2>(lhst);
+
+  for (const auto& p : rhs->pairs)
+  {
+    //each dimension will either be a constant dimension, or passed as a 
+    //parameter
+    //so it is either #.d or evaluates to a constant
+
+    auto t_1 = apply_visitor(*this, p.second);
+
+    A.join(std::get<0>(t_1));
+    C.make_union(std::get<2>(t_1));
+
+    const Tree::HashExpr* h = get<Tree::HashExpr>(&p.first);
+    const Tree::DimensionExpr* dim = nullptr;
+
+    if (h != nullptr && (dim = get<Tree::DimensionExpr>(&h->e)) != nullptr)
+    {
+      //the dimension is passed as a parameter
+      auto upper = fresh();
+      auto value = fresh();
+      auto thedim = fresh();
+
+      A.addParamDim(dim->dim, thedim, value, upper);
+      C.add_to_closure(Constraint{std::get<1>(t_1), value});
+    }
+    else
+    {
+      //the dimension is a constant
+      auto t_0 = apply_visitor(*this, p.first);
+
+      A.join(std::get<0>(t_0));
+      C.make_union(std::get<2>(t_0));
+
+      auto& C_0 = std::get<2>(t_0);
+      TypeVariable v_0 = get<TypeVariable>(std::get<1>(t_0));
+      Type lowerType = C_0.lower(v_0);
+      const Constant* lower = get<Constant>(&lowerType);
+
+      if (C_0.predecessor(v_0).size() == 0 && lower != nullptr)
+      {
+        A.addConstantDim(*lower, std::get<1>(t_1), fresh());
+      }
+      else
+      {
+        throw "Invalid dimension in context change";
+      }
+    }
+  }
+
+  return std::make_tuple(A, std::get<1>(lhst), C);
 }
 
 TypeInferrer::result_type
@@ -1226,13 +1365,13 @@ class CanoniseRewriter
   }
 
   TypeVariable
-  rename_var(TypeVariable v)
+  rename_var(TypeVariable v) const
   {
     return get<TypeVariable>(rewrite_type(v));
   }
 
   Type
-  rewrite_type(const Type& t)
+  rewrite_type(const Type& t) const
   {
     if (m_pos)
     {
@@ -2053,8 +2192,10 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
   //constraints until the queue is empty
 
   auto typecanon = apply_visitor(canon, std::get<1>(t), TagPositive());
-  auto context = TypeContext::rewrite(std::get<0>(t), 
-    CanoniseRewriter(canon, false));
+  auto context = TypeContext::canonise(std::get<0>(t), 
+    CanoniseRewriter(canon, true),
+    CanoniseRewriter(canon, false)
+  );
 
   //  std::bind(visitor_applier(), std::ref(canon), std::placeholders::_1,
   //    TagNegative())
@@ -2174,7 +2315,13 @@ polarity(const TypeScheme& t)
   std::get<0>(t).for_each(
     std::bind(gatherneg, std::placeholders::_1, std::ref(pos), std::ref(neg)));
 
+  std::get<0>(t).markTLContext(
+    std::bind(gatherpos, std::placeholders::_1, std::ref(pos), std::ref(neg)),
+    std::bind(gatherneg, std::placeholders::_1, std::ref(pos), std::ref(neg))
+  );
+
   //mark dimensions in the TL context
+  #if 0
   const auto& dims = std::get<0>(t).getDimensions();
   for (const auto& d : dims)
   {
@@ -2189,6 +2336,7 @@ polarity(const TypeScheme& t)
     //  }
     //);
   }
+  #endif
 
   VarSet currentPos;
   VarSet currentNeg;
@@ -2230,14 +2378,12 @@ garbage_collect(const TypeScheme& t)
 {
   auto p = polarity(t);
 
-  #if 0
   std::cout << "positive: ";
   print_container(std::cout, p.second);
   std::cout << std::endl;
   std::cout << "negative: ";
   print_container(std::cout, p.first);
   std::cout << std::endl;
-  #endif
 
   auto C = std::get<2>(t);
   C.collect(p.first, p.second);

@@ -162,6 +162,9 @@ namespace TransLucid
       std::vector<std::vector<u32string>>
       generate_recurse_groups(const std::set<u32string>& ids);
 
+      TypeScheme
+      simplify(TypeScheme t);
+
       void
       process_region_guard
       (
