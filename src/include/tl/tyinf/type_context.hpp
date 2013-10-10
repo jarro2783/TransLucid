@@ -260,6 +260,9 @@ namespace TransLucid
       void
       fix_context(ConstraintGraph& C);
 
+      void
+      instantiate_parameters(ConstraintGraph& C);
+
       private:
       std::map<dimension_index, Type> m_lambdas;
       std::unordered_map<u32string, Type> m_vars;

@@ -137,10 +137,10 @@ TypeInferrer::simplify(TypeScheme t)
   #endif
   ;
 
-  //now, to sort out the TL context, rerun simplification
-
+  std::get<0>(S).instantiate_parameters(std::get<2>(S));
   #ifndef TL_TYINF_NO_SIMPLIFY
-  //S = minimise(garbage_collect(canonise(S, m_freshVars)));
+  //now, to sort out the TL context, rerun simplification
+  S = minimise(garbage_collect(canonise(S, m_freshVars)));
   #endif
 
   return S;

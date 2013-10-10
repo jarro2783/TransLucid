@@ -101,6 +101,13 @@ TypeContext::join(const TypeContext& other)
 
   joinDims(m_constDims, other.m_constDims);
   //joinDims(m_paramDims, other.m_paramDims);
+
+  for (const auto& p : other.m_paramDims)
+  {
+    addParamDim(p.first, std::get<0>(p.second), std::get<1>(p.second),
+      std::get<2>(p.second)
+    );
+  }
 }
 
 Type
@@ -208,6 +215,44 @@ TypeContext::instantiateDim(dimension_index param, const Constant& value)
   }
 }
 #endif
+
+void
+TypeContext::instantiate_parameters(ConstraintGraph& C)
+{
+  auto iter = m_paramDims.begin();
+
+  while (iter != m_paramDims.end())
+  {
+    const auto& d = *iter;
+
+    bool increment = true;
+
+    //the value of the dimension must have a unique lower bound
+    const TypeVariable* v = get<TypeVariable>(&std::get<0>(d.second));
+
+    if (v != nullptr)
+    {
+      Type lower = C.lower(*v);
+      Constant* thedim = get<Constant>(&lower);
+
+      //then we can instantiate it as that dimension, which will compute the
+      //lub and glb of the appropriate types if that dimension already exists
+      if (thedim != nullptr && C.predecessor(*v).size() == 0)
+      {
+        addConstantDim(*thedim, std::get<1>(d.second), std::get<2>(d.second));
+        m_paramDims.erase(iter++);
+        increment = false;
+      }
+    }
+
+    if (increment)
+    {
+      ++iter;
+    }
+  }
+
+  fix_context(C);
+}
 
 }
 }
