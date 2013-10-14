@@ -441,7 +441,10 @@ TypeInferrer::infer(const Tree::Expr& e)
 {
   auto t = apply_visitor(*this, e);
 
-  return simplify(t);
+  auto S = simplify(t);
+  std::get<0>(S).clear_context();
+
+  return simplify(S);
 }
 
 TypeInferrer::result_type
@@ -2378,12 +2381,14 @@ garbage_collect(const TypeScheme& t)
 {
   auto p = polarity(t);
 
+  #if 0
   std::cout << "positive: ";
   print_container(std::cout, p.second);
   std::cout << std::endl;
   std::cout << "negative: ";
   print_container(std::cout, p.first);
   std::cout << std::endl;
+  #endif
 
   auto C = std::get<2>(t);
   C.collect(p.first, p.second);
