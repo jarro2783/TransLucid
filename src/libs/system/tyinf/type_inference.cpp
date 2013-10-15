@@ -2698,7 +2698,7 @@ minimise(const TypeScheme& t)
       }
     }
   }
-  std::cout << std::endl;
+  //std::cout << std::endl;
 
   ConstraintGraph C1 = C;
 
