@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tl 0.0.80\n"
 "Report-Msgid-Bugs-To: jarrydb@cse.unsw.edu.au\n"
-"POT-Creation-Date: 2013-07-24 10:16+1000\n"
+"POT-Creation-Date: 2013-10-15 13:27+1100\n"
 "PO-Revision-Date: 2012-02-08 11:56+11\n"
 "Last-Translator: Jarryd Beck <jarrydb@cse.unsw.edu.au>\n"
 "Language-Team: French <translucid@cse.unsw.edu.au>\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:289
+#: src/tltext/tltext.cpp:291
 msgid "// instant %1% beginning"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which demand we are printing
-#: src/tltext/tltext.cpp:296
+#: src/tltext/tltext.cpp:298
 msgid "// demand %1%"
 msgstr ""
 
 #. TRANSLATORS: verbose output, which instant we are at
-#: src/tltext/tltext.cpp:319
+#: src/tltext/tltext.cpp:321
 msgid "// instant %1% end"
 msgstr ""
 

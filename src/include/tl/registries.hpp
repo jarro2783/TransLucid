@@ -1,5 +1,5 @@
 /* Object registries.
-   Copyright (C) 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2011--2013 Jarryd Beck
 
 This file is part of TransLucid.
 

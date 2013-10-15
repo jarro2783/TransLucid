@@ -1,5 +1,5 @@
 /* TransLucid lexer utility functions.
-   Copyright (C) 2011 Jarryd Beck and John Plaice
+   Copyright (C) 2011--2013 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -20,10 +20,6 @@ along with TransLucid; see the file COPYING.  If not see
 /**
  * @file lexer_util.hpp
  * Lexer utility header.
- * This file contains the following:
- * - init_*: initialises the numbers that can be recognised by the lexer.
- * - value_wrapper: a class which wraps values and acts as a proxy to
- * remove ambiguity when placing them in a boost::variant.
  */
 
 #ifndef TL_LEXER_UTIL_HPP_INCLUDED

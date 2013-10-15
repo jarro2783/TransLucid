@@ -1,5 +1,5 @@
-/* TODO: Give a descriptor.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+/* Caused a compile error.
+   Copyright (C) 2009, 2010 Jarryd Beck
 
 This file is part of TransLucid.
 

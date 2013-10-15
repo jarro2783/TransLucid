@@ -1,5 +1,5 @@
 /* OpWS class.
-   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+   Copyright (C) 2009--2013 Jarryd Beck
 
 This file is part of TransLucid.
 
@@ -301,7 +301,7 @@ namespace TransLucid
   }
 
   /**
-   * An operation hyperdaton. The indices must be known at compile time.
+   * An operation workshop. The indices must be known at compile time.
    * @param T A functor which carries out the operation.
    * @param Args The variadic template pack of the TransLucid argument indices.
    */

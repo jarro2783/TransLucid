@@ -28,11 +28,11 @@ includes_HEADERS = \
   eval_workshops.hpp fixed_indexes.hpp free_variables.hpp \
   function.hpp function_registry.hpp \
 	function_transform.hpp generic_walker.hpp \
-  gmpxx_fwd.hpp header_parser.hpp hyperdaton.hpp \
+  gmpxx_fwd.hpp hyperdaton.hpp \
   internal_strings.hpp lexer_util.hpp library.hpp \
   line_tokenizer.hpp mpl.hpp \
   object_registry.hpp opdef.hpp output.hpp \
-  parser_api.hpp parser_defs.hpp parser_iterator.hpp \
+  parser_api.hpp parser_iterator.hpp \
   range.hpp region.hpp registries.hpp rename.hpp semantic_transform.hpp \
   semantics.hpp \
   set_types.hpp \

@@ -18,4 +18,4 @@ EXTRA_DIST = ./rules.hpp \
 ./char_traits.hpp \
 ./size_t.hpp \
 ./bool.hpp \
-./file_shared_iterator.hpp
+./stream_shared_iterator.hpp

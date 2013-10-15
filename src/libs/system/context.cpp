@@ -1,5 +1,5 @@
 /* The context.
-   Copyright (C) 2009-2011 Jarryd Beck and John Plaice
+   Copyright (C) 2009-2013 Jarryd Beck
 
 This file is part of TransLucid.
 

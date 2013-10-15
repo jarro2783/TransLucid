@@ -1,4 +1,4 @@
-dnl   Copyright (C) 2009, 2010 Jarryd Beck and John Plaice
+dnl   Copyright (C) 2009--2013 Jarryd Beck
 dnl
 dnl   This file is part of TransLucid.
 dnl
