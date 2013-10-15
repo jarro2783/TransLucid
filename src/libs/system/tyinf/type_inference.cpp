@@ -746,10 +746,8 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
 
       //variables for parameter lookup
       auto alpha = fresh();
-      auto gamma = fresh();
 
       A.add(dim->dim, alpha);
-      C.add_to_closure(Constraint{gamma, alpha});
 
       //the variables for the dimension query
       auto value = fresh();
