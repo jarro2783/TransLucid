@@ -174,6 +174,8 @@ AC_CONFIG_FILES([po/Makefile
                  src/include/tl/Makefile
                  src/include/tl/detail/Makefile
                  src/include/tl/hyperdatons/Makefile
+                 src/include/tl/static/Makefile
+                 src/include/tl/tyinf/Makefile
                  src/include/tl/types/Makefile
                  src/libs/system/lex/Makefile
                  src/libs/system/tl/Makefile

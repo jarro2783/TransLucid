@@ -15,7 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with TransLucid; see the file COPYING.  If not see
 #   <http://www.gnu.org/licenses/>.
-SUBDIRS=detail types hyperdatons
+SUBDIRS=detail types hyperdatons static tyinf
 
 includesdir = $(prefix)/include/tl
 
@@ -24,7 +24,7 @@ includes_HEADERS = \
   basefun.hpp bestfit.hpp builtin_types.hpp \
   cache.hpp \
   charset.hpp chi.hpp collapse.hpp constws.hpp context.hpp datadef.hpp \
-  dimtranslator.hpp equation.hpp exception.hpp \
+  dependencies.hpp dimtranslator.hpp equation.hpp exception.hpp \
   eval_workshops.hpp fixed_indexes.hpp free_variables.hpp \
   function.hpp function_registry.hpp \
 	function_transform.hpp generic_walker.hpp \
