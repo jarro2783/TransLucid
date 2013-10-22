@@ -308,7 +308,7 @@ fun print!c [c imp uuid] = print_uuid.c;;
 fun print!c [c imp demand] = "Cannot print demands";;
 fun print!c [c imp calc] = "Cannot print calc";;
 
-fun print_typename!c = "unknown typename";;
+fun print_typename!c = "unknown_typename(" >> (print!(type_index.c)) >> ")" ;;
 fun print_typename!c [c imp intmp] = "intmp";;
 fun print_typename!c [c imp ustring] = "ustring";;
 fun print_typename!c [c imp uchar] = "uchar";;

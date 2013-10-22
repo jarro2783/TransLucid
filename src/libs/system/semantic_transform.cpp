@@ -262,7 +262,7 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
   }
 
   //drop the dims to hold on to
-  if (!caching())
+  if (!simplified())
   {
     m_scope.resize(m_scope.size() - e.dims.size());
   }
@@ -290,8 +290,8 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
   auto iter = m_fnScope.find(unique);
   if (iter != m_fnScope.end())
   {
-    //is it a dimension and are we caching?
-    if (caching() && m_dimscope.find(unique) != m_dimscope.end())
+    //is it a dimension and are we simplifying the tree?
+    if (simplified() && m_dimscope.find(unique) != m_dimscope.end())
     {
       //std::cerr << unique << " is a dimension" << std::endl;
       return Tree::DimensionExpr(iter->second);

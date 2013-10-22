@@ -156,6 +156,19 @@ TypeContext::print_context(System& system)
 {
   u32string result;
 
+  for (const auto& l : m_lambdas)
+  {
+    std::ostringstream os;
+    os << l.first;
+    result += U"(" + utf8_to_utf32(os.str()) + U", " + 
+      print_type(l.second, system) + U")\n";
+  }
+
+  for (const auto& v : m_vars)
+  {
+    result += U"(" + v.first + U", " + print_type(v.second, system) + U")\n";
+  }
+
   for (const auto& d : m_constDims)
   {
     result += U"(" + system.printConstant(d.first) + U", ("
@@ -239,8 +252,18 @@ TypeContext::instantiate_parameters(ConstraintGraph& C)
       //lub and glb of the appropriate types if that dimension already exists
       if (thedim != nullptr && C.predecessor(*v).size() == 0)
       {
-        addConstantDim(*thedim, std::get<1>(d.second), std::get<2>(d.second));
-        m_paramDims.erase(iter++);
+        if (thedim->index() == TYPE_INDEX_DIMENSION)
+        {
+          std::cout << "dimension " << get_constant<dimension_index>(*thedim)
+            << " being instantiated" << std::endl;
+          add(get_constant<dimension_index>(*thedim), std::get<2>(d.second));
+          m_paramDims.erase(iter++);
+        }
+        else
+        {
+          addConstantDim(*thedim, std::get<1>(d.second), std::get<2>(d.second));
+          m_paramDims.erase(iter++);
+        }
         increment = false;
       }
     }

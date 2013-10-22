@@ -342,6 +342,14 @@ namespace TransLucid
       {TYPE_INDEX_UCHAR, TYPE_INDEX_USTRING}
     };
 
+    BuiltinBaseFunction<1> get_type_index{
+      [] (const Constant& c) -> Constant
+      {
+        return Types::Intmp::create(c.index());
+      },
+      {TYPE_INDEX_INTMP, TYPE_INDEX_INTMP}
+    };
+
     BuiltinBaseFunction<2> construct_union{&Types::Union::create,
       {TYPE_INDEX_UNION, TYPE_INDEX_UNION, TYPE_INDEX_UNION}};
 
@@ -408,6 +416,7 @@ namespace TransLucid
       {U"print_uuid", &print_uuid},
       {U"print_floatmp", &print_floatmp},
       {U"make_union", &construct_union},
+      {U"type_index", &get_type_index}
     };
 
     bool

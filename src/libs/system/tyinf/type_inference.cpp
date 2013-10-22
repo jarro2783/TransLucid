@@ -966,6 +966,9 @@ TypeInferrer::operator()(const Tree::BaseAbstractionExpr& e)
   auto& A = std::get<0>(t_0);
   auto& C = std::get<2>(t_0);
 
+  std::cout << "At base function: " <<
+    A.print_context(m_system) << std::endl;
+
   std::vector<Type> lhs;
   lhs.reserve(e.dims.size());
 
@@ -1047,9 +1050,18 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
 {
   auto t_0 = apply_visitor(*this, e.e);
 
+  std::cout << "before instantiate at where:\n" << 
+    std::get<0>(t_0).print_context(m_system)
+    << std::endl;
+
+  //t_0 = simplify(t_0);
+
   auto& A = std::get<0>(t_0);
   auto& C = std::get<2>(t_0);
 
+  A.instantiate_parameters(C);
+
+  int dimCount = 0;
   for (const auto& d : e.dims)
   {
     auto t = apply_visitor(*this, d.second);
@@ -1060,9 +1072,16 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
     // pull d out of the type context, allocate a new variable alpha, and set
     // inferred type of d <= alpha <= required type of d
     auto alpha = fresh();
-    C.add_to_closure(Constraint{alpha, A.lookup(d.first)});
+
+    auto whichDim = e.dimAllocation[dimCount];
+
+    C.add_to_closure(Constraint{alpha, A.lookup(whichDim)});
     C.add_to_closure(Constraint{std::get<1>(t), alpha});
-    A.remove(d.first);
+    A.remove(whichDim);
+
+    std::cout << "removing dimension " << e.dimAllocation[whichDim]
+      << " from context" << std::endl;
+    ++dimCount;
   }
 
   return std::make_tuple(A, std::get<1>(t_0), C);
