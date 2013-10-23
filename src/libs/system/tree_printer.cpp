@@ -667,11 +667,14 @@ class TreePrinter
       m_os << "var " << var << ";;" << std::endl;
     }
 
+    int which = 0;
     for (const auto& v : w.dims)
     {
-      m_os << "dim " << v.first << " <- ";
+      m_os << "dim " << "(" << v.first << ", " << w.dimAllocation[which] << ")" 
+      << " <- ";
       apply_visitor(*this, v.second);
       m_os << ";;" << std::endl;
+      ++which;
     }
 
     m_os << "end" << std::endl;
