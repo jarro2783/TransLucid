@@ -1742,43 +1742,61 @@ LambdaApplicationWS::operator()
 Constant
 WhereWS::operator()(Context& k)
 {
-  //get a new CHI dimension for each dim
-  //evaluate each initialiser
-  //perturb theta_j with the initiliaser
-  //evaluate E_0
-
-  RhoManager rho(k);
-
-  std::vector<std::pair<dimension_index, Constant>> change;
-
-  int index = 1;
-  for (auto v : m_dims)
+  if (m_simplified)
   {
-    //the CHI dimension
-    ChiDim chi(index, 
-      std::vector<uint8_t>(k.getRho().begin(), k.getRho().end()));
-    dimension_index d = m_system.getChiDim(chi);
+    //this is much the same as the cache one, but without the cache
+    //we use the actual dimension allocated, and insert it into the context
+    std::vector<std::pair<dimension_index, Constant>> change;
 
-    //std::cerr << "chi dimension: " << chi << " has index " << d << std::endl;
-
-    //the initialiser
-    if (v.second != nullptr)
+    for (const auto& v : m_dims)
     {
-      rho.changeTop(index);
-      change.push_back(std::make_pair(d, (*v.second)(k)));
-
-      //std::cerr << "setting dimension " << d << std::endl;
+      change.push_back(std::make_pair(v.first, (*v.second)(k)));
     }
 
-    //which dim are we actually using
-    //std::cerr << "setting: [" << v.first << " <- " << d << "]" << std::endl;
-    change.push_back(std::make_pair(v.first, Types::Dimension::create(d)));
-    ++index;
-  }
+    ContextPerturber p(k, change);
 
-  rho.changeTop(0);
-  ContextPerturber p(k, change);
-  return (*m_expr)(k);
+    return (*m_expr)(k);
+  }
+  else
+  {
+    //get a new CHI dimension for each dim
+    //evaluate each initialiser
+    //perturb theta_j with the initiliaser
+    //evaluate E_0
+
+    RhoManager rho(k);
+
+    std::vector<std::pair<dimension_index, Constant>> change;
+
+    int index = 1;
+    for (const auto& v : m_dims)
+    {
+      //the CHI dimension
+      ChiDim chi(index, 
+        std::vector<uint8_t>(k.getRho().begin(), k.getRho().end()));
+      dimension_index d = m_system.getChiDim(chi);
+
+      //std::cerr << "chi dimension: " << chi << " has index " << d << std::endl;
+
+      //the initialiser
+      if (v.second != nullptr)
+      {
+        rho.changeTop(index);
+        change.push_back(std::make_pair(d, (*v.second)(k)));
+
+        //std::cerr << "setting dimension " << d << std::endl;
+      }
+
+      //which dim are we actually using
+      //std::cerr << "setting: [" << v.first << " <- " << d << "]" << std::endl;
+      change.push_back(std::make_pair(v.first, Types::Dimension::create(d)));
+      ++index;
+    }
+
+    rho.changeTop(0);
+    ContextPerturber p(k, change);
+    return (*m_expr)(k);
+  }
 }
 
 Constant

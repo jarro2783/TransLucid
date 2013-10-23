@@ -31,6 +31,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "tl/parser.hpp"
 
+#define TL_PRINT_TREE
+
 /**
  * @file bestfit.cpp
  * The implementation of bestfitting.
@@ -447,7 +449,7 @@ BestfitGroup::compileExpression(const Tree::Expr& expr, ScopePtr scope)
   //fixup the ast
   Tree::Expr fixed = m_system.fixupTreeAndAdd(expr, scope);
 
-  #if 0
+  #ifdef TL_PRINT_TREE
   std::cerr << m_name << ": fixed up tree: " 
     << Printer::print_expr_tree(fixed, true)
     << ";;\n" << std::endl;

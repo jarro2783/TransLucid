@@ -753,6 +753,7 @@ namespace TransLucid
       : m_expr(expr)
       , m_dims(dims)
       , m_system(system)
+      , m_simplified(system.simplified())
       {
       }
 
@@ -771,6 +772,7 @@ namespace TransLucid
       std::vector<std::pair<dimension_index, WS*>> m_dims;
 
       System& m_system;
+      bool m_simplified;
     };
 
     /**

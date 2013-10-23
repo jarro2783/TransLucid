@@ -1059,8 +1059,6 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
   auto& A = std::get<0>(t_0);
   auto& C = std::get<2>(t_0);
 
-  A.instantiate_parameters(C);
-
   int dimCount = 0;
   for (const auto& d : e.dims)
   {
