@@ -1065,14 +1065,17 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
 
     auto whichDim = e.dimAllocation[dimCount];
 
-    auto dimUse = A.lookup(Types::Dimension::create(whichDim));
+    auto dimConstant = Types::Dimension::create(whichDim);
+    auto dimUse = A.lookup(dimConstant);
 
     C.add_to_closure(Constraint{alpha, dimUse.second});
     C.add_to_closure(Constraint{dimUse.first, alpha});
 
     C.add_to_closure(Constraint{alpha, A.lookup(whichDim)});
     C.add_to_closure(Constraint{std::get<1>(t), alpha});
+
     A.remove(whichDim);
+    A.remove(dimConstant);
 
     std::cout << "removing dimension " << whichDim
       << " from context" << std::endl;

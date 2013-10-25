@@ -143,6 +143,12 @@ namespace TransLucid
       }
 
       void
+      remove(const Constant& c)
+      {
+        m_constDims.erase(c);
+      }
+
+      void
       add(const u32string& x, Type t);
 
       //inserts other into the current
