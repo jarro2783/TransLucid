@@ -139,6 +139,21 @@ TypeContext::lookup(const u32string& x)
   }
 }
 
+std::pair<Type, Type>
+TypeContext::lookup(const Constant& c)
+{
+  auto iter = m_constDims.find(c);
+
+  if (iter == m_constDims.end())
+  {
+    return std::make_pair(TypeBot(), TypeTop());
+  }
+  else
+  {
+    return iter->second;
+  }
+}
+
 bool
 TypeContext::has_entry(dimension_index d)
 {
@@ -256,7 +271,8 @@ TypeContext::instantiate_parameters(ConstraintGraph& C)
         {
           std::cout << "dimension " << get_constant<dimension_index>(*thedim)
             << " being instantiated" << std::endl;
-          add(get_constant<dimension_index>(*thedim), std::get<2>(d.second));
+          addConstantDim(*thedim, std::get<1>(d.second), std::get<2>(d.second));
+          //add(get_constant<dimension_index>(*thedim), std::get<2>(d.second));
           m_paramDims.erase(iter++);
         }
         else

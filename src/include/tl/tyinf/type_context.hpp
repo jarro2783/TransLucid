@@ -155,6 +155,9 @@ namespace TransLucid
       Type
       lookup(const u32string& x);
 
+      std::pair<Type, Type>
+      lookup(const Constant& c);
+
       bool
       has_entry(dimension_index d);
 

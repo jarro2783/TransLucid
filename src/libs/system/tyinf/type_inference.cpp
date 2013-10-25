@@ -140,7 +140,7 @@ TypeInferrer::simplify(TypeScheme t)
   std::get<0>(S).instantiate_parameters(std::get<2>(S));
   #ifndef TL_TYINF_NO_SIMPLIFY
   //now, to sort out the TL context, rerun simplification
-  S = minimise(garbage_collect(canonise(S, m_freshVars)));
+  //S = minimise(garbage_collect(canonise(S, m_freshVars)));
   #endif
 
   return S;
@@ -264,14 +264,6 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         }
         #endif
 
-        std::get<0>(S).for_each
-        (
-          [this] (Type t) -> void
-          {
-            std::cout << print_type(t, m_system) << " ";
-          }
-        );
-        std::cout << "\n" << std::endl;
         m_environment[xt.first] = S;
       }
     }
@@ -1054,7 +1046,7 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
     std::get<0>(t_0).print_context(m_system)
     << std::endl;
 
-  //t_0 = simplify(t_0);
+  t_0 = simplify(t_0);
 
   auto& A = std::get<0>(t_0);
   auto& C = std::get<2>(t_0);
@@ -1073,14 +1065,24 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
 
     auto whichDim = e.dimAllocation[dimCount];
 
+    auto dimUse = A.lookup(Types::Dimension::create(whichDim));
+
+    C.add_to_closure(Constraint{alpha, dimUse.second});
+    C.add_to_closure(Constraint{dimUse.first, alpha});
+
     C.add_to_closure(Constraint{alpha, A.lookup(whichDim)});
     C.add_to_closure(Constraint{std::get<1>(t), alpha});
     A.remove(whichDim);
 
-    std::cout << "removing dimension " << e.dimAllocation[whichDim]
+    std::cout << "removing dimension " << whichDim
       << " from context" << std::endl;
     ++dimCount;
   }
+
+  std::cout << "at the end of where:\n" << 
+    A.print_context(m_system)
+    << std::endl;
+  std::cout << C.print(m_system) << std::endl;
 
   return std::make_tuple(A, std::get<1>(t_0), C);
 }
