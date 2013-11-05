@@ -641,8 +641,10 @@ namespace
 
     typedef void result_type;
 
-    TypePrinter(System& s)
+    TypePrinter(System& s, bool alpha)
     : m_system(s)
+    , m_alpha(alpha)
+    , m_nextAlpha(U"a")
     {
     }
 
@@ -674,7 +676,14 @@ namespace
     void
     operator()(const TypeVariable& var)
     {
-      m_result += print_type_variable(var);
+      if (m_alpha)
+      {
+        m_result += get_alpha(var);
+      }
+      else
+      {
+        m_result += print_type_variable(var);
+      }
     }
 
     void
@@ -853,13 +862,67 @@ namespace
     private:
     u32string m_result;
     System& m_system;
+    bool m_alpha;
+
+    std::map<TypeVariable, u32string> m_alphamap;
+    u32string m_nextAlpha;
+
+    u32string
+    get_alpha(TypeVariable v)
+    {
+      auto iter = m_alphamap.find(v);
+
+      if (iter == m_alphamap.end())
+      {
+        auto next = m_alphamap.insert(std::make_pair(v, m_nextAlpha));
+
+        increment_alpha();
+
+        return next.first->second;
+      }
+      else
+      {
+        return iter->second;
+      }
+    }
+
+    void
+    increment_alpha()
+    {
+      size_t digit = m_nextAlpha.size() - 1;
+
+      while (true)
+      {
+        if (m_nextAlpha[digit] == U'z')
+        {
+          //if we have run out of digits we need to add one more
+          if (digit == 0)
+          {
+            m_nextAlpha[digit] = U'a';
+            m_nextAlpha = U'a' + m_nextAlpha;
+            break;
+          }
+          else
+          {
+            //otherwise reset and go to the next digit
+            m_nextAlpha[digit] = U'a';
+            --digit;
+          }
+        }
+        else
+        {
+          ++m_nextAlpha[digit];
+          break;
+        }
+      }
+    }
   };
 }
 
 u32string
-print_type(const Type& t, System& system)
+print_type(const Type& t, System& system, bool alpha)
 {
-  TypePrinter p(system);
+  TypePrinter p(system, alpha);
   return p.print(t);
 }
 

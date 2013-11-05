@@ -256,8 +256,10 @@ namespace TransLucid
     bool
     type_term_contains_pos(Type t, Type tp);
 
+    //if alpha is true, then replace type variables with alphabetic
+    //characters to make it easier to read
     u32string
-    print_type(const Type& t, System& system);
+    print_type(const Type& t, System& system, bool alpha = false);
 
     u32string
     print_type_variable(TypeVariable var);
