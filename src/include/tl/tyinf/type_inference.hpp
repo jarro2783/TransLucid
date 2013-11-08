@@ -57,6 +57,10 @@ namespace TransLucid
 
       result_type
       infer(const Tree::Expr& e);
+
+      //the actual type, the context (the type will be TypeNothing here)
+      std::pair<TypeScheme, TypeScheme>
+      separate_context(const TypeScheme& t);
       
       result_type
       operator()(const Tree::nil&);

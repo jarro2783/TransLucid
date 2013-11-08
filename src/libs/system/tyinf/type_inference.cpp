@@ -434,9 +434,24 @@ TypeInferrer::infer(const Tree::Expr& e)
   auto t = apply_visitor(*this, e);
 
   auto S = simplify(t);
-  std::get<0>(S).clear_context();
+  //std::get<0>(S).clear_context();
 
   return simplify(S);
+}
+
+std::pair<TypeScheme, TypeScheme>
+TypeInferrer::separate_context(const TypeScheme& t)
+{
+  TypeScheme context = t;
+  TypeScheme bare = t;
+
+  std::get<0>(bare).clear_context();
+  std::get<1>(context) = TypeNothing();
+
+  context = simplify(context);
+  bare = simplify(bare);
+
+  return std::make_pair(bare, context);
 }
 
 TypeInferrer::result_type
@@ -958,9 +973,6 @@ TypeInferrer::operator()(const Tree::BaseAbstractionExpr& e)
   auto& A = std::get<0>(t_0);
   auto& C = std::get<2>(t_0);
 
-  std::cout << "At base function: " <<
-    A.print_context(m_system) << std::endl;
-
   std::vector<Type> lhs;
   lhs.reserve(e.dims.size());
 
@@ -1042,10 +1054,6 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
 {
   auto t_0 = apply_visitor(*this, e.e);
 
-  std::cout << "before instantiate at where:\n" << 
-    std::get<0>(t_0).print_context(m_system)
-    << std::endl;
-
   t_0 = simplify(t_0);
 
   auto& A = std::get<0>(t_0);
@@ -1077,15 +1085,8 @@ TypeInferrer::operator()(const Tree::WhereExpr& e)
     A.remove(whichDim);
     A.remove(dimConstant);
 
-    std::cout << "removing dimension " << whichDim
-      << " from context" << std::endl;
     ++dimCount;
   }
-
-  std::cout << "at the end of where:\n" << 
-    A.print_context(m_system)
-    << std::endl;
-  std::cout << C.print(m_system) << std::endl;
 
   return std::make_tuple(A, std::get<1>(t_0), C);
 }
