@@ -445,7 +445,7 @@ TypeInferrer::separate_context(const TypeScheme& t)
   TypeScheme context = t;
   TypeScheme bare = t;
 
-  std::get<0>(bare).clear_context();
+  std::get<0>(bare).clear_raw_context();
   std::get<1>(context) = TypeNothing();
 
   context = simplify(context);
@@ -2030,6 +2030,12 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
   {
   }
 
+  Type
+  rewrite_type(const Type& t)
+  {
+    return replace(t);
+  }
+
   TypeScheme
   replace()
   {
@@ -2037,6 +2043,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
     //what is left in the context
     auto t = replace(m_type);
 
+    TypeContext A = TypeContext::rewrite(m_A, *this);
     ConstraintGraph C;
 
     std::map
@@ -2090,7 +2097,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
       C.setSuccessor(vv.first, remains);
     }
 
-    return std::make_tuple(TypeContext(), t, C);
+    return std::make_tuple(A, t, C);
   }
 
 #if 0

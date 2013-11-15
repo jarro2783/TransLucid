@@ -279,6 +279,12 @@ namespace TransLucid
         m_paramDims.clear();
       }
 
+      void
+      clear_raw_context()
+      {
+        m_constDims.clear();
+      }
+
       private:
       std::map<dimension_index, Type> m_lambdas;
       std::unordered_map<u32string, Type> m_vars;

@@ -639,10 +639,12 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 
       *m_os << print_type(std::get<1>(display), m_system, true) << "\n\n";
 
-      //*m_os << print_type(std::get<1>(t), m_system) << std::endl
-      //  << std::get<2>(t).print(m_system) << std::endl;
+      *m_os << "Type with constraint graph:" << std::endl;
+      *m_os << print_type(std::get<1>(t), m_system) << std::endl
+        << std::get<2>(t).print(m_system) << std::endl;
 
-      *m_os << std::get<0>(separated.second).print_context(m_system) << 
+      *m_os << "Type context:" << std::endl;
+      *m_os << std::get<0>(display).print_context(m_system) << 
         std::endl;
 
       #if 0

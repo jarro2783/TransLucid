@@ -375,6 +375,11 @@ ConstraintGraph::check_single_conditional
 bool
 ConstraintGraph::less(TypeVariable a, TypeVariable b) const
 {
+  if (a == b)
+  {
+    return true;
+  }
+
   auto iter = m_graph.find(a);
 
   if (iter == m_graph.end())
@@ -390,6 +395,11 @@ ConstraintGraph::less(TypeVariable a, TypeVariable b) const
 void
 ConstraintGraph::add_less(TypeVariable a, TypeVariable b)
 {
+  if (a == b)
+  {
+    return ;
+  }
+
   //add b to the greater of a, and a to the less of b
   auto a_data = get_make_entry(a);
   auto b_data = get_make_entry(b);
@@ -415,6 +425,11 @@ ConstraintGraph::add_less_closed(TypeVariable a, TypeVariable b)
 {
   auto a_data = get_make_entry(a);
   auto b_data = get_make_entry(b);
+
+  if (less(a, b))
+  {
+    return;
+  }
 
   //include a < a and b < b
   auto a_less = a_data->second.less;
