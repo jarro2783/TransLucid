@@ -240,7 +240,7 @@ class TreePrinter
   {
     if (d.text.size() == 0)
     {
-      m_os << "dim_" << d.dim;
+      m_os << u32string(U"ϕ{") << d.dim << "}";
     }
     else
     {
@@ -549,11 +549,19 @@ class TreePrinter
 
     print_binds(f.binds);
     m_os << "{";
-    std::copy(f.scope.begin(), f.scope.end(), 
-      std::ostream_iterator<typename decltype(f.scope)::value_type>(m_os));
-    m_os << "}";
+    print_container(m_os, f.scope);
+//    std::copy(f.scope.begin(), f.scope.end(), 
+//      std::ostream_iterator<typename decltype(f.scope)::value_type>(m_os));
+    m_os << "} ";
 
-    m_os << "(" << f.name << ", " << f.argDim << ")";
+    if (f.argDim == 0)
+    {
+      m_os << f.name;
+    }
+    else
+    {
+      m_os << u32string(U"ϕ{") << f.argDim << "}";
+    }
     
     m_os << " -> ";
 
@@ -598,14 +606,24 @@ class TreePrinter
   operator()(const Tree::BangAppExpr& b)
   {
     apply_visitor(*this, b.name);
-    m_os << ".(";
+    m_os << ".";
+
+    if (b.args.size() > 1)
+    {
+      m_os << "(";
+    }
+
     apply_visitor(*this, b.args.front());
     for (auto iter = ++b.args.begin(); iter != b.args.end(); ++iter)
     {
       m_os << ", ";
       apply_visitor(*this, *iter);
     }
-    m_os << ")";
+
+    if (b.args.size() > 1)
+    {
+      m_os << ")";
+    }
   }
 
   void
