@@ -373,6 +373,7 @@ class TreePrinter
   void
   operator()(const Tree::MakeIntenExpr& e)
   {
+    pp('(', Precedence::PREFIX_FN);
     m_os << u32string(U"↑");
 
     print_binds(e.binds);
@@ -382,14 +383,24 @@ class TreePrinter
       printIntenScope(e);
     }
 
+    parenPush(Precedence::PREFIX_FN, Assoc::NON, Subtree::RIGHT);
     apply_visitor(*this, e.expr);
+    parenPop();
+
+    pp(')', Precedence::PREFIX_FN);
   }
 
   void
   operator()(const Tree::EvalIntenExpr& e)
   {
+    pp('(', Precedence::PREFIX_FN);
     m_os << u32string(U"↓");
+
+    parenPush(Precedence::PREFIX_FN, Assoc::NON, Subtree::RIGHT);
     apply_visitor(*this, e.expr);
+    parenPop();
+
+    pp(')', Precedence::PREFIX_FN);
   }
 
   void
@@ -419,6 +430,8 @@ class TreePrinter
   void
   operator()(const Tree::HashExpr& h)
   {
+    pp('(', Precedence::FN_APP);
+
     m_os << "#.";
 
     parenPush(Precedence::FN_APP, Assoc::LEFT, Subtree::RIGHT);
@@ -426,6 +439,8 @@ class TreePrinter
     apply_visitor(*this, h.e);
 
     parenPop();
+
+    pp(')', Precedence::FN_APP);
   }
 
   void
