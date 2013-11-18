@@ -121,7 +121,7 @@ TypeInferrer::make_constant(T&& v)
 TypeScheme
 TypeInferrer::simplify(TypeScheme t)
 {
-  std::get<0>(t).fix_context(std::get<2>(t));
+  //std::get<0>(t).fix_context(std::get<2>(t));
   auto S = 
   #ifndef TL_TYINF_NO_SIMPLIFY
     minimise(
@@ -140,7 +140,7 @@ TypeInferrer::simplify(TypeScheme t)
   std::get<0>(S).instantiate_parameters(std::get<2>(S));
   #ifndef TL_TYINF_NO_SIMPLIFY
   //now, to sort out the TL context, rerun simplification
-  //S = minimise(garbage_collect(canonise(S, m_freshVars)));
+  S = minimise(garbage_collect(canonise(S, m_freshVars)));
   #endif
 
   return S;
@@ -759,9 +759,10 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
       //the variables for the dimension query
       auto value = fresh();
       auto upper = fresh();
+      auto lower = fresh();
       auto thedim = fresh();
 
-      A.addParamDim(dim->dim, thedim, value, upper);
+      A.addParamDim(dim->dim, thedim, lower, upper);
       C.add_to_closure(Constraint{upper, value});
       C.add_to_closure(Constraint{alpha, thedim});
 
@@ -790,8 +791,9 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
     {
       auto alpha = fresh();
       auto beta = fresh();
+      auto lower = fresh();
 
-      A.addConstantDim(*lowerConstant, alpha, beta);
+      A.addConstantDim(*lowerConstant, lower, beta);
 
       C.add_to_closure(Constraint{beta, alpha});
       

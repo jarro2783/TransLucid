@@ -209,7 +209,7 @@ TypeContext::print_context(System& system)
 void
 TypeContext::fix_context(ConstraintGraph& C)
 {
-  //add subc(b, a) for each pair of dimensions with types (a, b)
+  //add subc(a, b) for each pair of dimensions with types (a, b)
   std::vector<Constraint> constraints;
 
   for (const auto& d : m_constDims)
