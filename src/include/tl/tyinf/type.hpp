@@ -264,6 +264,9 @@ namespace TransLucid
     u32string
     print_type_variable(TypeVariable var);
 
+//    std::tuple<u32string, u32string, u32string>
+//    display_scheme(const TypeScheme& t);
+
     template <typename C>
     u32string
     print_type_variable_list(const C& c)
@@ -286,6 +289,80 @@ namespace TransLucid
 
       return result;
     }
+    
+    class TypePrinter
+    {
+      public:
+
+      typedef void result_type;
+
+      TypePrinter(System& s, bool alpha)
+      : m_system(s)
+      , m_alpha(alpha)
+      , m_nextAlpha(U"a")
+      {
+      }
+
+      u32string
+      print(const Type& t);
+
+      void
+      operator()(const TypeNothing& n);
+
+      void
+      operator()(const TypeTop& top);
+
+      void
+      operator()(const TypeBot& bot);
+
+      void
+      operator()(const TypeVariable& var);
+
+      void
+      operator()(const Constant& c);
+
+      void
+      operator()(const TypeAtomic& atomic);
+
+      void
+      operator()(const TypeRegion& atomic);
+
+      void
+      operator()(const TypeTuple& atomic);
+
+      void
+      operator()(const TypeAtomicUnion& u);
+
+      void
+      operator()(const TypeGLB& glb);
+
+      void
+      operator()(const TypeLUB& lub);
+
+      void
+      operator()(const TypeIntension& inten);
+
+      void
+      operator()(const TypeCBV& cbv);
+
+      void
+      operator()(const TypeBase& base);
+
+      private:
+      u32string m_result;
+      System& m_system;
+      bool m_alpha;
+
+      std::map<TypeVariable, u32string> m_alphamap;
+      u32string m_nextAlpha;
+
+      u32string
+      get_alpha(TypeVariable v);
+
+      void
+      increment_alpha();
+    };
+
   }
 }
 

@@ -630,7 +630,10 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
     {
       auto eFixed = m_system.fixupTreeAndAdd(e);
 
-      *m_os << Printer::print_expr_tree(eFixed, false) << " :: ";
+      *m_os << "==== Type Inference Result ====\n\n";
+
+      *m_os << Printer::print_expr_tree(eFixed, false) << "\n\n";
+
       auto t = infer.infer(eFixed);
 
       auto separated = infer.separate_context(t);
@@ -638,16 +641,24 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       auto display = TypeInference::display_type(separated.first);
       auto display_context = TypeInference::display_type(separated.second);
 
+      *m_os << "== Display Type ==\n";
+
       *m_os << print_type(std::get<1>(display), m_system, true) << "\n\n";
 
-      *m_os << "Type with constraint graph:" << std::endl;
+      *m_os << "Plain type :: A => " << print_type(std::get<1>(t), m_system)
+            << " | C\n\n== C ==\n\n";
+      *m_os << std::get<2>(t).print(m_system) << "\n== A ==\n\n";
+      *m_os << std::get<0>(t).print_context(m_system) << "\n";
+
+#if 0
       *m_os << print_type(std::get<1>(display), m_system, true) << std::endl
         << std::get<2>(display).print(m_system) << std::endl;
 
       *m_os << "Type context:" << std::endl;
-      *m_os << std::get<0>(display_context).print_context(m_system) << 
+      *m_os << std::get<0>(separated.second).print_context(m_system) << 
         std::endl;
-      *m_os << std::get<2>(display_context).print(m_system) << std::endl;
+      *m_os << std::get<2>(separated.second).print(m_system) << std::endl;
+#endif
 
       #if 0
       const auto& dims = std::get<0>(t).getDimensions();

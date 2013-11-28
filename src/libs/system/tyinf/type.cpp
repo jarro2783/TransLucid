@@ -633,290 +633,265 @@ type_term_contains_pos(Type t, Type tp)
   return lub == t;
 }
 
-namespace
+u32string
+TypePrinter::print(const Type& t)
 {
-  class TypePrinter
+  apply_visitor(*this, t);
+  return m_result;
+}
+
+void
+TypePrinter::operator()(const TypeNothing& n)
+{
+  m_result += U"_";
+}
+
+void
+TypePrinter::operator()(const TypeTop& top)
+{
+  m_result += U"⊤";
+}
+
+void
+TypePrinter::operator()(const TypeBot& bot)
+{
+  m_result += U"⊥";
+}
+
+void
+TypePrinter::operator()(const TypeVariable& var)
+{
+  if (m_alpha)
   {
-    public:
+    m_result += get_alpha(var);
+  }
+  else
+  {
+    m_result += print_type_variable(var);
+  }
+}
 
-    typedef void result_type;
+void
+TypePrinter::operator()(const Constant& c)
+{
+  m_result += m_system.printConstant(c);
+}
 
-    TypePrinter(System& s, bool alpha)
-    : m_system(s)
-    , m_alpha(alpha)
-    , m_nextAlpha(U"a")
+void
+TypePrinter::operator()(const TypeAtomic& atomic)
+{
+  std::ostringstream os;
+  os << U"atomic<" + atomic.name + U",";
+  os << atomic.index << ">";
+
+  m_result += utf8_to_utf32(os.str());
+}
+
+void
+TypePrinter::operator()(const TypeRegion& atomic)
+{
+  m_result += U"region";
+}
+
+void
+TypePrinter::operator()(const TypeTuple& atomic)
+{
+  m_result += U"tuple";
+}
+
+void
+TypePrinter::operator()(const TypeAtomicUnion& u)
+{
+  m_result += U"Union::";
+
+  if (u.constants.size() != 0)
+  {
+    m_result += U"Constants = {";
+  }
+  for (const auto& c : u.constants)
+  {
+    operator()(c);
+    m_result += U" ";
+  }
+  if (u.constants.size() != 0)
+  {
+    m_result += U"}";
+  }
+
+  if (u.atomics.size() != 0)
+  {
+    m_result += U"Base Types = {";
+  }
+  for (const auto& a : u.atomics)
+  {
+    std::ostringstream os;
+    os << a << " ";
+    auto s = os.str();
+    m_result += u32string(s.begin(), s.end());
+  }
+  if (u.atomics.size() != 0)
+  {
+    m_result += U"}";
+  }
+}
+
+void
+TypePrinter::operator()(const TypeGLB& glb)
+{
+  m_result += U"⊓{";
+
+  if (!variant_is_type<TypeNothing>(glb.constructed))
+  {
+    apply_visitor(*this, glb.constructed);
+
+    if (glb.vars.size() != 0)
     {
+      m_result += U", ";
     }
+  }
 
-    u32string
-    print(const Type& t)
+  auto iter = glb.vars.begin();
+  while (iter != glb.vars.end())
+  {
+    operator()(*iter);
+    if (++iter != glb.vars.end())
     {
-      apply_visitor(*this, t);
-      return m_result;
+      m_result += U", ";
     }
+  }
 
-    void
-    operator()(const TypeNothing& n)
+  //for (const auto& v : glb.vars)
+  //{
+  //  m_result += U", ";
+  //  operator()(v);
+  //}
+
+  m_result += U"}";
+}
+
+void
+TypePrinter::operator()(const TypeLUB& lub)
+{
+  m_result += U"⊔{";
+
+  if (!variant_is_type<TypeNothing>(lub.constructed))
+  {
+    apply_visitor(*this, lub.constructed);
+
+    if (lub.vars.size() != 0)
     {
-      m_result += U"_";
+      m_result += U", ";
     }
+  }
 
-    void
-    operator()(const TypeTop& top)
+  auto iter = lub.vars.begin();
+  while (iter != lub.vars.end())
+  {
+    operator()(*iter);
+    if (++iter != lub.vars.end())
     {
-      m_result += U"⊤";
+      m_result += U", ";
     }
+  }
 
-    void
-    operator()(const TypeBot& bot)
-    {
-      m_result += U"⊥";
-    }
+  m_result += U"}";
+}
 
-    void
-    operator()(const TypeVariable& var)
+void
+TypePrinter::operator()(const TypeIntension& inten)
+{
+  m_result += U"↑ ";
+  apply_visitor(*this, inten.body);
+}
+
+void
+TypePrinter::operator()(const TypeCBV& cbv)
+{
+  m_result += U"(";
+
+  apply_visitor(*this, cbv.lhs);
+
+  m_result += U" → ";
+
+  apply_visitor(*this, cbv.rhs);
+
+  m_result += U")";
+}
+
+void
+TypePrinter::operator()(const TypeBase& base)
+{
+  m_result += U"((";
+
+  auto iter = base.lhs.begin();
+
+  if (iter != base.lhs.end())
+  {
+    apply_visitor(*this, *iter);
+    ++iter;
+  }
+
+  while (iter != base.lhs.end())
+  {
+    m_result += U", ";
+    apply_visitor(*this, *iter);
+    ++iter;
+  }
+
+  m_result += U") ↦ ";
+
+  apply_visitor(*this, base.rhs);
+  m_result += U")";
+}
+
+u32string
+TypePrinter::get_alpha(TypeVariable v)
+{
+  auto iter = m_alphamap.find(v);
+
+  if (iter == m_alphamap.end())
+  {
+    auto next = m_alphamap.insert(std::make_pair(v, m_nextAlpha));
+
+    increment_alpha();
+
+    return next.first->second;
+  }
+  else
+  {
+    return iter->second;
+  }
+}
+
+void
+TypePrinter::increment_alpha()
+{
+  size_t digit = m_nextAlpha.size() - 1;
+
+  while (true)
+  {
+    if (m_nextAlpha[digit] == U'z')
     {
-      if (m_alpha)
+      //if we have run out of digits we need to add one more
+      if (digit == 0)
       {
-        m_result += get_alpha(var);
+        m_nextAlpha[digit] = U'a';
+        m_nextAlpha = U'a' + m_nextAlpha;
+        break;
       }
       else
       {
-        m_result += print_type_variable(var);
+        //otherwise reset and go to the next digit
+        m_nextAlpha[digit] = U'a';
+        --digit;
       }
     }
-
-    void
-    operator()(const Constant& c)
+    else
     {
-      m_result += m_system.printConstant(c);
+      ++m_nextAlpha[digit];
+      break;
     }
-
-    void
-    operator()(const TypeAtomic& atomic)
-    {
-      std::ostringstream os;
-      os << U"atomic<" + atomic.name + U",";
-      os << atomic.index << ">";
-
-      m_result += utf8_to_utf32(os.str());
-    }
-
-    void
-    operator()(const TypeRegion& atomic)
-    {
-      m_result += U"region";
-    }
-
-    void
-    operator()(const TypeTuple& atomic)
-    {
-      m_result += U"tuple";
-    }
-
-    void
-    operator()(const TypeAtomicUnion& u)
-    {
-      m_result += U"Union::";
-
-      if (u.constants.size() != 0)
-      {
-        m_result += U"Constants = {";
-      }
-      for (const auto& c : u.constants)
-      {
-        operator()(c);
-        m_result += U" ";
-      }
-      if (u.constants.size() != 0)
-      {
-        m_result += U"}";
-      }
-
-      if (u.atomics.size() != 0)
-      {
-        m_result += U"Base Types = {";
-      }
-      for (const auto& a : u.atomics)
-      {
-        std::ostringstream os;
-        os << a << " ";
-        auto s = os.str();
-        m_result += u32string(s.begin(), s.end());
-      }
-      if (u.atomics.size() != 0)
-      {
-        m_result += U"}";
-      }
-    }
-
-    void
-    operator()(const TypeGLB& glb)
-    {
-      m_result += U"⊓{";
-
-      if (!variant_is_type<TypeNothing>(glb.constructed))
-      {
-        apply_visitor(*this, glb.constructed);
-
-        if (glb.vars.size() != 0)
-        {
-          m_result += U", ";
-        }
-      }
-
-      auto iter = glb.vars.begin();
-      while (iter != glb.vars.end())
-      {
-        operator()(*iter);
-        if (++iter != glb.vars.end())
-        {
-          m_result += U", ";
-        }
-      }
-
-      //for (const auto& v : glb.vars)
-      //{
-      //  m_result += U", ";
-      //  operator()(v);
-      //}
-
-      m_result += U"}";
-    }
-
-    void
-    operator()(const TypeLUB& lub)
-    {
-      m_result += U"⊔{";
-
-      if (!variant_is_type<TypeNothing>(lub.constructed))
-      {
-        apply_visitor(*this, lub.constructed);
-
-        if (lub.vars.size() != 0)
-        {
-          m_result += U", ";
-        }
-      }
-
-      auto iter = lub.vars.begin();
-      while (iter != lub.vars.end())
-      {
-        operator()(*iter);
-        if (++iter != lub.vars.end())
-        {
-          m_result += U", ";
-        }
-      }
-
-      m_result += U"}";
-    }
-
-    void
-    operator()(const TypeIntension& inten)
-    {
-      m_result += U"↑ ";
-      apply_visitor(*this, inten.body);
-    }
-
-    void
-    operator()(const TypeCBV& cbv)
-    {
-      m_result += U"(";
-
-      apply_visitor(*this, cbv.lhs);
-
-      m_result += U" → ";
-
-      apply_visitor(*this, cbv.rhs);
-
-      m_result += U")";
-    }
-
-    void
-    operator()(const TypeBase& base)
-    {
-      m_result += U"((";
-
-      auto iter = base.lhs.begin();
-
-      if (iter != base.lhs.end())
-      {
-        apply_visitor(*this, *iter);
-        ++iter;
-      }
-
-      while (iter != base.lhs.end())
-      {
-        m_result += U", ";
-        apply_visitor(*this, *iter);
-        ++iter;
-      }
-
-      m_result += U") ↦ ";
-
-      apply_visitor(*this, base.rhs);
-      m_result += U")";
-    }
-
-    private:
-    u32string m_result;
-    System& m_system;
-    bool m_alpha;
-
-    std::map<TypeVariable, u32string> m_alphamap;
-    u32string m_nextAlpha;
-
-    u32string
-    get_alpha(TypeVariable v)
-    {
-      auto iter = m_alphamap.find(v);
-
-      if (iter == m_alphamap.end())
-      {
-        auto next = m_alphamap.insert(std::make_pair(v, m_nextAlpha));
-
-        increment_alpha();
-
-        return next.first->second;
-      }
-      else
-      {
-        return iter->second;
-      }
-    }
-
-    void
-    increment_alpha()
-    {
-      size_t digit = m_nextAlpha.size() - 1;
-
-      while (true)
-      {
-        if (m_nextAlpha[digit] == U'z')
-        {
-          //if we have run out of digits we need to add one more
-          if (digit == 0)
-          {
-            m_nextAlpha[digit] = U'a';
-            m_nextAlpha = U'a' + m_nextAlpha;
-            break;
-          }
-          else
-          {
-            //otherwise reset and go to the next digit
-            m_nextAlpha[digit] = U'a';
-            --digit;
-          }
-        }
-        else
-        {
-          ++m_nextAlpha[digit];
-          break;
-        }
-      }
-    }
-  };
+  }
 }
 
 u32string
@@ -934,6 +909,11 @@ print_type_variable(TypeVariable var)
   
   return utf8_to_utf32(os.str());
 }
+
+//std::tuple<u32string, u32string, u32string>
+//display_scheme(const TypeScheme& t)
+//{
+//}
 
 void
 TypeAtomicUnion::add(const Type& t)

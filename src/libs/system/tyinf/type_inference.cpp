@@ -1155,6 +1155,7 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 
       C.add_to_closure(Constraint{std::get<1>(t_0), TypeRegion()});
     }
+
     if (!variant_is_type<Tree::nil>(std::get<2>(d)))
     {
       auto t_1 = apply_visitor(*this, std::get<2>(d));
