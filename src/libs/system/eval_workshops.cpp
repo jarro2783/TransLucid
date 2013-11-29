@@ -1473,7 +1473,14 @@ HostOpWS::operator()(Context& k)
   }
   else
   {
-    return Types::BaseFunction::create(*m_function);
+    if (m_function->arity() == 0)
+    {
+      return m_function->apply(std::vector<Constant>());
+    }
+    else
+    {
+      return Types::BaseFunction::create(*m_function);
+    }
   }
 }
 
