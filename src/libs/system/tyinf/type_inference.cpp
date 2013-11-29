@@ -2760,5 +2760,11 @@ display_type(const TypeScheme& t)
   return display;
 }
 
+std::tuple<u32string, u32string, u32string>
+display_type_scheme(const TypeScheme& t, System& system)
+{
+  TypePrinter printer(system, true);
+}
+
 }
 }

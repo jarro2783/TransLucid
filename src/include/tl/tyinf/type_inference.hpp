@@ -34,6 +34,9 @@ namespace TransLucid
   {
     typedef std::tuple<TypeContext, Type, ConstraintGraph> TypeScheme;
 
+    std::tuple<u32string, u32string, u32string>
+    display_type_scheme(const TypeScheme& t, System& system);
+
     class TypeInferrer
     {
       public:
