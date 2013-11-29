@@ -41,6 +41,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types/floatmp.hpp>
 #include <tl/types/function.hpp>
 #include <tl/types/hyperdatons.hpp>
+#include <tl/types/infinity.hpp>
 #include <tl/types/intmp.hpp>
 #include <tl/types/numbers.hpp>
 #include <tl/types/range.hpp>
@@ -186,6 +187,22 @@ namespace TransLucid
         return Types::Range::create(TransLucid::Range(nullptr, rhsp));
       },
       {TYPE_INDEX_INTMP, TYPE_INDEX_RANGE}
+    };
+
+    BuiltinBaseFunction<0> pos_inf_create {
+      [] () -> Constant
+      {
+        return Types::Infinity::create(1);
+      },
+      {TYPE_INDEX_INFINITY}
+    };
+
+    BuiltinBaseFunction<0> neg_inf_create {
+      [] () -> Constant
+      {
+        return Types::Infinity::create(-1);
+      },
+      {TYPE_INDEX_INFINITY}
     };
 
     BuiltinBaseFunction<0> range_create_infinity{
@@ -388,6 +405,9 @@ namespace TransLucid
       {U"floatmp_abs", &float_abs},
       {U"floatmp_uminus", &float_uminus},
       {U"floatmp_convert_intmp", &float_convert_intmp},
+
+      {U"neginfty", &neg_inf_create},
+      {U"infty", &pos_inf_create},
 
       {U"bool_eq", &boolean_eq},
       {U"ustring_plus", &ustring_plus_fn},
@@ -1135,6 +1155,15 @@ namespace TransLucid
       }
     }
 
+    namespace Infinity
+    {
+      Constant
+      create(int8_t value)
+      {
+        return Constant(value, TYPE_INDEX_INFINITY);
+      }
+    }
+
     namespace Range
     {
       Constant
@@ -1722,7 +1751,8 @@ init_builtin_types(System& s)
     U"tuple",
     U"demand",
     U"calc",
-    U"floatmp"
+    U"floatmp",
+    U"infinity"
   };
 
   std::vector<u32string> type_names = to_print_types;

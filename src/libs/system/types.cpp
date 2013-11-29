@@ -305,6 +305,7 @@ char32_t const* const type_index_names[] =
  U"ustring",
  U"floatmp",
  U"dim",
+ U"infinity",
  U"region",
  U"tuple",
  U"typetype",

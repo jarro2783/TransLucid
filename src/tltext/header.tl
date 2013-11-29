@@ -2,9 +2,9 @@
 dim slot;;
 dim envvar;;
 
-data Infinite;;
-constructor infty = Infinite;;
-constructor neginfty = Infinite;;
+//data Infinite;;
+//constructor infty = Infinite;;
+//constructor neginfty = Infinite;;
 
 var sperror = construct_special."sperror";;
 var spaccess = construct_special."spaccess";;

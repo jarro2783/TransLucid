@@ -259,6 +259,7 @@ namespace
           &isSubsetAtomic<TYPE_INDEX_USTRING>,
           &isSubsetAtomic<TYPE_INDEX_FLOATMP>,
           &isSubsetAtomic<TYPE_INDEX_DIMENSION>,
+          &isSubsetAtomic<TYPE_INDEX_INFINITY>,
           &subset_of_region,
           &subset_of_tuple,
           &subset_of_type,
