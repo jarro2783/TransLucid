@@ -27,6 +27,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_AST_FWD_HPP_INCLUDED
 
 #include <tl/types_basic.hpp>
+#include <tl/types.hpp>
 #include <tl/gmpxx_fwd.hpp>
 
 namespace TransLucid
@@ -72,11 +73,12 @@ namespace TransLucid
     <
       nil,
       bool,
-      Special,     //replaces SpecialExpr
-      mpz_class,          //replaces IntegerExpr
-      char32_t,           //replaces UcharExpr
-      u32string,          //replaces StringExpr
+      Special,
+      mpz_class,
+      char32_t,
+      u32string,
       DimensionExpr,
+      Constant,
       IdentExpr,
       HashSymbol,
       HostOpExpr,

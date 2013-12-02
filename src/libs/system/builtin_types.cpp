@@ -189,22 +189,6 @@ namespace TransLucid
       {TYPE_INDEX_INTMP, TYPE_INDEX_RANGE}
     };
 
-    BuiltinBaseFunction<0> pos_inf_create {
-      [] () -> Constant
-      {
-        return Types::Infinity::create(1);
-      },
-      {TYPE_INDEX_INFINITY}
-    };
-
-    BuiltinBaseFunction<0> neg_inf_create {
-      [] () -> Constant
-      {
-        return Types::Infinity::create(-1);
-      },
-      {TYPE_INDEX_INFINITY}
-    };
-
     BuiltinBaseFunction<0> range_create_infinity{
       [] () -> Constant
       {
@@ -405,9 +389,6 @@ namespace TransLucid
       {U"floatmp_abs", &float_abs},
       {U"floatmp_uminus", &float_uminus},
       {U"floatmp_convert_intmp", &float_convert_intmp},
-
-      {U"neginfty", &neg_inf_create},
-      {U"infty", &pos_inf_create},
 
       {U"bool_eq", &boolean_eq},
       {U"ustring_plus", &ustring_plus_fn},
@@ -1737,6 +1718,19 @@ add_base_functions(System& s)
   }
 }
 
+void
+add_one_constant(System& s, const u32string& v, const Constant& c)
+{
+  s.addVariableDeclParsed(Parser::Equation(v, Tree::Expr(), Tree::Expr(), c));
+}
+
+void
+add_constants(System& s)
+{
+  add_one_constant(s, U"infty", Types::Infinity::create(1));
+  add_one_constant(s, U"neginfty", Types::Infinity::create(-1));
+}
+
 
 void
 init_builtin_types(System& s)
@@ -1765,6 +1759,8 @@ init_builtin_types(System& s)
     
   //add all of the literals (LITERAL ... =)
   add_builtin_literals(s, type_names);
+
+  add_constants(s);
 
   //add all the definitions of t = type"t";;
   addTypeNames(s, type_names);

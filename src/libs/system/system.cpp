@@ -395,6 +395,7 @@ System::System(bool cached, bool simplify)
    type_name_pair(TYPE_INDEX_SPECIAL),
    type_name_pair(TYPE_INDEX_UCHAR),
    type_name_pair(TYPE_INDEX_DIMENSION),
+   type_name_pair(TYPE_INDEX_INFINITY),
    type_name_pair(TYPE_INDEX_TUPLE),
    type_name_pair(TYPE_INDEX_TYPE),
    type_name_pair(TYPE_INDEX_RANGE),

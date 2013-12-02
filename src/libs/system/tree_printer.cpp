@@ -228,6 +228,12 @@ class TreePrinter
     m_os << "\"" << s << "\"";
   }
 
+  void
+  operator()(const Constant& c)
+  {
+    m_os << "Constant(index = " << c.index() << ")";
+  }
+
   void 
   operator()(const Tree::LiteralExpr& l)
   {

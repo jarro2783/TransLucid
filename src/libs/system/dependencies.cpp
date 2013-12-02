@@ -152,6 +152,12 @@ DependencyFinder::operator()(const bool& e)
 }
 
 DependencyFinder::result_type
+DependencyFinder::operator()(const Constant& c)
+{
+  return result_type();
+}
+
+DependencyFinder::result_type
 DependencyFinder::operator()(const Special& e)
 {
   return result_type();

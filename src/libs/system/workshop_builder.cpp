@@ -99,6 +99,12 @@ WorkshopBuilder::operator()(const Tree::HostOpExpr& e)
 }
 
 WS*
+WorkshopBuilder::operator()(const Constant& c)
+{
+  return new Workshops::ConstantWS(c);
+}
+
+WS*
 WorkshopBuilder::operator()(const Tree::LiteralExpr& e)
 {
   return apply_visitor(*this, e.rewritten);

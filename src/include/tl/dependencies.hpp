@@ -79,6 +79,9 @@ namespace TransLucid
       operator()(const Tree::LiteralExpr&);
 
       result_type
+      operator()(const Constant&);
+
+      result_type
       operator()(const Tree::DimensionExpr&);
 
       result_type

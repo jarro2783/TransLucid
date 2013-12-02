@@ -200,8 +200,10 @@ namespace TransLucid
     addHostFunction
       (const u32string& name, BaseFunctionType* address, int arity);
 
+#if 0
     Constant
     addEquation(const Parser::Equation& eqn);
+#endif
 
     Constant
     addAssignment(const Parser::Equation& eqn);

@@ -84,6 +84,9 @@ namespace TransLucid
       operator()(const u32string&);
 
       result_type
+      operator()(const Constant& c);
+
+      result_type
       operator()(const Tree::LiteralExpr&);
 
       result_type

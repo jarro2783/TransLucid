@@ -37,6 +37,37 @@ namespace TransLucid
    */
   namespace Workshops
   {
+    class ConstantWS : public WS
+    {
+      public:
+
+      ConstantWS(const Constant& c)
+      : m_const(c)
+      {
+      }
+
+      Constant
+      operator()(Context& k)
+      {
+        return m_const;
+      }
+
+      Constant
+      operator()(Context& kappa, Context& delta)
+      {
+        return m_const;
+      }
+
+      TimeConstant
+      operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
+      {
+        return std::make_pair(t, m_const);
+      }
+
+      private:
+      Constant m_const;
+    };
+
     class TypeConstWS : public WS
     {
       public:

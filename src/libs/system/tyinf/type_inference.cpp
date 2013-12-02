@@ -492,6 +492,12 @@ TypeInferrer::operator()(const u32string& e)
 }
 
 TypeInferrer::result_type
+TypeInferrer::operator()(const Constant& c)
+{
+  return make_constant(c);
+}
+
+TypeInferrer::result_type
 TypeInferrer::operator()(const Tree::LiteralExpr& e)
 {
   //evaluate the literal, and that is its type
