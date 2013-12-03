@@ -702,30 +702,45 @@ TypePrinter::operator()(const TypeTuple& atomic)
 void
 TypePrinter::operator()(const TypeAtomicUnion& u)
 {
-  m_result += U"Union::";
+  m_result += U"Union{";
 
   if (u.constants.size() != 0)
   {
     m_result += U"Constants = {";
   }
-  for (const auto& c : u.constants)
+
+  auto citer = u.constants.begin();
+  while (citer != u.constants.end())
   {
+    const auto& c = *citer;
     operator()(c);
-    m_result += U" ";
+
+    if (++citer != u.constants.end())
+    {
+      m_result += U" ";
+    }
   }
   if (u.constants.size() != 0)
   {
-    m_result += U"}";
+    m_result += U"} ";
   }
 
   if (u.atomics.size() != 0)
   {
     m_result += U"Base Types = {";
   }
-  for (const auto& a : u.atomics)
+  auto aiter = u.atomics.begin();
+  while (aiter != u.atomics.end())
   {
+    const auto& a = *aiter;
     std::ostringstream os;
-    os << a << " ";
+    
+    os << a;
+    if (++aiter != u.atomics.end())
+    {
+       os << " ";
+    }
+
     auto s = os.str();
     m_result += u32string(s.begin(), s.end());
   }
@@ -733,6 +748,7 @@ TypePrinter::operator()(const TypeAtomicUnion& u)
   {
     m_result += U"}";
   }
+  m_result += U"}";
 }
 
 void
