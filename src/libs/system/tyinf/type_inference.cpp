@@ -401,6 +401,9 @@ TypeInferrer::process_region_guard
             auto baseType = get_constant<type_index>(c);
             currentType = TypeAtomic{m_system.getTypeName(baseType), baseType};
             result.push_back(std::make_pair(d, currentType));
+
+            std::cout << "dimension " << d << " has type " << baseType 
+              << std::endl;
           }
           else
           {
@@ -411,6 +414,7 @@ TypeInferrer::process_region_guard
           case Region::Containment::IS:
           //this one is easy, it is exactly equal to the object
           result.push_back(std::make_pair(d, c));
+          std::cout << "dimension " << d << " is a constant" << std::endl;
           break;
 
           case Region::Containment::IN:
@@ -1130,6 +1134,8 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
       //put the current types into the region
       for (const auto& dt : currentRegionType)
       {
+        std::cout << "processing dimension " << dt.first << std::endl;
+
         ++dimCounter[dt.first];
         auto iter = regionTypes.find(dt.first);
         if (iter == regionTypes.end())
@@ -1190,6 +1196,9 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 
   for (const auto& rt : regionTypes)
   {
+    std::cout << "region type: " << rt.first << " :: " <<
+      print_type(rt.second, m_system) << std::endl;
+
     TypeContext Atemp;
     //only add this dimension if it was mentioned in every guard
     //if it wasn't, then there is a guard that will accept it even if none
@@ -1219,6 +1228,9 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
 
   //put in anything left that wasn't even mentioned in the guards
   A.join(nonGuarded);
+
+  std::cout << "returned context: " << A.print_context(m_system) << std::endl;
+  std::cout << "return C:\n" << C.print(m_system) << std::endl;
 
   return std::make_tuple(A, alpha, C);
 }
@@ -1678,6 +1690,26 @@ struct CompareHead
   operator()(const TypeAtomic& a, const TypeAtomic& b) const
   {
     return a.index < b.index;
+  }
+
+  bool
+  operator()(const TypeAtomicUnion& a, const TypeAtomicUnion& b) const
+  {
+    if (a.constants < b.constants)
+    {
+      return true;
+    }
+    else
+    {
+      if (a.constants == b.constants)
+      {
+        return a.atomics < b.atomics;
+      }
+      else
+      {
+        return false;
+      }
+    }
   }
 
   template <typename A, typename B>
@@ -2714,12 +2746,12 @@ minimise(const TypeScheme& t)
 
   std::map<TypeVariable, TypeVariable> replace;
 
-  //std::cout << "blocks: ";
+  std::cout << "blocks: ";
   for (const auto& b : blocks)
   {
-    //std::cout << "(";
-    //print_container(std::cout, b.second.vars);
-    //std::cout << ") ";
+    std::cout << "(";
+    print_container(std::cout, b.second.vars);
+    std::cout << ") ";
 
     if (b.second.vars.size() > 1)
     {
@@ -2737,7 +2769,7 @@ minimise(const TypeScheme& t)
       }
     }
   }
-  //std::cout << std::endl;
+  std::cout << std::endl;
 
   ConstraintGraph C1 = C;
 
