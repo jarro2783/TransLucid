@@ -681,8 +681,19 @@ void
 TypePrinter::operator()(const TypeAtomic& atomic)
 {
   std::ostringstream os;
-  os << U"atomic<" + atomic.name + U",";
-  os << atomic.index << ">";
+
+  os << "atomic<";
+  
+  if (atomic.name.empty())
+  {
+    os << m_system.getTypeName(atomic.index);
+  }
+  else
+  {
+    os << atomic.name;
+  }
+  
+  os << ">";
 
   m_result += utf8_to_utf32(os.str());
 }
@@ -735,7 +746,7 @@ TypePrinter::operator()(const TypeAtomicUnion& u)
     const auto& a = *aiter;
     std::ostringstream os;
     
-    os << a;
+    os << m_system.getTypeName(a);
     if (++aiter != u.atomics.end())
     {
        os << " ";
