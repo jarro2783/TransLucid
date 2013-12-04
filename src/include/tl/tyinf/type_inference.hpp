@@ -175,7 +175,7 @@ namespace TransLucid
       TypeScheme
       simplify(TypeScheme t);
 
-      TypeContext
+      std::pair<TypeContext, ConstraintGraph>
       process_region_guard
       (
         const Tree::RegionExpr& r,

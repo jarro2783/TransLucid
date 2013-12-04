@@ -369,7 +369,7 @@ TypeInferrer::generate_recurse_groups(const std::set<u32string>& ids)
   return groups;
 }
 
-TypeContext
+std::pair<TypeContext, ConstraintGraph>
 TypeInferrer::process_region_guard
 (
   const Tree::RegionExpr& r,
@@ -377,18 +377,21 @@ TypeInferrer::process_region_guard
 )
 {
   TypeContext A;
+  ConstraintGraph C;
 
   for (const auto& e : r.entries)
   {
+    auto rhs = apply_visitor(*this, std::get<2>(e));
+    A.join(std::get<0>(rhs));
+    C.make_union(std::get<2>(rhs));
+
     if (variant_is_type<Tree::DimensionExpr>(std::get<0>(e)))
     {
       //this only works if these objects are constants, i.e., the lower bound
       //of this type is a Constant object
       auto d = get<Tree::DimensionExpr>(std::get<0>(e)).dim;
-      auto rhs = apply_visitor(*this, std::get<2>(e));
 
       auto t = std::get<2>(rhs).lower(get<TypeVariable>(std::get<1>(rhs)));
-      A.join(std::get<0>(rhs));
 
       std::cout << "context of rhs of " << d << "\n" << 
         std::get<0>(rhs).print_context(m_system)
@@ -440,7 +443,7 @@ TypeInferrer::process_region_guard
     }
   }
 
-  return A;
+  return std::make_pair(A, C);
 }
 
 TypeInferrer::result_type
@@ -1139,10 +1142,12 @@ TypeInferrer::operator()(const Tree::ConditionalBestfitExpr& e)
       //at the same time, the type in this guard for that dimension must
       //be less than the required type for the dimension in the body
 
-      auto guardA = process_region_guard(get<Tree::RegionExpr>(std::get<1>(d)),
+      auto guardType = 
+        process_region_guard(get<Tree::RegionExpr>(std::get<1>(d)),
         currentRegionType);
 
-      A.join(guardA);
+      A.join(guardType.first);
+      C.make_union(guardType.second);
 
       //put the current types into the region
       for (const auto& dt : currentRegionType)
