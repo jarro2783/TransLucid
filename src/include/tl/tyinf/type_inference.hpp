@@ -175,7 +175,7 @@ namespace TransLucid
       TypeScheme
       simplify(TypeScheme t);
 
-      void
+      TypeContext
       process_region_guard
       (
         const Tree::RegionExpr& r,
