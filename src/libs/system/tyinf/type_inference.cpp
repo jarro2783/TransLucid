@@ -2817,9 +2817,12 @@ display_type(const TypeScheme& t)
 }
 
 std::tuple<u32string, u32string, u32string>
-display_type_scheme(const TypeScheme& t, System& system)
+display_type_scheme(const TypeScheme& s, System& system)
 {
   TypePrinter printer(system, true);
+
+  auto t = printer.print(std::get<1>(s));
+  auto A = std::get<0>(s).print_display(printer);
 }
 
 }

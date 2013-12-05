@@ -264,7 +264,10 @@ namespace TransLucid
       }
 
       u32string
-      print_context(System& system);
+      print_context(System& system) const;
+
+      u32string
+      print_display(TypePrinter& printer) const;
 
       void
       fix_context(ConstraintGraph& C);

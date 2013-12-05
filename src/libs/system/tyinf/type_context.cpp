@@ -167,7 +167,7 @@ TypeContext::has_entry(const u32string& x)
 }
 
 u32string
-TypeContext::print_context(System& system)
+TypeContext::print_context(System& system) const
 {
   u32string result;
 
@@ -204,6 +204,11 @@ TypeContext::print_context(System& system)
   }
 
   return result;
+}
+
+u32string
+TypeContext::print_display(TypePrinter& printer) const
+{
 }
 
 void
