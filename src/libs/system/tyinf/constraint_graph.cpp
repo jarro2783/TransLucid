@@ -21,6 +21,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <tl/tyinf/constraint_graph.hpp>
 #include <tl/tyinf/type_error.hpp>
+#include <tl/system.hpp>
 #include <tl/utility.hpp>
 
 #include <iostream>
@@ -577,9 +578,49 @@ ConstraintGraph::make_union(const ConstraintGraph& other)
   copy_contents(other);
 }
 
+template <typename Printer>
+u32string
+ConstraintGraph::print_internal(Printer&& p) const
+{
+  u32string result;
+  for (const auto& var : m_graph)
+  {
+    //lower bound
+    result += p(var.second.lower) + U", ";
+    //less than
+    result += print_type_variable_list(p, var.second.less);
+    result += U" ≤ ";
+    //the var
+    result += p(var.first);
+    result += U" ≤ ";
+    //greater than
+    result += print_type_variable_list(p, var.second.greater);
+    //upper bound
+    result += U", " + p(var.second.upper);
+
+    //conditional constraints
+    for (const auto& cc : var.second.conditions)
+    {
+      result += U"\n";
+      result += p(cc->s) + U" ≤ " + 
+        p(var.first);
+      result += U" ? ";
+      result += p(cc->lhs) + U" ≤ " 
+        + p(cc->rhs);
+    }
+
+    result += U"\n";
+  }
+
+  return result;
+}
+
 u32string
 ConstraintGraph::print(System& system) const
 {
+  using std::placeholders::_1;
+  return print_internal(std::bind(&print_type, _1, std::ref(system), false));
+  #if 0
   u32string result;
   for (const auto& var : m_graph)
   {
@@ -611,8 +652,17 @@ ConstraintGraph::print(System& system) const
   }
 
   return result;
+  #endif
 }
 
+u32string
+ConstraintGraph::print_display(TypePrinter& printer) const
+{
+  return print_internal([&] (const Type& t) -> u32string
+    {
+      return printer.print(t);
+    });
+}
 
 Type
 ConstraintGraph::upper(TypeVariable a) const

@@ -267,7 +267,7 @@ namespace TransLucid
       print_context(System& system) const;
 
       u32string
-      print_display(TypePrinter& printer) const;
+      print_display(TypePrinter& printer, System& system) const;
 
       void
       fix_context(ConstraintGraph& C);
@@ -289,6 +289,11 @@ namespace TransLucid
       }
 
       private:
+
+      template <typename Printer>
+      u32string
+      print_internal(Printer&& p, System& s) const;
+
       std::map<dimension_index, Type> m_lambdas;
       std::unordered_map<u32string, Type> m_vars;
       std::map<Constant, std::pair<Type, Type>> m_constDims;

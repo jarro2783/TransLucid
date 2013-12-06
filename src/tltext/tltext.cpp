@@ -641,9 +641,16 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       auto display = TypeInference::display_type(separated.first);
       auto display_context = TypeInference::display_type(separated.second);
 
+      auto displayed = display_type_scheme(display, m_system);
+
       *m_os << "== Display Type ==\n";
 
-      *m_os << print_type(std::get<1>(display), m_system, true) << "\n\n";
+      //*m_os << print_type(std::get<1>(display), m_system, true) << "\n\n";
+      *m_os << std::get<1>(displayed) << "\n\n";
+
+      *m_os << "With context\n\n";
+      //*m_os << std::get<0>(display).print_context(m_system) << "\n\n";
+      *m_os << std::get<0>(displayed) << "\n\n";
 
       *m_os << "Plain type :: A => " << print_type(std::get<1>(t), m_system)
             << " | C\n\n== C ==\n\n";

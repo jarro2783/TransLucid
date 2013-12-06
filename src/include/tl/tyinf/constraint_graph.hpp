@@ -138,6 +138,9 @@ namespace TransLucid
       u32string
       print(System& system) const;
 
+      u32string
+      print_display(TypePrinter& printer) const;
+
       void
       setUpper(TypeVariable a, Type t);
 
@@ -449,6 +452,10 @@ namespace TransLucid
         decltype(m_graph)::iterator var,
         const CondNodeP& cc
       );
+
+      template <typename Printer>
+      u32string
+      print_internal(Printer&& p) const;
     };
   }
 }

@@ -267,6 +267,29 @@ namespace TransLucid
 //    std::tuple<u32string, u32string, u32string>
 //    display_scheme(const TypeScheme& t);
 
+    template <typename Printer, typename C>
+    u32string
+    print_type_variable_list(Printer&& p, const C& c)
+    {
+      u32string result;
+
+      auto iter = c.begin();
+
+      if (iter != c.end())
+      {
+        result += p(*iter);
+        ++iter;
+      }
+      
+      while (iter != c.end())
+      {
+        result += U", " + p(*iter);
+        ++iter;
+      }
+
+      return result;
+    }
+
     template <typename C>
     u32string
     print_type_variable_list(const C& c)

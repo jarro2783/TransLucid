@@ -166,9 +166,55 @@ TypeContext::has_entry(const u32string& x)
   return m_vars.find(x) != m_vars.end();
 }
 
+template <typename Printer>
+u32string
+TypeContext::print_internal(Printer&& p, System& system) const
+{
+  u32string result;
+
+  for (const auto& l : m_lambdas)
+  {
+    std::ostringstream os;
+    os << l.first;
+    result += U"(" + utf8_to_utf32(os.str()) + U", " + 
+      p(l.second) + U")\n";
+  }
+
+  for (const auto& v : m_vars)
+  {
+    result += U"(" + v.first + U", " + p(v.second) + U")\n";
+  }
+
+  for (const auto& d : m_constDims)
+  {
+    result += U"(" + system.printConstant(d.first) + U", ("
+      + p(d.second.first) + U", " 
+      + p(d.second.second) + U"))\n";
+  }
+
+  for (const auto& d : m_paramDims)
+  {
+    std::ostringstream os;
+    os << d.first;
+
+    result += U"(" + utf8_to_utf32(os.str()) + U", ("
+      + p(std::get<0>(d.second)) + U", " 
+      + p(std::get<1>(d.second)) + U", " 
+      + p(std::get<2>(d.second))
+      + U"))\n";
+  }
+
+  return result;
+}
+
 u32string
 TypeContext::print_context(System& system) const
 {
+  using std::placeholders::_1;
+  return print_internal(std::bind(&print_type, _1, std::ref(system), false), 
+    system);
+
+#if 0
   u32string result;
 
   for (const auto& l : m_lambdas)
@@ -204,11 +250,17 @@ TypeContext::print_context(System& system) const
   }
 
   return result;
+#endif
 }
 
 u32string
-TypeContext::print_display(TypePrinter& printer) const
+TypeContext::print_display(TypePrinter& printer, System& s) const
 {
+  return print_internal([&] (const Type& t) -> u32string
+    {
+      return printer.print(t);
+    }, 
+    s);
 }
 
 void

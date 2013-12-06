@@ -2822,7 +2822,10 @@ display_type_scheme(const TypeScheme& s, System& system)
   TypePrinter printer(system, true);
 
   auto t = printer.print(std::get<1>(s));
-  auto A = std::get<0>(s).print_display(printer);
+  auto A = std::get<0>(s).print_display(printer, system);
+  auto C = std::get<2>(s).print_display(printer);
+
+  return std::make_tuple(A, t, C);
 }
 
 }

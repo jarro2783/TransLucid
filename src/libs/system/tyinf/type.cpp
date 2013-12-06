@@ -636,6 +636,7 @@ type_term_contains_pos(Type t, Type tp)
 u32string
 TypePrinter::print(const Type& t)
 {
+  m_result.clear();
   apply_visitor(*this, t);
   return m_result;
 }
