@@ -187,9 +187,10 @@ TypeContext::print_internal(Printer&& p, System& system) const
 
   for (const auto& d : m_constDims)
   {
-    result += U"(" + system.printConstant(d.first) + U", ("
-      + p(d.second.first) + U", " 
-      + p(d.second.second) + U"))\n";
+    result += 
+      p(d.second.first) + U" ≤ " +
+      U"#." + system.printConstant(d.first) + U" ≤ " +
+      p(d.second.second) + U"\n";
   }
 
   for (const auto& d : m_paramDims)
@@ -197,11 +198,11 @@ TypeContext::print_internal(Printer&& p, System& system) const
     std::ostringstream os;
     os << d.first;
 
-    result += U"(" + utf8_to_utf32(os.str()) + U", ("
-      + p(std::get<0>(d.second)) + U", " 
-      + p(std::get<1>(d.second)) + U", " 
-      + p(std::get<2>(d.second))
-      + U"))\n";
+    result += 
+      p(std::get<1>(d.second)) + U" ≤ " +
+      U"#.(φ{" + utf8_to_utf32(os.str()) + U"} = "
+      + p(std::get<0>(d.second)) + U") ≤ " 
+      + p(std::get<2>(d.second)) + U"\n";
   }
 
   return result;
@@ -348,6 +349,31 @@ TypeContext::instantiate_parameters(ConstraintGraph& C)
   }
 
   fix_context(C);
+}
+
+void
+TypeContext::remove_tl_context(const ConstraintGraph& C)
+{
+  //only remove the context when the lower bound variable has a non bottom
+  //lower bound
+  auto iter = m_constDims.begin();
+  while (iter != m_constDims.end())
+  {
+    const auto& d = *iter;
+
+    //here we assume that it is a type variable because we only run this
+    //function on simplified type schemes
+    auto lower = C.lower(get<TypeVariable>(d.second.first));
+    
+    if (get<TypeBot>(&lower) == nullptr)
+    {
+      iter = m_constDims.erase(iter); 
+    }
+    else
+    {
+      ++iter;
+    }
+  }
 }
 
 }

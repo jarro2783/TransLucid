@@ -643,19 +643,23 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 
       auto displayed = display_type_scheme(display, m_system);
 
+      //auto display = TypeInference::display_type(t);
+      //auto display_context = TypeInference::display_type(t);
+      //auto displayed = display_type_scheme(display, m_system);
+
       *m_os << "== Display Type ==\n";
 
       //*m_os << print_type(std::get<1>(display), m_system, true) << "\n\n";
       *m_os << std::get<1>(displayed) << "\n\n";
 
       *m_os << "With context\n\n";
-      //*m_os << std::get<0>(display).print_context(m_system) << "\n\n";
       *m_os << std::get<0>(displayed) << "\n\n";
+      *m_os << std::get<0>(display_context).print_context(m_system) << "\n\n";
 
-      *m_os << "Plain type :: A => " << print_type(std::get<1>(t), m_system)
+      *m_os << "Plain type :: A => " << print_type(std::get<1>(separated.first), m_system)
             << " | C\n\n== C ==\n\n";
-      *m_os << std::get<2>(t).print(m_system) << "\n== A ==\n\n";
-      *m_os << std::get<0>(t).print_context(m_system) << "\n";
+      *m_os << std::get<2>(separated.first).print(m_system) << "\n== A ==\n\n";
+      *m_os << std::get<0>(separated.first).print_context(m_system) << "\n";
 
 #if 0
       *m_os << print_type(std::get<1>(display), m_system, true) << std::endl

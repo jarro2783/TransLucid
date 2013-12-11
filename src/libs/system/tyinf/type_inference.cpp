@@ -463,8 +463,11 @@ TypeInferrer::separate_context(const TypeScheme& t)
   TypeScheme context = t;
   TypeScheme bare = t;
 
-  std::get<0>(bare).clear_raw_context();
   std::get<1>(context) = TypeNothing();
+  std::get<0>(bare).remove_tl_context(std::get<2>(t));
+
+  //std::get<0>(bare).clear_raw_context();
+  //std::get<1>(context) = TypeNothing();
 
   context = simplify(context);
   bare = simplify(bare);

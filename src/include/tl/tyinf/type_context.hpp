@@ -288,6 +288,9 @@ namespace TransLucid
         m_constDims.clear();
       }
 
+      void
+      remove_tl_context(const ConstraintGraph& C);
+
       private:
 
       template <typename Printer>

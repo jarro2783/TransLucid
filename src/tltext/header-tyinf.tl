@@ -256,7 +256,7 @@ fun union_construct!a!b = make_union.(a,b);;
 fun convert!a!b [a is floatmp, b imp intmp] = floatmp_convert_intmp.b;;
 
 //var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
-fun fby.d X Y = if #.d <= 0 then X else prev.d Y fi;;
+fun fby.d X Y = if #.d <= 0 then X else Y @ [d <- #.d - 1] fi;;
 fun index!d = #.d + 1;;
 fun prev.d X = X @ [d <- #.d - 1];;
 fun next.d X = X @ [d <- #.d + 1];;
