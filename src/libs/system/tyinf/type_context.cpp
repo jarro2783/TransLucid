@@ -327,8 +327,8 @@ TypeContext::instantiate_parameters(ConstraintGraph& C)
       {
         if (thedim->index() == TYPE_INDEX_DIMENSION)
         {
-          std::cout << "dimension " << get_constant<dimension_index>(*thedim)
-            << " being instantiated" << std::endl;
+          //std::cout << "dimension " << get_constant<dimension_index>(*thedim)
+          //  << " being instantiated" << std::endl;
           addConstantDim(*thedim, std::get<1>(d.second), std::get<2>(d.second));
           //add(get_constant<dimension_index>(*thedim), std::get<2>(d.second));
           m_paramDims.erase(iter++);

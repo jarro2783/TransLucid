@@ -151,11 +151,11 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 {
   indecl = true;
 
-  std::cout << "infer_system" << std::endl;
+  //std::cout << "infer_system" << std::endl;
 
-  std::cout << "inferring types of : ";
-  print_container(std::cout, ids);
-  std::cout << std::endl;
+  //std::cout << "inferring types of : ";
+  //print_container(std::cout, ids);
+  //std::cout << std::endl;
 
   auto recursion_groups = generate_recurse_groups(ids);
 
@@ -194,7 +194,7 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
           currentId = &x;
           auto e = m_system.getIdentifierTree(x);
 
-          std::cout << "inferring : " << x << std::endl;
+          //std::cout << "inferring : " << x << std::endl;
 
           auto t = apply_visitor(*this, e);
 
@@ -204,9 +204,9 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
           typeInserted = types.insert(std::make_pair(x, std::get<1>(t))).first;
         }
 
-        std::cout << x << " : " << 
-          print_type(typeInserted->second, m_system) 
-          << std::endl;
+        //std::cout << x << " : " << 
+        //  print_type(typeInserted->second, m_system) 
+        //  << std::endl;
       }
         
       if (types.size() > 1)
@@ -253,9 +253,9 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
         )
         ;
 
-        std::cout << std::get<2>(S).print(m_system) << "\n";
-        std::cout << "\nContext: ";
-        std::cout << std::get<0>(S).print_context(m_system) << std::endl;
+        //std::cout << std::get<2>(S).print(m_system) << "\n";
+        //std::cout << "\nContext: ";
+        //std::cout << std::get<0>(S).print_context(m_system) << std::endl;
         #if 0 
         for (const auto& d : std::get<0>(S).getDimensions())
         {
@@ -393,9 +393,9 @@ TypeInferrer::process_region_guard
 
       auto t = std::get<2>(rhs).lower(get<TypeVariable>(std::get<1>(rhs)));
 
-      std::cout << "context of rhs of " << d << "\n" << 
-        std::get<0>(rhs).print_context(m_system)
-        << std::endl;
+      //std::cout << "context of rhs of " << d << "\n" << 
+      //  std::get<0>(rhs).print_context(m_system)
+      //  << std::endl;
 
       Type currentType;
 
