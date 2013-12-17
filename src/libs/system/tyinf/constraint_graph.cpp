@@ -591,7 +591,7 @@ ConstraintGraph::print_internal(Printer&& p) const
     result += print_type_variable_list(p, var.second.less);
     result += U" ≤ ";
     //the var
-    result += p(var.first);
+    result += print_type_variable(var.first);
     result += U" ≤ ";
     //greater than
     result += print_type_variable_list(p, var.second.greater);

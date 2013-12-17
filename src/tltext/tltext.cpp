@@ -639,7 +639,8 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       auto separated = infer.separate_context(t);
 
       auto display = TypeInference::display_type(separated.first);
-      auto display_context = TypeInference::display_type(separated.second);
+      auto display_context = 
+        TypeInference::display_type_scheme(separated.second, m_system);
 
       auto displayed = display_type_scheme(display, m_system);
 
@@ -666,8 +667,10 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 
       *m_os << "== TransLucid Context ==\n\n";
 
-      *m_os << std::get<0>(separated.second).print_context(m_system) 
-        << std::endl;
+      *m_os << std::get<0>(display_context)
+        << "\n\n";
+      *m_os << std::get<2>(display_context) << "\n";
+
     }
   }
 }
