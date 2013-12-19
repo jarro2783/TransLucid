@@ -658,7 +658,8 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       if (!std::get<0>(displayed).empty())
       {
         *m_os << "With context\n\n";
-        *m_os << std::get<0>(displayed) << "\n\n";
+        *m_os << std::get<0>(display_context).print_context(m_system)
+              << "\n\n";
       }
 
       *m_os << "== Full type == \n\n";
@@ -674,7 +675,7 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       *m_os 
         << print_type(std::get<1>(separated.first), m_system)
         << " | C\n\n== C ==\n\n";
-      *m_os << std::get<2>(separated.first).print(m_system) << "\n";
+      *m_os << Cprinted << "\n";
 
       if (!Aprinted.empty())
       {
