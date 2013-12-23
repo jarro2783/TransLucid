@@ -658,7 +658,9 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       if (!std::get<0>(displayed).empty())
       {
         *m_os << "With context\n\n";
-        *m_os << std::get<0>(display_context).print_context(m_system)
+        *m_os 
+              << std::get<0>(displayed)
+        //      << std::get<0>(display_context).print_context(m_system)
               << "\n\n";
       }
 

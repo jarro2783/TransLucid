@@ -42,6 +42,8 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <stack>
 
+#define TYINF_PRINT_ALL
+
 //define this to turn off type simplification
 //#define TL_TYINF_NO_SIMPLIFY
 
@@ -204,9 +206,11 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
           typeInserted = types.insert(std::make_pair(x, std::get<1>(t))).first;
         }
 
-        //std::cout << x << " : " << 
-        //  print_type(typeInserted->second, m_system) 
-        //  << std::endl;
+        #ifdef TYINF_PRINT_ALL
+        std::cout << x << " : " << 
+          print_type(typeInserted->second, m_system) 
+          << std::endl;
+        #endif
       }
         
       if (types.size() > 1)
@@ -233,37 +237,12 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 
       for (const auto& xt : types)
       {
-        auto S =  simplify(
-        #if 0
-        #ifndef TL_TYINF_NO_SIMPLIFY
-          minimise(
-            garbage_collect(
-              canonise(
-        #endif
-        #endif
-                std::make_tuple(A, xt.second, C)
-        #if 0
-        #ifndef TL_TYINF_NO_SIMPLIFY
-                , m_freshVars
-              )
-            )
-          )
-        #endif
-        #endif
-        )
-        ;
+        auto S =  simplify(std::make_tuple(A, xt.second, C));
 
-        //std::cout << std::get<2>(S).print(m_system) << "\n";
-        //std::cout << "\nContext: ";
-        //std::cout << std::get<0>(S).print_context(m_system) << std::endl;
-        #if 0 
-        for (const auto& d : std::get<0>(S).getDimensions())
-        {
-          std::cout << "(" << d.first << ", (" << 
-            print_type(d.second.first, m_system) << ", " <<
-            print_type(d.second.second, m_system)
-            << ")) ";
-        }
+        #ifdef TYINF_PRINT_ALL
+        std::cout << std::get<2>(S).print(m_system) << "\n";
+        std::cout << "\nContext: ";
+        std::cout << std::get<0>(S).print_context(m_system) << std::endl;
         #endif
 
         m_environment[xt.first] = S;

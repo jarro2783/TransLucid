@@ -31,7 +31,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "tl/parser.hpp"
 
-//#define TL_PRINT_TREE
+#define TL_PRINT_TREE
 
 /**
  * @file bestfit.cpp
