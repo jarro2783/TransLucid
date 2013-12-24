@@ -917,8 +917,13 @@ TypeInferrer::operator()(const Tree::AtExpr& e)
       auto value = fresh();
       auto thedim = fresh();
 
+      auto alpha = fresh();
+
+      A.add(dim->dim, alpha);
+
       A.addParamDim(dim->dim, thedim, value, upper);
       C.add_to_closure(Constraint{std::get<1>(t_1), value});
+      C.add_to_closure(Constraint{alpha, thedim});
     }
     else
     {
@@ -2461,14 +2466,14 @@ garbage_collect(const TypeScheme& t)
 {
   auto p = polarity(t);
 
-  #if 0
+  //#if 0
   std::cout << "positive: ";
   print_container(std::cout, p.second);
   std::cout << std::endl;
   std::cout << "negative: ";
   print_container(std::cout, p.first);
   std::cout << std::endl;
-  #endif
+  //#endif
 
   auto C = std::get<2>(t);
   C.collect(p.first, p.second);

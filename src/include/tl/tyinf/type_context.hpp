@@ -89,6 +89,7 @@ namespace TransLucid
       addParamDim(dimension_index d, const Type& value,
         const Type& lower, const Type& upper)
       {
+        //add as param dim
         auto iter = m_paramDims.find(d);
 
         if (iter == m_paramDims.end())
@@ -104,6 +105,9 @@ namespace TransLucid
             construct_glb(std::get<2>(iter->second), upper)
           );
         }
+
+        //add as a normal dimension
+        //add(d, value);
       }
 
       template <typename Pos, typename Neg>
