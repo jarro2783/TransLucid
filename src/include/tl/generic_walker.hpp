@@ -60,6 +60,7 @@ namespace TransLucid
       return Tree::UnaryOpExpr(e.op, 
         apply_visitor(*reinterpret_cast<Derived*>(this), e.e));
     }
+
     Tree::Expr operator()(const Tree::BinaryOpExpr& e)
     {
       return Tree::BinaryOpExpr

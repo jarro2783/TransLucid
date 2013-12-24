@@ -153,11 +153,11 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 {
   indecl = true;
 
-  //std::cout << "infer_system" << std::endl;
+  std::cout << "infer_system" << std::endl;
 
-  //std::cout << "inferring types of : ";
-  //print_container(std::cout, ids);
-  //std::cout << std::endl;
+  std::cout << "inferring types of : ";
+  print_container(std::cout, ids);
+  std::cout << std::endl;
 
   auto recursion_groups = generate_recurse_groups(ids);
 
@@ -444,6 +444,7 @@ TypeInferrer::separate_context(const TypeScheme& t)
 
   std::get<1>(context) = TypeNothing();
   std::get<0>(bare).remove_tl_context(std::get<2>(t));
+  std::get<0>(context).inverse_remove_tl_context(std::get<2>(t));
 
   //std::get<0>(bare).clear_raw_context();
   //std::get<1>(context) = TypeNothing();
@@ -535,6 +536,7 @@ TypeInferrer::operator()(const Tree::IdentExpr& e)
   auto iter = m_environment.find(e.text);
   if (iter == m_environment.end())
   {
+    std::cout << "recursive variable: " << e.text << std::endl;
     auto alpha = fresh();
     auto gamma = fresh();
 
@@ -549,6 +551,7 @@ TypeInferrer::operator()(const Tree::IdentExpr& e)
   }
   else
   {
+    std::cout << e.text << " is in the environment" << std::endl;
     //rename the type scheme and return
     return rename_scheme(iter->second, m_freshVars);
   }
@@ -2095,6 +2098,8 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
 
     VarSet inGraphVars;
 
+    std::cerr << m_unreplaced.size() << " unreplaced variables" << std::endl;
+
     while (!m_unreplaced.empty())
     {
       auto v = *m_unreplaced.begin();
@@ -2171,16 +2176,19 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         auto succ = m_C.successor(v);
         if (succ.size() == 0)
         {
+          std::cout << v << " has a unique upper bound" << std::endl;
           bound = replace(upper, MySetCaller(s, v));
         }
         else if (succ.size() == 1 && (get<TypeTop>(&upper) != nullptr))
         {
+          std::cout << v << " has a unique succ bound" << std::endl;
           bound = succ[0];
           m_uniqueBounds[v] = succ[0];
         }
         else
         {
           //variable has no unique bound, in which case it is itself
+          std::cout << v << " has no unique bound" << std::endl;
           bound = v;
           m_uniqueBounds[v] = v;
           m_unreplaced.insert(v);
@@ -2193,10 +2201,12 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         auto lower = m_C.lower(v);
         if (pred.size() == 0)
         {
+          std::cout << v << " has a unique lower bound" << std::endl;
           bound = replace(lower, MySetCaller(s, v));
         }
         else if (pred.size() == 1 && (get<TypeBot>(&lower) != nullptr))
         {
+          std::cout << v << " has a unique pred bound" << std::endl;
           //don't replace with the lower bound in this case,
           //we replace with the upper bound in the opposite case,
           //this way variables that are the same stay the same
@@ -2205,6 +2215,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         }
         else
         {
+          std::cout << v << " has no unique bound" << std::endl;
           bound = v;
           m_unreplaced.insert(v);
         }

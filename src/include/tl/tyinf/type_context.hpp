@@ -173,7 +173,7 @@ namespace TransLucid
       template <typename Rewriter>
       static
       TypeContext
-      rewrite(const TypeContext& c, Rewriter r)
+      rewrite(const TypeContext& c, Rewriter&& r)
       {
         TypeContext result;
 
@@ -288,8 +288,13 @@ namespace TransLucid
         m_constDims.clear();
       }
 
+      //remove the TL context
       void
       remove_tl_context(const ConstraintGraph& C);
+
+      //remove from the context the opposite of what remove does
+      void
+      inverse_remove_tl_context(const ConstraintGraph& C);
 
       private:
 
