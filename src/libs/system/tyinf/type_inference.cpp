@@ -2068,6 +2068,16 @@ struct SetCaller
   T m_t;
 };
 
+struct TrueF
+{
+  template <typename... T>
+  bool
+  operator()(T&& ...t)
+  {
+    return true;
+  }
+};
+
 struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
 {
   typedef Type result_type;
@@ -2109,9 +2119,13 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
 
     //std::cerr << m_unreplaced.size() << " unreplaced variables" << std::endl;
 
-    while (!m_unreplaced.empty())
+    auto recordUsed = [&] (TypeVariable v) -> void
     {
-      auto v = *m_unreplaced.begin();
+      //only if its not already in the graph
+      if (inGraphVars.find(v) != inGraphVars.end())
+      {
+        return;
+      }
 
       inGraphVars.insert(v);
 
@@ -2124,11 +2138,32 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
       C.setUpper(v, upper);
 
       inGraph[v] = std::make_pair(m_C.predecessor(v), m_C.successor(v));
+    };
+
+    while (!m_unreplaced.empty())
+    {
+      auto v = *m_unreplaced.begin();
+
+      recordUsed(v);
 
       m_unreplaced.erase(v);
     }
 
     //now go through the conditional constraints and keep them
+    m_C.for_each_condition_if(
+      [&] (const std::vector<CondConstraint>& c) -> void
+      {
+        for (const auto& cc : c)
+        {
+          C.add_conditional(cc);
+          //then all variables mentioned are now included in the graph
+          recordUsed(cc.a);
+          recordUsed(cc.lhs);
+          recordUsed(cc.rhs);
+        }
+      },
+      TrueF()
+    );
 
     //now we can go through the variables that still appear, and only set their
     //predecessors and successors if they also appear in the graph
