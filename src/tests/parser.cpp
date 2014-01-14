@@ -28,6 +28,16 @@ along with TransLucid; see the file COPYING.  If not see
 
 namespace TL = TransLucid;
 
+namespace std
+{
+ostream&
+operator<<(ostream& os, const pair<TL::u32string, TL::u32string>& p)
+{
+  os << "(" << p.first << ", " << p.second << ")";
+  return os;
+}
+}
+
 TEST_CASE ( "empty input", "empty input to line tokenizer" )
 {
   std::string input;
@@ -692,7 +702,10 @@ parse
         break;
 
         case TL::Parser::TOKEN_OPERATOR:
-        INFO("Got TOKEN_OPERATOR");
+        {
+          INFO("Got TOKEN_OPERATOR");
+        }
+
         default:
         success = false;
         break;
