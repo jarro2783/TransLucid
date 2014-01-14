@@ -536,7 +536,6 @@ TypeInferrer::operator()(const Tree::IdentExpr& e)
   auto iter = m_environment.find(e.text);
   if (iter == m_environment.end())
   {
-    std::cout << "recursive variable: " << e.text << std::endl;
     auto alpha = fresh();
     auto gamma = fresh();
 
@@ -551,7 +550,6 @@ TypeInferrer::operator()(const Tree::IdentExpr& e)
   }
   else
   {
-    std::cout << e.text << " is in the environment" << std::endl;
     //rename the type scheme and return
     return rename_scheme(iter->second, m_freshVars);
   }
@@ -2109,7 +2107,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
 
     VarSet inGraphVars;
 
-    std::cerr << m_unreplaced.size() << " unreplaced variables" << std::endl;
+    //std::cerr << m_unreplaced.size() << " unreplaced variables" << std::endl;
 
     while (!m_unreplaced.empty())
     {
@@ -2187,12 +2185,12 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         auto succ = m_C.successor(v);
         if (succ.size() == 0)
         {
-          std::cout << v << " has a unique upper bound" << std::endl;
+          //std::cout << v << " has a unique upper bound" << std::endl;
           bound = replace(upper, MySetCaller(s, v));
         }
         else if (succ.size() == 1 && (get<TypeTop>(&upper) != nullptr))
         {
-          std::cout << v << " has a unique succ bound" << std::endl;
+          //std::cout << v << " has a unique succ bound" << std::endl;
           bound = succ[0];
           m_uniqueBounds[v] = succ[0];
         }
@@ -2212,12 +2210,12 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         auto lower = m_C.lower(v);
         if (pred.size() == 0)
         {
-          std::cout << v << " has a unique lower bound" << std::endl;
+          //std::cout << v << " has a unique lower bound" << std::endl;
           bound = replace(lower, MySetCaller(s, v));
         }
         else if (pred.size() == 1 && (get<TypeBot>(&lower) != nullptr))
         {
-          std::cout << v << " has a unique pred bound" << std::endl;
+          //std::cout << v << " has a unique pred bound" << std::endl;
           //don't replace with the lower bound in this case,
           //we replace with the upper bound in the opposite case,
           //this way variables that are the same stay the same
@@ -2226,7 +2224,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         }
         else
         {
-          std::cout << v << " has no unique bound" << std::endl;
+          //std::cout << v << " has no unique bound" << std::endl;
           bound = v;
           m_unreplaced.insert(v);
         }
@@ -2472,14 +2470,14 @@ garbage_collect(const TypeScheme& t)
 {
   auto p = polarity(t);
 
-  //#if 0
+  #if 0
   std::cout << "positive: ";
   print_container(std::cout, p.second);
   std::cout << std::endl;
   std::cout << "negative: ";
   print_container(std::cout, p.first);
   std::cout << std::endl;
-  //#endif
+  #endif
 
   auto C = std::get<2>(t);
   C.collect(p.first, p.second);
