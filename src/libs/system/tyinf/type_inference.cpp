@@ -2128,6 +2128,8 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
       m_unreplaced.erase(v);
     }
 
+    //now go through the conditional constraints and keep them
+
     //now we can go through the variables that still appear, and only set their
     //predecessors and successors if they also appear in the graph
 
