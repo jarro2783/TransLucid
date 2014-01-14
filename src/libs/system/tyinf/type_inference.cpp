@@ -2102,11 +2102,6 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
   TypeScheme
   replace()
   {
-    //replace the type, then the type context, then try to replace
-    //what is left in the context
-    auto t = replace(m_type);
-
-    TypeContext A = TypeContext::rewrite(m_A, *this);
     ConstraintGraph C;
 
     std::map
@@ -2116,8 +2111,6 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
     > inGraph;
 
     VarSet inGraphVars;
-
-    //std::cerr << m_unreplaced.size() << " unreplaced variables" << std::endl;
 
     auto recordUsed = [&] (TypeVariable v) -> void
     {
@@ -2140,16 +2133,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
       inGraph[v] = std::make_pair(m_C.predecessor(v), m_C.successor(v));
     };
 
-    while (!m_unreplaced.empty())
-    {
-      auto v = *m_unreplaced.begin();
-
-      recordUsed(v);
-
-      m_unreplaced.erase(v);
-    }
-
-    //now go through the conditional constraints and keep them
+    //go through the conditional constraints and keep them first
     m_C.for_each_condition_if(
       [&] (const std::vector<CondConstraint>& c) -> void
       {
@@ -2160,10 +2144,32 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
           recordUsed(cc.a);
           recordUsed(cc.lhs);
           recordUsed(cc.rhs);
+
+          //keep the variables mentioned in conditional constraints
+          m_inConditional.insert(cc.a);
+          m_inConditional.insert(cc.lhs);
+          m_inConditional.insert(cc.rhs);
         }
       },
       TrueF()
     );
+
+    //replace the type, then the type context, then try to replace
+    //what is left in the context
+    auto t = replace(m_type);
+
+    TypeContext A = TypeContext::rewrite(m_A, *this);
+
+    //std::cerr << m_unreplaced.size() << " unreplaced variables" << std::endl;
+
+    while (!m_unreplaced.empty())
+    {
+      auto v = *m_unreplaced.begin();
+
+      recordUsed(v);
+
+      m_unreplaced.erase(v);
+    }
 
     //now we can go through the variables that still appear, and only set their
     //predecessors and successors if they also appear in the graph
@@ -2205,10 +2211,14 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
   operator()(TypeVariable v, std::set<TypeVariable>& s)
   {
     Type bound;
-    if (s.find(v) != s.end())
+
+    //if it is mentioned in a conditional constraint, then we can't
+    //display it or
+    //we're already computing the unique bound for this variable
+    //which also means that we now know that its unique bound is itself
+    if (m_inConditional.find(v) != m_inConditional.end()
+     || s.find(v) != s.end())
     {
-      //we're already computing the unique bound for this variable
-      //which also means that we now know that its unique bound is itself
       m_uniqueBounds[v] = v;
       m_unreplaced.insert(v);
       return v;
@@ -2305,6 +2315,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
   VarSet m_unreplaced;
 
   std::map<TypeVariable, Type> m_uniqueBounds;
+  std::set<TypeVariable> m_inConditional;
 };
 
 }
