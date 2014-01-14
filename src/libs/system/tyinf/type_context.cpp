@@ -352,9 +352,12 @@ TypeContext::instantiate_parameters(ConstraintGraph& C)
 }
 
 void
-TypeContext::remove_tl_context(const ConstraintGraph& C)
+TypeContext::inverse_remove_tl_context(const ConstraintGraph& C)
 {
-  //only remove the context when the lower bound variable has a non bottom
+  //remove the param dims
+  m_paramDims.clear();
+#if 0
+  //only remove the context when the which dimension variable has a bottom
   //lower bound
   auto iter = m_constDims.begin();
   while (iter != m_constDims.end())
@@ -363,7 +366,36 @@ TypeContext::remove_tl_context(const ConstraintGraph& C)
 
     //here we assume that it is a type variable because we only run this
     //function on simplified type schemes
-    auto lower = C.lower(get<TypeVariable>(d.second.first));
+    auto lower = C.lower(get<TypeVariable>(d.first));
+    
+    if (get<TypeBot>(&lower) != nullptr)
+    {
+      iter = m_constDims.erase(iter); 
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+#endif
+}
+
+void
+TypeContext::remove_tl_context(const ConstraintGraph& C)
+{
+  //remove the const dims
+  m_constDims.clear();
+#if 0
+  //only remove the context when the which dimension variable has a non bottom
+  //lower bound
+  auto iter = m_constDims.begin();
+  while (iter != m_constDims.end())
+  {
+    const auto& d = *iter;
+
+    //here we assume that it is a type variable because we only run this
+    //function on simplified type schemes
+    auto lower = C.lower(get<TypeVariable>(d.first));
     
     if (get<TypeBot>(&lower) == nullptr)
     {
@@ -374,6 +406,7 @@ TypeContext::remove_tl_context(const ConstraintGraph& C)
       ++iter;
     }
   }
+#endif
 }
 
 }

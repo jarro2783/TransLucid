@@ -45,6 +45,9 @@ namespace TransLucid
     result_type
     operator()(const Tree::WhereExpr&);
 
+    result_type
+    operator()(const Tree::BinaryOpExpr& e);
+
     private:
 
     std::set<u32string> m_free;

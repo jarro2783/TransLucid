@@ -49,4 +49,12 @@ FreeVariables::operator()(const Tree::WhereExpr& e)
   }
 }
 
+void
+FreeVariables::operator()(const Tree::BinaryOpExpr& e)
+{
+  m_free.insert(e.op.op);
+  apply_visitor(*this, e.lhs);
+  apply_visitor(*this, e.rhs);
+}
+
 }

@@ -89,6 +89,7 @@ namespace TransLucid
       addParamDim(dimension_index d, const Type& value,
         const Type& lower, const Type& upper)
       {
+        //add as param dim
         auto iter = m_paramDims.find(d);
 
         if (iter == m_paramDims.end())
@@ -104,6 +105,9 @@ namespace TransLucid
             construct_glb(std::get<2>(iter->second), upper)
           );
         }
+
+        //add as a normal dimension
+        //add(d, value);
       }
 
       template <typename Pos, typename Neg>
@@ -173,7 +177,7 @@ namespace TransLucid
       template <typename Rewriter>
       static
       TypeContext
-      rewrite(const TypeContext& c, Rewriter r)
+      rewrite(const TypeContext& c, Rewriter&& r)
       {
         TypeContext result;
 
@@ -288,8 +292,13 @@ namespace TransLucid
         m_constDims.clear();
       }
 
+      //remove the TL context
       void
       remove_tl_context(const ConstraintGraph& C);
+
+      //remove from the context the opposite of what remove does
+      void
+      inverse_remove_tl_context(const ConstraintGraph& C);
 
       private:
 
