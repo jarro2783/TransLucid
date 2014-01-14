@@ -10,7 +10,10 @@ fun inf!a!b [a imp intmp, b imp intmp] = false ;;
 
 var Hashzero = #.0 ;;
 
+fun foo.d = fby.d ;;
+
 %%
+foo ;;
 Hashzero ;;
 Hashzero @ [0 <- 0] ;;
 \a -> \b -> \c -> a + b + c ;;

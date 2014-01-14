@@ -904,18 +904,29 @@ TypeInferrer::operator()(const Tree::AtExpr& e)
     A.join(std::get<0>(t_1));
     C.make_union(std::get<2>(t_1));
 
+    //  std::cout << "after joining rhs of tuple: \n" <<
+    //    A.print_context(m_system) << "\n" <<
+    //    C.print(m_system) << std::endl;
+
     const Tree::HashExpr* h = get<Tree::HashExpr>(&p.first);
     const Tree::DimensionExpr* dim = nullptr;
 
     if (h != nullptr && (dim = get<Tree::DimensionExpr>(&h->e)) != nullptr)
     {
+      TypeContext A2;
+
       //the dimension is passed as a parameter
       auto upper = fresh();
       auto value = fresh();
       auto thedim = fresh();
+      auto dimupper = fresh();
 
-      A.addParamDim(dim->dim, thedim, value, upper);
+      A2.add(dim->dim, dimupper);
+      A2.addParamDim(dim->dim, thedim, value, upper);
       C.add_to_closure(Constraint{std::get<1>(t_1), value});
+      C.add_to_closure(Constraint{dimupper, thedim});
+
+      A.join(A2);
     }
     else
     {
