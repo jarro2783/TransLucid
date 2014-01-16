@@ -671,6 +671,8 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 
       *m_os << std::get<2>(displayed) << std::endl;
 
+      #if 0
+
       *m_os << "== Full type == \n\n";
 
       auto Aprinted = std::get<0>(separated.first).print_context(m_system);
@@ -699,6 +701,8 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
       //*m_os << std::get<2>(display_context) << "\n";
 
       *m_os << std::get<0>(display_context).print_context(m_system) << "\n";
+
+      #endif
 
     }
   }

@@ -42,7 +42,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <stack>
 
-#define TYINF_PRINT_ALL
+//#define TYINF_PRINT_ALL
 
 //define this to turn off type simplification
 //#define TL_TYINF_NO_SIMPLIFY
@@ -153,11 +153,13 @@ TypeInferrer::infer_system(const std::set<u32string>& ids)
 {
   indecl = true;
 
+  #if 0
   std::cout << "infer_system" << std::endl;
 
   std::cout << "inferring types of : ";
   print_container(std::cout, ids);
   std::cout << std::endl;
+  #endif
 
   auto recursion_groups = generate_recurse_groups(ids);
 
