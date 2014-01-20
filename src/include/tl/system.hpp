@@ -26,6 +26,7 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_SYSTEM_HPP_INCLUDED
 
 #include <tl/ast_fwd.hpp>
+#include <tl/cache.hpp>
 #include <tl/chi.hpp>
 #include <tl/datadef.hpp>
 #include <tl/dimtranslator.hpp>
@@ -224,6 +225,9 @@ namespace TransLucid
       OutputHD* hd
     );
 
+    Constant
+    addCacheIO(const u32string& id, Cache*);
+
     //Constant
     //addInputHyperdaton
     //(
@@ -410,6 +414,8 @@ namespace TransLucid
     UUIDStringMap m_outputUUIDs;
 
     InputHDMap m_inputHDs;
+
+    std::map<u32string, Cache*> m_cacheio;
 
     //input and output hd declarations, for now just have the valid range
     std::unordered_map<u32string, Region> m_outputHDDecls;
