@@ -30,10 +30,196 @@ namespace TypeInference
 namespace
 {
 
+template <typename T>
+struct is_union_valid;
+
+template <>
+struct is_union_valid<Constant>
+{
+  typedef void type;
+};
+
+template <>
+struct is_union_valid<TypeAtomic>
+{
+  typedef void type;
+};
+
+struct LUBConstructed
+{
+  typedef Type result_type;
+
+  template <typename A, typename B>
+  Type
+  invalid(const A& a, const B& b) const
+  {
+    throw BoundInvalid{BoundInvalid::LUB, a, b};
+  }
+
+  template <typename A, typename B>
+  Type
+  operator()(const A& a, const B& b) const
+  {
+    return invalid(a, b);
+  }
+
+  template <typename T>
+  Type
+  operator()(const TypeNothing& n, const T& t) const
+  {
+    return t;
+  }
+
+  Type
+  operator()(const TypeCBV& a, const TypeCBV& b) const
+  {
+    return TypeCBV
+      {
+        construct_glb(a.lhs, b.lhs),
+        construct_lub(a.rhs, b.rhs)
+      };
+  }
+
+  Type
+  operator()(const TypeIntension& a, const TypeIntension& b) const
+  {
+    return TypeIntension
+      {
+        construct_lub(a.body, b.body)
+      };
+  }
+  
+  Type
+  operator()(const TypeBase& a, const TypeBase& b) const
+  {
+    if (a.lhs.size() == b.lhs.size())
+    {
+      std::vector<Type> lhs;
+      for (size_t i = 0; i != a.lhs.size(); ++i)
+      {
+        lhs.push_back(construct_glb(a.lhs.at(i), b.lhs.at(i)));
+
+      }
+      
+      return TypeBase
+        {
+          lhs,
+          construct_lub(a.rhs, b.rhs)
+        };
+
+    }
+    else
+    {
+      return invalid(a, b);
+    }
+  }
+
+  Type
+  operator()(const Constant& a, const Constant& b) const
+  {
+    if (a == b)
+    {
+      return a;
+    }
+    else if (a.index() == b.index())
+    {
+      return TypeAtomic{type_index_names[a.index()], a.index()};
+    }
+    {
+      return TypeBot();
+    }
+  }
+
+  Type
+  operator()(const TypeAtomic& a, const Constant& b)
+  {
+    if (a.index == b.index())
+    {
+      return a;
+    }
+    else
+    {
+      TypeAtomicUnion u;
+      u.add(a);
+      u.add(b);
+      return u;
+    }
+  }
+
+  Type 
+  operator()(const Constant& a, const TypeAtomic& b)
+  {
+    return operator()(b, a);
+  }
+
+  Type
+  operator()(const TypeAtomic& a, const TypeAtomic& b)
+  {
+    if (a.index == b.index)
+    {
+      return a;
+    } else
+    {
+      TypeAtomicUnion u;
+      u.add(a);
+      u.add(b);
+
+      return u;
+    }
+  }
+
+  Type
+  operator()(const TypeAtomicUnion& a, const TypeAtomicUnion& b)
+  {
+    TypeAtomicUnion u = a;
+    u.join(b);
+
+    return u;
+  }
+
+  Type
+  join_union(const TypeAtomicUnion& a, const Constant& b)
+  {
+    TypeAtomicUnion u = a;
+    u.add(b);
+
+    return u;
+  }
+
+  Type
+  join_union(const TypeAtomicUnion& a, const TypeAtomic& b)
+  {
+    TypeAtomicUnion u = a;
+
+    u.add(b);
+
+    return u;
+  }
+
+  template <typename T, typename Dummy = typename is_union_valid<T>::type>
+  Type
+  operator()(const TypeAtomicUnion& a, const T& b)
+  {
+    return join_union(a, b);
+  }
+
+  template <typename T, typename Dummy = typename is_union_valid<T>::type>
+  Type
+  operator()(const T& a, const TypeAtomicUnion& b)
+  {
+    return join_union(b, a);
+  }
+};
+
 //builds lub with current and join, current could be TypeNothing
 Type
 build_lub_constructed(Type current, Type join)
 {
+  LUBConstructed lub;
+  return apply_visitor_double(lub, current, join);
+
+  #if 0
+
   //this could all be replaced with a double dispatch
   if (variant_is_type<TypeNothing>(current))
   {
@@ -120,22 +306,9 @@ build_lub_constructed(Type current, Type join)
   }
 
   throw BoundInvalid{BoundInvalid::LUB, current, join};
+
+  #endif
 }
-
-template <typename T>
-struct is_union_valid;
-
-template <>
-struct is_union_valid<Constant>
-{
-  typedef void type;
-};
-
-template <>
-struct is_union_valid<TypeAtomic>
-{
-  typedef void type;
-};
 
 struct GLBConstructed
 {
@@ -950,20 +1123,7 @@ TypeAtomicUnion::add(const Type& t)
   {
     const auto& a = get<TypeAtomic>(t);
 
-    atomics.insert(a.index);
-
-    //keep normalised, i.e., remove any constants that are covered by an
-    //atomic
-    auto iter = atomic_map.find(a.index);
-    if (iter != atomic_map.end())
-    {
-      for (const auto& v : iter->second)
-      {
-        constants.erase(v);
-      }
-
-      atomic_map.erase(iter);
-    }
+    add_atomic(a.index);
   }
   else if (variant_is_type<Constant>(t))
   {
@@ -1000,6 +1160,45 @@ TypeAtomicUnion::in(const Type& t) const
   }
   
   return false;
+}
+
+bool
+TypeAtomicUnion::atomic_in(type_index index) const
+{
+  return atomics.find(index) != atomics.end();
+}
+
+void
+TypeAtomicUnion::join(const TypeAtomicUnion& u)
+{
+  for (const auto& i : u.atomics)
+  {
+    add_atomic(i);
+  }
+
+  for (const auto& c : u.constants)
+  {
+    add(c);
+  }
+}
+
+void
+TypeAtomicUnion::add_atomic(type_index index)
+{
+  atomics.insert(index);
+
+  //keep normalised, i.e., remove any constants that are covered by an
+  //atomic
+  auto iter = atomic_map.find(index);
+  if (iter != atomic_map.end())
+  {
+    for (const auto& v : iter->second)
+    {
+      constants.erase(v);
+    }
+
+    atomic_map.erase(iter);
+  }
 }
 
 TypeAtomicUnion

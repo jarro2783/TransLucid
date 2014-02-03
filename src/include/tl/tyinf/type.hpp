@@ -127,6 +127,14 @@ namespace TransLucid
       bool
       in(const Type& t) const;
 
+      bool
+      atomic_in(type_index index) const;
+
+      void
+      join(const TypeAtomicUnion& u);
+
+      void add_atomic(type_index index);
+
       static
       TypeAtomicUnion
       intersection(const TypeAtomicUnion& a, const TypeAtomicUnion& b);
