@@ -1,5 +1,5 @@
 /* Type inference algorithm.
-   Copyright (C) 2013 Jarryd Beck
+   Copyright (C) 2013, 2014 Jarryd Beck
 
 This file is part of TransLucid.
 

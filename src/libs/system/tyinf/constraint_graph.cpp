@@ -65,6 +65,12 @@ struct HeadCompare
   {
     return a == b;
   }
+
+  bool
+  operator()(const Constant& a, const TypeAtomicUnion& u)
+  {
+    return u.in(a);
+  }
 };
 
 bool
@@ -476,6 +482,7 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   const TypeIntension* intenlhs = nullptr;
   const TypeIntension* intenrhs = nullptr;
   const TypeAtomicUnion* unionrhs = nullptr;
+  const TypeAtomicUnion* unionlhs = nullptr;
 
   if((lub = get<TypeLUB>(&c.lhs)) != nullptr)
   {
@@ -527,6 +534,11 @@ subc(const Constraint& c, std::vector<Constraint>& result)
   }
   else if ((unionrhs = get<TypeAtomicUnion>(&c.rhs)) != nullptr &&
             unionrhs->in(c.lhs))
+  {
+    //nothing to do here
+  }
+  else if ((unionlhs = get<TypeAtomicUnion>(&c.lhs)) != nullptr &&
+            unionlhs->within(c.rhs))
   {
     //nothing to do here
   }

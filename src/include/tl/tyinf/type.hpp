@@ -133,7 +133,11 @@ namespace TransLucid
       void
       join(const TypeAtomicUnion& u);
 
-      void add_atomic(type_index index);
+      void 
+      add_atomic(type_index index);
+
+      bool
+      within(const Type& t) const;
 
       static
       TypeAtomicUnion

@@ -121,12 +121,13 @@ struct LUBConstructed
     {
       return a;
     }
-    else if (a.index() == b.index())
+    else
     {
-      return TypeAtomic{type_index_names[a.index()], a.index()};
-    }
-    {
-      return TypeBot();
+      TypeAtomicUnion u;
+      u.add(a);
+      u.add(b);
+
+      return u;
     }
   }
 
@@ -1219,6 +1220,38 @@ TypeAtomicUnion::intersection
     std::inserter(result.atomics, result.atomics.end()));
 
   return result;
+}
+
+bool
+TypeAtomicUnion::within(const Type& t) const
+{
+  //if t is an atomic, and the union is completely inside the atomic
+  const TypeAtomic *a = get<TypeAtomic>(&t);
+
+  if (a != nullptr)
+  {
+    for (auto i : atomics)
+    {
+      if (i != a->index)
+      {
+        return false;
+      }
+    }
+
+    for (const auto& c : constants)
+    {
+      if (c.index() != a->index)
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 }
