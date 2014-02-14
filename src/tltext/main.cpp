@@ -166,6 +166,8 @@ int main(int argc, char *argv[])
     ("output,o", po::value<std::string>(), _("output file"))
     /* TRANSLATORS: the help message for --tyinf */
     ("tyinf", _("enable type inference"))
+    /* TRANSLATORS: the help message for --full-types */
+    ("fulltypes", _("print full non-display types"))
     /* TRANSLATORS: the help message for --uuid */
     ("uuid", _("print uuids"))
     /* TRANSLATORS: the help message for --verbose */
@@ -253,6 +255,11 @@ int main(int argc, char *argv[])
     if (vm.count("debug"))
     {
       tltext.debug();
+    }
+
+    if (vm.count("fulltypes"))
+    {
+      tltext.print_full_types(true);
     }
 
     if (vm.count("uuid"))

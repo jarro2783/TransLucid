@@ -244,6 +244,12 @@ namespace TransLucid
         }
       }
 
+      void
+      print_full_types(bool full = true)
+      {
+        m_fulltypes = full;
+      }
+
       private:
       std::string m_myname;
 
@@ -252,6 +258,7 @@ namespace TransLucid
       bool m_debug;
       bool m_cached;
       bool m_infer;
+      bool m_fulltypes;
 
       std::istream* m_is;
       std::ostream* m_os;

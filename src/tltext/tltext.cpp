@@ -671,38 +671,38 @@ TLText::typeInference(const std::vector<Tree::Expr>& exprs)
 
       *m_os << std::get<2>(displayed) << std::endl;
 
-      #if 0
-
-      *m_os << "== Full type == \n\n";
-
-      auto Aprinted = std::get<0>(separated.first).print_context(m_system);
-      auto Cprinted = std::get<2>(separated.first).print(m_system);
-
-      if (!Aprinted.empty())
+      if (m_fulltypes)
       {
-        *m_os << "A => ";
+
+        *m_os << "== Full type == \n\n";
+
+        auto Aprinted = std::get<0>(separated.first).print_context(m_system);
+        auto Cprinted = std::get<2>(separated.first).print(m_system);
+
+        if (!Aprinted.empty())
+        {
+          *m_os << "A => ";
+        }
+
+        *m_os 
+          << print_type(std::get<1>(separated.first), m_system)
+          << " | C\n\n== C ==\n\n";
+        *m_os << Cprinted << "\n";
+
+        if (!Aprinted.empty())
+        {
+          *m_os << "== A ==\n\n"
+            << Aprinted << "\n";
+        }
+
+        *m_os << "== TransLucid Context ==\n\n";
+
+        //*m_os << std::get<0>(display_context)
+        //  << "\n\n";
+        //*m_os << std::get<2>(display_context) << "\n";
+
+        *m_os << std::get<0>(display_context).print_context(m_system) << "\n";
       }
-
-      *m_os 
-        << print_type(std::get<1>(separated.first), m_system)
-        << " | C\n\n== C ==\n\n";
-      *m_os << Cprinted << "\n";
-
-      if (!Aprinted.empty())
-      {
-        *m_os << "== A ==\n\n"
-          << Aprinted << "\n";
-      }
-
-      *m_os << "== TransLucid Context ==\n\n";
-
-      //*m_os << std::get<0>(display_context)
-      //  << "\n\n";
-      //*m_os << std::get<2>(display_context) << "\n";
-
-      *m_os << std::get<0>(display_context).print_context(m_system) << "\n";
-
-      #endif
 
     }
   }
