@@ -253,6 +253,10 @@ fun union_construct!a!b = make_union.(a,b);;
 //convert to a from b
 fun convert!a!b [a is floatmp, b imp intmp] = floatmp_convert_intmp.b;;
 
+// max and min
+fun max.a.b = if a < b then b else a fi ;;
+fun min.a.b = if a < b then a else b fi ;;
+
 //var fby = \d -> \\X -> \\Y -> if #!d <= 0 then X else prev.d Y fi;;
 fun fby.d X Y = if #.d <= 0 then X else prev.d Y fi;;
 fun index!d = #.d + 1;;
