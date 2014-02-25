@@ -12,18 +12,33 @@ fun bubble_sort.d.n X = A where
   dim a <- n - 1 ;;
   dim b <- n - 1 ;;
 
-  var A = fby.b X (fby.a (A @ [a <- n - 1]) sort_swap.d.(#.a).(#.a + 1) A) ;;
+  //var A = fby.a X (sort_swap.d.(#.a).(#.a + 1) A) ;;
+
+  var A = fby.b X 
+    (fby.a (A @ [a <- n - 1]) (next.b (sort_swap.d.(#.a).(#.a + 1) A)) ) ;;
 end ;;
 
 var R = (random_lrc.0!45) % 26 ;;
 
 var S = bubble_sort.0.4 R ;;
 
+var swapped = sort_swap.0.1.2 R ;;
+
 %%
+
+swapped @ [0 <- 0] ;;
+swapped @ [0 <- 1] ;;
+swapped @ [0 <- 2] ;;
+swapped @ [0 <- 3] ;;
+
+$$ %%
+
 R @ [0 <- 0] ;;
 R @ [0 <- 1] ;;
 R @ [0 <- 2] ;;
 R @ [0 <- 3] ;;
+
+$$ %%
 
 S @ [0 <- 0] ;;
 S @ [0 <- 1] ;;
