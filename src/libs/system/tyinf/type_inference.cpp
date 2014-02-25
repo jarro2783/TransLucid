@@ -800,9 +800,9 @@ TypeInferrer::operator()(const Tree::HashExpr& e)
     {
       auto alpha = fresh();
       auto beta = fresh();
-      auto lower = fresh();
+      auto lowerbound = fresh();
 
-      A.addConstantDim(*lowerConstant, lower, beta);
+      A.addConstantDim(*lowerConstant, lowerbound, beta);
 
       C.add_to_closure(Constraint{beta, alpha});
       
