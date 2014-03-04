@@ -420,7 +420,7 @@ namespace TransLucid
       static void 
       initialise(Variant& v, Current&& current)
       {
-        v.construct(std::forward<Current>(current));
+        v.construct(std::move(current));
         v.indicate_which(Which);
       }
 
