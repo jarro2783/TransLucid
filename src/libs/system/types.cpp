@@ -276,6 +276,16 @@ print_constant(const Constant& c)
     return Types::Intmp::get(c).get_str();
     break;
 
+    case TYPE_INDEX_SPECIAL:
+    str << "special<" << get_constant<Special>(c) << ">";
+    return str.str();
+    break;
+
+    case TYPE_INDEX_USTRING:
+    str << "\"" << utf32_to_utf8(Types::String::get(c)) << "\"";
+    return str.str();
+    break;
+
     case TYPE_INDEX_CALC:
     return "calc";
     break;

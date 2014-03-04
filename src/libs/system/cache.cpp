@@ -28,6 +28,9 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include <iostream>
 
+//define this to debug the cache
+//#define TL_DEBUG_CACHE
+
 namespace TransLucid
 {
 
@@ -91,13 +94,21 @@ namespace
     operator()(const Constant& c, const Context& k, const Delta& delta, 
       Cache& cache) const
     {
+
       cache.hit();
 
       if (c.index() == TYPE_INDEX_CALC)
       {
-        //std::cerr << "calc already in cache" << std::endl;
+        #ifdef TL_DEBUG_CACHE
+        std::cerr << " = loop" << std::endl;
+        #endif
         return Types::Special::create(SP_LOOP);
       }
+
+      #ifdef TL_DEBUG_CACHE
+      std::cerr << " = " << print_constant(c) << std::endl;
+      #endif
+
       return c;
     }
 
@@ -108,7 +119,7 @@ namespace
       std::vector<dimension_index> demands;
       for (auto d : l.dims)
       {
-        if (delta.find(d) == delta.end())
+        if (!delta.contains(d))
         {
           demands.push_back(d);
         }
@@ -255,6 +266,10 @@ lookup_entry_map
   //find the value of the current dimension in the map
 
   Constant c = k.lookup(*iter);
+
+  #ifdef TL_DEBUG_CACHE
+  std::cerr << "(" << *iter << " = " << print_constant(c) << ")";
+  #endif
 
   auto entryiter = entry.find(c);
 
@@ -490,6 +505,10 @@ Cache::~Cache()
 Constant
 Cache::get(const Context& k, const Delta& delta)
 {
+  #ifdef TL_DEBUG_CACHE
+  std::cerr << "Cache::get ";
+  #endif
+
   if (!m_entry)
   {
     m_entry = new CacheLevel;
@@ -683,27 +702,38 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
 
     if (d.index() == TYPE_INDEX_CALC)
     {
-      //std::cerr << "cache node: " << m_name << ": calc" << std::endl;
+      #ifdef TL_DEBUG_CACHE
+      std::cerr << "cache node: " << m_name << ": calc" << std::endl;
+      #endif
+
       auto result = (*m_expr)(kappa, subdelta, w, t);
       m_cache.set(kappa, subdelta, result.second);
       d = result.second;
     }
-    //std::cerr << "cache node: " << m_name << ": result: " <<
-    //  print_constant(d) << std::endl;
+    #ifdef TL_DEBUG_CACHE
+    std::cerr << "cache node: " << m_name << ": result: " <<
+      print_constant(d) << std::endl;
+    #endif
 
     if (d.index() == TYPE_INDEX_DEMAND)
     {
-      //std::cerr << "cache node: " << m_name << ": demands:";
+      #ifdef TL_DEBUG_CACHE
+      std::cerr << "cache node: " << m_name << ": demands:";
+      #endif
       const auto& demands = Types::Demand::get(d);
 
       subdelta.insert(demands.dims().begin(), demands.dims().end());
 
       for (auto dim : demands.dims())
       {
-        //std::cerr << " " << dim << " = " << print_constant(kappa.lookup(dim));
+        #ifdef TL_DEBUG_CACHE
+        std::cerr << " " << dim << " = " << print_constant(kappa.lookup(dim));
+        #endif
         p.perturb(dim, kappa.lookup(dim));
       }
-      //std::cerr << std::endl;
+      #ifdef TL_DEBUG_CACHE
+      std::cerr << std::endl;
+      #endif
     }
     else
     {
@@ -723,10 +753,12 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
 
   Constant v = m_cache.get(kappa, delta);
 
-  //if (v.index() == TYPE_INDEX_SPECIAL && get_constant<Special>(v) == SP_LOOP)
-  //{
-    //std::cerr << m_name << " loop" << std::endl;
-  //}
+  #ifdef TL_DEBUG_CACHE
+  if (v.index() == TYPE_INDEX_SPECIAL && get_constant<Special>(v) == SP_LOOP)
+  {
+    std::cerr << m_name << " loop" << std::endl;
+  }
+  #endif
 
   return std::make_pair(t, v);
 }

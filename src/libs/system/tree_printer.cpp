@@ -653,6 +653,10 @@ class TreePrinter
     m_os << "\\_";
     print_binds(f.binds);
 
+    m_os << "{";
+    print_container(m_os, f.scope);
+    m_os << "}";
+
     if (f.params.size() > 1)
     {
       m_os << "(";

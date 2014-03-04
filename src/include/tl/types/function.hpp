@@ -228,13 +228,16 @@ namespace TransLucid
       }
 
       Context newk;
+      Delta newd(true);
       ContextPerturber p(newk, m_binds);
-      DeltaPerturber pd(d);
+      DeltaPerturber pd(newd);
+
+      pd.perturb(m_binds);
 
       p.perturb({{m_dims.at(0), c}});
       pd.perturb(m_dims.at(0));
 
-      return (*m_expr)(newk, d, w, t);
+      return (*m_expr)(newk, newd, w, t);
     }
 
     TimeConstant
@@ -248,8 +251,11 @@ namespace TransLucid
       }
 
       Context newk;
+      Delta newd(true);
       ContextPerturber p(newk, m_binds);
-      DeltaPerturber pd(d);
+      DeltaPerturber pd(newd);
+
+      pd.perturb(m_binds);
 
       //these ranges are the same length because we just checked it
       auto dimIter = m_dims.begin();
@@ -263,7 +269,7 @@ namespace TransLucid
         ++argIter;
       }
 
-      return (*m_expr)(newk, d, w, t);
+      return (*m_expr)(newk, newd, w, t);
     }
 
     BaseFunctionAbstraction*
@@ -493,10 +499,13 @@ namespace TransLucid
         m_binds.push_back(std::make_pair(d, k.lookup(d)));
       }
 
+      //std::cerr << "binding in function:" << std::endl;
       for (auto d : scope)
       {
+        //std::cerr << d << " ";
         m_binds.push_back(std::make_pair(d, k.lookup(d)));
       }
+      //std::cerr << std::endl;
     }
 
     ValueFunctionType*

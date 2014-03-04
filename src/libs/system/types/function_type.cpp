@@ -171,7 +171,7 @@ createValueFunctionCachedNew
 
   for (auto d : binds)
   {
-    if (delta.find(d) == delta.end())
+    if (!delta.contains(d))
     {
       demands.push_back(d);
     }
@@ -179,8 +179,10 @@ createValueFunctionCachedNew
 
   for (auto d : scope)
   {
-    if (delta.find(d) == delta.end())
+    if (!delta.contains(d))
     {
+      std::cerr << "cbv function " << argDim << " needs dimension " << d
+        << std::endl;
       demands.push_back(d);
     }
   }

@@ -736,7 +736,7 @@ MakeIntenWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
     {
       auto i = m_system.getDimensionIndex(c);
 
-      if (d.find(i) == d.end())
+      if (!d.contains(i))
       {
         demands.push_back(i);
       }
@@ -744,7 +744,7 @@ MakeIntenWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
     
     for (auto& c : m_scope)
     {
-      if (d.find(c) == d.end())
+      if (!d.contains(c))
       {
         demands.push_back(c);
       }
@@ -1033,7 +1033,7 @@ HashWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
   }
 
   auto dim = m_system.getDimensionIndex(r.second);
-  if (d.find(dim) == d.end())
+  if (!d.contains(dim))
   {
     return std::make_pair(r.first, Types::Demand::create({dim}));
   }
@@ -1550,7 +1550,7 @@ BaseAbstractionWS::operator()
   //are the bound dimensions in the context?
   for (auto dim : binds)
   {
-    if (d.find(dim) == d.end())
+    if (!d.contains(dim))
     {
       demands.push_back(dim);
     }
@@ -1558,9 +1558,16 @@ BaseAbstractionWS::operator()
 
   for (auto dim : m_scope)
   {
-    if (d.find(dim) == d.end())
+    if (!d.contains(dim))
     {
+      std::cerr << "bang function " << m_dims.at(0) <<
+        " needs scope dim " << dim << std::endl;
       demands.push_back(dim);
+    }
+    else 
+    {
+      std::cerr << "bang function " << m_dims.at(0) << " binding " << dim
+        << " in scope" << std::endl;
     }
   }
 

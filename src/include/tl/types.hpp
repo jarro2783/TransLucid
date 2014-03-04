@@ -317,7 +317,56 @@ namespace TransLucid
 
   typedef std::pair<size_t, Constant> TimeConstant;
 
-  typedef std::set<dimension_index> Delta;
+  //typedef std::set<dimension_index> Delta;
+  class Delta
+  {
+    public:
+    Delta(bool all = false)
+    : m_all(all)
+    {
+    }
+
+    private:
+    std::set<dimension_index> m_delta;
+    bool m_all;
+
+    public:
+
+    auto
+    insert(dimension_index d)
+      -> decltype(m_delta.insert(d))
+    {
+      return m_delta.insert(d);
+    }
+
+    template <typename Iterator>
+    auto
+    insert(Iterator begin, Iterator end)
+      -> decltype(m_delta.insert(begin, end))
+    {
+      return m_delta.insert(begin, end);
+    }
+
+    auto
+    erase(dimension_index d)
+      -> decltype(m_delta.erase(d))
+    {
+      return m_delta.erase(d);
+    }
+
+    bool
+    contains(dimension_index d) const
+    {
+      if (m_all)
+      {
+        return true;
+      }
+      else
+      {
+        return m_delta.find(d) != m_delta.end();
+      }
+    }
+  };
 
   //this is just for debugging, it doesn't do much
   std::string

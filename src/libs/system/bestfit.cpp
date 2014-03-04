@@ -1203,7 +1203,7 @@ ConditionalBestfitWS::operator()
         bool hasdemands = false;
         for (const auto& index : *context)
         {
-          if (d.find(index.first) == d.end())
+          if (!d.contains(index.first))
           {
             demands.push_back(index.first);
             hasdemands = true;
