@@ -1560,14 +1560,7 @@ BaseAbstractionWS::operator()
   {
     if (!d.contains(dim))
     {
-      std::cerr << "bang function " << m_dims.at(0) <<
-        " needs scope dim " << dim << std::endl;
       demands.push_back(dim);
-    }
-    else 
-    {
-      std::cerr << "bang function " << m_dims.at(0) << " binding " << dim
-        << " in scope" << std::endl;
     }
   }
 

@@ -366,6 +366,18 @@ namespace TransLucid
         return m_delta.find(d) != m_delta.end();
       }
     }
+
+    decltype(m_delta.begin())
+    begin() const
+    {
+      return m_delta.begin();
+    }
+
+    decltype(m_delta.end())
+    end() const
+    {
+      return m_delta.end();
+    }
   };
 
   //this is just for debugging, it doesn't do much

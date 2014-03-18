@@ -720,7 +720,18 @@ CacheWS::operator()(Context& kappa, Delta& delta, const Thread& w, size_t t)
       #ifdef TL_DEBUG_CACHE
       std::cerr << "cache node: " << m_name << ": demands:";
       #endif
+
+      std::vector<dimension_index> diff;
       const auto& demands = Types::Demand::get(d);
+
+      std::set_difference(demands.dims().begin(), demands.dims().end(),
+        delta.begin(), delta.end(),
+        std::back_inserter(diff));
+
+      if (diff.size() != 0)
+      {
+        return TimeConstant(t, Types::Demand::create(diff));
+      }
 
       subdelta.insert(demands.dims().begin(), demands.dims().end());
 

@@ -716,7 +716,6 @@ namespace TransLucid
     return get<T>(&v) != nullptr;
   }
 
-
   template 
   <
     typename Visitor,
