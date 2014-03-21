@@ -37,6 +37,18 @@ where
   var Y = fby.a X (remove_dim.d.b.(F*2) (merge.d L R)) ;;
 end;;
 
+fun rotate.a.b X = X @ [a <- #.b] ;;
+
+fun merge_sort_2.d.n X = Y
+where
+  dim a <- 0 ;;
+  dim b <- ilog.n ;;
+
+  var Y = fby.b 
+    (default₁.a.0.0.infty (rotate.d.a (default₁.d.0.(n-1).infty X)))
+    (merge.d (Y @ [a <- #.a * 2]) (Y @ [a <- #.a * 2 + 1]))
+end ;;
+
 var A = #.0 ;;
 var B = #.0 * 2 ;;
 

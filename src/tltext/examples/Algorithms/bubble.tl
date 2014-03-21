@@ -21,7 +21,7 @@ fun bubble_sort_faster.d.n X = A where
   dim b <- n - 1 ;;
 
   var A = fby.b X 
-    (fby.a (A @ [a <- n - #.a - 1]) (next.b (sort_swap.d.(#.a).(#.a + 1) A)) ) 
+    (fby.a (A @ [a <- n - #.b]) (next.b (sort_swap.d.(#.a).(#.a + 1) A)) ) 
     ;;
 end ;;
 
