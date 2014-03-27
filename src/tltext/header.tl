@@ -369,11 +369,11 @@ where
 end ;;
 
 // The merge function, X and Y are assumed to be comparable.
-fun merge.d X Y = if Xʹ <= Yʹ then Xʹ else Yʹ fi
-where
-  var Xʹ = upon.d X (Xʹ <= Yʹ) ;;
-  var Yʹ = upon.d Y (Yʹ <= Xʹ) ;;
-end ;;
+//fun merge.d X Y = if Xʹ <= Yʹ then Xʹ else Yʹ fi
+//where
+//  var Xʹ = upon.d X (Xʹ <= Yʹ) ;;
+//  var Yʹ = upon.d Y (Yʹ <= Xʹ) ;;
+//end ;;
 
 // The as-soon-as function, B is assumed to be Boolean.
 fun asa.d X B = first.d (wvr.d X B) ;;

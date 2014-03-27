@@ -1,4 +1,4 @@
-fun random_lrc.d!seed = Rand where
+fun random_lcg.d!seed = Rand where
   var Rand = fby.d seed ((1664525 * Rand + 1013904223) % 4294967296) ;;
 end ;;
 
@@ -7,8 +7,8 @@ fun max_wvr.d.n X B = M @ [d <- n + 1] where
   var M = fby.d 0 (if B && (X > M) then X else M fi) ;;
 end ;;
 
-var weights = (random_lrc.0!16) % 25 + 1 ;;
-var values = (random_lrc.0!1) % 40 ;;
+var weights = (random_lcg.0!16) % 25 + 1 ;;
+var values = (random_lcg.0!1) % 40 ;;
 
 fun knapsack_unbounded.d.n W V = K where
   dim a <- 0 ;;

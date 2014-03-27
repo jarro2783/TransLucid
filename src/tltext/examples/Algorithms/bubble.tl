@@ -1,4 +1,4 @@
-fun random_lrc.d!seed = Rand where
+fun random_lcg.d!seed = Rand where
   var Rand = fby.d seed ((1664525 * Rand + 1013904223) % 4294967296) ;;
 end ;;
 
@@ -25,7 +25,7 @@ fun bubble_sort_faster.d.n X = A where
     ;;
 end ;;
 
-var R = (random_lrc.0!45) % 26 ;;
+var R = (random_lcg.0!45) % 26 ;;
 
 var S = bubble_sort.0.4 R ;;
 

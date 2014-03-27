@@ -1,8 +1,8 @@
-fun random_lrc.d!seed = Rand where
+fun random_lcg.d!seed = Rand where
   var Rand = fby.d seed ((1664525 * Rand + 1013904223) % 4294967296) ;;
 end ;;
 
-var R = (random_lrc.0!45) % 25 ;;
+var R = (random_lcg.0!45) % 25 ;;
 
 %%
 
