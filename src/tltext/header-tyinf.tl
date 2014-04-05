@@ -389,7 +389,7 @@ fun LofPair.d X = X @ [d <- #.d * 2] ;;
 fun RofPair.d X = X @ [d <- #.d * 2 + 1] ;;
 
 // The integer log function, for depth of divide-and-conquer.
-fun ilog.n = asa.d (#.d) (double > n)
+fun ilog.n = asa.d (#.d) (double >= n)
 where
   dim d <- 0 ;;
   var double = fby.d 1 (double * 2) ;;

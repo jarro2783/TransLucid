@@ -7,26 +7,39 @@ fun max_wvr.d.n X B = M @ [d <- n + 1] where
   var M = fby.d 0 (if B && (X > M) then X else M fi) ;;
 end ;;
 
+fun Max.d.n X = M @ [d <- n + 1] 
+where
+  var M = fby.d neginfty (if X > M then X else M fi) ;;
+end ;;
+
 var weights = (random_lcg.0!16) % 25 + 1 ;;
 var values = (random_lcg.0!1) % 40 ;;
 
 fun knapsack_unbounded.d.n W V = K where
   dim a <- 0 ;;
-  var K = if #.d <= 0 then 0 else
-    max_wvr.a.n 
-    ((V @ [d <- #.a]) + (K @ [d <- #.d - (W @ [d <- #.a]) ]) )
-    ((W @ [d <- #.a]) <= #.d)
-    fi ;;
+  var K = fby.d 0 (
+      //max_wvr.a.n 
+      //(Va + (K @ [d <- #.d - Wa ]) )
+      //(Wa <= #.d)
+      Max.a.n (wvr.a (Va + (K @ [d <- #.d - Wa])) (Wa <= #.d))
+    ) ;;
+  var Va = rotate.d.a V ;;
+  var Wa = rotate.d.a W ;;
 end ;;
 
 var ws = #.0 + 1 ;;
 var vs = #.0 + 2 ;;
 
-var K = if #.0 <= 0 then 0 else
-  max_wvr.2.1 
-  ((vs @ [0 <- #.2]) + (K @ [0 <- (#.0 - (ws @ [0 <- #.2])) ]) )
-  ((ws @ [0 <- #.2]) <= #.0)
-  fi ;;
+//var K = if #.0 <= 0 then 0 else
+//  max_wvr.2.1 
+//  ((vs @ [0 <- #.2]) + (K @ [0 <- (#.0 - (ws @ [0 <- #.2])) ]) )
+//  ((ws @ [0 <- #.2]) <= #.0)
+//  fi ;;
+
+var K2 = fby.0 0 (
+  wvr.1 ((rotate.d.a weights) + K2 @ [0 <- #.0 - (rotate.d.a weights))
+    ((rotate.d.a weights) <= #.d)
+    ) ;;
 
 var M = max_wvr.2.25
   (values @ [0 <- #.2])
