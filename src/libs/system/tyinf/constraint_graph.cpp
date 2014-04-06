@@ -372,7 +372,7 @@ ConstraintGraph::check_single_conditional
 )
 {
   HeadCompare head;
-  if (apply_visitor_double(head, cc->s, var->second.lower))
+  if (apply_visitor_binary(head, cc->s, var->second.lower))
   {
     add_to_closure(Constraint{cc->lhs, cc->rhs});
   }

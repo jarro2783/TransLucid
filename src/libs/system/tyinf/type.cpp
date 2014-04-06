@@ -217,7 +217,7 @@ Type
 build_lub_constructed(Type current, Type join)
 {
   LUBConstructed lub;
-  return apply_visitor_double(lub, current, join);
+  return apply_visitor_binary(lub, current, join);
 
   #if 0
 
@@ -476,7 +476,7 @@ Type
 build_glb_constructed(const Type& current, const Type& join)
 {
   GLBConstructed construct;
-  return apply_visitor_double(construct, current, join);
+  return apply_visitor_binary(construct, current, join);
 
   #if 0
   if (variant_is_type<TypeNothing>(current))

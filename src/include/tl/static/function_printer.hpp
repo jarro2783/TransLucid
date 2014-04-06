@@ -23,18 +23,21 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/static/function.hpp>
 #include <tl/output.hpp>
 
-namespace TransLucid
+namespace Juice
 {
   //this has to be here, because Static::Functor is actually a 
   //TransLucid::Variant of stuff
   template <typename Prop>
   std::ostream& operator<<(std::ostream& os,
-    const Static::Functor<Prop>& f)
+    const TransLucid::Static::Functor<Prop>& f)
   {
-    os << Static::print_functor(f);
+    os << TransLucid::Static::print_functor(f);
     return os;
   }
+}
 
+namespace TransLucid
+{
   namespace Static
   {
     namespace detail

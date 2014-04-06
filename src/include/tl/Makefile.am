@@ -40,6 +40,7 @@ includes_HEADERS = \
   system_util.hpp \
   tree_printer.hpp tree_rewriter.hpp tree_to_wstree.hpp trie.hpp \
   types.hpp types_basic.hpp types_fwd.hpp types_util.hpp utility.hpp \
-  uuid.hpp variant.hpp workshop.hpp workshop_builder.hpp
+  uuid.hpp workshop.hpp workshop_builder.hpp \
+  juice/mpl.hpp juice/variant.hpp
 
 EXTRA_DIST = CMakeLists.txt

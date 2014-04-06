@@ -30,13 +30,19 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/types.hpp>
 #include <tl/gmpxx_fwd.hpp>
 
-namespace TransLucid
+namespace Juice
 {
   template <typename First, typename... Types>
   class Variant;
 
   template <typename T>
   class recursive_wrapper;
+}
+
+namespace TransLucid
+{
+  using Juice::Variant;
+  using Juice::recursive_wrapper;
 
   namespace Tree
   {

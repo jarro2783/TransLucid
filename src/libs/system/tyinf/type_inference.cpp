@@ -1691,7 +1691,7 @@ struct CompareHead
   bool
   less(const Type& a, const Type& b) const
   {
-    return apply_visitor_double(*this, a, b);
+    return apply_visitor_binary(*this, a, b);
   }
 
   bool

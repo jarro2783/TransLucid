@@ -33,7 +33,7 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/parser_api.hpp>
 #include <tl/parser_iterator.hpp>
 #include <tl/system.hpp>
-#include <tl/variant.hpp>
+#include <tl/juice/variant.hpp>
 
 namespace TransLucid
 {
