@@ -17,7 +17,8 @@ add_custom_target(generate_static_lexer DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp)
 
 set (SYSTEM_SOURCES
-assignment.cpp ast.cpp bestfit.cpp builtin_types.cpp cache.cpp charset.cpp
+assignment.cpp ast.cpp bestfit.cpp builtin_types.cpp cache.cpp cacheio.cpp
+charset.cpp
 chi.cpp context.cpp datadef.cpp dependencies.cpp dimtranslator.cpp 
 equation.cpp
 eval_workshops.cpp free_variables.cpp
