@@ -162,7 +162,7 @@ namespace TransLucid
     }
 
     void
-    fillDelta(Delta& d)
+    fillDelta(Delta& d) const
     {
       auto m = min();
       ++m;

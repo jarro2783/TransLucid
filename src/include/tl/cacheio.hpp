@@ -21,9 +21,23 @@ along with TransLucid; see the file COPYING.  If not see
 #define TL_CACHE_IO_HPP_INCLUDED
 
 #include <tl/cache.hpp>
+#include <tl/hyperdaton.hpp>
 
 namespace TransLucid
 {
+  class CacheIO : public IOHD
+  {
+    public:
+
+    void
+    put(const Context& k, const Constant& c);
+
+    Constant
+    get(const Context& k) const;
+
+    private:
+    mutable Cache m_cache;
+  };
 }
 
 #endif

@@ -18,3 +18,33 @@ along with TransLucid; see the file COPYING.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 #include <tl/cacheio.hpp>
+#include <tl/fixed_indexes.hpp>
+
+namespace TransLucid
+{
+
+void
+CacheIO::put(const Context& k, const Constant& c)
+{
+  Delta d;
+  k.fillDelta(d);
+
+  m_cache.set(k, d, c);
+}
+
+Constant
+CacheIO::get(const Context& k) const
+{
+  Delta d;
+  k.fillDelta(d);
+  auto r = m_cache.get(k, d);
+
+  if (r.index() == TYPE_INDEX_DEMAND || r.index() == TYPE_INDEX_CALC)
+  {
+    return Types::Special::create(SP_UNDEF);
+  }
+
+  return r;
+}
+
+}
