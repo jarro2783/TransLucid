@@ -7,6 +7,11 @@ fun max_wvr.d.n X B = M @ [d <- n + 1] where
   var M = fby.d 0 (if B && (X > M) then X else M fi) ;;
 end ;;
 
+fun fold_wvr.d.f.z X B = F
+where
+  var F = fby.d z if B then f!F!X else F fi ;;
+end ;;
+
 fun Max.d.n X = M @ [d <- n + 1] 
 where
   var M = fby.d neginfty (if X > M then X else M fi) ;;
@@ -21,7 +26,9 @@ fun knapsack_unbounded.d.n W V = K where
       //max_wvr.a.n 
       //(Va + (K @ [d <- #.d - Wa ]) )
       //(Wa <= #.d)
-      Max.a.n (wvr.a (Va + (K @ [d <- #.d - Wa])) (Wa <= #.d))
+      //Max.a.n (wvr.a (Va + (K @ [d <- #.d - Wa])) (Wa <= #.d))
+      (fold_wvr.a.max.0 (Va + (K @ [d <- #.d - Wa ]) ) (Wa <= #.d))
+        @ [a <- n + 1]
     ) ;;
   var Va = rotate.d.a V ;;
   var Wa = rotate.d.a W ;;
@@ -64,6 +71,10 @@ values @ [0 <- 3] ;;
 $$ %%
 
 max_wvr.0.5 weights (#.0 % 1 == 0) ;;
+fold_wvr.0.max.neginfty weights (weights < #.0) @ [0 <- 0] ;;
+fold_wvr.0.max.neginfty weights (weights < #.0) @ [0 <- 18] ;;
+fold_wvr.0.max.neginfty weights (weights < #.0) @ [0 <- 19] ;;
+fold_wvr.0.max.neginfty weights (weights < #.0) @ [0 <- 20] ;;
 
 $$ %%
 
