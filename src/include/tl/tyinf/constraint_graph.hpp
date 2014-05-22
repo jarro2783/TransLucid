@@ -189,6 +189,14 @@ namespace TransLucid
 
         std::map<ConditionalNode*, ConditionalNode*> noderewrites;
 
+        //go through the domain and rename everything first, then add
+        //things later, this makes it deterministic
+        for (const auto& v : C.m_graph)
+        {
+          auto r = rewrite.rename_var(v.first);
+          result.m_graph[r] = ConstraintNode();
+        }
+
         //rewrite the conditional constraints
         for (auto ccn : C.m_conditionals)
         {

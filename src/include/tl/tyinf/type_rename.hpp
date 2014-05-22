@@ -63,9 +63,10 @@ namespace TransLucid
       {
         using std::placeholders::_1;
 
-        TypeContext A = TypeContext::rewrite(std::get<0>(t), Rewriter{*this});
-
+        //rename the constraint graph first so that it is deterministic
         ConstraintGraph C = rename_graph(std::get<2>(t));
+
+        TypeContext A = TypeContext::rewrite(std::get<0>(t), Rewriter{*this});
 
         auto tr = apply_visitor(*this, std::get<1>(t));
 
