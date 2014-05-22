@@ -1292,9 +1292,9 @@ class CanoniseVars
       auto gamma = m_fresh.fresh();
       auto lambda = m_fresh.fresh();
 
-      //std::cout << "S = {";
+      //std::cerr << "S = {";
       //print_container(std::cout, vars);
-      //std::cout << "} |-> (" << gamma << ", " << lambda << ")" << std::endl;
+      //std::cerr << "} |-> (" << gamma << ", " << lambda << ")" << std::endl;
 
       iter = m_rewrites.insert
         (std::make_pair(vars, CanoniseReplaced{gamma, lambda})).first;
@@ -1426,7 +1426,8 @@ class CanoniseRewriter
   TypeVariable
   rename_var(TypeVariable v) const
   {
-    return get<TypeVariable>(rewrite_type(v));
+    //return get<TypeVariable>(rewrite_type(v));
+    return v;
   }
 
   Type

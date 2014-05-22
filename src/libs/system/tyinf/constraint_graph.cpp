@@ -598,8 +598,12 @@ ConstraintGraph::print_internal(Printer&& p) const
   for (const auto& var : m_graph)
   {
     //lower bound
-    result += p(var.second.lower) + U", ";
+    result += p(var.second.lower);
     //less than
+    if (var.second.less.size() > 0)
+    {
+      result += U"   ";
+    }
     result += print_type_variable_list(p, var.second.less);
     result += U" ≤ ";
     //the var
@@ -607,8 +611,12 @@ ConstraintGraph::print_internal(Printer&& p) const
     result += U" ≤ ";
     //greater than
     result += print_type_variable_list(p, var.second.greater);
+    if (var.second.greater.size() > 0)
+    {
+      result += U"   ";
+    }
     //upper bound
-    result += U", " + p(var.second.upper);
+    result += p(var.second.upper);
 
     //conditional constraints
     for (const auto& cc : var.second.conditions)
