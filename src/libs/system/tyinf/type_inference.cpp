@@ -142,7 +142,7 @@ TypeInferrer::simplify(TypeScheme t)
   std::get<0>(S).instantiate_parameters(std::get<2>(S));
   #ifndef TL_TYINF_NO_SIMPLIFY
   //now, to sort out the TL context, rerun simplification
-  S = minimise(garbage_collect(canonise(S, m_freshVars)));
+  //S = minimise(garbage_collect(canonise(S, m_freshVars)));
   #endif
 
   return S;
@@ -2247,7 +2247,7 @@ struct ReplaceDisplay : private GenericTypeTransformer<ReplaceDisplay>
         else
         {
           //variable has no unique bound, in which case it is itself
-          std::cout << v << " has no unique bound" << std::endl;
+          //std::cout << v << " has no unique bound" << std::endl;
           bound = v;
           m_uniqueBounds[v] = v;
           m_unreplaced.insert(v);
@@ -2391,11 +2391,8 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
 
   while (itera != rewrites.end())
   {
-    //iterb = itera;
-    //if (iterb != rewrites.end())
-    //{
-      ++iterb;
-    //}
+    iterb = itera;
+    ++iterb;
 
     while (iterb != rewrites.end())
     {
