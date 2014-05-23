@@ -2373,9 +2373,17 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
       lub = construct_lub(lub, C.lower(v));
     }
 
-    C.setUpper(current.second.gamma, apply_visitor(canon, glb, TagNegative()));
-    C.setLower(current.second.lambda, 
-      apply_visitor(canon, lub, TagPositive()));
+    //don't add it if the types are top and bot
+    if (variant_is_type<TypeTop>(glb))
+    {
+      C.setUpper(current.second.gamma, 
+        apply_visitor(canon, glb, TagNegative()));
+    }
+    if (variant_is_type<TypeBot>(lub))
+    {
+      C.setLower(current.second.lambda, 
+        apply_visitor(canon, lub, TagPositive()));
+    }
 
     //if there exists a beta in S such that beta < a, set gamma < a
     //if there exists a beta in S such that a < beta, set a < lambda
