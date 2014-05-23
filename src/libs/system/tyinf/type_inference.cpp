@@ -126,16 +126,16 @@ TypeInferrer::simplify(TypeScheme t)
   //std::get<0>(t).fix_context(std::get<2>(t));
   auto S = 
   #ifndef TL_TYINF_NO_SIMPLIFY
-    minimise(
-      garbage_collect(
+    //minimise(
+      //garbage_collect(
         canonise(
   #endif
           t
   #ifndef TL_TYINF_NO_SIMPLIFY
           , m_freshVars
         )
-      )
-    )
+      //)
+    //)
   #endif
   ;
 

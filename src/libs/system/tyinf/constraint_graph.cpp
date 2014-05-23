@@ -766,7 +766,8 @@ ConstraintGraph::rewrite_less(TypeVariable gamma, const VarSet& S)
     auto iter = S.begin();
     while (!found && iter != S.end())
     {
-      if (less(*iter, v.first))
+      //don't add variables that are less than themselves
+      if (less(*iter, v.first) && *iter != v.first)
       {
         found = true;
         add_less_closed(gamma, v.first);
@@ -786,7 +787,8 @@ ConstraintGraph::rewrite_greater(TypeVariable lambda, const VarSet& S)
     auto iter = S.begin();
     while (!found && iter != S.end())
     {
-      if (less(v.first, *iter))
+      //don't add variables that are less than themselves
+      if (less(v.first, *iter) && *iter != v.first)
       {
         found = true;
         add_less_closed(v.first, lambda);
