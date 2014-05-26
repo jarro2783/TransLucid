@@ -2374,12 +2374,12 @@ canonise(const TypeScheme& t, FreshTypeVars& fresh)
     }
 
     //don't add it if the types are top and bot
-    if (variant_is_type<TypeTop>(glb))
+    if (!variant_is_type<TypeTop>(glb))
     {
       C.setUpper(current.second.gamma, 
         apply_visitor(canon, glb, TagNegative()));
     }
-    if (variant_is_type<TypeBot>(lub))
+    if (!variant_is_type<TypeBot>(lub))
     {
       C.setLower(current.second.lambda, 
         apply_visitor(canon, lub, TagPositive()));
