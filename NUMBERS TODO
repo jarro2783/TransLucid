@@ -1,0 +1,23 @@
+discussion about numbers
+
+so, i think we have finally solved what was vexing us for months.
+For fixed-precision types, there are two annex variables: precision, and protected (Boolean).
+These are set (and there are standard defaults) at each instant.
+If the user wants to be more precise, each fixed-precision type actually defines a whole set of types:
+so fixedint includes "signed, 8-bit, protected" and "unsigned, 128-bit, unprotected", etc.
+if you are working from GNU mp floating-point, there are a lot more, since the precision can be increased as much as necessary.
+And there are a whole pile of explicit conversion operators.
+We need syntax, and it needs to be implemented ( a fair amount of work ), but the ideas are all there.
+
+the only fiddly detail would be making sure that the types are correct and consistent
+since each type needs to be named and have a type index
+and there is now an infinite number of possible types
+so you would generate the type index on the fly, and perhaps call it floatmp128
+floatmp256
+etc
+but then if you type it in as floatmp"2", you don't actually get a floatmp"2", you get a floatmp128"2"
+
+you would have to write
+construct_literal ! t ! v [t regex "floatmp[0-9]+"] =
+
+and something slightly more complicated for the integers.
