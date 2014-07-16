@@ -391,22 +391,27 @@ namespace TransLucid
       {U"floatmp_convert_intmp", &float_convert_intmp},
 
       {U"bool_eq", &boolean_eq},
-      {U"ustring_plus", &ustring_plus_fn},
+
       {U"make_range", &range_create},
       {U"make_range_infty", &range_create_inf},
       {U"make_range_neginfty", &range_create_neginf},
       {U"make_range_infinite", &range_create_infinity},
+
       {U"construct_intmp", &construct_integer},
       {U"construct_special", &construct_special},
       {U"construct_uuid", &construct_uuid},
       {U"construct_floatmp", &construct_floatmp},
-      {U"is_printable", &icu_is_printable},
+
+      {U"ustring_concatenate", &ustring_plus_fn},
       {U"string_at_base", &string_at_base},
       {U"substring_base", &substring_base},
       {U"substring_toend_base", &substring_toend_base},
+
+      {U"is_printable", &icu_is_printable},
       {U"code_point", &uchar_code_point},
       {U"code_point_4", &code_point_4},
       {U"code_point_8", &code_point_8},
+
       {U"print_intmp", &print_intmp},
       {U"print_uchar", &print_uchar},
       //{U"print_special", &print_special},
@@ -416,6 +421,7 @@ namespace TransLucid
       {U"print_error", &print_error},
       {U"print_uuid", &print_uuid},
       {U"print_floatmp", &print_floatmp},
+
       {U"make_union", &construct_union},
       {U"type_index", &get_type_index}
     };

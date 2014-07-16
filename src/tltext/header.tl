@@ -239,7 +239,7 @@ fun eq!a!b [a imp bool, b imp bool] = bool_eq.(a,b);;
 fun bool_and a b = if a then b else false fi;;
 fun bool_or a b = if a then true else b fi;;
 
-fun concatenate!a!b [a imp ustring, b imp ustring] = ustring_plus.(a,b);;
+fun concatenate!a!b [a imp ustring, b imp ustring] = ustring_concatenate.(a,b);;
 
 fun abs!a [a imp floatmp] = floatmp_abs.a;;
 
