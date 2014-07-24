@@ -138,6 +138,7 @@ fun eq!a!b [a imp bool, b imp bool] = bool_eq.(a,b);;
 
 fun bool_and a b = if a then b else false fi;;
 fun bool_or a b = if a then true else b fi;;
+fun not!b = if b then false else true fi ;;
 
 fun concatenate!a!b [a imp ustring, b imp ustring] = ustring_concatenate.(a,b);;
 
@@ -254,6 +255,8 @@ fun canonical_print!c [c is neginfty] = "neginfty";;
 //fun canonical_print!c = "cannot print this thing";;
 
 var RETURN = 0;;
+
+fun translate.d.n X = X @ [d <- #.d + n] ;;
 
 // The first function.
 fun first.d X = X @ [d <- 0] ;;
