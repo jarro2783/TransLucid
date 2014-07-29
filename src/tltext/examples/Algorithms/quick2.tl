@@ -42,7 +42,7 @@ end ;;
 
 var R = (random_lcg.0!89) % 51 ;;
 
-var sorted = quick_sort.0.0.4 R ;;
+var sorted = quick_sort.0.0.6 R ;;
 
 var small = quick_sort.0.0.3 R ;;
 
@@ -65,16 +65,16 @@ R @ [0 <- 14] ;;
 
 $$%%
 
-small @ [0 <- 0] ;;
-small @ [0 <- 1] ;;
-small @ [0 <- 2] ;;
+//small @ [0 <- 0] ;;
+//small @ [0 <- 1] ;;
+//small @ [0 <- 2] ;;
 
 $$%%
 
-sorted @ [0 <- 0] ;;
-sorted @ [0 <- 1] ;;
-sorted @ [0 <- 2] ;;
-sorted @ [0 <- 3] ;;
+//sorted @ [0 <- 0] ;;
+//sorted @ [0 <- 1] ;;
+//sorted @ [0 <- 2] ;;
+//sorted @ [0 <- 3] ;;
 //sorted @ [0 <- 4] ;;
 //sorted @ [0 <- 5] ;;
 //sorted @ [0 <- 6] ;;
