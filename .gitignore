@@ -10,7 +10,10 @@ Makefile.in
 /depcomp
 /install-sh
 /ltmain.sh
+
 .*.swp
+.*.swo
+
 Makefile.in.in
 Rules-quot
 boldquot.sed
