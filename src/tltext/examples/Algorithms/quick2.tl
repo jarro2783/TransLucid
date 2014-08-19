@@ -7,31 +7,28 @@ where
   var Y = X ;;
 end ;;
 
-fun quick_sort.d.m.n X = if #.d < m || #.d >= n then X else result fi
+fun quick_sort.d.m.n X = //partition
+if #.d < m || #.d >= n then X else result fi
 where
-  dim a <- 0 ;;
+  dim a <- n - m - 2 ;;
   var pivot = X @ [d <- pivoti] ;;
-  var pivoti = (m + n - 1) / 2 ;;
-  var swaplower = (P @ [d <- current]) < pivot ;;
-  var upper = upon.a (n - #.a - 2) (not!swaplower) ;;
-  var current = upon.a (#.a + m) swaplower ;;
+  var pivoti = (n - m) / 2 + m ;;
+  var doswap = (P @ [d <- current]) < pivot ;;
+  var swapindex = upon.a (#.a + m) doswap ;;
+  var current = (#.a + m)  ;;
 
-  var P = fby.a (swap.d.pivoti.(n-1) X) (if swaplower then P else 
-    swap.d.current.upper P fi) ;;
+  var P = fby.a (swap.d.pivoti.(n-1) X) 
+    (if doswap then swap.d.current.swapindex P else P fi) ;;
   
-  var result = if n - m < 2 then X 
-    elsif n - m == 2 then
-      if X @ [d <- m] > X @ [d <- m + 1] then swap.d.m.(m+1) X else X fi
-    else asa.a glued (current == upper)
-    fi ;;
+  var result = if n - m < 2 then X else glued fi ;;
 
-  var partition = swap.d.(n-1).current P ;;
+  var partition = swap.d.(n-1).swapindex P ;;
 
-  var glued = if #.d < current 
+  var glued = if #.d < swapindex 
     then 
-      (quick_sort.d.m.current partition)
+      (quick_sort.d.m.swapindex partition)
     else
-      (quick_sort.d.current.n partition) 
+      (quick_sort.d.(swapindex + 1).n partition) 
     fi ;;
 end ;;
 
@@ -65,18 +62,18 @@ R @ [0 <- 14] ;;
 
 $$%%
 
-//small @ [0 <- 0] ;;
-//small @ [0 <- 1] ;;
-//small @ [0 <- 2] ;;
+small @ [0 <- 0] ;;
+small @ [0 <- 1] ;;
+small @ [0 <- 2] ;;
 
 $$%%
 
-//sorted @ [0 <- 0] ;;
-//sorted @ [0 <- 1] ;;
-//sorted @ [0 <- 2] ;;
-//sorted @ [0 <- 3] ;;
-//sorted @ [0 <- 4] ;;
-//sorted @ [0 <- 5] ;;
+sorted @ [0 <- 0] ;;
+sorted @ [0 <- 1] ;;
+sorted @ [0 <- 2] ;;
+sorted @ [0 <- 3] ;;
+sorted @ [0 <- 4] ;;
+sorted @ [0 <- 5] ;;
 //sorted @ [0 <- 6] ;;
 //sorted @ [0 <- 7] ;;
 //sorted @ [0 <- 8] ;;
