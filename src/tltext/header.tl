@@ -318,7 +318,7 @@ end ;;
 
 fun tournamentOp₁.d.n.g X = Y @ [d <- 0]
 where
-  dim t <- ilog.n ;;
+  dim t <- ilog.(n+1) ;;
   var Y = fby.t X (g!(LofPair.d Y)!(RofPair.d Y)) ;;
 end ;;
 
