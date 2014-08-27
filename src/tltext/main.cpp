@@ -36,7 +36,50 @@ along with TransLucid; see the file COPYING.  If not see
 
 #include "gettext.h"
 
+#include "optionparser.h"
+
 #define _(String) gettext (String)
+
+#if 0
+enum OptionIndex
+{
+  ARGS,
+  CACHE,
+  DEBUG,
+  DEPS,
+  HELP,
+  NO_HEADER,
+  HEADER,
+  INPUT,
+  OUTPUT,
+  TYINF,
+  FULLTYPES,
+  UUID,
+  VERBOSE,
+  VERSION
+};
+
+const option::Descriptor program_args[] =
+{
+  {ARGS,      0, "", "args", option::Arg::None, 
+    "arguments to pass to TransLucid in the CLARGS variable"},
+  {CACHE,     0, "", "cache", option::Arg::None, "use cache"},
+  {DEBUG,     0, "", "debug", option::Arg::None, "debug mode"},
+  {DEPS,      0, "", "deps", option::Arg::None, "compute dependencies"},
+  {HELP,      0, "h", "help", option::Arg::None, "show this message"},
+  {NO_HEADER, 0, "", "no-builtin-header", option::Arg::None,
+    "do not use the standard header"},
+  {HEADER,    0, "", "header", option::Arg::Optional, "load another header"},
+  {INPUT,     0, "i", "input", option::Arg::Optional, "input file"},
+  {OUTPUT,    0, "o", "output", option::Arg::Optional, "output file"},
+  {TYINF,     0, "", "tyinf", option::Arg::None, "enable type inference"},
+  {FULLTYPES, 0, "", "fulltypes", option::Arg::None, 
+    "print full non-display types"},
+  {UUID,      0, "", "uuid", option::Arg::None, "print uuids"},
+  {VERBOSE,   0, "v", "verbose", option::Arg::Optional, "level of verbosity"},
+  {VERSION,   0, "", "version", option::Arg::None, "show version"}
+};
+#endif
 
 namespace po = boost::program_options;
 
@@ -139,6 +182,13 @@ int main(int argc, char *argv[])
 
   //void (*foo)() = nullptr;
   //(*foo)();
+
+  #if 0
+  option::Stats stats(program_args, argc+1, argv+1);
+  option::Option *poptions = new option::Option[stats.options_max];
+  option::Option *buffer = new option::Option[stats.buffer_max];
+  option::Parser parse(program_args, argc+1, argv+1, poptions, buffer);
+  #endif
 
   po::variables_map vm;
   /* TRANSLATORS: the options description name in the help message */
