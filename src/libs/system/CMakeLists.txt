@@ -5,11 +5,12 @@ if (COMMAND cmake_policy)
    cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
 
-add_definitions(${TLCFLAGS} 
+add_definitions(
 #-DSHAREDIR=\\\"${CMAKE_INSTALL_PREFIX}/share/tl\\\"
 -DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"${LOCALEDIR}\"
--DENABLE_NLS
--Wall)
+-DENABLE_NLS)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TLCFLAGS} -Wall")
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/system/)
 

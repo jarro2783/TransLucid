@@ -31,9 +31,10 @@ if (ENABLE_TLWEB)
   endif()
 endif()
 
-add_definitions(${TLCFLAGS} -DTRANSLATE_DOMAIN=\"tltext\" 
-  -DLOCALEDIR=\"${LOCALEDIR}\"
-  -DENABLE_NLS)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TLCFLAGS}")
+
+add_definitions(-DTRANSLATE_DOMAIN=\"tltext\" 
+    -DLOCALEDIR=\"${LOCALEDIR}\" -DENABLE_NLS)
 
 add_test(blackbox ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${TESTPATH})
 add_test(examples ${RUN} ${LIBDIR} ${TESTFILE} ${TLTEXTFILE} ${EXAMPLESPATH})

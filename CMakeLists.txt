@@ -54,9 +54,7 @@ if (HAS_NO_UNUSED_LOCAL)
   set(W_NO_UNUSED_LOCAL -Wno-unused-local-typedefs)
 endif()
 
-set(TLCFLAGS -Wall ${W_NO_UNUSED_LOCAL} -std=c++11 
-  -DPACKAGE_VERSION=\"${VERSION}\"
-  -DHAVE_CONFIG_H)
+set(TLCFLAGS "-Wall ${W_NO_UNUSED_LOCAL} -std=c++11 -DPACKAGE_VERSION=\\\"${VERSION}\\\" -DHAVE_CONFIG_H")
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
 "${CMAKE_INSTALL_PREFIX}/share/tl")
