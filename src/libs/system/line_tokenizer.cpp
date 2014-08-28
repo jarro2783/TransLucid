@@ -95,6 +95,11 @@ LineTokenizer::next()
         throw EndOfInput();
       }
     }
+    //if we have previously reached end of input, return empty
+    else if (m_current == m_end)
+    {
+      throw EndOfInput();
+    }
     else
     {
       //otherwise get going on the next character
