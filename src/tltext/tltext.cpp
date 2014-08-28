@@ -76,6 +76,7 @@ TLText::TLText
  ,m_debug(false)
  ,m_cached(cached)
  ,m_infer(tyinf)
+ ,m_fulltypes(false)
  ,m_is(&std::cin)
  ,m_os(&std::cout)
  ,m_error(&std::cerr)
