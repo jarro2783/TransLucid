@@ -6,7 +6,7 @@ set(BINDIR .)
 
 link_directories(${ICU_LIBRARY_DIRS})
 
-add_definitions(${TLCFLAGS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TLCFLAGS}")
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/system)
 #add_executable(expressions expressions.cpp)
