@@ -26,9 +26,9 @@ where
 
   var glued = if #.d < swapindex 
     then 
-      (quick_sort.d.m.swapindex!(↑ {a} partition))
+      (quick_sort.d.m.swapindex!(↑ partition))
     else
-      (quick_sort.d.(swapindex + 1).n!(↑ {a} partition)) 
+      (quick_sort.d.(swapindex + 1).n!(↑ partition)) 
     fi ;;
 end ;;
 

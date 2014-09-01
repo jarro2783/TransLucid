@@ -293,11 +293,11 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
   if (iter != m_fnScope.end())
   {
     //is it a dimension and are we simplifying the tree?
-    //if (simplified() && m_dimscope.find(unique) != m_dimscope.end())
-    //{
+    if (simplified() && m_dimscope.find(unique) != m_dimscope.end())
+    {
       //std::cerr << unique << " is a dimension" << std::endl;
-    //  return Tree::DimensionExpr(iter->second);
-    //}
+      return Tree::DimensionExpr(iter->second);
+    }
 
     //is it a call by name?
     auto cbniter = m_cbnscope.find(unique);
@@ -320,6 +320,11 @@ SemanticTransform::operator()(const Tree::MakeIntenExpr& e)
 {
   Tree::MakeIntenExpr inten;
   inten.expr = apply_visitor(*this, e.expr);
+
+  for (const auto b : e.binds)
+  {
+    inten.binds.push_back(apply_visitor(*this, b));
+  }
 
   inten.scope.insert(inten.scope.end(), m_scope.begin(), m_scope.end());
 
