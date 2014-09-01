@@ -798,6 +798,10 @@ namespace TransLucid
       typedef std::vector<std::pair<u32string, Expr>> DimensionList;
       DimensionList dims;
 
+      //the tag for wheredim
+      int tagQ;
+      dimension_index psiQ;
+
       //redefinition of Equation because otherwise the definition would be
       //circular
       std::vector

@@ -1780,7 +1780,7 @@ WhereWS::operator()(Context& k)
     {
       //the CHI dimension
       ChiDim chi(index, 
-        std::vector<uint8_t>(k.getRho().begin(), k.getRho().end()));
+        std::vector<ChiDim::type_t>(k.getRho().begin(), k.getRho().end()));
       dimension_index d = m_system.getChiDim(chi);
 
       //std::cerr << "chi dimension: " << chi << " has index " << d << std::endl;
@@ -1819,11 +1819,27 @@ WhereWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
   std::vector<std::pair<dimension_index, Constant>> change;
   size_t maxTime = 0;
 
+  //setup chi depth
+  int depth = 0;
+  if (kappa.has_entry(m_psiQ))
+  {
+    depth = Types::Intmp::get(kappa.lookup(m_psiQ)).get_si();
+  }
+
+  m_chivalue.push_back(depth);
+
+  int index = 0;
   for (auto v : m_dims)
   {
     auto init = (*v.second)(kappa, d, w, t);
 
-    change.push_back(std::make_pair(v.first, init.second));
+    //allocate cached chi dim
+    ChiDim chi(index, m_chivalue);
+    auto dimIndex = m_system.getChiDim(chi);
+
+    change.push_back(std::make_pair(dimIndex, init.second));
+    change.push_back(std::make_pair(v.first, 
+      Types::Dimension::create(dimIndex)));
 
     maxTime = std::max(maxTime, init.first);
 
@@ -1831,12 +1847,19 @@ WhereWS::operator()(Context& kappa, Delta& d, const Thread& w, size_t t)
     {
       Types::Demand::append(init.second, demands);
     }
+
+    ++index;
   }
+
+  //restore chi depth
+  m_chivalue.pop_back();
 
   if (!demands.empty())
   {
     return std::make_pair(maxTime, Types::Demand::create(demands));
   }
+
+  change.push_back(std::make_pair(m_psiQ, Types::Intmp::create(depth + 1)));
 
   ContextPerturber pk(kappa, change);
   DeltaPerturber pd(d);

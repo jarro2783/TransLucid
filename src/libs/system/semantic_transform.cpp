@@ -267,6 +267,8 @@ SemanticTransform::operator()(const Tree::WhereExpr& e)
     m_scope.resize(m_scope.size() - e.dims.size());
   }
 
+  w.tagQ = m_system.nextHiddenDim();
+  w.psiQ = m_system.nextHiddenDim();
   w.e = expr;
 
   //we return the rewritten E and add the variables to the list of variables
@@ -291,11 +293,11 @@ SemanticTransform::operator()(const Tree::IdentExpr& e)
   if (iter != m_fnScope.end())
   {
     //is it a dimension and are we simplifying the tree?
-    if (simplified() && m_dimscope.find(unique) != m_dimscope.end())
-    {
+    //if (simplified() && m_dimscope.find(unique) != m_dimscope.end())
+    //{
       //std::cerr << unique << " is a dimension" << std::endl;
-      return Tree::DimensionExpr(iter->second);
-    }
+    //  return Tree::DimensionExpr(iter->second);
+    //}
 
     //is it a call by name?
     auto cbniter = m_cbnscope.find(unique);

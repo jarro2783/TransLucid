@@ -28,6 +28,7 @@ along with TransLucid; see the file COPYING.  If not see
 
 //#include <tl/ast.hpp>
 #include <tl/builtin_types.hpp>
+#include <tl/chi.hpp>
 #include <tl/system.hpp>
 #include <tl/types/special.hpp>
 #include <tl/workshop.hpp>
@@ -746,15 +747,20 @@ namespace TransLucid
       public:
       WhereWS
       (
+        int tagQ,
+        int psiQ,
         WS* expr,
         std::vector<std::pair<dimension_index, WS*>> dims,
         System& system
       )
-      : m_expr(expr)
+      : m_tag(tagQ)
+      , m_psiQ(psiQ)
+      , m_expr(expr)
       , m_dims(dims)
       , m_system(system)
       , m_simplified(system.simplified())
       {
+        m_chivalue.push_back(m_tag);
       }
 
       Constant
@@ -768,11 +774,16 @@ namespace TransLucid
 
       private:
 
+      int m_tag;
+      dimension_index m_psiQ;
+
       WS* m_expr;
       std::vector<std::pair<dimension_index, WS*>> m_dims;
 
       System& m_system;
       bool m_simplified;
+
+      std::vector<ChiDim::type_t> m_chivalue;
     };
 
     /**

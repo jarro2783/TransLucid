@@ -341,7 +341,7 @@ WorkshopBuilder::operator()(const Tree::WhereExpr& e)
 
   auto expr = apply_visitor(*this, e.e);
 
-  return new Workshops::WhereWS(expr, dims, *m_system);
+  return new Workshops::WhereWS(e.tagQ, e.psiQ, expr, dims, *m_system);
 }
 
 WS* 

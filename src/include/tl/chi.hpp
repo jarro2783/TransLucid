@@ -40,8 +40,9 @@ namespace TransLucid
   class ChiDim
   {
     public:
+    typedef int16_t type_t;
 
-    ChiDim(int which, const std::vector<uint8_t>& stack)
+    ChiDim(int which, const std::vector<type_t>& stack)
     : m_which(which)
     , m_stack(stack)
     {
@@ -69,7 +70,7 @@ namespace TransLucid
     private:
 
     int m_which;
-    std::vector<uint8_t> m_stack;
+    std::vector<type_t> m_stack;
 
     friend
     std::ostream&
