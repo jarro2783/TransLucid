@@ -23,6 +23,8 @@ set(VERSION "0.4.0")
 set(builddir ${CMAKE_BINARY_DIR}/doc)
 set(abs_top_srcdir ${CMAKE_SOURCE_DIR})
 
+set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE TRUE)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 include(GettextTranslate)
 
@@ -92,7 +94,8 @@ if (DOT STREQUAL "DOT-NOTFOUND")
   message(WARNING "documentation will be built without graphs")
 endif()
 
-INCLUDE_DIRECTORIES(src/include ${CMAKE_BINARY_DIR})
+#INCLUDE_DIRECTORIES(BEFORE src/include ${CMAKE_BINARY_DIR})
+set(CMAKE_CXX_FLAGS "-I${CMAKE_SOURCE_DIR}/src/include -I${CMAKE_BINARY_DIR} ${CMAKE_CXX_FLAGS}")
 
 set(PREFIX \"${CMAKE_INSTALL_PREFIX}\")
 set(HEADERDIR \"${CMAKE_INSTALL_PREFIX}/share/tl/tltext\")

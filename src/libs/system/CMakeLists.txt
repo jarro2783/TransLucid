@@ -10,9 +10,8 @@ add_definitions(
 -DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"${LOCALEDIR}\"
 -DENABLE_NLS)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TLCFLAGS} -Wall")
-
-include_directories(${CMAKE_SOURCE_DIR}/src/libs/system/)
+include_directories(BEFORE ${CMAKE_SOURCE_DIR}/src/libs/system/)
+set(CMAKE_CXX_FLAGS "${TLCFLAGS} -Wall ${CMAKE_CXX_FLAGS}")
 
 add_custom_target(generate_static_lexer DEPENDS 
   ${CMAKE_CURRENT_SOURCE_DIR}/lex/static_lexer.hpp)
