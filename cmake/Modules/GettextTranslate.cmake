@@ -58,13 +58,17 @@
 #
 # if you want update-gmo to be added to the "all" target, then define the
 # variable GettextTranslate_ALL before including this file
+#
+# by default, the gmo files are built in the source directory. If you want
+# them to be built in the binary directory, then define the variable
+# GettextTranslate_GMO_BINARY
 
 
 
 # add the update-po and update-gmo targets, the actual files that need to
 # depend on this will be added as we go
 
-if (DEFINED ${GettextTranslate_ALL})
+if (DEFINED GettextTranslate_ALL)
   set(_addToALL "ALL")
 endif()
 
@@ -121,6 +125,12 @@ mark_as_advanced(
 
 macro(GettextTranslate)
 
+  if(GettextTranslate_GMO_BINARY)
+    set (GMO_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+  else()
+    set (GMO_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+  endif()
+
   if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in)
     message(FATAL_ERROR "There is no POTFILES.in in
     ${CMAKE_CURRENT_SOURCE_DIR}")
@@ -151,8 +161,8 @@ macro(GettextTranslate)
   )
 
   #set the directory to not clean
-  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    PROPERTY CLEAN_NO_CUSTOM true)
+  #set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  #  PROPERTY CLEAN_NO_CUSTOM true)
 
   file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/POTFILES.in potfiles
     REGEX "^[^#].*"
@@ -165,7 +175,6 @@ macro(GettextTranslate)
 
   set(TEMPLATE_FILE ${MAKEVAR_DOMAIN}.pot)
   set(TEMPLATE_FILE_ABS ${CMAKE_CURRENT_SOURCE_DIR}/${TEMPLATE_FILE})
-
   string(REGEX MATCHALL "[^ ]+" XGETTEXT_OPTS ${MAKEVAR_XGETTEXT_OPTIONS})
   #add_custom_target(${MAKEVAR_DOMAIN}.pot-update DEPENDS
   #  ${TEMPLATE_FILE_ABS}
@@ -211,7 +220,7 @@ macro(GettextTranslate)
 
   foreach(lang ${languages})
     set(PO_FILE_NAME "${CMAKE_CURRENT_SOURCE_DIR}/${lang}.po")
-    set(GMO_FILE_NAME "${CMAKE_CURRENT_SOURCE_DIR}/${lang}.gmo")
+    set(GMO_FILE_NAME "${GMO_BUILD_DIR}/${lang}.gmo")
     set(PO_TARGET "generate-${MAKEVAR_DOMAIN}-${lang}-po")
     set(GMO_TARGET "generate-${MAKEVAR_DOMAIN}-${lang}-gmo")
     list(APPEND po_files ${PO_TARGET})
@@ -226,7 +235,7 @@ macro(GettextTranslate)
       )
 
       #generate the en@quot files
-      add_custom_command(OUTPUT ${PO_FILE_NAME}
+      add_custom_target(${PO_TARGET}
         COMMAND
         ${GettextTranslate_MSGINIT_EXECUTABLE} -i ${TEMPLATE_FILE_ABS} 
         --no-translator -l ${lang} 
@@ -243,28 +252,23 @@ macro(GettextTranslate)
 
     else()
 
-      add_custom_command(OUTPUT ${PO_FILE_NAME}
+      add_custom_target(${PO_TARGET}
         COMMAND ${GettextTranslate_MSGMERGE_EXECUTABLE} --lang=${lang}
           ${PO_FILE_NAME} ${TEMPLATE_FILE_ABS} 
           -o ${PO_FILE_NAME}.new
         COMMAND mv ${PO_FILE_NAME}.new ${PO_FILE_NAME}
-        #there seems to be a race making multiple *.pot, neither of these
-        #makes a difference, although the first doesn't update my language
-        #files anymore
-        #DEPENDS ${MAKEVAR_DOMAIN}.pot-update
         DEPENDS ${TEMPLATE_FILE_ABS}
       )
 
     endif()
 
-    add_custom_command(OUTPUT ${GMO_FILE_NAME}
+    add_custom_target(${GMO_TARGET}
       COMMAND ${GettextTranslate_MSGFMT_EXECUTABLE} -c --statistics --verbose 
         -o ${GMO_FILE_NAME} ${PO_FILE_NAME}
-        DEPENDS ${PO_FILE_NAME}
+        DEPENDS ${PO_TARGET}
     )
-    add_custom_target(${GMO_TARGET} DEPENDS ${GMO_FILE_NAME})
 
-    add_custom_target(${PO_TARGET} DEPENDS ${PO_FILE_NAME})
+    add_dependencies(${PO_TARGET} ${MAKEVAR_DOMAIN}.pot-update)
 
     install(FILES ${GMO_FILE_NAME} DESTINATION
       ${LOCALEDIR}/${lang}/LC_MESSAGES
