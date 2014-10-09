@@ -12,8 +12,7 @@ where
   var F = fby.d z if B then f!F!X else F fi ;;
 end ;;
 
-fun pow_by_square.x.n = //inresult @ [d <- 0]
-  asa.d result (divs == 0)
+fun pow_by_square.x.n = asa.d result (divs == 0)
 where
   dim d <- 0 ;;
   var P = fby.d x (P*P) ;;
