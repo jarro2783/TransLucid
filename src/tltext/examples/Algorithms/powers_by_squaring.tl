@@ -1,3 +1,12 @@
+// this computes powers by the squaring method
+// there are three arrays used:
+//
+// P      = <x, x², x⁴, x⁸, ...>
+// divs   = <n, n/2, n/4, n/8, ...>
+// result = fold P whenever divs % 2 != 0
+//
+// the answer is just result as soon as divs is zero
+
 fun fold_wvr.d.f.z X B = F
 where
   var F = fby.d z if B then f!F!X else F fi ;;
