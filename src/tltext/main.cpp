@@ -26,7 +26,6 @@ along with TransLucid; see the file COPYING.  If not see
 #include "config.h"
 #endif
 
-#include <boost/program_options.hpp>
 #include <iostream>
 #include "tltext.hpp"
 #include <fstream>
@@ -35,10 +34,9 @@ along with TransLucid; see the file COPYING.  If not see
 #include <tl/output.hpp>
 
 #include "gettext.h"
+#include "cxxopts.hpp"
 
 #define _(String) gettext (String)
-
-namespace po = boost::program_options;
 
 namespace
 {
@@ -140,37 +138,30 @@ int main(int argc, char *argv[])
   //void (*foo)() = nullptr;
   //(*foo)();
 
-  #if 0
-  option::Stats stats(program_args, argc+1, argv+1);
-  option::Option *poptions = new option::Option[stats.options_max];
-  option::Option *buffer = new option::Option[stats.buffer_max];
-  option::Parser parse(program_args, argc+1, argv+1, poptions, buffer);
-  #endif
-
-  po::variables_map vm;
-  /* TRANSLATORS: the options description name in the help message */
-  po::options_description desc(_("tltext options"));
-  desc.add_options()
+  cxxopts::Options options(argv[0]);
+  options.add_options()
     ("args", 
-      po::value<std::vector<std::string>>()->multitoken(),
       /* TRANSLATORS: the help message for --args */
-      _("arguments to pass to TransLucid in the CLARGS variable"))
+      _("arguments to pass to TransLucid in the CLARGS variable"),
+      cxxopts::value<std::vector<std::string>>()
+      )
     /* TRANSLATORS: the help message for --cache */
     ("cache", _("use cache, no testing is done to check if this is valid"))
     /* TRANSLATORS: the help message for --debug */
-    ("debug,d", _("debug mode"))
+    ("d,debug", _("debug mode"))
     /* TRANSLATORS: the help message for --deps */
     ("deps", _("compute dependencies"))
     /* TRANSLATORS: the help message for --help */
-    ("help,h", _("show this message"))
+    ("h,help", _("show this message"))
     /* TRANSLATORS: the help message for --no-builtin-header */
     ("no-builtin-header", _("don't use the standard header"))
     /* TRANSLATORS: the help message for --header */
-    ("header", po::value<std::vector<std::string>>(), _("load another header"))
+    ("header", _("load another header"), 
+      cxxopts::value<std::vector<std::string>>())
     /* TRANSLATORS: the help message for --input */
-    ("input,i", po::value<std::string>(), _("input file"))
+    ("i,input", _("input file"), cxxopts::value<std::string>())
     /* TRANSLATORS: the help message for --output */
-    ("output,o", po::value<std::string>(), _("output file"))
+    ("o,output", _("output file"), cxxopts::value<std::string>())
     /* TRANSLATORS: the help message for --tyinf */
     ("tyinf", _("enable type inference"))
     /* TRANSLATORS: the help message for --full-types */
@@ -178,43 +169,31 @@ int main(int argc, char *argv[])
     /* TRANSLATORS: the help message for --uuid */
     ("uuid", _("print uuids"))
     /* TRANSLATORS: the help message for --verbose */
-    ("verbose,v", po::value<int>(), _("level of verbosity"))
+    ("v,verbose", _("level of verbosity"), cxxopts::value<int>())
     /* TRANSLATORS: the help message for --version */
     ("version", _("show version"))
   ;
 
-  std::vector<po::basic_option<char>> options;
-
   try
   {
-    po::basic_parsed_options<char> parsed = po::command_line_parser(argc, argv).
-      options(desc).allow_unregistered().run();
-    po::notify(vm);
-
-    po::store(parsed, vm);
-
-    std::vector<std::string> extra_options = 
-      po::collect_unrecognized(parsed.options, po::exclude_positional);
-
-
-    options = parsed.options;
+    options.parse(argc, argv);
   }
   catch (std::exception& e)
   {
     std::cerr << "error parsing command line arguments: " << 
       e.what() << std::endl;
-    std::cerr << desc << std::endl;
+    std::cerr << options.help() << std::endl;
 
     return -1;
   }
 
-  if (vm.count("help"))
+  if (options.count("help"))
   {
-    std::cerr << desc << std::endl;
+    std::cerr << options.help() << std::endl;
     return 0;
   }
 
-  if (vm.count("version"))
+  if (options.count("version"))
   {
     std::cerr << "tltext " << PACKAGE_VERSION << std::endl;
     return 0;
@@ -225,18 +204,20 @@ int main(int argc, char *argv[])
     bool tyinf = false;
     bool cached = false;
 
-    if (vm.count("cache"))
+    if (options.count("cache"))
     {
       cached = true;
     }
 
-    if (vm.count("tyinf"))
+    if (options.count("tyinf"))
     {
       tyinf = true;
     }
 
     TransLucid::TLText::TLText tltext(argv[0], "TLtext...", cached, tyinf);
  
+    //TODO fix this and sort out CLARGS
+    #if 0
     for (const auto& s : options)
     {
       if (s.unregistered)
@@ -253,53 +234,54 @@ int main(int argc, char *argv[])
         }
       }
     }
+    #endif
 
-    if (vm.count("verbose"))
+    if (options.count("verbose"))
     {
-      tltext.verbose(vm["verbose"].as<int>());
+      tltext.verbose(options["verbose"].as<int>());
     }
 
-    if (vm.count("debug"))
+    if (options.count("debug"))
     {
       tltext.debug();
     }
 
-    if (vm.count("fulltypes"))
+    if (options.count("fulltypes"))
     {
       tltext.print_full_types(true);
     }
 
-    if (vm.count("uuid"))
+    if (options.count("uuid"))
     {
       tltext.uuids(true);
     }
 
-    if (vm.count("deps"))
+    if (options.count("deps"))
     {
       tltext.compute_deps();
     }
 
     std::unique_ptr<std::ifstream> input;
-    if (vm.count("input"))
+    if (options.count("input"))
     {
-      std::string inputName = vm["input"].as<std::string>();
+      std::string inputName = options["input"].as<std::string>();
       input = openInput(inputName);
       tltext.set_input(input.get(), inputName);
     }
 
     std::unique_ptr<std::ofstream> output;
-    if (vm.count("output"))
+    if (options.count("output"))
     {
-      output = openOutput(vm["output"].as<std::string>());
+      output = openOutput(options["output"].as<std::string>());
       tltext.set_output(output.get());
     }
 
-    if (vm.count("args"))
+    if (options.count("args"))
     {
-      tltext.set_clargs(vm["args"].as<std::vector<std::string>>());
+      tltext.set_clargs(options["args"].as<std::vector<std::string>>());
     }
     
-    if (vm.count("no-builtin-header") == 0)
+    if (options.count("no-builtin-header") == 0)
     {
       if (tyinf)
       {
@@ -311,9 +293,9 @@ int main(int argc, char *argv[])
       }
     }
 
-    if (vm.count("header") > 0)
+    if (options.count("header") > 0)
     {
-      std::vector<std::string> headers = vm["header"].
+      std::vector<std::string> headers = options["header"].
         as<std::vector<std::string>>();
 
       for (const auto& header : headers)

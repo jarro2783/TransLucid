@@ -61,16 +61,6 @@ set(TLCFLAGS "-Wall ${W_NO_UNUSED_LOCAL} -std=c++11 -DPACKAGE_VERSION=\\\"${VERS
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
 "${CMAKE_INSTALL_PREFIX}/share/tl")
 
-set (Boost_USE_STATIC_LIBS OFF)
-set (Boost_ADDITIONAL_VERSIONS 1.46.1 1.46.0 1.47.0 1.48.0 1.49.0)
-set (Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options)
-
-if (Boost_FOUND)
-   include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
-
 pkg_check_modules(ICU REQUIRED icu-uc)
 if (NOT ICU_FOUND)
   message(FATAL_ERROR "ICU not found")

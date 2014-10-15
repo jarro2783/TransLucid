@@ -15,9 +15,8 @@ if(COMMAND cmake_policy)
    cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-link_directories(${Boost_LIBRARY_DIRS})
 add_executable(tltext main.cpp tltext.cpp demandhd.cpp)
-target_link_libraries(tltext tlsystem ${Boost_LIBRARIES})
+target_link_libraries(tltext tlsystem)
 
 add_executable(matrixweb matrixweb.cpp)
 
