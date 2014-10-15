@@ -64,8 +64,10 @@
       #error
     #endif
 
-    #if __GNUC_MINOR__ < REQUIRED_MINOR
-      #error
+    #if __GNUC__ == REQUIRED_MAJOR
+      #if __GNUC_MINOR__ < REQUIRED_MINOR
+        #error
+      #endif
     #endif
 
   #endif
