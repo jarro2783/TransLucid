@@ -27,7 +27,7 @@ libtlsystem_la_LDFLAGS = \
   $(TL_LDFLAGS)
 libtlsystem_la_LIBADD = \
   -lgmpxx -lgmp \
-  -lltdl $(TL_LIBS) $(BOOST_LDFLAGS)
+  -lltdl $(TL_LIBS)
 
 libtlsystem_la_SOURCES = \
   assignment.cpp ast.cpp bestfit.cpp builtin_types.cpp \
@@ -48,7 +48,7 @@ libtlsystem_la_SOURCES = \
 
 libtlsystem_la_CPPFLAGS = \
   -I$(top_srcdir)/src/include \
-  -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) \
+  -DPKGLIBDIR=\"$(pkglibdir)\" -Wall $(TL_CFLAGS) \
   -DTRANSLATE_DOMAIN=\"libtl\" -DLOCALEDIR=\"$(localedir)\"
 
 systemdatadir = $(pkgdatadir)

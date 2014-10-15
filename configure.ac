@@ -96,9 +96,6 @@ AC_MSG_RESULT([yes])
 
 # Checks for libraries.
 
-AX_BOOST_BASE([1.46])
-AX_BOOST_PROGRAM_OPTIONS
-
 PKG_PROG_PKG_CONFIG([0.26])
 
 # check for libraries statically

@@ -7,14 +7,14 @@ if WANT_TLWEB
 endif
 
 TLTEXT_LIBS = $(top_builddir)/src/libs/system/libtlsystem.la \
-$(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) -lgmp
+-lgmp
 
 tltext_LDFLAGS = $(TL_LDFLAGS) -export-dynamic
 tltext_LDADD = $(TLTEXT_LIBS)
 
 tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DSHAREDIR=\"$(pkgdatadir)\" -DPREFIX=\"$(prefix)\" \
--Wall $(BOOST_CPPFLAGS) $(TL_CFLAGS) -DLOCALEDIR=\"$(localedir)\" \
+-Wall $(TL_CFLAGS) -DLOCALEDIR=\"$(localedir)\" \
 -DTRANSLATE_DOMAIN=\"tltext\"
 
 if TLWEB_STATIC
