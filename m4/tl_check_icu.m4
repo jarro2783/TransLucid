@@ -10,6 +10,24 @@ AC_DEFUN([TL_CHECK_ICU_HELPER], [
   [$1])
 
   if test "x$ICU_FOUND" = "xno"; then
+    AC_CHECK_LIB([icuuc], [u_isprint_54], ICU_FOUND=yes,
+    ,
+    [$1])
+  fi
+
+  if test "x$ICU_FOUND" = "xno"; then
+    AC_CHECK_LIB([icuuc], [u_isprint_53], ICU_FOUND=yes,
+    ,
+    [$1])
+  fi
+
+  if test "x$ICU_FOUND" = "xno"; then
+    AC_CHECK_LIB([icuuc], [u_isprint_52], ICU_FOUND=yes,
+    ,
+    [$1])
+  fi
+
+  if test "x$ICU_FOUND" = "xno"; then
     AC_CHECK_LIB([icuuc], [u_isprint_51], ICU_FOUND=yes,
     ,
     [$1])
