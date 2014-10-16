@@ -18,7 +18,7 @@ tltext_CPPFLAGS = -I$(top_srcdir)/src/include \
 -DTRANSLATE_DOMAIN=\"tltext\"
 
 if TLWEB_STATIC
-  TLWEB_STATIC_FLAGS = -all-static
+  TLWEB_STATIC_FLAGS = -all-static -pthread
   matrixweb_LDFLAGS=-all-static
 endif
 
